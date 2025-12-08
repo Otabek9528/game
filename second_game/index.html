@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4ECDC4">
+    <meta name="description" content="Find and drag numbers in sequence. Educational game for toddlers ages 2-4.">
+    <title>Find the Number - Count & Learn</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="show-dots guided-mode">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-icon">🎯</div>
+            <h1 class="loading-title">Find the Number</h1>
+            <p class="loading-subtitle">Getting ready...</p>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div id="gameContainer" class="game-container hidden">
+        
+        <!-- Header -->
+        <div class="game-header">
+            <a href="../index.html" class="back-btn" aria-label="Back to menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </a>
+            <div class="header-title">Find the Number</div>
+            <button id="settingsBtn" class="settings-btn" aria-label="Settings">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Instruction -->
+        <div class="instruction-area">
+            <p class="instruction-text" id="instructionText">Find and drag number <span class="target-number">1</span> to the box!</p>
+        </div>
+
+        <!-- Target Drop Zone -->
+        <div class="target-area">
+            <div class="drop-zone" id="dropZone">
+                <span class="drop-placeholder">?</span>
+                <span class="drop-number hidden"></span>
+            </div>
+            <div class="dots-display" id="dotsDisplay"></div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+            <div class="progress-label"><span id="currentProgress">0</span> / <span id="totalProgress">10</span></div>
+        </div>
+
+        <!-- Numbers Field -->
+        <div class="numbers-field" id="numbersField">
+            <!-- Draggable numbers will be generated here -->
+        </div>
+    </div>
+
+    <!-- Celebration Overlay -->
+    <div id="celebrationOverlay" class="celebration-overlay hidden">
+        <canvas id="celebrationCanvas"></canvas>
+        <div class="celebration-message">
+            <div class="celebration-emoji">🎉</div>
+            <div class="celebration-text">Amazing!</div>
+            <div class="accuracy-display"></div>
+            <button class="next-level-btn">Play Again!</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Difficulty Level -->
+                <div class="setting-group">
+                    <label class="setting-label">Difficulty</label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" data-level="easy">
+                            <span class="difficulty-emoji">🌱</span>
+                            <span>1 to 3</span>
+                            <small>Ages 2</small>
+                        </button>
+                        <button class="difficulty-btn active" data-level="medium">
+                            <span class="difficulty-emoji">🌿</span>
+                            <span>1 to 5</span>
+                            <small>Ages 2-3</small>
+                        </button>
+                        <button class="difficulty-btn" data-level="hard">
+                            <span class="difficulty-emoji">🌳</span>
+                            <span>1 to 10</span>
+                            <small>Ages 3-4</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Learning Aids -->
+                <div class="setting-group">
+                    <label class="setting-label">Learning Aids</label>
+                    <div class="toggle-group">
+                        <div class="toggle-item">
+                            <span>Show Quantity Dots</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="dotsToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Highlight Target</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="guidedToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sound Settings -->
+                <div class="setting-group">
+                    <label class="setting-label">Sound & Voice</label>
+                    <div class="toggle-group">
+                        <div class="toggle-item">
+                            <span>Sound Effects</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="soundToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Voice Narration</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="voiceToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accessibility -->
+                <div class="setting-group">
+                    <label class="setting-label">Accessibility</label>
+                    <div class="toggle-group">
+                        <div class="toggle-item">
+                            <span>High Contrast</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="contrastToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Extra Large Mode</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="largeToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Stats -->
+                <div class="setting-group">
+                    <label class="setting-label">Progress</label>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalRounds">0</div>
+                            <div class="stat-label">Rounds</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalTime">0m</div>
+                            <div class="stat-label">Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="overallAccuracy">100%</div>
+                            <div class="stat-label">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="reset-btn" id="resetProgress">Reset Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
