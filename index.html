@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FFE66D">
+    <meta name="description" content="Ad-free educational counting game for toddlers ages 1-4">
+    <title>Count & Learn - Educational Game for Toddlers</title>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Count & Learn">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h1 class="loading-title">Count & Learn</h1>
+            <p class="loading-subtitle">Getting ready to count...</p>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div id="gameContainer" class="game-container hidden">
+        
+        <!-- Settings Button (Parent Access) -->
+        <button id="settingsBtn" class="settings-btn" aria-label="Settings">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6m0-18a2 2 0 0 0-2 2v.09A5.002 5.002 0 0 0 7 12a5.002 5.002 0 0 0 3 4.91V17a2 2 0 0 0 2 2a2 2 0 0 0 2-2v-.09A5.002 5.002 0 0 0 17 12a5.002 5.002 0 0 0-3-4.91V3a2 2 0 0 0-2-2z"></path>
+            </svg>
+        </button>
+
+        <!-- Number Display (Large, Central) -->
+        <div id="numberDisplay" class="number-display">
+            <div class="number-value">0</div>
+            <div class="number-label">Let's Count!</div>
+        </div>
+
+        <!-- Counting Objects Grid -->
+        <div id="objectsGrid" class="objects-grid">
+            <!-- Objects will be dynamically inserted here -->
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <!-- Theme Selector (Bottom) -->
+        <div id="themeSelector" class="theme-selector">
+            <button class="theme-btn active" data-theme="farm">🐄</button>
+            <button class="theme-btn" data-theme="ocean">🐠</button>
+            <button class="theme-btn" data-theme="forest">🦊</button>
+            <button class="theme-btn" data-theme="vehicles">🚗</button>
+            <button class="theme-btn" data-theme="fruits">🍎</button>
+            <button class="theme-btn" data-theme="party">🎈</button>
+        </div>
+    </div>
+
+    <!-- Celebration Overlay -->
+    <div id="celebrationOverlay" class="celebration-overlay hidden">
+        <canvas id="celebrationCanvas"></canvas>
+        <div class="celebration-message">
+            <div class="celebration-emoji">🎉</div>
+            <div class="celebration-text">Amazing!</div>
+            <button class="next-level-btn">Count More!</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Parent Settings</h2>
+                <button class="close-modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Difficulty Level -->
+                <div class="setting-group">
+                    <label class="setting-label">Counting Level</label>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" data-level="easy">
+                            <span class="difficulty-emoji">🌱</span>
+                            <span>Count to 3</span>
+                            <small>Ages 1-2</small>
+                        </button>
+                        <button class="difficulty-btn active" data-level="medium">
+                            <span class="difficulty-emoji">🌿</span>
+                            <span>Count to 5</span>
+                            <small>Ages 2-3</small>
+                        </button>
+                        <button class="difficulty-btn" data-level="hard">
+                            <span class="difficulty-emoji">🌳</span>
+                            <span>Count to 10</span>
+                            <small>Ages 3-4</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sound Settings -->
+                <div class="setting-group">
+                    <label class="setting-label">Sound & Voice</label>
+                    <div class="toggle-group">
+                        <div class="toggle-item">
+                            <span>Sound Effects</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="soundToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Voice Narration</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="voiceToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Background Music</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="musicToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accessibility -->
+                <div class="setting-group">
+                    <label class="setting-label">Accessibility</label>
+                    <div class="toggle-group">
+                        <div class="toggle-item">
+                            <span>High Contrast</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="contrastToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Extra Large Mode</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="largeToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Slow Animations</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="slowToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Stats -->
+                <div class="setting-group">
+                    <label class="setting-label">Progress</label>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalCounts">0</div>
+                            <div class="stat-label">Total Counts</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="sessionTime">0m</div>
+                            <div class="stat-label">Time Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="masteredNumbers">0</div>
+                            <div class="stat-label">Numbers Mastered</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset Button -->
+                <button class="reset-btn" id="resetProgress">Reset Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements (Preloaded) -->
+    <audio id="audioPlayer" preload="auto"></audio>
+    <audio id="bgMusic" loop preload="auto"></audio>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
