@@ -95,23 +95,96 @@ class AudioManager {
     playPickup() { this.playTone(600, 0.05); }
     playCelebrate() { [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => setTimeout(() => this.playTone(f, 0.2), i * 100)); }
 
-    playNumberSound(num) { if (!GameState.soundEnabled) return; const baseFreq = 350 + (num * 80); this.playTone(baseFreq, 0.15); setTimeout(() => this.playTone(baseFreq * 1.25, 0.12), 100); }
+    playNumberSound(num) { 
+        if (!GameState.soundEnabled) return; 
+        const baseFreq = 350 + (num * 80); 
+        this.playTone(baseFreq, 0.15); 
+        setTimeout(() => this.playTone(baseFreq * 1.25, 0.12), 100); 
+    }
 
-    speak(text) {
+    // Play "find number X" sound pattern
+    playFindNumberSound(num) {
+        if (!GameState.soundEnabled) return;
+        // Three-tone pattern: attention + "find" + number tone
+        this.playTone(500, 0.1); // Attention
+        setTimeout(() => this.playTone(400, 0.1), 120); // "Find"
+        setTimeout(() => {
+            const baseFreq = 350 + (num * 80);
+            this.playTone(baseFreq, 0.2);
+            setTimeout(() => this.playTone(baseFreq * 1.25, 0.15), 100);
+        }, 250);
+    }
+
+    // Play celebration/completion sound pattern  
+    playCompletionSound() {
+        if (!GameState.soundEnabled) return;
+        [400, 500, 600, 800].forEach((f, i) => setTimeout(() => this.playTone(f, 0.15), i * 100));
+    }
+
+    speak(text, type = 'general') {
         if (!GameState.voiceEnabled) return;
+        
+        // Extract number from text for fallback
+        const numMatch = text.match(/\d+/);
+        const num = numMatch ? parseInt(numMatch[0]) : null;
+        
+        // Try speech synthesis
         if (window.speechSynthesis) {
             try {
                 speechSynthesis.cancel();
                 const utt = new SpeechSynthesisUtterance(text);
                 utt.rate = 0.85; utt.pitch = 1.1; utt.volume = 0.9;
-                if (this.voicesLoaded) { const voice = speechSynthesis.getVoices().find(v => v.lang.startsWith('en')); if (voice) utt.voice = voice; }
-                utt.onerror = () => { const num = parseInt(text); if (!isNaN(num)) this.playNumberSound(num); };
+                
+                if (this.voicesLoaded) { 
+                    const voice = speechSynthesis.getVoices().find(v => v.lang.startsWith('en')); 
+                    if (voice) utt.voice = voice; 
+                }
+                
+                // Track if speech actually starts
+                let speechStarted = false;
+                utt.onstart = () => { speechStarted = true; };
+                
+                utt.onerror = () => { 
+                    this.playFallbackSound(type, num);
+                };
+                
+                utt.onend = () => {
+                    // If speech ended immediately without starting, it failed silently
+                    if (!speechStarted) this.playFallbackSound(type, num);
+                };
+                
                 speechSynthesis.speak(utt);
-            } catch (e) { const num = parseInt(text); if (!isNaN(num)) this.playNumberSound(num); }
-        } else { const num = parseInt(text); if (!isNaN(num)) this.playNumberSound(num); }
+                
+                // Telegram WebView often fails silently - check after delay
+                setTimeout(() => {
+                    if (!speechStarted && !speechSynthesis.speaking) {
+                        this.playFallbackSound(type, num);
+                    }
+                }, 300);
+                
+            } catch (e) { 
+                this.playFallbackSound(type, num);
+            }
+        } else { 
+            this.playFallbackSound(type, num);
+        }
     }
 
-    speakNumber(num) { this.speak(num.toString()); }
+    playFallbackSound(type, num) {
+        if (type === 'findNumber' && num) {
+            this.playFindNumberSound(num);
+        } else if (type === 'number' && num) {
+            this.playNumberSound(num);
+        } else if (type === 'completion') {
+            this.playCompletionSound();
+        } else if (num) {
+            this.playNumberSound(num);
+        }
+    }
+
+    speakNumber(num) { this.speak(num.toString(), 'number'); }
+    speakFindNumber(num) { this.speak(`Find number ${num}!`, 'findNumber'); }
+    speakCompletion(text) { this.speak(text, 'completion'); }
 }
 
 class CelebrationSystem {
@@ -277,7 +350,7 @@ class GameController {
         this.roundStats = { correct: 0, incorrect: 0 }; this.numberElements = [];
         this.elements.totalProgress.textContent = GameState.maxNumber;
         this.updateProgress(); this.updateInstruction(); this.updateDots(); this.resetDropZone(); this.generateNumbers();
-        setTimeout(() => this.audio.speak('Find number 1!'), 400);
+        setTimeout(() => this.audio.speakFindNumber(1), 400);
     }
 
     generateNumbers() {
@@ -338,7 +411,7 @@ class GameController {
         this.elements.instructionText.innerHTML = `<span style="color:#6BCF7F">${ENCOURAGEMENT.correct[Math.floor(Math.random() * ENCOURAGEMENT.correct.length)]}</span>`;
         GameState.currentTarget++;
         if (GameState.currentTarget > GameState.maxNumber) setTimeout(() => this.completeRound(), 600);
-        else setTimeout(() => { this.resetDropZone(); this.updateInstruction(); this.updateProgress(); this.updateTargetHighlight(); this.audio.speak(`Find number ${GameState.currentTarget}!`); }, 800);
+        else setTimeout(() => { this.resetDropZone(); this.updateInstruction(); this.updateProgress(); this.updateTargetHighlight(); this.audio.speakFindNumber(GameState.currentTarget); }, 800);
     }
 
     handleIncorrectDrop(element, number, dragClone) {
@@ -348,7 +421,8 @@ class GameController {
         this.elements.dropZone.classList.add('wrong'); setTimeout(() => this.elements.dropZone.classList.remove('wrong'), 400);
         this.audio.playIncorrect(); this.telegram.haptic('error');
         this.elements.instructionText.innerHTML = `That's ${number}. ${ENCOURAGEMENT.tryAgain[Math.floor(Math.random() * ENCOURAGEMENT.tryAgain.length)]} Find <span class="target-number">${GameState.currentTarget}</span>!`;
-        this.audio.speak(`That's ${number}. Find number ${GameState.currentTarget}!`);
+        // Play "wrong" feedback then instruction
+        setTimeout(() => this.audio.speakFindNumber(GameState.currentTarget), 200);
     }
 
     resetDropZone() { this.elements.dropPlaceholder.classList.remove('hidden'); this.elements.dropNumber.classList.add('hidden'); this.elements.dropZone.classList.remove('correct', 'wrong'); }
@@ -367,7 +441,7 @@ class GameController {
         document.querySelector('.accuracy-display').textContent = `Accuracy: ${accuracy}%`;
         this.elements.celebrationOverlay.classList.remove('hidden');
         this.celebration.celebrate(Math.min(5, Math.floor(accuracy / 20)));
-        this.audio.playCelebrate(); this.telegram.haptic('success'); this.audio.speak(msg); GameState.save();
+        this.audio.playCelebrate(); this.telegram.haptic('success'); this.audio.speakCompletion(msg); GameState.save();
     }
 
     openSettings() {
