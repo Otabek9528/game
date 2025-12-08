@@ -77,114 +77,86 @@ class AudioManager {
         } catch (e) {}
     }
 
-    playTone(freq, dur, type = 'sine') {
+    resume() {
+        if (this.context?.state === 'suspended') this.context.resume();
+    }
+
+    playTone(freq, dur, type = 'sine', delay = 0) {
         if (!this.context || !GameState.soundEnabled) return;
         try {
-            if (this.context.state === 'suspended') this.context.resume();
+            this.resume();
+            const startTime = this.context.currentTime + delay;
             const osc = this.context.createOscillator(), gain = this.context.createGain();
             osc.connect(gain); gain.connect(this.context.destination);
             osc.type = type; osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.25, this.context.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + dur);
-            osc.start(this.context.currentTime); osc.stop(this.context.currentTime + dur);
+            gain.gain.setValueAtTime(0.3, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + dur);
+            osc.start(startTime); osc.stop(startTime + dur);
         } catch (e) {}
     }
 
-    playCorrect() { this.playTone(523.25, 0.12); setTimeout(() => this.playTone(659.25, 0.12), 80); setTimeout(() => this.playTone(783.99, 0.15), 160); }
+    playCorrect() { 
+        this.playTone(523.25, 0.12); 
+        this.playTone(659.25, 0.12, 'sine', 0.08); 
+        this.playTone(783.99, 0.15, 'sine', 0.16); 
+    }
+    
     playIncorrect() { this.playTone(200, 0.25, 'square'); }
-    playPickup() { this.playTone(600, 0.05); }
-    playCelebrate() { [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => setTimeout(() => this.playTone(f, 0.2), i * 100)); }
-
-    playNumberSound(num) { 
-        if (!GameState.soundEnabled) return; 
-        const baseFreq = 350 + (num * 80); 
-        this.playTone(baseFreq, 0.15); 
-        setTimeout(() => this.playTone(baseFreq * 1.25, 0.12), 100); 
+    playPickup() { this.playTone(600, 0.06); }
+    playCelebrate() { 
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => this.playTone(f, 0.2, 'sine', i * 0.1)); 
     }
 
-    // Play "find number X" sound pattern
-    playFindNumberSound(num) {
+    // Distinct melody for each number (1-10)
+    playNumberMelody(num) {
         if (!GameState.soundEnabled) return;
-        // Three-tone pattern: attention + "find" + number tone
-        this.playTone(500, 0.1); // Attention
-        setTimeout(() => this.playTone(400, 0.1), 120); // "Find"
-        setTimeout(() => {
-            const baseFreq = 350 + (num * 80);
-            this.playTone(baseFreq, 0.2);
-            setTimeout(() => this.playTone(baseFreq * 1.25, 0.15), 100);
-        }, 250);
+        const baseFreq = 300 + (num * 60);
+        this.playTone(baseFreq, 0.18);
+        this.playTone(baseFreq * 1.2, 0.15, 'sine', 0.12);
     }
 
-    // Play celebration/completion sound pattern  
-    playCompletionSound() {
+    // "Find number X" - attention pattern + number melody
+    playFindInstruction(num) {
         if (!GameState.soundEnabled) return;
-        [400, 500, 600, 800].forEach((f, i) => setTimeout(() => this.playTone(f, 0.15), i * 100));
+        // Attention: two quick high tones
+        this.playTone(800, 0.08);
+        this.playTone(900, 0.08, 'sine', 0.1);
+        // Then the number melody
+        const baseFreq = 300 + (num * 60);
+        this.playTone(baseFreq, 0.22, 'sine', 0.25);
+        this.playTone(baseFreq * 1.25, 0.18, 'sine', 0.4);
     }
 
-    speak(text, type = 'general') {
-        if (!GameState.voiceEnabled) return;
-        
-        // Extract number from text for fallback
-        const numMatch = text.match(/\d+/);
-        const num = numMatch ? parseInt(numMatch[0]) : null;
-        
-        // Try speech synthesis
-        if (window.speechSynthesis) {
-            try {
-                speechSynthesis.cancel();
-                const utt = new SpeechSynthesisUtterance(text);
-                utt.rate = 0.85; utt.pitch = 1.1; utt.volume = 0.9;
-                
-                if (this.voicesLoaded) { 
-                    const voice = speechSynthesis.getVoices().find(v => v.lang.startsWith('en')); 
-                    if (voice) utt.voice = voice; 
-                }
-                
-                // Track if speech actually starts
-                let speechStarted = false;
-                utt.onstart = () => { speechStarted = true; };
-                
-                utt.onerror = () => { 
-                    this.playFallbackSound(type, num);
-                };
-                
-                utt.onend = () => {
-                    // If speech ended immediately without starting, it failed silently
-                    if (!speechStarted) this.playFallbackSound(type, num);
-                };
-                
-                speechSynthesis.speak(utt);
-                
-                // Telegram WebView often fails silently - check after delay
-                setTimeout(() => {
-                    if (!speechStarted && !speechSynthesis.speaking) {
-                        this.playFallbackSound(type, num);
-                    }
-                }, 300);
-                
-            } catch (e) { 
-                this.playFallbackSound(type, num);
+    // Try speech, but don't rely on it
+    trySpeech(text) {
+        if (!GameState.voiceEnabled || !window.speechSynthesis) return;
+        try {
+            speechSynthesis.cancel();
+            const utt = new SpeechSynthesisUtterance(text);
+            utt.rate = 0.85; utt.pitch = 1.1; utt.volume = 0.9;
+            if (this.voicesLoaded) { 
+                const voice = speechSynthesis.getVoices().find(v => v.lang.startsWith('en')); 
+                if (voice) utt.voice = voice; 
             }
-        } else { 
-            this.playFallbackSound(type, num);
-        }
+            speechSynthesis.speak(utt);
+        } catch (e) {}
     }
 
-    playFallbackSound(type, num) {
-        if (type === 'findNumber' && num) {
-            this.playFindNumberSound(num);
-        } else if (type === 'number' && num) {
-            this.playNumberSound(num);
-        } else if (type === 'completion') {
-            this.playCompletionSound();
-        } else if (num) {
-            this.playNumberSound(num);
-        }
+    // Public methods - always play sound, optionally try speech
+    speakNumber(num) { 
+        this.playNumberMelody(num);
+        this.trySpeech(num.toString()); 
     }
-
-    speakNumber(num) { this.speak(num.toString(), 'number'); }
-    speakFindNumber(num) { this.speak(`Find number ${num}!`, 'findNumber'); }
-    speakCompletion(text) { this.speak(text, 'completion'); }
+    
+    speakFindNumber(num) { 
+        this.playFindInstruction(num);
+        this.trySpeech(`Find number ${num}`); 
+    }
+    
+    speakCompletion(text) { 
+        // Celebration sound is separate, just try speech
+        this.trySpeech(text); 
+    }
 }
 
 class CelebrationSystem {
@@ -425,7 +397,12 @@ class GameController {
         setTimeout(() => this.audio.speakFindNumber(GameState.currentTarget), 200);
     }
 
-    resetDropZone() { this.elements.dropPlaceholder.classList.remove('hidden'); this.elements.dropNumber.classList.add('hidden'); this.elements.dropZone.classList.remove('correct', 'wrong'); }
+    resetDropZone() { 
+        this.elements.dropPlaceholder.textContent = GameState.currentTarget;
+        this.elements.dropPlaceholder.classList.remove('hidden'); 
+        this.elements.dropNumber.classList.add('hidden'); 
+        this.elements.dropZone.classList.remove('correct', 'wrong'); 
+    }
     updateInstruction() { this.elements.instructionText.innerHTML = `Find and drag number <span class="target-number">${GameState.currentTarget}</span> to the box!`; }
     updateProgress() { const done = GameState.currentTarget - 1; this.elements.currentProgress.textContent = done; this.elements.progressBar.style.setProperty('--progress', `${(done / GameState.maxNumber) * 100}%`); }
     updateDots(filledCount = 0) { this.elements.dotsDisplay.innerHTML = ''; for (let i = 0; i < GameState.currentTarget; i++) { const dot = document.createElement('div'); dot.className = 'dot' + (i < filledCount ? ' filled' : ''); this.elements.dotsDisplay.appendChild(dot); } }
