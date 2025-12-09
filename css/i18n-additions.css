@@ -1,0 +1,43 @@
+/* =========================
+   LANGUAGE FLAG BUTTONS - ACTIVE STATE
+   Add this to your existing css/style.css
+   ========================= */
+
+/* Language flag buttons in header */
+.lang-flags {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.flag-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.flag-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.flag-btn:active {
+  transform: scale(0.95);
+}
+
+/* Active language indicator */
+.flag-btn.active {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Uzbek flag should be shown by default since it's the primary language */
+#flagUz {
+  order: -1; /* Move Uzbek flag to first position */
+}

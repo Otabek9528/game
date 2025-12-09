@@ -1,180 +1,343 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#FFE66D">
-    <meta name="description" content="Ad-free educational games for toddlers ages 1-4. Learn counting, numbers, and more!">
-    <title>Count & Learn - Educational Games for Toddlers</title>
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Count & Learn">
-    
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Halal Compass</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loading-icon">🎓</div>
-            <h1 class="loading-title">Count & Learn</h1>
-            <p class="loading-subtitle">Loading games...</p>
-        </div>
+  <!-- HEADER (Panel 1) -->
+  <header class="app__header">
+    <div class="header-content">
+      <img src="assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+      <!-- Language flags in header - Smart 2-button display -->
+      <div class="lang-flags" id="langFlags">
+        <button class="flag-btn" id="flagUz" data-lang="uz" title="O'zbek">🇺🇿</button>
+        <button class="flag-btn" id="flagRu" data-lang="ru" title="Русский">🇷🇺</button>
+        <button class="flag-btn" id="flagEn" data-lang="en" title="English">🇬🇧</button>
+      </div>
     </div>
+  </header>
 
-    <!-- Main Menu -->
-    <div id="mainMenu" class="main-menu hidden">
+  <!-- MERGED PANEL (Panels 2 & 3 Combined) -->
+  <div class="merged-content-panel">
+    <!-- PRAYER SECTION (Fixed at top when scrolling) -->
+    <section class="prayer-section-fixed">
+      <button class="prayer-card-timeline" id="prayerCardBtn">
+        <!-- Top Row: Date/Hijri on left, Location on right (same line) -->
+        <div class="top-row">
+          <div class="left-side">
+            <p class="weekday" id="weekday">Yuklanmoqda...</p>
+            <p class="hijri" id="hijri">Yuklanmoqda...</p>
+          </div>
+          <div class="right-side">
+            <span class="location-icon">📍</span>
+            <span class="city-name" id="cityName">Yuklanmoqda...</span>
+          </div>
+        </div>
+
+        <!-- Timeline: Current → Next -->
+        <div class="timeline-prayer">
+          <div class="timeline-start">
+            <span class="timeline-emoji" id="currentEmoji">🌅</span>
+            <h3 class="timeline-name" id="currentPrayer">--</h3>
+            <p class="timeline-time" id="prayerTime">--:--</p>
+          </div>
+
+          <div class="timeline-progress">
+            <div class="progress-line"></div>
+            <div class="countdown-badge">
+              <span id="countdown">--:--:--</span>
+            </div>
+          </div>
+
+          <div class="timeline-end">
+            <span class="timeline-emoji" id="nextEmoji">☀️</span>
+            <h3 class="timeline-name" id="nextPrayer">--</h3>
+            <p class="timeline-time" id="nextPrayerTime">--:--</p>
+          </div>
+        </div>
+      </button>
+    </section>
+
+    <!-- SCROLLABLE FEATURES SECTION -->
+    <div class="scrollable-features">
+      <main class="main" id="featureCards">
+        <!-- Feature cards will be dynamically generated -->
+      </main>
+    </div>
+  </div>
+
+  <!-- JS Scripts -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/locationManager.js"></script>
+  <script src="js/prayerTimes.js"></script>
+  <script>
+    // Initialize Telegram WebApp
+    const tg = window.Telegram.WebApp;
+    
+    console.log('🚀 Main page script loading...');
+    
+    // Notify Telegram that the web app is ready
+    tg.ready();
+    console.log('✅ WebApp.ready() called');
+    
+    // Expand the WebApp to full height
+    try {
+      tg.expand();
+      console.log('✅ WebApp.expand() called');
+    } catch (e) {
+      console.log('⚠️ Expand not supported:', e);
+    }
+    
+    // Hide Telegram's BackButton on main page
+    try {
+      if (tg.BackButton) {
+        tg.BackButton.hide();
+        console.log('✅ Telegram BackButton hidden on main page');
+      }
+    } catch (e) {
+      console.log('⚠️ BackButton not available:', e);
+    }
+
+    // ============================================
+    // FEATURE CARDS CONFIGURATION
+    // ============================================
+    
+    const FEATURE_CARDS = {
+      mosque: { icon: '🕌', labelKey: 'feature.mosques', href: 'pages/places/places.html?type=mosque' },
+      restaurant: { icon: '🍽️', labelKey: 'feature.restaurants', href: 'pages/places/places.html?type=restaurant' },
+      shop: { icon: '🏪', labelKey: 'feature.shops', href: 'pages/places/places.html?type=shop' },
+      qibla: { icon: '🕋', labelKey: 'feature.qibla', href: 'pages/qibla/qibla.html', isNew: true }, // ← NEW FEATURE },
+      parcel: { icon: '📦', labelKey: 'feature.parcel', href: 'pages/parcel/parcel.html' },
+      links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
+      jobs: { icon: '💼', labelKey: 'feature.jobs', href: 'pages/job-group/job-group.html' },
+      donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },
+      barcode: { icon: '📷', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html' },
+      //news: { icon: '📢', labelKey: 'feature.news', href: '#', comingSoon: true },
+      //events: { icon: '📅', labelKey: 'feature.events', href: '#', comingSoon: true },
+      //market: { icon: '🛒', labelKey: 'feature.market', href: '#', comingSoon: true },
+      community: { icon: '👥', labelKey: 'feature.community', href: 'pages/community/community.html' }
+    };
+
+    // ============================================
+    // LANGUAGE SELECTOR - SMART 2-BUTTON DISPLAY
+    // ============================================
+
+    function updateLanguageButtons() {
+      const currentLang = window.I18N ? I18N.getLanguage() : 'uz';
+      const flagBtns = document.querySelectorAll('.flag-btn');
+      
+      flagBtns.forEach(btn => {
+        const btnLang = btn.getAttribute('data-lang');
+        if (btnLang === currentLang) {
+          // Hide current language button
+          btn.style.display = 'none';
+        } else {
+          // Show other language buttons
+          btn.style.display = 'flex';
+        }
+      });
+      
+      console.log('🌐 Language buttons updated, current:', currentLang);
+    }
+
+    function initLanguageSelector() {
+      const flagBtns = document.querySelectorAll('.flag-btn');
+      
+      flagBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang');
+          if (window.I18N) {
+            I18N.setLanguage(lang);
+            updateLanguageButtons();
+            updateFeatureCards();
+          }
+          
+          // Haptic feedback
+          try {
+            if (tg.HapticFeedback) {
+              tg.HapticFeedback.impactOccurred('light');
+            }
+          } catch (e) {}
+          
+          console.log('✅ Language changed to:', lang);
+        });
+      });
+      
+      // Initial update
+      updateLanguageButtons();
+    }
+
+    // ============================================
+    // INTERACTION LOGGING - FAST VERSION
+    // ============================================
+
+    /**
+     * Log user interaction to backend
+     * Returns a Promise that resolves when logging is complete
+     * Navigation should wait for this to complete (or timeout)
+     * 
+     * @param {string} action - The action to log (e.g., 'mosque', 'restaurant', 'prayers')
+     * @returns {Promise} - Resolves when logging is complete or times out
+     */
+    function logInteraction(action) {
+      console.log('logInteraction called with action =', action);
+      
+      try {
+        const user = tg.initDataUnsafe?.user;
         
-        <!-- Header -->
-        <header class="menu-header">
-            <h1 class="app-title">Count & Learn</h1>
-            <p class="app-subtitle">Fun learning for little ones!</p>
-            <button id="settingsBtn" class="settings-btn" aria-label="Settings">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-            </button>
-        </header>
+        // If no user data (not in Telegram), resolve immediately
+        if (!user) {
+          console.log('⚠️ No user data available (not in Telegram?)');
+          return Promise.resolve();
+        }
+        
+        const payload = {
+          user_id: user.id,
+          username: user.username || user.first_name || 'unknown',
+          action: action
+        };
+        
+        console.log('Sending payload:', payload);
+        
+        // Create fetch promise
+        const fetchPromise = fetch('https://vegukin-api.duckdns.org/api/log-interaction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log('✅ Logged:', action);
+          } else {
+            console.log('❌ Server returned:', response.status);
+          }
+        })
+        .catch(err => {
+          console.log('⚠️ Log failed:', err);
+        });
+        
+        // Create timeout promise (300ms max wait)
+        const timeoutPromise = new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Return whichever completes first
+        // This ensures navigation happens within 300ms even if server is slow
+        return Promise.race([fetchPromise, timeoutPromise]);
+        
+      } catch (e) {
+        console.log('⚠️ Log error:', e);
+        return Promise.resolve();
+      }
+    }
+    // ============================================
+    // FEATURE CARDS RENDERING
+    // ============================================
 
-        <!-- Games Grid -->
-        <div class="games-container">
-            <h2 class="section-title">Choose a Game</h2>
-            
-            <div class="games-grid">
-                <!-- Game 1: Tap & Count -->
-                <a href="first_game/index.html" class="game-card" data-game="tap-count">
-                    <div class="game-icon">🔢</div>
-                    <div class="game-info">
-                        <h3 class="game-title">Tap & Count</h3>
-                        <p class="game-desc">Tap objects in order to count</p>
-                        <div class="game-meta">
-                            <span class="age-badge">Ages 1-4</span>
-                            <span class="difficulty-badge">1-10</span>
-                        </div>
-                    </div>
-                    <div class="game-arrow">→</div>
-                </a>
+    function updateFeatureCards() {
+      const container = document.getElementById('featureCards');
+      if (!container) return;
+      
+      // Get available features for current language
+      const availableFeatures = window.I18N ? I18N.getAvailableFeatures() : 
+        //['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'news', 'events', 'market', 'community'];
+        ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'community'];
+      
+        container.innerHTML = '';
+        
+        availableFeatures.forEach(featureKey => {
+          const feature = FEATURE_CARDS[featureKey];
+          if (!feature) return;
+          
+          const card = document.createElement('button');
+          
+          let cardClasses = 'card';
+          if (feature.comingSoon) cardClasses += ' coming-soon';
+          if (feature.isNew) cardClasses += ' new-feature';
+          card.className = cardClasses;
+          
+          card.onclick = () => {
+            try {
+              if (tg.HapticFeedback) { 
+                tg.HapticFeedback.impactOccurred('light');
+              }
+            } catch (e) {}
+              
+            // Log interaction and wait for it to complete
+            logInteraction(featureKey).then(() => {
+              window.location.href = feature.href;
+            });
+          };
+          
+          
+          const label = window.I18N ? I18N.t(feature.labelKey) : feature.labelKey.split('.')[1];
+          const newBadge = feature.isNew ? '<span class="new-badge">NEW</span>' : '';
+          
+          card.innerHTML = `
+            ${newBadge}
+            <span class="card-icon">${feature.icon}</span>
+            <p>${label}</p>
+          `;
+          
+          container.appendChild(card);
+        });
+        
+        //addRippleEffect();
+        console.log('✅ Feature cards updated');
+      }
 
-                <!-- Game 2: Find the Number -->
-                <a href="second_game/index.html" class="game-card" data-game="find-number">
-                    <div class="game-icon">🎯</div>
-                    <div class="game-info">
-                        <h3 class="game-title">Find the Number</h3>
-                        <p class="game-desc">Drag numbers in sequence</p>
-                        <div class="game-meta">
-                            <span class="age-badge">Ages 2-4</span>
-                            <span class="difficulty-badge">1-10</span>
-                        </div>
-                    </div>
-                    <div class="game-arrow">→</div>
-                </a>
+    // ============================================
+    // PRAYER CARD NAVIGATION
+    // ============================================
 
-                <!-- Coming Soon -->
-                <div class="game-card locked" data-game="coming-soon">
-                    <div class="game-icon">🔒</div>
-                    <div class="game-info">
-                        <h3 class="game-title">More Games</h3>
-                        <p class="game-desc">Coming soon!</p>
-                        <div class="game-meta">
-                            <span class="age-badge">Stay tuned</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    const prayerCardBtn = document.getElementById('prayerCardBtn');
+    if (prayerCardBtn) {
+      prayerCardBtn.addEventListener('click', () => {
+        // Haptic feedback
+        try {
+          if (tg.HapticFeedback) {
+            tg.HapticFeedback.impactOccurred('light');
+          }
+        } catch (e) {}
+        // Log interaction
+        logInteraction('prayers');  
+        console.log('Clicked PRAYER');
+        window.location.href = 'pages/prayers.html';
+      });
+    }
 
-        <!-- Progress Overview -->
-        <div class="progress-overview">
-            <h2 class="section-title">Your Progress</h2>
-            <div class="stats-row">
-                <div class="stat-item">
-                    <div class="stat-value" id="totalPlays">0</div>
-                    <div class="stat-label">Games Played</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="totalTime">0m</div>
-                    <div class="stat-label">Time Learning</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="totalStars">0</div>
-                    <div class="stat-label">Stars Earned</div>
-                </div>
-            </div>
-        </div>
+    // ============================================
+    // LOCATION UPDATE HANDLER
+    // ============================================
 
-        <!-- Footer -->
-        <footer class="menu-footer">
-            <p>Made with ❤️ for little learners</p>
-            <p class="version">v2.0.0 • Ad-free forever</p>
-        </footer>
-    </div>
+    window.addEventListener('locationUpdated', (event) => {
+      console.log('✅ Location updated:', event.detail.city);
+    });
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Settings</h2>
-                <button class="close-modal" aria-label="Close">×</button>
-            </div>
-            <div class="modal-body">
-                
-                <div class="setting-group">
-                    <label class="setting-label">Sound & Voice</label>
-                    <div class="toggle-group">
-                        <div class="toggle-item">
-                            <span>Sound Effects</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="soundToggle" checked>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <div class="toggle-item">
-                            <span>Voice Narration</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="voiceToggle" checked>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+    // ============================================
+    // LANGUAGE CHANGE LISTENER
+    // ============================================
 
-                <div class="setting-group">
-                    <label class="setting-label">Accessibility</label>
-                    <div class="toggle-group">
-                        <div class="toggle-item">
-                            <span>High Contrast</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="contrastToggle">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <div class="toggle-item">
-                            <span>Extra Large Mode</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="largeToggle">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+    window.addEventListener('languageChanged', () => {
+      updateLanguageButtons();
+      updateFeatureCards();
+    });
 
-                <div class="setting-group">
-                    <label class="setting-label">Data</label>
-                    <button class="reset-btn" id="resetAllProgress">Reset All Progress</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <script src="app.js"></script>
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initLanguageSelector();
+      updateFeatureCards();
+      console.log('✅ Main page initialized');
+    });
+  </script>
 </body>
 </html>
