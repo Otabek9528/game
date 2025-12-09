@@ -72,6 +72,20 @@ const LocationManager = {
     // Inject modal styles
     this.injectModalStyles();
     
+    // Check if this is the main index.html (not a subpage)
+    // Clear session check flag to force fresh GPS verification
+    const isMainPage = window.location.pathname.endsWith('index.html') || 
+                       window.location.pathname === '/' ||
+                       window.location.pathname.endsWith('/');
+    
+    if (isMainPage && !this.isGpsCheckedThisSession()) {
+      // First load of index.html in this session - clear old cached data
+      console.log('🏠 Main page first load - clearing cached location for fresh check');
+      localStorage.removeItem(this.STORAGE_KEY);
+      localStorage.removeItem(this.PERMISSION_KEY);
+      localStorage.removeItem(this.LAST_UPDATE_KEY);
+    }
+    
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     const storedLocation = this.getStoredLocation();
     const gpsAlreadyChecked = this.isGpsCheckedThisSession();
