@@ -8,7 +8,7 @@ const LocationManager = {
   PERMISSION_KEY: 'locationPermissionGranted',
   LAST_UPDATE_KEY: 'lastLocationUpdate',
   UPDATE_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  DEBUG_MODE: true, // Set to false to hide debug panel in production
+  DEBUG_MODE: false, // Set to true to show debug panel
 
   // Debug logger
   debugLogs: [],
@@ -233,29 +233,23 @@ const LocationManager = {
     uz: {
       title: '📍 GPS yoqilmagan',
       message: 'Joylashuvingizni aniqlash uchun telefoningizda GPS (Lokatsiya) yoqilgan bo\'lishi kerak.',
-      instructions: 'Iltimos, quyidagi tugmani bosing yoki telefoningiz sozlamalaridan GPS ni yoqing.',
-      openSettings: '⚙️ Sozlamalarni ochish',
+      instructions: 'Iltimos, telefoningiz sozlamalaridan GPS ni yoqing va qayta urining.',
       tryAgain: '🔄 Qayta urinish',
-      close: '✕ Yopish',
-      gpsOffError: 'GPS o\'chirilgan. Iltimos, yoqing va qayta urining.'
+      close: '✕ Yopish'
     },
     ru: {
       title: '📍 GPS выключен',
       message: 'Для определения вашего местоположения необходимо включить GPS (Геолокацию) на вашем телефоне.',
-      instructions: 'Пожалуйста, нажмите кнопку ниже или включите GPS в настройках телефона.',
-      openSettings: '⚙️ Открыть настройки',
+      instructions: 'Пожалуйста, включите GPS в настройках телефона и попробуйте снова.',
       tryAgain: '🔄 Попробовать снова',
-      close: '✕ Закрыть',
-      gpsOffError: 'GPS выключен. Пожалуйста, включите и попробуйте снова.'
+      close: '✕ Закрыть'
     },
     en: {
       title: '📍 GPS is turned off',
       message: 'To detect your location, GPS (Location Services) must be enabled on your phone.',
-      instructions: 'Please tap the button below or enable GPS in your phone settings.',
-      openSettings: '⚙️ Open Settings',
+      instructions: 'Please enable GPS in your phone settings and try again.',
       tryAgain: '🔄 Try Again',
-      close: '✕ Close',
-      gpsOffError: 'GPS is off. Please enable it and try again.'
+      close: '✕ Close'
     }
   },
 
@@ -470,38 +464,9 @@ const LocationManager = {
     // Remove existing modal if any
     this.hideGPSModal();
     
-    const isAndroid = /android/i.test(navigator.userAgent);
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    
     const overlay = document.createElement('div');
     overlay.className = 'gps-modal-overlay';
     overlay.id = 'gps-modal-overlay';
-    
-    // Manual steps based on platform
-    let manualSteps = '';
-    if (isAndroid) {
-      manualSteps = `
-        <div class="gps-modal-help">
-          <p class="gps-modal-help-title">Android:</p>
-          <ol class="gps-modal-steps">
-            <li>Yuqoridan pastga suring</li>
-            <li>"Location" yoki "GPS" tugmasini bosing</li>
-            <li>Qayta urining</li>
-          </ol>
-        </div>
-      `;
-    } else if (isIOS) {
-      manualSteps = `
-        <div class="gps-modal-help">
-          <p class="gps-modal-help-title">iPhone:</p>
-          <ol class="gps-modal-steps">
-            <li>Settings → Privacy → Location Services</li>
-            <li>Location Services ni yoqing</li>
-            <li>Telegram uchun "While Using" tanlang</li>
-          </ol>
-        </div>
-      `;
-    }
     
     overlay.innerHTML = `
       <div class="gps-modal">
@@ -511,33 +476,19 @@ const LocationManager = {
         <p class="gps-modal-instructions">${this.t('instructions')}</p>
         
         <div class="gps-modal-buttons">
-          ${isAndroid ? `
-            <button class="gps-modal-btn gps-modal-btn-primary" id="gps-open-settings">
-              ${this.t('openSettings')}
-            </button>
-          ` : ''}
-          <button class="gps-modal-btn gps-modal-btn-secondary" id="gps-try-again">
+          <button class="gps-modal-btn gps-modal-btn-primary" id="gps-try-again">
             ${this.t('tryAgain')}
           </button>
           <button class="gps-modal-btn gps-modal-btn-close" id="gps-close">
             ${this.t('close')}
           </button>
         </div>
-        
-        ${manualSteps}
       </div>
     `;
     
     document.body.appendChild(overlay);
     
     // Event listeners
-    const openSettingsBtn = document.getElementById('gps-open-settings');
-    if (openSettingsBtn) {
-      openSettingsBtn.addEventListener('click', () => {
-        this.openLocationSettings();
-      });
-    }
-    
     document.getElementById('gps-try-again').addEventListener('click', () => {
       this.hideGPSModal();
       this.requestInitialPermission();
@@ -567,60 +518,6 @@ const LocationManager = {
     const overlay = document.getElementById('gps-modal-overlay');
     if (overlay) {
       overlay.remove();
-    }
-  },
-
-  // Open device location settings (Android only - deep linking)
-  openLocationSettings() {
-    const isAndroid = /android/i.test(navigator.userAgent);
-    
-    if (isAndroid) {
-      // Try Android intent URL
-      // This works in many Android browsers and Telegram
-      const settingsUrls = [
-        'intent://settings/location#Intent;scheme=android-app;end',
-        'app-settings:',
-      ];
-      
-      // Try opening Telegram's location settings request
-      try {
-        if (Telegram.WebApp.openLink) {
-          // This might prompt user to enable location
-          Telegram.WebApp.openLink('https://telegram.org', { try_instant_view: false });
-        }
-      } catch (e) {
-        console.log('Could not open via Telegram');
-      }
-      
-      // Show alert with instructions since direct settings access is limited
-      try {
-        if (Telegram.WebApp.showAlert) {
-          const lang = this.getCurrentLang();
-          const messages = {
-            uz: 'Telefoningiz sozlamalarini oching:\n\n1. Yuqoridan pastga suring\n2. GPS/Location tugmasini bosing\n3. Ilovaga qayting va "Qayta urinish" bosing',
-            ru: 'Откройте настройки телефона:\n\n1. Потяните сверху вниз\n2. Нажмите кнопку GPS/Локация\n3. Вернитесь в приложение и нажмите "Попробовать снова"',
-            en: 'Open your phone settings:\n\n1. Swipe down from top\n2. Tap GPS/Location button\n3. Return to app and tap "Try Again"'
-          };
-          Telegram.WebApp.showAlert(messages[lang] || messages['en']);
-        }
-      } catch (e) {
-        alert('Please enable GPS in your phone settings, then tap "Try Again"');
-      }
-    } else {
-      // iOS - can't open settings directly, show instructions
-      try {
-        if (Telegram.WebApp.showAlert) {
-          const lang = this.getCurrentLang();
-          const messages = {
-            uz: 'iPhone sozlamalarini oching:\n\nSettings → Privacy → Location Services → On\n\nKeyin Telegram uchun "While Using the App" tanlang',
-            ru: 'Откройте настройки iPhone:\n\nНастройки → Конфиденциальность → Службы геолокации → Вкл\n\nЗатем выберите "При использовании" для Telegram',
-            en: 'Open iPhone Settings:\n\nSettings → Privacy → Location Services → On\n\nThen select "While Using the App" for Telegram'
-          };
-          Telegram.WebApp.showAlert(messages[lang] || messages['en']);
-        }
-      } catch (e) {
-        alert('Please enable Location Services in Settings → Privacy → Location Services');
-      }
     }
   },
 
@@ -687,7 +584,7 @@ const LocationManager = {
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 3000,
           maximumAge: 0
         }
       );
