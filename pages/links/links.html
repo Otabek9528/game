@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Foydali Linklar</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="links.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <!-- LINKS CONTAINER -->
+  <div class="links-container">
+    
+    <!-- Hero Section -->
+    <div class="links-hero">
+      <div class="hero-icon">📂</div>
+      <h2 class="hero-title">Foydali Linklar</h2>
+      <p class="hero-subtitle">Quyidagi kategoriyalardan birini tanlang</p>
+    </div>
+
+    <!-- Categories Section (Main View) -->
+    <div class="categories-section" id="categoriesSection">
+      
+      <!-- Category Buttons -->
+      <div class="category-buttons">
+        <button class="category-btn arbayt-btn" id="arbaytBtn">
+          <span class="cat-icon">👷🏻‍♂️</span>
+          <span class="cat-text">Arbayt</span>
+          <span class="cat-arrow">→</span>
+        </button>
+        
+        <button class="category-btn korea-btn" id="koreaLifeBtn">
+          <span class="cat-icon">🇰🇷</span>
+          <span class="cat-text">Koreya hayoti</span>
+          <span class="cat-arrow">→</span>
+        </button>
+      </div>
+
+      <!-- Direct Links -->
+      <div class="direct-links-section">
+        <h3 class="section-title">🔗 Telegram guruhlar</h3>
+        
+        <a href="https://t.me/+cyn-FkSVNfA5ZDdl" class="direct-link-card" target="_blank">
+          <div class="link-icon">👩‍🦰</div>
+          <div class="link-info">
+            <span class="link-title">Onajonlar guruhi</span>
+            <span class="link-subtitle">Ayollar uchun</span>
+          </div>
+          <span class="link-arrow">↗</span>
+        </a>
+
+        <div class="tangin-group">
+          <a href="https://t.me/TanginUz" class="direct-link-card tangin" target="_blank">
+            <div class="link-icon">🥕</div>
+            <div class="link-info">
+              <span class="link-title">Tangin UZ</span>
+              <span class="link-subtitle">Umumiy</span>
+            </div>
+            <span class="link-arrow">↗</span>
+          </a>
+          
+          <a href="https://t.me/+yJj3Pq5tm043MDY1" class="direct-link-card tangin" target="_blank">
+            <div class="link-icon">🤵🏻‍♀️</div>
+            <div class="link-info">
+              <span class="link-title">Tangin UZ</span>
+              <span class="link-subtitle">Ayollar</span>
+            </div>
+            <span class="link-arrow">↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arbayt Links Section (Hidden by default) -->
+    <div class="links-list-section" id="arbaytSection" style="display: none;">
+      <div class="section-header">
+        <button class="back-btn" id="arbaytBackBtn">
+          <span>←</span>
+          <span>Orqaga</span>
+        </button>
+        <h3 class="section-heading">👷🏻‍♂️ Arbayt guruhlari</h3>
+      </div>
+      
+      <div class="links-list" id="arbaytList">
+        <!-- Links will be populated by JS -->
+      </div>
+
+      <div class="info-note">
+        <p>💡 Boshqa arbayt guruhlar haqida xabar berish uchun <a href="https://t.me/MuslimVegukin" target="_blank">Telegram guruhimizga</a> o'ting.</p>
+      </div>
+    </div>
+
+    <!-- Korea Life Links Section (Hidden by default) -->
+    <div class="links-list-section" id="koreaLifeSection" style="display: none;">
+      <div class="section-header">
+        <button class="back-btn" id="koreaBackBtn">
+          <span>←</span>
+          <span>Orqaga</span>
+        </button>
+        <h3 class="section-heading">🇰🇷 Koreya hayoti</h3>
+      </div>
+      
+      <div class="links-list" id="koreaLifeList">
+        <!-- Links will be populated by JS -->
+      </div>
+
+      <div class="info-note">
+        <p>💡 Koreya hayoti haqidagi boshqa kanal va guruhlar haqida xabar berish uchun <a href="https://t.me/MuslimVegukin" target="_blank">Telegram guruhimizga</a> o'ting.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="links.js"></script>
+
+</body>
+</html>
