@@ -584,7 +584,7 @@ const LocationManager = {
         },
         {
           enableHighAccuracy: true,
-          timeout: 3000,
+          timeout: 5000,
           maximumAge: 0
         }
       );
