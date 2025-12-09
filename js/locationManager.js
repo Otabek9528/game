@@ -8,6 +8,225 @@ const LocationManager = {
   PERMISSION_KEY: 'locationPermissionGranted',
   LAST_UPDATE_KEY: 'lastLocationUpdate',
   UPDATE_INTERVAL: 5 * 60 * 1000, // 5 minutes
+  DEBUG_MODE: true, // Set to false to hide debug panel in production
+
+  // Debug logger
+  debugLogs: [],
+  
+  log(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${message}`;
+    console.log(logEntry);
+    
+    if (this.DEBUG_MODE) {
+      this.debugLogs.push({ time: timestamp, msg: message, type });
+      this.updateDebugPanel();
+    }
+  },
+
+  // Initialize debug panel
+  initDebugPanel() {
+    if (!this.DEBUG_MODE) return;
+    if (document.getElementById('location-debug-panel')) return;
+
+    const panel = document.createElement('div');
+    panel.id = 'location-debug-panel';
+    panel.innerHTML = `
+      <div class="debug-header">
+        <span>📍 Location Debug</span>
+        <button id="debug-toggle-btn">_</button>
+        <button id="debug-close-btn">×</button>
+      </div>
+      <div class="debug-status" id="debug-status">
+        <div><strong>Stored Location:</strong> <span id="debug-stored">checking...</span></div>
+        <div><strong>Permission:</strong> <span id="debug-permission">checking...</span></div>
+        <div><strong>Current City:</strong> <span id="debug-city">--</span></div>
+        <div><strong>Coordinates:</strong> <span id="debug-coords">--</span></div>
+        <div><strong>Last Update:</strong> <span id="debug-timestamp">--</span></div>
+      </div>
+      <div class="debug-actions">
+        <button id="debug-refresh-btn">🔄 Refresh Location</button>
+        <button id="debug-clear-btn">🗑️ Clear Storage</button>
+        <button id="debug-test-modal-btn">🧪 Test Modal</button>
+      </div>
+      <div class="debug-logs" id="debug-logs"></div>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #location-debug-panel {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        max-height: 50vh;
+        background: rgba(0, 0, 0, 0.95);
+        border: 2px solid #00ff00;
+        border-radius: 10px;
+        font-family: monospace;
+        font-size: 11px;
+        color: #00ff00;
+        z-index: 99999;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      #location-debug-panel.minimized .debug-status,
+      #location-debug-panel.minimized .debug-actions,
+      #location-debug-panel.minimized .debug-logs {
+        display: none;
+      }
+      .debug-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: #003300;
+        border-bottom: 1px solid #00ff00;
+        font-weight: bold;
+      }
+      .debug-header button {
+        background: #004400;
+        border: 1px solid #00ff00;
+        color: #00ff00;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+      .debug-status {
+        padding: 10px 12px;
+        border-bottom: 1px solid #004400;
+        line-height: 1.6;
+      }
+      .debug-status span {
+        color: #ffff00;
+      }
+      .debug-actions {
+        padding: 8px 12px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #004400;
+      }
+      .debug-actions button {
+        background: #004400;
+        border: 1px solid #00ff00;
+        color: #00ff00;
+        padding: 6px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 11px;
+      }
+      .debug-actions button:active {
+        background: #006600;
+      }
+      .debug-logs {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 12px;
+        max-height: 150px;
+      }
+      .debug-log-entry {
+        padding: 2px 0;
+        border-bottom: 1px solid #002200;
+      }
+      .debug-log-entry.error {
+        color: #ff4444;
+      }
+      .debug-log-entry.success {
+        color: #44ff44;
+      }
+      .debug-log-entry.warning {
+        color: #ffaa00;
+      }
+      .debug-log-entry .time {
+        color: #888;
+        margin-right: 8px;
+      }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(panel);
+
+    // Event listeners
+    document.getElementById('debug-toggle-btn').addEventListener('click', () => {
+      panel.classList.toggle('minimized');
+    });
+    
+    document.getElementById('debug-close-btn').addEventListener('click', () => {
+      panel.remove();
+      this.DEBUG_MODE = false;
+    });
+
+    document.getElementById('debug-refresh-btn').addEventListener('click', () => {
+      this.log('Manual refresh triggered by debug panel', 'info');
+      this.manualRefresh();
+    });
+
+    document.getElementById('debug-clear-btn').addEventListener('click', () => {
+      this.clearLocation();
+      this.updateDebugStatus();
+      this.log('Storage cleared!', 'warning');
+    });
+
+    document.getElementById('debug-test-modal-btn').addEventListener('click', () => {
+      this.log('Testing GPS modal...', 'info');
+      this.showGPSModal();
+    });
+
+    this.updateDebugStatus();
+  },
+
+  // Update debug status display
+  updateDebugStatus() {
+    if (!this.DEBUG_MODE) return;
+
+    const stored = this.getStoredLocation();
+    const permission = localStorage.getItem(this.PERMISSION_KEY);
+
+    const storedEl = document.getElementById('debug-stored');
+    const permEl = document.getElementById('debug-permission');
+    const cityEl = document.getElementById('debug-city');
+    const coordsEl = document.getElementById('debug-coords');
+    const timestampEl = document.getElementById('debug-timestamp');
+
+    if (storedEl) {
+      storedEl.textContent = stored ? 'YES ✅' : 'NO ❌';
+    }
+    if (permEl) {
+      permEl.textContent = permission === 'true' ? 'GRANTED ✅' : 'NOT GRANTED ❌';
+    }
+    if (cityEl && stored) {
+      cityEl.textContent = stored.city || '--';
+    }
+    if (coordsEl && stored) {
+      coordsEl.textContent = stored.lat && stored.lon 
+        ? `${stored.lat.toFixed(4)}, ${stored.lon.toFixed(4)}` 
+        : '--';
+    }
+    if (timestampEl && stored && stored.timestamp) {
+      const date = new Date(stored.timestamp);
+      timestampEl.textContent = date.toLocaleString();
+    }
+  },
+
+  // Update debug log panel
+  updateDebugPanel() {
+    const logsContainer = document.getElementById('debug-logs');
+    if (!logsContainer) return;
+
+    logsContainer.innerHTML = this.debugLogs
+      .slice(-20) // Keep last 20 logs
+      .map(log => `
+        <div class="debug-log-entry ${log.type}">
+          <span class="time">${log.time}</span>${log.msg}
+        </div>
+      `)
+      .join('');
+    
+    logsContainer.scrollTop = logsContainer.scrollHeight;
+  },
 
   // Translations for the GPS modal
   translations: {
@@ -56,6 +275,10 @@ const LocationManager = {
 
   // Initialize on every page load
   async init() {
+    // Initialize debug panel first
+    this.initDebugPanel();
+    this.log('🚀 LocationManager initializing...', 'info');
+    
     Telegram.WebApp.ready();
     Telegram.WebApp.disableVerticalSwipes();
     
@@ -65,21 +288,26 @@ const LocationManager = {
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     const storedLocation = this.getStoredLocation();
     
+    this.log(`Permission flag: ${hasPermission}`, 'info');
+    this.log(`Stored location: ${storedLocation ? storedLocation.city : 'NONE'}`, 'info');
+    
     if (hasPermission && storedLocation) {
-      console.log('✅ Using stored location');
+      this.log('✅ Using stored location: ' + storedLocation.city, 'success');
       // Use cached location immediately
       this.updateUI(storedLocation);
+      this.updateDebugStatus();
       
       // Try silent background refresh (won't prompt)
       this.silentRefresh();
     } else if (storedLocation) {
       // Have location but no permission flag (legacy case)
-      console.log('📍 Using cached location (no permission flag)');
+      this.log('📍 Using cached location (no permission flag)', 'warning');
       this.updateUI(storedLocation);
       localStorage.setItem(this.PERMISSION_KEY, 'true');
+      this.updateDebugStatus();
     } else {
       // First time - need to ask for permission
-      console.log('🔔 First time - requesting permission');
+      this.log('🔔 No stored location - requesting permission', 'warning');
       await this.requestInitialPermission();
     }
   },
@@ -237,6 +465,8 @@ const LocationManager = {
 
   // Show GPS off modal
   showGPSModal() {
+    this.log('🔔 Showing GPS modal to user', 'warning');
+    
     // Remove existing modal if any
     this.hideGPSModal();
     
@@ -409,25 +639,31 @@ const LocationManager = {
 
   // Request permission only on first use
   async requestInitialPermission() {
+    this.log('📡 Requesting geolocation permission...', 'info');
+    
     return new Promise((resolve) => {
       // First check if geolocation is available
       if (!navigator.geolocation) {
-        console.error('❌ Geolocation not supported');
+        this.log('❌ Geolocation API not supported!', 'error');
         this.showGPSModal();
         resolve(null);
         return;
       }
 
+      this.log('⏳ Calling getCurrentPosition...', 'info');
+
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
+          this.log(`✅ Got position: ${pos.coords.latitude}, ${pos.coords.longitude}`, 'success');
           const locationData = await this.processPosition(pos);
           localStorage.setItem(this.PERMISSION_KEY, 'true');
           this.updateUI(locationData);
+          this.updateDebugStatus();
           this.hideGPSModal();
           resolve(locationData);
         },
         (error) => {
-          console.error('❌ Location error:', error.code, error.message);
+          this.log(`❌ Geolocation error: code=${error.code}, msg=${error.message}`, 'error');
           
           // Error codes:
           // 1 = PERMISSION_DENIED - user clicked deny
@@ -435,19 +671,17 @@ const LocationManager = {
           // 3 = TIMEOUT - took too long
           
           if (error.code === 1) {
-            // User denied permission - show modal explaining why we need it
-            console.log('🚫 User denied permission');
+            this.log('🚫 PERMISSION_DENIED - User denied permission', 'error');
             this.showGPSModal();
           } else if (error.code === 2) {
-            // GPS is off or position unavailable
-            console.log('📍 GPS appears to be off');
+            this.log('📍 POSITION_UNAVAILABLE - GPS appears to be OFF', 'error');
             this.showGPSModal();
           } else if (error.code === 3) {
-            // Timeout - GPS might be slow or off
-            console.log('⏱️ Location request timed out');
+            this.log('⏱️ TIMEOUT - Location request timed out', 'error');
             this.showGPSModal();
           }
           
+          this.updateDebugStatus();
           // Don't set a fallback location - let user fix the issue
           resolve(null);
         },
@@ -467,25 +701,28 @@ const LocationManager = {
     
     // Don't refresh too frequently
     if (now - lastUpdate < this.UPDATE_INTERVAL) {
-      console.log('⏱️ Skipping refresh (too soon)');
+      this.log('⏱️ Skipping refresh (too soon)', 'info');
       return;
     }
 
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     if (!hasPermission) {
-      console.log('⭕ Skipping silent refresh (no permission)');
+      this.log('⭕ Skipping silent refresh (no permission)', 'warning');
       return;
     }
+
+    this.log('🔄 Attempting silent refresh...', 'info');
 
     // Try to get new position silently using cached data
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const locationData = await this.processPosition(pos);
-        console.log('🔄 Location refreshed silently');
+        this.log('✅ Location refreshed silently: ' + locationData.city, 'success');
         this.updateUI(locationData);
+        this.updateDebugStatus();
       },
       (error) => {
-        console.log('⚠️ Silent refresh failed (using cached):', error.message);
+        this.log(`⚠️ Silent refresh failed: ${error.message}`, 'warning');
         // Continue using cached location - don't update anything
       },
       {
@@ -498,18 +735,17 @@ const LocationManager = {
 
   // Manual refresh triggered by user button
   async manualRefresh() {
-    console.log('🔄 Manual refresh initiated');
+    this.log('🔄 Manual refresh initiated', 'info');
     
     // Check if we have permission already
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     
     if (!hasPermission) {
-      console.log('⚠️ No permission yet, will prompt user');
+      this.log('⚠️ No permission yet, will prompt user', 'warning');
       return this.requestInitialPermission();
     }
     
-    // We have permission - try to use any cached position first
-    console.log('✅ Using existing permission with cached position');
+    this.log('✅ Have permission, getting position...', 'info');
 
     return new Promise((resolve) => {
       const options = {
@@ -518,38 +754,41 @@ const LocationManager = {
         maximumAge: Infinity // Accept ANY cached position to avoid prompting
       };
 
-      console.log('📡 Getting cached position...');
+      this.log('📡 Getting cached position...', 'info');
       
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          console.log('✅ Got cached position (no prompt)');
+          this.log(`✅ Got position: ${pos.coords.latitude}, ${pos.coords.longitude}`, 'success');
           
           try {
             const locationData = await this.processPosition(pos);
-            console.log('✅ Location updated successfully');
+            this.log('✅ Location updated: ' + locationData.city, 'success');
             
             this.updateUI(locationData);
+            this.updateDebugStatus();
             resolve(locationData);
           } catch (error) {
-            console.error('❌ Error processing position:', error);
+            this.log('❌ Error processing position: ' + error, 'error');
             resolve(this.getStoredLocation());
           }
         },
         (error) => {
-          console.warn('⚠️ Could not get position:', error.message);
+          this.log(`⚠️ Could not get position: code=${error.code}, ${error.message}`, 'warning');
           
           // GPS might be off now - show modal
           if (error.code === 2) {
+            this.log('📍 GPS is OFF - showing modal', 'error');
             this.showGPSModal();
             resolve(null);
           } else {
             // Try using stored location
             const stored = this.getStoredLocation();
             if (stored) {
-              console.log('📍 Using stored location');
+              this.log('📍 Using stored location: ' + stored.city, 'info');
               this.updateUI(stored);
               resolve(stored);
             } else {
+              this.log('❌ No stored location - showing modal', 'error');
               this.showGPSModal();
               resolve(null);
             }
@@ -564,7 +803,12 @@ const LocationManager = {
   async processPosition(pos) {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
+    
+    this.log(`🌍 Processing position: ${lat.toFixed(4)}, ${lon.toFixed(4)}`, 'info');
+    
     const city = await this.getCityName(lat, lon);
+    
+    this.log(`🏙️ City resolved: ${city}`, 'success');
     
     const locationData = {
       lat,
@@ -573,7 +817,7 @@ const LocationManager = {
       timestamp: Date.now()
     };
     
-    console.log('💾 Saving to localStorage:', locationData);
+    this.log('💾 Saving to localStorage...', 'info');
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(locationData));
     localStorage.setItem(this.LAST_UPDATE_KEY, locationData.timestamp.toString());
     
@@ -655,7 +899,7 @@ const LocationManager = {
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.PERMISSION_KEY);
     localStorage.removeItem(this.LAST_UPDATE_KEY);
-    console.log('🗑️ Location data cleared');
+    this.log('🗑️ All location data cleared from storage', 'warning');
   }
 };
 
