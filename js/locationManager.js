@@ -1,232 +1,17 @@
 // locationManager.js
 // Universal location manager for Telegram WebApp
 // Works across multiple HTML pages without re-prompting
-// Updated with GPS detection and user-friendly notifications
+// Features:
+// - Session-based GPS check (only checks GPS on first app open)
+// - Silent background refresh for location updates
+// - User-friendly modal when GPS is off
 
 const LocationManager = {
   STORAGE_KEY: 'userLocation',
   PERMISSION_KEY: 'locationPermissionGranted',
   LAST_UPDATE_KEY: 'lastLocationUpdate',
+  SESSION_CHECK_KEY: 'gpsCheckedThisSession', // sessionStorage key
   UPDATE_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  DEBUG_MODE: false, // Set to true to show debug panel
-
-  // Debug logger
-  debugLogs: [],
-  
-  log(message, type = 'info') {
-    const timestamp = new Date().toLocaleTimeString();
-    const logEntry = `[${timestamp}] ${message}`;
-    console.log(logEntry);
-    
-    if (this.DEBUG_MODE) {
-      this.debugLogs.push({ time: timestamp, msg: message, type });
-      this.updateDebugPanel();
-    }
-  },
-
-  // Initialize debug panel
-  initDebugPanel() {
-    if (!this.DEBUG_MODE) return;
-    if (document.getElementById('location-debug-panel')) return;
-
-    const panel = document.createElement('div');
-    panel.id = 'location-debug-panel';
-    panel.innerHTML = `
-      <div class="debug-header">
-        <span>📍 Location Debug</span>
-        <button id="debug-toggle-btn">_</button>
-        <button id="debug-close-btn">×</button>
-      </div>
-      <div class="debug-status" id="debug-status">
-        <div><strong>Stored Location:</strong> <span id="debug-stored">checking...</span></div>
-        <div><strong>Permission:</strong> <span id="debug-permission">checking...</span></div>
-        <div><strong>Current City:</strong> <span id="debug-city">--</span></div>
-        <div><strong>Coordinates:</strong> <span id="debug-coords">--</span></div>
-        <div><strong>Last Update:</strong> <span id="debug-timestamp">--</span></div>
-      </div>
-      <div class="debug-actions">
-        <button id="debug-refresh-btn">🔄 Refresh Location</button>
-        <button id="debug-clear-btn">🗑️ Clear Storage</button>
-        <button id="debug-test-modal-btn">🧪 Test Modal</button>
-      </div>
-      <div class="debug-logs" id="debug-logs"></div>
-    `;
-
-    const style = document.createElement('style');
-    style.textContent = `
-      #location-debug-panel {
-        position: fixed;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-        max-height: 50vh;
-        background: rgba(0, 0, 0, 0.95);
-        border: 2px solid #00ff00;
-        border-radius: 10px;
-        font-family: monospace;
-        font-size: 11px;
-        color: #00ff00;
-        z-index: 99999;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      }
-      #location-debug-panel.minimized .debug-status,
-      #location-debug-panel.minimized .debug-actions,
-      #location-debug-panel.minimized .debug-logs {
-        display: none;
-      }
-      .debug-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 12px;
-        background: #003300;
-        border-bottom: 1px solid #00ff00;
-        font-weight: bold;
-      }
-      .debug-header button {
-        background: #004400;
-        border: 1px solid #00ff00;
-        color: #00ff00;
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 5px;
-      }
-      .debug-status {
-        padding: 10px 12px;
-        border-bottom: 1px solid #004400;
-        line-height: 1.6;
-      }
-      .debug-status span {
-        color: #ffff00;
-      }
-      .debug-actions {
-        padding: 8px 12px;
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        border-bottom: 1px solid #004400;
-      }
-      .debug-actions button {
-        background: #004400;
-        border: 1px solid #00ff00;
-        color: #00ff00;
-        padding: 6px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 11px;
-      }
-      .debug-actions button:active {
-        background: #006600;
-      }
-      .debug-logs {
-        flex: 1;
-        overflow-y: auto;
-        padding: 8px 12px;
-        max-height: 150px;
-      }
-      .debug-log-entry {
-        padding: 2px 0;
-        border-bottom: 1px solid #002200;
-      }
-      .debug-log-entry.error {
-        color: #ff4444;
-      }
-      .debug-log-entry.success {
-        color: #44ff44;
-      }
-      .debug-log-entry.warning {
-        color: #ffaa00;
-      }
-      .debug-log-entry .time {
-        color: #888;
-        margin-right: 8px;
-      }
-    `;
-    document.head.appendChild(style);
-    document.body.appendChild(panel);
-
-    // Event listeners
-    document.getElementById('debug-toggle-btn').addEventListener('click', () => {
-      panel.classList.toggle('minimized');
-    });
-    
-    document.getElementById('debug-close-btn').addEventListener('click', () => {
-      panel.remove();
-      this.DEBUG_MODE = false;
-    });
-
-    document.getElementById('debug-refresh-btn').addEventListener('click', () => {
-      this.log('Manual refresh triggered by debug panel', 'info');
-      this.manualRefresh();
-    });
-
-    document.getElementById('debug-clear-btn').addEventListener('click', () => {
-      this.clearLocation();
-      this.updateDebugStatus();
-      this.log('Storage cleared!', 'warning');
-    });
-
-    document.getElementById('debug-test-modal-btn').addEventListener('click', () => {
-      this.log('Testing GPS modal...', 'info');
-      this.showGPSModal();
-    });
-
-    this.updateDebugStatus();
-  },
-
-  // Update debug status display
-  updateDebugStatus() {
-    if (!this.DEBUG_MODE) return;
-
-    const stored = this.getStoredLocation();
-    const permission = localStorage.getItem(this.PERMISSION_KEY);
-
-    const storedEl = document.getElementById('debug-stored');
-    const permEl = document.getElementById('debug-permission');
-    const cityEl = document.getElementById('debug-city');
-    const coordsEl = document.getElementById('debug-coords');
-    const timestampEl = document.getElementById('debug-timestamp');
-
-    if (storedEl) {
-      storedEl.textContent = stored ? 'YES ✅' : 'NO ❌';
-    }
-    if (permEl) {
-      permEl.textContent = permission === 'true' ? 'GRANTED ✅' : 'NOT GRANTED ❌';
-    }
-    if (cityEl && stored) {
-      cityEl.textContent = stored.city || '--';
-    }
-    if (coordsEl && stored) {
-      coordsEl.textContent = stored.lat && stored.lon 
-        ? `${stored.lat.toFixed(4)}, ${stored.lon.toFixed(4)}` 
-        : '--';
-    }
-    if (timestampEl && stored && stored.timestamp) {
-      const date = new Date(stored.timestamp);
-      timestampEl.textContent = date.toLocaleString();
-    }
-  },
-
-  // Update debug log panel
-  updateDebugPanel() {
-    const logsContainer = document.getElementById('debug-logs');
-    if (!logsContainer) return;
-
-    logsContainer.innerHTML = this.debugLogs
-      .slice(-20) // Keep last 20 logs
-      .map(log => `
-        <div class="debug-log-entry ${log.type}">
-          <span class="time">${log.time}</span>${log.msg}
-        </div>
-      `)
-      .join('');
-    
-    logsContainer.scrollTop = logsContainer.scrollHeight;
-  },
 
   // Translations for the GPS modal
   translations: {
@@ -267,11 +52,19 @@ const LocationManager = {
     return this.translations[lang]?.[key] || this.translations['en'][key];
   },
 
+  // Check if GPS was already checked this session
+  isGpsCheckedThisSession() {
+    return sessionStorage.getItem(this.SESSION_CHECK_KEY) === 'true';
+  },
+
+  // Mark GPS as checked for this session
+  markGpsCheckedThisSession() {
+    sessionStorage.setItem(this.SESSION_CHECK_KEY, 'true');
+  },
+
   // Initialize on every page load
   async init() {
-    // Initialize debug panel first
-    this.initDebugPanel();
-    this.log('🚀 LocationManager initializing...', 'info');
+    console.log('🚀 LocationManager initializing...');
     
     Telegram.WebApp.ready();
     Telegram.WebApp.disableVerticalSwipes();
@@ -281,29 +74,78 @@ const LocationManager = {
     
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     const storedLocation = this.getStoredLocation();
+    const gpsAlreadyChecked = this.isGpsCheckedThisSession();
     
-    this.log(`Permission flag: ${hasPermission}`, 'info');
-    this.log(`Stored location: ${storedLocation ? storedLocation.city : 'NONE'}`, 'info');
+    console.log(`Permission: ${hasPermission}, Stored: ${storedLocation?.city || 'none'}, Session checked: ${gpsAlreadyChecked}`);
     
-    if (hasPermission && storedLocation) {
-      this.log('✅ Using stored location: ' + storedLocation.city, 'success');
-      // Use cached location immediately
+    // CASE 1: Already checked GPS this session - just use cached location
+    if (gpsAlreadyChecked && storedLocation) {
+      console.log('✅ GPS already checked this session, using cached location:', storedLocation.city);
       this.updateUI(storedLocation);
-      this.updateDebugStatus();
       
-      // Try silent background refresh (won't prompt)
+      // Still do silent refresh if interval passed
       this.silentRefresh();
-    } else if (storedLocation) {
-      // Have location but no permission flag (legacy case)
-      this.log('📍 Using cached location (no permission flag)', 'warning');
+      return;
+    }
+    
+    // CASE 2: Have permission and stored location, but first time this session
+    if (hasPermission && storedLocation) {
+      console.log('📍 First check this session - verifying GPS is still available...');
+      this.updateUI(storedLocation); // Show cached immediately
+      
+      // Verify GPS is still working (this is the session's first check)
+      await this.verifyGpsAndRefresh(storedLocation);
+      return;
+    }
+    
+    // CASE 3: Have location but no permission flag (legacy case)
+    if (storedLocation) {
+      console.log('📍 Legacy cached location found');
       this.updateUI(storedLocation);
       localStorage.setItem(this.PERMISSION_KEY, 'true');
-      this.updateDebugStatus();
-    } else {
-      // First time - need to ask for permission
-      this.log('🔔 No stored location - requesting permission', 'warning');
-      await this.requestInitialPermission();
+      this.markGpsCheckedThisSession();
+      return;
     }
+    
+    // CASE 4: First time ever - need to ask for permission
+    console.log('🔔 No stored location - requesting permission');
+    await this.requestInitialPermission();
+  },
+
+  // Verify GPS is working and refresh location (first check of session)
+  async verifyGpsAndRefresh(fallbackLocation) {
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          // GPS is working - update location
+          console.log('✅ GPS verified working, refreshing location...');
+          const locationData = await this.processPosition(pos);
+          this.updateUI(locationData);
+          this.markGpsCheckedThisSession();
+          resolve(locationData);
+        },
+        (error) => {
+          console.log('⚠️ GPS check failed:', error.code, error.message);
+          
+          // GPS might be off - show modal
+          if (error.code === 1 || error.code === 2) {
+            console.log('📍 GPS appears to be off - showing modal');
+            this.showGPSModal();
+          } else {
+            // Timeout or other error - just use cached location
+            console.log('⏱️ GPS timeout - using cached location');
+            this.markGpsCheckedThisSession();
+          }
+          
+          resolve(fallbackLocation);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    });
   },
 
   // Inject CSS for modal
@@ -408,16 +250,6 @@ const LocationManager = {
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
       }
       
-      .gps-modal-btn-secondary {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
-      
-      .gps-modal-btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.15);
-      }
-      
       .gps-modal-btn-close {
         background: transparent;
         color: rgba(255, 255, 255, 0.5);
@@ -428,46 +260,19 @@ const LocationManager = {
       .gps-modal-btn-close:hover {
         color: rgba(255, 255, 255, 0.8);
       }
-      
-      .gps-modal-help {
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      
-      .gps-modal-help-title {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 12px;
-        margin: 0 0 8px 0;
-        text-align: center;
-      }
-      
-      .gps-modal-steps {
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 11px;
-        line-height: 1.6;
-        margin: 0;
-        padding-left: 16px;
-      }
-      
-      .gps-modal-steps li {
-        margin-bottom: 4px;
-      }
     `;
     document.head.appendChild(styles);
   },
 
   // Show GPS off modal
   showGPSModal() {
-    this.log('🔔 Showing GPS modal to user', 'warning');
-    
     // Remove existing modal if any
     this.hideGPSModal();
     
     const overlay = document.createElement('div');
     overlay.className = 'gps-modal-overlay';
     overlay.id = 'gps-modal-overlay';
-    
+
     overlay.innerHTML = `
       <div class="gps-modal">
         <div class="gps-modal-icon">📍</div>
@@ -496,12 +301,15 @@ const LocationManager = {
     
     document.getElementById('gps-close').addEventListener('click', () => {
       this.hideGPSModal();
+      // Mark as checked so user isn't bothered again this session
+      this.markGpsCheckedThisSession();
     });
     
     // Close on overlay click
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
         this.hideGPSModal();
+        this.markGpsCheckedThisSession();
       }
     });
     
@@ -536,31 +344,29 @@ const LocationManager = {
 
   // Request permission only on first use
   async requestInitialPermission() {
-    this.log('📡 Requesting geolocation permission...', 'info');
+    console.log('📡 Requesting geolocation permission...');
     
     return new Promise((resolve) => {
       // First check if geolocation is available
       if (!navigator.geolocation) {
-        this.log('❌ Geolocation API not supported!', 'error');
+        console.error('❌ Geolocation API not supported!');
         this.showGPSModal();
         resolve(null);
         return;
       }
 
-      this.log('⏳ Calling getCurrentPosition...', 'info');
-
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          this.log(`✅ Got position: ${pos.coords.latitude}, ${pos.coords.longitude}`, 'success');
+          console.log('✅ Got position:', pos.coords.latitude, pos.coords.longitude);
           const locationData = await this.processPosition(pos);
           localStorage.setItem(this.PERMISSION_KEY, 'true');
           this.updateUI(locationData);
-          this.updateDebugStatus();
           this.hideGPSModal();
+          this.markGpsCheckedThisSession();
           resolve(locationData);
         },
         (error) => {
-          this.log(`❌ Geolocation error: code=${error.code}, msg=${error.message}`, 'error');
+          console.error('❌ Geolocation error:', error.code, error.message);
           
           // Error codes:
           // 1 = PERMISSION_DENIED - user clicked deny
@@ -568,18 +374,16 @@ const LocationManager = {
           // 3 = TIMEOUT - took too long
           
           if (error.code === 1) {
-            this.log('🚫 PERMISSION_DENIED - User denied permission', 'error');
+            console.log('🚫 User denied permission');
             this.showGPSModal();
           } else if (error.code === 2) {
-            this.log('📍 POSITION_UNAVAILABLE - GPS appears to be OFF', 'error');
+            console.log('📍 GPS appears to be off');
             this.showGPSModal();
           } else if (error.code === 3) {
-            this.log('⏱️ TIMEOUT - Location request timed out', 'error');
+            console.log('⏱️ Location request timed out');
             this.showGPSModal();
           }
           
-          this.updateDebugStatus();
-          // Don't set a fallback location - let user fix the issue
           resolve(null);
         },
         {
@@ -591,36 +395,36 @@ const LocationManager = {
     });
   },
 
-  // Silent refresh (no permission prompt after initial grant)
+  // Silent refresh - runs in background, never shows modal
   async silentRefresh() {
     const lastUpdate = parseInt(localStorage.getItem(this.LAST_UPDATE_KEY) || '0');
     const now = Date.now();
     
     // Don't refresh too frequently
     if (now - lastUpdate < this.UPDATE_INTERVAL) {
-      this.log('⏱️ Skipping refresh (too soon)', 'info');
+      console.log('⏱️ Skipping silent refresh (updated recently)');
       return;
     }
 
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     if (!hasPermission) {
-      this.log('⭕ Skipping silent refresh (no permission)', 'warning');
+      console.log('⭕ Skipping silent refresh (no permission)');
       return;
     }
 
-    this.log('🔄 Attempting silent refresh...', 'info');
+    console.log('🔄 Attempting silent background refresh...');
 
-    // Try to get new position silently using cached data
+    // Try to get new position silently - accept cached position
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const locationData = await this.processPosition(pos);
-        this.log('✅ Location refreshed silently: ' + locationData.city, 'success');
+        console.log('✅ Location silently refreshed:', locationData.city);
         this.updateUI(locationData);
-        this.updateDebugStatus();
       },
       (error) => {
-        this.log(`⚠️ Silent refresh failed: ${error.message}`, 'warning');
-        // Continue using cached location - don't update anything
+        // Silent refresh failed - just continue with cached location
+        // Do NOT show modal - this is background refresh
+        console.log('⚠️ Silent refresh failed (using cached):', error.message);
       },
       {
         enableHighAccuracy: false,
@@ -632,66 +436,45 @@ const LocationManager = {
 
   // Manual refresh triggered by user button
   async manualRefresh() {
-    this.log('🔄 Manual refresh initiated', 'info');
+    console.log('🔄 Manual refresh initiated');
     
-    // Check if we have permission already
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     
     if (!hasPermission) {
-      this.log('⚠️ No permission yet, will prompt user', 'warning');
+      console.log('⚠️ No permission yet');
       return this.requestInitialPermission();
     }
-    
-    this.log('✅ Have permission, getting position...', 'info');
 
     return new Promise((resolve) => {
-      const options = {
-        enableHighAccuracy: false,
-        timeout: 5000,
-        maximumAge: Infinity // Accept ANY cached position to avoid prompting
-      };
-
-      this.log('📡 Getting cached position...', 'info');
-      
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          this.log(`✅ Got position: ${pos.coords.latitude}, ${pos.coords.longitude}`, 'success');
-          
-          try {
-            const locationData = await this.processPosition(pos);
-            this.log('✅ Location updated: ' + locationData.city, 'success');
-            
-            this.updateUI(locationData);
-            this.updateDebugStatus();
-            resolve(locationData);
-          } catch (error) {
-            this.log('❌ Error processing position: ' + error, 'error');
-            resolve(this.getStoredLocation());
-          }
+          console.log('✅ Got position for manual refresh');
+          const locationData = await this.processPosition(pos);
+          this.updateUI(locationData);
+          resolve(locationData);
         },
         (error) => {
-          this.log(`⚠️ Could not get position: code=${error.code}, ${error.message}`, 'warning');
+          console.warn('⚠️ Manual refresh failed:', error.message);
           
-          // GPS might be off now - show modal
           if (error.code === 2) {
-            this.log('📍 GPS is OFF - showing modal', 'error');
             this.showGPSModal();
             resolve(null);
           } else {
-            // Try using stored location
             const stored = this.getStoredLocation();
             if (stored) {
-              this.log('📍 Using stored location: ' + stored.city, 'info');
               this.updateUI(stored);
               resolve(stored);
             } else {
-              this.log('❌ No stored location - showing modal', 'error');
               this.showGPSModal();
               resolve(null);
             }
           }
         },
-        options
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
       );
     });
   },
@@ -700,12 +483,7 @@ const LocationManager = {
   async processPosition(pos) {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
-    
-    this.log(`🌍 Processing position: ${lat.toFixed(4)}, ${lon.toFixed(4)}`, 'info');
-    
     const city = await this.getCityName(lat, lon);
-    
-    this.log(`🏙️ City resolved: ${city}`, 'success');
     
     const locationData = {
       lat,
@@ -714,7 +492,7 @@ const LocationManager = {
       timestamp: Date.now()
     };
     
-    this.log('💾 Saving to localStorage...', 'info');
+    console.log('💾 Saving location:', locationData.city);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(locationData));
     localStorage.setItem(this.LAST_UPDATE_KEY, locationData.timestamp.toString());
     
@@ -796,7 +574,8 @@ const LocationManager = {
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.PERMISSION_KEY);
     localStorage.removeItem(this.LAST_UPDATE_KEY);
-    this.log('🗑️ All location data cleared from storage', 'warning');
+    sessionStorage.removeItem(this.SESSION_CHECK_KEY);
+    console.log('🗑️ All location data cleared');
   }
 };
 
