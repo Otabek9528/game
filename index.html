@@ -71,7 +71,7 @@
   </div>
 
   <!-- JS Scripts -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     // Check location permission BEFORE loading anything else
     const tg = window.Telegram.WebApp;
@@ -82,9 +82,36 @@
     if (locationManager) {
       locationManager.init(() => {
         if (!locationManager.isAccessGranted && !sessionStorage.getItem('locationChecked')) {
-          // No permission granted - redirect to setup page
           sessionStorage.setItem('locationChecked', 'true');
-          window.location.href = 'pages/location-setup.html';
+          
+          // Get user language
+          const userLang = tg.initDataUnsafe?.user?.language_code || 'en';
+          
+          // Messages in 3 languages
+          const messages = {
+            uz: 'Lokatsiya aniqlashga ruxsat bering.',
+            ru: 'Bключите доступ к местоположению в настройках бота.',
+            en: 'Please enable location access for this Mini App in the bot settings.'
+          };
+          
+          const message = messages[userLang] || messages['en'];
+          
+          // Trigger location request to make toggle appear
+          locationManager.getLocation(() => {});
+          
+          // Show popup
+          tg.showPopup({
+            title: '📍 Location Access Needed',
+            message: message,
+            buttons: [
+              { id: 'settings', type: 'default', text: 'Open Settings' },
+              { id: 'close', type: 'close', text: 'Close' }
+            ]
+          }, (buttonId) => {
+            if (buttonId === 'settings') {
+              locationManager.openSettings();
+            }
+          });
         }
       });
     }
