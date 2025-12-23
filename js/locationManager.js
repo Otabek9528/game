@@ -12,10 +12,12 @@ const LocationManager = {
   LAST_UPDATE_KEY: 'lastLocationUpdate',
   SESSION_CHECK_KEY: 'gpsCheckedThisSession', // sessionStorage key
   UPDATE_INTERVAL: 5 * 60 * 1000, // 5 minutes
+  
 
   // Telegram LocationManager
   tgLocationManager: null,
   hasTelegramLocation: false,
+  gpsPromptShown: false, // ← ADD THIS FLAG
 
   // Translations for the GPS modal
   translations: {
@@ -174,17 +176,26 @@ const LocationManager = {
     });
   },
 
-  // Get location using Telegram API
+
+// Get location using Telegram API
   getTelegramLocation() {
     console.log('📡 Requesting location from Telegram...');
 
     this.tgLocationManager.getLocation(async (location) => {
       if (location === null) {
-        console.log('❌ Location null');
+        console.log('❌ Location null - GPS might be off');
+        
+        // Show GPS prompt only once per session
+        if (!this.gpsPromptShown) {
+          this.gpsPromptShown = true;
+          this.showGPSModal();
+        }
+        
         const cached = this.getStoredLocation();
         if (cached) this.updateUI(cached);
       } else {
         console.log('✅ Got Telegram location');
+        this.gpsPromptShown = false; // Reset flag on success
         const locationData = await this.processTelegramLocation(location);
         this.updateUI(locationData);
       }
