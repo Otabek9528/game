@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Joy Ma'lumotlari</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="places.css" />
+  <link rel="stylesheet" href="places-detail.css" />
+</head>
+<body>
+
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <div class="detail-container">
+    
+    <div class="detail-loading" id="detailLoading">
+      <div class="detail-spinner"></div>
+      <p data-i18n="common.loading">Yuklanmoqda...</p>
+    </div>
+
+    <div class="detail-error" id="detailError" style="display: none;">
+      <p class="detail-error-icon">❌</p>
+      <p class="detail-error-text" data-i18n="places.error">Xatolik yuz berdi</p>
+      <p class="detail-error-hint" id="errorMessage">Ma'lumotlarni yuklashda muammo. Iltimos, qaytadan urinib ko'ring.</p>
+      <button class="retry-button" onclick="loadPlaceDetail()" data-i18n="detail.retry">Qaytadan urinish</button>
+    </div>
+
+    <div id="detailContent" style="display: none;"></div>
+
+  </div>
+
+  <div class="image-modal" id="imageModal">
+    <div class="modal-content">
+      <button class="modal-nav modal-nav-prev" id="modalPrev">‹</button>
+      <img src="" alt="Full size image" class="modal-image" id="modalImage" />
+      <button class="modal-nav modal-nav-next" id="modalNext">›</button>
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-counter" id="modalCounter">1 / 1</div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/apiConfig.js"></script>
+  <script src="places-detail.js"></script>
+
+</body>
+</html>
