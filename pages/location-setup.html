@@ -93,15 +93,25 @@
     });
 
     document.getElementById('btnEnable').addEventListener('click', () => {
-      if (locationManager && typeof locationManager.openSettings === 'function') {
-        locationManager.openSettings();
-      } else {
-        locationManager.getLocation((location) => {
-          if (location) {
-            window.location.href = '../index.html';
-          }
-        });
-      }
+      // First try to request location directly - this triggers the toggle to appear
+      locationManager.getLocation((location) => {
+        if (location === null) {
+          // Permission not granted - show popup with settings button
+          tg.showPopup({
+            title: '📍 Location Permission',
+            message: 'Please enable the Geolocation toggle in bot settings.',
+            buttons: [
+              { id: 'ok', type: 'ok', text: 'OK' }
+            ]
+          }, () => {
+            // User needs to manually go to bot profile (three dots) → Geolocation toggle
+            tg.close();
+          });
+        } else {
+          // Success - go to main page
+          window.location.href = '../index.html';
+        }
+      });
     });
 
     document.getElementById('btnSkip').addEventListener('click', () => {
