@@ -236,38 +236,26 @@
   <script src="../js/locationManager.js"></script>
   <script src="../js/prayerTimes.js"></script>
   <script src="../js/prayersPage.js"></script>
-<script>
-  // Initialize Telegram WebApp on prayers page
-  const tg = window.Telegram.WebApp;
-  
-  console.log('🚀 Prayers page script loading...');
-  
-  tg.ready();
-  Telegram.WebApp.disableVerticalSwipes();
-  console.log('✅ WebApp.ready() called');
-  
-  // PREVENT LocationManager from re-initializing
-  // It was already initialized on index.html
-  if (window.LocationManager) {
-    // Override init to do nothing on subpages
-    const originalInit = LocationManager.init;
-    LocationManager.init = function() {
-      console.log('⏭️ Skipping LocationManager.init() on prayers page');
-      // Just update UI with cached location
-      const location = this.getStoredLocation();
-      if (location) {
-        this.updateUI(location);
-      }
-    };
-  }
-  
-  try {
-    tg.expand();
-    console.log('✅ WebApp.expand() called');
-  } catch (e) {
-    console.log('⚠️ Expand not supported:', e);
-  }
-</script>
+  <script>
+    // Initialize Telegram WebApp on prayers page
+    const tg = window.Telegram.WebApp;
+    
+    console.log('🚀 Prayers page script loading...');
+    console.log('📱 Telegram.WebApp:', tg);
+    
+    // Notify Telegram that the web app is ready
+    tg.ready();
+    Telegram.WebApp.disableVerticalSwipes();
+    console.log('✅ WebApp.ready() called');
+    
+    // Expand the WebApp to full height
+    try {
+      tg.expand();
+      console.log('✅ WebApp.expand() called');
+    } catch (e) {
+      console.log('⚠️ Expand not supported:', e);
+    }
+  </script>
 
 </body>
 </html>

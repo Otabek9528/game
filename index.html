@@ -71,66 +71,19 @@
   </div>
 
   <!-- JS Scripts -->
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/locationManager.js"></script>
   <script src="js/prayerTimes.js"></script>
   <script src="js/homeScreenPrompt.js"></script>
   <script>
-    // Wait for LocationManager to be ready, then check permissions
-    document.addEventListener('DOMContentLoaded', () => {
-      const tg = window.Telegram.WebApp;
-      tg.ready();
-      
-      // Give LocationManager time to initialize
-      setTimeout(() => {
-        const locationManager = tg.LocationManager;
-        
-        if (locationManager && !sessionStorage.getItem('locationChecked')) {
-          sessionStorage.setItem('locationChecked', 'true');
-          
-          locationManager.init(() => {
-            // Check if toggle is off
-            if (!locationManager.isAccessGranted) {
-              const userLang = tg.initDataUnsafe?.user?.language_code || 'uz';
-              
-              const messages = {
-                uz: 'Joylashuv xususiyatlaridan foydalanish uchun bot sozlamalarida joylashuvga ruxsat bering.',
-                ru: 'Чтобы использовать функции на основе местоположения, пожалуйста, включите доступ к местоположению в настройках бота.',
-                en: 'To provide location-based features, please enable location access for this Mini App in the bot settings.'
-              };
-              
-              const message = messages[userLang] || messages['en'];
-              
-              // Trigger location request to make toggle appear
-              locationManager.getLocation(() => {});
-              
-              // Show popup
-              tg.showPopup({
-                title: '📍 Location Access Needed',
-                message: message,
-                buttons: [
-                  { id: 'settings', type: 'default', text: 'Open Settings' },
-                  { id: 'close', type: 'close', text: 'Close' }
-                ]
-              }, (buttonId) => {
-                if (buttonId === 'settings') {
-                  if (locationManager.openSettings) {
-                    locationManager.openSettings();
-                  } else {
-                    tg.close();
-                  }
-                }
-              });
-            }
-          });
-        }
-      }, 500); // Wait 500ms for LocationManager to load
-    });
+    // Initialize Telegram WebApp
+    const tg = window.Telegram.WebApp;
     
     console.log('🚀 Main page script loading...');
-    console.log('✅ WebApp.ready() called');
-    console.log('🚀 Main page script loading...');
+    
+    // Notify Telegram that the web app is ready
+    tg.ready();
     console.log('✅ WebApp.ready() called');
     
     // Expand the WebApp to full height
