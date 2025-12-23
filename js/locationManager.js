@@ -12,12 +12,12 @@ const LocationManager = {
   LAST_UPDATE_KEY: 'lastLocationUpdate',
   SESSION_CHECK_KEY: 'gpsCheckedThisSession', // sessionStorage key
   UPDATE_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  
 
   // Telegram LocationManager
   tgLocationManager: null,
   hasTelegramLocation: false,
-  gpsPromptShown: false, // ← ADD THIS FLAG
+  gpsPromptShown: false, // Prevent repeated GPS prompts
+  isRequestingLocation: false, // Prevent simultaneous location requests
 
   // Translations for the GPS modal
   translations: {
@@ -176,12 +176,28 @@ const LocationManager = {
     });
   },
 
-
-// Get location using Telegram API
+  // Get location using Telegram API
   getTelegramLocation() {
+    // Prevent multiple simultaneous requests
+    if (this.isRequestingLocation) {
+      console.log('⏭️ Location request already in progress, skipping...');
+      return;
+    }
+
+    // Prevent showing GPS modal multiple times
+    if (this.gpsPromptShown) {
+      console.log('⏭️ GPS prompt already shown this session, skipping...');
+      const cached = this.getStoredLocation();
+      if (cached) this.updateUI(cached);
+      return;
+    }
+
     console.log('📡 Requesting location from Telegram...');
+    this.isRequestingLocation = true;
 
     this.tgLocationManager.getLocation(async (location) => {
+      this.isRequestingLocation = false; // Release lock
+      
       if (location === null) {
         console.log('❌ Location null - GPS might be off');
         
@@ -409,6 +425,13 @@ const LocationManager = {
     document.head.appendChild(styles);
   },
 
+  // Reset GPS prompt flag (for "Try Again" functionality)
+  resetGpsPrompt() {
+    this.gpsPromptShown = false;
+    this.isRequestingLocation = false;
+    console.log('🔄 GPS prompt flag reset');
+  },
+
   // Show GPS off modal
   showGPSModal() {
     // Remove existing modal if any
@@ -442,7 +465,7 @@ const LocationManager = {
     document.getElementById('gps-try-again').addEventListener('click', () => {
       console.log('🔄 User clicked Try Again');
       this.hideGPSModal();
-      this.resetGpsPrompt(); // ← ADDED: Reset flag before retry
+      this.resetGpsPrompt(); // Reset the flag
       
       if (this.hasTelegramLocation) {
         this.getTelegramLocation();
@@ -464,12 +487,21 @@ const LocationManager = {
         this.markGpsCheckedThisSession();
       }
     });
-    },
+    
+    // Haptic feedback
+    try {
+      if (Telegram.WebApp.HapticFeedback) {
+        Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+      }
+    } catch (e) {}
+  },
 
-  // Reset GPS prompt flag (for "Try Again" functionality)
-  resetGpsPrompt() {
-    this.gpsPromptShown = false;
-    console.log('🔄 GPS prompt flag reset');
+  // Hide GPS modal
+  hideGPSModal() {
+    const overlay = document.getElementById('gps-modal-overlay');
+    if (overlay) {
+      overlay.remove();
+    }
   },
 
   // Get stored location data
@@ -577,31 +609,10 @@ const LocationManager = {
     );
   },
 
-// Manual refresh triggered by user button
+  // Manual refresh triggered by user button
   async manualRefresh() {
     console.log('🔄 Manual refresh initiated');
     
-    // If using Telegram LocationManager
-    if (this.hasTelegramLocation) {
-      if (!this.tgLocationManager.isAccessGranted) {
-        console.log('⚠️ Toggle not enabled');
-        this.showTogglePrompt();
-        return null;
-      }
-      
-      // Check GPS flag before requesting
-      if (this.gpsPromptShown) {
-        console.log('⏭️ GPS prompt already shown, skipping');
-        const cached = this.getStoredLocation();
-        if (cached) this.updateUI(cached);
-        return cached;
-      }
-      
-      this.getTelegramLocation();
-      return;
-    }
-    
-    // Browser geolocation fallback
     const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
     
     if (!hasPermission) {
@@ -620,14 +631,19 @@ const LocationManager = {
         (error) => {
           console.warn('⚠️ Manual refresh failed:', error.message);
           
-          if (error.code === 2 && !this.gpsPromptShown) {
-            this.gpsPromptShown = true;
+          if (error.code === 2) {
             this.showGPSModal();
+            resolve(null);
+          } else {
+            const stored = this.getStoredLocation();
+            if (stored) {
+              this.updateUI(stored);
+              resolve(stored);
+            } else {
+              this.showGPSModal();
+              resolve(null);
+            }
           }
-          
-          const stored = this.getStoredLocation();
-          if (stored) this.updateUI(stored);
-          resolve(stored);
         },
         {
           enableHighAccuracy: true,
@@ -637,7 +653,6 @@ const LocationManager = {
       );
     });
   },
-
 
   // Process position and get city name
   async processPosition(pos) {
