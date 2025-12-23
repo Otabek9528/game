@@ -1,4 +1,4 @@
-// prayerTimes.js - Updated with I18N support and USER'S LOCAL TIMEZONE
+// prayerTimes.js - Prayer times calculations and display with I18N support
 Telegram.WebApp.ready();
 Telegram.WebApp.disableVerticalSwipes();
 
@@ -87,7 +87,7 @@ async function getShafiiAsrTime(lat, lon) {
 }
 
 function getCurrentPrayer(timings) {
-  // CRITICAL: Use user's local time, not server time
+  // Use user's local time
   const now = new Date();
   const currentTime = now.getHours() * 60 + now.getMinutes();
   
@@ -129,7 +129,7 @@ function getCurrentPrayer(timings) {
 }
 
 function formatCountdown(nextTime) {
-  // CRITICAL: Use user's local time, not server time
+  // Use user's local time
   const now = new Date();
   const [h, m] = nextTime.split(":").map(Number);
   const next = new Date();
@@ -153,7 +153,7 @@ function formatCountdown(nextTime) {
 
 async function updatePrayerData(lat, lon, city) {
   try {
-    console.log('📿 Fetching prayer times for:', city, '(' + lat + ', ' + lon + ')');
+    console.log('🕌 Fetching prayer times for:', city, '(' + lat + ', ' + lon + ')');
     
     // Update city name display
     const cityNameElem = document.getElementById("cityName");
@@ -192,7 +192,7 @@ async function updatePrayerData(lat, lon, city) {
     if (nextEmojiElem) nextEmojiElem.innerText = prayerEmojis[next.name] || '🕌';
     if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = data.timings[next.name];
 
-    // Update countdown every second (using local time)
+    // Update countdown every second
     function updateCountdown() {
       if (countdownElem) {
         countdownElem.innerText = formatCountdown(data.timings[next.name]);
@@ -200,13 +200,13 @@ async function updatePrayerData(lat, lon, city) {
     }
     updateCountdown();
     
-    // Clear any existing interval to prevent duplicates
+    // Clear any existing interval
     if (window.prayerCountdownInterval) {
       clearInterval(window.prayerCountdownInterval);
     }
     window.prayerCountdownInterval = setInterval(updateCountdown, 1000);
 
-    // Update date displays (using local time) with translated weekday
+    // Update date displays with translated weekday
     const localDate = new Date();
     const weekdayEnglish = localDate.toLocaleDateString('en-US', { weekday: 'long' });
     const weekdayTranslated = translateWeekday(weekdayEnglish);
@@ -218,7 +218,7 @@ async function updatePrayerData(lat, lon, city) {
     if (document.getElementById("weekday")) {
       // Format hijri: "day-monthName, year"
       const hijriDay = data.date.hijri.day;
-      const hijriMonthName = data.date.hijri.month.en; // API provides month name
+      const hijriMonthName = data.date.hijri.month.en;
       const hijriYear = data.date.hijri.year;
       const hijriFormatted = `${parseInt(hijriDay)}-${hijriMonthName}, ${hijriYear}`;
       
@@ -245,7 +245,7 @@ async function updatePrayerData(lat, lon, city) {
       nextPrayerNameElem.innerText = translatePrayer(next.name);
     }
 
-    // Fetch Shafi'i/Maliki/Hanbali Asr time (they use the same calculation)
+    // Fetch Shafi'i/Maliki/Hanbali Asr time
     const shafiiAsrTime = await getShafiiAsrTime(lat, lon);
     
     // Update Asr schools comparison section if it exists
@@ -288,7 +288,7 @@ window.addEventListener('languageChanged', () => {
   }
 });
 
-// Make updatePrayerData available globally for LocationManager
+// Make updatePrayerData available globally
 window.updatePrayerData = updatePrayerData;
 
 // ============================================
