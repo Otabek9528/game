@@ -1,16 +1,17 @@
 // locationManager.js
-// Universal location manager for Telegram WebApp
-// Works across multiple HTML pages without re-prompting
+// Universal location manager for Telegram WebApp with native LocationManager support
 // Features:
-// - Session-based GPS check (only checks GPS on first app open)
+// - Telegram LocationManager API (Bot API 8.0+) with persistent toggle
+// - Fallback to browser geolocation for older Telegram versions
+// - Session-based checks to prevent repeated prompts
 // - Silent background refresh for location updates
-// - User-friendly modal when GPS is off
 
 const LocationManager = {
+  // Storage keys
   STORAGE_KEY: 'userLocation',
   PERMISSION_KEY: 'locationPermissionGranted',
   LAST_UPDATE_KEY: 'lastLocationUpdate',
-  SESSION_CHECK_KEY: 'gpsCheckedThisSession', // sessionStorage key
+  SESSION_CHECK_KEY: 'gpsCheckedThisSession',
   UPDATE_INTERVAL: 5 * 60 * 1000, // 5 minutes
 
   // Telegram LocationManager
@@ -19,7 +20,7 @@ const LocationManager = {
   gpsPromptShown: false, // Prevent repeated GPS prompts
   isRequestingLocation: false, // Prevent simultaneous location requests
 
-  // Translations for the GPS modal
+  // Translations for GPS modal (only used for fallback browser geolocation)
   translations: {
     uz: {
       title: '📍 GPS yoqilmagan',
@@ -44,31 +45,10 @@ const LocationManager = {
     }
   },
 
-  // Get current language
-  getCurrentLang() {
-    if (window.I18N && typeof I18N.getLanguage === 'function') {
-      return I18N.getLanguage();
-    }
-    return localStorage.getItem('appLanguage') || 'uz';
-  },
+  // ============================================
+  // INITIALIZATION
+  // ============================================
 
-  // Get translation
-  t(key) {
-    const lang = this.getCurrentLang();
-    return this.translations[lang]?.[key] || this.translations['en'][key];
-  },
-
-  // Check if GPS was already checked this session
-  isGpsCheckedThisSession() {
-    return sessionStorage.getItem(this.SESSION_CHECK_KEY) === 'true';
-  },
-
-  // Mark GPS as checked for this session
-  markGpsCheckedThisSession() {
-    sessionStorage.setItem(this.SESSION_CHECK_KEY, 'true');
-  },
-
-  // Initialize on every page load
   async init() {
     console.log('🚀 LocationManager initializing...');
     
@@ -82,59 +62,20 @@ const LocationManager = {
     
     console.log('📍 Telegram LocationManager available:', this.hasTelegramLocation);
     
-    // If Telegram LocationManager available, use it
+    // Use Telegram LocationManager if available
     if (this.hasTelegramLocation) {
       await this.initTelegramLocation();
       return;
     }
     
-    // Fallback to browser geolocation
-    this.injectModalStyles();
-    
-    const isMainPage = window.location.pathname.endsWith('index.html') || 
-                       window.location.pathname === '/' ||
-                       window.location.pathname.endsWith('/');
-    
-    if (isMainPage && !this.isGpsCheckedThisSession()) {
-      console.log('🏠 Main page first load - clearing cached location');
-      localStorage.removeItem(this.STORAGE_KEY);
-      localStorage.removeItem(this.PERMISSION_KEY);
-      localStorage.removeItem(this.LAST_UPDATE_KEY);
-    }
-    
-    const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
-    const storedLocation = this.getStoredLocation();
-    const gpsAlreadyChecked = this.isGpsCheckedThisSession();
-    
-    console.log(`Permission: ${hasPermission}, Stored: ${storedLocation?.city || 'none'}, Checked: ${gpsAlreadyChecked}`);
-    
-    if (gpsAlreadyChecked && storedLocation) {
-      console.log('✅ GPS already checked, using cached');
-      this.updateUI(storedLocation);
-      this.silentRefresh();
-      return;
-    }
-    
-    if (hasPermission && storedLocation) {
-      console.log('📍 First check - verifying GPS...');
-      this.updateUI(storedLocation);
-      await this.verifyGpsAndRefresh(storedLocation);
-      return;
-    }
-    
-    if (storedLocation) {
-      console.log('📍 Legacy location found');
-      this.updateUI(storedLocation);
-      localStorage.setItem(this.PERMISSION_KEY, 'true');
-      this.markGpsCheckedThisSession();
-      return;
-    }
-    
-    console.log('🔔 No location - requesting permission');
-    await this.requestInitialPermission();
+    // Fallback to browser geolocation for older versions
+    this.initBrowserGeolocation();
   },
 
-  // Initialize Telegram LocationManager
+  // ============================================
+  // TELEGRAM LOCATIONMANAGER (PRIMARY METHOD)
+  // ============================================
+
   async initTelegramLocation() {
     return new Promise((resolve) => {
       this.tgLocationManager.init(() => {
@@ -176,7 +117,6 @@ const LocationManager = {
     });
   },
 
-  // Get location using Telegram API
   getTelegramLocation() {
     // Prevent multiple simultaneous requests
     if (this.isRequestingLocation) {
@@ -218,7 +158,6 @@ const LocationManager = {
     });
   },
 
-  // Process Telegram location
   async processTelegramLocation(location) {
     const lat = location.latitude;
     const lon = location.longitude;
@@ -239,7 +178,6 @@ const LocationManager = {
     return locationData;
   },
 
-  // Show toggle prompt
   showTogglePrompt() {
     const tg = Telegram.WebApp;
     const userLang = tg.initDataUnsafe?.user?.language_code || this.getCurrentLang();
@@ -252,7 +190,7 @@ const LocationManager = {
     
     const message = messages[userLang] || messages['en'];
     
-    // Trigger toggle to appear
+    // Trigger toggle to appear in bot settings
     this.tgLocationManager.getLocation(() => {});
     
     tg.showPopup({
@@ -273,12 +211,60 @@ const LocationManager = {
     });
   },
 
-  // Verify GPS is working and refresh location (first check of session)
+  // ============================================
+  // BROWSER GEOLOCATION (FALLBACK)
+  // ============================================
+
+  initBrowserGeolocation() {
+    this.injectModalStyles();
+    
+    const isMainPage = window.location.pathname.endsWith('index.html') || 
+                       window.location.pathname === '/' ||
+                       window.location.pathname.endsWith('/');
+    
+    if (isMainPage && !this.isGpsCheckedThisSession()) {
+      console.log('🏠 Main page first load - clearing cached location');
+      localStorage.removeItem(this.STORAGE_KEY);
+      localStorage.removeItem(this.PERMISSION_KEY);
+      localStorage.removeItem(this.LAST_UPDATE_KEY);
+    }
+    
+    const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
+    const storedLocation = this.getStoredLocation();
+    const gpsAlreadyChecked = this.isGpsCheckedThisSession();
+    
+    console.log(`Permission: ${hasPermission}, Stored: ${storedLocation?.city || 'none'}, Checked: ${gpsAlreadyChecked}`);
+    
+    if (gpsAlreadyChecked && storedLocation) {
+      console.log('✅ GPS already checked, using cached');
+      this.updateUI(storedLocation);
+      this.silentRefresh();
+      return;
+    }
+    
+    if (hasPermission && storedLocation) {
+      console.log('📍 First check - verifying GPS...');
+      this.updateUI(storedLocation);
+      this.verifyGpsAndRefresh(storedLocation);
+      return;
+    }
+    
+    if (storedLocation) {
+      console.log('📍 Legacy location found');
+      this.updateUI(storedLocation);
+      localStorage.setItem(this.PERMISSION_KEY, 'true');
+      this.markGpsCheckedThisSession();
+      return;
+    }
+    
+    console.log('🔔 No location - requesting permission');
+    this.requestInitialPermission();
+  },
+
   async verifyGpsAndRefresh(fallbackLocation) {
     return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          // GPS is working - update location
           console.log('✅ GPS verified working, refreshing location...');
           const locationData = await this.processPosition(pos);
           this.updateUI(locationData);
@@ -288,12 +274,10 @@ const LocationManager = {
         (error) => {
           console.log('⚠️ GPS check failed:', error.code, error.message);
           
-          // GPS might be off - show modal
           if (error.code === 1 || error.code === 2) {
             console.log('📍 GPS appears to be off - showing modal');
             this.showGPSModal();
           } else {
-            // Timeout or other error - just use cached location
             console.log('⏱️ GPS timeout - using cached location');
             this.markGpsCheckedThisSession();
           }
@@ -309,7 +293,233 @@ const LocationManager = {
     });
   },
 
-  // Inject CSS for modal
+  async requestInitialPermission() {
+    console.log('📡 Requesting geolocation permission...');
+    
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        console.error('❌ Geolocation API not supported!');
+        this.showGPSModal();
+        resolve(null);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          console.log('✅ Got position:', pos.coords.latitude, pos.coords.longitude);
+          const locationData = await this.processPosition(pos);
+          localStorage.setItem(this.PERMISSION_KEY, 'true');
+          this.updateUI(locationData);
+          this.hideGPSModal();
+          this.markGpsCheckedThisSession();
+          resolve(locationData);
+        },
+        (error) => {
+          console.error('❌ Geolocation error:', error.code, error.message);
+          
+          if (error.code === 1) {
+            console.log('🚫 User denied permission');
+          } else if (error.code === 2) {
+            console.log('📍 GPS appears to be off');
+          } else if (error.code === 3) {
+            console.log('⏱️ Location request timed out');
+          }
+          
+          this.showGPSModal();
+          resolve(null);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    });
+  },
+
+  async silentRefresh() {
+    const lastUpdate = parseInt(localStorage.getItem(this.LAST_UPDATE_KEY) || '0');
+    const now = Date.now();
+    
+    if (now - lastUpdate < this.UPDATE_INTERVAL) {
+      console.log('⏱️ Skipping silent refresh (updated recently)');
+      return;
+    }
+
+    const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
+    if (!hasPermission) {
+      console.log('⭕ Skipping silent refresh (no permission)');
+      return;
+    }
+
+    console.log('🔄 Attempting silent background refresh...');
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const locationData = await this.processPosition(pos);
+        console.log('✅ Location silently refreshed:', locationData.city);
+        this.updateUI(locationData);
+      },
+      (error) => {
+        console.log('⚠️ Silent refresh failed (using cached):', error.message);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 5000,
+        maximumAge: 600000 // Accept up to 10 minute old cached position
+      }
+    );
+  },
+
+  // ============================================
+  // MANUAL REFRESH
+  // ============================================
+
+  async manualRefresh() {
+    console.log('🔄 Manual refresh initiated');
+    
+    // If using Telegram LocationManager
+    if (this.hasTelegramLocation) {
+      if (!this.tgLocationManager.isAccessGranted) {
+        console.log('⚠️ Toggle not enabled');
+        this.showTogglePrompt();
+        return null;
+      }
+      
+      // Check GPS flag before requesting
+      if (this.gpsPromptShown) {
+        console.log('⏭️ GPS prompt already shown, skipping');
+        const cached = this.getStoredLocation();
+        if (cached) this.updateUI(cached);
+        return cached;
+      }
+      
+      this.getTelegramLocation();
+      return;
+    }
+    
+    // Browser geolocation fallback
+    const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
+    
+    if (!hasPermission) {
+      console.log('⚠️ No permission yet');
+      return this.requestInitialPermission();
+    }
+
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          console.log('✅ Got position for manual refresh');
+          const locationData = await this.processPosition(pos);
+          this.updateUI(locationData);
+          resolve(locationData);
+        },
+        (error) => {
+          console.warn('⚠️ Manual refresh failed:', error.message);
+          
+          if (error.code === 2 && !this.gpsPromptShown) {
+            this.gpsPromptShown = true;
+            this.showGPSModal();
+          }
+          
+          const stored = this.getStoredLocation();
+          if (stored) this.updateUI(stored);
+          resolve(stored);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    });
+  },
+
+  // ============================================
+  // LOCATION PROCESSING
+  // ============================================
+
+  async processPosition(pos) {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const city = await this.getCityName(lat, lon);
+    
+    const locationData = {
+      lat,
+      lon,
+      city,
+      timestamp: Date.now()
+    };
+    
+    console.log('💾 Saving location:', locationData.city);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(locationData));
+    localStorage.setItem(this.LAST_UPDATE_KEY, locationData.timestamp.toString());
+    
+    return locationData;
+  },
+
+  async getCityName(lat, lon) {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`
+      );
+      const data = await res.json();
+      return (
+        data.address.city ||
+        data.address.town ||
+        data.address.village ||
+        data.address.county ||
+        'Noma\'lum'
+      );
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return 'Noma\'lum';
+    }
+  },
+
+  // ============================================
+  // UI UPDATES
+  // ============================================
+
+  updateUI(locationData) {
+    if (!locationData) return;
+    
+    // Update city name elements
+    const cityElements = document.querySelectorAll('#cityName, .city-name');
+    cityElements.forEach(el => {
+      if (el) el.innerText = locationData.city;
+    });
+
+    // Update coordinates if element exists
+    const coordsElem = document.getElementById('coords');
+    if (coordsElem) {
+      coordsElem.innerText = `Koordinatalar: ${locationData.lat.toFixed(4)}, ${locationData.lon.toFixed(4)}`;
+    }
+
+    // Update timestamp display if exists
+    const timestampElem = document.getElementById('locationTimestamp');
+    if (timestampElem && locationData.timestamp) {
+      const date = new Date(locationData.timestamp);
+      const timeString = date.toLocaleTimeString();
+      const dateString = date.toLocaleDateString();
+      timestampElem.innerText = `Oxirgi yangilanish: ${timeString}, ${dateString}`;
+    }
+
+    // Trigger prayer times update
+    if (typeof updatePrayerData === 'function') {
+      updatePrayerData(locationData.lat, locationData.lon, locationData.city);
+    }
+
+    // Dispatch custom event for other scripts
+    window.dispatchEvent(new CustomEvent('locationUpdated', { 
+      detail: locationData 
+    }));
+  },
+
+  // ============================================
+  // GPS MODAL (for browser geolocation fallback)
+  // ============================================
+
   injectModalStyles() {
     if (document.getElementById('gps-modal-styles')) return;
     
@@ -407,34 +617,16 @@ const LocationManager = {
         color: white;
       }
       
-      .gps-modal-btn-primary:hover {
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      }
-      
       .gps-modal-btn-close {
-        background: transparent;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 13px;
-        padding: 10px;
-      }
-      
-      .gps-modal-btn-close:hover {
+        background: rgba(255, 255, 255, 0.1);
         color: rgba(255, 255, 255, 0.8);
       }
     `;
+    
     document.head.appendChild(styles);
   },
 
-  // Reset GPS prompt flag (for "Try Again" functionality)
-  resetGpsPrompt() {
-    this.gpsPromptShown = false;
-    this.isRequestingLocation = false;
-    console.log('🔄 GPS prompt flag reset');
-  },
-
-  // Show GPS off modal
   showGPSModal() {
-    // Remove existing modal if any
     this.hideGPSModal();
     
     const overlay = document.createElement('div');
@@ -465,7 +657,7 @@ const LocationManager = {
     document.getElementById('gps-try-again').addEventListener('click', () => {
       console.log('🔄 User clicked Try Again');
       this.hideGPSModal();
-      this.resetGpsPrompt(); // Reset the flag
+      this.resetGpsPrompt();
       
       if (this.hasTelegramLocation) {
         this.getTelegramLocation();
@@ -476,27 +668,17 @@ const LocationManager = {
     
     document.getElementById('gps-close').addEventListener('click', () => {
       this.hideGPSModal();
-      // Mark as checked so user isn't bothered again this session
       this.markGpsCheckedThisSession();
     });
     
-    // Close on overlay click
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
         this.hideGPSModal();
         this.markGpsCheckedThisSession();
       }
     });
-    
-    // Haptic feedback
-    try {
-      if (Telegram.WebApp.HapticFeedback) {
-        Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
-      }
-    } catch (e) {}
   },
 
-  // Hide GPS modal
   hideGPSModal() {
     const overlay = document.getElementById('gps-modal-overlay');
     if (overlay) {
@@ -504,7 +686,36 @@ const LocationManager = {
     }
   },
 
-  // Get stored location data
+  resetGpsPrompt() {
+    this.gpsPromptShown = false;
+    this.isRequestingLocation = false;
+    console.log('🔄 GPS prompt flag reset');
+  },
+
+  // ============================================
+  // UTILITY METHODS
+  // ============================================
+
+  getCurrentLang() {
+    if (window.I18N && typeof I18N.getLanguage === 'function') {
+      return I18N.getLanguage();
+    }
+    return localStorage.getItem('appLanguage') || 'uz';
+  },
+
+  t(key) {
+    const lang = this.getCurrentLang();
+    return this.translations[lang]?.[key] || this.translations['en'][key];
+  },
+
+  isGpsCheckedThisSession() {
+    return sessionStorage.getItem(this.SESSION_CHECK_KEY) === 'true';
+  },
+
+  markGpsCheckedThisSession() {
+    sessionStorage.setItem(this.SESSION_CHECK_KEY, 'true');
+  },
+
   getStoredLocation() {
     const stored = localStorage.getItem(this.STORAGE_KEY);
     if (stored) {
@@ -517,225 +728,10 @@ const LocationManager = {
     return null;
   },
 
-  // Request permission only on first use
-  async requestInitialPermission() {
-    console.log('📡 Requesting geolocation permission...');
-    
-    return new Promise((resolve) => {
-      // First check if geolocation is available
-      if (!navigator.geolocation) {
-        console.error('❌ Geolocation API not supported!');
-        this.showGPSModal();
-        resolve(null);
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          console.log('✅ Got position:', pos.coords.latitude, pos.coords.longitude);
-          const locationData = await this.processPosition(pos);
-          localStorage.setItem(this.PERMISSION_KEY, 'true');
-          this.updateUI(locationData);
-          this.hideGPSModal();
-          this.markGpsCheckedThisSession();
-          resolve(locationData);
-        },
-        (error) => {
-          console.error('❌ Geolocation error:', error.code, error.message);
-          
-          // Error codes:
-          // 1 = PERMISSION_DENIED - user clicked deny
-          // 2 = POSITION_UNAVAILABLE - GPS is off or not available
-          // 3 = TIMEOUT - took too long
-          
-          if (error.code === 1) {
-            console.log('🚫 User denied permission');
-            this.showGPSModal();
-          } else if (error.code === 2) {
-            console.log('📍 GPS appears to be off');
-            this.showGPSModal();
-          } else if (error.code === 3) {
-            console.log('⏱️ Location request timed out');
-            this.showGPSModal();
-          }
-          
-          resolve(null);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
-    });
-  },
-
-  // Silent refresh - runs in background, never shows modal
-  async silentRefresh() {
-    const lastUpdate = parseInt(localStorage.getItem(this.LAST_UPDATE_KEY) || '0');
-    const now = Date.now();
-    
-    // Don't refresh too frequently
-    if (now - lastUpdate < this.UPDATE_INTERVAL) {
-      console.log('⏱️ Skipping silent refresh (updated recently)');
-      return;
-    }
-
-    const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
-    if (!hasPermission) {
-      console.log('⭕ Skipping silent refresh (no permission)');
-      return;
-    }
-
-    console.log('🔄 Attempting silent background refresh...');
-
-    // Try to get new position silently - accept cached position
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const locationData = await this.processPosition(pos);
-        console.log('✅ Location silently refreshed:', locationData.city);
-        this.updateUI(locationData);
-      },
-      (error) => {
-        // Silent refresh failed - just continue with cached location
-        // Do NOT show modal - this is background refresh
-        console.log('⚠️ Silent refresh failed (using cached):', error.message);
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 5000,
-        maximumAge: 600000 // Accept up to 10 minute old cached position
-      }
-    );
-  },
-
-  // Manual refresh triggered by user button
-  async manualRefresh() {
-    console.log('🔄 Manual refresh initiated');
-    
-    const hasPermission = localStorage.getItem(this.PERMISSION_KEY) === 'true';
-    
-    if (!hasPermission) {
-      console.log('⚠️ No permission yet');
-      return this.requestInitialPermission();
-    }
-
-    return new Promise((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          console.log('✅ Got position for manual refresh');
-          const locationData = await this.processPosition(pos);
-          this.updateUI(locationData);
-          resolve(locationData);
-        },
-        (error) => {
-          console.warn('⚠️ Manual refresh failed:', error.message);
-          
-          if (error.code === 2) {
-            this.showGPSModal();
-            resolve(null);
-          } else {
-            const stored = this.getStoredLocation();
-            if (stored) {
-              this.updateUI(stored);
-              resolve(stored);
-            } else {
-              this.showGPSModal();
-              resolve(null);
-            }
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
-    });
-  },
-
-  // Process position and get city name
-  async processPosition(pos) {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    const city = await this.getCityName(lat, lon);
-    
-    const locationData = {
-      lat,
-      lon,
-      city,
-      timestamp: Date.now()
-    };
-    
-    console.log('💾 Saving location:', locationData.city);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(locationData));
-    localStorage.setItem(this.LAST_UPDATE_KEY, locationData.timestamp.toString());
-    
-    return locationData;
-  },
-
-  // Reverse geocoding
-  async getCityName(lat, lon) {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=en`
-      );
-      const data = await res.json();
-      return (
-        data.address.city ||
-        data.address.town ||
-        data.address.village ||
-        data.address.county ||
-        'Noma\'lum'
-      );
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      return 'Noma\'lum';
-    }
-  },
-
-  // Update UI elements on current page
-  updateUI(locationData) {
-    if (!locationData) return;
-    
-    // Update city name elements
-    const cityElements = document.querySelectorAll('#cityName, .city-name');
-    cityElements.forEach(el => {
-      if (el) el.innerText = locationData.city;
-    });
-
-    // Update coordinates if element exists
-    const coordsElem = document.getElementById('coords');
-    if (coordsElem) {
-      coordsElem.innerText = `Koordinatalar: ${locationData.lat.toFixed(4)}, ${locationData.lon.toFixed(4)}`;
-    }
-
-    // Update timestamp display if exists
-    const timestampElem = document.getElementById('locationTimestamp');
-    if (timestampElem && locationData.timestamp) {
-      const date = new Date(locationData.timestamp);
-      const timeString = date.toLocaleTimeString();
-      const dateString = date.toLocaleDateString();
-      timestampElem.innerText = `Oxirgi yangilanish: ${timeString}, ${dateString}`;
-    }
-
-    // Trigger prayer times update
-    if (typeof updatePrayerData === 'function') {
-      updatePrayerData(locationData.lat, locationData.lon, locationData.city);
-    }
-
-    // Dispatch custom event for other scripts
-    window.dispatchEvent(new CustomEvent('locationUpdated', { 
-      detail: locationData 
-    }));
-  },
-
-  // Get current location (returns cached if available)
   getCurrentLocation() {
     return this.getStoredLocation();
   },
 
-  // Check if location is stale (older than 24 hours)
   isLocationStale() {
     const location = this.getStoredLocation();
     if (!location || !location.timestamp) return true;
@@ -744,7 +740,6 @@ const LocationManager = {
     return age > 24 * 60 * 60 * 1000; // 24 hours
   },
 
-  // Clear stored location (useful for testing or reset)
   clearLocation() {
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.PERMISSION_KEY);
