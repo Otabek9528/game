@@ -238,8 +238,9 @@ const LocationManager = {
         
         .guide-modal-image {
           width: 80%;
+          display: block;
+          margin: 0 auto 16px auto;
           border-radius: 12px;
-          margin-bottom: 16px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
@@ -248,7 +249,7 @@ const LocationManager = {
           line-height: 1.6;
           color: #555;
           margin-bottom: 20px;
-          text-align: center;
+          text-align: left;
         }
         
         .guide-modal-button {
