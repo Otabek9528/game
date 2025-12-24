@@ -189,9 +189,9 @@ const LocationManager = {
     const userLang = tg.initDataUnsafe?.user?.language_code || this.getCurrentLang();
     
     const messages = {
-      uz: 'Joylashuv xususiyatlaridan foydalanish uchun bot sozlamalarida joylashuvga ruxsat bering.',
-      ru: 'Чтобы использовать функции на основе местоположения, пожалуйста, включите доступ к местоположению в настройках бота.',
-      en: 'To provide location-based features, please enable location access for this Mini App in the bot settings.'
+      uz: 'Joylashuv xususiyatlaridan foydalanish uchun bot sozlamalarida joylashuvga ruxsat bering va ilovani qayta oching.',
+      ru: 'Чтобы использовать функции на основе местоположения, включите доступ к местоположению в настройках бота и перезапустите приложение.',
+      en: 'To use location features, please enable location access in bot settings and reopen the app.'
     };
     
     const message = messages[userLang] || messages['en'];
@@ -203,16 +203,12 @@ const LocationManager = {
       title: '📍 Location Access Needed',
       message: message,
       buttons: [
-        { id: 'settings', type: 'default', text: 'Open Settings' },
-        { id: 'close', type: 'close', text: 'Close' }
+        { id: 'settings', type: 'default', text: 'Open Settings' }
       ]
     }, (buttonId) => {
       if (buttonId === 'settings') {
-        if (this.tgLocationManager.openSettings) {
-          this.tgLocationManager.openSettings();
-        } else {
-          tg.close();
-        }
+        // Close the app - user will land on bot settings
+        tg.close();
       }
     });
   },
@@ -606,54 +602,36 @@ const LocationManager = {
   },
 
   showGPSModal() {
-    this.hideGPSModal();
+    const tg = Telegram.WebApp;
+    const userLang = this.getCurrentLang();
     
-    const overlay = document.createElement('div');
-    overlay.className = 'gps-modal-overlay';
-    overlay.id = 'gps-modal-overlay';
-
-    overlay.innerHTML = `
-      <div class="gps-modal">
-        <div class="gps-modal-icon">📍</div>
-        <h2 class="gps-modal-title">${this.t('title')}</h2>
-        <p class="gps-modal-message">${this.t('message')}</p>
-        <p class="gps-modal-instructions">${this.t('instructions')}</p>
-        
-        <div class="gps-modal-buttons">
-          <button class="gps-modal-btn gps-modal-btn-primary" id="gps-try-again">
-            ${this.t('tryAgain')}
-          </button>
-          <button class="gps-modal-btn gps-modal-btn-close" id="gps-close">
-            ${this.t('close')}
-          </button>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(overlay);
-    
-    // Event listeners
-    document.getElementById('gps-try-again').addEventListener('click', () => {
-      console.log('🔄 User clicked Try Again');
-      this.hideGPSModal();
-      this.resetGpsPrompt();
-      
-      if (this.hasTelegramLocation) {
-        this.getTelegramLocation();
-      } else {
-        this.requestInitialPermission();
+    const messages = {
+      uz: {
+        title: '📍 GPS o\'chirilgan',
+        message: 'Joylashuvingizni aniqlash uchun telefoningizda GPS ni yoqing va ilovani qayta oching.'
+      },
+      ru: {
+        title: '📍 GPS выключен',
+        message: 'Включите GPS в настройках телефона и перезапустите приложение.'
+      },
+      en: {
+        title: '📍 GPS is Off',
+        message: 'Please enable GPS in your device settings and reopen the app.'
       }
-    });
+    };
     
-    document.getElementById('gps-close').addEventListener('click', () => {
-      this.hideGPSModal();
-      this.markGpsCheckedThisSession();
-    });
+    const msg = messages[userLang] || messages['en'];
     
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        this.hideGPSModal();
-        this.markGpsCheckedThisSession();
+    tg.showPopup({
+      title: msg.title,
+      message: msg.message,
+      buttons: [
+        { id: 'settings', type: 'default', text: 'Open Settings' }
+      ]
+    }, (buttonId) => {
+      if (buttonId === 'settings') {
+        // Close the app - user will go to device settings
+        tg.close();
       }
     });
   },
