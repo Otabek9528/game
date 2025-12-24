@@ -194,10 +194,11 @@ const LocationManager = {
       if (buttonId === 'settings') {
         // Tell Telegram to open bot settings/info
         if (tg.LocationManager && tg.LocationManager.openSettings) {
-          tg.LocationManager.openSettings();
-        } else {
+          tg.LocationManager.openSettings()
           tg.close(); // Fallback
-        }
+        }  
+          
+        
       }
     });
   },
