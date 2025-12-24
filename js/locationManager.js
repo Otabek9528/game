@@ -192,11 +192,12 @@ const LocationManager = {
       ]
     }, (buttonId) => {
       if (buttonId === 'settings') {
-        tg.openTelegramLink('https://t.me/Vegukin_TEST_bot');
-        // Close app after opening bot page
-        //setTimeout(() => {
-          //tg.close();
-        //}, 100); // Small delay to ensure link opens first
+        // Tell Telegram to open bot settings/info
+        if (tg.LocationManager && tg.LocationManager.openSettings) {
+          tg.LocationManager.openSettings();
+        } else {
+          tg.close(); // Fallback
+        }
       }
     });
   },
