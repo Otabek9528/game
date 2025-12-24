@@ -64,7 +64,7 @@ const LocationManager = {
         // Listen for permission changes
         tg.onEvent('locationManagerUpdated', () => {
           console.log('📍 Permission changed');
-          if (this.tgLocationManager.isAccessGranted) {
+          if (this.tgLocationManager.isAccessGranted && !this.isRequestingLocation) {
             this.getTelegramLocation();
           }
         });
@@ -147,9 +147,6 @@ const LocationManager = {
     };
     
     const message = messages[userLang] || messages['en'];
-    
-    // Trigger toggle to appear in bot settings
-    //this.tgLocationManager.getLocation(() => {});
     
     tg.showPopup({
       title: '📍 Location Access Needed',
