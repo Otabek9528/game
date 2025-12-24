@@ -93,6 +93,15 @@ const LocationManager = {
   },
 
   getTelegramLocation() {
+    // CRITICAL: Prevent multiple simultaneous requests
+    if (this.isRequestingLocation) {
+      console.log('⏭️ BLOCKED - Already requesting');
+      return; // Exit immediately
+    }
+    
+    // Set flag IMMEDIATELY before anything else
+    this.isRequestingLocation = true;
+    
     // Increment and show call counter
     this.locationCallCount++;
     
@@ -102,16 +111,8 @@ const LocationManager = {
       if (el) el.innerText = `🔴 DEBUG: Called ${this.locationCallCount} times`;
     });
     
-    // Prevent multiple simultaneous requests
-    if (this.isRequestingLocation) {
-      console.log('⏭️ Location request already in progress, skipping...');
-      console.trace('Called from:');
-      return;
-    }
-
     console.log('📡 Requesting location from Telegram...');
     console.trace('Called from:');
-    this.isRequestingLocation = true;
 
     // TEMPORARILY DISABLED - Set a timeout to close app if GPS fails
     // const gpsTimeout = setTimeout(() => {
@@ -200,6 +201,10 @@ const LocationManager = {
   // ============================================
 
   startPeriodicRefresh() {
+    // TEMPORARILY DISABLED - Debug infinite loop issue
+    console.log('⏭️ Periodic refresh disabled for debugging');
+    return;
+    
     // Clear any existing interval
     if (this.periodicRefreshInterval) {
       clearInterval(this.periodicRefreshInterval);
