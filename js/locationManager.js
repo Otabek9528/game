@@ -378,7 +378,7 @@ const LocationManager = {
   showLoadingState() {
     const cityElements = document.querySelectorAll('#cityName, .city-name');
     cityElements.forEach(el => {
-      if (el) el.innerText = '📍 Joylashuv aniqlanmoqda...';
+      if (el) el.innerText = '📍 Yuklanmoqda...';
     });
     console.log('⏳ Loading state shown');
   },
