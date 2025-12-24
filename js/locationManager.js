@@ -148,9 +148,6 @@ const LocationManager = {
     
     const message = messages[userLang] || messages['en'];
     
-    // Trigger toggle to appear in bot settings
-    this.tgLocationManager.getLocation(() => {});
-    
     tg.showPopup({
       title: '📍 Location Access Needed',
       message: message,
