@@ -184,21 +184,120 @@ const LocationManager = {
     
     const message = messages[userLang] || messages['en'];
     
-    tg.showPopup({
-      title: '📍 Location Access Needed',
-      message: message,
-      buttons: [
-        { id: 'settings', type: 'default', text: 'Open Settings' }
-      ]
-    }, (buttonId) => {
-      if (buttonId === 'settings') {
-        // Tell Telegram to open bot settings/info
-        if (tg.LocationManager && tg.LocationManager.openSettings) {
-          tg.LocationManager.openSettings()
-          tg.close(); // Fallback
-        }  
-          
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'location-guide-modal';
+    overlay.innerHTML = `
+      <style>
+        #location-guide-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          padding: 20px;
+          animation: fadeIn 0.3s ease;
+        }
         
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        .guide-modal-content {
+          background: white;
+          border-radius: 20px;
+          padding: 24px;
+          max-width: 400px;
+          width: 100%;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .guide-modal-title {
+          font-size: 1.3rem;
+          font-weight: 600;
+          margin: 0 0 16px 0;
+          text-align: center;
+          color: #333;
+        }
+        
+        .guide-modal-image {
+          width: 100%;
+          border-radius: 12px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .guide-modal-text {
+          font-size: 0.95rem;
+          line-height: 1.6;
+          color: #555;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+        
+        .guide-modal-button {
+          width: 100%;
+          padding: 14px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        
+        .guide-modal-button:active {
+          transform: scale(0.98);
+        }
+      </style>
+      
+      <div class="guide-modal-content">
+        <h2 class="guide-modal-title">📍 Enable Location Access</h2>
+        
+        <img src="assets/location-toggle-guide.jpg" alt="Location Toggle Guide" class="guide-modal-image">
+        
+        <p class="guide-modal-text">${message}</p>
+        
+        <button class="guide-modal-button" id="openSettingsBtn">
+          Open Settings
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    // Handle button click
+    document.getElementById('openSettingsBtn').addEventListener('click', () => {
+      overlay.remove();
+      if (tg.LocationManager && tg.LocationManager.openSettings) {
+        tg.LocationManager.openSettings();
+      } else {
+        tg.close();
+      }
+    });
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
       }
     });
   },
