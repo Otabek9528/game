@@ -96,34 +96,17 @@ const LocationManager = {
           }
         });
 
-        const storedLocation = this.getStoredLocation();
-        const isMainPage = window.location.pathname.endsWith('index.html') || 
-                           window.location.pathname === '/' ||
-                           window.location.pathname.endsWith('/');
-
-        // STRATEGY: Get fresh location on EVERY launch
+        // ALWAYS check permissions on every launch
         if (this.tgLocationManager.isAccessGranted) {
-          // Show loading state
+          // Toggle ON - get fresh location
           this.showLoadingState();
-          
-          // Get fresh location immediately
-          console.log('📡 Getting fresh location on launch...');
           this.getTelegramLocation();
         } else {
-          // Toggle is OFF
-          if (!storedLocation && isMainPage && !sessionStorage.getItem('togglePromptShown')) {
-            // First launch ever - show toggle prompt
-            sessionStorage.setItem('togglePromptShown', 'true');
-            this.showTogglePrompt();
-          } else if (storedLocation) {
-            // Have cached location - use as fallback
-            console.log('⚠️ Toggle OFF, using cached location');
-            this.updateUI(storedLocation);
-            this.showStaleDataWarning();
-          }
+          // Toggle OFF - always prompt (even if we have cache)
+          this.showTogglePrompt();
         }
 
-        // Start periodic refresh (every 5 minutes while app is open)
+        // Start periodic refresh
         this.startPeriodicRefresh();
 
         this.markGpsCheckedThisSession();
