@@ -194,9 +194,9 @@ const LocationManager = {
       if (buttonId === 'settings') {
         tg.openTelegramLink('https://t.me/Vegukin_TEST_bot');
         // Close app after opening bot page
-        setTimeout(() => {
-          tg.close();
-        }, 100); // Small delay to ensure link opens first
+        //setTimeout(() => {
+          //tg.close();
+        //}, 100); // Small delay to ensure link opens first
       }
     });
   },
