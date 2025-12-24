@@ -23,6 +23,33 @@ const LocationManager = {
   periodicRefreshInterval: null,
   isInitialized: false, // Prevent double initialization
 
+  // Translations
+  translations: {
+    uz: {
+      loading: 'Yuklanmoqda...'
+    },
+    ru: {
+      loading: 'Загрузка...'
+    },
+    en: {
+      loading: 'Loading...'
+    }
+  },
+
+  // Get current language
+  getCurrentLang() {
+    if (window.I18N && typeof I18N.getLanguage === 'function') {
+      return I18N.getLanguage();
+    }
+    return localStorage.getItem('appLanguage') || 'uz';
+  },
+
+  // Get translation
+  t(key) {
+    const lang = this.getCurrentLang();
+    return this.translations[lang]?.[key] || this.translations['en'][key];
+  },
+
   // ============================================
   // INITIALIZATION
   // ============================================
@@ -150,9 +177,9 @@ const LocationManager = {
     const userLang = tg.initDataUnsafe?.user?.language_code || this.getCurrentLang();
     
     const messages = {
-      uz: 'Joylashuv xususiyatlaridan foydalanish uchun bot sozlamalarida joylashuvga ruxsat bering va ilovani qayta oching.',
-      ru: 'Чтобы использовать функции на основе местоположения, включите доступ к местоположению в настройках бота и перезапустите приложение.',
-      en: 'To use location features, please enable location access in bot settings and reopen the app.'
+      uz: 'Geolokatsiyani aniqlash uchun:\n\n1. "Sozlamalarni ochish" tugmasini bosing\n2. "Geolokatsiya" tugmachasini yoqing\n3. Ilovani qayta oching',
+      ru: 'Чтобы определить местоположение:\n\n1. Нажмите кнопку "Открыть настройки"\n2. Включите переключатель "Геолокация"\n3. Откройте приложение заново',
+      en: 'To enable location:\n\n1. Tap "Open Settings" button\n2. Turn ON the "Geolocation" toggle switch\n3. Reopen the app'
     };
     
     const message = messages[userLang] || messages['en'];
@@ -376,9 +403,10 @@ const LocationManager = {
   // ============================================
 
   showLoadingState() {
+    const loadingText = this.t('loading');
     const cityElements = document.querySelectorAll('#cityName, .city-name');
     cityElements.forEach(el => {
-      if (el) el.innerText = '📍 Yuklanmoqda...';
+      if (el) el.innerText = `📍 ${loadingText}`;
     });
     console.log('⏳ Loading state shown');
   },
@@ -429,13 +457,6 @@ const LocationManager = {
   // ============================================
   // UTILITY METHODS
   // ============================================
-
-  getCurrentLang() {
-    if (window.I18N && typeof I18N.getLanguage === 'function') {
-      return I18N.getLanguage();
-    }
-    return localStorage.getItem('appLanguage') || 'uz';
-  },
 
   isGpsCheckedThisSession() {
     return sessionStorage.getItem(this.SESSION_CHECK_KEY) === 'true';
