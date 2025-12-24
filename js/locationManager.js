@@ -70,14 +70,9 @@ const LocationManager = {
 
         const tg = Telegram.WebApp;
         
-        // Listen for permission changes
-        tg.onEvent('locationManagerUpdated', () => {
-          console.log('📍 Permission changed');
-          if (this.tgLocationManager.isAccessGranted && !this.isRequestingLocation) {
-            this.getTelegramLocation();
-          }
-        });
-
+        // DON'T listen for permission changes - causes infinite loop!
+        // The event fires repeatedly when GPS is off
+        
         // ALWAYS check permissions on every launch
         if (this.tgLocationManager.isAccessGranted) {
           // Toggle ON - get fresh location
