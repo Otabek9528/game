@@ -22,6 +22,7 @@ const LocationManager = {
   isRequestingLocation: false,
   periodicRefreshInterval: null,
   isInitialized: false, // Prevent double initialization
+  locationCallCount: 0, // Track how many times getTelegramLocation is called
 
   // ============================================
   // INITIALIZATION
@@ -97,23 +98,41 @@ const LocationManager = {
   },
 
   getTelegramLocation() {
+    // Increment and show call counter
+    this.locationCallCount++;
+    
+    // Show visual feedback on screen
+    const cityElements = document.querySelectorAll('#cityName, .city-name');
+    cityElements.forEach(el => {
+      if (el) el.innerText = `🔴 DEBUG: Called ${this.locationCallCount} times`;
+    });
+    
     // Prevent multiple simultaneous requests
     if (this.isRequestingLocation) {
       console.log('⏭️ Location request already in progress, skipping...');
+      console.trace('Called from:');
       return;
     }
 
     console.log('📡 Requesting location from Telegram...');
+    console.trace('Called from:');
     this.isRequestingLocation = true;
 
+    // Set a timeout to close app if GPS fails
+    const gpsTimeout = setTimeout(() => {
+      console.log('⏱️ GPS timeout - closing app');
+      const tg = Telegram.WebApp;
+      tg.close();
+    }, 3000); // Close after 3 seconds if no response
+
     this.tgLocationManager.getLocation(async (location) => {
+      clearTimeout(gpsTimeout); // Cancel timeout on success
       this.isRequestingLocation = false;
       this.hideLoadingState();
       
       if (location === null) {
         console.log('❌ Location null - GPS might be off');
-        // Telegram already showed its native popup
-        // Close the app so user can enable GPS and reopen
+        // Close immediately
         const tg = Telegram.WebApp;
         tg.close();
       } else {
