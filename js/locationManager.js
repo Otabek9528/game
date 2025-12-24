@@ -118,23 +118,29 @@ const LocationManager = {
     console.trace('Called from:');
     this.isRequestingLocation = true;
 
-    // Set a timeout to close app if GPS fails
-    const gpsTimeout = setTimeout(() => {
-      console.log('⏱️ GPS timeout - closing app');
-      const tg = Telegram.WebApp;
-      tg.close();
-    }, 3000); // Close after 3 seconds if no response
+    // TEMPORARILY DISABLED - Set a timeout to close app if GPS fails
+    // const gpsTimeout = setTimeout(() => {
+    //   console.log('⏱️ GPS timeout - closing app');
+    //   const tg = Telegram.WebApp;
+    //   tg.close();
+    // }, 3000); // Close after 3 seconds if no response
 
     this.tgLocationManager.getLocation(async (location) => {
-      clearTimeout(gpsTimeout); // Cancel timeout on success
+      // clearTimeout(gpsTimeout); // Cancel timeout on success
       this.isRequestingLocation = false;
       this.hideLoadingState();
       
       if (location === null) {
         console.log('❌ Location null - GPS might be off');
-        // Close immediately
-        const tg = Telegram.WebApp;
-        tg.close();
+        // TEMPORARILY DISABLED - Don't close so we can see the counter
+        // const tg = Telegram.WebApp;
+        // tg.close();
+        
+        // Show error message instead
+        const cityElements = document.querySelectorAll('#cityName, .city-name');
+        cityElements.forEach(el => {
+          if (el) el.innerText = `❌ GPS OFF - Called ${this.locationCallCount} times`;
+        });
       } else {
         console.log('✅ Got fresh Telegram location');
         const locationData = await this.processTelegramLocation(location);
