@@ -237,7 +237,7 @@ const LocationManager = {
         }
         
         .guide-modal-image {
-          width: 80%;
+          width: 75%;
           display: block;
           margin: 0 auto 16px auto;
           border-radius: 12px;
