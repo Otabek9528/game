@@ -21,12 +21,20 @@ const LocationManager = {
   hasTelegramLocation: false,
   isRequestingLocation: false,
   periodicRefreshInterval: null,
+  isInitialized: false, // Prevent double initialization
 
   // ============================================
   // INITIALIZATION
   // ============================================
 
   async init() {
+    // Prevent double initialization
+    if (this.isInitialized) {
+      console.log('⏭️ LocationManager already initialized, skipping...');
+      return;
+    }
+    this.isInitialized = true;
+    
     console.log('🚀 LocationManager initializing...');
     
     const tg = Telegram.WebApp;
