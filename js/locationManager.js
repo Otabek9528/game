@@ -177,9 +177,9 @@ const LocationManager = {
     const userLang = tg.initDataUnsafe?.user?.language_code || this.getCurrentLang();
     
     const messages = {
-      uz: 'Geolokatsiyani aniqlash uchun:\n\n1. "Sozlamalarni ochish" tugmasini bosing\n2. "Geolokatsiya" tugmachasini yoqing\n3. Ilovani qayta oching',
-      ru: 'Чтобы определить местоположение:\n\n1. Нажмите кнопку "Открыть настройки"\n2. Включите переключатель "Геолокация"\n3. Откройте приложение заново',
-      en: 'To enable location:\n\n1. Tap "Open Settings" button\n2. Turn ON the "Geolocation" toggle switch\n3. Reopen the app'
+      uz: '1. "Sozlamalarni ochish" tugmasini bosing\n2. "Geolokatsiya" tugmachasini yoqing\n3. Ilovani qayta oching',
+      ru: '1. Нажмите кнопку "Открыть настройки"\n2. Включите переключатель "Геолокация"\n3. Откройте приложение заново',
+      en: '1. Tap "Open Settings" button\n2. Turn ON the "Geolocation" toggle switch\n3. Reopen the app'
     };
     
     const message = messages[userLang] || messages['en'];
@@ -266,6 +266,10 @@ const LocationManager = {
         
         .guide-modal-button:active {
           transform: scale(0.98);
+        }
+
+        .guide-modal-text {
+          white-space: pre-line;  
         }
       </style>
       
