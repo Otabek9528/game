@@ -87,8 +87,8 @@ const LocationManager = {
           this.showTogglePrompt();
         }
 
-        // Start periodic refresh
-        this.startPeriodicRefresh();
+        // Periodic refresh will start after first successful location
+        // Don't start it here to avoid duplicate requests
 
         this.markGpsCheckedThisSession();
         resolve();
@@ -120,6 +120,11 @@ const LocationManager = {
         console.log('✅ Got fresh Telegram location');
         const locationData = await this.processTelegramLocation(location);
         this.updateUI(locationData);
+        
+        // Start periodic refresh only after first successful location
+        if (!this.periodicRefreshInterval) {
+          this.startPeriodicRefresh();
+        }
       }
     });
   },
