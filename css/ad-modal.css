@@ -8,8 +8,10 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -20,6 +22,7 @@
   padding: 20px;
   animation: fadeIn 0.3s ease-out;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* Modal Container */
@@ -28,13 +31,15 @@
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   max-width: 500px;
-  width: 80%;
+  width: calc(100% - 40px); /* 100% minus padding */
   max-height: 85vh;
   overflow: hidden;
   position: relative;
   animation: slideUp 0.4s ease-out;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  margin: 0 auto; /* Ensure centering */
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Close Button (X) */
@@ -252,10 +257,17 @@
 
 /* Responsive Design */
 @media (max-width: 600px) {
+  .ad-modal-overlay {
+    padding: 15px;
+  }
+
   .ad-modal-container {
-    max-width: 95%;
+    max-width: 100%;
+    width: calc(100% - 30px);
     max-height: 90vh;
     border-radius: 16px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .ad-modal-image {
