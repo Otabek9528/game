@@ -1,0 +1,323 @@
+/* ==========================================
+   AD MODAL STYLES
+   Beautiful overlay ad system with blur effect
+   ========================================== */
+
+/* Modal Overlay - Blurred Background */
+.ad-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+  overflow-y: auto;
+}
+
+/* Modal Container */
+.ad-modal-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 85vh;
+  overflow: hidden;
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Close Button (X) */
+.ad-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.ad-modal-close:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.ad-modal-close:active {
+  transform: scale(0.95);
+}
+
+/* Ad Image Section */
+.ad-modal-image {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 20px 20px 0 0;
+  display: block;
+}
+
+.ad-modal-image-placeholder {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  border-radius: 20px 20px 0 0;
+}
+
+/* Ad Content Section */
+.ad-modal-content {
+  padding: 25px;
+  overflow-y: auto;
+  max-height: calc(85vh - 300px - 100px);
+}
+
+.ad-modal-html {
+  color: #2c3e50;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.ad-modal-html b,
+.ad-modal-html strong {
+  color: #1a202c;
+  font-weight: 600;
+}
+
+.ad-modal-html a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.ad-modal-html a:hover {
+  text-decoration: underline;
+}
+
+/* View Count Badge */
+.ad-modal-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #667eea;
+  margin-bottom: 15px;
+}
+
+/* Action Buttons Container */
+.ad-modal-actions {
+  padding: 0 25px 25px 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Hide for 7 Days Button */
+.ad-modal-hide-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ad-modal-hide-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.ad-modal-hide-btn:active {
+  transform: translateY(0);
+}
+
+.ad-modal-hide-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Success Message */
+.ad-modal-success {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  animation: fadeIn 0.3s ease-out;
+  z-index: 15;
+}
+
+.ad-modal-success-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.ad-modal-success-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  text-align: center;
+  padding: 0 30px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Fade Out Animation Class */
+.ad-modal-overlay.fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .ad-modal-container {
+    max-width: 95%;
+    max-height: 90vh;
+    border-radius: 16px;
+  }
+
+  .ad-modal-image {
+    max-height: 220px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .ad-modal-content {
+    padding: 20px;
+    max-height: calc(90vh - 220px - 100px);
+  }
+
+  .ad-modal-html {
+    font-size: 15px;
+  }
+
+  .ad-modal-actions {
+    padding: 0 20px 20px 20px;
+  }
+
+  .ad-modal-hide-btn {
+    padding: 12px 18px;
+    font-size: 14px;
+  }
+
+  .ad-modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    top: 12px;
+    right: 12px;
+  }
+
+  .ad-modal-success-icon {
+    font-size: 50px;
+  }
+
+  .ad-modal-success-text {
+    font-size: 16px;
+  }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .ad-modal-container {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .ad-modal-html {
+    color: #e2e8f0;
+  }
+
+  .ad-modal-html b,
+  .ad-modal-html strong {
+    color: #f7fafc;
+  }
+
+  .ad-modal-success {
+    background: rgba(26, 32, 44, 0.98);
+  }
+
+  .ad-modal-success-text {
+    color: #e2e8f0;
+  }
+}
