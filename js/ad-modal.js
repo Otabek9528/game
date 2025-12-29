@@ -12,6 +12,16 @@ class AdModalManager {
   }
 
   /**
+ * Decode HTML entities and preserve newlines
+ */
+  decodeHtml(html) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    // Convert \n to <br> for proper line breaks
+    return txt.value.replace(/\n/g, '<br>');
+  }
+
+  /**
    * Initialize ad system - call this on page load
    */
   async init() {
@@ -129,7 +139,7 @@ class AdModalManager {
             ` : ''}
             
             <div class="ad-modal-html">
-              ${ad.html}
+              ${this.decodeHtml(ad.html)}
             </div>
           </div>
 
