@@ -365,10 +365,10 @@ function initAdSystem() {
     console.log('[AdModal] 🔧 Checking API configuration...');
     
     // Get API base URL from apiConfig.js or use default
-    const apiBaseUrl = window.API_BASE_URL || 'https://your-api-domain.com';
+    const apiBaseUrl = window.API_BASE_URL || 'https://vegukin-api.duckdns.org/';
     console.log('[AdModal] 🌐 API Base URL:', apiBaseUrl);
     
-    if (apiBaseUrl === 'https://your-api-domain.com') {
+    if (apiBaseUrl === 'https://vegukin-api.duckdns.org/') {
       console.warn('[AdModal] ⚠️ WARNING: Using default API URL! Set window.API_BASE_URL in apiConfig.js');
     }
     
