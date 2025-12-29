@@ -191,7 +191,37 @@ class AdModalManager {
 
     // ESC key to close
     document.addEventListener('keydown', this.handleEscKey.bind(this));
+
+    // Handle external links - open in system browser/app
+    this.handleExternalLinks();
   }
+
+  /**
+   * Handle external links to open in system browser or native apps
+   */
+  handleExternalLinks() {
+    const adContent = document.querySelector('.ad-modal-html');
+    if (!adContent) return;
+
+    const links = adContent.querySelectorAll('a');
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = link.getAttribute('href');
+        
+        if (url) {
+          // Use Telegram WebApp API to open link externally
+          if (window.Telegram?.WebApp?.openLink) {
+            window.Telegram.WebApp.openLink(url);
+          } else {
+            // Fallback: open in new tab
+            window.open(url, '_blank');
+          }
+        }
+      });
+    });
+  }
+
 
   /**
    * Handle ESC key press
