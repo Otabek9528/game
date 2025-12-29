@@ -115,7 +115,7 @@ class AdModalManager {
 
           <!-- Ad Image -->
           ${ad.image 
-            ? `<img src="./assets/ads/${ad.image}" alt="Ad" class="ad-modal-image" onerror="this.style.display='none'">` 
+            ? `<img src="../../assets/ads/${ad.image}" alt="Ad" class="ad-modal-image" onerror="this.style.display='none'">` 
             : `<div class="ad-modal-image-placeholder">📢</div>`
           }
 
@@ -124,7 +124,7 @@ class AdModalManager {
             ${ad.view_count ? `
               <div class="ad-modal-stats">
                 <span>👁️</span>
-                <span>${ad.view_count} ko'rildi</span>
+                <span>${ad.view_count}</span>
               </div>
             ` : ''}
             
