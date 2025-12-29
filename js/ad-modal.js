@@ -15,29 +15,18 @@ class AdModalManager {
    * Initialize ad system - call this on page load
    */
   async init() {
-    console.log('[AdModal] 🚀 Starting ad system initialization...');
-    
     // Check if ad was already shown this session
     if (this.wasAdShownThisSession()) {
-      console.log('[AdModal] ✅ Ad already shown this session, skipping');
       return;
     }
-    console.log('[AdModal] ✓ Session check passed - no ad shown yet');
 
     // Get user ID from Telegram WebApp
     const userId = this.getTelegramUserId();
-    console.log('[AdModal] 👤 User ID retrieved:', userId);
-    
     if (!userId) {
-      console.warn('[AdModal] ❌ No Telegram user ID found, skipping ad');
-      console.log('[AdModal] Debug - Telegram object:', window.Telegram);
-      console.log('[AdModal] Debug - WebApp object:', window.Telegram?.WebApp);
-      console.log('[AdModal] Debug - initDataUnsafe:', window.Telegram?.WebApp?.initDataUnsafe);
       return;
     }
 
     // Fetch and show ad
-    console.log('[AdModal] 📡 Fetching ad for user:', userId);
     await this.fetchAndShowAd(userId);
   }
 
@@ -75,67 +64,22 @@ class AdModalManager {
    * Fetch ad from API
    */
   async fetchAd(userId) {
-    const url = `${this.apiBaseUrl}/api/ads/next?user_id=${userId}`;
-    console.log('[AdModal] 📡 API Request URL:', url);
-    
     try {
-      console.log('[AdModal] 🔄 Starting fetch request...');
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        mode: 'cors', // Explicitly set CORS mode
-      });
-      
-      console.log('[AdModal] 📥 API Response received');
-      console.log('[AdModal] 📥 Response status:', response.status);
-      console.log('[AdModal] 📥 Response ok:', response.ok);
-      console.log('[AdModal] 📥 Response headers:', {
-        contentType: response.headers.get('content-type'),
-        cors: response.headers.get('access-control-allow-origin')
-      });
+      const response = await fetch(`${this.apiBaseUrl}/api/ads/next?user_id=${userId}`);
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[AdModal] ❌ API returned error status:', response.status);
-        console.error('[AdModal] ❌ Error response:', errorText);
-        throw new Error(`API error: ${response.status} - ${errorText}`);
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const rawText = await response.text();
-      console.log('[AdModal] 📄 Raw response text:', rawText.substring(0, 200));
-      
-      const data = JSON.parse(rawText);
-      console.log('[AdModal] 📦 Parsed JSON data:', data);
+      const data = await response.json();
       
       if (data.success && data.ad) {
-        console.log('[AdModal] ✅ Ad received:', data.ad.ad_id);
-        console.log('[AdModal] 📝 Ad details:', {
-          id: data.ad.ad_id,
-          hasImage: !!data.ad.image,
-          hasHtml: !!data.ad.html,
-          viewCount: data.ad.view_count
-        });
         return data.ad;
       }
       
-      console.log('[AdModal] ℹ️ No ad available (data.ad is null or success is false)');
-      console.log('[AdModal] ℹ️ Full response:', data);
       return null;
     } catch (error) {
-      console.error('[AdModal] ❌ Error type:', error.name);
-      console.error('[AdModal] ❌ Error message:', error.message);
-      console.error('[AdModal] ❌ Error stack:', error.stack);
-      
-      // Check for specific error types
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        console.error('[AdModal] 🚫 NETWORK ERROR: This is likely a CORS issue or network connectivity problem');
-        console.error('[AdModal] 🚫 Check: 1) API CORS headers, 2) Network connection, 3) API server running');
-      } else if (error instanceof SyntaxError) {
-        console.error('[AdModal] 🚫 JSON PARSE ERROR: API returned invalid JSON');
-      }
-      
+      console.error('[AdModal] Error fetching ad:', error);
       return null;
     }
   }
@@ -144,20 +88,16 @@ class AdModalManager {
    * Fetch and show ad
    */
   async fetchAndShowAd(userId) {
-    console.log('[AdModal] 🎯 Attempting to fetch and show ad...');
     const ad = await this.fetchAd(userId);
     
     if (!ad) {
-      console.log('[AdModal] ⚠️ No ad to display');
       this.markAdAsShown(); // Mark as shown to avoid repeated API calls
       return;
     }
 
-    console.log('[AdModal] 🎨 Showing ad modal for:', ad.ad_id);
     this.currentAd = ad;
     this.showAdModal(ad, userId);
     this.markAdAsShown();
-    console.log('[AdModal] ✅ Ad modal displayed successfully');
   }
 
   /**
@@ -350,29 +290,17 @@ class AdModalManager {
 
 // Initialize ad system when DOM is ready
 if (document.readyState === 'loading') {
-  console.log('[AdModal] 📄 DOM loading... waiting for DOMContentLoaded');
   document.addEventListener('DOMContentLoaded', initAdSystem);
 } else {
-  console.log('[AdModal] 📄 DOM already loaded, initializing immediately');
   initAdSystem();
 }
 
 function initAdSystem() {
-  console.log('[AdModal] ⏱️ Waiting 500ms for Telegram WebApp to initialize...');
-  
   // Wait a bit for Telegram WebApp to initialize
   setTimeout(() => {
-    console.log('[AdModal] 🔧 Checking API configuration...');
-    
     // Get API base URL from apiConfig.js or use default
-    const apiBaseUrl = window.API_BASE_URL || 'https://vegukin-api.duckdns.org/';
-    console.log('[AdModal] 🌐 API Base URL:', apiBaseUrl);
+    const apiBaseUrl = window.API_BASE_URL || 'https://vegukin-api.duckdns.org';
     
-    if (apiBaseUrl === 'https://vegukin-api.duckdns.org/') {
-      console.warn('[AdModal] ⚠️ WARNING: Using default API URL! Set window.API_BASE_URL in apiConfig.js');
-    }
-    
-    console.log('[AdModal] 🎬 Creating AdModalManager instance...');
     const adManager = new AdModalManager(apiBaseUrl);
     adManager.init();
   }, 500);
