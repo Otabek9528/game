@@ -13,12 +13,6 @@ const LocationManager = {
   SESSION_CHECK_KEY: 'gpsCheckedThisSession', // sessionStorage key
   UPDATE_INTERVAL: 5 * 60 * 1000, // 5 minutes
 
-  // Telegram LocationManager
-  tgLocationManager: null,
-  hasTelegramLocation: false,
-  gpsPromptShown: false, // Prevent repeated GPS prompts
-  isRequestingLocation: false, // Prevent simultaneous location requests
-
   // Translations for the GPS modal
   translations: {
     uz: {
@@ -72,31 +66,21 @@ const LocationManager = {
   async init() {
     console.log('🚀 LocationManager initializing...');
     
-    const tg = Telegram.WebApp;
-    tg.ready();
-    tg.disableVerticalSwipes();
+    Telegram.WebApp.ready();
+    Telegram.WebApp.disableVerticalSwipes();
     
-    // Check for Telegram LocationManager (Bot API 8.0+)
-    this.tgLocationManager = tg.LocationManager;
-    this.hasTelegramLocation = !!this.tgLocationManager;
-    
-    console.log('📍 Telegram LocationManager available:', this.hasTelegramLocation);
-    
-    // If Telegram LocationManager available, use it
-    if (this.hasTelegramLocation) {
-      await this.initTelegramLocation();
-      return;
-    }
-    
-    // Fallback to browser geolocation
+    // Inject modal styles
     this.injectModalStyles();
     
+    // Check if this is the main index.html (not a subpage)
+    // Clear session check flag to force fresh GPS verification
     const isMainPage = window.location.pathname.endsWith('index.html') || 
                        window.location.pathname === '/' ||
                        window.location.pathname.endsWith('/');
     
     if (isMainPage && !this.isGpsCheckedThisSession()) {
-      console.log('🏠 Main page first load - clearing cached location');
+      // First load of index.html in this session - clear old cached data
+      console.log('🏠 Main page first load - clearing cached location for fresh check');
       localStorage.removeItem(this.STORAGE_KEY);
       localStorage.removeItem(this.PERMISSION_KEY);
       localStorage.removeItem(this.LAST_UPDATE_KEY);
@@ -106,171 +90,40 @@ const LocationManager = {
     const storedLocation = this.getStoredLocation();
     const gpsAlreadyChecked = this.isGpsCheckedThisSession();
     
-    console.log(`Permission: ${hasPermission}, Stored: ${storedLocation?.city || 'none'}, Checked: ${gpsAlreadyChecked}`);
+    console.log(`Permission: ${hasPermission}, Stored: ${storedLocation?.city || 'none'}, Session checked: ${gpsAlreadyChecked}`);
     
+    // CASE 1: Already checked GPS this session - just use cached location
     if (gpsAlreadyChecked && storedLocation) {
-      console.log('✅ GPS already checked, using cached');
+      console.log('✅ GPS already checked this session, using cached location:', storedLocation.city);
       this.updateUI(storedLocation);
+      
+      // Still do silent refresh if interval passed
       this.silentRefresh();
       return;
     }
     
+    // CASE 2: Have permission and stored location, but first time this session
     if (hasPermission && storedLocation) {
-      console.log('📍 First check - verifying GPS...');
-      this.updateUI(storedLocation);
+      console.log('📍 First check this session - verifying GPS is still available...');
+      this.updateUI(storedLocation); // Show cached immediately
+      
+      // Verify GPS is still working (this is the session's first check)
       await this.verifyGpsAndRefresh(storedLocation);
       return;
     }
     
+    // CASE 3: Have location but no permission flag (legacy case)
     if (storedLocation) {
-      console.log('📍 Legacy location found');
+      console.log('📍 Legacy cached location found');
       this.updateUI(storedLocation);
       localStorage.setItem(this.PERMISSION_KEY, 'true');
       this.markGpsCheckedThisSession();
       return;
     }
     
-    console.log('🔔 No location - requesting permission');
+    // CASE 4: First time ever - need to ask for permission
+    console.log('🔔 No stored location - requesting permission');
     await this.requestInitialPermission();
-  },
-
-  // Initialize Telegram LocationManager
-  async initTelegramLocation() {
-    return new Promise((resolve) => {
-      this.tgLocationManager.init(() => {
-        console.log('✅ Telegram LocationManager initialized');
-        console.log('📍 Access granted:', this.tgLocationManager.isAccessGranted);
-
-        const tg = Telegram.WebApp;
-        
-        // Listen for permission changes
-        tg.onEvent('locationManagerUpdated', () => {
-          console.log('📍 Permission changed');
-          if (this.tgLocationManager.isAccessGranted) {
-            this.getTelegramLocation();
-          }
-        });
-
-        const storedLocation = this.getStoredLocation();
-        const isMainPage = window.location.pathname.endsWith('index.html') || 
-                           window.location.pathname === '/' ||
-                           window.location.pathname.endsWith('/');
-
-        // Show toggle prompt on main page if no permission
-        if (isMainPage && !this.tgLocationManager.isAccessGranted && !sessionStorage.getItem('togglePromptShown')) {
-          sessionStorage.setItem('togglePromptShown', 'true');
-          this.showTogglePrompt();
-        } else if (this.tgLocationManager.isAccessGranted) {
-          if (!this.isGpsCheckedThisSession()) {
-            this.getTelegramLocation();
-          } else if (storedLocation) {
-            this.updateUI(storedLocation);
-          }
-        } else if (storedLocation) {
-          this.updateUI(storedLocation);
-        }
-
-        this.markGpsCheckedThisSession();
-        resolve();
-      });
-    });
-  },
-
-  // Get location using Telegram API
-  getTelegramLocation() {
-    // Prevent multiple simultaneous requests
-    if (this.isRequestingLocation) {
-      console.log('⏭️ Location request already in progress, skipping...');
-      return;
-    }
-
-    // Prevent showing GPS modal multiple times
-    if (this.gpsPromptShown) {
-      console.log('⏭️ GPS prompt already shown this session, skipping...');
-      const cached = this.getStoredLocation();
-      if (cached) this.updateUI(cached);
-      return;
-    }
-
-    console.log('📡 Requesting location from Telegram...');
-    this.isRequestingLocation = true;
-
-    this.tgLocationManager.getLocation(async (location) => {
-      this.isRequestingLocation = false; // Release lock
-      
-      if (location === null) {
-        console.log('❌ Location null - GPS might be off');
-        
-        // Show GPS prompt only once per session
-        if (!this.gpsPromptShown) {
-          this.gpsPromptShown = true;
-          this.showGPSModal();
-        }
-        
-        const cached = this.getStoredLocation();
-        if (cached) this.updateUI(cached);
-      } else {
-        console.log('✅ Got Telegram location');
-        this.gpsPromptShown = false; // Reset flag on success
-        const locationData = await this.processTelegramLocation(location);
-        this.updateUI(locationData);
-      }
-    });
-  },
-
-  // Process Telegram location
-  async processTelegramLocation(location) {
-    const lat = location.latitude;
-    const lon = location.longitude;
-    const city = await this.getCityName(lat, lon);
-    
-    const locationData = {
-      lat,
-      lon,
-      city,
-      timestamp: Date.now()
-    };
-    
-    console.log('💾 Saving location:', city);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(locationData));
-    localStorage.setItem(this.LAST_UPDATE_KEY, locationData.timestamp.toString());
-    localStorage.setItem(this.PERMISSION_KEY, 'true');
-    
-    return locationData;
-  },
-
-  // Show toggle prompt
-  showTogglePrompt() {
-    const tg = Telegram.WebApp;
-    const userLang = tg.initDataUnsafe?.user?.language_code || this.getCurrentLang();
-    
-    const messages = {
-      uz: 'Joylashuv xususiyatlaridan foydalanish uchun bot sozlamalarida joylashuvga ruxsat bering.',
-      ru: 'Чтобы использовать функции на основе местоположения, пожалуйста, включите доступ к местоположению в настройках бота.',
-      en: 'To provide location-based features, please enable location access for this Mini App in the bot settings.'
-    };
-    
-    const message = messages[userLang] || messages['en'];
-    
-    // Trigger toggle to appear
-    this.tgLocationManager.getLocation(() => {});
-    
-    tg.showPopup({
-      title: '📍 Location Access Needed',
-      message: message,
-      buttons: [
-        { id: 'settings', type: 'default', text: 'Open Settings' },
-        { id: 'close', type: 'close', text: 'Close' }
-      ]
-    }, (buttonId) => {
-      if (buttonId === 'settings') {
-        if (this.tgLocationManager.openSettings) {
-          this.tgLocationManager.openSettings();
-        } else {
-          tg.close();
-        }
-      }
-    });
   },
 
   // Verify GPS is working and refresh location (first check of session)
@@ -425,13 +278,6 @@ const LocationManager = {
     document.head.appendChild(styles);
   },
 
-  // Reset GPS prompt flag (for "Try Again" functionality)
-  resetGpsPrompt() {
-    this.gpsPromptShown = false;
-    this.isRequestingLocation = false;
-    console.log('🔄 GPS prompt flag reset');
-  },
-
   // Show GPS off modal
   showGPSModal() {
     // Remove existing modal if any
@@ -463,15 +309,8 @@ const LocationManager = {
     
     // Event listeners
     document.getElementById('gps-try-again').addEventListener('click', () => {
-      console.log('🔄 User clicked Try Again');
       this.hideGPSModal();
-      this.resetGpsPrompt(); // Reset the flag
-      
-      if (this.hasTelegramLocation) {
-        this.getTelegramLocation();
-      } else {
-        this.requestInitialPermission();
-      }
+      this.requestInitialPermission();
     });
     
     document.getElementById('gps-close').addEventListener('click', () => {

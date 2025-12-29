@@ -72,6 +72,7 @@
 
   <!-- JS Scripts -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="js/logger.js"></script> 
   <script src="js/i18n.js"></script>
   <script src="js/locationManager.js"></script>
   <script src="js/prayerTimes.js"></script>
@@ -173,69 +174,8 @@
       updateLanguageButtons();
     }
 
-    // ============================================
-    // INTERACTION LOGGING - FAST VERSION
-    // ============================================
+    // index.html - Replace the old logInteraction function with this:
 
-    /**
-     * Log user interaction to backend
-     * Returns a Promise that resolves when logging is complete
-     * Navigation should wait for this to complete (or timeout)
-     * 
-     * @param {string} action - The action to log (e.g., 'mosque', 'restaurant', 'prayers')
-     * @returns {Promise} - Resolves when logging is complete or times out
-     */
-    function logInteraction(action) {
-      console.log('logInteraction called with action =', action);
-      
-      try {
-        const user = tg.initDataUnsafe?.user;
-        
-        // If no user data (not in Telegram), resolve immediately
-        if (!user) {
-          console.log('⚠️ No user data available (not in Telegram?)');
-          return Promise.resolve();
-        }
-        
-        const payload = {
-          user_id: user.id,
-          username: user.username || user.first_name || 'unknown',
-          action: action
-        };
-        
-        console.log('Sending payload:', payload);
-        
-        // Create fetch promise
-        const fetchPromise = fetch('https://vegukin-api.duckdns.org/api/log-interaction', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        })
-        .then(response => {
-          if (response.ok) {
-            console.log('✅ Logged:', action);
-          } else {
-            console.log('❌ Server returned:', response.status);
-          }
-        })
-        .catch(err => {
-          console.log('⚠️ Log failed:', err);
-        });
-        
-        // Create timeout promise (300ms max wait)
-        const timeoutPromise = new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Return whichever completes first
-        // This ensures navigation happens within 300ms even if server is slow
-        return Promise.race([fetchPromise, timeoutPromise]);
-        
-      } catch (e) {
-        console.log('⚠️ Log error:', e);
-        return Promise.resolve();
-      }
-    }
     // ============================================
     // FEATURE CARDS RENDERING
     // ============================================
@@ -244,53 +184,53 @@
       const container = document.getElementById('featureCards');
       if (!container) return;
       
-      // Get available features for current language
       const availableFeatures = window.I18N ? I18N.getAvailableFeatures() : 
-        //['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'news', 'events', 'market', 'community'];
         ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'community'];
       
-        container.innerHTML = '';
+      container.innerHTML = '';
+      
+      availableFeatures.forEach(featureKey => {
+        const feature = FEATURE_CARDS[featureKey];
+        if (!feature) return;
         
-        availableFeatures.forEach(featureKey => {
-          const feature = FEATURE_CARDS[featureKey];
-          if (!feature) return;
-          
-          const card = document.createElement('button');
-          
-          let cardClasses = 'card';
-          if (feature.comingSoon) cardClasses += ' coming-soon';
-          if (feature.isNew) cardClasses += ' new-feature';
-          card.className = cardClasses;
-          
-          card.onclick = () => {
-            try {
-              if (tg.HapticFeedback) { 
-                tg.HapticFeedback.impactOccurred('light');
-              }
-            } catch (e) {}
-              
-            // Log interaction and wait for it to complete
-            logInteraction(featureKey).then(() => {
-              window.location.href = feature.href;
-            });
-          };
-          
-          
-          const label = window.I18N ? I18N.t(feature.labelKey) : feature.labelKey.split('.')[1];
-          const newBadge = feature.isNew ? '<span class="new-badge">NEW</span>' : '';
-          
-          card.innerHTML = `
-            ${newBadge}
-            <span class="card-icon">${feature.icon}</span>
-            <p>${label}</p>
-          `;
-          
-          container.appendChild(card);
-        });
+        const card = document.createElement('button');
         
-        //addRippleEffect();
-        console.log('✅ Feature cards updated');
-      }
+        let cardClasses = 'card';
+        if (feature.comingSoon) cardClasses += ' coming-soon';
+        if (feature.isNew) cardClasses += ' new-feature';
+        card.className = cardClasses;
+        
+        card.onclick = () => {
+          // Haptic feedback
+          try {
+            if (tg.HapticFeedback) { 
+              tg.HapticFeedback.impactOccurred('light');
+            }
+          } catch (e) {}
+          
+          // Log immediately (fire-and-forget with sendBeacon)
+          if (window.logInteraction) {
+            window.logInteraction(featureKey);
+          }
+          
+          // Navigate immediately (no URL parameter)
+          window.location.href = feature.href;
+        };
+        
+        const label = window.I18N ? I18N.t(feature.labelKey) : feature.labelKey.split('.')[1];
+        const newBadge = feature.isNew ? '<span class="new-badge">NEW</span>' : '';
+        
+        card.innerHTML = `
+          ${newBadge}
+          <span class="card-icon">${feature.icon}</span>
+          <p>${label}</p>
+        `;
+        
+        container.appendChild(card);
+      });
+      
+      console.log('✅ Feature cards updated');
+    }
 
     // ============================================
     // PRAYER CARD NAVIGATION
@@ -305,9 +245,13 @@
             tg.HapticFeedback.impactOccurred('light');
           }
         } catch (e) {}
-        // Log interaction
-        logInteraction('prayers');  
-        console.log('Clicked PRAYER');
+        
+        // Log immediately (fire-and-forget with sendBeacon)
+        if (window.logInteraction) {
+          window.logInteraction('prayers');
+        }
+        
+        // Navigate immediately (no waiting!)
         window.location.href = 'pages/prayers.html';
       });
     }

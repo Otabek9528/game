@@ -45,23 +45,29 @@ function initPrayersPage() {
   const tg = window.Telegram.WebApp;
   
   console.log('🔧 Initializing prayers page...');
+  console.log('📱 Telegram WebApp object:', tg);
+  console.log('🔙 BackButton available:', !!tg.BackButton);
   
   // Update UI translations
   updateUITranslations();
   
-  // Show and configure Telegram's BackButton
+  // Show and configure Telegram's BackButton using event listener
   try {
     if (tg.BackButton) {
       console.log('✅ Telegram BackButton API available');
       
+      // Show the back button first
       tg.BackButton.show();
+      console.log('👁️ BackButton.show() called');
+      console.log('📊 BackButton.isVisible:', tg.BackButton.isVisible);
       
-      // Listen to the backButtonClicked event
+      // Use onEvent instead of onClick for better compatibility
       const handleBackButton = () => {
-        console.log('🔙 Back button clicked');
+        console.log('🔙 Back button event fired!');
         window.location.href = "../index.html";
       };
       
+      // Listen to the backButtonClicked event
       tg.onEvent('backButtonClicked', handleBackButton);
       
       console.log('✅ BackButton event listener registered');
@@ -70,6 +76,71 @@ function initPrayersPage() {
     }
   } catch (e) {
     console.error('❌ Error setting up BackButton:', e);
+  }
+
+  // Handle manual location refresh (now inline button)
+  const refreshBtn = document.getElementById('refreshLocationBtn');
+  const refreshIcon = document.getElementById('refreshIcon');
+  
+  console.log('📍 Prayers page - Refresh button:', refreshBtn);
+  console.log('📍 Prayers page - Refresh icon:', refreshIcon);
+  
+  if (refreshBtn && refreshIcon) {
+    let isRefreshing = false;
+    
+    refreshBtn.addEventListener('click', async (e) => {
+      console.log('🖱️ PRAYERS PAGE - Refresh button clicked!');
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (isRefreshing) {
+        console.log('⏳ Already refreshing...');
+        return;
+      }
+      
+      isRefreshing = true;
+      
+      // Visual feedback - spinning animation
+      console.log('🔄 Starting animation...');
+      refreshIcon.innerText = '🔄';
+      refreshIcon.classList.add('spinning');
+      refreshBtn.style.opacity = '0.5';
+      refreshBtn.disabled = true;
+      
+      try {
+        console.log('📞 Calling manualRefresh...');
+        const result = await LocationManager.manualRefresh();
+        console.log('✅ Refresh completed:', result);
+        
+        // Success feedback
+        console.log('✅ Showing success icon');
+        refreshIcon.classList.remove('spinning');
+        refreshIcon.innerText = '✅';
+        setTimeout(() => {
+          refreshIcon.innerText = '📍';
+          console.log('🔙 Reset to location icon');
+        }, 2000);
+      } catch (error) {
+        console.error('❌ Refresh error:', error);
+        
+        // Error feedback
+        refreshIcon.classList.remove('spinning');
+        refreshIcon.innerText = '❌';
+        setTimeout(() => {
+          refreshIcon.innerText = '📍';
+        }, 2000);
+      } finally {
+        // Re-enable button
+        refreshBtn.style.opacity = '1';
+        refreshBtn.disabled = false;
+        isRefreshing = false;
+        console.log('🔓 Button re-enabled');
+      }
+    });
+    
+    console.log('✅ Prayers page - Click listener added');
+  } else {
+    console.error('❌ Refresh button or icon NOT FOUND on prayers page!');
   }
 
   // Update timestamp display when location updates
@@ -89,6 +160,11 @@ function initPrayersPage() {
       const neverText = t('prayer.never', 'Hech qachon');
       timestampElem.innerText = `${lastUpdateText}: ${neverText}`;
     }
+  }
+
+  // Check if location is stale and show warning
+  if (LocationManager.isLocationStale()) {
+    showStaleLocationWarning();
   }
 }
 
@@ -114,6 +190,25 @@ function updateTimestampDisplay(timestamp) {
     timestampElem.style.fontWeight = 'normal';
     
     console.log('✅ Timestamp updated to:', newText);
+  }
+}
+
+// ============================================
+// STALE LOCATION WARNING
+// ============================================
+
+function showStaleLocationWarning() {
+  const timestampElem = document.getElementById('locationTimestamp');
+  if (timestampElem) {
+    timestampElem.style.color = '#ff9800';
+    const warningText = t('prayer.staleWarning', 'Yangilashni maslahat beramiz');
+    timestampElem.innerHTML += ` ⚠️ <small>(${warningText})</small>`;
+  }
+
+  // Add pulse animation to refresh button
+  const refreshBtn = document.getElementById('refreshLocationBtn');
+  if (refreshBtn) {
+    refreshBtn.classList.add('stale');
   }
 }
 

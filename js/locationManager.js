@@ -184,6 +184,13 @@ const LocationManager = {
     
     const message = messages[userLang] || messages['en'];
     
+    // CRITICAL: Trigger the toggle to appear in bot settings
+    if (this.tgLocationManager) {
+      this.tgLocationManager.getLocation(() => {
+        console.log('🔘 Toggle trigger called');
+      });
+    }
+    
     // Create modal overlay
     const overlay = document.createElement('div');
     overlay.id = 'location-guide-modal';
