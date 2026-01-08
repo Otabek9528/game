@@ -445,13 +445,16 @@ body {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-4);
-  background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-600) 100%);
+  
+  background: #2aabee;
   border: none;
   border-radius: var(--radius-lg);
+  
   color: white;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.85rem;
+  
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: 0 2px 8px rgba(166, 124, 26, 0.25);
@@ -471,9 +474,20 @@ body {
   height: 18px;
 }
 
+.tg-icon {
+  width: 18px;
+  height: 18px;
+  color: white;
+  flex-shrink: 0;
+}
+
 .search-cancel:hover {
   background: var(--ivory-200);
   border-color: var(--ivory-400);
+}
+
+.search-actions {
+  display: flex;
 }
 
 .search-btn {

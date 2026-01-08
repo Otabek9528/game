@@ -81,9 +81,11 @@ searchTrigger.addEventListener('click', () => {
   }
 });
 
-searchCancel.addEventListener('click', () => {
-  collapseSearch();
-});
+if (searchCancel) {
+  searchCancel.addEventListener('click', () => {
+    collapseSearch();
+  });
+}
 
 // ===========================================
 // API FUNCTIONS
