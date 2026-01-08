@@ -77,11 +77,10 @@
             <span>Bot faqat grammatik to'g'ri yozilgan savollarni tushunadi</span>
           </div>
           <div class="search-actions">
-            <button class="search-cancel" id="searchCancel">Bekor qilish</button>
             <button class="search-btn" id="searchBtn">
               <span class="btn-text">Qidirish</span>
               <span class="btn-arrow">→</span>
-            </button>
+          </button>
           </div>
         </div>
       </div>
@@ -171,14 +170,24 @@
           </div>
         </article>
 
-        <!-- Source Link -->
-        <a class="source-link" id="sourceLink" href="#" target="_blank" rel="noopener noreferrer">
-          <span class="link-text">Asl manbani ko'rish</span>
-          <svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M7 17L17 7M17 7H7M17 7v10"/>
-          </svg>
-        </a>
-      </div>
+        <!-- Action Buttons -->
+        <div class="modal-actions">
+          <a class="source-link" id="sourceLink" href="#" target="_blank" rel="noopener noreferrer">
+            <span class="link-text">Asl manbani ko'rish</span>
+            <svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </a>
+          <button class="share-btn" id="shareBtn">
+            <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+            </svg>
+            <span>Ulashish</span>
+          </button>
+        </div>
 
       <!-- Related Questions -->
       <footer class="modal-footer">
