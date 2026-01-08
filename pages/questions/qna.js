@@ -124,6 +124,11 @@ async function fetchQuestionDetail(questionId) {
   }
 }
 
+function formatTextWithLinks(text) {
+  // Convert URLs to clickable links
+  const urlPattern = /(https?:\/\/[^\s]+)/g;
+  return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+}
 // ===========================================
 // ALPHABET AUTO-DETECTION (for display purposes)
 // ===========================================
@@ -248,7 +253,7 @@ async function openAnswerModal(question) {
   // Hide source section if no answerSource
   const answerSourceEl = document.getElementById('answerSource');
   answerSourceEl.style.display = sourceText ? 'flex' : 'none';
-  document.getElementById('answerBody').textContent = question.answerBody || '';
+  document.getElementById('answerBody').innerHTML = formatTextWithLinks(question.answerBody || '');
   document.getElementById('sourceLink').href = question.link || '#';
   
   // Show modal immediately with available data
