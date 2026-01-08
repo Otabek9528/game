@@ -13,9 +13,9 @@ try {
 // API CONFIGURATION
 // ===========================================
 
-// Base URL for API calls - adjust based on your server setup
-const API_BASE_URL = window.location.origin;  // Same origin as webapp
-//const API_BASE_URL = 'http://localhost:5000';  // Or your server URL
+// Base URL for API calls - Your AWS server
+const API_BASE_URL = 'https://vegukin-api.duckdns.org';
+
 // API Endpoints
 const API = {
   search: `${API_BASE_URL}/api/questions/search`,
@@ -76,12 +76,21 @@ async function fetchBrowseQuestions(limit = 15) {
 
 async function searchQuestionsAPI(query, limit = 10) {
   try {
+    // Get Telegram user info if available
+    const userId = tg.initDataUnsafe?.user?.id || 'anonymous';
+    const username = tg.initDataUnsafe?.user?.username || 'unknown';
+    
     const response = await fetch(API.search, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ query, limit })
+      body: JSON.stringify({ 
+        query, 
+        limit,
+        user_id: userId,
+        username: username
+      })
     });
     const data = await response.json();
     
