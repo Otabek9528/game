@@ -403,10 +403,11 @@ body {
    =========================================== */
 .modal-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--space-3);
 }
 
-.source-link {
+.source-link_detail {
   flex: 1;
   display: flex;
   align-items: center;
