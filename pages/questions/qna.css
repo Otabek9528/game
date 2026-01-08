@@ -127,11 +127,42 @@ body::before {
   z-index: 0;
 }
 
-/* --- App Header --- */
+/* ===========================================
+   APP HEADER - Proper Styling
+   =========================================== */
 .app__header {
   flex-shrink: 0;
   position: relative;
   z-index: 10;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: var(--space-3) var(--space-4);
+}
+
+.app__header .header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 600px;
+  margin: 0 auto;
+  text-decoration: none;
+  color: inherit;
+}
+
+.app__header .bot-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.app__header h1 {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
 }
 
 /* --- Main Container --- */
