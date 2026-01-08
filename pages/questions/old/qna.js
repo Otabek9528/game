@@ -13,8 +13,10 @@ try {
 // API CONFIGURATION
 // ===========================================
 
+// Base URL for API calls - Your AWS server
 const API_BASE_URL = 'https://vegukin-api.duckdns.org';
 
+// API Endpoints
 const API = {
   search: `${API_BASE_URL}/api/questions/search`,
   browse: `${API_BASE_URL}/api/questions/browse`,
@@ -27,7 +29,7 @@ const API = {
 // STATE MANAGEMENT
 // ===========================================
 
-let currentView = 'browse';
+let currentView = 'browse'; // 'browse' | 'results'
 let currentQuestions = [];
 let displayedCount = 10;
 let searchResults = [];
@@ -74,6 +76,7 @@ async function fetchBrowseQuestions(limit = 15) {
 
 async function searchQuestionsAPI(query, limit = 10) {
   try {
+    // Get Telegram user info if available
     const userId = tg.initDataUnsafe?.user?.id || 'anonymous';
     const username = tg.initDataUnsafe?.user?.username || 'unknown';
     
@@ -121,22 +124,19 @@ async function fetchQuestionDetail(questionId) {
   }
 }
 
-// ===========================================
-// HELPER FUNCTIONS
-// ===========================================
-
 function formatTextWithLinks(text) {
   if (!text) return '';
   
-  // Add space before http if stuck to other text
+  // First, add space before http if it's stuck to other text (e.g., "бор.http://")
   let processed = text.replace(/([^\s])(https?:\/\/)/g, '$1 $2');
   
-  // Handle multiple URLs stuck together
+  // Also handle multiple URLs stuck together (e.g., "...topic=123http://...")
   processed = processed.replace(/(\.0|\.html|\.php|\.uz)(https?:\/\/)/g, '$1 $2');
   
-  // Convert URLs to clickable links with shortened display
+  // Convert URLs to clickable links with shortened display text
   const urlPattern = /(https?:\/\/[^\s]+)/g;
   return processed.replace(urlPattern, (url) => {
+    // Create shortened display text
     let displayUrl = url;
     if (url.length > 50) {
       displayUrl = url.substring(0, 47) + '...';
@@ -144,11 +144,18 @@ function formatTextWithLinks(text) {
     return `<a href="${url}" target="_blank" rel="noopener noreferrer">${displayUrl}</a>`;
   });
 }
+// ===========================================
+// ALPHABET AUTO-DETECTION (for display purposes)
+// ===========================================
 
 function detectAlphabet(text) {
-  const cyrillicPattern = /[\u0400-\u04FF]/;
+  const cyrillicPattern = /[\u0400-\u04FF\u0401\u0451\u040E\u045E\u049A\u049B\u04A2\u04A3\u04B0\u04B1\u04D8\u04D9]/;
   return cyrillicPattern.test(text) ? 'cyrillic' : 'latin';
 }
+
+// ===========================================
+// UTILITY FUNCTIONS
+// ===========================================
 
 function showLoading() {
   loadingOverlay.style.display = 'flex';
@@ -173,14 +180,17 @@ function formatViews(views) {
 function renderQuestionCard(question, container) {
   const card = document.createElement('div');
   card.className = 'question-card';
+  card.style.animationDelay = `${Math.random() * 0.2}s`;
   
+  // Build view count HTML only if available
   const viewCountHtml = question.views 
-    ? `<span class="view-count">${formatViews(question.views)} ko'rilgan</span>` 
+    ? `<span class="view-count">👁️ ${formatViews(question.views)}</span>` 
     : '';
   
+  // Only show scholar section if answerSource exists
   const scholarHtml = question.answerSource 
     ? `<div class="card-scholar">
-        <span class="scholar-icon">📖</span>
+        <span class="scholar-icon">📚</span>
         <span>${question.answerSource}</span>
       </div>`
     : '';
@@ -193,7 +203,7 @@ function renderQuestionCard(question, container) {
     <h3 class="card-title">${question.title}</h3>
     ${scholarHtml}
     <div class="card-action">
-      <span class="read-more">Batafsil →</span>
+      <span class="read-more">Ko'rish →</span>
     </div>
   `;
   
@@ -210,6 +220,7 @@ function renderBrowseQuestions() {
   const questionsToShow = currentQuestions.slice(0, displayedCount);
   questionsToShow.forEach(q => renderQuestionCard(q, questionCards));
   
+  // Show/hide load more button
   if (displayedCount >= currentQuestions.length) {
     loadMoreBtn.style.display = 'none';
   } else {
@@ -222,10 +233,14 @@ function renderSearchResults() {
   
   if (searchResults.length === 0) {
     resultsCards.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        <p class="empty-title">Hech qanday natija topilmadi</p>
-        <p class="empty-description">Boshqa so'z bilan qidirib ko'ring</p>
+      <div style="text-align: center; padding: 40px 20px;">
+        <p style="font-size: 3rem; margin-bottom: 12px;">😔</p>
+        <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">
+          Ҳеч қандай натижа топилмади
+        </p>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          Илтимос, бошқа сўз билан қидиринг
+        </p>
       </div>
     `;
     return;
@@ -242,39 +257,28 @@ function renderSearchResults() {
 async function openAnswerModal(question) {
   currentQuestion = question;
   
-  // Set category badge
-  document.getElementById('modalCategory').textContent = question.topic || 'Boshqa';
-  
-  // Set question content
+  // Populate modal content with what we have
+  document.getElementById('modalCategory').textContent = question.topic || '📚 Boshqa';
   document.getElementById('questionTitle').textContent = question.title;
   document.getElementById('questionBody').textContent = question.questionBody || '';
-  
-  // Handle answer source
+  // Only show source if available
   const sourceText = question.answerSource || '';
+  document.getElementById('answerSource').querySelector('.source-text').textContent = sourceText;
+  
+  // Hide source section if no answerSource
   const answerSourceEl = document.getElementById('answerSource');
-  const sourceTextEl = answerSourceEl.querySelector('.source-text');
-  
-  if (sourceText) {
-    sourceTextEl.textContent = sourceText;
-    answerSourceEl.style.display = 'flex';
-  } else {
-    answerSourceEl.style.display = 'none';
-  }
-  
-  // Set answer body with formatted links
+  answerSourceEl.style.display = sourceText ? 'flex' : 'none';
   document.getElementById('answerBody').innerHTML = formatTextWithLinks(question.answerBody || '');
-  
-  // Set source link
   document.getElementById('sourceLink').href = question.link || '#';
   
-  // Show modal
+  // Show modal immediately with available data
   answerModal.style.display = 'block';
   document.body.style.overflow = 'hidden';
   
-  // Scroll to top
+  // Scroll modal to top
   document.querySelector('.modal-content').scrollTop = 0;
   
-  // Fetch related questions
+  // Fetch related questions from API (if we have question ID)
   if (question.id) {
     try {
       const detail = await fetchQuestionDetail(question.id);
@@ -283,6 +287,7 @@ async function openAnswerModal(question) {
       }
     } catch (error) {
       console.error('Failed to fetch related questions:', error);
+      // Clear related questions section on error
       document.getElementById('relatedList').innerHTML = '';
     }
   }
@@ -298,7 +303,7 @@ function renderRelatedQuestions(relatedQuestions) {
   relatedList.innerHTML = '';
   
   if (!relatedQuestions || relatedQuestions.length === 0) {
-    relatedList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">O\'xshash savollar topilmadi</p>';
+    relatedList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Ўхшаш саволлар топилмади</p>';
     return;
   }
   
@@ -307,6 +312,7 @@ function renderRelatedQuestions(relatedQuestions) {
     item.className = 'related-item';
     item.textContent = q.title;
     item.addEventListener('click', async () => {
+      // Fetch full question detail and open modal
       showLoading();
       const detail = await fetchQuestionDetail(q.id);
       hideLoading();
@@ -327,10 +333,16 @@ async function performSearch(query) {
   const detectedAlphabet = detectAlphabet(query);
   console.log(`Searching for: "${query}" (Detected alphabet: ${detectedAlphabet})`);
   
+  // Show loading
   showLoading();
+  
+  // Call real API
   searchResults = await searchQuestionsAPI(query, 10);
+  
+  // Hide loading
   hideLoading();
   
+  // Show results
   showResultsView();
 }
 
@@ -361,13 +373,14 @@ searchBtn.addEventListener('click', () => {
   const query = searchInput.value.trim();
   
   if (query.length < 3) {
-    alert('Iltimos, kamida 3 ta harf yozing');
+    alert('Илтимос, камида 3 та ҳарф ёзинг / Iltimos, kamida 3 ta harf yozing');
     return;
   }
   
   performSearch(query);
 });
 
+// Search on Enter key
 searchInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -376,12 +389,21 @@ searchInput.addEventListener('keypress', (e) => {
 });
 
 refreshBtn.addEventListener('click', async () => {
+  // Animate button
+  refreshBtn.style.transform = 'rotate(360deg)';
+  
+  // Fetch new random questions
   showLoading();
   currentQuestions = await fetchBrowseQuestions(15);
   hideLoading();
   
   displayedCount = 10;
   renderBrowseQuestions();
+  
+  // Reset animation
+  setTimeout(() => {
+    refreshBtn.style.transform = 'rotate(0deg)';
+  }, 300);
 });
 
 loadMoreBtn.addEventListener('click', () => {
@@ -397,6 +419,7 @@ backToSearchBtn.addEventListener('click', () => {
 modalClose.addEventListener('click', closeAnswerModal);
 modalOverlay.addEventListener('click', closeAnswerModal);
 
+// Close modal with Escape key
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && answerModal.style.display === 'block') {
     closeAnswerModal();
@@ -413,6 +436,7 @@ function handleBackButton() {
   } else if (currentView === 'results') {
     showBrowseView();
   } else {
+    // Go back to index
     window.location.href = "../../index.html";
   }
 }
@@ -433,8 +457,12 @@ try {
 async function initQnAPage() {
   console.log('✅ Q&A page initializing...');
   
+  // Show loading while fetching initial data
   showLoading();
+  
+  // Fetch initial random questions from API
   currentQuestions = await fetchBrowseQuestions(15);
+  
   hideLoading();
   
   if (currentQuestions.length > 0) {
@@ -442,15 +470,21 @@ async function initQnAPage() {
     renderBrowseQuestions();
     console.log(`✅ Q&A page initialized with ${currentQuestions.length} questions`);
   } else {
+    // Show error state
     questionCards.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">😕</div>
-        <p class="empty-title">Ma'lumotlarni yuklashda xatolik</p>
-        <p class="empty-description">Iltimos, sahifani yangilang</p>
+      <div style="text-align: center; padding: 40px 20px;">
+        <p style="font-size: 3rem; margin-bottom: 12px;">😕</p>
+        <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">
+          Маълумотларни юклашда хатолик
+        </p>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          Илтимос, саҳифани янгиланг
+        </p>
       </div>
     `;
     console.error('❌ Failed to load initial questions');
   }
 }
 
+// Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', initQnAPage);
