@@ -105,8 +105,6 @@ html, body {
 }
 
 body {
-  display: flex;
-  flex-direction: column;
   background: var(--bg-page);
   font-family: var(--font-body);
   font-size: 16px;
@@ -116,54 +114,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle page texture */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.015;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ===========================================
-   APP HEADER - Proper Styling
-   =========================================== */
-.app__header {
-  flex-shrink: 0;
-  position: relative;
-  z-index: 10;
-  background: var(--bg-elevated);
-  border-bottom: 1px solid var(--border-subtle);
-  padding: var(--space-3) var(--space-4);
-}
-
-.app__header .header-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  max-width: 600px;
-  margin: 0 auto;
-  text-decoration: none;
-  color: inherit;
-}
-
-.app__header .bot-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.app__header h1 {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-  color: var(--text-primary);
-}
+/* Let parent style.css handle .app__header */
 
 /* --- Main Container --- */
 .qna-container {
