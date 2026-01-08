@@ -51,40 +51,6 @@ const modalClose = document.getElementById('modalClose');
 const modalOverlay = document.getElementById('modalOverlay');
 const resultsCards = document.getElementById('resultsCards');
 
-const searchTrigger = document.getElementById('searchTrigger');
-const searchExpandable = document.getElementById('searchExpandable');
-const searchCancel = document.getElementById('searchCancel');
-
-let isSearchExpanded = false;
-
-function expandSearch() {
-  isSearchExpanded = true;
-  searchSection.classList.add('expanded');
-  searchExpandable.style.maxHeight = searchExpandable.scrollHeight + 'px';
-  setTimeout(() => {
-    searchInput.focus();
-  }, 300);
-}
-
-function collapseSearch() {
-  isSearchExpanded = false;
-  searchSection.classList.remove('expanded');
-  searchExpandable.style.maxHeight = '0';
-  searchInput.value = '';
-}
-
-searchTrigger.addEventListener('click', () => {
-  if (isSearchExpanded) {
-    collapseSearch();
-  } else {
-    expandSearch();
-  }
-});
-
-searchCancel.addEventListener('click', () => {
-  collapseSearch();
-});
-
 // ===========================================
 // API FUNCTIONS
 // ===========================================
