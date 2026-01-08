@@ -125,9 +125,24 @@ async function fetchQuestionDetail(questionId) {
 }
 
 function formatTextWithLinks(text) {
-  // Convert URLs to clickable links
+  if (!text) return '';
+  
+  // First, add space before http if it's stuck to other text (e.g., "бор.http://")
+  let processed = text.replace(/([^\s])(https?:\/\/)/g, '$1 $2');
+  
+  // Also handle multiple URLs stuck together (e.g., "...topic=123http://...")
+  processed = processed.replace(/(\.0|\.html|\.php|\.uz)(https?:\/\/)/g, '$1 $2');
+  
+  // Convert URLs to clickable links with shortened display text
   const urlPattern = /(https?:\/\/[^\s]+)/g;
-  return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+  return processed.replace(urlPattern, (url) => {
+    // Create shortened display text
+    let displayUrl = url;
+    if (url.length > 50) {
+      displayUrl = url.substring(0, 47) + '...';
+    }
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${displayUrl}</a>`;
+  });
 }
 // ===========================================
 // ALPHABET AUTO-DETECTION (for display purposes)

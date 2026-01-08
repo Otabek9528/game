@@ -833,9 +833,11 @@ body {
 
 /* Make links in answer body wrap properly */
 #answerBody a {
-  color: var(--primary-green);
+  color: var(--green-accent);
   word-break: break-all;
   overflow-wrap: break-word;
+  display: inline-block;
+  max-width: 100%;
 }
 
 #answerBody {
