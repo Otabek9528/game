@@ -1331,3 +1331,19 @@ a:focus-visible {
 .bottom-refresh-btn:hover .refresh-icon {
   transform: rotate(180deg);
 }
+
+.load-more-btn.as-refresh {
+  background: linear-gradient(135deg, var(--teal-700) 0%, var(--teal-800) 100%);
+  border: none;
+  color: var(--text-inverse);
+  box-shadow: 0 4px 12px rgba(19, 78, 74, 0.2);
+}
+
+.load-more-btn.as-refresh:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(19, 78, 74, 0.3);
+}
+
+.load-more-btn.as-refresh:hover .load-more-icon {
+  transform: rotate(180deg);
+}
