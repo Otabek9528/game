@@ -203,7 +203,6 @@ function renderQuestionCard(question, container) {
   
   container.appendChild(card);
 }
-
 function renderBrowseQuestions() {
   questionCards.innerHTML = '';
   
@@ -212,8 +211,34 @@ function renderBrowseQuestions() {
   
   if (displayedCount >= currentQuestions.length) {
     loadMoreBtn.style.display = 'none';
+    
+    // Show bottom refresh button
+    let bottomRefresh = document.getElementById('bottomRefreshBtn');
+    if (!bottomRefresh) {
+      bottomRefresh = document.createElement('button');
+      bottomRefresh.id = 'bottomRefreshBtn';
+      bottomRefresh.className = 'bottom-refresh-btn';
+      bottomRefresh.innerHTML = `
+        <span>Yangi savollar yuklash</span>
+        <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+      `;
+      bottomRefresh.addEventListener('click', async () => {
+        showLoading();
+        currentQuestions = await fetchBrowseQuestions(15);
+        hideLoading();
+        displayedCount = 10;
+        renderBrowseQuestions();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      questionCards.after(bottomRefresh);
+    }
+    bottomRefresh.style.display = 'flex';
   } else {
     loadMoreBtn.style.display = 'flex';
+    const bottomRefresh = document.getElementById('bottomRefreshBtn');
+    if (bottomRefresh) bottomRefresh.style.display = 'none';
   }
 }
 

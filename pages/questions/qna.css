@@ -115,6 +115,10 @@ body {
 }
 
 /* Let parent style.css handle .app__header */
+/* --- App Header --- */
+.app__header {
+  flex-shrink: 0;
+}
 
 /* --- Main Container --- */
 .qna-container {
@@ -1284,4 +1288,46 @@ button:focus-visible,
 a:focus-visible {
   outline: 2px solid var(--teal-500);
   outline-offset: 2px;
+}
+
+/* ===========================================
+   BOTTOM REFRESH BUTTON
+   =========================================== */
+.bottom-refresh-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-6);
+  margin-top: var(--space-6);
+  background: linear-gradient(135deg, var(--teal-700) 0%, var(--teal-800) 100%);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: var(--text-inverse);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 12px rgba(19, 78, 74, 0.2);
+}
+
+.bottom-refresh-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(19, 78, 74, 0.3);
+}
+
+.bottom-refresh-btn:active {
+  transform: translateY(0);
+}
+
+.bottom-refresh-btn .refresh-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform var(--transition-base);
+}
+
+.bottom-refresh-btn:hover .refresh-icon {
+  transform: rotate(180deg);
 }
