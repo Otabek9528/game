@@ -213,7 +213,7 @@ body {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: var(--space-lg);
+  padding: 24px 20px;
   background: var(--bg-elevated);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
@@ -221,6 +221,7 @@ body {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Decorative top accent */
@@ -240,8 +241,8 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   background: radial-gradient(circle at top right, var(--emerald-50) 0%, transparent 70%);
   pointer-events: none;
 }
@@ -260,7 +261,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--space-lg);
+  margin-bottom: 20px;
   position: relative;
   z-index: 1;
 }
@@ -268,48 +269,54 @@ body {
 .left-side {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .left-side .weekday {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  line-height: 1.3;
 }
 
 .left-side .hijri {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
   margin: 0;
+  line-height: 1.3;
 }
 
 .right-side {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-sm);
+  gap: 6px;
+  padding: 8px 14px;
   background: var(--emerald-50);
   border-radius: var(--radius-full);
 }
 
 .right-side .location-icon {
-  font-size: 0.85rem;
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
 .right-side .city-name {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--emerald-700);
+  line-height: 1;
 }
 
 /* Timeline Prayer */
 .timeline-prayer {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  justify-content: space-between;
+  gap: 12px;
   position: relative;
   z-index: 1;
+  margin-top: 8px;
 }
 
 .timeline-start,
@@ -318,27 +325,30 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 8px;
 }
 
 .timeline-emoji {
-  font-size: 1.75rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  font-size: 2.75rem;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+  line-height: 1;
 }
 
 .timeline-name {
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  line-height: 1.2;
 }
 
 .timeline-time {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--emerald-700);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--emerald-600);
   margin: 0;
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 
 /* Timeline Progress */
@@ -346,13 +356,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 0 var(--space-sm);
+  gap: 10px;
+  padding: 0 8px;
+  min-width: 110px;
 }
 
 .progress-line {
-  width: 60px;
-  height: 2px;
+  width: 80px;
+  height: 3px;
   background: linear-gradient(90deg, var(--emerald-500), var(--emerald-400));
   border-radius: var(--radius-full);
   position: relative;
@@ -364,26 +375,28 @@ body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
   border-radius: var(--radius-full);
   background: var(--emerald-500);
-  box-shadow: 0 0 0 2px white;
+  box-shadow: 0 0 0 3px white, 0 2px 4px rgba(0,0,0,0.15);
 }
 
-.progress-line::before { left: -3px; }
-.progress-line::after { right: -3px; }
+.progress-line::before { left: -5px; }
+.progress-line::after { right: -5px; }
 
 .countdown-badge {
   background: linear-gradient(135deg, var(--gold-100) 0%, #fff8e7 100%);
-  border: 1.5px solid var(--gold-400);
+  border: 2px solid var(--gold-400);
   border-radius: var(--radius-full);
-  padding: var(--space-xs) var(--space-sm);
-  font-size: 0.75rem;
+  padding: 8px 14px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--gold-600);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(212, 162, 26, 0.2);
 }
 
 /* =========================
@@ -834,15 +847,48 @@ body {
   }
   
   .prayer-card-timeline {
-    padding: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+  }
+  
+  .top-row {
+    margin-bottom: var(--space-lg);
+  }
+  
+  .left-side .weekday {
+    font-size: 1rem;
+  }
+  
+  .left-side .hijri {
+    font-size: 0.85rem;
+  }
+  
+  .right-side {
+    padding: var(--space-xs) var(--space-sm);
+  }
+  
+  .right-side .city-name {
+    font-size: 0.85rem;
   }
   
   .timeline-emoji {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
   
   .timeline-name {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
+  }
+  
+  .timeline-time {
+    font-size: 1rem;
+  }
+  
+  .progress-line {
+    width: 60px;
+  }
+  
+  .countdown-badge {
+    font-size: 0.85rem;
+    padding: var(--space-xs) var(--space-sm);
   }
 }
 
