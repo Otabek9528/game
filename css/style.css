@@ -135,8 +135,8 @@ body {
 }
 
 .bot-logo {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-full);
   border: 2px solid rgba(255, 255, 255, 0.2);
   object-fit: cover;
@@ -150,7 +150,7 @@ body {
 
 .header-content h1 {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: white;
   margin: 0;
@@ -165,12 +165,12 @@ body {
 }
 
 .flag-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.1);
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   cursor: pointer;
   transition: all var(--transition-fast);
   display: flex;
@@ -438,6 +438,8 @@ body {
 
 /* Feature Card */
 .card {
+  min-height: 130px;
+  justify-content: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -489,6 +491,10 @@ body {
 }
 
 .card p {
+  min-height: 2.4em; /* Reserve space for 2 lines */
+  display: flex;
+  align-items: center;
+  
   margin: 0;
   font-size: 0.8rem;
   font-weight: 600;
