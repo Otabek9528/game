@@ -21,7 +21,7 @@ const I18N = {
     'feature.restaurants': { uz: 'Oshxonalar', ru: 'Рестораны', en: 'Restaurants' },
     'feature.shops': { uz: 'Do\'konlar', ru: 'Магазины', en: 'Shops' },
     'feature.qibla': { uz: 'Qibla', ru: 'Кибла', en: 'Qibla' },
-    'feature.qna': { uz: '"Zikr ahlidan so\'rang" savol-javoblari', ru: 'Zikr ahlidan so\'rang', en: 'Zikr ahlidan so\'rang' },
+    'feature.qna': { uz: 'Diniy savol-javoblar', ru: 'Zikr ahlidan so\'rang', en: 'Zikr ahlidan so\'rang' },
     'feature.parcel': { uz: 'Pochta', ru: 'Почта', en: 'Parcel' },
     'feature.links': { uz: 'Foydali linklar', ru: 'Полезные ссылки', en: 'Useful Links' },
     'feature.jobs': { uz: 'Ish e\'lonlari', ru: 'Вакансии', en: 'Job Listings' },
