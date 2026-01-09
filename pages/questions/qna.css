@@ -345,6 +345,7 @@ body {
   display: block;
   font-size: 0.75rem;
   font-weight: 700;
+  text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--teal-700);
@@ -379,6 +380,64 @@ body {
 .search-textarea::placeholder {
   color: var(--ivory-500);
   font-style: italic;
+}
+
+/* Search Guide - Collapsible */
+.search-guide {
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--teal-50) 0%, var(--ivory-100) 100%);
+  border: 1px solid var(--teal-100);
+  overflow: hidden;
+}
+
+.search-guide summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--teal-700);
+  cursor: pointer;
+  list-style: none;
+  transition: background var(--transition-fast);
+}
+
+.search-guide summary::-webkit-details-marker {
+  display: none;
+}
+
+.search-guide summary::after {
+  content: '';
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a5f5a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform var(--transition-fast);
+}
+
+.search-guide[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.search-guide summary:hover {
+  background: var(--teal-100);
+}
+
+.search-guide .guide-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.search-guide p {
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-4);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
 }
 
 .search-notice {
