@@ -6,7 +6,7 @@ const I18N = {
   STORAGE_KEY: 'vegukin_language',
 
   availableFeatures: {
-    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'community', 'news', 'events', 'market'],
+    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'community', 'news', 'events', 'market'],
     ru: ['mosque', 'restaurant', 'shop', 'qibla', 'donation', 'community'],
     en: ['mosque', 'restaurant', 'shop', 'qibla', 'donation', 'community']
   },
@@ -21,6 +21,7 @@ const I18N = {
     'feature.restaurants': { uz: 'Oshxonalar', ru: 'Рестораны', en: 'Restaurants' },
     'feature.shops': { uz: 'Do\'konlar', ru: 'Магазины', en: 'Shops' },
     'feature.qibla': { uz: 'Qibla', ru: 'Кибла', en: 'Qibla' },
+    'feature.qna': { uz: '"Zikr ahlidan so\'rang" savol-javoblari', ru: 'Zikr ahlidan so\'rang', en: 'Zikr ahlidan so\'rang' },
     'feature.parcel': { uz: 'Pochta', ru: 'Почта', en: 'Parcel' },
     'feature.links': { uz: 'Foydali linklar', ru: 'Полезные ссылки', en: 'Useful Links' },
     'feature.jobs': { uz: 'Ish e\'lonlari', ru: 'Вакансии', en: 'Job Listings' },
