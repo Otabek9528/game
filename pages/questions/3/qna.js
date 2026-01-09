@@ -81,9 +81,11 @@ searchTrigger.addEventListener('click', () => {
   }
 });
 
-searchCancel.addEventListener('click', () => {
-  collapseSearch();
-});
+if (searchCancel) {
+  searchCancel.addEventListener('click', () => {
+    collapseSearch();
+  });
+}
 
 // ===========================================
 // API FUNCTIONS
@@ -341,6 +343,30 @@ function closeAnswerModal() {
   answerModal.style.display = 'none';
   document.body.style.overflow = 'auto';
 }
+
+function shareQuestion() {
+  const title = document.getElementById('questionTitle').textContent;
+  const link = document.getElementById('sourceLink').href;
+  
+  const shareText = `📖 ${title}\n\n🔗 ${link}`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      text: shareText,
+      url: link
+    }).catch(err => console.log('Share cancelled'));
+  } else if (tg.openTelegramLink) {
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent('📖 ' + title)}`;
+    tg.openTelegramLink(telegramUrl);
+  } else {
+    navigator.clipboard.writeText(shareText).then(() => {
+      alert('Nusxa olindi!');
+    });
+  }
+}
+
+document.getElementById('shareBtn').addEventListener('click', shareQuestion);
 
 function renderRelatedQuestions(relatedQuestions) {
   const relatedList = document.getElementById('relatedList');

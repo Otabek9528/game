@@ -56,14 +56,14 @@ const searchExpandable = document.getElementById('searchExpandable');
 const searchCancel = document.getElementById('searchCancel');
 
 let isSearchExpanded = false;
+let userInitiatedFocus = false;
 
 function expandSearch() {
   isSearchExpanded = true;
   searchSection.classList.add('expanded');
   searchExpandable.style.maxHeight = searchExpandable.scrollHeight + 'px';
-  setTimeout(() => {
-    searchInput.focus();
-  }, 300);
+  // ✅ No auto-focus here
+  searchInput.blur();
 }
 
 function collapseSearch() {
@@ -72,6 +72,17 @@ function collapseSearch() {
   searchExpandable.style.maxHeight = '0';
   searchInput.value = '';
 }
+
+searchInput.addEventListener('touchstart', () => {
+  userInitiatedFocus = true;
+  searchInput.focus();
+}, { passive: true });
+
+// For desktop / non-touch
+searchInput.addEventListener('mousedown', () => {
+  userInitiatedFocus = true;
+  searchInput.focus();
+});
 
 searchTrigger.addEventListener('click', () => {
   if (isSearchExpanded) {

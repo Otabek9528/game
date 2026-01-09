@@ -398,28 +398,97 @@ body {
   flex-shrink: 0;
 }
 
-.search-actions {
+/* ===========================================
+   MODAL ACTION BUTTONS
+   =========================================== */
+.modal-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--space-3);
 }
 
-.search-cancel {
+.source-link_detail {
   flex: 1;
-  padding: var(--space-3) var(--space-4);
-  background: transparent;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  font-family: var(--font-body);
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--teal-50);
+  border: 1px solid var(--teal-100);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--teal-700);
   font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: all var(--transition-base);
+}
+
+.source-link:hover {
+  background: var(--teal-100);
+  border-color: var(--teal-400);
+}
+
+.link-arrow {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition-fast);
+}
+
+.source-link:hover .link-arrow {
+  transform: translate(2px, -2px);
+}
+
+.share-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  
+  background: #2aabee;
+  border: none;
+  border-radius: var(--radius-lg);
+  
+  color: white;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-base);
+  box-shadow: 0 2px 8px rgba(166, 124, 26, 0.25);
+}
+
+.share-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(166, 124, 26, 0.35);
+}
+
+.share-btn:active {
+  transform: translateY(0);
+}
+
+.share-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.tg-icon {
+  width: 18px;
+  height: 18px;
+  color: white;
+  flex-shrink: 0;
 }
 
 .search-cancel:hover {
   background: var(--ivory-200);
   border-color: var(--ivory-400);
+}
+
+.search-actions {
+  display: flex;
 }
 
 .search-btn {
