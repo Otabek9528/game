@@ -13,7 +13,7 @@ try {
 // API CONFIGURATION
 // ===========================================
 
-const API_BASE_URL = 'https://vegukin-api.duckdns.org';
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 const API = {
   search: `${API_BASE_URL}/api/questions/search`,

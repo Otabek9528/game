@@ -2,8 +2,6 @@
 // This file contains the base URL for the Muslim Vegukin API
 
 const API_CONFIG = {
-  // Base URL for the Flask API deployed on Render/Fly.io
-  //BASE_URL: 'https://muslim-vegukin-api.fly.dev',
   BASE_URL: 'https://vegukin-api.duckdns.org/',
   
   // API endpoints
