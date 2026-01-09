@@ -29,7 +29,6 @@ const API = {
 
 let currentView = 'browse';
 let currentQuestions = [];
-let displayedCount = 10;
 let searchResults = [];
 let currentQuestion = null;
 
@@ -253,30 +252,17 @@ function renderQuestionCard(question, container) {
 function renderBrowseQuestions() {
   questionCards.innerHTML = '';
   
-  const questionsToShow = currentQuestions.slice(0, displayedCount);
-  questionsToShow.forEach(q => renderQuestionCard(q, questionCards));
+  currentQuestions.forEach(q => renderQuestionCard(q, questionCards));
   
-  if (displayedCount >= currentQuestions.length) {
-    // Transform into refresh button
-    loadMoreBtn.innerHTML = `
-      <span>Yangi savollar yuklash</span>
-      <svg class="load-more-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-      </svg>
-    `;
-    loadMoreBtn.classList.add('as-refresh');
-    loadMoreBtn.style.display = 'flex';
-  } else {
-    // Normal load more state
-    loadMoreBtn.innerHTML = `
-      <span>Yana ko'rsatish</span>
-      <svg class="load-more-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M6 9l6 6 6-6"/>
-      </svg>
-    `;
-    loadMoreBtn.classList.remove('as-refresh');
-    loadMoreBtn.style.display = 'flex';
-  }
+  // Always show refresh button
+  loadMoreBtn.classList.add('as-refresh');
+  loadMoreBtn.innerHTML = `
+    <span>Yangi savollar yuklash</span>
+    <svg class="load-more-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+    </svg>
+  `;
+  loadMoreBtn.style.display = 'flex';
 }
 
 function renderSearchResults() {
@@ -465,25 +451,15 @@ refreshBtn.addEventListener('click', async () => {
   showLoading();
   currentQuestions = await fetchBrowseQuestions(15);
   hideLoading();
-  
-  displayedCount = 10;
   renderBrowseQuestions();
 });
 
 loadMoreBtn.addEventListener('click', async () => {
-  if (loadMoreBtn.classList.contains('as-refresh')) {
-    // Refresh behavior
-    showLoading();
-    currentQuestions = await fetchBrowseQuestions(15);
-    hideLoading();
-    displayedCount = 10;
-    renderBrowseQuestions();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  } else {
-    // Load more behavior
-    displayedCount += 5;
-    renderBrowseQuestions();
-  }
+  showLoading();
+  currentQuestions = await fetchBrowseQuestions(15);
+  hideLoading();
+  renderBrowseQuestions();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 backToSearchBtn.addEventListener('click', () => {
@@ -535,7 +511,6 @@ async function initQnAPage() {
   hideLoading();
   
   if (currentQuestions.length > 0) {
-    displayedCount = 10;
     renderBrowseQuestions();
     console.log(`✅ Q&A page initialized with ${currentQuestions.length} questions`);
   } else {
