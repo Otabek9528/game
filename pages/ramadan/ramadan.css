@@ -800,7 +800,7 @@ body {
 .times-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   position: relative;
   z-index: 1;
 }
