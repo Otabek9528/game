@@ -270,29 +270,7 @@
         window.location.href = 'pages/prayers.html';
       });
     }
-// ============================================
-    // RAMADAN BUTTON NAVIGATION
-    // ============================================
 
-    const ramadanBtn = document.getElementById('ramadanBtn');
-    if (ramadanBtn) {
-      ramadanBtn.addEventListener('click', () => {
-        // Haptic feedback
-        try {
-          if (tg.HapticFeedback) {
-            tg.HapticFeedback.impactOccurred('light');
-          }
-        } catch (e) {}
-        
-        // Log interaction (fire-and-forget)
-        if (window.logInteraction) {
-          window.logInteraction('ramadan');
-        }
-        
-        // Navigate to Ramadan page
-        window.location.href = 'pages/ramadan/ramadan.html';
-      });
-    }
     // ============================================
     // LOCATION UPDATE HANDLER
     // ============================================
