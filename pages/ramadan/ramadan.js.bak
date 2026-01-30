@@ -40,7 +40,7 @@ const CONFIG = {
 const State = {
   location: null,
   cityName: '---',
-  activeTab: 'today',
+  activeTab: 'tomorrow',
   todayTimes: null,
   tomorrowTimes: null,
   heroCountdownInterval: null,
@@ -430,38 +430,20 @@ function startNextEventCountdown() {
   }, 1000); // Update every second
 }
 
-async function updateTodayTab() {
+async function fetchTodayTimes() {
   if (!State.location) return;
   
   const today = new Date();
-  const ramadanDay = calculateRamadanDay(today);
-  
-  // Update date display
-  document.getElementById('todayDate').textContent = formatDate(today, true);
-  
-  if (isRamadan(today)) {
-    document.getElementById('todayRamadan').textContent = `Ramazonning ${ramadanDay}-kuni`;
-  } else {
-    document.getElementById('todayRamadan').textContent = '';
-  }
   
   // Fetch times if not cached
   if (!State.todayTimes) {
     State.todayTimes = await fetchPrayerTimes(State.location.lat, State.location.lon, today);
   }
   
-  if (State.todayTimes) {
-    document.getElementById('todaySuhur').textContent = State.todayTimes.suhur;
-    document.getElementById('todayIftar').textContent = State.todayTimes.iftar;
-    
-    // Start iftar countdown for today tab
-    startIftarCountdown(State.todayTimes.iftar);
-    
-    // Update hero section now that we have times
-    if (isRamadan()) {
-      updateNextEventDisplay();
-      startNextEventCountdown();
-    }
+  // Update hero section now that we have times
+  if (State.todayTimes && isRamadan()) {
+    updateNextEventDisplay();
+    startNextEventCountdown();
   }
 }
 
@@ -494,27 +476,6 @@ async function updateTomorrowTab() {
   }
 }
 
-function startIftarCountdown(iftarTime) {
-  const countdownBox = document.getElementById('iftarCountdownBox');
-  const timerEl = document.getElementById('iftarTimer');
-  
-  function update() {
-    const remaining = getTimeUntilIftar(iftarTime);
-    
-    if (remaining) {
-      const timeStr = `${String(remaining.hours).padStart(2, '0')}:${String(remaining.minutes).padStart(2, '0')}:${String(remaining.seconds).padStart(2, '0')}`;
-      timerEl.textContent = timeStr;
-      countdownBox.style.display = 'flex';
-    } else {
-      countdownBox.style.display = 'none';
-    }
-  }
-  
-  update();
-  // Use the same interval as the hero - no need for separate interval
-  // The hero interval handles the 1-second updates
-}
-
 // ===========================================
 // TAB NAVIGATION
 // ===========================================
@@ -538,9 +499,7 @@ function initTabs() {
       haptic('light');
       
       // Load tab content if needed
-      if (tabId === 'today') {
-        updateTodayTab();
-      } else if (tabId === 'tomorrow') {
+      if (tabId === 'tomorrow') {
         updateTomorrowTab();
       }
     });
@@ -664,10 +623,11 @@ async function init() {
   // Setup event listeners
   setupEventListeners();
   
-  // Load initial tab data
+  // Load data
   if (State.location) {
-    await updateTodayTab();
-    // Pre-fetch tomorrow's data for hero countdown
+    // Fetch today's times for hero section
+    await fetchTodayTimes();
+    // Fetch and display tomorrow's data (default tab)
     await updateTomorrowTab();
   }
   

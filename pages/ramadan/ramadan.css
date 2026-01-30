@@ -435,7 +435,8 @@ body {
 
 /* Next Event Box */
 .next-event {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
@@ -461,7 +462,6 @@ body {
 }
 
 .next-event-info {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -469,19 +469,20 @@ body {
 }
 
 .next-event-label {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 2px;
 }
 
 .next-event-time {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
+  line-height: 1;
 }
 
 .next-event-countdown {

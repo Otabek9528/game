@@ -132,86 +132,21 @@
 
       <!-- Tab Navigation -->
       <nav class="tab-nav" id="tabNav">
-        <button class="tab-btn active" data-tab="today">
-          <span class="tab-icon">🌙</span>
-          <span class="tab-text">Bugun</span>
-        </button>
-        <button class="tab-btn" data-tab="tomorrow">
+        <button class="tab-btn active" data-tab="tomorrow">
           <span class="tab-icon">🌅</span>
           <span class="tab-text">Ertaga</span>
         </button>
         <button class="tab-btn" data-tab="calendar">
           <span class="tab-icon">📅</span>
-          <span class="tab-text">Oylik</span>
+          <span class="tab-text">Oylik taqvim</span>
         </button>
       </nav>
 
       <!-- Tab Content Area -->
       <section class="tab-content">
-        
-        <!-- TODAY TAB -->
-        <div class="tab-pane active" id="tabToday">
-          <div class="day-card today-theme">
-            <!-- Night Sky Illustration -->
-            <div class="day-illustration today-illustration">
-              <div class="illust-moon">🌙</div>
-              <div class="illust-stars">
-                <span>✦</span><span>✧</span><span>✦</span>
-              </div>
-              <div class="illust-mosque">🕌</div>
-            </div>
-            
-            <div class="day-header">
-              <span class="day-date" id="todayDate">--</span>
-              <span class="day-ramadan" id="todayRamadan">Ramazonning --kuni</span>
-            </div>
-            
-            <div class="times-grid">
-              <div class="time-card suhur">
-                <div class="time-icon-wrap">
-                  <span class="time-icon">🌙</span>
-                </div>
-                <div class="time-details">
-                  <span class="time-label">Saharlik</span>
-                  <span class="time-value" id="todaySuhur">--:--</span>
-                  <span class="time-note">Bomdod azoni</span>
-                </div>
-              </div>
-              <div class="time-card iftar">
-                <div class="time-icon-wrap">
-                  <span class="time-icon">🌅</span>
-                </div>
-                <div class="time-details">
-                  <span class="time-label">Iftorlik</span>
-                  <span class="time-value" id="todayIftar">--:--</span>
-                  <span class="time-note">Shom azoni</span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Iftar Countdown -->
-            <div class="iftar-countdown" id="iftarCountdownBox">
-              <span class="iftar-label">Iftorgacha qoldi:</span>
-              <span class="iftar-timer" id="iftarTimer">--:--:--</span>
-            </div>
-          </div>
-          
-          <!-- Advice Box -->
-          <div class="advice-box">
-            <div class="advice-header">
-              <span class="advice-icon">💡</span>
-              <span class="advice-title">Maslahat</span>
-            </div>
-            <ul class="advice-list">
-              <li><strong>Saharlikni</strong> Bomdoddan 5 daqiqa oldin yakunlang</li>
-              <li><strong>Iftorlikni</strong> Shomdan 5 daqiqa keyin oching</li>
-              <li><strong>Namozlarni</strong> 10 daqiqa kechiktiring</li>
-            </ul>
-          </div>
-        </div>
 
         <!-- TOMORROW TAB -->
-        <div class="tab-pane" id="tabTomorrow">
+        <div class="tab-pane active" id="tabTomorrow">
           <div class="day-card tomorrow-theme">
             <!-- Dawn Illustration -->
             <div class="day-illustration tomorrow-illustration">
