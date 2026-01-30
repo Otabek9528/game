@@ -11,7 +11,7 @@
 
 const CONFIG = {
   // Ramadan 2026 estimated start (may need adjustment based on moon sighting)
-  RAMADAN_START: new Date(2026, 0, 28), // February 28, 2026
+  RAMADAN_START: new Date(2026, 1, 28), // February 28, 2026
   RAMADAN_DAYS: 30,
   
   // Aladhan API
@@ -330,7 +330,7 @@ function updateNextEventDisplay() {
   const { suhur, iftar } = State.todayTimes;
   const nextEvent = getNextEvent(suhur, iftar);
   
-  const eventBox = document.getElementById('nextEventBox');
+  const eventCard = document.getElementById('nextEventCard');
   const eventIcon = document.getElementById('nextEventIcon');
   const eventLabel = document.getElementById('nextEventLabel');
   const eventTime = document.getElementById('nextEventTime');
@@ -342,12 +342,12 @@ function updateNextEventDisplay() {
   document.getElementById('quickIftarTime').textContent = iftar;
   
   // Remove active classes
-  eventBox.classList.remove('suhur-mode', 'iftar-mode');
+  eventCard.classList.remove('suhur-mode', 'iftar-mode');
   quickSuhur.classList.remove('active');
   quickIftar.classList.remove('active');
   
   if (nextEvent === 'suhur') {
-    eventBox.classList.add('suhur-mode');
+    eventCard.classList.add('suhur-mode');
     eventIcon.textContent = '🌙';
     eventLabel.textContent = 'Saharlikgacha';
     
@@ -366,7 +366,7 @@ function updateNextEventDisplay() {
     
     quickSuhur.classList.add('active');
   } else {
-    eventBox.classList.add('iftar-mode');
+    eventCard.classList.add('iftar-mode');
     eventIcon.textContent = '🌅';
     eventLabel.textContent = 'Iftorlikgacha';
     eventTime.textContent = iftar;

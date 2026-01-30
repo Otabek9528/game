@@ -403,6 +403,7 @@ body {
 .hero-during-ramadan {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-md);
 }
 
@@ -415,12 +416,12 @@ body {
 }
 
 .day-badge-label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
 }
 
 .day-badge-num {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: var(--gold-400);
   line-height: 1;
@@ -428,86 +429,102 @@ body {
 }
 
 .day-badge-suffix {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--gold-400);
 }
 
-/* Next Event Box */
-.next-event {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+/* Next Event Card */
+.next-event-card {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) var(--space-lg);
-  background: rgba(0, 0, 0, 0.35);
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-xl);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 180px;
 }
 
-.next-event.suhur-mode {
-  border-color: rgba(129, 140, 248, 0.3);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(0, 0, 0, 0.3));
+.next-event-card.suhur-mode {
+  border-color: rgba(129, 140, 248, 0.4);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(0, 0, 0, 0.3));
 }
 
-.next-event.iftar-mode {
-  border-color: rgba(250, 204, 21, 0.3);
-  background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(0, 0, 0, 0.3));
+.next-event-card.iftar-mode {
+  border-color: rgba(250, 204, 21, 0.4);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(0, 0, 0, 0.3));
+}
+
+.next-event-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 .next-event-icon {
-  font-size: 2.2rem;
+  font-size: 1.3rem;
   line-height: 1;
-  flex-shrink: 0;
-}
-
-.next-event-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
 }
 
 .next-event-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 2px;
+  letter-spacing: 0.08em;
 }
 
 .next-event-time {
-  font-size: 1.6rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
-.next-event-countdown {
+/* Hero Countdown Timer */
+.hero-countdown-timer {
   display: flex;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.timer-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
   padding: var(--space-sm) var(--space-md);
   background: rgba(0, 0, 0, 0.4);
   border-radius: var(--radius-md);
-  flex-shrink: 0;
+  border: 1px solid rgba(250, 204, 21, 0.2);
 }
 
-.next-countdown-value {
-  font-size: 1.1rem;
+.timer-value {
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--gold-400);
   font-variant-numeric: tabular-nums;
-  min-width: 1.5ch;
-  text-align: center;
+  line-height: 1;
 }
 
-.next-countdown-sep {
-  font-size: 1rem;
+.timer-label {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+.timer-sep {
+  font-size: 1.3rem;
+  font-weight: 700;
   color: var(--gold-500);
   opacity: 0.6;
+  margin-bottom: 12px;
 }
 
 /* Quick Times Reference */
@@ -516,7 +533,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--space-md);
-  padding-top: var(--space-sm);
+  padding-top: var(--space-xs);
+  margin-top: var(--space-xs);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
 }
 
 .quick-time {
