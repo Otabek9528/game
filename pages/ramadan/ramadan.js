@@ -43,7 +43,8 @@ const State = {
   activeTab: 'today',
   todayTimes: null,
   tomorrowTimes: null,
-  iftarCountdownInterval: null
+  heroCountdownInterval: null,
+  nextEventInterval: null
 };
 
 // ===========================================
@@ -169,7 +170,59 @@ function getTimeUntilIftar(iftarTimeStr) {
   const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const s = Math.floor((diff % (1000 * 60)) / 1000);
   
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return { hours: h, minutes: m, seconds: s };
+}
+
+function getTimeUntilSuhur(suhurTimeStr) {
+  if (!suhurTimeStr || suhurTimeStr === '--:--') return null;
+  
+  const now = new Date();
+  const [hours, minutes] = suhurTimeStr.split(':').map(Number);
+  
+  const suhur = new Date(now);
+  suhur.setHours(hours, minutes, 0, 0);
+  
+  // If suhur time has passed today, it's tomorrow's suhur
+  if (suhur <= now) {
+    suhur.setDate(suhur.getDate() + 1);
+  }
+  
+  const diff = suhur.getTime() - now.getTime();
+  
+  if (diff <= 0) return null;
+  
+  const h = Math.floor(diff / (1000 * 60 * 60));
+  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const s = Math.floor((diff % (1000 * 60)) / 1000);
+  
+  return { hours: h, minutes: m, seconds: s };
+}
+
+function getNextEvent(suhurTime, iftarTime) {
+  // Returns 'suhur' or 'iftar' based on which is coming next
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  
+  if (!suhurTime || !iftarTime) return null;
+  
+  const [sH, sM] = suhurTime.split(':').map(Number);
+  const [iH, iM] = iftarTime.split(':').map(Number);
+  
+  const suhurMinutes = sH * 60 + sM;
+  const iftarMinutes = iH * 60 + iM;
+  
+  // Logic:
+  // Before Suhur (e.g., 3am) → next is Suhur
+  // After Suhur, Before Iftar (e.g., 2pm) → next is Iftar
+  // After Iftar (e.g., 8pm) → next is tomorrow's Suhur
+  
+  if (currentMinutes < suhurMinutes) {
+    return 'suhur';
+  } else if (currentMinutes < iftarMinutes) {
+    return 'iftar';
+  } else {
+    return 'suhur'; // Tomorrow's suhur
+  }
 }
 
 // ===========================================
@@ -212,35 +265,36 @@ function updateCityDisplay() {
 
 function updateHeroSection() {
   const now = new Date();
-  const heroTitle = document.getElementById('heroTitle');
-  const heroSubtitle = document.getElementById('heroSubtitle');
-  const countdownSection = document.getElementById('countdownSection');
-  const ramadanBadge = document.getElementById('ramadanBadge');
+  
+  const heroBeforeRamadan = document.getElementById('heroBeforeRamadan');
+  const heroDuringRamadan = document.getElementById('heroDuringRamadan');
+  const heroAfterRamadan = document.getElementById('heroAfterRamadan');
+  
+  // Hide all first
+  heroBeforeRamadan.style.display = 'none';
+  heroDuringRamadan.style.display = 'none';
+  heroAfterRamadan.style.display = 'none';
   
   if (isBeforeRamadan(now)) {
-    // Show countdown
-    heroTitle.textContent = 'Ramazon 2026';
-    heroSubtitle.textContent = 'Muqaddas oy boshlanishiga';
-    countdownSection.style.display = 'flex';
-    ramadanBadge.style.display = 'none';
-    
+    // Show countdown to Ramadan
+    heroBeforeRamadan.style.display = 'block';
     updateCountdown();
+    startHeroCountdown();
   } else if (isRamadan(now)) {
-    // Show Ramadan day
+    // Show during Ramadan view
+    heroDuringRamadan.style.display = 'flex';
+    
     const dayNum = calculateRamadanDay(now);
-    
-    heroTitle.textContent = 'Ramazon Muborak';
-    heroSubtitle.textContent = 'Muqaddas oy davom etmoqda';
-    countdownSection.style.display = 'none';
-    ramadanBadge.style.display = 'inline-flex';
-    
     document.getElementById('badgeDayNum').textContent = dayNum;
+    
+    // Update next event if we have times
+    if (State.todayTimes) {
+      updateNextEventDisplay();
+      startNextEventCountdown();
+    }
   } else {
     // After Ramadan
-    heroTitle.textContent = 'Ramazon 2026';
-    heroSubtitle.textContent = 'Muqaddas oy yakunlandi';
-    countdownSection.style.display = 'none';
-    ramadanBadge.style.display = 'none';
+    heroAfterRamadan.style.display = 'block';
   }
 }
 
@@ -252,6 +306,128 @@ function updateCountdown() {
     document.getElementById('countdownHours').textContent = String(countdown.hours).padStart(2, '0');
     document.getElementById('countdownMinutes').textContent = String(countdown.minutes).padStart(2, '0');
   }
+}
+
+function startHeroCountdown() {
+  // Clear existing interval
+  if (State.heroCountdownInterval) {
+    clearInterval(State.heroCountdownInterval);
+  }
+  
+  State.heroCountdownInterval = setInterval(() => {
+    if (isBeforeRamadan()) {
+      updateCountdown();
+    } else {
+      clearInterval(State.heroCountdownInterval);
+      updateHeroSection(); // Switch to during Ramadan view
+    }
+  }, 60000); // Update every minute
+}
+
+function updateNextEventDisplay() {
+  if (!State.todayTimes) return;
+  
+  const { suhur, iftar } = State.todayTimes;
+  const nextEvent = getNextEvent(suhur, iftar);
+  
+  const eventBox = document.getElementById('nextEventBox');
+  const eventIcon = document.getElementById('nextEventIcon');
+  const eventLabel = document.getElementById('nextEventLabel');
+  const eventTime = document.getElementById('nextEventTime');
+  const quickSuhur = document.getElementById('quickSuhur');
+  const quickIftar = document.getElementById('quickIftar');
+  
+  // Update quick times reference
+  document.getElementById('quickSuhurTime').textContent = suhur;
+  document.getElementById('quickIftarTime').textContent = iftar;
+  
+  // Remove active classes
+  eventBox.classList.remove('suhur-mode', 'iftar-mode');
+  quickSuhur.classList.remove('active');
+  quickIftar.classList.remove('active');
+  
+  if (nextEvent === 'suhur') {
+    eventBox.classList.add('suhur-mode');
+    eventIcon.textContent = '🌙';
+    eventLabel.textContent = 'Saharlikgacha';
+    
+    // For suhur after iftar, we need tomorrow's suhur time
+    const now = new Date();
+    const [iH, iM] = iftar.split(':').map(Number);
+    const iftarMinutes = iH * 60 + iM;
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    if (currentMinutes >= iftarMinutes && State.tomorrowTimes) {
+      // Show tomorrow's suhur time
+      eventTime.textContent = State.tomorrowTimes.suhur;
+    } else {
+      eventTime.textContent = suhur;
+    }
+    
+    quickSuhur.classList.add('active');
+  } else {
+    eventBox.classList.add('iftar-mode');
+    eventIcon.textContent = '🌅';
+    eventLabel.textContent = 'Iftorlikgacha';
+    eventTime.textContent = iftar;
+    quickIftar.classList.add('active');
+  }
+  
+  // Update the countdown values
+  updateNextEventCountdownValues();
+}
+
+function updateNextEventCountdownValues() {
+  if (!State.todayTimes) return;
+  
+  const { suhur, iftar } = State.todayTimes;
+  const nextEvent = getNextEvent(suhur, iftar);
+  
+  let remaining;
+  
+  if (nextEvent === 'suhur') {
+    // If after iftar, use tomorrow's suhur
+    const now = new Date();
+    const [iH, iM] = iftar.split(':').map(Number);
+    const iftarMinutes = iH * 60 + iM;
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    if (currentMinutes >= iftarMinutes && State.tomorrowTimes) {
+      remaining = getTimeUntilSuhur(State.tomorrowTimes.suhur);
+    } else {
+      remaining = getTimeUntilSuhur(suhur);
+    }
+  } else {
+    remaining = getTimeUntilIftar(iftar);
+  }
+  
+  if (remaining) {
+    document.getElementById('nextCountdownHours').textContent = String(remaining.hours).padStart(2, '0');
+    document.getElementById('nextCountdownMinutes').textContent = String(remaining.minutes).padStart(2, '0');
+    document.getElementById('nextCountdownSeconds').textContent = String(remaining.seconds).padStart(2, '0');
+  }
+}
+
+function startNextEventCountdown() {
+  // Clear existing interval
+  if (State.nextEventInterval) {
+    clearInterval(State.nextEventInterval);
+  }
+  
+  State.nextEventInterval = setInterval(() => {
+    if (isRamadan()) {
+      updateNextEventCountdownValues();
+      
+      // Check if we need to switch the event (suhur <-> iftar)
+      // by re-evaluating every minute
+      const now = new Date();
+      if (now.getSeconds() === 0) {
+        updateNextEventDisplay();
+      }
+    } else {
+      clearInterval(State.nextEventInterval);
+    }
+  }, 1000); // Update every second
 }
 
 async function updateTodayTab() {
@@ -278,8 +454,14 @@ async function updateTodayTab() {
     document.getElementById('todaySuhur').textContent = State.todayTimes.suhur;
     document.getElementById('todayIftar').textContent = State.todayTimes.iftar;
     
-    // Start iftar countdown
+    // Start iftar countdown for today tab
     startIftarCountdown(State.todayTimes.iftar);
+    
+    // Update hero section now that we have times
+    if (isRamadan()) {
+      updateNextEventDisplay();
+      startNextEventCountdown();
+    }
   }
 }
 
@@ -313,11 +495,6 @@ async function updateTomorrowTab() {
 }
 
 function startIftarCountdown(iftarTime) {
-  // Clear existing interval
-  if (State.iftarCountdownInterval) {
-    clearInterval(State.iftarCountdownInterval);
-  }
-  
   const countdownBox = document.getElementById('iftarCountdownBox');
   const timerEl = document.getElementById('iftarTimer');
   
@@ -325,7 +502,8 @@ function startIftarCountdown(iftarTime) {
     const remaining = getTimeUntilIftar(iftarTime);
     
     if (remaining) {
-      timerEl.textContent = remaining;
+      const timeStr = `${String(remaining.hours).padStart(2, '0')}:${String(remaining.minutes).padStart(2, '0')}:${String(remaining.seconds).padStart(2, '0')}`;
+      timerEl.textContent = timeStr;
       countdownBox.style.display = 'flex';
     } else {
       countdownBox.style.display = 'none';
@@ -333,7 +511,8 @@ function startIftarCountdown(iftarTime) {
   }
   
   update();
-  State.iftarCountdownInterval = setInterval(update, 1000);
+  // Use the same interval as the hero - no need for separate interval
+  // The hero interval handles the 1-second updates
 }
 
 // ===========================================
@@ -488,16 +667,9 @@ async function init() {
   // Load initial tab data
   if (State.location) {
     await updateTodayTab();
-    // Pre-fetch tomorrow's data
-    updateTomorrowTab();
+    // Pre-fetch tomorrow's data for hero countdown
+    await updateTomorrowTab();
   }
-  
-  // Update countdown every minute
-  setInterval(() => {
-    if (isBeforeRamadan()) {
-      updateCountdown();
-    }
-  }, 60000);
   
   console.log('✅ Ramadan page ready');
 }

@@ -55,13 +55,12 @@
             <span class="lantern lantern-right">🏮</span>
           </div>
           
-          <!-- Hero Content -->
-          <div class="hero-content">
+          <!-- Hero Content: BEFORE RAMADAN -->
+          <div class="hero-content hero-before-ramadan" id="heroBeforeRamadan">
             <div class="crescent-moon">☪</div>
-            <h2 class="hero-title" id="heroTitle">Ramazon Muborak</h2>
-            <p class="hero-subtitle" id="heroSubtitle">Muqaddas oy boshlanishiga</p>
+            <h2 class="hero-title">Ramazon 2026</h2>
+            <p class="hero-subtitle">Muqaddas oy boshlanishiga</p>
             
-            <!-- Countdown (shown before Ramadan) -->
             <div class="countdown" id="countdownSection">
               <div class="countdown-item">
                 <span class="countdown-value" id="countdownDays">--</span>
@@ -78,12 +77,55 @@
                 <span class="countdown-label">Daqiqa</span>
               </div>
             </div>
-            
-            <!-- Ramadan Day Badge (shown during Ramadan) -->
-            <div class="ramadan-badge" id="ramadanBadge" style="display: none;">
-              <span class="badge-day" id="badgeDayNum">1</span>
-              <span class="badge-label">-kun</span>
+          </div>
+          
+          <!-- Hero Content: DURING RAMADAN -->
+          <div class="hero-content hero-during-ramadan" id="heroDuringRamadan" style="display: none;">
+            <!-- Top: Day Badge -->
+            <div class="ramadan-day-badge">
+              <span class="day-badge-label">Ramazonning</span>
+              <span class="day-badge-num" id="badgeDayNum">1</span>
+              <span class="day-badge-suffix">-kuni</span>
             </div>
+            
+            <!-- Center: Next Event Countdown -->
+            <div class="next-event" id="nextEventBox">
+              <div class="next-event-icon" id="nextEventIcon">🌙</div>
+              <div class="next-event-info">
+                <span class="next-event-label" id="nextEventLabel">Saharlikgacha</span>
+                <span class="next-event-time" id="nextEventTime">05:23</span>
+              </div>
+              <div class="next-event-countdown">
+                <span class="next-countdown-value" id="nextCountdownHours">00</span>
+                <span class="next-countdown-sep">:</span>
+                <span class="next-countdown-value" id="nextCountdownMinutes">00</span>
+                <span class="next-countdown-sep">:</span>
+                <span class="next-countdown-value" id="nextCountdownSeconds">00</span>
+              </div>
+            </div>
+            
+            <!-- Bottom: Quick Times Reference -->
+            <div class="hero-quick-times">
+              <div class="quick-time suhur-quick" id="quickSuhur">
+                <span class="quick-icon">🌙</span>
+                <span class="quick-label">Saharlik</span>
+                <span class="quick-value" id="quickSuhurTime">--:--</span>
+              </div>
+              <div class="quick-divider"></div>
+              <div class="quick-time iftar-quick" id="quickIftar">
+                <span class="quick-icon">🌅</span>
+                <span class="quick-label">Iftorlik</span>
+                <span class="quick-value" id="quickIftarTime">--:--</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Hero Content: AFTER RAMADAN -->
+          <div class="hero-content hero-after-ramadan" id="heroAfterRamadan" style="display: none;">
+            <div class="crescent-moon">☪</div>
+            <h2 class="hero-title">Ramazon 2026</h2>
+            <p class="hero-subtitle">Muqaddas oy yakunlandi</p>
+            <p class="hero-eid">Hayit Muborak! 🎉</p>
           </div>
         </div>
       </section>

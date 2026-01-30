@@ -330,7 +330,8 @@ body {
   z-index: 1;
 }
 
-.crescent-moon {
+/* --- Before Ramadan --- */
+.hero-before-ramadan .crescent-moon {
   font-size: 3rem;
   color: var(--gold-400);
   text-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(250, 204, 21, 0.2);
@@ -398,27 +399,175 @@ body {
   opacity: 0.5;
 }
 
-/* Ramadan Badge */
-.ramadan-badge {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 2px;
-  padding: var(--space-sm) var(--space-lg);
-  background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
-  border-radius: var(--radius-full);
-  box-shadow: 0 4px 20px rgba(234, 179, 8, 0.3);
+/* --- During Ramadan --- */
+.hero-during-ramadan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
-.badge-day {
+/* Day Badge */
+.ramadan-day-badge {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.day-badge-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.day-badge-num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold-400);
+  line-height: 1;
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.day-badge-suffix {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold-400);
+}
+
+/* Next Event Box */
+.next-event {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.next-event.suhur-mode {
+  border-color: rgba(129, 140, 248, 0.3);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(0, 0, 0, 0.3));
+}
+
+.next-event.iftar-mode {
+  border-color: rgba(250, 204, 21, 0.3);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(0, 0, 0, 0.3));
+}
+
+.next-event-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.next-event-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.next-event-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.next-event-time {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--night-900);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 
-.badge-label {
+.next-event-countdown {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.next-countdown-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-400);
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5ch;
+  text-align: center;
+}
+
+.next-countdown-sep {
+  font-size: 1rem;
+  color: var(--gold-500);
+  opacity: 0.6;
+}
+
+/* Quick Times Reference */
+.hero-quick-times {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+}
+
+.quick-time {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.quick-icon {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.quick-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.quick-value {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--night-800);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.suhur-quick.active .quick-value {
+  color: #818cf8;
+}
+
+.iftar-quick.active .quick-value {
+  color: var(--gold-400);
+}
+
+/* --- After Ramadan --- */
+.hero-after-ramadan .crescent-moon {
+  font-size: 3rem;
+  color: var(--gold-400);
+  text-shadow: 0 0 40px var(--accent-glow);
+  margin-bottom: var(--space-sm);
+}
+
+.hero-eid {
+  font-size: 1.1rem;
+  color: var(--gold-400);
+  margin-top: var(--space-md);
 }
 
 /* ===========================================
