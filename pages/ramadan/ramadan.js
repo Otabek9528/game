@@ -20,7 +20,7 @@ const CONFIG = {
   SCHOOL: 1, // Hanafi
   
   // localStorage key (same as locationManager.js)
-  LOCATION_STORAGE_KEY: 'user_location',
+  LOCATION_STORAGE_KEY: 'userLocation',
   
   // Month names in Uzbek
   MONTHS_UZ: {
