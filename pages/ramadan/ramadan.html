@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ramazon 2026 - Muslim Vegukin Bot</title>
+  <link rel="stylesheet" href="ramadan.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Decorative Background Elements -->
+    <div class="bg-pattern"></div>
+    <div class="bg-glow"></div>
+    
+    <!-- Header -->
+    <header class="header">
+      <a href="../../index.html" class="header-back" id="backBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      <div class="header-title">
+        <span class="header-icon">☪</span>
+        <h1>Ramazon 2026</h1>
+      </div>
+      <div class="header-ornament"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero Section with Countdown -->
+      <section class="hero-section" id="heroSection">
+        <div class="hero-card">
+          <div class="hero-decoration">
+            <div class="lantern lantern-left">🏮</div>
+            <div class="lantern lantern-right">🏮</div>
+            <div class="stars">
+              <span class="star" style="--delay: 0s; --x: 10%; --y: 20%;">✦</span>
+              <span class="star" style="--delay: 0.5s; --x: 85%; --y: 15%;">✧</span>
+              <span class="star" style="--delay: 1s; --x: 20%; --y: 70%;">✦</span>
+              <span class="star" style="--delay: 1.5s; --x: 75%; --y: 65%;">✧</span>
+              <span class="star" style="--delay: 2s; --x: 50%; --y: 10%;">✦</span>
+            </div>
+          </div>
+          
+          <div class="hero-content">
+            <div class="crescent-moon">☪</div>
+            <h2 class="hero-title" id="heroTitle">Ramazon Muborak</h2>
+            <p class="hero-subtitle" id="heroSubtitle">Muqaddas oy boshlanishiga</p>
+            
+            <div class="countdown" id="countdown">
+              <div class="countdown-item">
+                <span class="countdown-value" id="countdownDays">--</span>
+                <span class="countdown-label">Kun</span>
+              </div>
+              <div class="countdown-separator">:</div>
+              <div class="countdown-item">
+                <span class="countdown-value" id="countdownHours">--</span>
+                <span class="countdown-label">Soat</span>
+              </div>
+              <div class="countdown-separator">:</div>
+              <div class="countdown-item">
+                <span class="countdown-value" id="countdownMinutes">--</span>
+                <span class="countdown-label">Daqiqa</span>
+              </div>
+            </div>
+            
+            <div class="ramadan-day-badge" id="ramadanDayBadge" style="display: none;">
+              <span class="day-number" id="ramadanDayNumber">1</span>
+              <span class="day-label">-kun</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Today's Times Card (shown during Ramadan) -->
+      <section class="today-section" id="todaySection" style="display: none;">
+        <div class="today-card">
+          <div class="today-header">
+            <span class="today-date" id="todayDate">--</span>
+            <span class="today-city" id="todayCity">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <span id="cityName">Yuklanmoqda...</span>
+            </span>
+          </div>
+          <div class="today-times">
+            <div class="time-block suhur">
+              <div class="time-icon">🌙</div>
+              <div class="time-info">
+                <span class="time-label">Saharlik</span>
+                <span class="time-value" id="suhurTime">--:--</span>
+              </div>
+              <div class="time-hint">Bomdoddan oldin</div>
+            </div>
+            <div class="time-divider">
+              <div class="divider-line"></div>
+              <div class="divider-icon">☀️</div>
+              <div class="divider-line"></div>
+            </div>
+            <div class="time-block iftar">
+              <div class="time-icon">🌅</div>
+              <div class="time-info">
+                <span class="time-label">Iftorlik</span>
+                <span class="time-value" id="iftarTime">--:--</span>
+              </div>
+              <div class="time-hint">Shom vaqtida</div>
+            </div>
+          </div>
+          <div class="countdown-iftar" id="countdownIftar">
+            <span class="iftar-label">Iftorgacha:</span>
+            <span class="iftar-countdown" id="iftarCountdown">--:--:--</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu Grid -->
+      <section class="menu-section">
+        <div class="menu-grid">
+          <!-- Today -->
+          <button class="menu-card" id="btnToday" data-view="today">
+            <div class="menu-icon-wrap">
+              <span class="menu-icon">⌛</span>
+            </div>
+            <span class="menu-label">Bugun</span>
+            <span class="menu-sublabel">Saharlik & Iftor</span>
+          </button>
+          
+          <!-- Tomorrow -->
+          <button class="menu-card" id="btnTomorrow" data-view="tomorrow">
+            <div class="menu-icon-wrap">
+              <span class="menu-icon">⏳</span>
+            </div>
+            <span class="menu-label">Ertaga</span>
+            <span class="menu-sublabel">Keyingi kun</span>
+          </button>
+          
+          <!-- Monthly Calendar -->
+          <button class="menu-card" id="btnCalendar" data-view="calendar">
+            <div class="menu-icon-wrap">
+              <span class="menu-icon">📅</span>
+            </div>
+            <span class="menu-label">Taqvim</span>
+            <span class="menu-sublabel">30 kunlik</span>
+          </button>
+          
+          <!-- Duas -->
+          <button class="menu-card" id="btnDuas" data-view="duas">
+            <div class="menu-icon-wrap">
+              <span class="menu-icon">🤲</span>
+            </div>
+            <span class="menu-label">Duolar</span>
+            <span class="menu-sublabel">Sahar & Iftor</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Info Link -->
+      <section class="info-section">
+        <a href="#" class="info-link" id="infoLink">
+          <span class="info-icon">📖</span>
+          <span class="info-text">Taqvimlardagi farqlar haqida</span>
+          <svg class="info-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </section>
+    </main>
+
+    <!-- Detail Views (Hidden by default) -->
+    <!-- Today/Tomorrow View -->
+    <div class="detail-view" id="detailView">
+      <div class="detail-header">
+        <button class="detail-back" id="detailBack">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h2 class="detail-title" id="detailTitle">Bugungi taqvim</h2>
+      </div>
+      
+      <div class="detail-content">
+        <div class="detail-date-card">
+          <div class="date-gregorian" id="detailGregorian">28-Fevral, 2026</div>
+          <div class="date-ramadan" id="detailRamadan">Ramazonning 1-kuni</div>
+          <div class="date-city">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            <span id="detailCity">Yuklanmoqda...</span>
+          </div>
+        </div>
+        
+        <div class="detail-times">
+          <div class="detail-time-card suhur-card">
+            <div class="dtc-icon">🌙</div>
+            <div class="dtc-content">
+              <span class="dtc-label">Saharlik tugashi</span>
+              <span class="dtc-time" id="detailSuhur">--:--</span>
+              <span class="dtc-note">Bomdod azoni</span>
+            </div>
+          </div>
+          
+          <div class="detail-time-card iftar-card">
+            <div class="dtc-icon">🌅</div>
+            <div class="dtc-content">
+              <span class="dtc-label">Iftorlik vaqti</span>
+              <span class="dtc-time" id="detailIftar">--:--</span>
+              <span class="dtc-note">Shom azoni</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-advice">
+          <h3 class="advice-title">💡 Maslahat</h3>
+          <ul class="advice-list">
+            <li><strong>Saharlikni</strong> Bomdoddan 5 daqiqa oldin yakunlang</li>
+            <li><strong>Iftorlikni</strong> Shomdan 5 daqiqa keyin oching</li>
+            <li><strong>Namozlarni</strong> 10 daqiqa kechiktiring</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar View -->
+    <div class="calendar-view" id="calendarView">
+      <div class="detail-header">
+        <button class="detail-back" id="calendarBack">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h2 class="detail-title">Ramazon Taqvimi</h2>
+      </div>
+      
+      <div class="calendar-content">
+        <div class="calendar-city" id="calendarCity">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          <span id="calendarCityName">Yuklanmoqda...</span>
+        </div>
+        
+        <div class="calendar-table-wrap">
+          <table class="calendar-table">
+            <thead>
+              <tr>
+                <th>Kun</th>
+                <th>Sana</th>
+                <th>Saharlik</th>
+                <th>Iftorlik</th>
+              </tr>
+            </thead>
+            <tbody id="calendarBody">
+              <!-- Generated by JS -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="calendar-legend">
+          <div class="legend-item">
+            <span class="legend-dot friday"></span>
+            <span>Juma kuni</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot today"></span>
+            <span>Bugun</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Duas View -->
+    <div class="duas-view" id="duasView">
+      <div class="detail-header">
+        <button class="detail-back" id="duasBack">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h2 class="detail-title">Ramazon Duolari</h2>
+      </div>
+      
+      <div class="duas-content">
+        <!-- Suhur Dua -->
+        <div class="dua-card">
+          <div class="dua-header suhur">
+            <span class="dua-icon">🌙</span>
+            <h3 class="dua-title">Saharlik (Oğiz yopish) duosi</h3>
+          </div>
+          <div class="dua-body">
+            <p class="dua-arabic">نَوَيْتُ أَنْ أَصُومَ صَوْمَ شَهْرِ رَمَضَانَ مِنَ الْفَجْرِ إِلَى الْمَغْرِبِ خَالِصًا لِلَّهِ تَعَالَى</p>
+            <p class="dua-transliteration">Navaytu an asuma savma shahri Ramazana minal fajri ilal mag'ribi, xolisan lillahi ta'ala.</p>
+            <p class="dua-meaning">"Ramazon oyining ro'zasini subhdan to kun botguncha tutmoqni niyat qildim. Xolis Alloh uchun."</p>
+          </div>
+        </div>
+
+        <!-- Iftar Dua -->
+        <div class="dua-card">
+          <div class="dua-header iftar">
+            <span class="dua-icon">🌅</span>
+            <h3 class="dua-title">Iftorlik (Oğiz ochish) duosi</h3>
+          </div>
+          <div class="dua-body">
+            <p class="dua-arabic">اَللّٰهُمَّ لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَيْكَ تَوَكَّلْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ</p>
+            <p class="dua-transliteration">Allohumma laka sumtu va bika amantu va 'alayka tavakkaltu va 'ala rizqika aftartu.</p>
+            <p class="dua-meaning">"Ey Alloh, ushbu ro'zamni Sen uchun tutdim va Senga iymon keltirdim va Senga tavakkal qildim va bergan rizqing bilan iftor qildim."</p>
+          </div>
+        </div>
+
+        <!-- 10 Days Duas -->
+        <div class="dua-card special">
+          <div class="dua-header special">
+            <span class="dua-icon">📿</span>
+            <h3 class="dua-title">Ramazonning 10 kunliklari uchun</h3>
+          </div>
+          <div class="dua-body">
+            <div class="ten-day-dua">
+              <span class="ten-day-label">Birinchi 10 kunlik (Rahmat)</span>
+              <p class="dua-arabic small">يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ</p>
+              <p class="dua-transliteration">Ya Hayyu, ya Qayyumu birahmatika astag'is</p>
+            </div>
+            <div class="ten-day-dua">
+              <span class="ten-day-label">Ikkinchi 10 kunlik (Mag'firat)</span>
+              <p class="dua-arabic small">أَسْتَغْفِرُ اللَّهَ رَبِّي مِنْ كُلِّ ذَنْبٍ وَأَتُوبُ إِلَيْهِ</p>
+              <p class="dua-transliteration">Astag'firulloha Rabbi min kulli zanbiyon va-atubu ilayh</p>
+            </div>
+            <div class="ten-day-dua">
+              <span class="ten-day-label">Uchinchi 10 kunlik (Najot)</span>
+              <p class="dua-arabic small">اَللّٰهُمَّ أَجِرْنِي مِنَ النَّارِ</p>
+              <p class="dua-transliteration">Allohumma ajirni minan naar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <span class="spinner-icon">☪</span>
+      </div>
+      <p class="loading-text">Yuklanmoqda...</p>
+    </div>
+
+    <!-- Location Permission Modal -->
+    <div class="location-modal" id="locationModal">
+      <div class="modal-content">
+        <div class="modal-icon">📍</div>
+        <h3 class="modal-title">Joylashuv kerak</h3>
+        <p class="modal-text">Aniq namoz vaqtlarini olish uchun joylashuvingizni yuboring</p>
+        <button class="modal-btn" id="requestLocationBtn">
+          <span>Joylashuvni yuborish</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </button>
+        <button class="modal-skip" id="skipLocationBtn">Keyinroq</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="ramadan.js"></script>
+</body>
+</html>
