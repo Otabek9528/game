@@ -587,16 +587,7 @@ const CalendarGenerator = {
     }
   },
   
-  async showCalendarImage(imageUrl, cityName) {
-    // Pre-cache the image data for sharing/downloading
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      this.generatedImageData = await this.blobToBase64(blob);
-    } catch (e) {
-      console.error('Failed to cache image data:', e);
-    }
-    
+  showCalendarImage(imageUrl, cityName) {
     // Create modal overlay
     const modal = document.createElement('div');
     modal.className = 'calendar-modal';
@@ -626,11 +617,6 @@ const CalendarGenerator = {
     
     document.body.appendChild(modal);
     
-    // Animate in
-    requestAnimationFrame(() => {
-      modal.classList.add('active');
-    });
-    
     // Event listeners
     const closeBtn = modal.querySelector('.calendar-modal-close');
     const backdrop = modal.querySelector('.calendar-modal-backdrop');
@@ -638,11 +624,8 @@ const CalendarGenerator = {
     const shareBtn = modal.querySelector('.calendar-btn-share');
     
     const closeModal = () => {
-      modal.classList.remove('active');
-      setTimeout(() => {
-        modal.remove();
-        URL.revokeObjectURL(imageUrl);
-      }, 300);
+      modal.remove();
+      URL.revokeObjectURL(imageUrl);
     };
     
     closeBtn.addEventListener('click', closeModal);
@@ -679,12 +662,6 @@ const CalendarGenerator = {
         align-items: center;
         justify-content: center;
         padding: 16px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      
-      .calendar-modal.active {
-        opacity: 1;
       }
       
       .calendar-modal-backdrop {
@@ -699,7 +676,7 @@ const CalendarGenerator = {
       
       .calendar-modal-content {
         position: relative;
-        background: linear-gradient(180deg, #1a2d42 0%, #132743 100%);
+        background: var(--bg-secondary, #1a2d42);
         border-radius: 16px;
         max-width: 100%;
         max-height: 90vh;
@@ -708,12 +685,6 @@ const CalendarGenerator = {
         flex-direction: column;
         border: 1px solid rgba(244, 197, 66, 0.2);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        transform: scale(0.9) translateY(20px);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      
-      .calendar-modal.active .calendar-modal-content {
-        transform: scale(1) translateY(0);
       }
       
       .calendar-modal-header {
@@ -742,12 +713,6 @@ const CalendarGenerator = {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
-      }
-      
-      .calendar-modal-close:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
       }
       
       .calendar-modal-body {
@@ -769,7 +734,6 @@ const CalendarGenerator = {
         display: flex;
         gap: 12px;
         padding: 12px 16px;
-        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
         border-top: 1px solid rgba(255, 255, 255, 0.1);
       }
       
@@ -779,618 +743,191 @@ const CalendarGenerator = {
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 14px 16px;
+        padding: 12px 16px;
         border: none;
-        border-radius: 12px;
+        border-radius: 10px;
         font-family: inherit;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
       }
       
-      .calendar-btn:active {
-        transform: scale(0.96);
-      }
-      
       .calendar-btn-download {
         background: linear-gradient(135deg, #10b981, #059669);
         color: white;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      }
-      
-      .calendar-btn-download:hover {
-        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
       }
       
       .calendar-btn-share {
         background: linear-gradient(135deg, #f4c542, #eab308);
         color: #1a1a2e;
-        box-shadow: 0 4px 12px rgba(244, 197, 66, 0.3);
-      }
-      
-      .calendar-btn-share:hover {
-        box-shadow: 0 6px 16px rgba(244, 197, 66, 0.4);
       }
     `;
     document.head.appendChild(styles);
   },
   
-  // Store the generated image data for reuse
-  generatedImageData: null,
-  
-  async downloadImage(imageUrl, cityName) {
+  downloadImage(imageUrl, cityName) {
     const tg = window.Telegram?.WebApp;
     
-    try {
-      // Convert blob URL to base64 if not already cached
-      if (!this.generatedImageData) {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        this.generatedImageData = await this.blobToBase64(blob);
-      }
-      
-      const base64 = this.generatedImageData;
-      const fileName = `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`;
-      
-      // Haptic feedback
-      if (tg?.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('medium');
-      }
-      
-      // Method 1: Direct download link (works on most platforms)
-      const link = document.createElement('a');
-      link.href = base64;
-      link.download = fileName;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      
-      // For iOS Safari and some mobile browsers
-      if (this.isIOS()) {
-        // iOS doesn't support download attribute well, show the image for long-press save
-        this.showImageForSave(base64, cityName);
-        document.body.removeChild(link);
-        return;
-      }
-      
-      link.click();
-      document.body.removeChild(link);
-      
-      // Success feedback
-      if (tg?.HapticFeedback) {
-        tg.HapticFeedback.notificationOccurred('success');
-      }
-      
-      this.showToast('✅ Rasm yuklab olindi!');
-      
-    } catch (err) {
-      console.error('Download error:', err);
-      // Fallback: show image for manual save
-      if (this.generatedImageData) {
-        this.showImageForSave(this.generatedImageData, cityName);
-      } else {
-        this.showError("Yuklab olishda xatolik. Qaytadan urinib ko'ring.");
-      }
-    }
-  },
-  
-  // Helper: Convert blob to base64
-  blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  },
-  
-  // Helper: Detect iOS
-  isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  },
-  
-  // Show image in fullscreen for manual save (iOS/fallback)
-  showImageForSave(base64, cityName) {
-    const tg = window.Telegram?.WebApp;
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'save-image-overlay';
-    overlay.innerHTML = `
-      <div class="save-image-container">
-        <div class="save-image-header">
-          <h3>📥 Rasmni saqlash</h3>
-          <button class="save-image-close">✕</button>
-        </div>
-        <p class="save-image-hint">
-          📱 Rasmni bosib turing → "Rasmni saqlash" ni tanlang
-        </p>
-        <div class="save-image-wrapper">
-          <img src="${base64}" alt="Ramazon 2026 Taqvimi - ${cityName}" />
-        </div>
-        <button class="save-image-done">✓ Tayyor</button>
-      </div>
-    `;
-    
-    this.addSaveImageStyles();
-    document.body.appendChild(overlay);
-    
-    // Animate in
-    requestAnimationFrame(() => {
-      overlay.classList.add('active');
-    });
-    
-    // Close handlers
-    const closeOverlay = () => {
-      overlay.classList.remove('active');
-      setTimeout(() => overlay.remove(), 300);
-    };
-    
-    overlay.querySelector('.save-image-close').addEventListener('click', closeOverlay);
-    overlay.querySelector('.save-image-done').addEventListener('click', closeOverlay);
-    
-    if (tg?.HapticFeedback) {
-      tg.HapticFeedback.impactOccurred('light');
-    }
-  },
-  
-  addSaveImageStyles() {
-    if (document.getElementById('save-image-styles')) return;
-    
-    const styles = document.createElement('style');
-    styles.id = 'save-image-styles';
-    styles.textContent = `
-      .save-image-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.95);
-        z-index: 2000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .save-image-overlay.active {
-        opacity: 1;
-      }
-      .save-image-container {
-        width: 100%;
-        max-width: 400px;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-      .save-image-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .save-image-header h3 {
-        color: #f4c542;
-        font-size: 18px;
-        margin: 0;
-      }
-      .save-image-close {
-        background: rgba(255,255,255,0.1);
-        border: none;
-        color: #94a3b8;
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        font-size: 18px;
-        cursor: pointer;
-      }
-      .save-image-hint {
-        color: #94a3b8;
-        font-size: 14px;
-        text-align: center;
-        margin: 0;
-        padding: 12px;
-        background: rgba(250, 204, 21, 0.1);
-        border-radius: 8px;
-        border: 1px solid rgba(250, 204, 21, 0.2);
-      }
-      .save-image-wrapper {
-        flex: 1;
-        overflow: auto;
-        border-radius: 12px;
-      }
-      .save-image-wrapper img {
-        width: 100%;
-        display: block;
-        border-radius: 12px;
-      }
-      .save-image-done {
-        background: linear-gradient(135deg, #10b981, #059669);
-        border: none;
-        color: white;
-        padding: 14px 24px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: inherit;
-      }
-    `;
-    document.head.appendChild(styles);
+    // Convert blob URL to base64 for better compatibility
+    fetch(imageUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result;
+          
+          // Method 1: Try opening in new tab (works in most browsers)
+          const newTab = window.open();
+          if (newTab) {
+            newTab.document.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Ramazon 2026 Taqvimi - ${cityName}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  body {
+                    margin: 0;
+                    padding: 16px;
+                    background: #0a1628;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    min-height: 100vh;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                  }
+                  h3 {
+                    color: #f4c542;
+                    margin-bottom: 12px;
+                    text-align: center;
+                  }
+                  p {
+                    color: #94a3b8;
+                    font-size: 14px;
+                    margin-bottom: 16px;
+                    text-align: center;
+                  }
+                  img {
+                    max-width: 100%;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                  }
+                </style>
+              </head>
+              <body>
+                <h3>📅 Ramazon 2026 Taqvimi</h3>
+                <p>Rasmni bosib turing va "Saqlash" ni tanlang</p>
+                <img src="${base64}" alt="Ramazon Taqvimi ${cityName}" />
+              </body>
+              </html>
+            `);
+            newTab.document.close();
+            
+            if (tg?.HapticFeedback) {
+              tg.HapticFeedback.notificationOccurred('success');
+            }
+          } else {
+            // Method 2: Fallback - create downloadable link
+            const link = document.createElement('a');
+            link.href = base64;
+            link.download = `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            if (tg) {
+              tg.showAlert("Rasm yuklab olindi!");
+            }
+          }
+        };
+        reader.readAsDataURL(blob);
+      })
+      .catch(err => {
+        console.error('Download error:', err);
+        if (tg) {
+          tg.showAlert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+        }
+      });
   },
   
   async shareImage(imageUrl, cityName) {
     const tg = window.Telegram?.WebApp;
     
     try {
-      // Ensure we have base64 data
-      if (!this.generatedImageData) {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        this.generatedImageData = await this.blobToBase64(blob);
-      }
+      // Convert to base64
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
       
-      // Haptic feedback
-      if (tg?.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('medium');
-      }
-      
-      // Try Web Share API first (best experience when available)
-      if (navigator.share) {
-        try {
-          // Convert base64 to blob for sharing
-          const response = await fetch(this.generatedImageData);
-          const blob = await response.blob();
-          const file = new File([blob], `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`, { 
-            type: 'image/png' 
-          });
-          
-          // Check if we can share files
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              title: 'Ramazon 2026 Taqvimi',
-              text: `📅 ${cityName} shahri uchun Ramazon 2026 taqvimi\n\n🌙 @muslim_vegukin_bot orqali yaratildi`,
-              files: [file]
-            });
-            
-            if (tg?.HapticFeedback) {
-              tg.HapticFeedback.notificationOccurred('success');
-            }
-            this.showToast('✅ Ulashildi!');
-            return;
+      // Method 1: Try Telegram's switchInlineQuery (share to chat)
+      if (tg?.switchInlineQuery) {
+        // This opens chat selector with pre-filled message
+        // Unfortunately can't share image directly, but can share bot link
+        const shareText = `Ramazon 2026 taqvimi - ${cityName} 🌙\n\nTaqvimni olish uchun: @muslim_vegukin_bot`;
+        
+        // Show options to user
+        tg.showPopup({
+          title: 'Ulashish',
+          message: 'Qanday ulashmoqchisiz?',
+          buttons: [
+            { id: 'save_share', type: 'default', text: '💾 Saqlash va ulashish' },
+            { id: 'bot_link', type: 'default', text: '🤖 Bot havolasini ulashish' },
+            { id: 'cancel', type: 'cancel' }
+          ]
+        }, (buttonId) => {
+          if (buttonId === 'save_share') {
+            // Open image in new tab for saving
+            this.downloadImage(imageUrl, cityName);
+            setTimeout(() => {
+              tg.showAlert("Rasmni saqlang, so'ng Telegram chatga yuboring");
+            }, 500);
+          } else if (buttonId === 'bot_link') {
+            // Share bot link via inline query
+            tg.switchInlineQuery(shareText, ['users', 'groups', 'channels']);
           }
-          
-          // Fallback: share without file (just text)
-          await navigator.share({
-            title: 'Ramazon 2026 Taqvimi',
-            text: `📅 ${cityName} shahri uchun Ramazon 2026 taqvimi\n\n🌙 Taqvimni olish uchun: @muslim_vegukin_bot`,
-            url: 'https://t.me/muslim_vegukin_bot'
-          });
           
           if (tg?.HapticFeedback) {
-            tg.HapticFeedback.notificationOccurred('success');
+            tg.HapticFeedback.impactOccurred('light');
           }
-          return;
-          
-        } catch (shareError) {
-          // User cancelled or share failed, continue to fallback
-          if (shareError.name === 'AbortError') {
-            return; // User cancelled, do nothing
-          }
-          console.log('Web Share failed, trying fallback:', shareError);
-        }
+        });
+        return;
       }
       
-      // Fallback: Show share options modal
-      this.showShareOptions(cityName);
+      // Method 2: Try Web Share API (works on some mobile browsers)
+      const file = new File([blob], `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`, { type: 'image/png' });
       
-    } catch (error) {
-      console.error('Share error:', error);
-      this.showShareOptions(cityName);
-    }
-  },
-  
-  // Show share options when native share isn't available
-  showShareOptions(cityName) {
-    const tg = window.Telegram?.WebApp;
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'share-options-overlay';
-    overlay.innerHTML = `
-      <div class="share-options-backdrop"></div>
-      <div class="share-options-container">
-        <div class="share-options-header">
-          <h3>📤 Ulashish</h3>
-          <button class="share-options-close">✕</button>
-        </div>
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Ramazon 2026 Taqvimi',
+          text: `Ramazon 2026 taqvimi - ${cityName}\n@muslim_vegukin_bot orqali yaratildi`,
+          files: [file]
+        });
         
-        <div class="share-options-content">
-          <p class="share-options-desc">Taqvimni do'stlaringiz bilan ulashing</p>
-          
-          <div class="share-options-buttons">
-            <button class="share-option-btn share-save-first">
-              <span class="share-option-icon">💾</span>
-              <div class="share-option-text">
-                <strong>Rasmni saqlash</strong>
-                <span>So'ng Telegramda ulashing</span>
-              </div>
-            </button>
-            
-            <button class="share-option-btn share-copy-link">
-              <span class="share-option-icon">🔗</span>
-              <div class="share-option-text">
-                <strong>Bot havolasini nusxalash</strong>
-                <span>@muslim_vegukin_bot</span>
-              </div>
-            </button>
-            
-            <button class="share-option-btn share-telegram">
-              <span class="share-option-icon">✈️</span>
-              <div class="share-option-text">
-                <strong>Telegram orqali ulashish</strong>
-                <span>Chatni tanlang</span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    this.addShareOptionsStyles();
-    document.body.appendChild(overlay);
-    
-    // Animate in
-    requestAnimationFrame(() => {
-      overlay.classList.add('active');
-    });
-    
-    // Close function
-    const closeOverlay = () => {
-      overlay.classList.remove('active');
-      setTimeout(() => overlay.remove(), 300);
-    };
-    
-    // Event listeners
-    overlay.querySelector('.share-options-backdrop').addEventListener('click', closeOverlay);
-    overlay.querySelector('.share-options-close').addEventListener('click', closeOverlay);
-    
-    // Save first option
-    overlay.querySelector('.share-save-first').addEventListener('click', () => {
-      closeOverlay();
-      setTimeout(() => {
-        this.showImageForSave(this.generatedImageData, cityName);
-      }, 300);
-    });
-    
-    // Copy bot link
-    overlay.querySelector('.share-copy-link').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText('https://t.me/muslim_vegukin_bot');
-        this.showToast('✅ Havola nusxalandi!');
         if (tg?.HapticFeedback) {
           tg.HapticFeedback.notificationOccurred('success');
         }
-      } catch (e) {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = 'https://t.me/muslim_vegukin_bot';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        this.showToast('✅ Havola nusxalandi!');
+        return;
       }
-      closeOverlay();
-    });
-    
-    // Telegram share
-    overlay.querySelector('.share-telegram').addEventListener('click', () => {
-      const shareText = encodeURIComponent(`📅 ${cityName} shahri uchun Ramazon 2026 taqvimi\n\n🌙 Taqvimni olish uchun:\n@muslim_vegukin_bot`);
       
-      // Try Telegram's share URL
-      if (tg) {
-        // Inside Telegram WebApp - use switchInlineQuery if available
-        if (tg.switchInlineQuery) {
-          tg.switchInlineQuery(`Ramazon 2026 - ${cityName}`, ['users', 'groups', 'channels']);
+      // Method 3: Fallback - save first then share manually
+      this.downloadImage(imageUrl, cityName);
+      setTimeout(() => {
+        if (tg) {
+          tg.showAlert("Rasmni saqlang va Telegram orqali do'stlaringizga yuboring!");
         } else {
-          // Open Telegram share link
-          window.open(`https://t.me/share/url?url=https://t.me/muslim_vegukin_bot&text=${shareText}`, '_blank');
+          alert("Rasmni saqlang va ulashing");
         }
-      } else {
-        // Outside Telegram - open share link
-        window.open(`https://t.me/share/url?url=https://t.me/muslim_vegukin_bot&text=${shareText}`, '_blank');
-      }
+      }, 500);
       
-      closeOverlay();
-    });
-    
-    if (tg?.HapticFeedback) {
-      tg.HapticFeedback.impactOccurred('light');
+    } catch (error) {
+      console.log('Share error:', error);
+      
+      // Fallback
+      this.downloadImage(imageUrl, cityName);
+      if (tg) {
+        tg.showAlert("Rasmni saqlang va Telegram orqali ulashing");
+      }
     }
-  },
-  
-  addShareOptionsStyles() {
-    if (document.getElementById('share-options-styles')) return;
-    
-    const styles = document.createElement('style');
-    styles.id = 'share-options-styles';
-    styles.textContent = `
-      .share-options-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 2000;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .share-options-overlay.active {
-        opacity: 1;
-      }
-      .share-options-backdrop {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(4px);
-      }
-      .share-options-container {
-        position: relative;
-        width: 100%;
-        max-width: 500px;
-        background: linear-gradient(180deg, #1a2d42 0%, #132743 100%);
-        border-radius: 20px 20px 0 0;
-        padding: 20px;
-        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .share-options-overlay.active .share-options-container {
-        transform: translateY(0);
-      }
-      .share-options-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 16px;
-      }
-      .share-options-header h3 {
-        color: #f4c542;
-        font-size: 18px;
-        margin: 0;
-      }
-      .share-options-close {
-        background: rgba(255,255,255,0.1);
-        border: none;
-        color: #94a3b8;
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        font-size: 18px;
-        cursor: pointer;
-      }
-      .share-options-desc {
-        color: #94a3b8;
-        font-size: 14px;
-        margin: 0 0 16px 0;
-      }
-      .share-options-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .share-option-btn {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        width: 100%;
-        padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-family: inherit;
-        text-align: left;
-      }
-      .share-option-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(250, 204, 21, 0.3);
-      }
-      .share-option-btn:active {
-        transform: scale(0.98);
-      }
-      .share-option-icon {
-        font-size: 24px;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 10px;
-      }
-      .share-option-text {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-      .share-option-text strong {
-        color: #f1f5f9;
-        font-size: 15px;
-        font-weight: 600;
-      }
-      .share-option-text span {
-        color: #64748b;
-        font-size: 12px;
-      }
-      .share-telegram {
-        background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 136, 204, 0.1));
-        border-color: rgba(0, 136, 204, 0.3);
-      }
-      .share-telegram:hover {
-        border-color: rgba(0, 136, 204, 0.5);
-      }
-    `;
-    document.head.appendChild(styles);
-  },
-  
-  // Toast notification helper
-  showToast(message) {
-    // Remove existing toast
-    const existingToast = document.querySelector('.calendar-toast');
-    if (existingToast) existingToast.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'calendar-toast';
-    toast.textContent = message;
-    
-    if (!document.getElementById('toast-styles')) {
-      const styles = document.createElement('style');
-      styles.id = 'toast-styles';
-      styles.textContent = `
-        .calendar-toast {
-          position: fixed;
-          bottom: 100px;
-          left: 50%;
-          transform: translateX(-50%) translateY(20px);
-          background: rgba(16, 185, 129, 0.95);
-          color: white;
-          padding: 12px 24px;
-          border-radius: 12px;
-          font-size: 14px;
-          font-weight: 500;
-          z-index: 3000;
-          opacity: 0;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        .calendar-toast.active {
-          opacity: 1;
-          transform: translateX(-50%) translateY(0);
-        }
-      `;
-      document.head.appendChild(styles);
-    }
-    
-    document.body.appendChild(toast);
-    
-    requestAnimationFrame(() => {
-      toast.classList.add('active');
-    });
-    
-    setTimeout(() => {
-      toast.classList.remove('active');
-      setTimeout(() => toast.remove(), 300);
-    }, 2500);
   },
   
   showError(message) {
