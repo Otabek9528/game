@@ -767,22 +767,133 @@ const CalendarGenerator = {
   },
   
   downloadImage(imageUrl, cityName) {
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const tg = window.Telegram?.WebApp;
     
-    if (window.Telegram?.WebApp?.HapticFeedback) {
-      window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-    }
+    // Convert blob URL to base64 for better compatibility
+    fetch(imageUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result;
+          
+          // Method 1: Try opening in new tab (works in most browsers)
+          const newTab = window.open();
+          if (newTab) {
+            newTab.document.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Ramazon 2026 Taqvimi - ${cityName}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  body {
+                    margin: 0;
+                    padding: 16px;
+                    background: #0a1628;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    min-height: 100vh;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                  }
+                  h3 {
+                    color: #f4c542;
+                    margin-bottom: 12px;
+                    text-align: center;
+                  }
+                  p {
+                    color: #94a3b8;
+                    font-size: 14px;
+                    margin-bottom: 16px;
+                    text-align: center;
+                  }
+                  img {
+                    max-width: 100%;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                  }
+                </style>
+              </head>
+              <body>
+                <h3>📅 Ramazon 2026 Taqvimi</h3>
+                <p>Rasmni bosib turing va "Saqlash" ni tanlang</p>
+                <img src="${base64}" alt="Ramazon Taqvimi ${cityName}" />
+              </body>
+              </html>
+            `);
+            newTab.document.close();
+            
+            if (tg?.HapticFeedback) {
+              tg.HapticFeedback.notificationOccurred('success');
+            }
+          } else {
+            // Method 2: Fallback - create downloadable link
+            const link = document.createElement('a');
+            link.href = base64;
+            link.download = `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            if (tg) {
+              tg.showAlert("Rasm yuklab olindi!");
+            }
+          }
+        };
+        reader.readAsDataURL(blob);
+      })
+      .catch(err => {
+        console.error('Download error:', err);
+        if (tg) {
+          tg.showAlert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+        }
+      });
   },
   
   async shareImage(imageUrl, cityName) {
+    const tg = window.Telegram?.WebApp;
+    
     try {
+      // Convert to base64
       const response = await fetch(imageUrl);
       const blob = await response.blob();
+      
+      // Method 1: Try Telegram's switchInlineQuery (share to chat)
+      if (tg?.switchInlineQuery) {
+        // This opens chat selector with pre-filled message
+        // Unfortunately can't share image directly, but can share bot link
+        const shareText = `Ramazon 2026 taqvimi - ${cityName} 🌙\n\nTaqvimni olish uchun: @muslim_vegukin_bot`;
+        
+        // Show options to user
+        tg.showPopup({
+          title: 'Ulashish',
+          message: 'Qanday ulashmoqchisiz?',
+          buttons: [
+            { id: 'save_share', type: 'default', text: '💾 Saqlash va ulashish' },
+            { id: 'bot_link', type: 'default', text: '🤖 Bot havolasini ulashish' },
+            { id: 'cancel', type: 'cancel' }
+          ]
+        }, (buttonId) => {
+          if (buttonId === 'save_share') {
+            // Open image in new tab for saving
+            this.downloadImage(imageUrl, cityName);
+            setTimeout(() => {
+              tg.showAlert("Rasmni saqlang, so'ng Telegram chatga yuboring");
+            }, 500);
+          } else if (buttonId === 'bot_link') {
+            // Share bot link via inline query
+            tg.switchInlineQuery(shareText, ['users', 'groups', 'channels']);
+          }
+          
+          if (tg?.HapticFeedback) {
+            tg.HapticFeedback.impactOccurred('light');
+          }
+        });
+        return;
+      }
+      
+      // Method 2: Try Web Share API (works on some mobile browsers)
       const file = new File([blob], `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`, { type: 'image/png' });
       
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -792,19 +903,30 @@ const CalendarGenerator = {
           files: [file]
         });
         
-        if (window.Telegram?.WebApp?.HapticFeedback) {
-          window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        if (tg?.HapticFeedback) {
+          tg.HapticFeedback.notificationOccurred('success');
         }
-      } else {
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-          tg.showAlert("Rasmni saqlang va Telegram orqali ulashing");
-        } else {
-          alert("Rasmni saqlang va keyin ulashing");
-        }
+        return;
       }
+      
+      // Method 3: Fallback - save first then share manually
+      this.downloadImage(imageUrl, cityName);
+      setTimeout(() => {
+        if (tg) {
+          tg.showAlert("Rasmni saqlang va Telegram orqali do'stlaringizga yuboring!");
+        } else {
+          alert("Rasmni saqlang va ulashing");
+        }
+      }, 500);
+      
     } catch (error) {
-      console.log('Share cancelled or failed:', error);
+      console.log('Share error:', error);
+      
+      // Fallback
+      this.downloadImage(imageUrl, cityName);
+      if (tg) {
+        tg.showAlert("Rasmni saqlang va Telegram orqali ulashing");
+      }
     }
   },
   
