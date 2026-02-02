@@ -717,60 +717,8 @@ const CalendarGenerator = {
     this.setupResultPageEvents(resultPage, imageBase64, cityName);
   },
   
-	setupResultPageEvents(resultPage, imageBase64, cityName) {
-	  const tg = window.Telegram?.WebApp;
-	  
-	  // Back button
-	  const backBtn = resultPage.querySelector('#resultBackBtn');
-	  backBtn.addEventListener('click', () => {
-		this.haptic('light');
-		this.closeResultPage(resultPage);
-	  });
-	  
-	  // Save button - Direct download
-	  const saveBtn = resultPage.querySelector('#saveImageBtn');
-	  saveBtn.addEventListener('click', () => {
-		this.haptic('medium');
-		
-		// Create temporary download link
-		const link = document.createElement('a');
-		link.href = imageBase64;
-		link.download = `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	  });
-	  
-	  // Regenerate button
-	  const regenerateBtn = resultPage.querySelector('#regenerateBtn');
-	  regenerateBtn.addEventListener('click', () => {
-		this.haptic('light');
-		this.closeResultPage(resultPage);
-		setTimeout(() => {
-		  window.generateRamadanCalendarImage();
-		}, 400);
-	  });
-	  
-	  // Preview image click - open fullscreen for viewing
-	  const previewWrapper = resultPage.querySelector('#previewWrapper');
-	  previewWrapper.addEventListener('click', () => {
-		this.haptic('light');
-		this.openFullscreenViewer(resultPage);
-	  });
-	  
-	  // Fullscreen viewer close
-	  const fullscreenViewer = resultPage.querySelector('#fullscreenViewer');
-	  const fullscreenClose = resultPage.querySelector('#fullscreenClose');
-	  const fullscreenBackdrop = resultPage.querySelector('.fullscreen-backdrop');
-	  
-	  const closeFullscreen = () => {
-		this.haptic('light');
-		fullscreenViewer.classList.remove('active');
-	  };
-	  
-	  fullscreenClose.addEventListener('click', closeFullscreen);
-	  fullscreenBackdrop.addEventListener('click', closeFullscreen);
-	},
+  setupResultPageEvents(resultPage, imageBase64, cityName) {
+    const tg = window.Telegram?.WebApp;
     
     // Back button
     const backBtn = resultPage.querySelector('#resultBackBtn');
