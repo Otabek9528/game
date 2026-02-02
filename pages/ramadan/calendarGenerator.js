@@ -717,27 +717,46 @@ const CalendarGenerator = {
     this.setupResultPageEvents(resultPage, imageBase64, cityName);
   },
   
+  
+  
+  
+  
   setupResultPageEvents(resultPage, imageBase64, cityName) {
     const tg = window.Telegram?.WebApp;
     
-    
-	
-	
-	
-	
-	
-	// Back button
+    // Back button
     const backBtn = resultPage.querySelector('#resultBackBtn');
     backBtn.addEventListener('click', () => {
       this.haptic('light');
       this.closeResultPage(resultPage);
     });
     
-    // Save button - Opens fullscreen viewer for long-press save
+    // Save button - Open in external browser for download
     const saveBtn = resultPage.querySelector('#saveImageBtn');
     saveBtn.addEventListener('click', () => {
       this.haptic('medium');
-      this.openFullscreenViewer(resultPage);
+      
+      try {
+        // Convert base64 to blob
+        const byteString = atob(imageBase64.split(',')[1]);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: 'image/png' });
+        const blobUrl = URL.createObjectURL(blob);
+        
+        // Open in external browser where save works
+        if (tg?.openLink) {
+          tg.openLink(blobUrl);
+        } else {
+          window.open(blobUrl, '_blank');
+        }
+      } catch (err) {
+        console.error('Save error:', err);
+        alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+      }
     });
     
     // Regenerate button
@@ -745,7 +764,6 @@ const CalendarGenerator = {
     regenerateBtn.addEventListener('click', () => {
       this.haptic('light');
       this.closeResultPage(resultPage);
-      // Trigger regeneration after a short delay
       setTimeout(() => {
         window.generateRamadanCalendarImage();
       }, 400);
@@ -771,7 +789,7 @@ const CalendarGenerator = {
     fullscreenClose.addEventListener('click', closeFullscreen);
     fullscreenBackdrop.addEventListener('click', closeFullscreen);
     
-    // Handle Telegram back button
+    // Telegram back button handler
     if (tg?.BackButton) {
       tg.BackButton.show();
       const backHandler = () => {
@@ -785,6 +803,12 @@ const CalendarGenerator = {
       tg.BackButton.onClick(backHandler);
     }
   },
+
+
+
+
+
+
   
   openFullscreenViewer(resultPage) {
     const viewer = resultPage.querySelector('#fullscreenViewer');
