@@ -717,6 +717,9 @@ const CalendarGenerator = {
     this.setupResultPageEvents(resultPage, imageBase64, cityName);
   },
   
+  
+  
+  
 setupResultPageEvents(resultPage, imageBase64, cityName) {
   const tg = window.Telegram?.WebApp;
   
