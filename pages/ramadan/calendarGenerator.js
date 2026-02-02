@@ -183,24 +183,17 @@ const CalendarGenerator = {
       
       const tg = window.Telegram?.WebApp;
       
-      try {
-        const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ramazon 2026</title><style>*{margin:0;padding:0}body{min-height:100vh;background:#0a1628;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:sans-serif}h1{color:#f4c542;font-size:1.3rem;margin-bottom:8px}.hint{color:#10b981;font-size:0.95rem;margin-bottom:20px;padding:12px;background:rgba(16,185,129,0.15);border-radius:10px}img{max-width:100%;border-radius:12px}</style></head><body><h1>📅 Ramazon 2026</h1><p class="hint">👆 Rasmni bosib turing → Saqlash</p><img src="${imageBase64}" /><p style="color:#64748b;margin-top:20px;font-size:12px">@muslim_vegukin_bot</p></body></html>`;
-        
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const blobUrl = URL.createObjectURL(blob);
-        
-        if (tg?.openLink) {
-          tg.showAlert('openLink ishlamoqda...');
-          tg.openLink(blobUrl);
-        } else {
-          window.open(blobUrl, '_blank');
-        }
-      } catch (err) {
-        if (tg) {
-          tg.showAlert('Xatolik: ' + err.message);
-        } else {
-          alert('Xatolik: ' + err.message);
-        }
+      // Create download link with data URL directly
+      const link = document.createElement('a');
+      link.href = imageBase64;
+      link.download = `ramazon_2026_${cityName.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      if (tg) {
+        tg.showAlert('Rasm yuklab olindi! Galereyani tekshiring.');
       }
     });
     
