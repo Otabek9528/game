@@ -717,62 +717,99 @@ const CalendarGenerator = {
     this.setupResultPageEvents(resultPage, imageBase64, cityName);
   },
   
-	setupResultPageEvents(resultPage, imageBase64, cityName) {
-	  const tg = window.Telegram?.WebApp;
-	  
-	  // Back button
-	  const backBtn = resultPage.querySelector('#resultBackBtn');
-	  backBtn.addEventListener('click', () => {
-		this.haptic('light');
-		this.closeResultPage(resultPage);
-	  });
-	  
-	  // Save button - Direct download
-	  const saveBtn = resultPage.querySelector('#saveImageBtn');
-	  saveBtn.addEventListener('click', () => {
-		this.haptic('medium');
-		
-		// Create temporary download link
-		const link = document.createElement('a');
-		link.href = imageBase64;
-		link.download = `ramazon_2026_${cityName.replace(/\s+/g, '_')}.png`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	  });
-	  
-	  // Regenerate button
-	  const regenerateBtn = resultPage.querySelector('#regenerateBtn');
-	  regenerateBtn.addEventListener('click', () => {
-		this.haptic('light');
-		this.closeResultPage(resultPage);
-		setTimeout(() => {
-		  window.generateRamadanCalendarImage();
-		}, 400);
-	  });
-	  
-	  // Preview image click - open fullscreen for viewing
-	  const previewWrapper = resultPage.querySelector('#previewWrapper');
-	  previewWrapper.addEventListener('click', () => {
-		this.haptic('light');
-		this.openFullscreenViewer(resultPage);
-	  });
-	  
-	  // Fullscreen viewer close
-	  const fullscreenViewer = resultPage.querySelector('#fullscreenViewer');
-	  const fullscreenClose = resultPage.querySelector('#fullscreenClose');
-	  const fullscreenBackdrop = resultPage.querySelector('.fullscreen-backdrop');
-	  
-	  const closeFullscreen = () => {
-		this.haptic('light');
-		fullscreenViewer.classList.remove('active');
-	  };
-	  
-	  fullscreenClose.addEventListener('click', closeFullscreen);
-	  fullscreenBackdrop.addEventListener('click', closeFullscreen);
-	},
+  
+  
+  
+setupResultPageEvents(resultPage, imageBase64, cityName) {
+  const tg = window.Telegram?.WebApp;
+  
+  // Back button
+  const backBtn = resultPage.querySelector('#resultBackBtn');
+  backBtn.addEventListener('click', () => {
+    this.haptic('light');
+    this.closeResultPage(resultPage);
+  });
+  
+  // Save button - Open in external browser for download
+  const saveBtn = resultPage.querySelector('#saveImageBtn');
+  saveBtn.addEventListener('click', () => {
+    this.haptic('medium');
     
-    // Back button
+    try {
+      // Convert base64 to blob
+      const byteString = atob(imageBase64.split(',')[1]);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: 'image/png' });
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // Open in external browser where save works
+      if (tg?.openLink) {
+        tg.openLink(blobUrl);
+      } else {
+        window.open(blobUrl, '_blank');
+      }
+    } catch (err) {
+      console.error('Save error:', err);
+      alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+    }
+  });
+  
+  // Regenerate button
+  const regenerateBtn = resultPage.querySelector('#regenerateBtn');
+  regenerateBtn.addEventListener('click', () => {
+    this.haptic('light');
+    this.closeResultPage(resultPage);
+    setTimeout(() => {
+      window.generateRamadanCalendarImage();
+    }, 400);
+  });
+  
+  // Preview image click - open fullscreen
+  const previewWrapper = resultPage.querySelector('#previewWrapper');
+  previewWrapper.addEventListener('click', () => {
+    this.haptic('light');
+    this.openFullscreenViewer(resultPage);
+  });
+  
+  // Fullscreen viewer close
+  const fullscreenViewer = resultPage.querySelector('#fullscreenViewer');
+  const fullscreenClose = resultPage.querySelector('#fullscreenClose');
+  const fullscreenBackdrop = resultPage.querySelector('.fullscreen-backdrop');
+  
+  const closeFullscreen = () => {
+    this.haptic('light');
+    fullscreenViewer.classList.remove('active');
+  };
+  
+  fullscreenClose.addEventListener('click', closeFullscreen);
+  fullscreenBackdrop.addEventListener('click', closeFullscreen);
+  
+  // Telegram back button handler
+  if (tg?.BackButton) {
+    tg.BackButton.show();
+    const backHandler = () => {
+      if (fullscreenViewer.classList.contains('active')) {
+        closeFullscreen();
+      } else {
+        this.closeResultPage(resultPage);
+        tg.BackButton.offClick(backHandler);
+      }
+    };
+    tg.BackButton.onClick(backHandler);
+  }
+},
+    
+    
+	
+	
+	
+	
+	
+	// Back button
     const backBtn = resultPage.querySelector('#resultBackBtn');
     backBtn.addEventListener('click', () => {
       this.haptic('light');
