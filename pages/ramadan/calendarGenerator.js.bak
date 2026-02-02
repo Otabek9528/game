@@ -181,22 +181,15 @@ const CalendarGenerator = {
     resultPage.querySelector('#saveImageBtn').addEventListener('click', () => {
       this.haptic('medium');
       
-      const tg = window.Telegram?.WebApp;
-      
-      // Create download link with data URL directly
-      const link = document.createElement('a');
-      link.href = imageBase64;
-      link.download = `ramazon_2026_${cityName.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      if (tg) {
-        tg.showAlert('Rasm yuklab olindi! Galereyani tekshiring.');
+      // Open image directly in new tab
+      const newWindow = window.open();
+      if (newWindow) {
+        newWindow.document.write(`<html><head><title>Ramazon 2026</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#0a1628;display:flex;justify-content:center;padding:16px"><img src="${imageBase64}" style="max-width:100%;border-radius:12px" /></body></html>`);
+        newWindow.document.close();
+      } else {
+        window.Telegram?.WebApp?.showAlert('Brauzerni ochib bo\'lmadi');
       }
-    });
-    
+    });    
     // Regenerate button
     resultPage.querySelector('#regenerateBtn').addEventListener('click', () => {
       this.haptic('light');
