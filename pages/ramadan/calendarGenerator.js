@@ -27,6 +27,9 @@ const CalendarGenerator = {
   
   // Store generated image
   generatedImageBase64: null,
+
+  // Store temporary object URL for fullscreen (if used)
+  _fullscreenObjectUrl: null,
   
   // ===========================================
   // MAIN FUNCTION
@@ -566,6 +569,67 @@ const CalendarGenerator = {
     // Convert to base64 directly (more reliable than blob URL)
     return canvas.toDataURL('image/png', 1.0);
   },
+
+  // ===========================================
+  // SAVE / SHARE HELPERS (CROSS-PLATFORM)
+  // ===========================================
+
+  async _dataUrlToFile(dataUrl, filename) {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type || 'image/png' });
+  },
+
+  async _tryNativeShare(file, title, text) {
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title, text, files: [file] });
+        return true;
+      }
+    } catch (e) {
+      // user cancelled or share failed
+    }
+    return false;
+  },
+
+  async _tryDownloadFile(file) {
+    try {
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  async _setFullscreenImageSrc(resultPage, imageBase64) {
+    // Use blob URL in fullscreen to improve long-press/save behavior in WebViews
+    try {
+      // Cleanup previous URL if any
+      if (this._fullscreenObjectUrl) {
+        URL.revokeObjectURL(this._fullscreenObjectUrl);
+        this._fullscreenObjectUrl = null;
+      }
+
+      const res = await fetch(imageBase64);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      this._fullscreenObjectUrl = url;
+
+      const fullscreenImage = resultPage.querySelector('#fullscreenImage');
+      if (fullscreenImage) fullscreenImage.src = url;
+    } catch (e) {
+      // fallback to original data URL
+      const fullscreenImage = resultPage.querySelector('#fullscreenImage');
+      if (fullscreenImage) fullscreenImage.src = imageBase64;
+    }
+  },
   
   // ===========================================
   // UI FUNCTIONS
@@ -651,7 +715,7 @@ const CalendarGenerator = {
             </div>
             <div class="btn-text-wrap">
               <span class="btn-main-text">Rasmni saqlash</span>
-              <span class="btn-sub-text">Galereyaga yuklab olish</span>
+              <span class="btn-sub-text">Ulashish yoki saqlash</span>
             </div>
           </button>
           
@@ -670,7 +734,7 @@ const CalendarGenerator = {
         <div class="info-card">
           <div class="info-card-icon">💡</div>
           <div class="info-card-content">
-            <p><strong>Maslahat:</strong> Rasmni do'stlaringizga Telegram orqali yuboring yoki ijtimoiy tarmoqlarda ulashing!</p>
+            <p><strong>Maslahat:</strong> iPhone’da “Saqlash” tugmasi Share oynasini ochadi. Android’da esa rasm Downloads ga tushishi mumkin.</p>
           </div>
         </div>
         
@@ -702,6 +766,9 @@ const CalendarGenerator = {
     `;
     
     document.body.appendChild(resultPage);
+
+    // Improve fullscreen long-press/save behavior (blob URL)
+    this._setFullscreenImageSrc(resultPage, imageBase64);
     
     // Animate in
     requestAnimationFrame(() => {
@@ -717,10 +784,6 @@ const CalendarGenerator = {
     this.setupResultPageEvents(resultPage, imageBase64, cityName);
   },
   
-  
-  
-  
-  
   setupResultPageEvents(resultPage, imageBase64, cityName) {
     const tg = window.Telegram?.WebApp;
     
@@ -731,31 +794,40 @@ const CalendarGenerator = {
       this.closeResultPage(resultPage);
     });
     
-    // Save button - Open in external browser for download
+    // Save button - Cross-platform: Share -> Download -> Fullscreen fallback
     const saveBtn = resultPage.querySelector('#saveImageBtn');
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', async () => {
       this.haptic('medium');
-      
+
+      const safeCity = String(cityName || 'Nomalum').trim().replace(/\s+/g, '_');
+      const filename = `ramazon_2026_${safeCity}.png`;
+
       try {
-        // Convert base64 to blob
-        const byteString = atob(imageBase64.split(',')[1]);
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
+        const file = await this._dataUrlToFile(imageBase64, filename);
+
+        // 1) Best for iOS: native share sheet (user can "Save Image" / "Save to Files")
+        const shared = await this._tryNativeShare(
+          file,
+          'Ramazon 2026 Taqvimi',
+          `${cityName} uchun Ramazon 2026`
+        );
+        if (shared) return;
+
+        // 2) Usually works on Android: a.download
+        const downloaded = await this._tryDownloadFile(file);
+        if (downloaded) {
+          // Keep this short; Telegram webviews can be picky with toasts
+          try { tg?.showAlert?.("Rasm yuklab olindi. Files → Downloads ichidan tekshiring."); } catch (e) {}
+          return;
         }
-        const blob = new Blob([ab], { type: 'image/png' });
-        const blobUrl = URL.createObjectURL(blob);
-        
-        // Open in external browser where save works
-        if (tg?.openLink) {
-          tg.openLink(blobUrl);
-        } else {
-          window.open(blobUrl, '_blank');
-        }
+
+        // 3) Fallback: open fullscreen for long-press
+        this.openFullscreenViewer(resultPage);
+
       } catch (err) {
-        console.error('Save error:', err);
-        alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+        console.error('Save/share error:', err);
+        // If anything goes wrong, still allow manual long-press save
+        this.openFullscreenViewer(resultPage);
       }
     });
     
@@ -804,12 +876,6 @@ const CalendarGenerator = {
     }
   },
 
-
-
-
-
-
-  
   openFullscreenViewer(resultPage) {
     const viewer = resultPage.querySelector('#fullscreenViewer');
     viewer.classList.add('active');
@@ -823,6 +889,13 @@ const CalendarGenerator = {
   closeResultPage(resultPage) {
     resultPage.classList.remove('active');
     setTimeout(() => {
+      // cleanup fullscreen blob URL if we created one
+      try {
+        if (this._fullscreenObjectUrl) {
+          URL.revokeObjectURL(this._fullscreenObjectUrl);
+          this._fullscreenObjectUrl = null;
+        }
+      } catch (e) {}
       resultPage.remove();
     }, 400);
   },
