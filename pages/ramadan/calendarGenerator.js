@@ -181,20 +181,17 @@ const CalendarGenerator = {
     resultPage.querySelector('#saveImageBtn').addEventListener('click', () => {
       this.haptic('medium');
       
-      // Open raw image in new tab (not HTML page)
-      window.open(imageBase64, '_blank');
-    });    // Regenerate button
-    resultPage.querySelector('#regenerateBtn').addEventListener('click', () => {
-      this.haptic('light');
-      this.closeResultPage(resultPage);
-      setTimeout(() => window.generateRamadanCalendarImage(), 400);
+      const tg = window.Telegram?.WebApp;
+      
+      // Show fullscreen with screenshot instruction
+      this.openFullscreenViewer(resultPage);
+      
+      if (tg) {
+        tg.showAlert('📸 Skrinshot oling!\n\niPhone: Power + Volume Up\nAndroid: Power + Volume Down');
+      }
     });
     
-    // Preview click - fullscreen
-    resultPage.querySelector('#previewWrapper').addEventListener('click', () => {
-      this.haptic('light');
-      this.openFullscreenViewer(resultPage);
-    });
+
     
     // Fullscreen close
     const fullscreenViewer = resultPage.querySelector('#fullscreenViewer');
