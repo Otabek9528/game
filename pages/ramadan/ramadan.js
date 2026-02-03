@@ -11,7 +11,7 @@
 
 const CONFIG = {
   // Ramadan 2026 estimated start (may need adjustment based on moon sighting)
-  RAMADAN_START: new Date(2026, 1, 8), // February 28, 2026
+  RAMADAN_START: new Date(2026, 1, 1), // February 28, 2026
   RAMADAN_DAYS: 30,
   
   // Aladhan API
