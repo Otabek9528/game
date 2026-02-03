@@ -265,7 +265,7 @@ body {
   background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(4, 120, 87, 0.2) 100%);
   border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: var(--radius-xl);
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-lg) var(--space-md) var(--space-md);
   overflow: hidden;
 }
 
@@ -399,43 +399,42 @@ body {
   opacity: 0.5;
 }
 
-/* --- During Ramadan (Redesigned) --- */
+/* --- During Ramadan (Redesigned - Compact) --- */
 .hero-during-ramadan {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 8px 0;
+  gap: 10px;
+  padding: 0;
 }
 
-/* Date Row */
+/* Date Row - positioned between lanterns */
 .hero-date-row {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: -4px;
 }
 
 .current-date {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
 .date-separator {
-  color: var(--gold-400);
-  font-size: 0.7rem;
+  display: none;
 }
 
 .ramadan-day {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--gold-400);
   font-weight: 500;
 }
 
 .ramadan-day strong {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
@@ -444,17 +443,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
 .countdown-label-box {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
+  gap: 6px;
+  padding: 4px 12px;
   background: rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -469,71 +468,71 @@ body {
 }
 
 .countdown-icon {
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .countdown-text {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Countdown Timer */
+/* Countdown Timer - Smaller */
 .countdown-timer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .timer-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 64px;
-  padding: 12px 8px;
+  min-width: 52px;
+  padding: 8px 6px;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid rgba(250, 204, 21, 0.2);
 }
 
 .timer-value {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--gold-400);
   font-variant-numeric: tabular-nums;
   line-height: 1;
-  text-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+  text-shadow: 0 0 15px rgba(250, 204, 21, 0.3);
 }
 
 .timer-unit {
-  font-size: 0.65rem;
+  font-size: 0.55rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .timer-sep {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--gold-500);
   opacity: 0.7;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-/* Prayer Times Row */
+/* Prayer Times Row - Compact */
 .prayer-times-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
   width: 100%;
-  max-width: 300px;
+  max-width: 260px;
   background: rgba(0, 0, 0, 0.25);
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
 }
@@ -543,8 +542,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 8px;
+  padding: 8px 10px;
   transition: all 0.3s ease;
 }
 
@@ -561,24 +560,24 @@ body {
 }
 
 .prayer-icon {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .prayer-info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0;
 }
 
 .prayer-label {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
 .prayer-value {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
@@ -594,41 +593,37 @@ body {
 
 .prayer-divider {
   width: 1px;
-  height: 36px;
+  height: 28px;
   background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.15), transparent);
 }
 
 /* Responsive for hero during ramadan */
 @media (max-width: 360px) {
   .timer-block {
-    min-width: 56px;
-    padding: 10px 6px;
+    min-width: 46px;
+    padding: 6px 4px;
   }
   
   .timer-value {
-    font-size: 1.7rem;
+    font-size: 1.3rem;
   }
   
   .prayer-time {
-    padding: 10px 10px;
-    gap: 8px;
+    padding: 6px 8px;
+    gap: 6px;
   }
   
   .prayer-icon {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   
   .prayer-value {
-    font-size: 0.95rem;
-  }
-  
-  .hero-date-row {
-    gap: 6px;
+    font-size: 0.85rem;
   }
   
   .current-date,
   .ramadan-day {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 }
 
