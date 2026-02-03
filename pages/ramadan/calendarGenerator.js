@@ -6,7 +6,7 @@
 
 const CalendarGenerator = {
   
-  RAMADAN_START: new Date(2026, 1, 28),
+  RAMADAN_START: new Date(2026, 1, 18),
   RAMADAN_DAYS: 30,
   API_BASE: 'https://api.aladhan.com/v1/timings',
   METHOD: 3,
