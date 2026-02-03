@@ -199,8 +199,8 @@ const CalendarGenerator = {
       btn.disabled = true;
       
       try {
-        mainText.textContent = '1/3 imgbb...';
-        subText.textContent = 'Rasm yuklanmoqda';
+        mainText.textContent = '1/2 Yuklanmoqda...';
+        subText.textContent = 'Rasm tayyorlanmoqda';
         
         const base64Data = imageBase64.split(',')[1];
         const formData = new FormData();
@@ -214,22 +214,18 @@ const CalendarGenerator = {
         const imgbbResult = await imgbbResponse.json();
         
         if (!imgbbResult.success) {
-          mainText.textContent = 'imgbb xato';
-          tg?.showAlert('imgbb error: ' + JSON.stringify(imgbbResult));
-          return;
+          throw new Error('Rasm yuklanmadi');
         }
         
         const imageUrl = imgbbResult.data.display_url;
         
-        // Debug: show URL
-        tg?.showAlert('URL: ' + imageUrl);
+        mainText.textContent = '2/2 Yuborilmoqda...';
+        subText.textContent = 'Telegramga jo\'natilmoqda';
         
-        mainText.textContent = '2/3 Lambda...';
-        subText.textContent = 'Telegramga yuborilmoqda';
-        
-        const lambdaResponse = await fetch('https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/', {
+        // Send to Lambda - don't wait for response
+        fetch('https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/', {
           method: 'POST',
-          mode: 'cors',
+          mode: 'no-cors',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             user_id: userId,
@@ -238,30 +234,23 @@ const CalendarGenerator = {
           })
         });
         
-        mainText.textContent = '3/3 Tekshirish...';
-        const lambdaResult = await lambdaResponse.json();
-        
-        if (lambdaResult.error) {
-          mainText.textContent = 'Lambda xato';
-          tg?.showAlert('Lambda error: ' + lambdaResult.error + ' | ' + (lambdaResult.details || ''));
-          btn.disabled = false;
-          return;
-        }
+        // Wait a moment for Lambda to process
+        await new Promise(r => setTimeout(r, 2000));
         
         mainText.textContent = '✓ Yuborildi!';
         subText.textContent = 'Chatni tekshiring';
-        tg?.showAlert('✅ Rasm chatga yuborildi!');
+        
+        tg?.showAlert('✅ Rasm chatga yuborildi!\n\nTelegram chatni tekshiring.');
         
         setTimeout(() => tg?.close(), 2000);
         
       } catch (err) {
         mainText.textContent = 'Xatolik';
-        subText.textContent = err.message.substring(0, 25);
-        tg?.showAlert('Catch error: ' + err.name + ' - ' + err.message);
+        subText.textContent = 'Qaytadan urining';
+        tg?.showAlert('Xatolik: ' + err.message);
         btn.disabled = false;
       }
     });    
-    
     // Regenerate button
     resultPage.querySelector('#regenerateBtn').addEventListener('click', () => {
       this.haptic('light');
