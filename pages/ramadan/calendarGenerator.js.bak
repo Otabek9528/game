@@ -194,12 +194,14 @@ const CalendarGenerator = {
       }
       
       const btn = resultPage.querySelector('#saveImageBtn');
-      btn.querySelector('.btn-main-text').textContent = 'Yuborilmoqda...';
+      const mainText = btn.querySelector('.btn-main-text');
+      const subText = btn.querySelector('.btn-sub-text');
       btn.disabled = true;
       
       try {
-        // Step 1: Upload to imgbb
-        tg?.showAlert('1: imgbb ga yuklanmoqda...');
+        // Step 1
+        mainText.textContent = '1/3 imgbb...';
+        subText.textContent = 'Rasm yuklanmoqda';
         
         const base64Data = imageBase64.split(',')[1];
         const formData = new FormData();
@@ -213,19 +215,18 @@ const CalendarGenerator = {
         const imgbbResult = await imgbbResponse.json();
         
         if (!imgbbResult.success) {
-          tg?.showAlert('imgbb xatolik: ' + JSON.stringify(imgbbResult));
+          mainText.textContent = 'imgbb xato';
+          subText.textContent = JSON.stringify(imgbbResult).substring(0, 30);
           return;
         }
         
         const imageUrl = imgbbResult.data.url;
-        tg?.showAlert('2: imgbb OK! URL: ' + imageUrl.substring(0, 50) + '...');
         
-        // Step 2: Send to Lambda
-        tg?.showAlert('3: Lambda ga yuborilmoqda...');
+        // Step 2
+        mainText.textContent = '2/3 Lambda...';
+        subText.textContent = 'Telegramga yuborilmoqda';
         
-        const lambdaUrl = 'https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/';
-        
-        const lambdaResponse = await fetch(lambdaUrl, {
+        const lambdaResponse = await fetch('https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/', {
           method: 'POST',
           mode: 'cors',
           headers: {'Content-Type': 'application/json'},
@@ -236,17 +237,28 @@ const CalendarGenerator = {
           })
         });
         
-        tg?.showAlert('4: Lambda javob: ' + lambdaResponse.status);
+        // Step 3
+        mainText.textContent = '3/3 Tekshirish...';
+        subText.textContent = 'Status: ' + lambdaResponse.status;
         
         const lambdaResult = await lambdaResponse.json();
-        tg?.showAlert('5: Natija: ' + JSON.stringify(lambdaResult));
+        
+        if (lambdaResult.error) {
+          mainText.textContent = 'Lambda xato';
+          subText.textContent = lambdaResult.error.substring(0, 30);
+          return;
+        }
+        
+        mainText.textContent = '✓ Yuborildi!';
+        subText.textContent = 'Chatni tekshiring';
+        tg?.showAlert('✅ Rasm chatga yuborildi!');
         
       } catch (err) {
-        tg?.showAlert('XATOLIK: ' + err.name + ' - ' + err.message);
+        mainText.textContent = 'Xatolik';
+        subText.textContent = err.name + ': ' + err.message.substring(0, 25);
         btn.disabled = false;
       }
-    });   
-    
+    });    
     
     
     // Regenerate button
