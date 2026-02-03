@@ -193,15 +193,14 @@ const CalendarGenerator = {
         return;
       }
       
-      // Show loading
       const btn = resultPage.querySelector('#saveImageBtn');
-      const originalText = btn.querySelector('.btn-main-text').textContent;
       btn.querySelector('.btn-main-text').textContent = 'Yuborilmoqda...';
-      btn.querySelector('.btn-sub-text').textContent = 'Iltimos kuting...';
       btn.disabled = true;
       
       try {
-        // Upload to imgbb
+        // Step 1: Upload to imgbb
+        tg?.showAlert('1: imgbb ga yuklanmoqda...');
+        
         const base64Data = imageBase64.split(',')[1];
         const formData = new FormData();
         formData.append('image', base64Data);
@@ -214,14 +213,21 @@ const CalendarGenerator = {
         const imgbbResult = await imgbbResponse.json();
         
         if (!imgbbResult.success) {
-          throw new Error('Rasm yuklanmadi');
+          tg?.showAlert('imgbb xatolik: ' + JSON.stringify(imgbbResult));
+          return;
         }
         
         const imageUrl = imgbbResult.data.url;
+        tg?.showAlert('2: imgbb OK! URL: ' + imageUrl.substring(0, 50) + '...');
         
-        // Send to Lambda
-        const lambdaResponse = await fetch('https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/', {
+        // Step 2: Send to Lambda
+        tg?.showAlert('3: Lambda ga yuborilmoqda...');
+        
+        const lambdaUrl = 'https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/';
+        
+        const lambdaResponse = await fetch(lambdaUrl, {
           method: 'POST',
+          mode: 'cors',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             user_id: userId,
@@ -230,31 +236,14 @@ const CalendarGenerator = {
           })
         });
         
+        tg?.showAlert('4: Lambda javob: ' + lambdaResponse.status);
+        
         const lambdaResult = await lambdaResponse.json();
-        
-        if (lambdaResult.error) {
-          throw new Error(lambdaResult.error);
-        }
-        
-        // Success
-        btn.querySelector('.btn-main-text').textContent = '✓ Yuborildi!';
-        btn.querySelector('.btn-sub-text').textContent = 'Chatni tekshiring';
-        
-        tg?.showAlert('✅ Rasm chatga yuborildi!\n\nTelegram chatni tekshiring.');
-        
-        setTimeout(() => tg?.close(), 2000);
+        tg?.showAlert('5: Natija: ' + JSON.stringify(lambdaResult));
         
       } catch (err) {
-        btn.querySelector('.btn-main-text').textContent = 'Xatolik';
-        btn.querySelector('.btn-sub-text').textContent = 'Qaytadan urining';
+        tg?.showAlert('XATOLIK: ' + err.name + ' - ' + err.message);
         btn.disabled = false;
-        
-        tg?.showAlert('Xatolik: ' + err.message);
-        
-        setTimeout(() => {
-          btn.querySelector('.btn-main-text').textContent = originalText;
-          btn.querySelector('.btn-sub-text').textContent = 'Galereyaga yuklab olish';
-        }, 2000);
       }
     });   
     

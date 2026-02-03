@@ -177,6 +177,10 @@ const CalendarGenerator = {
       this.closeResultPage(resultPage);
     });
     
+    
+    
+    
+    
     // Save button - Open HTML page in external browser
     resultPage.querySelector('#saveImageBtn').addEventListener('click', async () => {
       this.haptic('medium');
@@ -253,6 +257,9 @@ const CalendarGenerator = {
         }, 2000);
       }
     });   
+    
+    
+    
     // Regenerate button
     resultPage.querySelector('#regenerateBtn').addEventListener('click', () => {
       this.haptic('light');
