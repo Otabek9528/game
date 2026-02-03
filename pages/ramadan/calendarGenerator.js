@@ -177,19 +177,89 @@ const CalendarGenerator = {
       this.closeResultPage(resultPage);
     });
     
+    
+    
+    
+    
     // Save button - Open HTML page in external browser
-    resultPage.querySelector('#saveImageBtn').addEventListener('click', () => {
+    resultPage.querySelector('#saveImageBtn').addEventListener('click', async () => {
       this.haptic('medium');
       
-      // Open image directly in new tab
-      const newWindow = window.open();
-      if (newWindow) {
-        newWindow.document.write(`<html><head><title>Ramazon 2026</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#0a1628;display:flex;justify-content:center;padding:16px"><img src="${imageBase64}" style="max-width:100%;border-radius:12px" /></body></html>`);
-        newWindow.document.close();
-      } else {
-        window.Telegram?.WebApp?.showAlert('Brauzerni ochib bo\'lmadi');
+      const tg = window.Telegram?.WebApp;
+      const userId = tg?.initDataUnsafe?.user?.id;
+      
+      if (!userId) {
+        tg?.showAlert('Telegram user topilmadi');
+        return;
+      }
+      
+      // Show loading
+      const btn = resultPage.querySelector('#saveImageBtn');
+      const originalText = btn.querySelector('.btn-main-text').textContent;
+      btn.querySelector('.btn-main-text').textContent = 'Yuborilmoqda...';
+      btn.querySelector('.btn-sub-text').textContent = 'Iltimos kuting...';
+      btn.disabled = true;
+      
+      try {
+        // Upload to imgbb
+        const base64Data = imageBase64.split(',')[1];
+        const formData = new FormData();
+        formData.append('image', base64Data);
+        
+        const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=eefabc00819da88747fb75efee14a80c', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const imgbbResult = await imgbbResponse.json();
+        
+        if (!imgbbResult.success) {
+          throw new Error('Rasm yuklanmadi');
+        }
+        
+        const imageUrl = imgbbResult.data.url;
+        
+        // Send to Lambda
+        const lambdaResponse = await fetch('https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            user_id: userId,
+            image_url: imageUrl,
+            city: cityName
+          })
+        });
+        
+        const lambdaResult = await lambdaResponse.json();
+        
+        if (lambdaResult.error) {
+          throw new Error(lambdaResult.error);
+        }
+        
+        // Success
+        btn.querySelector('.btn-main-text').textContent = '✓ Yuborildi!';
+        btn.querySelector('.btn-sub-text').textContent = 'Chatni tekshiring';
+        
+        tg?.showAlert('✅ Rasm chatga yuborildi!\n\nTelegram chatni tekshiring.');
+        
+        setTimeout(() => tg?.close(), 2000);
+        
+      } catch (err) {
+        btn.querySelector('.btn-main-text').textContent = 'Xatolik';
+        btn.querySelector('.btn-sub-text').textContent = 'Qaytadan urining';
+        btn.disabled = false;
+        
+        tg?.showAlert('Xatolik: ' + err.message);
+        
+        setTimeout(() => {
+          btn.querySelector('.btn-main-text').textContent = originalText;
+          btn.querySelector('.btn-sub-text').textContent = 'Galereyaga yuklab olish';
+        }, 2000);
       }
     });   
+    
+    
+    
     // Regenerate button
     resultPage.querySelector('#regenerateBtn').addEventListener('click', () => {
       this.haptic('light');
