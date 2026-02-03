@@ -199,7 +199,6 @@ const CalendarGenerator = {
       btn.disabled = true;
       
       try {
-        // Step 1
         mainText.textContent = '1/3 imgbb...';
         subText.textContent = 'Rasm yuklanmoqda';
         
@@ -216,13 +215,15 @@ const CalendarGenerator = {
         
         if (!imgbbResult.success) {
           mainText.textContent = 'imgbb xato';
-          subText.textContent = JSON.stringify(imgbbResult).substring(0, 30);
+          tg?.showAlert('imgbb error: ' + JSON.stringify(imgbbResult));
           return;
         }
         
-        const imageUrl = imgbbResult.data.url;
+        const imageUrl = imgbbResult.data.display_url;
         
-        // Step 2
+        // Debug: show URL
+        tg?.showAlert('URL: ' + imageUrl);
+        
         mainText.textContent = '2/3 Lambda...';
         subText.textContent = 'Telegramga yuborilmoqda';
         
@@ -237,15 +238,13 @@ const CalendarGenerator = {
           })
         });
         
-        // Step 3
         mainText.textContent = '3/3 Tekshirish...';
-        subText.textContent = 'Status: ' + lambdaResponse.status;
-        
         const lambdaResult = await lambdaResponse.json();
         
         if (lambdaResult.error) {
           mainText.textContent = 'Lambda xato';
-          subText.textContent = lambdaResult.error.substring(0, 30);
+          tg?.showAlert('Lambda error: ' + lambdaResult.error + ' | ' + (lambdaResult.details || ''));
+          btn.disabled = false;
           return;
         }
         
@@ -253,13 +252,15 @@ const CalendarGenerator = {
         subText.textContent = 'Chatni tekshiring';
         tg?.showAlert('✅ Rasm chatga yuborildi!');
         
+        setTimeout(() => tg?.close(), 2000);
+        
       } catch (err) {
         mainText.textContent = 'Xatolik';
-        subText.textContent = err.name + ': ' + err.message.substring(0, 25);
+        subText.textContent = err.message.substring(0, 25);
+        tg?.showAlert('Catch error: ' + err.name + ' - ' + err.message);
         btn.disabled = false;
       }
     });    
-    
     
     // Regenerate button
     resultPage.querySelector('#regenerateBtn').addEventListener('click', () => {
