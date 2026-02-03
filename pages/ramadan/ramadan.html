@@ -81,54 +81,58 @@
           
           <!-- Hero Content: DURING RAMADAN -->
           <div class="hero-content hero-during-ramadan" id="heroDuringRamadan" style="display: none;">
-            <!-- Top: Day Badge -->
-            <div class="ramadan-day-badge">
-              <span class="day-badge-label">Ramazonning</span>
-              <span class="day-badge-num" id="badgeDayNum">1</span>
-              <span class="day-badge-suffix">-kuni</span>
+            
+            <!-- Top: Date & Ramadan Day -->
+            <div class="hero-date-row">
+              <span class="current-date" id="currentDate">1-Mart, Dushanba</span>
+              <span class="date-separator">•</span>
+              <span class="ramadan-day">Ramazonning <strong id="badgeDayNum">1</strong>-kuni</span>
             </div>
             
-            <!-- Middle: Next Event Info -->
-            <div class="next-event-card" id="nextEventCard">
-              <div class="next-event-header">
-                <span class="next-event-icon" id="nextEventIcon">🌙</span>
-                <span class="next-event-label" id="nextEventLabel">Saharlikgacha</span>
+            <!-- Middle: Countdown to Next Event -->
+            <div class="countdown-section" id="countdownSection">
+              <div class="countdown-label-box" id="countdownLabelBox">
+                <span class="countdown-icon" id="countdownIcon">🌅</span>
+                <span class="countdown-text" id="countdownText">Iftorlikgacha</span>
               </div>
-              <div class="next-event-time" id="nextEventTime">05:23</div>
-            </div>
-            
-            <!-- Countdown Timer - Separate Row -->
-            <div class="hero-countdown-timer" id="heroCountdownTimer">
-              <div class="timer-block">
-                <span class="timer-value" id="nextCountdownHours">00</span>
-                <span class="timer-label">soat</span>
-              </div>
-              <span class="timer-sep">:</span>
-              <div class="timer-block">
-                <span class="timer-value" id="nextCountdownMinutes">00</span>
-                <span class="timer-label">daq</span>
-              </div>
-              <span class="timer-sep">:</span>
-              <div class="timer-block">
-                <span class="timer-value" id="nextCountdownSeconds">00</span>
-                <span class="timer-label">son</span>
+              
+              <div class="countdown-timer">
+                <div class="timer-block">
+                  <span class="timer-value" id="nextCountdownHours">00</span>
+                  <span class="timer-unit">soat</span>
+                </div>
+                <span class="timer-sep">:</span>
+                <div class="timer-block">
+                  <span class="timer-value" id="nextCountdownMinutes">00</span>
+                  <span class="timer-unit">daq</span>
+                </div>
+                <span class="timer-sep">:</span>
+                <div class="timer-block">
+                  <span class="timer-value" id="nextCountdownSeconds">00</span>
+                  <span class="timer-unit">son</span>
+                </div>
               </div>
             </div>
             
-            <!-- Bottom: Quick Times Reference -->
-            <div class="hero-quick-times">
-              <div class="quick-time suhur-quick" id="quickSuhur">
-                <span class="quick-icon">🌙</span>
-                <span class="quick-label">Saharlik</span>
-                <span class="quick-value" id="quickSuhurTime">--:--</span>
+            <!-- Bottom: Suhur & Iftar Times -->
+            <div class="prayer-times-row">
+              <div class="prayer-time suhur-time" id="quickSuhur">
+                <span class="prayer-icon">🌙</span>
+                <div class="prayer-info">
+                  <span class="prayer-label">Saharlik</span>
+                  <span class="prayer-value" id="quickSuhurTime">--:--</span>
+                </div>
               </div>
-              <div class="quick-divider"></div>
-              <div class="quick-time iftar-quick" id="quickIftar">
-                <span class="quick-icon">🌅</span>
-                <span class="quick-label">Iftorlik</span>
-                <span class="quick-value" id="quickIftarTime">--:--</span>
+              <div class="prayer-divider"></div>
+              <div class="prayer-time iftar-time" id="quickIftar">
+                <span class="prayer-icon">🌅</span>
+                <div class="prayer-info">
+                  <span class="prayer-label">Iftorlik</span>
+                  <span class="prayer-value" id="quickIftarTime">--:--</span>
+                </div>
               </div>
             </div>
+            
           </div>
           
           <!-- Hero Content: AFTER RAMADAN -->
