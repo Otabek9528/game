@@ -111,7 +111,7 @@ const CalendarGenerator = {
     await new Promise(resolve => setTimeout(resolve, 300));
     const calendar = iframe.contentDocument.querySelector('.calendar');
     if (!calendar) { container.remove(); throw new Error('Calendar element not found'); }
-    const canvas = await html2canvas(calendar, {backgroundColor: null, scale: 4, useCORS: true, allowTaint: true, logging: false, imageTimeout: 0, removeContainer: true});
+    const canvas = await html2canvas(calendar, {backgroundColor: null, scale: 2, useCORS: true, allowTaint: true, logging: false, imageTimeout: 0, removeContainer: true});
     container.remove();
     return canvas.toDataURL('image/png', 1.0);
   },

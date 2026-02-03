@@ -217,7 +217,7 @@ const CalendarGenerator = {
           throw new Error('Rasm yuklanmadi');
         }
         
-        const imageUrl = imgbbResult.data.display_url;
+        const imageUrl = imgbbResult.data.image.url;
         
         mainText.textContent = '2/2 Yuborilmoqda...';
         subText.textContent = 'Telegramga jo\'natilmoqda';
