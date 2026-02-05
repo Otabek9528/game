@@ -938,3 +938,86 @@ body {
 .countdown-badge {
   animation: subtle-pulse 2s ease-in-out infinite;
 }
+
+/* =========================
+   RAMADAN 2026 BANNER
+   ========================= */
+.ramadan-section {
+  padding: 0 var(--space-md) var(--space-md);
+  flex-shrink: 0;
+}
+
+.ramadan-btn {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 60px;
+  margin: 0 auto;
+  display: flex;
+  background: linear-gradient(135deg, #0d5c46 0%, #1a8a6e 30%, #0a4a3a 70%, #0d5c46 100%);
+  border: none;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 25px rgba(13, 92, 70, 0.4);
+  transition: all 0.3s ease;
+}
+
+.ramadan-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(13, 92, 70, 0.5);
+}
+
+.ramadan-btn:active {
+  transform: translateY(0);
+}
+
+/* Animated twinkling stars */
+.ramadan-star {
+  position: absolute;
+  color: #ffd700;
+  opacity: 0.6;
+  animation: ramadan-twinkle 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ramadan-star:nth-child(1) { top: 8px; left: 15px; font-size: 0.6rem; animation-delay: 0s; }
+.ramadan-star:nth-child(2) { top: 12px; left: 55px; font-size: 0.5rem; animation-delay: 0.5s; }
+.ramadan-star:nth-child(3) { top: 6px; right: 45px; font-size: 0.7rem; animation-delay: 1s; }
+.ramadan-star:nth-child(4) { bottom: 10px; left: 35px; font-size: 0.5rem; animation-delay: 1.5s; }
+.ramadan-star:nth-child(5) { bottom: 12px; right: 25px; font-size: 0.6rem; animation-delay: 2s; }
+.ramadan-star:nth-child(6) { top: 18px; right: 15px; font-size: 0.5rem; animation-delay: 2.5s; }
+
+@keyframes ramadan-twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Button content */
+.ramadan-btn-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ramadan-crescent {
+  font-size: 1.6rem;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}
+
+.ramadan-btn-text {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ramadan-year {
+  color: #ffd700;
+}

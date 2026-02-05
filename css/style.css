@@ -669,6 +669,8 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  justify-content: flex-start; /* Aligns content to the left */
+}
 }
 
 .prayer-emoji {
