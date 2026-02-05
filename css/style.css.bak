@@ -667,9 +667,8 @@ body {
 
 .prayer-name-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;;
   gap: var(--space-sm);
-  justify-content: flex-start; /* Aligns content to the left */
 }
 
 .prayer-emoji {
