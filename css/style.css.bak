@@ -671,7 +671,6 @@ body {
   gap: var(--space-sm);
   justify-content: flex-start; /* Aligns content to the left */
 }
-}
 
 .prayer-emoji {
   font-size: 1.5rem;
