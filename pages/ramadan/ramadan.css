@@ -597,6 +597,45 @@ body {
   background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.15), transparent);
 }
 
+/* "Today's times" label */
+.hero-today-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Safety tip */
+.hero-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(250, 204, 21, 0.06);
+  border: 1px solid rgba(250, 204, 21, 0.12);
+  border-radius: var(--radius-sm);
+  margin-top: 2px;
+}
+
+.hero-tip-icon {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.hero-tip-text {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  text-align: left;
+}
+
 /* Responsive for hero during ramadan */
 @media (max-width: 360px) {
   .timer-block {

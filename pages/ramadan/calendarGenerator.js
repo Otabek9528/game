@@ -24,14 +24,73 @@ const CalendarGenerator = {
       const html = this.generateHTML(cityName, prayerTimes);
       const imageBase64 = await this.renderToImage(html);
       this.generatedImageBase64 = imageBase64;
-      this.hideLoading();
-      this.showResultPage(imageBase64, cityName);
+      
+      // Directly save — skip result page
+      await this.directSave(imageBase64, cityName);
       return imageBase64;
     } catch (error) {
       console.error('❌ Calendar generation failed:', error);
       this.hideLoading();
       this.showError(error.message);
       return null;
+    }
+  },
+
+  async directSave(imageBase64, cityName) {
+    const tg = window.Telegram?.WebApp;
+    const userId = tg?.initDataUnsafe?.user?.id;
+
+    if (!userId) {
+      this.hideLoading();
+      tg?.showAlert('Telegram user topilmadi');
+      return;
+    }
+
+    try {
+      this.showLoading('Rasm yuklanmoqda...');
+
+      const base64Data = imageBase64.split(',')[1];
+      const formData = new FormData();
+      formData.append('image', base64Data);
+
+      const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=eefabc00819da88747fb75efee14a80c', {
+        method: 'POST',
+        body: formData
+      });
+
+      const imgbbResult = await imgbbResponse.json();
+
+      if (!imgbbResult.success) {
+        throw new Error('Rasm yuklanmadi');
+      }
+
+      const imageUrl = imgbbResult.data.image.url;
+
+      this.showLoading('Telegramga yuborilmoqda...');
+
+      fetch('https://3jvo6d2sqini7jmro7x2q4lvti0hfhyh.lambda-url.ap-southeast-2.on.aws/', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          image_url: imageUrl,
+          city: cityName
+        })
+      });
+
+      // Wait for Lambda to process
+      await new Promise(r => setTimeout(r, 2000));
+
+      this.hideLoading();
+      tg?.showAlert('✅ Rasm chatga yuborildi!\n\nTelegram chatni tekshiring.');
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      setTimeout(() => tg?.close(), 2000);
+
+    } catch (err) {
+      this.hideLoading();
+      tg?.showAlert('Xatolik: ' + err.message + '\n\nQaytadan urinib ko\'ring.');
     }
   },
 

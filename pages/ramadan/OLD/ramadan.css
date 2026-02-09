@@ -265,7 +265,7 @@ body {
   background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(4, 120, 87, 0.2) 100%);
   border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: var(--radius-xl);
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-lg) var(--space-md) var(--space-md);
   overflow: hidden;
 }
 
@@ -399,107 +399,102 @@ body {
   opacity: 0.5;
 }
 
-/* --- During Ramadan --- */
+/* --- During Ramadan (Redesigned - Compact) --- */
 .hero-during-ramadan {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
+  gap: 10px;
+  padding: 0;
 }
 
-/* Day Badge */
-.ramadan-day-badge {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
-}
-
-.day-badge-label {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.day-badge-num {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--gold-400);
-  line-height: 1;
-  text-shadow: 0 0 20px var(--accent-glow);
-}
-
-.day-badge-suffix {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--gold-400);
-}
-
-/* Next Event Card */
-.next-event-card {
+/* Date Row - positioned between lanterns */
+.hero-date-row {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-md) var(--space-xl);
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-width: 180px;
+  gap: 2px;
+  margin-top: -4px;
 }
 
-.next-event-card.suhur-mode {
-  border-color: rgba(129, 140, 248, 0.4);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(0, 0, 0, 0.3));
+.current-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
-.next-event-card.iftar-mode {
-  border-color: rgba(250, 204, 21, 0.4);
-  background: linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(0, 0, 0, 0.3));
+.date-separator {
+  display: none;
 }
 
-.next-event-header {
+.ramadan-day {
+  font-size: 0.85rem;
+  color: var(--gold-400);
+  font-weight: 500;
+}
+
+.ramadan-day strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Countdown Section */
+.countdown-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.countdown-label-box {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.next-event-icon {
-  font-size: 1.3rem;
-  line-height: 1;
+.countdown-label-box.suhur-mode {
+  border-color: rgba(129, 140, 248, 0.3);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(0, 0, 0, 0.25));
 }
 
-.next-event-label {
+.countdown-label-box.iftar-mode {
+  border-color: rgba(250, 204, 21, 0.3);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(0, 0, 0, 0.25));
+}
+
+.countdown-icon {
+  font-size: 1rem;
+}
+
+.countdown-text {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.next-event-time {
-  font-size: 2rem;
-  font-weight: 700;
   color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Hero Countdown Timer */
-.hero-countdown-timer {
+/* Countdown Timer - Smaller */
+.countdown-timer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
+  gap: 4px;
 }
 
 .timer-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 50px;
-  padding: var(--space-sm) var(--space-md);
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: var(--radius-md);
+  min-width: 52px;
+  padding: 8px 6px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+  border-radius: 10px;
   border: 1px solid rgba(250, 204, 21, 0.2);
 }
 
@@ -509,13 +504,14 @@ body {
   color: var(--gold-400);
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  text-shadow: 0 0 15px rgba(250, 204, 21, 0.3);
 }
 
-.timer-label {
+.timer-unit {
   font-size: 0.55rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.5px;
   margin-top: 2px;
 }
 
@@ -523,8 +519,112 @@ body {
   font-size: 1.3rem;
   font-weight: 700;
   color: var(--gold-500);
-  opacity: 0.6;
+  opacity: 0.7;
   margin-bottom: 12px;
+}
+
+/* Prayer Times Row - Compact */
+.prayer-times-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  max-width: 260px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.prayer-time {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  transition: all 0.3s ease;
+}
+
+.prayer-time.active {
+  background: rgba(250, 204, 21, 0.1);
+}
+
+.suhur-time.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(129, 140, 248, 0.08));
+}
+
+.iftar-time.active {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(245, 158, 11, 0.08));
+}
+
+.prayer-icon {
+  font-size: 1rem;
+}
+
+.prayer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.prayer-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.prayer-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.suhur-time .prayer-value {
+  color: #a5b4fc;
+}
+
+.iftar-time .prayer-value {
+  color: #fcd34d;
+}
+
+.prayer-divider {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+/* Responsive for hero during ramadan */
+@media (max-width: 360px) {
+  .timer-block {
+    min-width: 46px;
+    padding: 6px 4px;
+  }
+  
+  .timer-value {
+    font-size: 1.3rem;
+  }
+  
+  .prayer-time {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  
+  .prayer-icon {
+    font-size: 0.9rem;
+  }
+  
+  .prayer-value {
+    font-size: 0.85rem;
+  }
+  
+  .current-date,
+  .ramadan-day {
+    font-size: 0.75rem;
+  }
 }
 
 /* Quick Times Reference */

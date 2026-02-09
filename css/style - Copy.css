@@ -667,7 +667,7 @@ body {
 
 .prayer-name-container {
   display: flex;
-  align-items: flex-start;;
+  align-items: center;;
   gap: var(--space-sm);
 }
 

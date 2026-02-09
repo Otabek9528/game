@@ -284,6 +284,13 @@ function updateHeroSection() {
     // Show during Ramadan view
     heroDuringRamadan.style.display = 'flex';
     
+    // Update current date
+    const currentDateEl = document.getElementById('currentDate');
+    if (currentDateEl) {
+      currentDateEl.textContent = formatCurrentDate(now);
+    }
+    
+    // Update Ramadan day number
     const dayNum = calculateRamadanDay(now);
     document.getElementById('badgeDayNum').textContent = dayNum;
     
@@ -296,6 +303,14 @@ function updateHeroSection() {
     // After Ramadan
     heroAfterRamadan.style.display = 'block';
   }
+}
+
+// Format current date in Uzbek
+function formatCurrentDate(date) {
+  const day = date.getDate();
+  const month = CONFIG.MONTHS_UZ[date.getMonth()];
+  const weekday = CONFIG.WEEKDAYS_UZ[date.getDay()];
+  return `${day}-${month}, ${weekday}`;
 }
 
 function updateCountdown() {
@@ -330,10 +345,9 @@ function updateNextEventDisplay() {
   const { suhur, iftar } = State.todayTimes;
   const nextEvent = getNextEvent(suhur, iftar);
   
-  const eventCard = document.getElementById('nextEventCard');
-  const eventIcon = document.getElementById('nextEventIcon');
-  const eventLabel = document.getElementById('nextEventLabel');
-  const eventTime = document.getElementById('nextEventTime');
+  const countdownLabelBox = document.getElementById('countdownLabelBox');
+  const countdownIcon = document.getElementById('countdownIcon');
+  const countdownText = document.getElementById('countdownText');
   const quickSuhur = document.getElementById('quickSuhur');
   const quickIftar = document.getElementById('quickIftar');
   
@@ -341,35 +355,20 @@ function updateNextEventDisplay() {
   document.getElementById('quickSuhurTime').textContent = suhur;
   document.getElementById('quickIftarTime').textContent = iftar;
   
-  // Remove active classes
-  eventCard.classList.remove('suhur-mode', 'iftar-mode');
+  // Remove active/mode classes
+  countdownLabelBox.classList.remove('suhur-mode', 'iftar-mode');
   quickSuhur.classList.remove('active');
   quickIftar.classList.remove('active');
   
   if (nextEvent === 'suhur') {
-    eventCard.classList.add('suhur-mode');
-    eventIcon.textContent = '🌙';
-    eventLabel.textContent = 'Saharlikgacha';
-    
-    // For suhur after iftar, we need tomorrow's suhur time
-    const now = new Date();
-    const [iH, iM] = iftar.split(':').map(Number);
-    const iftarMinutes = iH * 60 + iM;
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    
-    if (currentMinutes >= iftarMinutes && State.tomorrowTimes) {
-      // Show tomorrow's suhur time
-      eventTime.textContent = State.tomorrowTimes.suhur;
-    } else {
-      eventTime.textContent = suhur;
-    }
-    
+    countdownLabelBox.classList.add('suhur-mode');
+    countdownIcon.textContent = '🌙';
+    countdownText.textContent = 'Saharlikgacha';
     quickSuhur.classList.add('active');
   } else {
-    eventCard.classList.add('iftar-mode');
-    eventIcon.textContent = '🌅';
-    eventLabel.textContent = 'Iftorlikgacha';
-    eventTime.textContent = iftar;
+    countdownLabelBox.classList.add('iftar-mode');
+    countdownIcon.textContent = '🌅';
+    countdownText.textContent = 'Iftorlikgacha';
     quickIftar.classList.add('active');
   }
   
