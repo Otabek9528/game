@@ -224,49 +224,41 @@
 
         <!-- CALENDAR TAB -->
         <div class="tab-pane" id="tabCalendar">
-          <div class="calendar-promo">
-            <div class="promo-illustration">
-              <div class="promo-icon">📅</div>
-              <div class="promo-decoration">
-                <span>✨</span>
-                <span>🌙</span>
-                <span>✨</span>
+          <div class="calendar-promo-v2">
+            <!-- Mini calendar preview -->
+            <div class="mini-cal-preview">
+              <div class="mini-cal-header">
+                <span class="mini-cal-lantern">🏮</span>
+                <div class="mini-cal-title-block">
+                  <span class="mini-cal-arabic">رمضان</span>
+                  <span class="mini-cal-year">2026</span>
+                </div>
+                <span class="mini-cal-lantern">🏮</span>
+              </div>
+              <div class="mini-cal-rows">
+                <div class="mini-cal-row head"><span>Kun</span><span>Sana</span><span>Saharlik</span><span>Iftorlik</span></div>
+                <div class="mini-cal-row"><span>1</span><span>18-Fev</span><span>05:42</span><span>17:51</span></div>
+                <div class="mini-cal-row fri"><span>2</span><span>19-Fev</span><span>05:41</span><span>17:52</span></div>
+                <div class="mini-cal-row"><span>3</span><span>20-Fev</span><span>05:40</span><span>17:53</span></div>
+                <div class="mini-cal-row fade"><span>⋯</span><span></span><span></span><span></span></div>
               </div>
             </div>
-            
-            <h3 class="promo-title">Oylik Ramazon Taqvimi</h3>
-            <p class="promo-desc">
-              Sizning joriy joylashuvingiz asosida butun Ramazon oyi uchun 
-              saharlik va iftorlik vaqtlarini ko'rsatuvchi rasm generatsiya qilinadi.
-            </p>
-            
-            <div class="promo-features">
-              <div class="promo-feature">
-                <span class="feature-icon">📍</span>
-                <span class="feature-text">Joylashuvga asoslangan</span>
-              </div>
-              <div class="promo-feature">
-                <span class="feature-icon">🖼️</span>
-                <span class="feature-text">Rasmni saqlash mumkin</span>
-              </div>
-              <div class="promo-feature">
-                <span class="feature-icon">📤</span>
-                <span class="feature-text">Do'stlarga ulashish</span>
-              </div>
+
+            <div class="promo-v2-body">
+              <h3 class="promo-v2-title">30 kunlik taqvim rasmi</h3>
+              <p class="promo-v2-city">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span id="calendarCityName">---</span> uchun
+              </p>
+              
+              <button class="generate-btn" id="generateCalendarBtn">
+                <span class="btn-icon">🎨</span>
+                <span class="btn-text">Taqvimni yaratish</span>
+                <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+              
+              <p class="promo-v2-note">Rasm Telegram chatga yuboriladi</p>
             </div>
-            
-            <button class="generate-btn" id="generateCalendarBtn">
-              <span class="btn-icon">🎨</span>
-              <span class="btn-text">Taqvimni yaratish</span>
-              <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </button>
-            
-            <p class="promo-note">
-              <span class="note-icon">ℹ️</span>
-              Generatsiya bir necha soniya vaqt olishi mumkin
-            </p>
           </div>
         </div>
       </section>

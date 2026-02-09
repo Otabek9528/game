@@ -256,7 +256,7 @@ async function fetchPrayerTimes(lat, lon, date = new Date()) {
 // ===========================================
 
 function updateCityDisplay() {
-  const elements = ['headerCityName'];
+  const elements = ['headerCityName', 'calendarCityName'];
   elements.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = State.cityName;
