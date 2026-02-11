@@ -369,7 +369,7 @@
 
       <!-- Info Link -->
       <section class="info-section">
-        <a href="https://telegra.ph/Ta%D2%9Bvimlardagi-tafovvutlar-02-03" class="info-link" id="infoLink">
+        <a href="#" class="info-link" id="infoLink">
           <span class="info-icon">📖</span>
           <span class="info-text">Taqvimlardagi farqlar haqida</span>
           <svg class="info-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
