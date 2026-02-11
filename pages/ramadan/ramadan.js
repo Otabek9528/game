@@ -528,16 +528,15 @@ function setupEventListeners() {
   });
   
   // Info link
-  //document.getElementById('infoLink')?.addEventListener('click', (e) => {
-  //  e.preventDefault();
-  //  haptic();
-    // TODO: Open info modal or external link
-  //  if (tg) {
-  //    tg.showAlert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
-  //  } else {
-  //    alert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
-  //  }
-  //});
+  document.getElementById('infoLink')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      haptic();
+      if (tg) {
+        tg.openLink('https://telegra.ph/Ta%D2%9Bvimlardagi-tafovvutlar-02-03', { try_instant_view: true });
+      } else {
+        window.open('https://telegra.ph/Ta%D2%9Bvimlardagi-tafovvutlar-02-03', '_blank');
+      }
+  });
 }
 
 // ===========================================

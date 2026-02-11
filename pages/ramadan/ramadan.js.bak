@@ -528,16 +528,16 @@ function setupEventListeners() {
   });
   
   // Info link
-  document.getElementById('infoLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    haptic();
+  //document.getElementById('infoLink')?.addEventListener('click', (e) => {
+  //  e.preventDefault();
+  //  haptic();
     // TODO: Open info modal or external link
-    if (tg) {
-      tg.showAlert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
-    } else {
-      alert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
-    }
-  });
+  //  if (tg) {
+  //    tg.showAlert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
+  //  } else {
+  //    alert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
+  //  }
+  //});
 }
 
 // ===========================================
