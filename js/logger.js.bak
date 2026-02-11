@@ -19,8 +19,7 @@
     'pages/job-group/job-group.html': 'jobs',
     'pages/donation/donation.html': 'donation',
     'pages/barcode/barcode.html': 'barcode',
-    'pages/community/community.html': 'community',
-    'pages/ramadan/ramadan.html': 'ramadan'
+    'pages/community/community.html': 'community'
   };
   
   /**

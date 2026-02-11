@@ -11,7 +11,7 @@
 
 const CONFIG = {
   // Ramadan 2026 estimated start (may need adjustment based on moon sighting)
-  RAMADAN_START: new Date(2026, 1, 1), // February 28, 2026
+  RAMADAN_START: new Date(2026, 1, 18), // February 18, 2026
   RAMADAN_DAYS: 30,
   
   // Aladhan API
@@ -256,7 +256,7 @@ async function fetchPrayerTimes(lat, lon, date = new Date()) {
 // ===========================================
 
 function updateCityDisplay() {
-  const elements = ['headerCityName'];
+  const elements = ['headerCityName', 'calendarCityName'];
   elements.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = State.cityName;
@@ -529,14 +529,13 @@ function setupEventListeners() {
   
   // Info link
   document.getElementById('infoLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    haptic();
-    // TODO: Open info modal or external link
-    if (tg) {
-      tg.showAlert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
-    } else {
-      alert('Turli taqvimlardagi farqlar haqida ma\'lumot tez orada qo\'shiladi');
-    }
+      e.preventDefault();
+      haptic();
+      if (tg) {
+        tg.openLink('https://telegra.ph/Ta%D2%9Bvimlardagi-tafovvutlar-02-03', { try_instant_view: true });
+      } else {
+        window.open('https://telegra.ph/Ta%D2%9Bvimlardagi-tafovvutlar-02-03', '_blank');
+      }
   });
 }
 

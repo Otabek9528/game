@@ -525,6 +525,10 @@ function setupEventListeners() {
   document.getElementById('generateCalendarBtn')?.addEventListener('click', () => {
     haptic('medium');
     generateCalendar();
+      // Log interaction
+    if (window.logInteraction) {
+      window.logInteraction('ramadan_monthly');
+  }
   });
   
   // Info link
