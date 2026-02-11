@@ -95,56 +95,50 @@ const CalendarGenerator = {
   },
 
   async fetchPrayerTimes(lat, lon) {
-      const times = [];
-      const batchSize = 3; // was 5, reduce to 3
-      for (let i = 0; i < this.RAMADAN_DAYS; i += batchSize) {
-        const batch = [];
-        for (let j = i; j < Math.min(i + batchSize, this.RAMADAN_DAYS); j++) {
-          const date = new Date(this.RAMADAN_START);
-          date.setDate(this.RAMADAN_START.getDate() + j);
-          batch.push(this.fetchDayTimes(lat, lon, date, j + 1));
-        }
-        const results = await Promise.all(batch);
-        times.push(...results);
-        const progress = Math.round((times.length / this.RAMADAN_DAYS) * 100);
-        this.showLoading(`Vaqtlar yuklanmoqda... ${progress}%`);
-        if (i + batchSize < this.RAMADAN_DAYS) await new Promise(r => setTimeout(r, 300)); // was 100ms
+    const times = [];
+    const batchSize = 5;
+    for (let i = 0; i < this.RAMADAN_DAYS; i += batchSize) {
+      const batch = [];
+      for (let j = i; j < Math.min(i + batchSize, this.RAMADAN_DAYS); j++) {
+        const date = new Date(this.RAMADAN_START);
+        date.setDate(this.RAMADAN_START.getDate() + j);
+        batch.push(this.fetchDayTimes(lat, lon, date, j + 1));
       }
-      return times;
-    },
+      const results = await Promise.all(batch);
+      times.push(...results);
+      const progress = Math.round((times.length / this.RAMADAN_DAYS) * 100);
+      this.showLoading(`Vaqtlar yuklanmoqda... ${progress}%`);
+      if (i + batchSize < this.RAMADAN_DAYS) await new Promise(r => setTimeout(r, 100));
+    }
+    return times;
+  },
 
-  async fetchDayTimes(lat, lon, date, dayNum, retries = 3) {
-      const dateStr = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-      for (let attempt = 1; attempt <= retries; attempt++) {
-        try {
-          const url = `${this.API_BASE}/${dateStr}?latitude=${lat}&longitude=${lon}&method=${this.METHOD}&school=${this.SCHOOL}`;
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`API error ${response.status}`);
-          const data = await response.json();
-          const timings = data.data.timings;
-          return {
-            day: dayNum, date: date,
-            dateStr: `${date.getDate()}-${this.MONTHS_UZ[date.getMonth()]}`,
-            weekday: this.WEEKDAYS_UZ[date.getDay()],
-            isFriday: date.getDay() === 5,
-            suhur: timings.Fajr.slice(0, 5),
-            iftar: timings.Maghrib.slice(0, 5)
-          };
-        } catch (e) {
-          if (attempt < retries) {
-            await new Promise(r => setTimeout(r, 500 * attempt)); // backoff: 500ms, 1000ms, 1500ms
-            continue;
-          }
-          return {
-            day: dayNum, date: date,
-            dateStr: `${date.getDate()}-${this.MONTHS_UZ[date.getMonth()]}`,
-            weekday: this.WEEKDAYS_UZ[date.getDay()],
-            isFriday: date.getDay() === 5,
-            suhur: '--:--', iftar: '--:--'
-          };
-        }
-      }
-    },
+  async fetchDayTimes(lat, lon, date, dayNum) {
+    const dateStr = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+    try {
+      const url = `${this.API_BASE}/${dateStr}?latitude=${lat}&longitude=${lon}&method=${this.METHOD}&school=${this.SCHOOL}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('API error');
+      const data = await response.json();
+      const timings = data.data.timings;
+      return {
+        day: dayNum, date: date,
+        dateStr: `${date.getDate()}-${this.MONTHS_UZ[date.getMonth()]}`,
+        weekday: this.WEEKDAYS_UZ[date.getDay()],
+        isFriday: date.getDay() === 5,
+        suhur: timings.Fajr.slice(0, 5),
+        iftar: timings.Maghrib.slice(0, 5)
+      };
+    } catch (e) {
+      return {
+        day: dayNum, date: date,
+        dateStr: `${date.getDate()}-${this.MONTHS_UZ[date.getMonth()]}`,
+        weekday: this.WEEKDAYS_UZ[date.getDay()],
+        isFriday: date.getDay() === 5,
+        suhur: '--:--', iftar: '--:--'
+      };
+    }
+  },
 
   generateHTML(cityName, prayerTimes) {
     const generateTableRows = (startIdx, endIdx) => {
