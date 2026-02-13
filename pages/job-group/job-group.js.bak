@@ -41,7 +41,7 @@ const errorText = document.getElementById('errorText');
 // STATE
 // ===========================================
 
-let currentLinks = null;
+let currentLink = null;
 let timerInterval = null;
 let timeRemaining = LINK_DURATION;
 
@@ -159,12 +159,9 @@ async function requestInviteLink() {
     
     const data = await response.json();
     
-    if (data.success) {
-      currentLinks = {
-        job: data.job_invite_link,
-        taxi: data.taxi_invite_link
-      };
-      displayLinks(currentLinks);
+    if (data.success && data.invite_link) {
+      currentLink = data.invite_link;
+      displayLink(currentLink);
     } else {
       throw new Error(data.message || 'Link yaratishda xatolik');
     }
@@ -175,26 +172,20 @@ async function requestInviteLink() {
   }
 }
 
-function displayLinks(links) {
-  document.getElementById('jobLinkText').textContent = links.job;
-  document.getElementById('jobJoinBtn').href = links.job;
-  document.getElementById('taxiLinkText').textContent = links.taxi;
-  document.getElementById('taxiJoinBtn').href = links.taxi;
+function displayLink(link) {
+  linkText.textContent = link;
+  joinBtn.href = link;
   showState('link');
   startTimer();
-  if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-}
-
-function copyToClipboard(type) {
-  if (!currentLinks) return;
-  const link = type === 'job' ? currentLinks.job : currentLinks.taxi;
-  navigator.clipboard.writeText(link).then(() => {
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-  }).catch(err => console.error('Copy failed:', err));
+  
+  // Haptic feedback
+  if (tg.HapticFeedback) {
+    tg.HapticFeedback.notificationOccurred('success');
+  }
 }
 
 function handleLinkExpired() {
-  currentLinks = null;
+  currentLink = null;
   showState('expired');
   
   // Haptic feedback
