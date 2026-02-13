@@ -171,6 +171,7 @@ async function requestInviteLink() {
     
   } catch (error) {
     console.error('Error requesting invite link:', error);
+    alert('Error: ' + error.message);  // Add this line temporarily
     showError(error.message || 'Link yaratishda xatolik yuz berdi');
   }
 }
