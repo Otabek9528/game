@@ -53,7 +53,7 @@ const CalendarGenerator = {
       const formData = new FormData();
       formData.append('image', base64Data);
 
-      const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=a53b8edcebf340addb9f1921d7d79382', {
+      const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=55e3597c1eab5a28567d39bae592c83d', {
         method: 'POST',
         body: formData
       });
@@ -271,7 +271,7 @@ const CalendarGenerator = {
         const formData = new FormData();
         formData.append('image', base64Data);
         
-        const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=a53b8edcebf340addb9f1921d7d79382', {
+        const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=55e3597c1eab5a28567d39bae592c83d', {
           method: 'POST',
           body: formData
         });
