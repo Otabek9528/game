@@ -154,6 +154,13 @@ async function requestInviteLink() {
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      if (errorData.error === 'trial_used') {
+        // Show payment option instead of generic error
+        showError(errorData.message || "Sinov muddati tugagan");
+        // TODO: Add payment button here in future
+        return;
+    }
+      
       throw new Error(errorData.message || `Server xatosi: ${response.status}`);
     }
     
