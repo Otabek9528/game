@@ -1,13 +1,17 @@
 // barcode.js - Barcode Scanner for Telegram WebApp
-// VERSION 7: Camera Selection - Pick the right back camera with autofocus
+// VERSION 8: Single permission + Stable detection
+// - Only 1 permission prompt (no repeated getUserMedia during camera testing)
+// - Barcode must be detected consistently across multiple frames before accepting
 // ============================================
 // CONSTANTS
 // ============================================
 
-const SCAN_INTERVAL = 200; // ms between scan attempts
+const SCAN_INTERVAL = 200;       // ms between scan attempts
+const STABLE_COUNT_NEEDED = 3;   // barcode must appear in N consecutive scans to be accepted
+const STABLE_TIMEOUT = 2000;     // reset stability counter if no match within this ms
 const HISTORY_MAX_ITEMS = 10;
 const HISTORY_STORAGE_KEY = 'barcode_scan_history';
-const PREFERRED_CAMERA_KEY = 'barcode_preferred_camera';
+const PREFERRED_CAMERA_KEY = 'barcode_preferred_camera_v8';
 
 // Format display names
 const FORMAT_NAMES = {
@@ -41,12 +45,19 @@ let cameraTrack = null;
 let imageCapture = null;
 
 // Camera selection state
-let allCameras = [];        // All video input devices
-let backCameras = [];       // Back-facing cameras only
-let frontCameras = [];      // Front-facing cameras only
-let currentCameraIndex = 0; // Index within backCameras or frontCameras
-let currentFacing = 'back'; // 'back' or 'front'
-let currentDeviceId = null; // The actual deviceId being used
+let allCameras = [];
+let backCameras = [];
+let frontCameras = [];
+let currentCameraIndex = 0;
+let currentFacing = 'back';
+let currentDeviceId = null;
+let camerasEnumerated = false;
+
+// Barcode stability state
+let pendingCode = null;       // The code being confirmed
+let pendingFormat = null;
+let pendingCount = 0;         // How many consecutive frames it appeared
+let pendingLastSeen = 0;      // Timestamp of last detection
 
 // ============================================
 // TELEGRAM WEBAPP INITIALIZATION
@@ -150,8 +161,8 @@ function updateStatus(text, type = 'scanning') {
 // ============================================
 
 /**
- * Enumerate all cameras and categorize them as front/back.
- * We need an initial getUserMedia call first to get labels.
+ * Enumerate all cameras and categorize as front/back using labels.
+ * Must be called AFTER a getUserMedia grant so labels are available.
  */
 async function enumerateCameras() {
   try {
@@ -163,53 +174,34 @@ async function enumerateCameras() {
       console.log(`  [${i}] ${cam.label || 'Camera ' + i} (id: ${cam.deviceId.substring(0, 12)}...)`);
     });
     
-    // Categorize by label heuristics
     backCameras = [];
     frontCameras = [];
     
     allCameras.forEach((cam, i) => {
       const label = (cam.label || '').toLowerCase();
-      // Common patterns for front cameras
+      
       if (label.includes('front') || label.includes('user') || label.includes('selfie') || label.includes('facetime')) {
         frontCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
-      }
-      // Common patterns for back cameras
-      else if (label.includes('back') || label.includes('rear') || label.includes('environment') || label.includes('main') || label.includes('wide') || label.includes('tele') || label.includes('ultra')) {
+      } else if (label.includes('back') || label.includes('rear') || label.includes('environment') || label.includes('main') || label.includes('wide') || label.includes('tele') || label.includes('ultra') || label.includes('camera2 0') || label.includes('camera2 2') || label.includes('camera2 3')) {
         backCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
-      }
-      // No label clue — use facingMode test or index heuristic
-      else {
+      } else {
+        // No label clue
         if (allCameras.length === 1) {
           backCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
         } else if (allCameras.length === 2) {
-          // Classic 2-camera phone: index 0 = back, index 1 = front (usually)
-          if (i === 0) {
-            backCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
-          } else {
-            frontCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
-          }
+          if (i === 0) backCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
+          else frontCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
         } else {
-          // Multi-camera: try to detect facing by opening briefly
-          // For now, add to back cameras (most multi-cam are back cameras)
           backCameras.push({ deviceId: cam.deviceId, label: cam.label, originalIndex: i });
         }
       }
     });
-
-    // If labels were available and gave us no back cameras but we have unlabeled ones,
-    // try facingMode-based detection
-    if (backCameras.length === 0 && allCameras.length > 0) {
-      await detectFacingByStream();
-    }
     
     console.log(`📷 Back cameras: ${backCameras.length}, Front cameras: ${frontCameras.length}`);
-    backCameras.forEach((cam, i) => {
-      console.log(`  Back[${i}]: ${cam.label || 'Camera'}`);
-    });
-    frontCameras.forEach((cam, i) => {
-      console.log(`  Front[${i}]: ${cam.label || 'Camera'}`);
-    });
+    backCameras.forEach((cam, i) => console.log(`  Back[${i}]: ${cam.label || 'Camera'}`));
+    frontCameras.forEach((cam, i) => console.log(`  Front[${i}]: ${cam.label || 'Camera'}`));
     
+    camerasEnumerated = true;
     return true;
   } catch (e) {
     console.error('❌ Camera enumeration failed:', e);
@@ -218,48 +210,11 @@ async function enumerateCameras() {
 }
 
 /**
- * Detect camera facing by briefly opening each camera and checking settings.facingMode
- */
-async function detectFacingByStream() {
-  console.log('📷 Detecting facing by opening each camera...');
-  
-  backCameras = [];
-  frontCameras = [];
-  
-  for (const cam of allCameras) {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: cam.deviceId } },
-        audio: false
-      });
-      const track = stream.getVideoTracks()[0];
-      const settings = track.getSettings();
-      stream.getTracks().forEach(t => t.stop());
-      
-      const entry = { deviceId: cam.deviceId, label: cam.label, originalIndex: allCameras.indexOf(cam) };
-      
-      if (settings.facingMode === 'environment') {
-        backCameras.push(entry);
-      } else if (settings.facingMode === 'user') {
-        frontCameras.push(entry);
-      } else {
-        // Unknown, assume back
-        backCameras.push(entry);
-      }
-      
-      await new Promise(r => setTimeout(r, 100));
-    } catch (e) {
-      console.log(`  ⚠️ Could not test camera: ${e.message}`);
-    }
-  }
-}
-
-/**
- * Try to find the best back camera - the one with autofocus capability.
- * Tests each back camera and picks the one that supports continuous autofocus.
+ * Find the best back camera WITHOUT opening separate streams.
  * 
- * ALWAYS tests all cameras on every launch — we never skip based on saved preference alone.
- * Saved preference is only used as a tiebreaker when scores are equal.
+ * Strategy: Open each camera one at a time using the SAME permission grant,
+ * read capabilities, score, stop, then open the winner for real.
+ * Since permission is already granted, no new prompts appear.
  */
 async function findBestBackCamera() {
   if (backCameras.length <= 1) {
@@ -267,9 +222,17 @@ async function findBestBackCamera() {
     return backCameras.length === 1 ? 0 : -1;
   }
   
+  // Check saved preference first (from v8 — not stale)
   const savedId = localStorage.getItem(PREFERRED_CAMERA_KEY);
+  if (savedId) {
+    const savedIndex = backCameras.findIndex(c => c.deviceId === savedId);
+    if (savedIndex !== -1) {
+      console.log(`📷 Using saved preferred camera: Back[${savedIndex}]`);
+      return savedIndex;
+    }
+  }
   
-  console.log(`📷 Testing ${backCameras.length} back cameras to find best autofocus...`);
+  console.log(`📷 Testing ${backCameras.length} back cameras (single permission)...`);
   
   let bestIndex = 0;
   let bestScore = -1;
@@ -277,9 +240,10 @@ async function findBestBackCamera() {
   
   for (let i = 0; i < backCameras.length; i++) {
     const cam = backCameras[i];
-    console.log(`📷 Testing back camera [${i}]: ${cam.label || 'Unknown'}...`);
+    console.log(`📷 Testing Back[${i}]: ${cam.label || 'Unknown'}...`);
     
     try {
+      // Open stream — permission already granted, no new prompt
       const testStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: cam.deviceId } },
         audio: false
@@ -287,52 +251,44 @@ async function findBestBackCamera() {
       
       const track = testStream.getVideoTracks()[0];
       const capabilities = track.getCapabilities ? track.getCapabilities() : {};
-      const settings = track.getSettings();
       
       let score = 0;
       
-      // === FOCUS (most important for barcode scanning) ===
+      // FOCUS (most important)
       if (capabilities.focusMode) {
         const modes = capabilities.focusMode;
         console.log(`  Focus modes: [${modes.join(', ')}]`);
-        if (modes.includes('continuous')) score += 100;  // This is what we need most
+        if (modes.includes('continuous')) score += 100;
         if (modes.includes('single-shot')) score += 50;
-        if (modes.includes('manual')) score += 10;
       }
       
-      // focusDistance available = real autofocus hardware
       if (capabilities.focusDistance) {
         score += 60;
         console.log(`  Focus distance: ${capabilities.focusDistance.min}-${capabilities.focusDistance.max}`);
       }
       
-      // === TORCH (very strong main-camera signal) ===
+      // TORCH (strong main-camera signal)
       if (capabilities.torch) {
         score += 80;
         console.log(`  Torch: supported`);
       }
       
-      // === ZOOM (main camera usually supports optical/digital zoom) ===
+      // ZOOM
       if (capabilities.zoom && capabilities.zoom.max > 1) {
         score += 30;
         console.log(`  Zoom: ${capabilities.zoom.min}-${capabilities.zoom.max}`);
       }
       
-      // === RESOLUTION (higher max = likely main sensor, not ultrawide) ===
+      // RESOLUTION
       if (capabilities.width && capabilities.width.max) {
         score += Math.min(Math.floor(capabilities.width.max / 100), 30);
-        console.log(`  Max resolution: ${capabilities.width.max}x${capabilities.height ? capabilities.height.max : '?'}`);
+        console.log(`  Max resolution: ${capabilities.width.max}`);
       }
       
-      // Tiebreaker: if user previously chose this one manually, slight bonus
-      if (savedId && cam.deviceId === savedId) {
-        score += 5;
-        console.log(`  User preference bonus: +5`);
-      }
-      
-      console.log(`  ✅ Total score: ${score}`);
+      console.log(`  ✅ Score: ${score}`);
       scores.push({ index: i, score, label: cam.label });
       
+      // IMPORTANT: stop immediately to release camera for next test
       testStream.getTracks().forEach(t => t.stop());
       
       if (score > bestScore) {
@@ -340,22 +296,22 @@ async function findBestBackCamera() {
         bestIndex = i;
       }
       
-      await new Promise(r => setTimeout(r, 200));
+      // Brief pause between tests
+      await new Promise(r => setTimeout(r, 100));
       
     } catch (e) {
-      console.log(`  ❌ Failed to test: ${e.message}`);
+      console.log(`  ❌ Failed: ${e.message}`);
       scores.push({ index: i, score: 0, label: cam.label, error: true });
     }
   }
   
-  // Log summary
-  console.log('📷 Camera scores summary:');
+  console.log('📷 Camera scores:');
   scores.forEach(s => {
-    const winner = s.index === bestIndex ? ' ← SELECTED' : '';
-    console.log(`  [${s.index}] ${s.label || 'Camera'}: ${s.score} pts${winner}`);
+    const marker = s.index === bestIndex ? ' ← BEST' : '';
+    console.log(`  Back[${s.index}] ${s.label || 'Camera'}: ${s.score}${marker}`);
   });
   
-  // Save the winner
+  // Save winner
   if (backCameras[bestIndex]) {
     localStorage.setItem(PREFERRED_CAMERA_KEY, backCameras[bestIndex].deviceId);
   }
@@ -376,8 +332,17 @@ async function checkCameraPermission() {
   }
 }
 
+/**
+ * Main camera start function.
+ * 
+ * Flow for first launch:
+ * 1. Single getUserMedia({ video: true }) — triggers ONE permission prompt
+ * 2. enumerateDevices() — now has labels
+ * 3. Test each back camera's capabilities (no new permission prompts)
+ * 4. Open the best camera for actual use
+ */
 async function startCamera() {
-  console.log('📷 Starting camera v7 (with camera selection)...');
+  console.log('📷 Starting camera v8...');
   
   try {
     if (videoStream) {
@@ -386,23 +351,34 @@ async function startCamera() {
     
     videoElement = document.getElementById('videoElement');
     
-    // First, get a temporary stream to trigger permission and enable enumeration with labels
-    if (allCameras.length === 0) {
+    // Step 1: Get initial permission with a single prompt
+    if (!camerasEnumerated) {
       let tempStream = null;
       try {
+        // This is the ONLY getUserMedia that may trigger a permission prompt
         tempStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        console.log('✅ Camera permission granted');
       } catch (e) {
         handleCameraError(e);
         return false;
       }
       
-      // Now enumerate (labels should be available)
+      // Step 2: Enumerate with labels
       await enumerateCameras();
       
-      // Stop temp stream
+      // Stop temp stream before testing
       if (tempStream) {
         tempStream.getTracks().forEach(t => t.stop());
-        await new Promise(r => setTimeout(r, 300));
+        tempStream = null;
+        await new Promise(r => setTimeout(r, 200));
+      }
+      
+      // Step 3: Find the best back camera (opens/closes streams but no new prompts)
+      if (currentFacing === 'back' && backCameras.length > 1 && !currentDeviceId) {
+        const bestIdx = await findBestBackCamera();
+        if (bestIdx >= 0) {
+          currentCameraIndex = bestIdx;
+        }
       }
     }
     
@@ -410,16 +386,7 @@ async function startCamera() {
     const cameraList = currentFacing === 'back' ? backCameras : frontCameras;
     
     if (cameraList.length === 0) {
-      console.log('📷 No categorized cameras, falling back to facingMode');
       return await startCameraWithFacingMode();
-    }
-    
-    // For back cameras, find the best one on first use
-    if (currentFacing === 'back' && !currentDeviceId) {
-      const bestIdx = await findBestBackCamera();
-      if (bestIdx >= 0) {
-        currentCameraIndex = bestIdx;
-      }
     }
     
     // Clamp index
@@ -430,9 +397,9 @@ async function startCamera() {
     const selectedCamera = cameraList[currentCameraIndex];
     currentDeviceId = selectedCamera.deviceId;
     
-    console.log(`📷 Opening: ${selectedCamera.label || 'Camera ' + currentCameraIndex} (${currentFacing} [${currentCameraIndex + 1}/${cameraList.length}])`);
+    console.log(`📷 Opening: ${selectedCamera.label || 'Camera'} (${currentFacing} [${currentCameraIndex + 1}/${cameraList.length}])`);
     
-    // Request with exact deviceId — this is the key fix
+    // Step 4: Open the chosen camera — no permission prompt
     const constraints = {
       video: {
         deviceId: { exact: currentDeviceId },
@@ -445,7 +412,7 @@ async function startCamera() {
     try {
       videoStream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch (e) {
-      console.log('⚠️ With ideal resolution failed, trying bare deviceId...');
+      console.log('⚠️ Ideal resolution failed, trying bare deviceId...');
       videoStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: currentDeviceId } },
         audio: false
@@ -454,25 +421,22 @@ async function startCamera() {
     
     cameraTrack = videoStream.getVideoTracks()[0];
     const settings = cameraTrack.getSettings();
-    const capabilities = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {};
     
-    console.log('📷 Active settings:', JSON.stringify(settings));
-    console.log('📷 Active capabilities:', JSON.stringify(capabilities));
+    console.log('📷 Active:', JSON.stringify(settings));
     
-    // Apply continuous autofocus if available
+    // Apply continuous autofocus
     await applyContinuousAutofocus();
     
-    // Try ImageCapture
+    // ImageCapture
     try {
       if ('ImageCapture' in window) {
         imageCapture = new ImageCapture(cameraTrack);
-        console.log('✅ ImageCapture available');
       }
     } catch (e) {
       imageCapture = null;
     }
     
-    // Attach stream to video
+    // Attach to video element
     videoElement.srcObject = videoStream;
     
     await new Promise((resolve, reject) => {
@@ -499,9 +463,6 @@ async function startCamera() {
   }
 }
 
-/**
- * Apply continuous autofocus if the camera supports it.
- */
 async function applyContinuousAutofocus() {
   if (!cameraTrack) return;
   
@@ -518,17 +479,12 @@ async function applyContinuousAutofocus() {
         advanced: [{ focusMode: 'single-shot' }]
       });
       console.log('✅ Single-shot autofocus enabled');
-    } else {
-      console.log('⚠️ No autofocus modes available on this camera');
     }
   } catch (e) {
     console.log('⚠️ Could not set focus mode:', e.message);
   }
 }
 
-/**
- * Fallback: start camera with just facingMode (old behavior)
- */
 async function startCameraWithFacingMode() {
   console.log('📷 Fallback: using facingMode...');
   try {
@@ -554,7 +510,6 @@ async function startCameraWithFacingMode() {
     showState('scanner');
     startScanning();
     return true;
-    
   } catch (e) {
     showError('Kameraga ulanib bo\'lmadi.');
     return false;
@@ -575,9 +530,6 @@ function handleCameraError(error) {
   }
 }
 
-/**
- * Update the camera info badge in the UI
- */
 function updateCameraInfo() {
   const cameraList = currentFacing === 'back' ? backCameras : frontCameras;
   const infoEl = document.getElementById('cameraInfoBadge');
@@ -590,10 +542,8 @@ function updateCameraInfo() {
   }
 }
 
-// Tap to focus — trigger single-shot autofocus
+// Tap to focus
 async function triggerFocus() {
-  console.log('👆 Focus tap');
-  
   focusIndicator.classList.add('active');
   setTimeout(() => focusIndicator.classList.remove('active'), 600);
   
@@ -606,9 +556,7 @@ async function triggerFocus() {
       await cameraTrack.applyConstraints({
         advanced: [{ focusMode: 'single-shot' }]
       });
-      console.log('🎯 Single-shot focus triggered');
       
-      // Switch back to continuous after a short delay
       setTimeout(async () => {
         try {
           if (capabilities.focusMode.includes('continuous')) {
@@ -619,9 +567,7 @@ async function triggerFocus() {
         } catch (e) {}
       }, 1500);
     }
-  } catch (e) {
-    console.log('⚠️ Focus trigger failed:', e.message);
-  }
+  } catch (e) {}
 }
 
 function stopCamera() {
@@ -636,11 +582,7 @@ function stopCamera() {
   imageCapture = null;
 }
 
-/**
- * Switch between front and back camera groups
- */
 async function switchFacing() {
-  console.log('🔄 Switching facing...');
   currentFacing = currentFacing === 'back' ? 'front' : 'back';
   currentCameraIndex = 0;
   currentDeviceId = null;
@@ -650,15 +592,10 @@ async function switchFacing() {
   await startCamera();
 }
 
-/**
- * Cycle through cameras within the current facing group.
- * This is the KEY feature — lets user try different back cameras to find the one with good autofocus.
- */
 async function cycleCamera() {
   const cameraList = currentFacing === 'back' ? backCameras : frontCameras;
   
   if (cameraList.length <= 1) {
-    // Only one camera in this group, switch facing instead
     await switchFacing();
     return;
   }
@@ -666,9 +603,8 @@ async function cycleCamera() {
   currentCameraIndex = (currentCameraIndex + 1) % cameraList.length;
   currentDeviceId = cameraList[currentCameraIndex].deviceId;
   
-  console.log(`📷 Cycling to ${currentFacing} camera [${currentCameraIndex}]: ${cameraList[currentCameraIndex].label || 'Unknown'}`);
+  console.log(`📷 Cycling to ${currentFacing} [${currentCameraIndex}]: ${cameraList[currentCameraIndex].label || 'Unknown'}`);
   
-  // Save user's preference
   if (currentFacing === 'back') {
     localStorage.setItem(PREFERRED_CAMERA_KEY, currentDeviceId);
   }
@@ -689,7 +625,6 @@ function checkTorchSupport() {
     const capabilities = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {};
     if (capabilities.torch) {
       torchBtn.style.display = 'flex';
-      console.log('✅ Torch supported');
     } else {
       torchBtn.style.display = 'none';
     }
@@ -707,13 +642,9 @@ async function toggleTorch() {
     await cameraTrack.applyConstraints({
       advanced: [{ torch: torchEnabled }]
     });
-    
     torchBtn.classList.toggle('active', torchEnabled);
     torchIcon.textContent = torchEnabled ? '💡' : '🔦';
-    console.log(`🔦 Torch ${torchEnabled ? 'ON' : 'OFF'}`);
-    
   } catch (e) {
-    console.error('❌ Torch error:', e);
     torchEnabled = false;
   }
 }
@@ -727,14 +658,12 @@ async function initBarcodeDetector() {
     try {
       const formats = await BarcodeDetector.getSupportedFormats();
       console.log('✅ BarcodeDetector formats:', formats);
-      
       barcodeDetector = new BarcodeDetector({ formats });
       return true;
     } catch (e) {
       console.warn('⚠️ BarcodeDetector init failed:', e);
     }
   }
-  
   console.log('⚠️ BarcodeDetector not available');
   return false;
 }
@@ -743,6 +672,7 @@ function startScanning() {
   if (isScanning) return;
   
   isScanning = true;
+  resetPendingBarcode();
   updateStatus('Qidirilmoqda...', 'scanning');
   
   scanInterval = setInterval(scanFrame, SCAN_INTERVAL);
@@ -755,8 +685,65 @@ function stopScanning() {
     clearInterval(scanInterval);
     scanInterval = null;
   }
-  console.log('⏹️ Scanning stopped');
+  resetPendingBarcode();
 }
+
+// ============================================
+// BARCODE STABILITY CHECK
+// ============================================
+
+function resetPendingBarcode() {
+  pendingCode = null;
+  pendingFormat = null;
+  pendingCount = 0;
+  pendingLastSeen = 0;
+}
+
+/**
+ * Process a detected barcode through the stability filter.
+ * The same code must be detected in STABLE_COUNT_NEEDED consecutive scans
+ * to be accepted. This prevents accepting partial/misread barcodes
+ * when the user is still positioning the product.
+ */
+function processDetection(code, format) {
+  const now = Date.now();
+  
+  // If this is a different code from what we were tracking, restart
+  if (code !== pendingCode) {
+    pendingCode = code;
+    pendingFormat = format;
+    pendingCount = 1;
+    pendingLastSeen = now;
+    console.log(`🔍 New candidate: ${code} (1/${STABLE_COUNT_NEEDED})`);
+    return false;
+  }
+  
+  // Same code — check if it timed out (user moved away and came back)
+  if (now - pendingLastSeen > STABLE_TIMEOUT) {
+    pendingCount = 1;
+    pendingLastSeen = now;
+    console.log(`🔍 Candidate reset (timeout): ${code} (1/${STABLE_COUNT_NEEDED})`);
+    return false;
+  }
+  
+  // Same code, within timeout — increment
+  pendingCount++;
+  pendingLastSeen = now;
+  pendingFormat = format; // Use latest format detection
+  
+  console.log(`🔍 Candidate confirmed: ${code} (${pendingCount}/${STABLE_COUNT_NEEDED})`);
+  
+  if (pendingCount >= STABLE_COUNT_NEEDED) {
+    // Stable! Accept it.
+    return true;
+  }
+  
+  return false;
+}
+
+// ============================================
+// SCAN FRAME
+// ============================================
 
 async function scanFrame() {
   if (!isScanning || !videoElement || videoElement.readyState !== 4) {
@@ -770,7 +757,7 @@ async function scanFrame() {
       barcodes = await barcodeDetector.detect(videoElement);
     }
     
-    // If nothing found and we have ImageCapture, try from grabbed frame
+    // Fallback: try ImageCapture grabbed frame
     if (barcodes.length === 0 && imageCapture) {
       try {
         const frame = await imageCapture.grabFrame();
@@ -778,13 +765,23 @@ async function scanFrame() {
           barcodes = await barcodeDetector.detect(frame);
           frame.close();
         }
-      } catch (e) {
-        // Silently fail
-      }
+      } catch (e) {}
     }
     
     if (barcodes.length > 0) {
-      handleBarcodeFound(barcodes[0]);
+      const barcode = barcodes[0];
+      const code = barcode.rawValue || barcode.data;
+      const format = barcode.format || 'unknown';
+      
+      // Skip if this was already accepted
+      if (code === lastScannedCode) return;
+      
+      // Run through stability filter
+      const stable = processDetection(code, format);
+      
+      if (stable) {
+        handleBarcodeConfirmed(code, format);
+      }
     }
     
   } catch (error) {
@@ -792,14 +789,9 @@ async function scanFrame() {
   }
 }
 
-function handleBarcodeFound(barcode) {
-  const code = barcode.rawValue || barcode.data;
-  const format = barcode.format || 'unknown';
-  
-  if (code === lastScannedCode) return;
-  
+function handleBarcodeConfirmed(code, format) {
   lastScannedCode = code;
-  console.log(`✅ Found: ${code} (${format})`);
+  console.log(`✅ Confirmed: ${code} (${format})`);
   
   if (navigator.vibrate) {
     navigator.vibrate([100, 50, 100]);
@@ -971,12 +963,11 @@ retryBtn.addEventListener('click', async () => {
   await startCamera();
 });
 
-// 📷 button: short tap = cycle cameras in same group, long press = switch front/back
+// Short tap = cycle cameras in same facing group
 switchCameraBtn.addEventListener('click', () => cycleCamera());
 
-// RESTART button
+// Restart camera
 restartCameraBtn.addEventListener('click', async () => {
-  console.log('🔄 Restart camera button clicked');
   focusIndicator.classList.add('active');
   setTimeout(() => focusIndicator.classList.remove('active'), 600);
   
@@ -988,7 +979,7 @@ restartCameraBtn.addEventListener('click', async () => {
 
 torchBtn.addEventListener('click', () => toggleTorch());
 
-// TAP TO FOCUS
+// Tap to focus
 cameraContainer.addEventListener('click', () => triggerFocus());
 
 copyBtn.addEventListener('click', () => {
@@ -1000,7 +991,7 @@ scanAgainBtn.addEventListener('click', () => scanAgain());
 
 clearHistoryBtn.addEventListener('click', () => clearHistory());
 
-// Long press on switch button to flip between front/back
+// Long press switch button = flip front/back
 let switchLongPressTimer = null;
 switchCameraBtn.addEventListener('touchstart', (e) => {
   switchLongPressTimer = setTimeout(() => {
@@ -1036,15 +1027,7 @@ window.addEventListener('beforeunload', () => {
 // ============================================
 
 async function initializeApp() {
-  console.log('🚀 Barcode Scanner v7 - Camera Selection & Autofocus');
-  
-  // Clear stale preferences from older versions
-  const version = localStorage.getItem('barcode_scanner_version');
-  if (version !== 'v7') {
-    localStorage.removeItem(PREFERRED_CAMERA_KEY);
-    localStorage.setItem('barcode_scanner_version', 'v7');
-    console.log('🧹 Cleared stale camera preferences from older version');
-  }
+  console.log('🚀 Barcode Scanner v8 - Single Permission + Stable Detection');
   
   showState('loading');
   loadHistory();
@@ -1067,4 +1050,4 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
 });
 
-console.log('📜 barcode.js v7 loaded');
+console.log('📜 barcode.js v8 loaded');
