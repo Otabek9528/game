@@ -133,7 +133,7 @@
       links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
       jobs: { icon: '💼', labelKey: 'feature.jobs', href: 'pages/job-group/job-group.html' },
       donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },
-      barcode: { icon: '📷', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html' },
+      //barcode: { icon: '📷', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html' },
       //news: { icon: '📢', labelKey: 'feature.news', href: 'pages/questions/qna.html' },
       //events: { icon: '📅', labelKey: 'feature.events', href: '#', comingSoon: true },
       //market: { icon: '🛒', labelKey: 'feature.market', href: '#', comingSoon: true },

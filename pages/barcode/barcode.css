@@ -522,6 +522,17 @@ body {
   text-align: center;
 }
 
+/* Camera info badge */
+.camera-info-badge {
+  font-size: 0.8rem;
+  background: #00a884;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* =========================
    RESULT SECTION
    ========================= */
