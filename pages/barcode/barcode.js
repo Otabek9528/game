@@ -1,14 +1,12 @@
 // barcode.js - Barcode Scanner for Telegram WebApp
-// VERSION 10: STRICTLY one getUserMedia call per session
+// VERSION 12: Try cameras from last to first
 //
-// Telegram WebView prompts permission for EVERY getUserMedia call.
-// So we call it exactly ONCE:
-//   - If we have a saved deviceId → open that directly (1 prompt)
-//   - If no saved preference → open with facingMode:environment (1 prompt)
-//   - After opening, check if camera has torch+autofocus
-//   - If not, user can tap cycle button (1 additional prompt, saves preference)
-//   - Next session opens the right camera directly (1 prompt)
+// enumerateDevices() returns deviceIds without permission (no labels though).
+// We try cameras starting from the LAST one (main camera on most phones)
+// and stop as soon as we find one with torch capability.
 //
+// Best case: 1 prompt (last camera is the main one)
+// Worst case: N prompts until we find torch (but typically 1-2)
 // ============================================
 
 const SCAN_INTERVAL = 200;
@@ -16,7 +14,6 @@ const STABLE_COUNT_NEEDED = 3;
 const STABLE_TIMEOUT = 2000;
 const HISTORY_MAX_ITEMS = 10;
 const HISTORY_STORAGE_KEY = 'barcode_scan_history';
-const PREFERRED_CAMERA_KEY = 'barcode_cam_v10';
 
 const FORMAT_NAMES = {
   'ean_13': 'EAN-13', 'ean_8': 'EAN-8', 'upc_a': 'UPC-A', 'upc_e': 'UPC-E',
@@ -40,11 +37,10 @@ let scanHistory = [];
 let cameraTrack = null;
 let imageCapture = null;
 
-let backCameraIds = [];       // deviceIds of back cameras (populated after first open)
+let backCameraIds = [];
 let currentDeviceId = null;
 let currentIndexAmongBack = 0;
 
-// Stability
 let pendingCode = null;
 let pendingFormat = null;
 let pendingCount = 0;
@@ -118,110 +114,108 @@ function updateStatus(text, type = 'scanning') {
 }
 
 // ============================================
-// CAMERA — ONE getUserMedia PER SESSION
+// CAMERA
 // ============================================
 
 /**
- * The main entry point. Opens camera with minimum getUserMedia calls.
- *
- * Returning user (saved preference): 1 prompt → done
- * New user, lucky (got main camera): 1 prompt → done
- * New user, unlucky (got wrong camera): 2 prompts → auto-switches → done
- * Every session after first: 1 prompt → done
+ * Main entry. Enumerates cameras first (no prompt), then tries from
+ * last to first looking for torch. Stops at the first good camera.
  */
 async function openCamera() {
   showState('loading');
 
   try {
-    if (videoStream) { stopCamera(); }
+    if (videoStream) stopCamera();
     videoElement = document.getElementById('videoElement');
 
-    const savedId = localStorage.getItem(PREFERRED_CAMERA_KEY);
-
-    if (savedId) {
-      // Saved preference — open directly (1 prompt)
-      try {
-        videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: { exact: savedId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: false
-        });
-      } catch (e) {
-        // Saved device gone — clear and retry with facingMode
-        localStorage.removeItem(PREFERRED_CAMERA_KEY);
-        videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' } },
-          audio: false
-        });
-      }
-
-      cameraTrack = videoStream.getVideoTracks()[0];
-      currentDeviceId = cameraTrack.getSettings().deviceId;
-      await finishCameraSetup();
-      return true;
-    }
-
-    // --- No saved preference: first-time flow ---
-
-    // Prompt 1: open with facingMode
-    videoStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false
-    });
-
-    cameraTrack = videoStream.getVideoTracks()[0];
-    currentDeviceId = cameraTrack.getSettings().deviceId;
-
-    // Check: does this camera have torch? (= main camera with autofocus)
-    const caps = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {};
-    const hasTorch = !!caps.torch;
-
-    if (hasTorch) {
-      // Got the right camera on first try — save and use
-      localStorage.setItem(PREFERRED_CAMERA_KEY, currentDeviceId);
-      await finishCameraSetup();
-      return true;
-    }
-
-    // Wrong camera (no torch) — find the other back camera
+    // Step 1: enumerate deviceIds (no permission prompt, no labels)
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoCams = devices.filter(d => d.kind === 'videoinput');
-    
-    // Find back cameras that are NOT the current one
-    let otherBackId = null;
-    for (const cam of videoCams) {
-      if (cam.deviceId === currentDeviceId) continue;
-      const label = (cam.label || '').toLowerCase();
-      const isFront = label.includes('front') || label.includes('user') || label.includes('selfie') || label.includes('facetime');
-      if (!isFront) {
-        otherBackId = cam.deviceId;
-        break;
+
+    if (videoCams.length === 0) {
+      showError('Kamera topilmadi.');
+      return false;
+    }
+
+    // Step 2: try cameras from LAST to FIRST
+    // On most phones: back cameras are listed first, front cameras last.
+    // But the MAIN back camera (with torch/autofocus) is often the last
+    // among the back cameras, or we try reverse order to find it fast.
+    //
+    // Since we have no labels yet, we try ALL cameras in reverse.
+    // As soon as we find one with torch → stop.
+
+    let foundCamera = false;
+
+    for (let i = videoCams.length - 1; i >= 0; i--) {
+      const cam = videoCams[i];
+
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: { exact: cam.deviceId },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
+        });
+
+        cameraTrack = videoStream.getVideoTracks()[0];
+        currentDeviceId = cameraTrack.getSettings().deviceId;
+
+        const caps = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {};
+
+        if (caps.torch) {
+          // Found the main camera with torch — use it!
+          foundCamera = true;
+          break;
+        }
+
+        // No torch — check if it's at least a back camera (environment)
+        const settings = cameraTrack.getSettings();
+        if (settings.facingMode === 'user') {
+          // Front camera — skip
+          videoStream.getTracks().forEach(t => t.stop());
+          videoStream = null;
+          cameraTrack = null;
+          continue;
+        }
+
+        // Back camera but no torch — remember it as fallback but keep looking
+        if (!foundCamera) {
+          // Keep this stream as fallback, but try more
+          // Actually stop it and continue — we want the torch one
+          videoStream.getTracks().forEach(t => t.stop());
+          videoStream = null;
+          cameraTrack = null;
+          continue;
+        }
+
+      } catch (e) {
+        // Permission denied or camera error — skip this one
+        continue;
       }
     }
 
-    if (!otherBackId) {
-      // No other back camera found — use what we have
-      localStorage.setItem(PREFERRED_CAMERA_KEY, currentDeviceId);
-      await finishCameraSetup();
-      return true;
+    // If we didn't find a torch camera, just use facingMode as last resort
+    if (!foundCamera || !videoStream) {
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
+        });
+        cameraTrack = videoStream.getVideoTracks()[0];
+        currentDeviceId = cameraTrack.getSettings().deviceId;
+      } catch (e) {
+        handleCameraError(e);
+        return false;
+      }
     }
 
-    // Stop current stream and open the other camera (Prompt 2)
-    videoStream.getTracks().forEach(t => t.stop());
-    videoStream = null;
-    cameraTrack = null;
-
-    await new Promise(r => setTimeout(r, 200));
-
-    videoStream = await navigator.mediaDevices.getUserMedia({
-      video: { deviceId: { exact: otherBackId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false
-    });
-
-    cameraTrack = videoStream.getVideoTracks()[0];
-    currentDeviceId = otherBackId;
-
-    // Save this one regardless — it's our best bet
-    localStorage.setItem(PREFERRED_CAMERA_KEY, currentDeviceId);
     await finishCameraSetup();
     return true;
 
@@ -231,9 +225,6 @@ async function openCamera() {
   }
 }
 
-/**
- * Common setup after camera stream is acquired.
- */
 async function finishCameraSetup() {
   await applyContinuousAutofocus();
 
@@ -254,35 +245,20 @@ async function finishCameraSetup() {
   startScanning();
 }
 
-/**
- * Enumerate back cameras WITHOUT opening any streams.
- * Just reads device list for the cycle button.
- */
 async function enumerateBackCamerasQuietly() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoCams = devices.filter(d => d.kind === 'videoinput');
-
     backCameraIds = [];
     videoCams.forEach(cam => {
       const label = (cam.label || '').toLowerCase();
-      const isFront = label.includes('front') || label.includes('user') || label.includes('selfie') || label.includes('facetime');
-      if (!isFront) {
-        backCameraIds.push(cam.deviceId);
-      }
+      const isFront = label.includes('front') || label.includes('user') ||
+                       label.includes('selfie') || label.includes('facetime');
+      if (!isFront) backCameraIds.push(cam.deviceId);
     });
-
-    // Find current camera's index
     currentIndexAmongBack = backCameraIds.indexOf(currentDeviceId);
     if (currentIndexAmongBack < 0) currentIndexAmongBack = 0;
-
-    // Show/hide cycle button based on whether there are multiple back cameras
-    if (backCameraIds.length > 1) {
-      switchCameraBtn.style.display = 'flex';
-    } else {
-      switchCameraBtn.style.display = 'none';
-    }
-
+    switchCameraBtn.style.display = backCameraIds.length > 1 ? 'flex' : 'none';
     updateCameraInfo();
   } catch (e) {}
 }
@@ -346,60 +322,24 @@ function stopCamera() {
   imageCapture = null;
 }
 
-/**
- * Cycle to next back camera.
- * This WILL trigger 1 permission prompt in Telegram WebView.
- * But it saves the preference, so next session opens correctly with 1 prompt.
- */
 async function cycleCamera() {
   if (backCameraIds.length <= 1) return;
-
   stopScanning();
   stopCamera();
-
   currentIndexAmongBack = (currentIndexAmongBack + 1) % backCameraIds.length;
   const nextId = backCameraIds[currentIndexAmongBack];
-
-  // Save immediately so next session uses this
-  localStorage.setItem(PREFERRED_CAMERA_KEY, nextId);
-
   showState('loading');
-
   try {
     videoElement = document.getElementById('videoElement');
-
     videoStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        deviceId: { exact: nextId },
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      },
+      video: { deviceId: { exact: nextId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
-
     cameraTrack = videoStream.getVideoTracks()[0];
     currentDeviceId = nextId;
-
-    await applyContinuousAutofocus();
-
-    try {
-      if ('ImageCapture' in window) imageCapture = new ImageCapture(cameraTrack);
-    } catch (e) { imageCapture = null; }
-
-    videoElement.srcObject = videoStream;
-    await new Promise((resolve, reject) => {
-      videoElement.onloadedmetadata = () => videoElement.play().then(resolve).catch(reject);
-      videoElement.onerror = reject;
-    });
-
-    updateCameraInfo();
-    checkTorchSupport();
-    showState('scanner');
-    startScanning();
-
+    await finishCameraSetup();
   } catch (e) {
-    // If switch failed, reopen previous
-    showError('Kamerani almashtirib bo\'lmadi. Qaytadan urinib ko\'ring.');
+    showError('Kamerani almashtirib bo\'lmadi.');
   }
 }
 
@@ -456,35 +396,28 @@ function resetPending() {
 
 function processDetection(code, format) {
   const now = Date.now();
-
   if (code !== pendingCode) {
     pendingCode = code; pendingFormat = format; pendingCount = 1; pendingLastSeen = now;
     return false;
   }
-
   if (now - pendingLastSeen > STABLE_TIMEOUT) {
-    pendingCount = 1; pendingLastSeen = now;
-    return false;
+    pendingCount = 1; pendingLastSeen = now; return false;
   }
-
   pendingCount++; pendingLastSeen = now; pendingFormat = format;
   return pendingCount >= STABLE_COUNT_NEEDED;
 }
 
 async function scanFrame() {
   if (!isScanning || !videoElement || videoElement.readyState !== 4) return;
-
   try {
     let barcodes = [];
     if (barcodeDetector) barcodes = await barcodeDetector.detect(videoElement);
-
     if (barcodes.length === 0 && imageCapture) {
       try {
         const frame = await imageCapture.grabFrame();
         if (frame && barcodeDetector) { barcodes = await barcodeDetector.detect(frame); frame.close(); }
       } catch (e) {}
     }
-
     if (barcodes.length > 0) {
       const b = barcodes[0];
       const code = b.rawValue || b.data;
