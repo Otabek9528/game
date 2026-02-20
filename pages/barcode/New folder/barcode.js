@@ -257,9 +257,6 @@ async function detectFacingByStream() {
 /**
  * Try to find the best back camera - the one with autofocus capability.
  * Tests each back camera and picks the one that supports continuous autofocus.
- * 
- * ALWAYS tests all cameras on every launch — we never skip based on saved preference alone.
- * Saved preference is only used as a tiebreaker when scores are equal.
  */
 async function findBestBackCamera() {
   if (backCameras.length <= 1) {
@@ -267,13 +264,20 @@ async function findBestBackCamera() {
     return backCameras.length === 1 ? 0 : -1;
   }
   
+  // Check if user has a saved preference
   const savedId = localStorage.getItem(PREFERRED_CAMERA_KEY);
+  if (savedId) {
+    const savedIndex = backCameras.findIndex(c => c.deviceId === savedId);
+    if (savedIndex !== -1) {
+      console.log(`📷 Using saved preferred camera: index ${savedIndex}`);
+      return savedIndex;
+    }
+  }
   
   console.log(`📷 Testing ${backCameras.length} back cameras to find best autofocus...`);
   
   let bestIndex = 0;
   let bestScore = -1;
-  const scores = [];
   
   for (let i = 0; i < backCameras.length; i++) {
     const cam = backCameras[i];
@@ -291,48 +295,43 @@ async function findBestBackCamera() {
       
       let score = 0;
       
-      // === FOCUS (most important for barcode scanning) ===
+      // Score based on focus capabilities
       if (capabilities.focusMode) {
         const modes = capabilities.focusMode;
         console.log(`  Focus modes: [${modes.join(', ')}]`);
-        if (modes.includes('continuous')) score += 100;  // This is what we need most
-        if (modes.includes('single-shot')) score += 50;
+        
+        if (modes.includes('continuous')) score += 50;
+        if (modes.includes('single-shot')) score += 30;
         if (modes.includes('manual')) score += 10;
       }
       
-      // focusDistance available = real autofocus hardware
-      if (capabilities.focusDistance) {
-        score += 60;
-        console.log(`  Focus distance: ${capabilities.focusDistance.min}-${capabilities.focusDistance.max}`);
+      // Score based on resolution (higher max = likely main camera, not ultrawide)
+      if (capabilities.width && capabilities.width.max) {
+        score += Math.min(capabilities.width.max / 100, 50);
+        console.log(`  Max width: ${capabilities.width.max}`);
       }
       
-      // === TORCH (very strong main-camera signal) ===
-      if (capabilities.torch) {
-        score += 80;
-        console.log(`  Torch: supported`);
-      }
-      
-      // === ZOOM (main camera usually supports optical/digital zoom) ===
-      if (capabilities.zoom && capabilities.zoom.max > 1) {
-        score += 30;
+      // Zoom support (main camera usually supports zoom)
+      if (capabilities.zoom) {
+        score += 20;
         console.log(`  Zoom: ${capabilities.zoom.min}-${capabilities.zoom.max}`);
       }
       
-      // === RESOLUTION (higher max = likely main sensor, not ultrawide) ===
-      if (capabilities.width && capabilities.width.max) {
-        score += Math.min(Math.floor(capabilities.width.max / 100), 30);
-        console.log(`  Max resolution: ${capabilities.width.max}x${capabilities.height ? capabilities.height.max : '?'}`);
+      // Torch support is a good sign (usually main camera)
+      if (capabilities.torch) {
+        score += 15;
+        console.log(`  Torch: supported`);
       }
       
-      // Tiebreaker: if user previously chose this one manually, slight bonus
-      if (savedId && cam.deviceId === savedId) {
-        score += 5;
-        console.log(`  User preference bonus: +5`);
+      // focusDistance available = autofocus hardware
+      if (capabilities.focusDistance) {
+        score += 25;
+        console.log(`  Focus distance: ${capabilities.focusDistance.min}-${capabilities.focusDistance.max}`);
       }
       
-      console.log(`  ✅ Total score: ${score}`);
-      scores.push({ index: i, score, label: cam.label });
+      console.log(`  Total score: ${score}`);
       
+      // Stop test stream
       testStream.getTracks().forEach(t => t.stop());
       
       if (score > bestScore) {
@@ -344,18 +343,12 @@ async function findBestBackCamera() {
       
     } catch (e) {
       console.log(`  ❌ Failed to test: ${e.message}`);
-      scores.push({ index: i, score: 0, label: cam.label, error: true });
     }
   }
   
-  // Log summary
-  console.log('📷 Camera scores summary:');
-  scores.forEach(s => {
-    const winner = s.index === bestIndex ? ' ← SELECTED' : '';
-    console.log(`  [${s.index}] ${s.label || 'Camera'}: ${s.score} pts${winner}`);
-  });
+  console.log(`📷 Best back camera: index ${bestIndex} (score: ${bestScore})`);
   
-  // Save the winner
+  // Save preference
   if (backCameras[bestIndex]) {
     localStorage.setItem(PREFERRED_CAMERA_KEY, backCameras[bestIndex].deviceId);
   }
@@ -1037,14 +1030,6 @@ window.addEventListener('beforeunload', () => {
 
 async function initializeApp() {
   console.log('🚀 Barcode Scanner v7 - Camera Selection & Autofocus');
-  
-  // Clear stale preferences from older versions
-  const version = localStorage.getItem('barcode_scanner_version');
-  if (version !== 'v7') {
-    localStorage.removeItem(PREFERRED_CAMERA_KEY);
-    localStorage.setItem('barcode_scanner_version', 'v7');
-    console.log('🧹 Cleared stale camera preferences from older version');
-  }
   
   showState('loading');
   loadHistory();
