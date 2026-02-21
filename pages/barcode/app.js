@@ -23,7 +23,10 @@
   // --- API base URL (change to your server's address) ---
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:5001'
-    : 'https://vegukin-api.duckdns.org'  // Your production server
+    : 'https://vegukin-api.duckdns.org/';  // Your production server
+
+  // Expose for ui.js (local image URL resolution)
+  window._API_BASE = API_BASE;
 
   // --- Current barcode state ---
   let currentBarcode = null;

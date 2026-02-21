@@ -96,7 +96,11 @@ window.UI = (() => {
     // Image
     const imgWrap = document.getElementById('modalImgWrap');
     if (data.image) {
-      document.getElementById('modalImg').src = data.image;
+      let modalImgSrc = data.image;
+      if (modalImgSrc && modalImgSrc.startsWith('/api/')) {
+        modalImgSrc = (window._API_BASE || '') + modalImgSrc;
+      }
+      document.getElementById('modalImg').src = modalImgSrc;
       imgWrap.style.display = 'block';
     } else {
       imgWrap.style.display = 'none';
@@ -196,20 +200,29 @@ window.UI = (() => {
     const e = els();
     e.resultSection.style.display = 'none';
     e.notFoundSection.style.display = 'none';
+    // Re-show viewfinder and status bar
+    e.viewfinderWrap.style.display = '';
+    document.querySelector('.status-bar').style.display = '';
   }
 
   function showNotFound(barcode) {
     const e = els();
     e.resultSection.style.display = 'none';
+    // Hide viewfinder — result replaces camera
+    e.viewfinderWrap.style.display = 'none';
+    document.querySelector('.status-bar').style.display = 'none';
+
     e.notFoundBarcode.textContent = barcode;
     e.notFoundSection.style.display = 'block';
     e.notFoundSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // --- Product result (Milestone 3 will flesh this out) ---
   function showProductResult(data) {
     const e = els();
     e.notFoundSection.style.display = 'none';
+    // Hide viewfinder — result replaces camera
+    e.viewfinderWrap.style.display = 'none';
+    document.querySelector('.status-bar').style.display = 'none';
 
     // Verdict
     e.verdictBanner.className = `verdict verdict--${data.verdict}`;
@@ -223,9 +236,14 @@ window.UI = (() => {
     e.verdictTitle.textContent = v.title;
     e.verdictDesc.textContent = v.desc;
 
-    // Image
+    // Image — handle local paths served via API
     if (data.image) {
-      e.productImage.src = data.image;
+      let imgSrc = data.image;
+      if (imgSrc.startsWith('/api/')) {
+        // Local photo served via Flask — need full URL
+        imgSrc = (window._API_BASE || '') + imgSrc;
+      }
+      e.productImage.src = imgSrc;
       e.productImageWrap.style.display = 'block';
     } else {
       e.productImageWrap.style.display = 'none';
