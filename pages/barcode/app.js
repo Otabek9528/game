@@ -23,7 +23,7 @@
   // --- API base URL (change to your server's address) ---
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:5001'
-    : 'https://vegukin-api.duckdns.org/';  // Your production server
+    : 'https://vegukin-api.duckdns.org';  // Your production server
 
   // Expose for ui.js (local image URL resolution)
   window._API_BASE = API_BASE;
@@ -200,14 +200,17 @@
       document.getElementById('ingredientsPanel').style.display = 'none';
     });
 
-    // --- Add product button (Milestone 5) ---
+    // --- Add product button ---
     document.getElementById('addProductBtn').addEventListener('click', () => {
-      // Will be implemented in Milestone 5
-      if (tg.showAlert) tg.showAlert('Bu funksiya tez orada qo\'shiladi!');
+      const bc = currentBarcode || document.getElementById('notFoundBarcode').textContent;
+      if (bc) AddProduct.start(bc);
     });
 
-    // --- Wizard done button (Milestone 5) ---
+    // --- Wizard done button ---
     document.getElementById('wizardDoneBtn').addEventListener('click', () => scanAgain());
+
+    // --- Init Add Product wizard ---
+    AddProduct.init();
 
     // --- Modal close ---
     document.getElementById('modalCloseBtn').addEventListener('click', () => UI.hideProductModal());
