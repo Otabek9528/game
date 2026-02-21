@@ -76,14 +76,18 @@ window.Camera = (() => {
     };
   }
 
-  // --- Open camera for capture (simpler, reuses existing or opens new) ---
+  // --- Open camera for capture (reuses known device to avoid re-prompting) ---
   async function openForCapture(videoElement) {
     if (videoStream) stop();
 
-    videoStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    const constraints = {
+      video: currentDeviceId
+        ? { deviceId: { exact: currentDeviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+        : { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
-    });
+    };
+
+    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
     cameraTrack = videoStream.getVideoTracks()[0];
     await _applyAutofocus();
     _setupImageCapture();

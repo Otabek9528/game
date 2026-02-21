@@ -179,6 +179,7 @@ body {
   -webkit-overflow-scrolling:touch; padding:2px 2px 4px; scrollbar-width:none;
 }
 .discover__scroll::-webkit-scrollbar { display:none; }
+.discover__loading { font-size:0.78rem; color:var(--gray-400); margin:0; padding:20px 0; text-align:center; width:100%; }
 .mini-card {
   flex:0 0 130px; scroll-snap-align:start; background:var(--white);
   border-radius:var(--r-sm); border:1px solid var(--gray-150);

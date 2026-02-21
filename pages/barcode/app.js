@@ -23,7 +23,7 @@
   // --- API base URL (change to your server's address) ---
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:5001'
-    : 'https://vegukin-api.duckdns.org';  // Your production server
+    : 'https://vegukin-api.duckdns.org';   // Your production server
 
   // Expose for ui.js (local image URL resolution)
   window._API_BASE = API_BASE;
@@ -102,7 +102,8 @@
     UI.hideAllResults();
     UI.showScanBeam(true);
     UI.showDiscover(true);
-    startScanning();
+    // Re-open camera and switch to scanner state
+    openCameraAndScan();
   }
 
   async function cycleCamera() {
@@ -152,11 +153,62 @@
   }
 
   // ============================================
+  // DISCOVER — fetch random products from API
+  // ============================================
+
+  async function loadDiscover() {
+    try {
+      const resp = await fetch(`${API_BASE}/api/scanner/discover?count=10`);
+      const data = await resp.json();
+
+      const tagMap = {
+        halol: { cls: 'halol', text: '☪️ Halol' },
+        shubhali: { cls: 'shubhali', text: '⚠️ Shubhali' },
+        harom: { cls: 'harom', text: '⛔️ Harom' }
+      };
+
+      ['halol', 'shubhali', 'harom'].forEach(verdict => {
+        const container = document.getElementById('discover' + verdict.charAt(0).toUpperCase() + verdict.slice(1));
+        const products = data[verdict] || [];
+        if (products.length === 0) {
+          container.innerHTML = '<p class="discover__loading">—</p>';
+          return;
+        }
+        container.innerHTML = '';
+        products.forEach(p => {
+          // Resolve image URL
+          let imgSrc = p.image || '';
+          if (imgSrc && imgSrc.startsWith('/api/')) imgSrc = API_BASE + imgSrc;
+
+          const tag = tagMap[verdict];
+          const card = document.createElement('div');
+          card.className = 'mini-card';
+          card.setAttribute('data-product', JSON.stringify(p));
+          card.innerHTML = `<img class="mini-card__img" src="${imgSrc}" alt="" loading="lazy"><div class="mini-card__body"><p class="mini-card__name">${_escHtml(p.name)}</p><span class="mini-card__tag mini-card__tag--${tag.cls}">${tag.text}</span></div>`;
+          card.addEventListener('click', () => UI.showProductModal(p));
+          container.appendChild(card);
+        });
+      });
+    } catch (e) {
+      console.error('Discover fetch failed:', e);
+    }
+  }
+
+  function _escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // ============================================
   // EVENT LISTENERS
   // ============================================
 
   document.addEventListener('DOMContentLoaded', async () => {
     await Scanner.init();
+
+    // Load discover products immediately (no camera needed)
+    loadDiscover();
 
     // Check permission
     let perm = 'prompt';
@@ -215,14 +267,6 @@
     // --- Modal close ---
     document.getElementById('modalCloseBtn').addEventListener('click', () => UI.hideProductModal());
     document.getElementById('modalBackdrop').addEventListener('click', () => UI.hideProductModal());
-
-    // --- Mini-card clicks (discover section) ---
-    document.querySelectorAll('.mini-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const data = JSON.parse(card.getAttribute('data-product') || '{}');
-        if (data.name) UI.showProductModal(data);
-      });
-    });
 
     // --- Visibility change ---
     document.addEventListener('visibilitychange', () => {
