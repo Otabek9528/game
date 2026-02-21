@@ -68,11 +68,25 @@
     });
   }
 
-  function lookupProduct(code, format) {
-    // Milestone 3 will replace this with real API call
-    // For now, show "not found" to demonstrate the flow
+  async function lookupProduct(code, format) {
     const formatName = Scanner.getFormatName(format);
-    UI.showNotFound(code);
+    UI.updateStatus('Tekshirilmoqda...', 'scanning');
+
+    try {
+      const resp = await fetch(`/api/scanner/product/${encodeURIComponent(code)}`);
+      const data = await resp.json();
+
+      if (data.found) {
+        data.format = formatName;
+        UI.showProductResult(data);
+      } else {
+        UI.showNotFound(code);
+      }
+    } catch (err) {
+      // Network error — show not found with the barcode
+      console.error('API lookup failed:', err);
+      UI.showNotFound(code);
+    }
   }
 
   function scanAgain() {
