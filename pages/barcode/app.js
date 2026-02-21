@@ -40,7 +40,7 @@
       UI.showTorch(info.hasTorch);
       UI.showSwitchBtn(info.hasMultipleCameras);
       UI.showState('scanner');
-      UI.showDiscover(true);
+      // Discover stays visible (it's outside scannerDisplay)
 
       startScanning();
     } catch (error) {

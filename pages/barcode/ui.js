@@ -46,6 +46,7 @@ window.UI = (() => {
       ingredientsPanel: document.getElementById('ingredientsPanel'),
       ingredientsText:  document.getElementById('ingredientsText'),
       discoverSection:  document.getElementById('discoverSection'),
+      tipBar:           document.getElementById('tipBar'),
       // Wizard (referenced from add-product.js)
       addProductWizard: document.getElementById('addProductWizard')
     };
@@ -64,7 +65,11 @@ window.UI = (() => {
       case 'permission': e.permissionState.style.display = 'flex'; break;
       case 'error':      e.errorState.style.display = 'flex'; break;
       case 'scanner':    e.scannerDisplay.style.display = 'block'; break;
-      case 'wizard':     e.addProductWizard.style.display = 'block'; break;
+      case 'wizard':
+        e.addProductWizard.style.display = 'block';
+        // Hide discover during wizard
+        showDiscover(false);
+        break;
     }
   }
 
@@ -209,6 +214,7 @@ window.UI = (() => {
   // --- Discover section ---
   function showDiscover(visible) {
     els().discoverSection.style.display = visible ? 'block' : 'none';
+    els().tipBar.style.display = visible ? 'block' : 'none';
   }
 
   // --- Clipboard ---
