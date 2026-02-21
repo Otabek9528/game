@@ -187,6 +187,18 @@
     // --- Wizard done button (Milestone 5) ---
     document.getElementById('wizardDoneBtn').addEventListener('click', () => scanAgain());
 
+    // --- Modal close ---
+    document.getElementById('modalCloseBtn').addEventListener('click', () => UI.hideProductModal());
+    document.getElementById('modalBackdrop').addEventListener('click', () => UI.hideProductModal());
+
+    // --- Mini-card clicks (discover section) ---
+    document.querySelectorAll('.mini-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const data = JSON.parse(card.getAttribute('data-product') || '{}');
+        if (data.name) UI.showProductModal(data);
+      });
+    });
+
     // --- Visibility change ---
     document.addEventListener('visibilitychange', () => {
       const scannerVisible = document.getElementById('scannerDisplay').style.display === 'block';

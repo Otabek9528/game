@@ -23,28 +23,25 @@
   <div class="page" id="page">
 
     <!-- ========================================
-         STATE: PERMISSION
+         STATE: PERMISSION (compact bar)
          ======================================== -->
-    <div class="state-view" id="permissionState" style="display:none;">
-      <div class="state-visual">
-        <div class="state-emoji bounce">📱</div>
+    <div class="notice-bar notice-bar--info" id="permissionState" style="display:none;">
+      <span class="notice-bar__emoji">📱</span>
+      <div class="notice-bar__content">
+        <p class="notice-bar__text">Shtrix kodni o'qish uchun kameraga ruxsat bering</p>
       </div>
-      <h2 class="state-title">Kameraga ruxsat bering</h2>
-      <p class="state-desc">Shtrix kodni o'qish uchun qurilmangiz kamerasiga ruxsat kerak</p>
-      <button class="btn btn--primary" id="requestPermissionBtn">Ruxsat berish</button>
-      <p class="state-hint">Brauzer so'roviga <strong>"Allow"</strong> tugmasini bosing</p>
+      <button class="btn btn--primary btn--sm" id="requestPermissionBtn">Ruxsat berish</button>
     </div>
 
     <!-- ========================================
-         STATE: ERROR
+         STATE: ERROR (compact bar)
          ======================================== -->
-    <div class="state-view" id="errorState" style="display:none;">
-      <div class="state-visual">
-        <div class="state-emoji">⚠️</div>
+    <div class="notice-bar notice-bar--error" id="errorState" style="display:none;">
+      <span class="notice-bar__emoji">⚠️</span>
+      <div class="notice-bar__content">
+        <p class="notice-bar__text" id="errorMessage">Kameraga ulanib bo'lmadi.</p>
       </div>
-      <h2 class="state-title state-title--error">Xatolik yuz berdi</h2>
-      <p class="state-desc" id="errorMessage">Kameraga ulanib bo'lmadi.</p>
-      <button class="btn btn--secondary" id="retryBtn">🔄 Qaytadan urinish</button>
+      <button class="btn btn--secondary btn--sm" id="retryBtn">🔄 Qaytadan</button>
     </div>
 
     <!-- ========================================
@@ -57,9 +54,9 @@
       <div class="discover__group">
         <div class="discover__label discover__label--halol">☪️ Halol</div>
         <div class="discover__scroll" id="discoverHalol">
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F5895a5f0-4f48-42dd-83d0-ddedfaada078%2F5895a5f0-4f48-42dd-83d0-ddedfaada078_front_angle_250_w.jpg?alt=media&token=5ce00f74-e90f-4c84-87ab-db4190009852-707019891" alt=""><div class="mini-card__body"><p class="mini-card__name">비타쿨 자두</p><span class="mini-card__tag mini-card__tag--halol">☪️ Halol</span></div></div>
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F7f6198b8-87f8-45b3-94a1-0e19d1b142d1%2F7f6198b8-87f8-45b3-94a1-0e19d1b142d1_front_angle_250_w.jpg?alt=media&token=bfac5c43-7fc5-4555-a71d-5adeae48e6812051707981" alt=""><div class="mini-card__body"><p class="mini-card__name">유우게</p><span class="mini-card__tag mini-card__tag--halol">☪️ Halol</span></div></div>
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2Fc0518c8e-7e31-46e0-b008-b28216049fec%2Fc0518c8e-7e31-46e0-b008-b28216049fec_front_angle_250_w.jpg?alt=media&token=81eac76d-deae-4b50-8c82-0d4f3984b2d2171898605" alt=""><div class="mini-card__body"><p class="mini-card__name">캔디미 레인보우러브</p><span class="mini-card__tag mini-card__tag--halol">☪️ Halol</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;비타쿨 자두&quot;, &quot;barcode&quot;: &quot;8801104300681&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F5895a5f0-4f48-42dd-83d0-ddedfaada078%2F5895a5f0-4f48-42dd-83d0-ddedfaada078_front_angle_250_w.jpg?alt=media&amp;token=5ce00f74-e90f-4c84-87ab-db4190009852-707019891&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: false, &quot;seafood&quot;: false, &quot;sameFactory&quot;: false, &quot;ingredients&quot;: &quot;정제수, 액상과당, 백설탕, 탈지분유(국산), 셀룰로오스검, 구연산, 구연산삼나트륨, 자두농축과즙(자두과즙으로1%)(수입산), 합성착향료 ( 자두향 ), 아스파탐 ( 합성감미료 ), 비타민 C 0.014%, 파프리카추출색소, 심황색소, 유산균주&quot;, &quot;verdict&quot;: &quot;halol&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F5895a5f0-4f48-42dd-83d0-ddedfaada078%2F5895a5f0-4f48-42dd-83d0-ddedfaada078_front_angle_250_w.jpg?alt=media&token=5ce00f74-e90f-4c84-87ab-db4190009852-707019891" alt=""><div class="mini-card__body"><p class="mini-card__name">비타쿨 자두</p><span class="mini-card__tag mini-card__tag--halol">☪️ Halol</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;유우게&quot;, &quot;barcode&quot;: &quot;4902388024004&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F7f6198b8-87f8-45b3-94a1-0e19d1b142d1%2F7f6198b8-87f8-45b3-94a1-0e19d1b142d1_front_angle_250_w.jpg?alt=media&amp;token=bfac5c43-7fc5-4555-a71d-5adeae48e6812051707981&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: false, &quot;seafood&quot;: false, &quot;sameFactory&quot;: false, &quot;ingredients&quot;: &quot;쌀장 ( 쌀 , 된장 ( 대두 , 식염 )),건조동결두부 ( 대두 , 로커스트콩검 , 카라기난 , 염화마그네슘 ),가다랭이분말,미역,L-글루타민산나트륨 ( 향미증진제 ),대파,5&#x27;-리보뉴클레오티드이나트륨&quot;, &quot;verdict&quot;: &quot;halol&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F7f6198b8-87f8-45b3-94a1-0e19d1b142d1%2F7f6198b8-87f8-45b3-94a1-0e19d1b142d1_front_angle_250_w.jpg?alt=media&token=bfac5c43-7fc5-4555-a71d-5adeae48e6812051707981" alt=""><div class="mini-card__body"><p class="mini-card__name">유우게</p><span class="mini-card__tag mini-card__tag--halol">☪️ Halol</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;캔디미 레인보우러브&quot;, &quot;barcode&quot;: &quot;8809549470167&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2Fc0518c8e-7e31-46e0-b008-b28216049fec%2Fc0518c8e-7e31-46e0-b008-b28216049fec_front_angle_250_w.jpg?alt=media&amp;token=81eac76d-deae-4b50-8c82-0d4f3984b2d2171898605&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: false, &quot;seafood&quot;: false, &quot;sameFactory&quot;: false, &quot;ingredients&quot;: &quot;백설탕,물엿 ( 수입산 ),구연산,합성착향료 ( 복숭아오일 , 레몬향 , 딸기향 , 망고향 , 포도향 , 블루베리향 , 라임향 ),합성착색료 ( 식용색소 : 청색제1호 , 적색제3호 , 적색제40호 , 황색제4호 , 황색제5호 )&quot;, &quot;verdict&quot;: &quot;halol&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2Fc0518c8e-7e31-46e0-b008-b28216049fec%2Fc0518c8e-7e31-46e0-b008-b28216049fec_front_angle_250_w.jpg?alt=media&token=81eac76d-deae-4b50-8c82-0d4f3984b2d2171898605" alt=""><div class="mini-card__body"><p class="mini-card__name">캔디미 레인보우러브</p><span class="mini-card__tag mini-card__tag--halol">☪️ Halol</span></div></div>
         </div>
       </div>
 
@@ -67,9 +64,9 @@
       <div class="discover__group">
         <div class="discover__label discover__label--shubhali">⚠️ Shubhali</div>
         <div class="discover__scroll" id="discoverShubhali">
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F0cafc70e-7a4c-44b9-9150-5cd750af2e9f%2F0cafc70e-7a4c-44b9-9150-5cd750af2e9f_front_angle_250_w.jpg?alt=media&token=c42b1088-7e70-438e-922d-f965e6609ee9357689549" alt=""><div class="mini-card__body"><p class="mini-card__name">초이스엘 팝콘칩</p><span class="mini-card__tag mini-card__tag--shubhali">⚠️ Shubhali</span></div></div>
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F5a293b2f-49a5-4bc4-a80c-483a1bad0c8a%2F5a293b2f-49a5-4bc4-a80c-483a1bad0c8a_front_angle_250_w.jpg?alt=media&token=30f88137-f082-4295-b4f3-089ddd1a4696-1796773587" alt=""><div class="mini-card__body"><p class="mini-card__name">동원라면참치 치즈</p><span class="mini-card__tag mini-card__tag--shubhali">⚠️ Shubhali</span></div></div>
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F410d5cf5-7418-4d6c-8829-0961fe406ceb%2F410d5cf5-7418-4d6c-8829-0961fe406ceb_front_angle_250_w.jpg?alt=media&token=6ee0960c-2ce8-4588-9b60-476d39209721-902056371" alt=""><div class="mini-card__body"><p class="mini-card__name">동원 연어</p><span class="mini-card__tag mini-card__tag--shubhali">⚠️ Shubhali</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;초이스엘 팝콘칩 바질체다치즈&quot;, &quot;barcode&quot;: &quot;8809027554600&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F0cafc70e-7a4c-44b9-9150-5cd750af2e9f%2F0cafc70e-7a4c-44b9-9150-5cd750af2e9f_front_angle_250_w.jpg?alt=media&amp;token=c42b1088-7e70-438e-922d-f965e6609ee9357689549&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: false, &quot;seafood&quot;: false, &quot;sameFactory&quot;: true, &quot;ingredients&quot;: &quot;옥수수 ( 호주산 ) 69.5%, 식물성유지 { 고올레산해바라기유 ( 수입산 ) 50% , 팜올레인유 ( 말레이시아산 ) 49.9% , d-토코페롤 }, 화이트치즈맛씨즈닝-제이 11.3% 체다치즈시즈닝 89.8% { 체다치즈파우다 65% ( 체다치즈 100% / 미국산 )}, 버터파우다와이큐 , 체다치즈파우다 4% ( 체다치즈 78% / 미국산 ), 이산화규소 , 제삼인산칼슘 , 천일염, 바질홀 ( 네덜란드산 ) 0.06%, 파슬리후레이크 ( 네덜란드산 )&quot;, &quot;verdict&quot;: &quot;shubhali&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F0cafc70e-7a4c-44b9-9150-5cd750af2e9f%2F0cafc70e-7a4c-44b9-9150-5cd750af2e9f_front_angle_250_w.jpg?alt=media&token=c42b1088-7e70-438e-922d-f965e6609ee9357689549" alt=""><div class="mini-card__body"><p class="mini-card__name">초이스엘 팝콘칩</p><span class="mini-card__tag mini-card__tag--shubhali">⚠️ Shubhali</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;라면에 넣어먹는 동원라면참치 고소한 치즈참치&quot;, &quot;barcode&quot;: &quot;8801047122623&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F5a293b2f-49a5-4bc4-a80c-483a1bad0c8a%2F5a293b2f-49a5-4bc4-a80c-483a1bad0c8a_front_angle_250_w.jpg?alt=media&amp;token=30f88137-f082-4295-b4f3-089ddd1a4696-1796773587&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: false, &quot;seafood&quot;: false, &quot;sameFactory&quot;: true, &quot;ingredients&quot;: &quot;정제수,가다랑어27%(원양산),DW하이체다치즈19%[자연치즈61.5%{체다치즈94.3%(수입산),고다치즈5.7%(네덜란드산)},야자경화유(인도네시아산,필리핀산), 변성전분 , 렌넷카제인 , 산도조절제 ],카놀라유(수입산),VB75,치즈분말1.5%{화이트체다씨즈닝506440%(미국산),체다치즈파우더23%(호주산)},변성전분,치즈향0.1%,구아검&quot;, &quot;verdict&quot;: &quot;shubhali&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F5a293b2f-49a5-4bc4-a80c-483a1bad0c8a%2F5a293b2f-49a5-4bc4-a80c-483a1bad0c8a_front_angle_250_w.jpg?alt=media&token=30f88137-f082-4295-b4f3-089ddd1a4696-1796773587" alt=""><div class="mini-card__body"><p class="mini-card__name">동원라면참치 치즈</p><span class="mini-card__tag mini-card__tag--shubhali">⚠️ Shubhali</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;동원 연어&quot;, &quot;barcode&quot;: &quot;8801047141617&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F410d5cf5-7418-4d6c-8829-0961fe406ceb%2F410d5cf5-7418-4d6c-8829-0961fe406ceb_front_angle_250_w.jpg?alt=media&amp;token=6ee0960c-2ce8-4588-9b60-476d39209721-902056371&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: false, &quot;seafood&quot;: false, &quot;sameFactory&quot;: true, &quot;ingredients&quot;: &quot;연어66.7%(칠레산),정제수,대두유,정제염,훈연향,파프리카추출색소,산도조절제&quot;, &quot;verdict&quot;: &quot;shubhali&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F410d5cf5-7418-4d6c-8829-0961fe406ceb%2F410d5cf5-7418-4d6c-8829-0961fe406ceb_front_angle_250_w.jpg?alt=media&token=6ee0960c-2ce8-4588-9b60-476d39209721-902056371" alt=""><div class="mini-card__body"><p class="mini-card__name">동원 연어</p><span class="mini-card__tag mini-card__tag--shubhali">⚠️ Shubhali</span></div></div>
         </div>
       </div>
 
@@ -77,9 +74,9 @@
       <div class="discover__group">
         <div class="discover__label discover__label--harom">⛔️ Harom</div>
         <div class="discover__scroll" id="discoverHarom">
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F70aab3ef-a82b-4fd4-bff1-4373ca20cb0f%2F70aab3ef-a82b-4fd4-bff1-4373ca20cb0f_front_angle_250_w.jpg?alt=media&token=70c20711-94d0-4974-be38-1fe2e15593e7-1614374259" alt=""><div class="mini-card__body"><p class="mini-card__name">다짐 새우살</p><span class="mini-card__tag mini-card__tag--harom">⛔️ Harom</span></div></div>
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2Fc11bdcd5-1ee0-4001-af01-2e404c93a2de%2Fc11bdcd5-1ee0-4001-af01-2e404c93a2de_front_angle_250_w.jpg?alt=media&token=f78eba51-891f-4d31-ac4e-4ed25af29b9f-1316782259" alt=""><div class="mini-card__body"><p class="mini-card__name">손예담청송애유과</p><span class="mini-card__tag mini-card__tag--harom">⛔️ Harom</span></div></div>
-          <div class="mini-card"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F4ba9b256-2d2b-430f-b584-686a600a20a1%2F4ba9b256-2d2b-430f-b584-686a600a20a1_front_angle_250_w.jpg?alt=media&token=fd0db47c-f0d8-4c91-920f-ff490a3df669" alt=""><div class="mini-card__body"><p class="mini-card__name">비타민C오징어</p><span class="mini-card__tag mini-card__tag--harom">⛔️ Harom</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;다짐 새우살&quot;, &quot;barcode&quot;: &quot;8809080350546&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F70aab3ef-a82b-4fd4-bff1-4373ca20cb0f%2F70aab3ef-a82b-4fd4-bff1-4373ca20cb0f_front_angle_250_w.jpg?alt=media&amp;token=70c20711-94d0-4974-be38-1fe2e15593e7-1614374259&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: true, &quot;seafood&quot;: true, &quot;sameFactory&quot;: true, &quot;ingredients&quot;: &quot;새우 100%(국산)&quot;, &quot;verdict&quot;: &quot;harom&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F70aab3ef-a82b-4fd4-bff1-4373ca20cb0f%2F70aab3ef-a82b-4fd4-bff1-4373ca20cb0f_front_angle_250_w.jpg?alt=media&token=70c20711-94d0-4974-be38-1fe2e15593e7-1614374259" alt=""><div class="mini-card__body"><p class="mini-card__name">다짐 새우살</p><span class="mini-card__tag mini-card__tag--harom">⛔️ Harom</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;손예담청송애유과&quot;, &quot;barcode&quot;: &quot;8809318519325&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2Fc11bdcd5-1ee0-4001-af01-2e404c93a2de%2Fc11bdcd5-1ee0-4001-af01-2e404c93a2de_front_angle_250_w.jpg?alt=media&amp;token=f78eba51-891f-4d31-ac4e-4ed25af29b9f-1316782259&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: true, &quot;meat&quot;: true, &quot;seafood&quot;: false, &quot;sameFactory&quot;: false, &quot;ingredients&quot;: &quot;찹쌀 68%(국산), 멥쌀 10%(국산), 사과조청 8%(국산), 물엿 8%(옥수수전분 : 러시아, 헝가리, 세르비아 등), 대두유 5% (대두원료 : 아르헨티나, 미국, 베트남 등), 소주 0.5%, 콩 0.5%&quot;, &quot;verdict&quot;: &quot;harom&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2Fc11bdcd5-1ee0-4001-af01-2e404c93a2de%2Fc11bdcd5-1ee0-4001-af01-2e404c93a2de_front_angle_250_w.jpg?alt=media&token=f78eba51-891f-4d31-ac4e-4ed25af29b9f-1316782259" alt=""><div class="mini-card__body"><p class="mini-card__name">손예담청송애유과</p><span class="mini-card__tag mini-card__tag--harom">⛔️ Harom</span></div></div>
+          <div class="mini-card" data-product="{&quot;name&quot;: &quot;비타민C오징어&quot;, &quot;barcode&quot;: &quot;8809237502224&quot;, &quot;image&quot;: &quot;https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F4ba9b256-2d2b-430f-b584-686a600a20a1%2F4ba9b256-2d2b-430f-b584-686a600a20a1_front_angle_250_w.jpg?alt=media&amp;token=fd0db47c-f0d8-4c91-920f-ff490a3df669&quot;, &quot;pork&quot;: false, &quot;alcohol&quot;: false, &quot;meat&quot;: true, &quot;seafood&quot;: true, &quot;sameFactory&quot;: true, &quot;ingredients&quot;: &quot;오징어(페루산)88.5 %, D-소비톨, 설탕, 기타설탕{설탕, 전분(밀)}, 정제소금(국산)0.8 %, L-글루탐산나트륨(향미증진제), 비타민C(영국산)0.07 %, 구연산, 혼합제제(L-글루탐산나트륨, 5&#x27;-리보뉴클레오티드이나트륨), 호박산이나트륨, 효소처리스테비아, 메타인산나트륨, 소브산칼륨(보존료)&quot;, &quot;verdict&quot;: &quot;harom&quot;}"><img class="mini-card__img" src="https://firebasestorage.googleapis.com/v0/b/steady-copilot-206205.appspot.com/o/goods%2F4ba9b256-2d2b-430f-b584-686a600a20a1%2F4ba9b256-2d2b-430f-b584-686a600a20a1_front_angle_250_w.jpg?alt=media&token=fd0db47c-f0d8-4c91-920f-ff490a3df669" alt=""><div class="mini-card__body"><p class="mini-card__name">비타민C오징어</p><span class="mini-card__tag mini-card__tag--harom">⛔️ Harom</span></div></div>
         </div>
       </div>
     </div>
@@ -370,6 +367,47 @@
     </div><!-- /addProductWizard -->
 
   </div><!-- /page -->
+
+  <!-- ========================================
+       PRODUCT DETAIL MODAL (overlay)
+       ======================================== -->
+  <div class="modal-overlay" id="productModal" style="display:none;">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-sheet">
+      <div class="modal-sheet__handle"></div>
+      <button class="modal-sheet__close" id="modalCloseBtn">✕</button>
+
+      <!-- Verdict mini-badge -->
+      <div class="modal-verdict" id="modalVerdict">
+        <span class="modal-verdict__emoji" id="modalVerdictEmoji"></span>
+        <span class="modal-verdict__label" id="modalVerdictLabel"></span>
+      </div>
+
+      <!-- Image -->
+      <div class="modal-img-wrap" id="modalImgWrap" style="display:none;">
+        <img class="modal-img" id="modalImg" src="" alt="" />
+      </div>
+
+      <!-- Info -->
+      <h3 class="modal-name" id="modalName">—</h3>
+      <div class="modal-barcode" id="modalBarcode">—</div>
+
+      <!-- Halal grid compact -->
+      <div class="modal-halal" id="modalHalalGrid"></div>
+
+      <!-- Factory -->
+      <div class="modal-factory" id="modalFactory" style="display:none;">
+        <span id="modalFactoryIcon"></span>
+        <span class="modal-factory__text" id="modalFactoryText"></span>
+      </div>
+
+      <!-- Ingredients -->
+      <div class="modal-ingredients" id="modalIngredients" style="display:none;">
+        <p class="modal-ingredients__label">🧪 Tarkibi:</p>
+        <p class="modal-ingredients__text" id="modalIngredientsText"></p>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== SCRIPTS ===== -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>

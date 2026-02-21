@@ -67,7 +67,6 @@ window.UI = (() => {
       case 'scanner':    e.scannerDisplay.style.display = 'block'; break;
       case 'wizard':
         e.addProductWizard.style.display = 'block';
-        // Hide discover during wizard
         showDiscover(false);
         break;
     }
@@ -76,6 +75,83 @@ window.UI = (() => {
   function showError(msg) {
     els().errorMessage.textContent = msg;
     showState('error');
+  }
+
+  // --- Product Detail Modal ---
+  function showProductModal(data) {
+    const modal = document.getElementById('productModal');
+    const verdictMap = {
+      halol:    { emoji: '☪️', label: 'Halol', cls: 'halol' },
+      harom:    { emoji: '⛔️', label: 'Harom', cls: 'harom' },
+      shubhali: { emoji: '⚠️', label: 'Shubhali', cls: 'shubhali' }
+    };
+    const v = verdictMap[data.verdict] || verdictMap.halol;
+
+    // Verdict badge
+    const badge = document.getElementById('modalVerdict');
+    badge.className = `modal-verdict modal-verdict--${v.cls}`;
+    document.getElementById('modalVerdictEmoji').textContent = v.emoji;
+    document.getElementById('modalVerdictLabel').textContent = v.label;
+
+    // Image
+    const imgWrap = document.getElementById('modalImgWrap');
+    if (data.image) {
+      document.getElementById('modalImg').src = data.image;
+      imgWrap.style.display = 'block';
+    } else {
+      imgWrap.style.display = 'none';
+    }
+
+    // Name & barcode
+    document.getElementById('modalName').textContent = data.name || '—';
+    document.getElementById('modalBarcode').textContent = data.barcode || '—';
+
+    // Halal grid
+    const grid = document.getElementById('modalHalalGrid');
+    const checks = [
+      { icon: '🐖', label: "Cho'chqa", bad: data.pork },
+      { icon: '🍷', label: 'Alkogol', bad: data.alcohol },
+      { icon: '🍗', label: "Go'sht", bad: data.meat },
+      { icon: '🦐', label: 'Dengiz m.', bad: data.seafood }
+    ];
+    grid.innerHTML = '';
+    checks.forEach(c => {
+      const ok = !c.bad;
+      const el = document.createElement('div');
+      el.className = `modal-halal-cell ${ok ? 'modal-halal-cell--ok' : 'modal-halal-cell--bad'}`;
+      el.innerHTML = `<span class="modal-halal-cell__icon">${c.icon}</span>${ok ? "✅ " + c.label + " yo'q" : "❌ " + c.label + " bor"}`;
+      grid.appendChild(el);
+    });
+
+    // Factory
+    const factory = document.getElementById('modalFactory');
+    if (data.sameFactory !== undefined) {
+      factory.className = `modal-factory ${data.sameFactory ? 'modal-factory--warn' : 'modal-factory--ok'}`;
+      document.getElementById('modalFactoryIcon').textContent = data.sameFactory ? '🏭' : '✅';
+      document.getElementById('modalFactoryText').textContent = data.sameFactory
+        ? "Harom mahsulotlar ishlab chiqarilgan uskunalarda tayyorlangan"
+        : "Toza ishlab chiqarish";
+      factory.style.display = 'flex';
+    } else {
+      factory.style.display = 'none';
+    }
+
+    // Ingredients
+    const ingr = document.getElementById('modalIngredients');
+    if (data.ingredients) {
+      document.getElementById('modalIngredientsText').textContent = data.ingredients;
+      ingr.style.display = 'block';
+    } else {
+      ingr.style.display = 'none';
+    }
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function hideProductModal() {
+    document.getElementById('productModal').style.display = 'none';
+    document.body.style.overflow = '';
   }
 
   // --- Status ---
@@ -259,6 +335,7 @@ window.UI = (() => {
     flashFocusIndicator, showScanBeam,
     hideAllResults, showNotFound, showProductResult,
     showDiscover,
+    showProductModal, hideProductModal,
     copyToClipboard, playSuccessSound,
     getVideoElement
   };

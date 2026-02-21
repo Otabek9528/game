@@ -56,22 +56,22 @@ body {
   max-width: 520px; margin: 0 auto; width: 100%; box-sizing: border-box;
 }
 
-/* === STATE VIEWS === */
-.state-view {
-  display: flex; flex-direction: column; align-items: center;
-  text-align: center; padding: 48px 20px 24px; gap: 10px;
+/* === NOTICE BARS (Permission, Error) === */
+.notice-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; margin-top: 10px;
+  border-radius: var(--r-md); border: 1px solid;
 }
-.state-visual {
-  position: relative; width: 88px; height: 88px;
-  display: flex; align-items: center; justify-content: center; margin-bottom: 6px;
+.notice-bar--info {
+  background: var(--green-50); border-color: var(--green-100);
 }
-.state-emoji { font-size: 2.6rem; position: relative; z-index: 2; }
-.bounce { animation: bounce 2.5s ease-in-out infinite; }
-@keyframes bounce { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
-.state-title { font-size: 1.2rem; font-weight: 700; color: var(--green-900); margin: 0; }
-.state-title--error { color: var(--red-600); }
-.state-desc { font-size: 0.92rem; color: var(--gray-500); margin: 0; max-width: 270px; line-height: 1.55; }
-.state-hint { font-size: 0.82rem; color: var(--gray-400); margin: 4px 0 0; }
+.notice-bar--error {
+  background: var(--red-50); border-color: var(--red-100);
+}
+.notice-bar__emoji { font-size: 1.3rem; flex-shrink: 0; }
+.notice-bar__content { flex: 1; min-width: 0; }
+.notice-bar__text { font-size: 0.84rem; font-weight: 500; color: var(--gray-700); margin: 0; line-height: 1.4; }
+.notice-bar .btn { flex-shrink: 0; white-space: nowrap; }
 
 /* === BUTTONS === */
 .btn {
@@ -93,7 +93,7 @@ body {
 /* === VIEWFINDER === */
 .viewfinder {
   border-radius: var(--r-lg); overflow: hidden; background: #0a0a0a;
-  box-shadow: 0 6px 28px rgba(0,0,0,0.12); margin-top: 14px;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.12); margin-top: 10px;
 }
 .viewfinder__screen {
   position: relative; width: 100%; aspect-ratio: 4/3;
@@ -146,7 +146,7 @@ body {
 .ctrl-btn.active { background: var(--green-500); }
 
 /* === STATUS === */
-.status-bar { display:flex; justify-content:center; padding:12px 0 4px; }
+.status-bar { display:flex; justify-content:center; padding:8px 0 2px; }
 .status-pill {
   display:inline-flex; align-items:center; gap:8px;
   padding:7px 16px; background:var(--white); border-radius:100px;
@@ -164,44 +164,44 @@ body {
 }
 
 /* === DISCOVER === */
-.discover { margin-top: 20px; }
-.discover__title { font-size:0.92rem; font-weight:700; color:var(--gray-800); margin:0 0 14px 2px; }
-.discover__group { margin-bottom: 18px; }
+.discover { margin-top: 12px; }
+.discover__title { font-size:0.85rem; font-weight:700; color:var(--gray-800); margin:0 0 10px 2px; }
+.discover__group { margin-bottom: 12px; }
 .discover__label {
-  display:inline-flex; align-items:center; gap:6px; font-size:0.78rem;
-  font-weight:700; padding:4px 10px 4px 8px; border-radius:100px; margin:0 0 8px 2px;
+  display:inline-flex; align-items:center; gap:5px; font-size:0.73rem;
+  font-weight:700; padding:3px 9px 3px 7px; border-radius:100px; margin:0 0 6px 2px;
 }
 .discover__label--halol { background:var(--green-50); color:var(--green-700); }
 .discover__label--harom { background:var(--red-50); color:var(--red-700); }
 .discover__label--shubhali { background:var(--amber-50); color:var(--amber-700); }
 .discover__scroll {
-  display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch; padding:2px 2px 6px; scrollbar-width:none;
+  display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch; padding:2px 2px 4px; scrollbar-width:none;
 }
 .discover__scroll::-webkit-scrollbar { display:none; }
 .mini-card {
-  flex:0 0 150px; scroll-snap-align:start; background:var(--white);
-  border-radius:var(--r-md); border:1px solid var(--gray-150);
+  flex:0 0 130px; scroll-snap-align:start; background:var(--white);
+  border-radius:var(--r-sm); border:1px solid var(--gray-150);
   overflow:hidden; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
 }
 .mini-card:active { transform:scale(0.97); box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-.mini-card__img { width:100%; height:100px; object-fit:contain; background:var(--gray-50); display:block; }
-.mini-card__body { padding:8px 10px; }
+.mini-card__img { width:100%; height:85px; object-fit:contain; background:var(--gray-50); display:block; }
+.mini-card__body { padding:6px 8px; }
 .mini-card__name {
-  font-size:0.78rem; font-weight:600; color:var(--gray-800); line-height:1.3;
+  font-size:0.72rem; font-weight:600; color:var(--gray-800); line-height:1.25;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
-  overflow:hidden; margin:0 0 4px;
+  overflow:hidden; margin:0 0 3px;
 }
-.mini-card__tag { font-size:0.68rem; font-weight:700; padding:2px 7px; border-radius:100px; display:inline-block; }
+.mini-card__tag { font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:100px; display:inline-block; }
 .mini-card__tag--halol { background:var(--green-50); color:var(--green-700); }
 .mini-card__tag--harom { background:var(--red-50); color:var(--red-700); }
 .mini-card__tag--shubhali { background:var(--amber-50); color:var(--amber-700); }
 
 /* === TIP === */
 .tip {
-  margin-top:20px; padding:11px 14px; background:var(--amber-50);
-  border:1px solid rgba(184,134,11,0.12); border-radius:var(--r-md);
-  font-size:0.82rem; color:var(--gray-600); text-align:center; line-height:1.5;
+  margin-top:10px; padding:8px 12px; background:var(--amber-50);
+  border:1px solid rgba(184,134,11,0.12); border-radius:var(--r-sm);
+  font-size:0.78rem; color:var(--gray-500); text-align:center; line-height:1.4;
 }
 
 /* === PRODUCT CARD === */
@@ -474,6 +474,121 @@ body {
 .confirm-summary__label { font-size:0.82rem; color:var(--gray-500); }
 .confirm-summary__value { font-size:0.82rem; font-weight:600; color:var(--gray-800); }
 .confirm-summary__value code { font-family:var(--mono); font-size:0.82rem; letter-spacing:0.5px; }
+
+
+/* ========================================
+   PRODUCT DETAIL MODAL (bottom sheet)
+   ======================================== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: fade-in 0.2s ease-out;
+}
+@keyframes fade-in { from { opacity:0; } to { opacity:1; } }
+
+.modal-sheet {
+  position: relative;
+  width: 100%; max-width: 520px;
+  max-height: 85vh;
+  background: var(--white);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: 12px 20px 28px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: sheet-up 0.3s var(--ease);
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.15);
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.modal-sheet__handle {
+  width: 36px; height: 4px;
+  background: var(--gray-200); border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+.modal-sheet__close {
+  position: absolute; top: 12px; right: 16px;
+  background: var(--gray-100); border: none;
+  width: 30px; height: 30px; border-radius: 50%;
+  font-size: 0.9rem; color: var(--gray-500);
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; transition: background 0.15s;
+}
+.modal-sheet__close:active { background: var(--gray-200); }
+
+/* Modal verdict badge */
+.modal-verdict {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px 4px 8px; border-radius: 100px;
+  margin-bottom: 12px; font-size: 0.82rem; font-weight: 700;
+}
+.modal-verdict--halol { background: var(--green-50); color: var(--green-700); }
+.modal-verdict--harom { background: var(--red-50); color: var(--red-700); }
+.modal-verdict--shubhali { background: var(--amber-50); color: var(--amber-700); }
+.modal-verdict__emoji { font-size: 1rem; }
+
+/* Modal image */
+.modal-img-wrap {
+  width: 100%; height: 150px;
+  border-radius: var(--r-md); overflow: hidden;
+  background: var(--gray-50); margin-bottom: 12px;
+}
+.modal-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Modal name & barcode */
+.modal-name {
+  font-size: 1.05rem; font-weight: 700; color: var(--gray-900);
+  margin: 0 0 6px; line-height: 1.3;
+}
+.modal-barcode {
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 600;
+  color: var(--gray-500); letter-spacing: 1px; margin-bottom: 14px;
+}
+
+/* Modal halal grid (compact) */
+.modal-halal {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  margin-bottom: 10px;
+}
+.modal-halal-cell {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: var(--r-sm);
+  font-size: 0.78rem; font-weight: 600;
+}
+.modal-halal-cell--ok { background: var(--green-50); color: var(--green-700); }
+.modal-halal-cell--bad { background: var(--red-50); color: var(--red-700); }
+.modal-halal-cell__icon { font-size: 1.1rem; }
+
+/* Modal factory */
+.modal-factory {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: var(--r-sm);
+  margin-bottom: 10px; font-size: 0.78rem;
+}
+.modal-factory--warn { background: var(--amber-50); color: var(--amber-700); }
+.modal-factory--ok { background: var(--green-50); color: var(--green-700); }
+.modal-factory__text { line-height: 1.4; }
+
+/* Modal ingredients */
+.modal-ingredients { margin-bottom: 4px; }
+.modal-ingredients__label {
+  font-size: 0.78rem; font-weight: 600; color: var(--gray-600); margin: 0 0 4px;
+}
+.modal-ingredients__text {
+  font-size: 0.78rem; color: var(--gray-500); line-height: 1.55;
+  margin: 0; max-height: 100px; overflow-y: auto;
+  padding: 8px 10px; background: var(--gray-50);
+  border-radius: var(--r-sm); border: 1px solid var(--gray-150);
+}
 
 
 /* ========================================
