@@ -23,8 +23,8 @@
   // --- API base URL (change to your server's address) ---
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:5001'
-    : 'https://vegukin-api.duckdns.org';  // Your production server
-    
+    : 'https://vegukin-api.duckdns.org';   // Your production server
+
   // Expose for ui.js (local image URL resolution)
   window._API_BASE = API_BASE;
 
@@ -87,16 +87,13 @@
       if (data.found) {
         data.format = formatName;
         UI.showProductResult(data);
-        _logInteraction('scanner_found', code);
       } else {
         UI.showNotFound(code);
-        _logInteraction('scanner_not_found', code);
       }
     } catch (err) {
+      // Network error — show not found with the barcode
       console.error('API lookup failed:', err);
       UI.showNotFound(code);
-      _logInteraction('scanner_not_found', code);
-    }
     }
   }
 
@@ -153,24 +150,6 @@
     } else {
       UI.showError('Kamera xatoligi: ' + error.message);
     }
-  }
-
-  // ============================================
-  // LOGGING
-  // ============================================
-  function _logInteraction(action, barcode) {
-    try {
-      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-      fetch(`${API_BASE}/api/log-interaction`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: tgUser ? String(tgUser.id) : 'unknown',
-          username: tgUser?.username || 'unknown',
-          action: `${action}:${barcode}`
-        })
-      }).catch(() => {});
-    } catch (e) {}
   }
 
   // ============================================
