@@ -2,15 +2,17 @@
 // Exposes: window.Camera
 // ============================================
 // STRATEGY:
-// 1. Get environment camera (1 prompt)
-// 2. If it has torch → done (main camera)
-// 3. If not → STOP current stream, then try other back cameras
-//    (Android can't run 2 back cameras simultaneously)
-// 4. If torch camera found → keep it
-// 5. If none found → reopen the original
+// 1. Check sessionStorage for a previously-found torch camera deviceId
+//    → If found, open it directly (0 probing, likely 0 extra prompts)
+// 2. Otherwise: get environment camera (1 prompt)
+// 3. If it has torch → done, cache deviceId
+// 4. If not → stop stream, probe other back cameras
+// 5. Cache whichever torch camera we find for next time
 // ============================================
 
 window.Camera = (() => {
+
+  const STORAGE_KEY = 'camera_torch_deviceId';
 
   let videoStream = null;
   let cameraTrack = null;
@@ -33,7 +35,7 @@ window.Camera = (() => {
     console.log(line);
     if (!DEBUG_ENABLED) return;
     _debugLines.push(line);
-    if (_debugLines.length > 30) _debugLines.shift();
+    if (_debugLines.length > 35) _debugLines.shift();
     if (!_debugEl) {
       _debugEl = document.createElement('div');
       _debugEl.id = 'camera-debug-overlay';
@@ -54,6 +56,14 @@ window.Camera = (() => {
     _debugEl.scrollTop = _debugEl.scrollHeight;
   }
 
+  // --- SessionStorage helpers ---
+  function _saveTorchDeviceId(deviceId) {
+    try { sessionStorage.setItem(STORAGE_KEY, deviceId); } catch (e) {}
+  }
+  function _getSavedTorchDeviceId() {
+    try { return sessionStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  }
+
   // --- Getters ---
   function getTrack()        { return cameraTrack; }
   function getStream()       { return videoStream; }
@@ -69,6 +79,47 @@ window.Camera = (() => {
       _dbg('Already active — reattaching');
       await _attachToVideo(videoElement);
       return _getInfo();
+    }
+
+    // ── Check cache: do we already know the right camera? ──
+    const savedId = _getSavedTorchDeviceId();
+    if (savedId) {
+      _dbg('Cache hit! Trying saved deviceId=' + savedId.substring(0, 8) + '…');
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: { exact: savedId },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
+        });
+        cameraTrack = videoStream.getVideoTracks()[0];
+        currentDeviceId = cameraTrack.getSettings().deviceId;
+
+        // Verify it still has torch (camera config can change on some devices)
+        let caps = {};
+        try { caps = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {}; } catch (e) {}
+
+        if (caps.torch) {
+          _dbg('✅ Cached camera confirmed — torch=true');
+          await _finalize(videoElement);
+          return _getInfo();
+        } else {
+          _dbg('⚠ Cached camera lost torch — falling through to discovery');
+          videoStream.getTracks().forEach(t => t.stop());
+          videoStream = null;
+          cameraTrack = null;
+          // Clear stale cache
+          try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        }
+      } catch (e) {
+        _dbg('⚠ Cached camera failed: ' + e.message + ' — falling through');
+        // Clear stale cache
+        try { sessionStorage.removeItem(STORAGE_KEY); } catch (e2) {}
+      }
+    } else {
+      _dbg('No cached deviceId');
     }
 
     // ── Step 1: Get environment camera (1 permission prompt) ──
@@ -102,16 +153,15 @@ window.Camera = (() => {
     }
 
     const hasTorch = !!caps.torch;
-    const facingMode = settings.facingMode || 'unknown';
-    _dbg('Torch: ' + hasTorch + ' | FacingMode: ' + facingMode);
+    _dbg('Torch: ' + hasTorch + ' | FacingMode: ' + (settings.facingMode || 'unknown'));
 
     if (hasTorch) {
       _dbg('✅ Default camera has torch — DONE');
+      _saveTorchDeviceId(currentDeviceId);
     } else {
       // ── Step 3: Default lacks torch — search others ──
       _dbg('⚠ No torch — enumerating cameras...');
 
-      // Enumerate while we still have permission context
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoCams = devices.filter(d => d.kind === 'videoinput');
 
@@ -121,29 +171,25 @@ window.Camera = (() => {
         _dbg('  [' + i + '] "' + (cam.label || 'no label') + '"' + cur);
       });
 
-      // Filter to back cameras only
       const backCams = videoCams.filter(cam => {
         const label = (cam.label || '').toLowerCase();
         return !(label.includes('front') || label.includes('user') ||
                  label.includes('selfie') || label.includes('facetime'));
       });
 
-      // Get other back cameras to try
       const candidates = backCams.filter(cam => cam.deviceId !== currentDeviceId);
-      _dbg('Back cameras: ' + backCams.length + ', candidates to try: ' + candidates.length);
+      _dbg('Back cameras: ' + backCams.length + ', candidates: ' + candidates.length);
 
       if (candidates.length > 0) {
-        // ★ KEY FIX: Stop current stream BEFORE probing!
-        // Android cannot run two back cameras simultaneously.
-        const fallbackDeviceId = currentDeviceId; // save in case we need to reopen
+        // ★ Stop current stream before probing (Android can't run 2 back cameras)
+        const fallbackDeviceId = currentDeviceId;
         _dbg('Stopping current stream before probing...');
         videoStream.getTracks().forEach(t => t.stop());
         videoStream = null;
         cameraTrack = null;
 
         let found = false;
-        for (let i = 0; i < candidates.length; i++) {
-          const cam = candidates[i];
+        for (const cam of candidates) {
           _dbg('Probing: "' + (cam.label || cam.deviceId.substring(0, 8)) + '"...');
           try {
             const testStream = await navigator.mediaDevices.getUserMedia({
@@ -157,9 +203,7 @@ window.Camera = (() => {
             const testTrack = testStream.getVideoTracks()[0];
 
             let testCaps = {};
-            try {
-              testCaps = testTrack.getCapabilities ? testTrack.getCapabilities() : {};
-            } catch (e) {}
+            try { testCaps = testTrack.getCapabilities ? testTrack.getCapabilities() : {}; } catch (e) {}
 
             const testSettings = testTrack.getSettings();
             const testTorch = !!testCaps.torch;
@@ -171,6 +215,7 @@ window.Camera = (() => {
               videoStream = testStream;
               cameraTrack = testTrack;
               currentDeviceId = testTrack.getSettings().deviceId;
+              _saveTorchDeviceId(currentDeviceId);
               found = true;
               break;
             } else {
@@ -184,7 +229,6 @@ window.Camera = (() => {
         }
 
         if (!found) {
-          // No torch camera — reopen the original default
           _dbg('ℹ No torch camera — reopening original...');
           try {
             videoStream = await navigator.mediaDevices.getUserMedia({
@@ -198,8 +242,7 @@ window.Camera = (() => {
             cameraTrack = videoStream.getVideoTracks()[0];
             currentDeviceId = fallbackDeviceId;
           } catch (e) {
-            _dbg('❌ Failed to reopen original: ' + e.message);
-            // Last resort — generic environment
+            _dbg('❌ Reopen failed — generic fallback');
             videoStream = await navigator.mediaDevices.getUserMedia({
               video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
               audio: false
@@ -209,11 +252,17 @@ window.Camera = (() => {
           }
         }
       } else {
-        _dbg('ℹ No other back cameras to try — keeping default');
+        _dbg('ℹ No other back cameras to try');
       }
     }
 
-    // ── Step 4: Finalize ──
+    // ── Finalize ──
+    await _finalize(videoElement);
+    return _getInfo();
+  }
+
+  // ── Shared finalization ──
+  async function _finalize(videoElement) {
     await _applyAutofocus();
     _setupImageCapture();
     await _attachToVideo(videoElement);
@@ -224,7 +273,6 @@ window.Camera = (() => {
     _dbg('READY: torch=' + info.hasTorch +
          ' cams=' + info.totalCameras +
          ' idx=' + info.cameraIndex);
-    return info;
   }
 
   // ============================================
@@ -250,7 +298,7 @@ window.Camera = (() => {
   }
 
   // ============================================
-  // GRAB PHOTO — capture frame from video
+  // GRAB PHOTO
   // ============================================
   async function grabPhoto(videoElement) {
     const canvas = document.createElement('canvas');
