@@ -73,7 +73,7 @@ window.AddProduct = (() => {
   async function _takePhoto() {
     try {
       photoBlob = await Camera.grabPhoto(document.getElementById('captureVideo'));
-      Camera.stop();
+      Camera.detach(document.getElementById('captureVideo'));
       document.getElementById('previewImage').src = URL.createObjectURL(photoBlob);
       _goToStep('1b');
     } catch (e) { console.error('Photo capture failed:', e); }
@@ -86,7 +86,7 @@ window.AddProduct = (() => {
   }
 
   function _confirmPhoto() {
-    Camera.stop();
+    Camera.detach(document.getElementById('captureVideo'));
     _goToStep(2);
   }
 
@@ -214,7 +214,7 @@ window.AddProduct = (() => {
 
   // === CANCEL ===
   function _cancel() {
-    Camera.stop();
+    Camera.detach(document.getElementById('captureVideo'));
     photoBlob = null;
     _resetFlags();
     if (window.AppActions) window.AppActions.scanAgain();

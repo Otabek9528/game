@@ -1,5 +1,5 @@
-// camera.js — Camera management module
-// Handles: open, torch, focus, cycle, stop
+// camera.js — Camera management module (persistent stream)
+// getUserMedia is called ONCE. Stream persists across scanner/wizard.
 // Exposes: window.Camera
 // ============================================
 
@@ -12,20 +12,28 @@ window.Camera = (() => {
   let backCameraIds = [];
   let currentDeviceId = null;
   let currentIndexAmongBack = 0;
+  let _initialized = false;
 
   // --- Getters ---
   function getTrack()        { return cameraTrack; }
   function getStream()       { return videoStream; }
   function getImageCapture() { return imageCapture; }
   function isTorchOn()       { return torchEnabled; }
+  function isActive()        { return !!videoStream && cameraTrack && cameraTrack.readyState === 'live'; }
 
-  // --- Open camera (reverse enumeration) ---
+  // ============================================
+  // OPEN — acquires stream ONCE, reuses after
+  // ============================================
   async function open(videoElement) {
-    if (videoStream) stop();
+    // If we already have a live stream, just reattach
+    if (isActive()) {
+      await _attachToVideo(videoElement);
+      return _getInfo();
+    }
 
+    // First time — acquire via reverse enumeration
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoCams = devices.filter(d => d.kind === 'videoinput');
-
     if (videoCams.length === 0) throw new Error('NO_CAMERA');
 
     let foundCamera = false;
@@ -67,26 +75,27 @@ window.Camera = (() => {
     _setupImageCapture();
     await _attachToVideo(videoElement);
     await _enumerateBackCameras();
+    _initialized = true;
 
-    return {
-      hasMultipleCameras: backCameraIds.length > 1,
-      hasTorch: _hasTorch(),
-      cameraIndex: currentIndexAmongBack,
-      totalCameras: backCameraIds.length
-    };
+    return _getInfo();
   }
 
-  // --- Open camera for capture (reuses known device to avoid re-prompting) ---
+  // ============================================
+  // ATTACH TO CAPTURE VIDEO — reuses existing stream
+  // ============================================
   async function openForCapture(videoElement) {
-    if (videoStream) stop();
-
+    if (isActive()) {
+      // Just reattach the same live stream
+      await _attachToVideo(videoElement);
+      return;
+    }
+    // Stream died somehow — re-acquire using known deviceId
     const constraints = {
       video: currentDeviceId
         ? { deviceId: { exact: currentDeviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } }
         : { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     };
-
     videoStream = await navigator.mediaDevices.getUserMedia(constraints);
     cameraTrack = videoStream.getVideoTracks()[0];
     await _applyAutofocus();
@@ -94,23 +103,28 @@ window.Camera = (() => {
     await _attachToVideo(videoElement);
   }
 
-  // --- Grab frame as blob (for photo capture) ---
+  // ============================================
+  // GRAB PHOTO — capture frame from video
+  // ============================================
   async function grabPhoto(videoElement) {
     const canvas = document.createElement('canvas');
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(videoElement, 0, 0);
-
     return new Promise(resolve => {
       canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.85);
     });
   }
 
-  // --- Cycle camera ---
+  // ============================================
+  // CYCLE — switch to next back camera (needs new stream)
+  // ============================================
   async function cycle(videoElement) {
     if (backCameraIds.length <= 1) return null;
-    stop();
+
+    // Must stop old stream to switch device
+    _killStream();
 
     currentIndexAmongBack = (currentIndexAmongBack + 1) % backCameraIds.length;
     const nextId = backCameraIds[currentIndexAmongBack];
@@ -126,25 +140,38 @@ window.Camera = (() => {
     _setupImageCapture();
     await _attachToVideo(videoElement);
 
-    return {
-      hasTorch: _hasTorch(),
-      cameraIndex: currentIndexAmongBack,
-      totalCameras: backCameraIds.length
-    };
+    return _getInfo();
   }
 
-  // --- Stop ---
-  function stop() {
-    if (videoStream) {
-      videoStream.getTracks().forEach(t => t.stop());
-      videoStream = null;
+  // ============================================
+  // DETACH — removes from video element but keeps stream alive
+  // ============================================
+  function detach(videoElement) {
+    if (videoElement) {
+      videoElement.pause();
+      videoElement.srcObject = null;
     }
-    cameraTrack = null;
-    imageCapture = null;
+  }
+
+  // ============================================
+  // STOP — soft stop: detach only, stream stays alive
+  // ============================================
+  function stop() {
+    // Don't kill the stream! Just reset torch state.
     torchEnabled = false;
   }
 
-  // --- Torch ---
+  // ============================================
+  // DESTROY — hard stop: kill stream (page unload only)
+  // ============================================
+  function destroy() {
+    _killStream();
+    _initialized = false;
+  }
+
+  // ============================================
+  // TORCH & FOCUS
+  // ============================================
   async function toggleTorch() {
     if (!cameraTrack) return false;
     torchEnabled = !torchEnabled;
@@ -154,7 +181,6 @@ window.Camera = (() => {
     } catch (e) { torchEnabled = false; return false; }
   }
 
-  // --- Focus ---
   async function triggerFocus() {
     if (!cameraTrack) return;
     try {
@@ -171,7 +197,19 @@ window.Camera = (() => {
     } catch (e) {}
   }
 
-  // --- Internal ---
+  // ============================================
+  // INTERNAL
+  // ============================================
+  function _killStream() {
+    if (videoStream) {
+      videoStream.getTracks().forEach(t => t.stop());
+      videoStream = null;
+    }
+    cameraTrack = null;
+    imageCapture = null;
+    torchEnabled = false;
+  }
+
   async function _applyAutofocus() {
     if (!cameraTrack) return;
     try {
@@ -206,6 +244,15 @@ window.Camera = (() => {
     } catch (e) { return false; }
   }
 
+  function _getInfo() {
+    return {
+      hasMultipleCameras: backCameraIds.length > 1,
+      hasTorch: _hasTorch(),
+      cameraIndex: currentIndexAmongBack,
+      totalCameras: backCameraIds.length
+    };
+  }
+
   async function _enumerateBackCameras() {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -223,8 +270,9 @@ window.Camera = (() => {
   }
 
   return {
-    open, openForCapture, grabPhoto, cycle, stop,
+    open, openForCapture, grabPhoto, cycle,
+    stop, destroy, detach,
     toggleTorch, triggerFocus,
-    getTrack, getStream, getImageCapture, isTorchOn
+    getTrack, getStream, getImageCapture, isTorchOn, isActive
   };
 })();
