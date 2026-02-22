@@ -31,38 +31,57 @@ window.Camera = (() => {
       return _getInfo();
     }
 
-    // First time — acquire via reverse enumeration
+    // First time — find the best back camera with torch
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoCams = devices.filter(d => d.kind === 'videoinput');
     if (videoCams.length === 0) throw new Error('NO_CAMERA');
 
-    let foundCamera = false;
+    // Try each camera, collect info about torch-capable back cameras
+    let torchCameras = [];  // {deviceId, stream, track, resolution}
 
-    for (let i = videoCams.length - 1; i >= 0; i--) {
+    for (let i = 0; i < videoCams.length; i++) {
       try {
-        videoStream = await navigator.mediaDevices.getUserMedia({
+        const stream = await navigator.mediaDevices.getUserMedia({
           video: { deviceId: { exact: videoCams[i].deviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
           audio: false
         });
-        cameraTrack = videoStream.getVideoTracks()[0];
-        currentDeviceId = cameraTrack.getSettings().deviceId;
+        const track = stream.getVideoTracks()[0];
+        const settings = track.getSettings();
 
-        const caps = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {};
-        if (caps.torch) { foundCamera = true; break; }
-
-        const settings = cameraTrack.getSettings();
+        // Skip front cameras
         if (settings.facingMode === 'user') {
-          videoStream.getTracks().forEach(t => t.stop());
-          videoStream = null; cameraTrack = null;
+          stream.getTracks().forEach(t => t.stop());
           continue;
         }
 
-        videoStream.getTracks().forEach(t => t.stop());
-        videoStream = null; cameraTrack = null;
+        const caps = track.getCapabilities ? track.getCapabilities() : {};
+        if (caps.torch) {
+          const resolution = (settings.width || 0) * (settings.height || 0);
+          torchCameras.push({
+            deviceId: settings.deviceId || videoCams[i].deviceId,
+            stream, track, resolution
+          });
+        } else {
+          stream.getTracks().forEach(t => t.stop());
+        }
       } catch (e) { continue; }
     }
 
-    if (!foundCamera || !videoStream) {
+    if (torchCameras.length > 0) {
+      // Pick highest resolution (main camera is usually highest)
+      torchCameras.sort((a, b) => b.resolution - a.resolution);
+      const best = torchCameras[0];
+
+      // Stop all other streams we opened
+      for (let i = 1; i < torchCameras.length; i++) {
+        torchCameras[i].stream.getTracks().forEach(t => t.stop());
+      }
+
+      videoStream = best.stream;
+      cameraTrack = best.track;
+      currentDeviceId = best.deviceId;
+    } else {
+      // No torch camera found — fallback to default back camera
       videoStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false
