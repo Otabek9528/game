@@ -1,11 +1,5 @@
 // camera.js — Camera management module (persistent stream)
-// getUserMedia is called ONCE. Stream persists across scanner/wizard.
 // Exposes: window.Camera
-// ============================================
-// STRATEGY: Trust the OS's facingMode:'environment' selection (which is
-// virtually always the main back camera on Android), verify it has torch,
-// and only probe further if it doesn't. This guarantees a single permission
-// prompt in Telegram WebView for 95%+ of devices.
 // ============================================
 
 window.Camera = (() => {
@@ -19,6 +13,40 @@ window.Camera = (() => {
   let currentIndexAmongBack = 0;
   let _initialized = false;
 
+  // ============================================
+  // DEBUG OVERLAY — shows logs on screen (remove for production)
+  // ============================================
+  let _debugEl = null;
+  let _debugLines = [];
+  const DEBUG_ENABLED = true; // ← set false for production
+
+  function _dbg(msg) {
+    const line = '[Cam] ' + msg;
+    console.log(line);
+    if (!DEBUG_ENABLED) return;
+    _debugLines.push(line);
+    if (_debugLines.length > 30) _debugLines.shift();
+    if (!_debugEl) {
+      _debugEl = document.createElement('div');
+      _debugEl.id = 'camera-debug-overlay';
+      Object.assign(_debugEl.style, {
+        position: 'fixed', bottom: '0', left: '0', right: '0',
+        maxHeight: '40vh', overflow: 'auto', zIndex: '99999',
+        background: 'rgba(0,0,0,0.85)', color: '#0f0',
+        fontSize: '11px', fontFamily: 'monospace',
+        padding: '6px', lineHeight: '1.4',
+        pointerEvents: 'auto', whiteSpace: 'pre-wrap'
+      });
+      // Tap to dismiss
+      _debugEl.addEventListener('click', () => {
+        _debugEl.style.display = _debugEl.style.display === 'none' ? 'block' : 'none';
+      });
+      document.body.appendChild(_debugEl);
+    }
+    _debugEl.textContent = _debugLines.join('\n');
+    _debugEl.scrollTop = _debugEl.scrollHeight;
+  }
+
   // --- Getters ---
   function getTrack()        { return cameraTrack; }
   function getStream()       { return videoStream; }
@@ -27,86 +55,103 @@ window.Camera = (() => {
   function isActive()        { return !!videoStream && cameraTrack && cameraTrack.readyState === 'live'; }
 
   // ============================================
-  // OPEN — acquires stream ONCE, reuses after
+  // OPEN — acquires stream, finds main camera
   // ============================================
   async function open(videoElement) {
-    // If we already have a live stream, just reattach
     if (isActive()) {
+      _dbg('Already active — reattaching');
       await _attachToVideo(videoElement);
       return _getInfo();
     }
 
-    // ── Step 1: Single permission prompt ──────────────────────
-    // Request environment camera with high resolution.
-    // On Android, this virtually always returns the main back camera.
-    console.log('[Camera] Requesting environment camera (single prompt)...');
-    videoStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      },
-      audio: false
-    });
+    // ── Step 1: Get environment camera (1 permission prompt) ──
+    _dbg('Step 1: getUserMedia(environment)...');
+    try {
+      videoStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      });
+    } catch (e) {
+      _dbg('❌ Permission denied: ' + e.message);
+      throw e;
+    }
     cameraTrack = videoStream.getVideoTracks()[0];
     currentDeviceId = cameraTrack.getSettings().deviceId;
 
     const settings = cameraTrack.getSettings();
-    console.log('[Camera] Got camera:', currentDeviceId,
-      'resolution:', settings.width, 'x', settings.height);
+    _dbg('Got: ' + (settings.width || '?') + 'x' + (settings.height || '?') +
+         ' id=' + currentDeviceId.substring(0, 8) + '…');
 
-    // ── Step 2: Check if this camera has torch ────────────────
-    const caps = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {};
+    // ── Step 2: Check capabilities ──
+    let caps = {};
+    try {
+      caps = cameraTrack.getCapabilities ? cameraTrack.getCapabilities() : {};
+    } catch (e) {
+      _dbg('getCapabilities() failed: ' + e.message);
+    }
 
-    if (caps.torch) {
-      // ✅ Main camera with torch — done! No probing needed.
-      console.log('[Camera] ✅ Default environment camera has torch — using it');
+    const hasTorch = !!caps.torch;
+    const facingMode = settings.facingMode || caps.facingMode || 'unknown';
+    _dbg('Torch: ' + hasTorch + ' | FacingMode: ' + facingMode);
+
+    if (hasTorch) {
+      _dbg('✅ Default camera has torch — DONE');
     } else {
-      // ── Step 3: Rare fallback — default lacks torch ─────────
-      // Use label-based heuristic to find main back camera.
-      // This minimizes extra getUserMedia calls.
-      console.log('[Camera] ⚠ Default camera lacks torch — trying label-based fallback');
+      // ── Step 3: Default lacks torch — search others ──
+      _dbg('⚠ No torch — enumerating cameras...');
 
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoCams = devices.filter(d => d.kind === 'videoinput');
 
-      console.log('[Camera] Available cameras:', videoCams.map(c =>
-        `${c.deviceId.substring(0, 8)}… "${c.label}"`));
-
-      // After first getUserMedia, labels are populated.
-      // Filter out front/ultrawide/macro/depth — keep only likely main cameras.
-      const mainCandidates = videoCams.filter(cam => {
-        const label = (cam.label || '').toLowerCase();
-        const isFront = label.includes('front') || label.includes('user') ||
-                        label.includes('selfie') || label.includes('facetime');
-        const isUltrawide = label.includes('ultra') || label.includes('wide');
-        const isMacro = label.includes('macro') || label.includes('depth');
-        const isTele = label.includes('tele');
-        // Exclude current camera (already checked) and non-main types
-        return !isFront && !isUltrawide && !isMacro && !isTele &&
-               cam.deviceId !== currentDeviceId;
+      _dbg('Total video devices: ' + videoCams.length);
+      videoCams.forEach((cam, i) => {
+        const cur = cam.deviceId === currentDeviceId ? ' ← CURRENT' : '';
+        _dbg('  [' + i + '] "' + (cam.label || 'no label') + '"' + cur);
       });
 
-      console.log('[Camera] Fallback candidates:', mainCandidates.length);
+      // Filter to back cameras only
+      const backCams = videoCams.filter(cam => {
+        const label = (cam.label || '').toLowerCase();
+        return !(label.includes('front') || label.includes('user') ||
+                 label.includes('selfie') || label.includes('facetime'));
+      });
 
+      _dbg('Back cameras: ' + backCams.length);
+
+      // Try each back camera that isn't the current one
       let found = false;
-      for (const candidate of mainCandidates) {
+      for (let i = 0; i < backCams.length; i++) {
+        const cam = backCams[i];
+        if (cam.deviceId === currentDeviceId) continue;
+
+        _dbg('Probing [' + i + ']: "' + (cam.label || cam.deviceId.substring(0, 8)) + '"...');
         try {
-          console.log('[Camera] Probing candidate:', candidate.label || candidate.deviceId);
           const testStream = await navigator.mediaDevices.getUserMedia({
             video: {
-              deviceId: { exact: candidate.deviceId },
+              deviceId: { exact: cam.deviceId },
               width: { ideal: 1920 },
               height: { ideal: 1080 }
             },
             audio: false
           });
           const testTrack = testStream.getVideoTracks()[0];
-          const testCaps = testTrack.getCapabilities ? testTrack.getCapabilities() : {};
 
-          if (testCaps.torch) {
-            // Found a torch camera — switch to it
-            console.log('[Camera] ✅ Found torch camera via fallback:', candidate.label);
+          let testCaps = {};
+          try {
+            testCaps = testTrack.getCapabilities ? testTrack.getCapabilities() : {};
+          } catch (e) {}
+
+          const testSettings = testTrack.getSettings();
+          const testTorch = !!testCaps.torch;
+          _dbg('  → ' + (testSettings.width || '?') + 'x' + (testSettings.height || '?') +
+               ' torch=' + testTorch);
+
+          if (testTorch) {
+            _dbg('✅ Found torch camera! Switching.');
             videoStream.getTracks().forEach(t => t.stop());
             videoStream = testStream;
             cameraTrack = testTrack;
@@ -114,32 +159,32 @@ window.Camera = (() => {
             found = true;
             break;
           } else {
+            _dbg('  ✗ No torch — stopping');
             testStream.getTracks().forEach(t => t.stop());
           }
         } catch (e) {
-          console.log('[Camera] Probe failed for', candidate.label, e.message);
+          _dbg('  ✗ Failed: ' + e.message);
           continue;
         }
       }
 
       if (!found) {
-        // No torch camera found — stick with original default.
-        // Scanning still works, just no flashlight.
-        console.log('[Camera] ℹ No torch camera found — using default without torch');
+        _dbg('ℹ No torch camera found — keeping default');
       }
     }
 
-    // ── Step 4: Setup ─────────────────────────────────────────
+    // ── Step 4: Finalize ──
     await _applyAutofocus();
     _setupImageCapture();
     await _attachToVideo(videoElement);
     await _enumerateBackCameras();
     _initialized = true;
 
-    console.log('[Camera] Initialized. Device:', currentDeviceId,
-      'Torch:', _hasTorch(), 'Back cameras:', backCameraIds.length);
-
-    return _getInfo();
+    const info = _getInfo();
+    _dbg('READY: torch=' + info.hasTorch +
+         ' cams=' + info.totalCameras +
+         ' idx=' + info.cameraIndex);
+    return info;
   }
 
   // ============================================
@@ -147,12 +192,10 @@ window.Camera = (() => {
   // ============================================
   async function openForCapture(videoElement) {
     if (isActive()) {
-      // Just reattach the same live stream
       await _attachToVideo(videoElement);
       return;
     }
-    // Stream died somehow — re-acquire using known deviceId
-    console.log('[Camera] Stream lost — re-acquiring for capture...');
+    _dbg('Stream lost — re-acquiring...');
     const constraints = {
       video: currentDeviceId
         ? { deviceId: { exact: currentDeviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } }
@@ -181,18 +224,16 @@ window.Camera = (() => {
   }
 
   // ============================================
-  // CYCLE — switch to next back camera (user-initiated, may prompt)
+  // CYCLE — switch to next back camera (user-initiated)
   // ============================================
   async function cycle(videoElement) {
     if (backCameraIds.length <= 1) return null;
 
-    // Must stop old stream to switch device
     _killStream();
 
     currentIndexAmongBack = (currentIndexAmongBack + 1) % backCameraIds.length;
     const nextId = backCameraIds[currentIndexAmongBack];
-
-    console.log('[Camera] Cycling to camera index', currentIndexAmongBack);
+    _dbg('Cycling to index ' + currentIndexAmongBack);
 
     videoStream = await navigator.mediaDevices.getUserMedia({
       video: { deviceId: { exact: nextId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
@@ -209,7 +250,7 @@ window.Camera = (() => {
   }
 
   // ============================================
-  // DETACH — removes from video element but keeps stream alive
+  // DETACH / STOP / DESTROY
   // ============================================
   function detach(videoElement) {
     if (videoElement) {
@@ -218,9 +259,6 @@ window.Camera = (() => {
     }
   }
 
-  // ============================================
-  // STOP — soft stop: reset torch, stream stays alive
-  // ============================================
   async function stop() {
     if (torchEnabled && cameraTrack) {
       try {
@@ -230,9 +268,6 @@ window.Camera = (() => {
     torchEnabled = false;
   }
 
-  // ============================================
-  // DESTROY — hard stop: kill stream (page unload only)
-  // ============================================
   function destroy() {
     _killStream();
     _initialized = false;
