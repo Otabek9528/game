@@ -168,6 +168,19 @@ window.AddProduct = (() => {
 
       if (result.success) {
         _showConfirmation(result);
+        // Log insertion
+        try {
+          const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+          fetch(`${window._API_BASE || ''}/api/log-interaction`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: tgUser ? String(tgUser.id) : 'unknown',
+              username: tgUser?.username || 'unknown',
+              action: `scanner_inserted:${barcode}`
+            })
+          }).catch(() => {});
+        } catch (e) {}
       } else {
         throw new Error(result.error || 'Xatolik');
       }
