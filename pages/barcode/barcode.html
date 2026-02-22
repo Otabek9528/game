@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#060d09" />
   <title>Halol Tekshirish</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="barcode.css" />
@@ -49,7 +50,7 @@
          ======================================== -->
     <div id="scannerDisplay" style="display:none;">
 
-      <!-- Viewfinder -->
+      <!-- Viewfinder — HERO element -->
       <div class="viewfinder" id="viewfinderWrap">
         <div class="viewfinder__screen" id="cameraContainer">
           <video id="videoElement" autoplay playsinline muted></video>
@@ -63,17 +64,18 @@
             </div>
           </div>
           <div class="focus-dot" id="focusIndicator"><span>◎</span></div>
-        </div>
-        <div class="viewfinder__controls">
-          <button class="ctrl-btn" id="restartCameraBtn" title="Qayta ishga tushirish">🔄</button>
-          <button class="ctrl-btn" id="switchCameraBtn" title="Kamerani almashtirish" style="display:none;">📷</button>
-          <button class="ctrl-btn" id="torchBtn" title="Chiroq" style="display:none;">
-            <span id="torchIcon">🔦</span>
-          </button>
+          <!-- Controls float inside viewfinder -->
+          <div class="viewfinder__controls">
+            <button class="ctrl-btn" id="restartCameraBtn" title="Qayta ishga tushirish">🔄</button>
+            <button class="ctrl-btn" id="switchCameraBtn" title="Kamerani almashtirish" style="display:none;">📷</button>
+            <button class="ctrl-btn" id="torchBtn" title="Chiroq" style="display:none;">
+              <span id="torchIcon">🔦</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Status pill -->
+      <!-- Status pill — bridges scanner and content -->
       <div class="status-bar">
         <div class="status-pill scanning" id="statusIndicator">
           <span class="status-dot"></span>
@@ -162,7 +164,7 @@
     </div><!-- /scannerDisplay -->
 
     <!-- ========================================
-         DISCOVER SECTION (visible on page load)
+         DISCOVER SECTION
          ======================================== -->
     <div class="discover" id="discoverSection">
       <h3 class="discover__title">📦 Ma'lumotlar bazasidan namunalar</h3>

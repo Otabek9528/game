@@ -3,187 +3,419 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Shtrix Kod Skaneri</title>
+  <title>Halol Tekshirish</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="barcode.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- ===== APP HEADER ===== -->
   <header class="app__header">
-    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+    <a href="../../index.html" class="header-content" style="text-decoration:none;color:inherit;">
       <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
       <h1>Muslim Vegukin Bot</h1>
     </a>
   </header>
 
-  <!-- BARCODE CONTAINER -->
-  <div class="barcode-container">
-    
-    <!-- Page Header -->
-    <div class="barcode-header">
-      <div class="header-decoration"></div>
-      <h2 class="barcode-title">
-        <span class="title-icon">📷</span>
-        <span class="title-text">Shtrix Kod Skaneri</span>
-      </h2>
-      <p class="barcode-subtitle">Mahsulot shtrix kodini kameraga ko'rsating</p>
+  <!-- ===== MAIN CONTAINER ===== -->
+  <div class="page" id="page">
+
+    <!-- ========================================
+         STATE: PERMISSION (compact bar)
+         ======================================== -->
+    <div class="notice-bar notice-bar--info" id="permissionState" style="display:none;">
+      <span class="notice-bar__emoji">📱</span>
+      <div class="notice-bar__content">
+        <p class="notice-bar__text">Shtrix kodni o'qish uchun kameraga ruxsat bering</p>
+      </div>
+      <button class="btn btn--primary btn--sm" id="requestPermissionBtn">Ruxsat berish</button>
     </div>
 
-    <!-- STATUS STATES CONTAINER -->
-    <div class="states-container">
-      
-      <!-- Loading State -->
-      <div class="state-card loading-state" id="loadingState">
-        <div class="loader">
-          <div class="loader-ring"></div>
-          <div class="loader-ring"></div>
-          <div class="loader-ring"></div>
-          <span class="loader-icon">📷</span>
-        </div>
-        <p class="state-title">Kamera tayyorlanmoqda...</p>
-        <p class="state-hint">Eng yaxshi kamera tanlanmoqda</p>
+    <!-- ========================================
+         STATE: ERROR (compact bar)
+         ======================================== -->
+    <div class="notice-bar notice-bar--error" id="errorState" style="display:none;">
+      <span class="notice-bar__emoji">⚠️</span>
+      <div class="notice-bar__content">
+        <p class="notice-bar__text" id="errorMessage">Kameraga ulanib bo'lmadi.</p>
       </div>
-
-      <!-- Permission State -->
-      <div class="state-card permission-state" id="permissionState" style="display: none;">
-        <div class="permission-icon-wrapper">
-          <span class="permission-icon">📱</span>
-          <span class="permission-badge">📷</span>
-        </div>
-        <h3 class="state-title">Kamera ruxsati kerak</h3>
-        <p class="state-description">
-          Shtrix kodni o'qish uchun qurilmangizning kamera funksiyasidan foydalanishga ruxsat bering.
-        </p>
-        <button class="action-btn primary" id="requestPermissionBtn">
-          <span class="btn-icon">✓</span>
-          <span class="btn-text">Ruxsat berish</span>
-        </button>
-        <p class="state-note">
-          <span class="note-icon">💡</span>
-          Brauzer so'roviga "Allow" tugmasini bosing
-        </p>
-      </div>
-
-      <!-- Error State -->
-      <div class="state-card error-state" id="errorState" style="display: none;">
-        <div class="error-icon-wrapper">
-          <span class="error-icon">⚠️</span>
-        </div>
-        <h3 class="state-title error-title">Xatolik yuz berdi</h3>
-        <p class="state-description" id="errorMessage">
-          Kameraga ulanib bo'lmadi. Qurilma sozlamalarini tekshiring.
-        </p>
-        <button class="action-btn secondary" id="retryBtn">
-          <span class="btn-icon">🔄</span>
-          <span class="btn-text">Qaytadan urinish</span>
-        </button>
-      </div>
-
+      <button class="btn btn--secondary btn--sm" id="retryBtn">🔄 Qaytadan</button>
     </div>
 
-    <!-- SCANNER DISPLAY -->
-    <div class="scanner-display" id="scannerDisplay" style="display: none;">
-      
-      <!-- Camera View -->
-      <div class="camera-wrapper">
-        <div class="camera-container" id="cameraContainer">
+    <!-- ========================================
+         STATE: SCANNER (main working state)
+         ======================================== -->
+    <div id="scannerDisplay" style="display:none;">
+
+      <!-- Viewfinder -->
+      <div class="viewfinder" id="viewfinderWrap">
+        <div class="viewfinder__screen" id="cameraContainer">
           <video id="videoElement" autoplay playsinline muted></video>
-          
-          <!-- Scanning Overlay -->
-          <div class="scan-overlay">
+          <div class="viewfinder__overlay">
             <div class="scan-frame">
-              <div class="corner corner-tl"></div>
-              <div class="corner corner-tr"></div>
-              <div class="corner corner-bl"></div>
-              <div class="corner corner-br"></div>
-              <div class="scan-line"></div>
+              <span class="scan-corner scan-corner--tl"></span>
+              <span class="scan-corner scan-corner--tr"></span>
+              <span class="scan-corner scan-corner--bl"></span>
+              <span class="scan-corner scan-corner--br"></span>
+              <div class="scan-beam" id="scanBeam"></div>
             </div>
           </div>
-          
-          <!-- Focus indicator -->
-          <div class="focus-indicator" id="focusIndicator">
-            <span>🎯</span>
-          </div>
+          <div class="focus-dot" id="focusIndicator"><span>◎</span></div>
         </div>
-        
-        <!-- Camera Controls -->
-        <div class="camera-controls">
-          <button class="control-btn" id="restartCameraBtn" title="Kamerani qayta ishga tushirish">
-            <span>🔄</span>
-          </button>
-          <button class="control-btn" id="switchCameraBtn" title="Kamerani almashtirish">
-            <span>📷</span>
-          </button>
-          <button class="control-btn" id="torchBtn" title="Chiroqni yoqish" style="display: none;">
+        <div class="viewfinder__controls">
+          <button class="ctrl-btn" id="restartCameraBtn" title="Qayta ishga tushirish">🔄</button>
+          <button class="ctrl-btn" id="switchCameraBtn" title="Kamerani almashtirish" style="display:none;">📷</button>
+          <button class="ctrl-btn" id="torchBtn" title="Chiroq" style="display:none;">
             <span id="torchIcon">🔦</span>
           </button>
         </div>
       </div>
-      
-      <!-- Scanning Status -->
-      <div class="scan-status">
-        <div class="status-indicator scanning" id="statusIndicator">
+
+      <!-- Status pill -->
+      <div class="status-bar">
+        <div class="status-pill scanning" id="statusIndicator">
           <span class="status-dot"></span>
-          <span class="status-text" id="statusText">Qidirilmoqda...</span>
-          <span class="camera-info-badge" id="cameraInfoBadge" style="display: none;"></span>
+          <span class="status-label" id="statusText">Qidirilmoqda...</span>
+          <span class="cam-badge" id="cameraInfoBadge" style="display:none;"></span>
         </div>
-        <p class="focus-hint">💡 Fokus: ekranga bosing | 📷 Kamerani almashtirish</p>
       </div>
 
-      <!-- Result Display -->
-      <div class="result-section" id="resultSection" style="display: none;">
-        <div class="result-card">
-          <div class="result-header">
-            <span class="result-icon">✅</span>
-            <span class="result-label">Shtrix kod topildi!</span>
-          </div>
-          <div class="result-content">
-            <p class="result-type" id="barcodeType">Turi: --</p>
-            <div class="result-code-wrapper">
-              <p class="result-code" id="barcodeNumber">--</p>
-              <button class="copy-btn" id="copyBtn" title="Nusxalash">
-                <span>📋</span>
-              </button>
+      <!-- ========================================
+           RESULT: PRODUCT FOUND
+           ======================================== -->
+      <div id="resultSection" style="display:none;">
+        <div class="product-card" id="productCard">
+
+          <!-- Verdict banner -->
+          <div class="verdict" id="verdictBanner">
+            <span class="verdict__emoji" id="verdictEmoji"></span>
+            <div class="verdict__text">
+              <h4 id="verdictTitle"></h4>
+              <p id="verdictDesc"></p>
             </div>
           </div>
-          <div class="result-actions">
-            <button class="action-btn primary" id="scanAgainBtn">
-              <span class="btn-icon">📷</span>
-              <span class="btn-text">Qayta skanerlash</span>
-            </button>
+
+          <!-- Product image -->
+          <div id="productImageWrap" style="display:none;">
+            <img class="product-img" id="productImage" src="" alt="Mahsulot" />
+          </div>
+
+          <!-- Head -->
+          <div class="product-head">
+            <h3 class="product-name" id="productName">—</h3>
+            <div class="barcode-chip">
+              <span class="barcode-chip__label" id="barcodeType">—</span>
+              <code class="barcode-chip__code" id="barcodeNumber">—</code>
+              <button class="barcode-chip__copy" id="copyBtn" title="Nusxalash">📋</button>
+            </div>
+          </div>
+
+          <!-- Halal grid -->
+          <div class="halal-grid" id="halalGrid"></div>
+
+          <!-- Factory notice -->
+          <div class="factory-bar" id="factoryNotice" style="display:none;">
+            <span class="factory-bar__icon" id="factoryIcon"></span>
+            <p class="factory-bar__text" id="factoryText"></p>
+          </div>
+
+          <!-- Actions -->
+          <div class="card-actions">
+            <button class="btn btn--ghost" id="showIngredientsBtn">🧪 Tarkibi</button>
+            <button class="btn btn--primary" id="scanAgainBtn">📷 Qayta skanerlash</button>
+          </div>
+
+          <!-- Ingredients panel -->
+          <div class="ingredients" id="ingredientsPanel" style="display:none;">
+            <div class="ingredients__top">
+              <span>🧪 Mahsulot tarkibi</span>
+              <button class="ingredients__close" id="closeIngredientsBtn">✕</button>
+            </div>
+            <p class="ingredients__body" id="ingredientsText"></p>
+          </div>
+
+          <!-- Info link -->
+          <a class="info-link" id="infoLink" href="https://telegra.ph/Koreyada-non-halol-emasmi-04-20" target="_blank">
+            🤔 Shubhali mahsulotni yesa bo'ladimi?
+          </a>
+        </div>
+      </div>
+
+      <!-- ========================================
+           RESULT: NOT FOUND
+           ======================================== -->
+      <div id="notFoundSection" style="display:none;">
+        <div class="empty-card">
+          <div class="empty-card__emoji">😕</div>
+          <h3 class="empty-card__title">Mahsulot topilmadi</h3>
+          <code class="empty-card__code" id="notFoundBarcode">—</code>
+          <p class="empty-card__desc">Ma'lumotlar bazasida ushbu mahsulot mavjud emas.</p>
+          <div class="empty-card__actions">
+            <button class="btn btn--primary btn--full" id="addProductBtn">➕ Mahsulot qo'shish</button>
+            <button class="btn btn--ghost btn--full" id="scanAgainBtn2">📷 Qayta skanerlash</button>
           </div>
         </div>
       </div>
 
-      <!-- Scan History -->
-      <div class="history-section" id="historySection" style="display: none;">
-        <div class="history-header">
-          <h3>📜 So'nggi skanerlashlar</h3>
-          <button class="clear-history-btn" id="clearHistoryBtn">Tozalash</button>
-        </div>
-        <div class="history-list" id="historyList">
-          <!-- History items will be inserted here -->
+    </div><!-- /scannerDisplay -->
+
+    <!-- ========================================
+         DISCOVER SECTION (visible on page load)
+         ======================================== -->
+    <div class="discover" id="discoverSection">
+      <h3 class="discover__title">📦 Ma'lumotlar bazasidan namunalar</h3>
+
+      <!-- Halol group -->
+      <div class="discover__group">
+        <div class="discover__label discover__label--halol">☪️ Halol</div>
+        <div class="discover__scroll" id="discoverHalol">
+          <p class="discover__loading">Yuklanmoqda...</p>
         </div>
       </div>
 
+      <!-- Shubhali group -->
+      <div class="discover__group">
+        <div class="discover__label discover__label--shubhali">⚠️ Shubhali</div>
+        <div class="discover__scroll" id="discoverShubhali">
+          <p class="discover__loading">Yuklanmoqda...</p>
+        </div>
+      </div>
+
+      <!-- Harom group -->
+      <div class="discover__group">
+        <div class="discover__label discover__label--harom">⛔️ Harom</div>
+        <div class="discover__scroll" id="discoverHarom">
+          <p class="discover__loading">Yuklanmoqda...</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Info Footer -->
-    <div class="info-footer">
-      <div class="info-footer-icon">💡</div>
-      <p class="info-footer-text">
-        Shtrix kodni aniq ko'rsating va yaxshi yorug'lik ta'minlang. Barcha EAN-13, EAN-8, UPC-A, Code-128 va boshqa formatlar qo'llab-quvvatlanadi.
-      </p>
-    </div>
+    <div class="tip" id="tipBar">💡 Shtrix kodni aniq ko'rsating va yaxshi yorug'lik ta'minlang</div>
 
+
+
+    <!-- ========================================
+         ADD PRODUCT WIZARD
+         ======================================== -->
+    <div id="addProductWizard" style="display:none;">
+
+      <!-- Progress dots -->
+      <div class="steps" id="wizardSteps">
+        <span class="step-dot" id="stepDot1"></span>
+        <span class="step-dot" id="stepDot2"></span>
+        <span class="step-dot" id="stepDot3"></span>
+      </div>
+      <p class="step-label" id="wizardStepLabel"></p>
+
+      <!-- ===== STEP 1: Camera capture ===== -->
+      <div id="wizardStep1" style="display:none;">
+        <div class="capture-card">
+          <div class="capture-card__header">
+            <h3 class="capture-card__title">Mahsulot rasmini oling</h3>
+            <p class="capture-card__desc">Mahsulotning umumiy ko'rinishini aks ettirgan rasmini oling</p>
+          </div>
+          <div class="capture-card__barcode-row">
+            <span class="capture-card__barcode-label">Shtrix-kod:</span>
+            <span class="capture-card__barcode-value" id="wizardBarcode">—</span>
+          </div>
+
+          <!-- Camera capture area -->
+          <div class="capture-camera" id="captureCamera">
+            <video id="captureVideo" autoplay playsinline muted></video>
+            <div class="crosshair"></div>
+            <div class="shutter-row">
+              <button class="shutter-btn" id="shutterBtn"></button>
+            </div>
+          </div>
+
+          <div class="capture-card__footer">
+            <button class="btn btn--danger btn--sm" id="wizardCancelBtn1">✕ Bekor qilish</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 1B: Photo preview ===== -->
+      <div id="wizardStep1b" style="display:none;">
+        <div class="capture-card">
+          <div class="capture-card__header">
+            <h3 class="capture-card__title">Rasmni tekshiring</h3>
+            <p class="capture-card__desc">Mahsulot aniq ko'rinsa, davom eting</p>
+          </div>
+
+          <div class="preview-img-wrap">
+            <img id="previewImage" src="" alt="Preview" />
+            <span class="preview-badge">📸 Yangi rasm</span>
+          </div>
+
+          <div class="capture-card__footer">
+            <button class="btn btn--ghost btn--sm" id="retakeBtn">🔄 Qaytadan</button>
+            <button class="btn btn--primary btn--sm" id="confirmPhotoBtn">Davom etish →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 2: Halal flags ===== -->
+      <div id="wizardStep2" style="display:none;">
+        <div class="flags-card">
+          <div class="flags-card__header">
+            <h3 class="flags-card__title">Haromlik belgilarini tanlang</h3>
+            <p class="flags-card__desc">Mahsulotga tegishli bo'lgan belgilarni belgilang. Bir nechta tanlash mumkin.</p>
+          </div>
+
+          <div class="flag-list" id="flagList">
+            <!-- Pork -->
+            <div class="flag-toggle" data-flag="pork" id="flagPork">
+              <span class="flag-toggle__icon">🐖</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Cho'chqa</p>
+                <p class="flag-toggle__desc">Cho'chqa go'shti yoki undan tayyorlangan moddalar</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </div>
+
+            <!-- Alcohol -->
+            <div class="flag-toggle" data-flag="alcohol" id="flagAlcohol">
+              <span class="flag-toggle__icon">🍷</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Alkogol</p>
+                <p class="flag-toggle__desc">Spirtli moddalar (etanol, pivo, vino...)</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </div>
+
+            <!-- Other meat -->
+            <div class="flag-toggle" data-flag="meat" id="flagMeat">
+              <span class="flag-toggle__icon">🍗</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Boshqa go'shtlar</p>
+                <p class="flag-toggle__desc">Mol, tovuq, qo'y yoki ulardan tayyorlangan ingredientlar</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </div>
+
+            <!-- Seafood -->
+            <div class="flag-toggle" data-flag="seafood" id="flagSeafood">
+              <span class="flag-toggle__icon">🦐</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Dengiz mahsulotlari</p>
+                <p class="flag-toggle__desc">Baliqdan tashqari: qisqichbaqa, kalmar, sakkizoyoq...</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </div>
+
+            <div class="flag-separator"><span>yoki</span></div>
+
+            <!-- Same factory -->
+            <div class="flag-toggle" data-flag="factory" id="flagFactory">
+              <span class="flag-toggle__icon">🏭</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Bir zavodda</p>
+                <p class="flag-toggle__desc">Harom mahsulotlar tayyorlangan uskunalarda ishlab chiqarilgan</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </div>
+
+            <div class="flag-separator"><span>yoki</span></div>
+
+            <!-- All halal -->
+            <div class="flag-toggle" data-flag="allhalal" id="flagAllHalal">
+              <span class="flag-toggle__icon">☪️</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Barchasi Halol</p>
+                <p class="flag-toggle__desc">Harom ingredientlar yo'q, ishlab chiqarish ham toza</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </div>
+          </div>
+
+          <div class="flags-card__footer">
+            <button class="btn btn--ghost btn--sm" id="wizardBackBtn2">← Orqaga</button>
+            <button class="btn btn--primary btn--sm" id="wizardSubmitBtn">Tayyor ✓</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 3: Uploading ===== -->
+      <div id="wizardStep3" style="display:none;">
+        <div class="uploading-card">
+          <div class="uploading-spinner"></div>
+          <p class="uploading-card__text">Ma'lumotlar yuborilmoqda...</p>
+        </div>
+      </div>
+
+      <!-- ===== STEP 3B: Success ===== -->
+      <div id="wizardStep3b" style="display:none;">
+        <div class="confirm-card">
+          <div class="confirm-card__icon">✅</div>
+          <h3 class="confirm-card__title">Rahmat!</h3>
+          <p class="confirm-card__desc">Ma'lumot yuborildi. Admin tasdig'idan o'tgandan so'ng ma'lumotlar bazasiga qo'shiladi.</p>
+
+          <div class="confirm-summary" id="confirmSummary">
+            <!-- Populated by JS -->
+          </div>
+
+          <button class="btn btn--primary btn--full" id="wizardDoneBtn">📷 Boshqa mahsulotni skanerlash</button>
+        </div>
+      </div>
+
+    </div><!-- /addProductWizard -->
+
+  </div><!-- /page -->
+
+  <!-- ========================================
+       PRODUCT DETAIL MODAL (overlay)
+       ======================================== -->
+  <div class="modal-overlay" id="productModal" style="display:none;">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-sheet">
+      <div class="modal-sheet__handle"></div>
+      <button class="modal-sheet__close" id="modalCloseBtn">✕</button>
+
+      <!-- Verdict mini-badge -->
+      <div class="modal-verdict" id="modalVerdict">
+        <span class="modal-verdict__emoji" id="modalVerdictEmoji"></span>
+        <span class="modal-verdict__label" id="modalVerdictLabel"></span>
+      </div>
+
+      <!-- Image -->
+      <div class="modal-img-wrap" id="modalImgWrap" style="display:none;">
+        <img class="modal-img" id="modalImg" src="" alt="" />
+      </div>
+
+      <!-- Info -->
+      <h3 class="modal-name" id="modalName">—</h3>
+      <div class="modal-barcode" id="modalBarcode">—</div>
+
+      <!-- Halal grid compact -->
+      <div class="modal-halal" id="modalHalalGrid"></div>
+
+      <!-- Factory -->
+      <div class="modal-factory" id="modalFactory" style="display:none;">
+        <span id="modalFactoryIcon"></span>
+        <span class="modal-factory__text" id="modalFactoryText"></span>
+      </div>
+
+      <!-- Ingredients -->
+      <div class="modal-ingredients" id="modalIngredients" style="display:none;">
+        <p class="modal-ingredients__label">🧪 Tarkibi:</p>
+        <p class="modal-ingredients__text" id="modalIngredientsText"></p>
+      </div>
+    </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- ===== SCRIPTS ===== -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="../../js/logger.js"></script>
   <script src="https://unpkg.com/@aspect-dev/barcode-scanner@0.3.0/dist/barcode-scanner.umd.js"></script>
-  <script src="barcode.js"></script>
+
+  <!-- Modular JS (loaded in dependency order) -->
+  <script src="camera.js"></script>
+  <script src="scanner.js"></script>
+  <script src="ui.js"></script>
+  <script src="add-product.js"></script>
+  <script src="app.js"></script>
 
 </body>
 </html>
