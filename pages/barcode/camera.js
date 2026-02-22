@@ -1,6 +1,14 @@
 // camera.js — Camera management module (persistent stream)
 // Exposes: window.Camera
 // ============================================
+// STRATEGY:
+// 1. Get environment camera (1 prompt)
+// 2. If it has torch → done (main camera)
+// 3. If not → STOP current stream, then try other back cameras
+//    (Android can't run 2 back cameras simultaneously)
+// 4. If torch camera found → keep it
+// 5. If none found → reopen the original
+// ============================================
 
 window.Camera = (() => {
 
@@ -14,11 +22,11 @@ window.Camera = (() => {
   let _initialized = false;
 
   // ============================================
-  // DEBUG OVERLAY — shows logs on screen (remove for production)
+  // DEBUG OVERLAY (set false for production)
   // ============================================
   let _debugEl = null;
   let _debugLines = [];
-  const DEBUG_ENABLED = true; // ← set false for production
+  const DEBUG_ENABLED = true;
 
   function _dbg(msg) {
     const line = '[Cam] ' + msg;
@@ -37,7 +45,6 @@ window.Camera = (() => {
         padding: '6px', lineHeight: '1.4',
         pointerEvents: 'auto', whiteSpace: 'pre-wrap'
       });
-      // Tap to dismiss
       _debugEl.addEventListener('click', () => {
         _debugEl.style.display = _debugEl.style.display === 'none' ? 'block' : 'none';
       });
@@ -95,7 +102,7 @@ window.Camera = (() => {
     }
 
     const hasTorch = !!caps.torch;
-    const facingMode = settings.facingMode || caps.facingMode || 'unknown';
+    const facingMode = settings.facingMode || 'unknown';
     _dbg('Torch: ' + hasTorch + ' | FacingMode: ' + facingMode);
 
     if (hasTorch) {
@@ -104,6 +111,7 @@ window.Camera = (() => {
       // ── Step 3: Default lacks torch — search others ──
       _dbg('⚠ No torch — enumerating cameras...');
 
+      // Enumerate while we still have permission context
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoCams = devices.filter(d => d.kind === 'videoinput');
 
@@ -120,56 +128,88 @@ window.Camera = (() => {
                  label.includes('selfie') || label.includes('facetime'));
       });
 
-      _dbg('Back cameras: ' + backCams.length);
+      // Get other back cameras to try
+      const candidates = backCams.filter(cam => cam.deviceId !== currentDeviceId);
+      _dbg('Back cameras: ' + backCams.length + ', candidates to try: ' + candidates.length);
 
-      // Try each back camera that isn't the current one
-      let found = false;
-      for (let i = 0; i < backCams.length; i++) {
-        const cam = backCams[i];
-        if (cam.deviceId === currentDeviceId) continue;
+      if (candidates.length > 0) {
+        // ★ KEY FIX: Stop current stream BEFORE probing!
+        // Android cannot run two back cameras simultaneously.
+        const fallbackDeviceId = currentDeviceId; // save in case we need to reopen
+        _dbg('Stopping current stream before probing...');
+        videoStream.getTracks().forEach(t => t.stop());
+        videoStream = null;
+        cameraTrack = null;
 
-        _dbg('Probing [' + i + ']: "' + (cam.label || cam.deviceId.substring(0, 8)) + '"...');
-        try {
-          const testStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              deviceId: { exact: cam.deviceId },
-              width: { ideal: 1920 },
-              height: { ideal: 1080 }
-            },
-            audio: false
-          });
-          const testTrack = testStream.getVideoTracks()[0];
-
-          let testCaps = {};
+        let found = false;
+        for (let i = 0; i < candidates.length; i++) {
+          const cam = candidates[i];
+          _dbg('Probing: "' + (cam.label || cam.deviceId.substring(0, 8)) + '"...');
           try {
-            testCaps = testTrack.getCapabilities ? testTrack.getCapabilities() : {};
-          } catch (e) {}
+            const testStream = await navigator.mediaDevices.getUserMedia({
+              video: {
+                deviceId: { exact: cam.deviceId },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+              },
+              audio: false
+            });
+            const testTrack = testStream.getVideoTracks()[0];
 
-          const testSettings = testTrack.getSettings();
-          const testTorch = !!testCaps.torch;
-          _dbg('  → ' + (testSettings.width || '?') + 'x' + (testSettings.height || '?') +
-               ' torch=' + testTorch);
+            let testCaps = {};
+            try {
+              testCaps = testTrack.getCapabilities ? testTrack.getCapabilities() : {};
+            } catch (e) {}
 
-          if (testTorch) {
-            _dbg('✅ Found torch camera! Switching.');
-            videoStream.getTracks().forEach(t => t.stop());
-            videoStream = testStream;
-            cameraTrack = testTrack;
-            currentDeviceId = testTrack.getSettings().deviceId;
-            found = true;
-            break;
-          } else {
-            _dbg('  ✗ No torch — stopping');
-            testStream.getTracks().forEach(t => t.stop());
+            const testSettings = testTrack.getSettings();
+            const testTorch = !!testCaps.torch;
+            _dbg('  → ' + (testSettings.width || '?') + 'x' + (testSettings.height || '?') +
+                 ' torch=' + testTorch);
+
+            if (testTorch) {
+              _dbg('✅ Found torch camera! Using it.');
+              videoStream = testStream;
+              cameraTrack = testTrack;
+              currentDeviceId = testTrack.getSettings().deviceId;
+              found = true;
+              break;
+            } else {
+              _dbg('  ✗ No torch — stopping');
+              testStream.getTracks().forEach(t => t.stop());
+            }
+          } catch (e) {
+            _dbg('  ✗ Failed: ' + e.message);
+            continue;
           }
-        } catch (e) {
-          _dbg('  ✗ Failed: ' + e.message);
-          continue;
         }
-      }
 
-      if (!found) {
-        _dbg('ℹ No torch camera found — keeping default');
+        if (!found) {
+          // No torch camera — reopen the original default
+          _dbg('ℹ No torch camera — reopening original...');
+          try {
+            videoStream = await navigator.mediaDevices.getUserMedia({
+              video: {
+                deviceId: { exact: fallbackDeviceId },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+              },
+              audio: false
+            });
+            cameraTrack = videoStream.getVideoTracks()[0];
+            currentDeviceId = fallbackDeviceId;
+          } catch (e) {
+            _dbg('❌ Failed to reopen original: ' + e.message);
+            // Last resort — generic environment
+            videoStream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+              audio: false
+            });
+            cameraTrack = videoStream.getVideoTracks()[0];
+            currentDeviceId = cameraTrack.getSettings().deviceId;
+          }
+        }
+      } else {
+        _dbg('ℹ No other back cameras to try — keeping default');
       }
     }
 
@@ -373,7 +413,6 @@ window.Camera = (() => {
     } catch (e) {}
   }
 
-  // Cleanup on page unload
   if (typeof window !== 'undefined') {
     window.addEventListener('beforeunload', () => destroy());
   }
