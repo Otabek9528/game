@@ -31,13 +31,32 @@ window.Camera = (() => {
       return _getInfo();
     }
 
-    // First time — find the best back camera with torch
+    // First time — get permission with one generic request
+    // This single getUserMedia grants camera access for all devices
+    let initialStream;
+    try {
+      initialStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false
+      });
+    } catch (e) {
+      throw e; // Permission denied or no camera
+    }
+
+    // Now enumerate — labels are available after permission grant
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoCams = devices.filter(d => d.kind === 'videoinput');
-    if (videoCams.length === 0) throw new Error('NO_CAMERA');
+    if (videoCams.length === 0) {
+      initialStream.getTracks().forEach(t => t.stop());
+      throw new Error('NO_CAMERA');
+    }
 
-    // Try each camera, collect info about torch-capable back cameras
-    let torchCameras = [];  // {deviceId, stream, track, resolution}
+    // Stop the initial stream — we'll pick the best one below
+    const initialDeviceId = initialStream.getVideoTracks()[0].getSettings().deviceId;
+    initialStream.getTracks().forEach(t => t.stop());
+
+    // Probe each camera for torch (no permission prompts — already granted)
+    let torchCameras = [];
 
     for (let i = 0; i < videoCams.length; i++) {
       try {
@@ -68,11 +87,11 @@ window.Camera = (() => {
     }
 
     if (torchCameras.length > 0) {
-      // Pick highest resolution (main camera is usually highest)
+      // Pick highest resolution (main camera)
       torchCameras.sort((a, b) => b.resolution - a.resolution);
       const best = torchCameras[0];
 
-      // Stop all other streams we opened
+      // Stop all other probed streams
       for (let i = 1; i < torchCameras.length; i++) {
         torchCameras[i].stream.getTracks().forEach(t => t.stop());
       }
@@ -81,13 +100,13 @@ window.Camera = (() => {
       cameraTrack = best.track;
       currentDeviceId = best.deviceId;
     } else {
-      // No torch camera found — fallback to default back camera
+      // No torch camera — reopen the initial default camera
       videoStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: { deviceId: { exact: initialDeviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false
       });
       cameraTrack = videoStream.getVideoTracks()[0];
-      currentDeviceId = cameraTrack.getSettings().deviceId;
+      currentDeviceId = initialDeviceId;
     }
 
     await _applyAutofocus();
