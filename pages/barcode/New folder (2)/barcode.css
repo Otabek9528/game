@@ -92,14 +92,15 @@ body {
 
 
 /* ========================================
-   SCANNER HERO — Light Theme
+   SCANNER HERO — Minimal Line-Art
    ======================================== */
 .scanner-hero {
   margin: 14px 14px 0;
-  background: var(--cream);
+  background: var(--white);
+  border: 1px solid var(--gray-150);
   border-radius: var(--r-xl);
   overflow: hidden;
-  padding: 24px 16px 22px;
+  padding: 28px 16px 22px;
   position: relative;
   animation: heroFadeIn 0.5s var(--ease);
   display: flex;
@@ -107,120 +108,95 @@ body {
   align-items: center;
 }
 @keyframes heroFadeIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Animated barcode visual --- */
-.scanner-hero__visual {
-  position: relative;
+/* --- Line illustration --- */
+.scanner-hero__illustration {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   width: 100%;
 }
 
-.barcode-anim {
-  position: relative;
-  width: 150px;
-  height: 85px;
+.hero-phone {
+  width: 80px;
+  height: auto;
+  color: var(--gray-700);
+}
+
+/* Barcode lines subtle entrance */
+.hero-barcode-lines rect {
+  animation: lineAppear 1.8s ease-out both;
+}
+.hero-barcode-lines rect:nth-child(1) { animation-delay: 0.1s; }
+.hero-barcode-lines rect:nth-child(2) { animation-delay: 0.15s; }
+.hero-barcode-lines rect:nth-child(3) { animation-delay: 0.2s; }
+.hero-barcode-lines rect:nth-child(4) { animation-delay: 0.25s; }
+.hero-barcode-lines rect:nth-child(5) { animation-delay: 0.3s; }
+.hero-barcode-lines rect:nth-child(6) { animation-delay: 0.35s; }
+.hero-barcode-lines rect:nth-child(7) { animation-delay: 0.4s; }
+.hero-barcode-lines rect:nth-child(8) { animation-delay: 0.45s; }
+.hero-barcode-lines rect:nth-child(9) { animation-delay: 0.5s; }
+.hero-barcode-lines rect:nth-child(10) { animation-delay: 0.55s; }
+.hero-barcode-lines rect:nth-child(11) { animation-delay: 0.6s; }
+.hero-barcode-lines rect:nth-child(12) { animation-delay: 0.65s; }
+.hero-barcode-lines rect:nth-child(13) { animation-delay: 0.7s; }
+
+@keyframes lineAppear {
+  0% { opacity: 0; transform: scaleY(0); }
+  60% { opacity: 0.5; transform: scaleY(1); }
+  100% { opacity: 0.5; }
+}
+
+/* Scan line sweeping */
+.hero-scan-line {
+  animation: lineSweep 2.8s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes lineSweep {
+  0%, 100% { transform: translateY(-25px); opacity: 0.4; }
+  50% { transform: translateY(25px); opacity: 1; }
+}
+
+/* Result indicators */
+.hero-indicators {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.barcode-anim__bars {
-  display: flex;
-  align-items: center;
-  gap: 2.5px;
-  height: 60px;
-}
-.barcode-anim__bars span {
-  display: block;
-  height: 100%;
-  background: var(--gray-700);
-  border-radius: 1px;
-  animation: barPulse 3s ease-in-out infinite;
-}
-.barcode-anim__bars span:nth-child(odd) { animation-delay: 0s; }
-.barcode-anim__bars span:nth-child(even) { animation-delay: 0.15s; }
-.barcode-anim__bars span:nth-child(3n) { animation-delay: 0.3s; }
-
-@keyframes barPulse {
-  0%, 100% { opacity: 0.15; }
-  50% { opacity: 0.45; }
-}
-
-/* Laser scan line */
-.barcode-anim__laser {
-  position: absolute;
-  left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--green-500) 15%, var(--green-400) 50%, var(--green-500) 85%, transparent);
-  border-radius: 1px;
-  box-shadow: 0 0 10px rgba(34,161,90,0.35), 0 0 25px rgba(34,161,90,0.1);
-  animation: heroLaserSweep 2.4s ease-in-out infinite;
-}
-@keyframes heroLaserSweep {
-  0%, 100% { top: 10%; opacity: 0.5; }
-  50% { top: 88%; opacity: 1; }
-}
-
-/* Scan frame corners */
-.barcode-anim__corner {
-  position: absolute;
-  width: 16px; height: 16px;
-  border-color: var(--green-600);
-  border-style: solid;
-  border-width: 0;
-  opacity: 0.45;
-}
-.barcode-anim__corner--tl { top:0;left:0; border-top-width:2px;border-left-width:2px; border-top-left-radius:5px; }
-.barcode-anim__corner--tr { top:0;right:0; border-top-width:2px;border-right-width:2px; border-top-right-radius:5px; }
-.barcode-anim__corner--bl { bottom:0;left:0; border-bottom-width:2px;border-left-width:2px; border-bottom-left-radius:5px; }
-.barcode-anim__corner--br { bottom:0;right:0; border-bottom-width:2px;border-right-width:2px; border-bottom-right-radius:5px; }
-
-/* Result badges */
-.scanner-hero__badges {
-  display: flex;
-  gap: 6px;
+  gap: 12px;
   margin-top: 14px;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-.hero-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 100px;
-  animation: badgeFloat 4s ease-in-out infinite;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
+.hero-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  animation: indicatorFade 3.5s ease-in-out infinite;
 }
-.hero-badge--halol {
-  background: var(--green-100);
-  color: var(--green-700);
-  border: 1px solid var(--green-200);
+.hero-indicator svg {
+  flex-shrink: 0;
+}
+.hero-indicator--halol {
+  color: var(--green-600);
   animation-delay: 0s;
 }
-.hero-badge--shubhali {
-  background: var(--amber-100);
-  color: var(--amber-700);
-  border: 1px solid var(--amber-200);
-  animation-delay: 1.3s;
+.hero-indicator--shubhali {
+  color: var(--amber-600);
+  animation-delay: 1.2s;
 }
-.hero-badge--harom {
-  background: var(--red-100);
-  color: var(--red-700);
-  border: 1px solid #f5c6c0;
-  animation-delay: 2.6s;
+.hero-indicator--harom {
+  color: var(--red-600);
+  animation-delay: 2.4s;
 }
-@keyframes badgeFloat {
-  0%, 100% { transform: translateY(0); opacity: 0.65; }
-  50% { transform: translateY(-3px); opacity: 1; }
+@keyframes indicatorFade {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
 }
 
 /* --- Text & CTA --- */
@@ -231,7 +207,7 @@ body {
 }
 
 .scanner-hero__title {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--gray-800);
   margin: 0 0 4px;
@@ -239,43 +215,46 @@ body {
 
 .scanner-hero__desc {
   font-size: 0.78rem;
-  color: var(--gray-500);
+  color: var(--gray-400);
   margin: 0 auto 16px;
   line-height: 1.45;
-  padding: 0 8px;
+  padding: 0 12px;
 }
 
 .scanner-hero__btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 26px;
-  border: none;
+  padding: 11px 24px;
+  border: 1.5px solid var(--green-600);
   border-radius: 100px;
-  background: var(--green-700);
-  color: white;
+  background: transparent;
+  color: var(--green-700);
   font-family: var(--font);
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s var(--ease);
-  box-shadow: 0 3px 16px rgba(20,92,52,0.22);
+  transition: all 0.25s var(--ease);
   -webkit-tap-highlight-color: transparent;
-  max-width: 100%;
-  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.scanner-hero__btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--green-600);
+  opacity: 0;
+  transition: opacity 0.25s;
+  border-radius: inherit;
+}
+.scanner-hero__btn:active::before {
+  opacity: 0.08;
 }
 .scanner-hero__btn:active {
   transform: scale(0.97);
-  box-shadow: 0 1px 8px rgba(20,92,52,0.18);
 }
-
-.scanner-hero__btn-icon { font-size: 1rem; }
-.scanner-hero__btn-arrow {
-  font-size: 1rem;
-  transition: transform 0.2s;
-}
-.scanner-hero__btn:active .scanner-hero__btn-arrow {
-  transform: translateX(3px);
+.scanner-hero__btn svg {
+  flex-shrink: 0;
 }
 
 
