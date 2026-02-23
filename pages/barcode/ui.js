@@ -133,7 +133,7 @@ window.UI = (() => {
       factory.className = `modal-factory ${data.sameFactory ? 'modal-factory--warn' : 'modal-factory--ok'}`;
       document.getElementById('modalFactoryIcon').textContent = data.sameFactory ? '🏭' : '✅';
       document.getElementById('modalFactoryText').textContent = data.sameFactory
-        ? "Harom mahsulotlar ishlab chiqarilgan uskunalarda tayyorlangan"
+        ? "Harom mahsulotlar ishlab chiqariladigan zavod/uskunalarda tayyorlangan"
         : "Toza ishlab chiqarish";
       factory.style.display = 'flex';
     } else {
