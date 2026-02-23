@@ -81,8 +81,8 @@ window.UI = (() => {
   function showProductModal(data) {
     const modal = document.getElementById('productModal');
     const verdictMap = {
-      halol:    { emoji: '☪️', label: 'Halol', cls: 'halol' },
-      harom:    { emoji: '⛔️', label: 'Harom', cls: 'harom' },
+      halol:    { emoji: '☪️', label: 'Joiz', cls: 'halol' },
+      harom:    { emoji: '⛔️', label: 'Nojoiz', cls: 'harom' },
       shubhali: { emoji: '⚠️', label: 'Shubhali', cls: 'shubhali' }
     };
     const v = verdictMap[data.verdict] || verdictMap.halol;
@@ -227,8 +227,8 @@ window.UI = (() => {
     // Verdict
     e.verdictBanner.className = `verdict verdict--${data.verdict}`;
     const verdictMap = {
-      halol:    { emoji: '☪️', title: 'Halol', desc: 'Tarkibida harom ingredientlar topilmadi' },
-      harom:    { emoji: '⛔️', title: 'Harom', desc: 'Tarkibida harom ingredientlar aniqlandi' },
+      halol:    { emoji: '☪️', title: 'Joiz', desc: 'Tarkibida harom ingredientlar topilmadi' },
+      harom:    { emoji: '⛔️', title: 'Nojoiz', desc: 'Tarkibida harom ingredientlar aniqlandi' },
       shubhali: { emoji: '⚠️', title: 'Shubhali', desc: "Harom moddalar yo'q, lekin bir zavodda ishlab chiqarilgan" }
     };
     const v = verdictMap[data.verdict] || verdictMap.halol;
