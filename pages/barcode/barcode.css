@@ -102,15 +102,9 @@ body {
   padding: 24px 16px 20px;
   position: relative;
   animation: heroFadeIn 0.5s var(--ease);
-  display: flex !important;
+  display: flex;
   flex-direction: column !important;
-  align-items: center !important;
-  width: auto;
-}
-.scanner-hero > * {
-  width: 100% !important;
-  max-width: 100% !important;
-  flex-direction: column !important;
+  align-items: center;
 }
 .scanner-hero::before {
   content: '';
