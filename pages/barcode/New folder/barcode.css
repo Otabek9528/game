@@ -67,7 +67,7 @@ body {
 
 
 /* ========================================
-   NOTICE BARS (Permission, Error)
+   NOTICE BARS (Error only)
    ======================================== */
 .notice-bar {
   display: flex; align-items: center; gap: 10px;
@@ -79,10 +79,6 @@ body {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.notice-bar--info {
-  background: linear-gradient(135deg, var(--green-50) 0%, #e4f6ec 100%);
-  border-color: var(--green-200);
-}
 .notice-bar--error {
   background: var(--red-50); border-color: var(--red-100);
 }
@@ -93,6 +89,223 @@ body {
   margin: 0; line-height: 1.4;
 }
 .notice-bar .btn { flex-shrink: 0; white-space: nowrap; }
+
+
+/* ========================================
+   SCANNER HERO — Animated CTA Section
+   ======================================== */
+.scanner-hero {
+  margin: 14px 14px 0;
+  background: linear-gradient(160deg, #0d1f15 0%, #0a2615 40%, #112e1c 100%);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  padding: 24px 16px 20px;
+  position: relative;
+  animation: heroFadeIn 0.5s var(--ease);
+  display: flex;
+  flex-direction: column !important;
+  align-items: center;
+}
+.scanner-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(52,210,120,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 90%, rgba(52,210,120,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Animated barcode visual --- */
+.scanner-hero__visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.barcode-anim {
+  position: relative;
+  width: 150px;
+  height: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.barcode-anim__bars {
+  display: flex;
+  align-items: center;
+  gap: 2.5px;
+  height: 60px;
+}
+.barcode-anim__bars span {
+  display: block;
+  height: 100%;
+  background: rgba(255,255,255,0.25);
+  border-radius: 1px;
+  animation: barPulse 3s ease-in-out infinite;
+}
+.barcode-anim__bars span:nth-child(odd) { animation-delay: 0s; }
+.barcode-anim__bars span:nth-child(even) { animation-delay: 0.15s; }
+.barcode-anim__bars span:nth-child(3n) { animation-delay: 0.3s; }
+
+@keyframes barPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.85; }
+}
+
+/* Laser scan line */
+.barcode-anim__laser {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green-400) 15%, #5fff95 50%, var(--green-400) 85%, transparent);
+  border-radius: 1px;
+  box-shadow:
+    0 0 12px rgba(52,210,120,0.6),
+    0 0 30px rgba(52,210,120,0.2);
+  animation: heroLaserSweep 2.4s ease-in-out infinite;
+}
+@keyframes heroLaserSweep {
+  0%, 100% { top: 10%; opacity: 0.6; }
+  50% { top: 88%; opacity: 1; }
+}
+
+/* Scan frame corners */
+.barcode-anim__corner {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-color: var(--green-400);
+  border-style: solid;
+  border-width: 0;
+  opacity: 0.6;
+}
+.barcode-anim__corner--tl { top:0;left:0; border-top-width:2px;border-left-width:2px; border-top-left-radius:5px; }
+.barcode-anim__corner--tr { top:0;right:0; border-top-width:2px;border-right-width:2px; border-top-right-radius:5px; }
+.barcode-anim__corner--bl { bottom:0;left:0; border-bottom-width:2px;border-left-width:2px; border-bottom-left-radius:5px; }
+.barcode-anim__corner--br { bottom:0;right:0; border-bottom-width:2px;border-right-width:2px; border-bottom-right-radius:5px; }
+
+/* Floating result badges */
+.scanner-hero__badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 100px;
+  animation: badgeFloat 4s ease-in-out infinite;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.hero-badge--halol {
+  background: rgba(34,161,90,0.2);
+  color: var(--green-300);
+  border: 1px solid rgba(34,161,90,0.25);
+  animation-delay: 0s;
+}
+.hero-badge--shubhali {
+  background: rgba(184,134,11,0.15);
+  color: var(--amber-200);
+  border: 1px solid rgba(184,134,11,0.2);
+  animation-delay: 1.3s;
+}
+.hero-badge--harom {
+  background: rgba(192,57,43,0.15);
+  color: #f5a09a;
+  border: 1px solid rgba(192,57,43,0.2);
+  animation-delay: 2.6s;
+}
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}
+
+/* --- Text & CTA --- */
+.scanner-hero__content {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
+}
+
+.scanner-hero__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px;
+  letter-spacing: -0.2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.scanner-hero__desc {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0 auto 14px;
+  line-height: 1.45;
+  padding: 0 8px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.scanner-hero__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 100px;
+  background: var(--green-500);
+  color: white;
+  font-family: var(--font);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  box-shadow:
+    0 4px 20px rgba(34,161,90,0.35),
+    0 0 0 0 rgba(34,161,90,0.3);
+  animation: btnPulseGlow 2.5s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+  max-width: 100%;
+  white-space: nowrap;
+}
+.scanner-hero__btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(34,161,90,0.3);
+}
+
+.scanner-hero__btn-icon { font-size: 1rem; }
+.scanner-hero__btn-arrow {
+  font-size: 1rem;
+  transition: transform 0.2s;
+}
+.scanner-hero__btn:active .scanner-hero__btn-arrow {
+  transform: translateX(3px);
+}
+
+@keyframes btnPulseGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(34,161,90,0.35), 0 0 0 0 rgba(34,161,90,0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(34,161,90,0.35), 0 0 0 8px rgba(34,161,90,0);
+  }
+}
 
 
 /* ========================================
