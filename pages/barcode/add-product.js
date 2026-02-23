@@ -193,8 +193,8 @@ window.AddProduct = (() => {
   }
 
   function _showConfirmation(result) {
-    let verdictText = '☪️ Joiz';
-    if (result.verdict === 'harom') verdictText = '⛔️ Nojoiz';
+    let verdictText = '☪️ Halol';
+    if (result.verdict === 'harom') verdictText = '⛔️ Harom';
     else if (result.verdict === 'shubhali') verdictText = '⚠️ Shubhali';
 
     const labels = [];
