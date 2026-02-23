@@ -99,7 +99,7 @@ body {
   background: linear-gradient(160deg, #0d1f15 0%, #0a2615 40%, #112e1c 100%);
   border-radius: var(--r-xl);
   overflow: hidden;
-  padding: 28px 20px 24px;
+  padding: 24px 16px 20px;
   position: relative;
   animation: heroFadeIn 0.5s var(--ease);
 }
@@ -107,8 +107,8 @@ body {
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse at 70% 20%, rgba(52,210,120,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 20% 80%, rgba(52,210,120,0.05) 0%, transparent 50%);
+    radial-gradient(ellipse at 50% 20%, rgba(52,210,120,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 90%, rgba(52,210,120,0.05) 0%, transparent 50%);
   pointer-events: none;
 }
 @keyframes heroFadeIn {
@@ -122,13 +122,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .barcode-anim {
   position: relative;
-  width: 180px;
-  height: 110px;
+  width: 160px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -138,7 +138,7 @@ body {
   display: flex;
   align-items: center;
   gap: 2.5px;
-  height: 80px;
+  height: 65px;
 }
 .barcode-anim__bars span {
   display: block;
@@ -147,15 +147,9 @@ body {
   border-radius: 1px;
   animation: barPulse 3s ease-in-out infinite;
 }
-.barcode-anim__bars span:nth-child(odd) {
-  animation-delay: 0s;
-}
-.barcode-anim__bars span:nth-child(even) {
-  animation-delay: 0.15s;
-}
-.barcode-anim__bars span:nth-child(3n) {
-  animation-delay: 0.3s;
-}
+.barcode-anim__bars span:nth-child(odd) { animation-delay: 0s; }
+.barcode-anim__bars span:nth-child(even) { animation-delay: 0.15s; }
+.barcode-anim__bars span:nth-child(3n) { animation-delay: 0.3s; }
 
 @keyframes barPulse {
   0%, 100% { opacity: 0.3; }
@@ -182,28 +176,30 @@ body {
 /* Scan frame corners */
 .barcode-anim__corner {
   position: absolute;
-  width: 18px; height: 18px;
+  width: 16px; height: 16px;
   border-color: var(--green-400);
   border-style: solid;
   border-width: 0;
   opacity: 0.6;
 }
-.barcode-anim__corner--tl { top:0;left:0; border-top-width:2px;border-left-width:2px; border-top-left-radius:6px; }
-.barcode-anim__corner--tr { top:0;right:0; border-top-width:2px;border-right-width:2px; border-top-right-radius:6px; }
-.barcode-anim__corner--bl { bottom:0;left:0; border-bottom-width:2px;border-left-width:2px; border-bottom-left-radius:6px; }
-.barcode-anim__corner--br { bottom:0;right:0; border-bottom-width:2px;border-right-width:2px; border-bottom-right-radius:6px; }
+.barcode-anim__corner--tl { top:0;left:0; border-top-width:2px;border-left-width:2px; border-top-left-radius:5px; }
+.barcode-anim__corner--tr { top:0;right:0; border-top-width:2px;border-right-width:2px; border-top-right-radius:5px; }
+.barcode-anim__corner--bl { bottom:0;left:0; border-bottom-width:2px;border-left-width:2px; border-bottom-left-radius:5px; }
+.barcode-anim__corner--br { bottom:0;right:0; border-bottom-width:2px;border-right-width:2px; border-bottom-right-radius:5px; }
 
 /* Floating result badges */
 .scanner-hero__badges {
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .hero-badge {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 100px;
   animation: badgeFloat 4s ease-in-out infinite;
   letter-spacing: 0.3px;
@@ -228,7 +224,7 @@ body {
 }
 @keyframes badgeFloat {
   0%, 100% { transform: translateY(0); opacity: 0.7; }
-  50% { transform: translateY(-4px); opacity: 1; }
+  50% { transform: translateY(-3px); opacity: 1; }
 }
 
 /* --- Text & CTA --- */
@@ -239,34 +235,32 @@ body {
 }
 
 .scanner-hero__title {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   letter-spacing: -0.2px;
 }
 
 .scanner-hero__desc {
-  font-size: 0.82rem;
-  color: rgba(255,255,255,0.55);
-  margin: 0 0 18px;
-  line-height: 1.5;
-  max-width: 280px;
-  margin-left: auto;
-  margin-right: auto;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0 auto 14px;
+  line-height: 1.45;
+  max-width: 260px;
 }
 
 .scanner-hero__btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 28px;
+  gap: 8px;
+  padding: 12px 24px;
   border: none;
   border-radius: 100px;
   background: var(--green-500);
   color: white;
   font-family: var(--font);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s var(--ease);
@@ -281,11 +275,9 @@ body {
   box-shadow: 0 2px 10px rgba(34,161,90,0.3);
 }
 
-.scanner-hero__btn-icon {
-  font-size: 1.1rem;
-}
+.scanner-hero__btn-icon { font-size: 1rem; }
 .scanner-hero__btn-arrow {
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: transform 0.2s;
 }
 .scanner-hero__btn:active .scanner-hero__btn-arrow {
