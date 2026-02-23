@@ -71,7 +71,6 @@
       UI.showScanBeam(false);
       UI.showDiscover(false);
 
-      // For now, show as "not found" — real API lookup comes in Milestone 3
       lookupProduct(code, format);
     });
   }

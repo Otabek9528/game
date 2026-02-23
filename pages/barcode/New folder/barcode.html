@@ -49,7 +49,7 @@
          ======================================== -->
     <div id="scannerDisplay" style="display:none;">
 
-      <!-- Viewfinder -->
+      <!-- Viewfinder — HERO -->
       <div class="viewfinder" id="viewfinderWrap">
         <div class="viewfinder__screen" id="cameraContainer">
           <video id="videoElement" autoplay playsinline muted></video>
@@ -63,13 +63,14 @@
             </div>
           </div>
           <div class="focus-dot" id="focusIndicator"><span>◎</span></div>
-        </div>
-        <div class="viewfinder__controls">
-          <button class="ctrl-btn" id="restartCameraBtn" title="Qayta ishga tushirish">🔄</button>
-          <button class="ctrl-btn" id="switchCameraBtn" title="Kamerani almashtirish" style="display:none;">📷</button>
-          <button class="ctrl-btn" id="torchBtn" title="Chiroq" style="display:none;">
-            <span id="torchIcon">🔦</span>
-          </button>
+          <!-- Controls float inside the camera view -->
+          <div class="viewfinder__controls">
+            <button class="ctrl-btn" id="restartCameraBtn" title="Qayta ishga tushirish">🔄</button>
+            <button class="ctrl-btn" id="switchCameraBtn" title="Kamerani almashtirish" style="display:none;">📷</button>
+            <button class="ctrl-btn" id="torchBtn" title="Chiroq" style="display:none;">
+              <span id="torchIcon">🔦</span>
+            </button>
+          </div>
         </div>
       </div>
 
