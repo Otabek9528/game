@@ -315,8 +315,9 @@ const I18N = {
     'month.8': { uz: 'Sentyabr', ru: 'Сентябрь', en: 'September' },
     'month.9': { uz: 'Oktyabr', ru: 'Октябрь', en: 'October' },
     'month.10': { uz: 'Noyabr', ru: 'Ноябрь', en: 'November' },
-    'month.11': { uz: 'Dekabr', ru: 'Декабрь', en: 'December' },
-
+    'month.11': { uz: 'Dekabr', ru: 'Декабрь', en: 'December' }
+  
+  
     // ========================================
     // Barcode Scanner Page
     // ========================================
