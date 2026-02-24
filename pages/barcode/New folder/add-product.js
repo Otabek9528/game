@@ -1,6 +1,6 @@
 // add-product.js — Add Product Wizard Module
 // 3-step wizard: photo capture → flags → submit
-// Depends on: Camera, UI, AppActions, I18N
+// Depends on: Camera, UI, AppActions
 // Exposes: window.AddProduct
 // ============================================
 
@@ -16,15 +16,10 @@ window.AddProduct = (() => {
     seafood: 'flagSeafood', factory: 'flagFactory', allhalal: 'flagAllHalal'
   };
 
-  function _stepLabels() {
-    return {
-      1: '📸 ' + t('bc.wiz.stepPhoto'),
-      '1b': '📸 ' + t('bc.wiz.stepReview'),
-      2: '🏷️ ' + t('bc.wiz.stepFlags'),
-      3: '📤 ' + t('bc.wiz.stepUploading'),
-      '3b': '✅ ' + t('bc.wiz.stepDone')
-    };
-  }
+  const STEP_LABELS = {
+    1: '📸 Mahsulot rasmi', '1b': '📸 Rasmni tekshiring',
+    2: '🏷️ Ta\'qiqlangan moddalar', 3: '📤 Yuborilmoqda', '3b': '✅ Yuborildi'
+  };
 
   // === PUBLIC ===
   function start(scannedBarcode) {
@@ -45,7 +40,7 @@ window.AddProduct = (() => {
       .forEach(id => document.getElementById(id).style.display = 'none');
     document.getElementById(`wizardStep${step}`).style.display = 'block';
     _updateDots(step);
-    document.getElementById('wizardStepLabel').textContent = _stepLabels()[step] || '';
+    document.getElementById('wizardStepLabel').textContent = STEP_LABELS[step] || '';
     document.getElementById('addProductWizard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -73,7 +68,7 @@ window.AddProduct = (() => {
       await Camera.openForCapture(document.getElementById('captureVideo'));
     } catch (e) {
       console.error('Capture camera failed:', e);
-      _goToStep(2);
+      _goToStep(2); // Skip photo
     }
   }
 
@@ -119,6 +114,7 @@ window.AddProduct = (() => {
       }
       return;
     }
+    // Deselect "all halal"
     if (flags.allhalal) {
       flags.allhalal = false;
       _applyVisual('allhalal', false, true);
@@ -174,6 +170,7 @@ window.AddProduct = (() => {
 
       if (result.success) {
         _showConfirmation(result);
+        // Log insertion
         try {
           const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
           fetch(`${window._API_BASE || ''}/api/log-interaction`, {
@@ -187,44 +184,44 @@ window.AddProduct = (() => {
           }).catch(() => {});
         } catch (e) {}
       } else {
-        throw new Error(result.error || t('bc.error'));
+        throw new Error(result.error || 'Xatolik');
       }
     } catch (err) {
       console.error('Submit failed:', err);
       const tg = window.Telegram?.WebApp;
-      if (tg?.showAlert) tg.showAlert(t('bc.error') + ': ' + err.message);
+      if (tg?.showAlert) tg.showAlert('Xatolik: ' + err.message);
       _goToStep(2);
     }
   }
 
   function _showConfirmation(result) {
-    let verdictText = '✅ ' + t('bc.verdictJoiz');
-    if (result.verdict === 'harom') verdictText = '⛔️ ' + t('bc.verdictTaqiqlangan');
-    else if (result.verdict === 'shubhali') verdictText = '⚠️ ' + t('bc.verdictShubhali');
+    let verdictText = '✅ Joiz';
+    if (result.verdict === 'harom') verdictText = '⛔️ Ta\'qiqlangan';
+    else if (result.verdict === 'shubhali') verdictText = '⚠️ Shubhali';
 
     const labels = [];
-    if (flags.pork) labels.push('🐖 ' + t('bc.flag.pork'));
-    if (flags.alcohol) labels.push('🍷 ' + t('bc.flag.alcohol'));
-    if (flags.meat) labels.push('🍗 ' + t('bc.grid.meat'));
-    if (flags.seafood) labels.push('🦐 ' + t('bc.grid.seafood'));
-    if (flags.factory) labels.push('🏭 ' + t('bc.flag.factory'));
-    if (flags.allhalal) labels.push('✅ ' + t('bc.flag.allJoiz'));
+    if (flags.pork) labels.push("🐖 Cho'chqa");
+    if (flags.alcohol) labels.push('🍷 Alkogol');
+    if (flags.meat) labels.push("🍗 Go'sht");
+    if (flags.seafood) labels.push('🦐 Dengiz m.');
+    if (flags.factory) labels.push('🏭 Bir zavod');
+    if (flags.allhalal) labels.push('✅ Barchasi joiz');
 
     document.getElementById('confirmSummary').innerHTML = `
       <div class="confirm-summary__row">
-        <span class="confirm-summary__label">${t('bc.confirm.barcode')}</span>
+        <span class="confirm-summary__label">Shtrix-kod</span>
         <span class="confirm-summary__value"><code>${barcode}</code></span>
       </div>
       <div class="confirm-summary__row">
-        <span class="confirm-summary__label">${t('bc.confirm.photo')}</span>
-        <span class="confirm-summary__value">${photoBlob ? '📸 ' + t('bc.confirm.photoYes') : '— ' + t('bc.confirm.photoNo')}</span>
+        <span class="confirm-summary__label">Rasm</span>
+        <span class="confirm-summary__value">${photoBlob ? '📸 Yuklangan' : "— Yo'q"}</span>
       </div>
       <div class="confirm-summary__row">
-        <span class="confirm-summary__label">${t('bc.confirm.status')}</span>
+        <span class="confirm-summary__label">Holati</span>
         <span class="confirm-summary__value">${verdictText}</span>
       </div>
       <div class="confirm-summary__row">
-        <span class="confirm-summary__label">${t('bc.confirm.flags')}</span>
+        <span class="confirm-summary__label">Belgilar</span>
         <span class="confirm-summary__value">${labels.join(', ') || '—'}</span>
       </div>`;
     _goToStep('3b');

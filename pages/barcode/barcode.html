@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Tarkib Tekshirish</title>
+  <title data-i18n="bc.pageTitle">Tarkib Tekshirish</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="barcode.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,18 +49,18 @@
         </div>
 
         <div class="scanner-hero__badges">
-          <span class="hero-badge hero-badge--joiz">✅ Joiz</span>
-          <span class="hero-badge hero-badge--shubhali">⚠️ Shubhali</span>
-          <span class="hero-badge hero-badge--taqiqlangan">⛔ Ta'qiqlangan</span>
+          <span class="hero-badge hero-badge--joiz" data-i18n="bc.badgeJoiz">✅ Joiz</span>
+          <span class="hero-badge hero-badge--shubhali" data-i18n="bc.badgeShubhali">⚠️ Shubhali</span>
+          <span class="hero-badge hero-badge--taqiqlangan" data-i18n="bc.badgeTaqiqlangan">⛔ Ta'qiqlangan</span>
         </div>
       </div>
 
       <div class="scanner-hero__content">
-        <h2 class="scanner-hero__title">Mahsulotni skanerlang</h2>
-        <p class="scanner-hero__desc">Shtrix kodni kameraga ko'rsating — tarkibida harom moddalar bor-yo'qligini bir zumda bilib oling</p>
+        <h2 class="scanner-hero__title" data-i18n="bc.heroTitle">Mahsulotni skanerlang</h2>
+        <p class="scanner-hero__desc" data-i18n="bc.heroDesc">Shtrix kodni kameraga ko'rsating — tarkibida harom moddalar bor-yo'qligini bir zumda bilib oling</p>
         <button class="scanner-hero__btn" id="requestPermissionBtn">
           <span class="scanner-hero__btn-icon">📷</span>
-          <span>Skanerlashni boshlash</span>
+          <span data-i18n="bc.startScan">Skanerlashni boshlash</span>
           <span class="scanner-hero__btn-arrow">→</span>
         </button>
       </div>
@@ -72,9 +72,9 @@
     <div class="notice-bar notice-bar--error" id="errorState" style="display:none;">
       <span class="notice-bar__emoji">⚠️</span>
       <div class="notice-bar__content">
-        <p class="notice-bar__text" id="errorMessage">Kameraga ulanib bo'lmadi.</p>
+        <p class="notice-bar__text" id="errorMessage" data-i18n="bc.cameraError">Kameraga ulanib bo'lmadi.</p>
       </div>
-      <button class="btn btn--secondary btn--sm" id="retryBtn">🔄 Qaytadan</button>
+      <button class="btn btn--secondary btn--sm" id="retryBtn" data-i18n="bc.retry">🔄 Qaytadan</button>
     </div>
 
     <!-- ========================================
@@ -96,11 +96,10 @@
             </div>
           </div>
           <div class="focus-dot" id="focusIndicator"><span>◎</span></div>
-          <!-- Controls float inside the camera view -->
           <div class="viewfinder__controls">
-            <button class="ctrl-btn" id="restartCameraBtn" title="Qayta ishga tushirish">🔄</button>
-            <button class="ctrl-btn" id="switchCameraBtn" title="Kamerani almashtirish" style="display:none;">📷</button>
-            <button class="ctrl-btn" id="torchBtn" title="Chiroq" style="display:none;">
+            <button class="ctrl-btn" id="restartCameraBtn" title="Restart">🔄</button>
+            <button class="ctrl-btn" id="switchCameraBtn" title="Switch" style="display:none;">📷</button>
+            <button class="ctrl-btn" id="torchBtn" title="Torch" style="display:none;">
               <span id="torchIcon">🔦</span>
             </button>
           </div>
@@ -111,7 +110,7 @@
       <div class="status-bar">
         <div class="status-pill scanning" id="statusIndicator">
           <span class="status-dot"></span>
-          <span class="status-label" id="statusText">Qidirilmoqda...</span>
+          <span class="status-label" id="statusText">...</span>
           <span class="cam-badge" id="cameraInfoBadge" style="display:none;"></span>
         </div>
       </div>
@@ -122,7 +121,6 @@
       <div id="resultSection" style="display:none;">
         <div class="product-card" id="productCard">
 
-          <!-- Verdict banner -->
           <div class="verdict" id="verdictBanner">
             <span class="verdict__emoji" id="verdictEmoji"></span>
             <div class="verdict__text">
@@ -131,47 +129,40 @@
             </div>
           </div>
 
-          <!-- Product image -->
           <div id="productImageWrap" style="display:none;">
-            <img class="product-img" id="productImage" src="" alt="Mahsulot" />
+            <img class="product-img" id="productImage" src="" alt="" />
           </div>
 
-          <!-- Head -->
           <div class="product-head">
             <h3 class="product-name" id="productName">—</h3>
             <div class="barcode-chip">
               <span class="barcode-chip__label" id="barcodeType">—</span>
               <code class="barcode-chip__code" id="barcodeNumber">—</code>
-              <button class="barcode-chip__copy" id="copyBtn" title="Nusxalash">📋</button>
+              <button class="barcode-chip__copy" id="copyBtn" title="Copy">📋</button>
             </div>
           </div>
 
-          <!-- Halal grid -->
           <div class="halal-grid" id="halalGrid"></div>
 
-          <!-- Factory notice -->
           <div class="factory-bar" id="factoryNotice" style="display:none;">
             <span class="factory-bar__icon" id="factoryIcon"></span>
             <p class="factory-bar__text" id="factoryText"></p>
           </div>
 
-          <!-- Actions -->
           <div class="card-actions">
-            <button class="btn btn--ghost" id="showIngredientsBtn">🧪 Tarkibi</button>
-            <button class="btn btn--primary" id="scanAgainBtn">📷 Qayta skanerlash</button>
+            <button class="btn btn--ghost" id="showIngredientsBtn" data-i18n="bc.ingredients">🧪 Tarkibi</button>
+            <button class="btn btn--primary" id="scanAgainBtn" data-i18n="bc.scanAgain">📷 Qayta skanerlash</button>
           </div>
 
-          <!-- Ingredients panel -->
           <div class="ingredients" id="ingredientsPanel" style="display:none;">
             <div class="ingredients__top">
-              <span>🧪 Mahsulot tarkibi</span>
+              <span data-i18n="bc.ingredientsTitle">🧪 Mahsulot tarkibi</span>
               <button class="ingredients__close" id="closeIngredientsBtn">✕</button>
             </div>
             <p class="ingredients__body" id="ingredientsText"></p>
           </div>
 
-          <!-- Info link -->
-          <a class="info-link" id="infoLink" href="https://telegra.ph/Koreyada-non-halol-emasmi-04-20" target="_blank">
+          <a class="info-link" id="infoLink" href="https://telegra.ph/Koreyada-non-halol-emasmi-04-20" target="_blank" data-i18n="bc.infoLink">
             🤔 Shubhali mahsulotni yesa bo'ladimi?
           </a>
         </div>
@@ -183,12 +174,12 @@
       <div id="notFoundSection" style="display:none;">
         <div class="empty-card">
           <div class="empty-card__emoji">😕</div>
-          <h3 class="empty-card__title">Mahsulot topilmadi</h3>
+          <h3 class="empty-card__title" data-i18n="bc.notFound">Mahsulot topilmadi</h3>
           <code class="empty-card__code" id="notFoundBarcode">—</code>
-          <p class="empty-card__desc">Ma'lumotlar bazasida ushbu mahsulot mavjud emas.</p>
+          <p class="empty-card__desc" data-i18n="bc.notFoundDesc">Ma'lumotlar bazasida ushbu mahsulot mavjud emas.</p>
           <div class="empty-card__actions">
-            <button class="btn btn--primary btn--full" id="addProductBtn">➕ Mahsulot qo'shish</button>
-            <button class="btn btn--ghost btn--full" id="scanAgainBtn2">📷 Qayta skanerlash</button>
+            <button class="btn btn--primary btn--full" id="addProductBtn" data-i18n="bc.addProduct">➕ Mahsulot qo'shish</button>
+            <button class="btn btn--ghost btn--full" id="scanAgainBtn2" data-i18n="bc.scanAgain">📷 Qayta skanerlash</button>
           </div>
         </div>
       </div>
@@ -196,32 +187,29 @@
     </div><!-- /scannerDisplay -->
 
     <!-- ========================================
-         DISCOVER SECTION (visible on page load)
+         DISCOVER SECTION
          ======================================== -->
     <div class="discover" id="discoverSection">
-      <h3 class="discover__title">📦 Ma'lumotlar bazasidan namunalar</h3>
+      <h3 class="discover__title" data-i18n="bc.discoverTitle">📦 Ma'lumotlar bazasidan namunalar</h3>
 
-      <!-- Joiz group -->
       <div class="discover__group">
-        <div class="discover__label discover__label--joiz">✅ Joiz</div>
+        <div class="discover__label discover__label--joiz" data-i18n="bc.badgeJoiz">✅ Joiz</div>
         <div class="discover__scroll" id="discoverHalol">
-          <p class="discover__loading">Yuklanmoqda...</p>
+          <p class="discover__loading" data-i18n="common.loading">Yuklanmoqda...</p>
         </div>
       </div>
 
-      <!-- Shubhali group -->
       <div class="discover__group">
-        <div class="discover__label discover__label--shubhali">⚠️ Shubhali</div>
+        <div class="discover__label discover__label--shubhali" data-i18n="bc.badgeShubhali">⚠️ Shubhali</div>
         <div class="discover__scroll" id="discoverShubhali">
-          <p class="discover__loading">Yuklanmoqda...</p>
+          <p class="discover__loading" data-i18n="common.loading">Yuklanmoqda...</p>
         </div>
       </div>
 
-      <!-- Ta'qiqlangan group -->
       <div class="discover__group">
-        <div class="discover__label discover__label--taqiqlangan">⛔️ Ta'qiqlangan</div>
+        <div class="discover__label discover__label--taqiqlangan" data-i18n="bc.badgeTaqiqlangan">⛔️ Ta'qiqlangan</div>
         <div class="discover__scroll" id="discoverHarom">
-          <p class="discover__loading">Yuklanmoqda...</p>
+          <p class="discover__loading" data-i18n="common.loading">Yuklanmoqda...</p>
         </div>
       </div>
     </div>
@@ -232,7 +220,6 @@
          ======================================== -->
     <div id="addProductWizard" style="display:none;">
 
-      <!-- Progress dots -->
       <div class="steps" id="wizardSteps">
         <span class="step-dot" id="stepDot1"></span>
         <span class="step-dot" id="stepDot2"></span>
@@ -240,19 +227,17 @@
       </div>
       <p class="step-label" id="wizardStepLabel"></p>
 
-      <!-- ===== STEP 1: Camera capture ===== -->
+      <!-- STEP 1 -->
       <div id="wizardStep1" style="display:none;">
         <div class="capture-card">
           <div class="capture-card__header">
-            <h3 class="capture-card__title">Mahsulot rasmini oling</h3>
-            <p class="capture-card__desc">Mahsulotning umumiy ko'rinishini aks ettirgan rasmini oling</p>
+            <h3 class="capture-card__title" data-i18n="bc.wiz.takePhoto">Mahsulot rasmini oling</h3>
+            <p class="capture-card__desc" data-i18n="bc.wiz.takePhotoDesc">Mahsulotning umumiy ko'rinishini aks ettirgan rasmini oling</p>
           </div>
           <div class="capture-card__barcode-row">
-            <span class="capture-card__barcode-label">Shtrix-kod:</span>
+            <span class="capture-card__barcode-label" data-i18n="bc.wiz.barcodeLabel">Shtrix-kod:</span>
             <span class="capture-card__barcode-value" id="wizardBarcode">—</span>
           </div>
-
-          <!-- Camera capture area -->
           <div class="capture-camera" id="captureCamera">
             <video id="captureVideo" autoplay playsinline muted></video>
             <div class="crosshair"></div>
@@ -260,134 +245,112 @@
               <button class="shutter-btn" id="shutterBtn"></button>
             </div>
           </div>
-
           <div class="capture-card__footer">
-            <button class="btn btn--danger btn--sm" id="wizardCancelBtn1">✕ Bekor qilish</button>
+            <button class="btn btn--danger btn--sm" id="wizardCancelBtn1" data-i18n="bc.wiz.cancel">✕ Bekor qilish</button>
           </div>
         </div>
       </div>
 
-      <!-- ===== STEP 1B: Photo preview ===== -->
+      <!-- STEP 1B -->
       <div id="wizardStep1b" style="display:none;">
         <div class="capture-card">
           <div class="capture-card__header">
-            <h3 class="capture-card__title">Rasmni tekshiring</h3>
-            <p class="capture-card__desc">Mahsulot aniq ko'rinsa, davom eting</p>
+            <h3 class="capture-card__title" data-i18n="bc.wiz.reviewPhoto">Rasmni tekshiring</h3>
+            <p class="capture-card__desc" data-i18n="bc.wiz.reviewPhotoDesc">Mahsulot aniq ko'rinsa, davom eting</p>
           </div>
-
           <div class="preview-img-wrap">
             <img id="previewImage" src="" alt="Preview" />
-            <span class="preview-badge">📸 Yangi rasm</span>
+            <span class="preview-badge" data-i18n="bc.wiz.newPhoto">📸 Yangi rasm</span>
           </div>
-
           <div class="capture-card__footer">
-            <button class="btn btn--ghost btn--sm" id="retakeBtn">🔄 Qaytadan</button>
-            <button class="btn btn--primary btn--sm" id="confirmPhotoBtn">Davom etish →</button>
+            <button class="btn btn--ghost btn--sm" id="retakeBtn" data-i18n="bc.wiz.retake">🔄 Qaytadan</button>
+            <button class="btn btn--primary btn--sm" id="confirmPhotoBtn" data-i18n="bc.wiz.continue">Davom etish →</button>
           </div>
         </div>
       </div>
 
-      <!-- ===== STEP 2: Halal flags ===== -->
+      <!-- STEP 2 -->
       <div id="wizardStep2" style="display:none;">
         <div class="flags-card">
           <div class="flags-card__header">
-            <h3 class="flags-card__title">Ta'qiqlangan moddalar belgilarini tanlang</h3>
-            <p class="flags-card__desc">Mahsulotga tegishli bo'lgan belgilarni belgilang. Bir nechta tanlash mumkin.</p>
+            <h3 class="flags-card__title" data-i18n="bc.wiz.flagsTitle">Ta'qiqlangan moddalar belgilarini tanlang</h3>
+            <p class="flags-card__desc" data-i18n="bc.wiz.flagsDesc">Mahsulotga tegishli bo'lgan belgilarni belgilang. Bir nechta tanlash mumkin.</p>
           </div>
-
           <div class="flag-list" id="flagList">
-            <!-- Pork -->
             <div class="flag-toggle" data-flag="pork" id="flagPork">
               <span class="flag-toggle__icon">🐖</span>
               <div class="flag-toggle__content">
-                <p class="flag-toggle__name">Cho'chqa</p>
-                <p class="flag-toggle__desc">Cho'chqa go'shti yoki undan tayyorlangan moddalar</p>
+                <p class="flag-toggle__name" data-i18n="bc.flag.pork">Cho'chqa</p>
+                <p class="flag-toggle__desc" data-i18n="bc.flag.porkDesc">Cho'chqa go'shti yoki undan tayyorlangan moddalar</p>
               </div>
               <div class="flag-toggle__check"></div>
             </div>
-
-            <!-- Alcohol -->
             <div class="flag-toggle" data-flag="alcohol" id="flagAlcohol">
               <span class="flag-toggle__icon">🍷</span>
               <div class="flag-toggle__content">
-                <p class="flag-toggle__name">Alkogol</p>
-                <p class="flag-toggle__desc">Spirtli moddalar (etanol, pivo, vino...)</p>
+                <p class="flag-toggle__name" data-i18n="bc.flag.alcohol">Alkogol</p>
+                <p class="flag-toggle__desc" data-i18n="bc.flag.alcoholDesc">Spirtli moddalar (etanol, pivo, vino...)</p>
               </div>
               <div class="flag-toggle__check"></div>
             </div>
-
-            <!-- Other meat -->
             <div class="flag-toggle" data-flag="meat" id="flagMeat">
               <span class="flag-toggle__icon">🍗</span>
               <div class="flag-toggle__content">
-                <p class="flag-toggle__name">Boshqa go'shtlar</p>
-                <p class="flag-toggle__desc">Mol, tovuq, qo'y yoki ulardan tayyorlangan ingredientlar</p>
+                <p class="flag-toggle__name" data-i18n="bc.flag.meat">Boshqa go'shtlar</p>
+                <p class="flag-toggle__desc" data-i18n="bc.flag.meatDesc">Mol, tovuq, qo'y yoki ulardan tayyorlangan ingredientlar</p>
               </div>
               <div class="flag-toggle__check"></div>
             </div>
-
-            <!-- Seafood -->
             <div class="flag-toggle" data-flag="seafood" id="flagSeafood">
               <span class="flag-toggle__icon">🦐</span>
               <div class="flag-toggle__content">
-                <p class="flag-toggle__name">Dengiz mahsulotlari</p>
-                <p class="flag-toggle__desc">Baliqdan tashqari: qisqichbaqa, kalmar, sakkizoyoq...</p>
+                <p class="flag-toggle__name" data-i18n="bc.flag.seafood">Dengiz mahsulotlari</p>
+                <p class="flag-toggle__desc" data-i18n="bc.flag.seafoodDesc">Baliqdan tashqari: qisqichbaqa, kalmar, sakkizoyoq...</p>
               </div>
               <div class="flag-toggle__check"></div>
             </div>
-
-            <div class="flag-separator"><span>yoki</span></div>
-
-            <!-- Same factory -->
+            <div class="flag-separator"><span data-i18n="bc.wiz.or">yoki</span></div>
             <div class="flag-toggle" data-flag="factory" id="flagFactory">
               <span class="flag-toggle__icon">🏭</span>
               <div class="flag-toggle__content">
-                <p class="flag-toggle__name">Bir zavodda</p>
-                <p class="flag-toggle__desc">Harom mahsulotlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan</p>
+                <p class="flag-toggle__name" data-i18n="bc.flag.factory">Bir zavodda</p>
+                <p class="flag-toggle__desc" data-i18n="bc.flag.factoryDesc">Harom mahsulotlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan</p>
               </div>
               <div class="flag-toggle__check"></div>
             </div>
-
-            <div class="flag-separator"><span>yoki</span></div>
-
-            <!-- All halal -->
+            <div class="flag-separator"><span data-i18n="bc.wiz.or">yoki</span></div>
             <div class="flag-toggle" data-flag="allhalal" id="flagAllHalal">
               <span class="flag-toggle__icon">☪️</span>
               <div class="flag-toggle__content">
-                <p class="flag-toggle__name">Barchasi Joiz</p>
-                <p class="flag-toggle__desc">Ta'qiqlangan ingredientlar yo'q, ishlab chiqarish ham toza</p>
+                <p class="flag-toggle__name" data-i18n="bc.flag.allJoiz">Barchasi Joiz</p>
+                <p class="flag-toggle__desc" data-i18n="bc.flag.allJoizDesc">Ta'qiqlangan ingredientlar yo'q, ishlab chiqarish ham toza</p>
               </div>
               <div class="flag-toggle__check"></div>
             </div>
           </div>
-
           <div class="flags-card__footer">
-            <button class="btn btn--ghost btn--sm" id="wizardBackBtn2">← Orqaga</button>
-            <button class="btn btn--primary btn--sm" id="wizardSubmitBtn">Tayyor ✓</button>
+            <button class="btn btn--ghost btn--sm" id="wizardBackBtn2" data-i18n="bc.wiz.back">← Orqaga</button>
+            <button class="btn btn--primary btn--sm" id="wizardSubmitBtn" data-i18n="bc.wiz.submit">Tayyor ✓</button>
           </div>
         </div>
       </div>
 
-      <!-- ===== STEP 3: Uploading ===== -->
+      <!-- STEP 3 -->
       <div id="wizardStep3" style="display:none;">
         <div class="uploading-card">
           <div class="uploading-spinner"></div>
-          <p class="uploading-card__text">Ma'lumotlar yuborilmoqda...</p>
+          <p class="uploading-card__text" data-i18n="bc.wiz.uploading">Ma'lumotlar yuborilmoqda...</p>
         </div>
       </div>
 
-      <!-- ===== STEP 3B: Success ===== -->
+      <!-- STEP 3B -->
       <div id="wizardStep3b" style="display:none;">
         <div class="confirm-card">
           <div class="confirm-card__icon">✅</div>
-          <h3 class="confirm-card__title">Rahmat!</h3>
-          <p class="confirm-card__desc">Ma'lumot yuborildi. Admin tasdig'idan o'tgandan so'ng ma'lumotlar bazasiga qo'shiladi.</p>
-
-          <div class="confirm-summary" id="confirmSummary">
-            <!-- Populated by JS -->
-          </div>
-
-          <button class="btn btn--primary btn--full" id="wizardDoneBtn">📷 Boshqa mahsulotni skanerlash</button>
+          <h3 class="confirm-card__title" data-i18n="bc.wiz.thanks">Rahmat!</h3>
+          <p class="confirm-card__desc" data-i18n="bc.wiz.thanksDesc">Ma'lumot yuborildi. Admin tasdig'idan o'tgandan so'ng ma'lumotlar bazasiga qo'shiladi.</p>
+          <div class="confirm-summary" id="confirmSummary"></div>
+          <button class="btn btn--primary btn--full" id="wizardDoneBtn" data-i18n="bc.wiz.scanAnother">📷 Boshqa mahsulotni skanerlash</button>
         </div>
       </div>
 
@@ -398,7 +361,7 @@
          ======================================== -->
     <div class="disclaimer" id="disclaimerFooter">
       <div class="disclaimer__icon">ℹ️</div>
-      <p class="disclaimer__text">
+      <p class="disclaimer__text" data-i18n-html="bc.disclaimer">
         Bu ma'lumotlar faqat mahsulot tarkibi asosida taqdim etilgan bo'lib, <strong>xatoliklar bo'lishi mumkin</strong>. 
         Biz rasmiy diniy hukm (fatvo) bermaymiz. Xatolik topsangiz <a href='https://t.me/MuslimVegukin'> Telegram guruhimizga</a> o'tib xabar bering.
       </p>
@@ -414,34 +377,22 @@
     <div class="modal-sheet">
       <div class="modal-sheet__handle"></div>
       <button class="modal-sheet__close" id="modalCloseBtn">✕</button>
-
-      <!-- Verdict mini-badge -->
       <div class="modal-verdict" id="modalVerdict">
         <span class="modal-verdict__emoji" id="modalVerdictEmoji"></span>
         <span class="modal-verdict__label" id="modalVerdictLabel"></span>
       </div>
-
-      <!-- Image -->
       <div class="modal-img-wrap" id="modalImgWrap" style="display:none;">
         <img class="modal-img" id="modalImg" src="" alt="" />
       </div>
-
-      <!-- Info -->
       <h3 class="modal-name" id="modalName">—</h3>
       <div class="modal-barcode" id="modalBarcode">—</div>
-
-      <!-- Halal grid compact -->
       <div class="modal-halal" id="modalHalalGrid"></div>
-
-      <!-- Factory -->
       <div class="modal-factory" id="modalFactory" style="display:none;">
         <span id="modalFactoryIcon"></span>
         <span class="modal-factory__text" id="modalFactoryText"></span>
       </div>
-
-      <!-- Ingredients -->
       <div class="modal-ingredients" id="modalIngredients" style="display:none;">
-        <p class="modal-ingredients__label">🧪 Tarkibi:</p>
+        <p class="modal-ingredients__label" data-i18n="bc.ingredientsLabel">🧪 Tarkibi:</p>
         <p class="modal-ingredients__text" id="modalIngredientsText"></p>
       </div>
     </div>
@@ -450,6 +401,7 @@
   <!-- ===== SCRIPTS ===== -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="../../js/logger.js"></script>
+  <script src="../../js/i18n.js"></script>
   <script src="https://unpkg.com/@aspect-dev/barcode-scanner@0.3.0/dist/barcode-scanner.umd.js"></script>
 
   <!-- Modular JS (loaded in dependency order) -->

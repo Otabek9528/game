@@ -7,8 +7,8 @@ const I18N = {
 
   availableFeatures: {
     uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'community', 'news', 'events', 'market'],
-    ru: ['mosque', 'restaurant', 'shop', 'qibla', 'donation', 'community'],
-    en: ['mosque', 'restaurant', 'shop', 'qibla', 'donation', 'community']
+    ru: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community'],
+    en: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community']
   },
 
   translations: {
@@ -316,6 +316,136 @@ const I18N = {
     'month.9': { uz: 'Oktyabr', ru: 'Октябрь', en: 'October' },
     'month.10': { uz: 'Noyabr', ru: 'Ноябрь', en: 'November' },
     'month.11': { uz: 'Dekabr', ru: 'Декабрь', en: 'December' }
+  
+  
+    // ========================================
+    // Barcode Scanner Page
+    // ========================================
+    'bc.pageTitle': { uz: 'Tarkib Tekshirish', ru: 'Проверка состава', en: 'Ingredient Check' },
+
+    // Hero / Permission screen
+    'bc.badgeJoiz': { uz: '✅ Joiz', ru: '✅ Допустимо', en: '✅ Permissible' },
+    'bc.badgeShubhali': { uz: '⚠️ Shubhali', ru: '⚠️ Сомнительно', en: '⚠️ Doubtful' },
+    'bc.badgeTaqiqlangan': { uz: '⛔ Ta\'qiqlangan', ru: '⛔ Запрещено', en: '⛔ Prohibited' },
+    'bc.heroTitle': { uz: 'Mahsulotni skanerlang', ru: 'Сканируйте продукт', en: 'Scan a product' },
+    'bc.heroDesc': { 
+      uz: 'Shtrix kodni kameraga ko\'rsating — tarkibida ta\'qiqlangan moddalar bor-yo\'qligini bir zumda bilib oling', 
+      ru: 'Наведите камеру на штрих-код — мгновенно узнайте, содержит ли продукт запрещённые ингредиенты', 
+      en: 'Point your camera at a barcode — instantly find out if the product contains prohibited ingredients' 
+    },
+    'bc.startScan': { uz: 'Skanerlashni boshlash', ru: 'Начать сканирование', en: 'Start scanning' },
+
+    // Error states
+    'bc.cameraError': { uz: 'Kameraga ulanib bo\'lmadi.', ru: 'Не удалось подключиться к камере.', en: 'Could not connect to camera.' },
+    'bc.retry': { uz: '🔄 Qaytadan', ru: '🔄 Повторить', en: '🔄 Retry' },
+    'bc.errNoCamera': { uz: 'Kamera topilmadi.', ru: 'Камера не найдена.', en: 'Camera not found.' },
+    'bc.errCameraBusy': { uz: 'Kamera band. Boshqa ilovalarni yoping.', ru: 'Камера занята. Закройте другие приложения.', en: 'Camera busy. Close other apps.' },
+    'bc.errCamera': { uz: 'Kamera xatoligi', ru: 'Ошибка камеры', en: 'Camera error' },
+    'bc.errCameraSwitch': { uz: 'Kamerani almashtirib bo\'lmadi.', ru: 'Не удалось переключить камеру.', en: 'Could not switch camera.' },
+    'bc.errPermDenied': { uz: 'Kamera ruxsati berilmagan. Brauzer sozlamalaridan ruxsat bering.', ru: 'Доступ к камере запрещён. Разрешите в настройках браузера.', en: 'Camera permission denied. Allow in browser settings.' },
+    'bc.error': { uz: 'Xatolik', ru: 'Ошибка', en: 'Error' },
+
+    // Scanner status
+    'bc.searching': { uz: 'Qidirilmoqda...', ru: 'Поиск...', en: 'Searching...' },
+    'bc.found': { uz: 'Topildi!', ru: 'Найдено!', en: 'Found!' },
+    'bc.checking': { uz: 'Tekshirilmoqda...', ru: 'Проверка...', en: 'Checking...' },
+    'bc.copied': { uz: 'Nusxalandi! ✅', ru: 'Скопировано! ✅', en: 'Copied! ✅' },
+
+    // Verdict labels
+    'bc.verdictJoiz': { uz: 'Joiz', ru: 'Допустимо', en: 'Permissible' },
+    'bc.verdictTaqiqlangan': { uz: 'Ta\'qiqlangan', ru: 'Запрещено', en: 'Prohibited' },
+    'bc.verdictShubhali': { uz: 'Shubhali', ru: 'Сомнительно', en: 'Doubtful' },
+    'bc.verdictJoizDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar topilmadi', ru: 'Запрещённые ингредиенты не обнаружены', en: 'No prohibited ingredients found' },
+    'bc.verdictTaqiqlanganDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar aniqlandi', ru: 'Обнаружены запрещённые ингредиенты', en: 'Prohibited ingredients detected' },
+    'bc.verdictShubhaliDesc': { uz: 'Ta\'qiqlangan moddalar yo\'q, lekin bir zavodda ishlab chiqarilgan', ru: 'Запрещённых веществ нет, но произведено на одном заводе', en: 'No prohibited substances, but produced in same factory' },
+
+    // Product result
+    'bc.ingredients': { uz: '🧪 Tarkibi', ru: '🧪 Состав', en: '🧪 Ingredients' },
+    'bc.ingredientsTitle': { uz: '🧪 Mahsulot tarkibi', ru: '🧪 Состав продукта', en: '🧪 Product ingredients' },
+    'bc.ingredientsLabel': { uz: '🧪 Tarkibi:', ru: '🧪 Состав:', en: '🧪 Ingredients:' },
+    'bc.scanAgain': { uz: '📷 Qayta skanerlash', ru: '📷 Сканировать снова', en: '📷 Scan again' },
+    'bc.infoLink': { uz: '🤔 Shubhali mahsulotni yesa bo\'ladimi?', ru: '🤔 Можно ли есть сомнительные продукты?', en: '🤔 Can I eat doubtful products?' },
+
+    // Halal grid labels
+    'bc.flag.pork': { uz: 'Cho\'chqa', ru: 'Свинина', en: 'Pork' },
+    'bc.flag.alcohol': { uz: 'Alkogol', ru: 'Алкоголь', en: 'Alcohol' },
+    'bc.grid.meat': { uz: 'Boshqa go\'sht', ru: 'Другое мясо', en: 'Other meat' },
+    'bc.grid.seafood': { uz: 'Dengiz m.', ru: 'Морепродукты', en: 'Seafood' },
+    'bc.absent': { uz: 'yo\'q', ru: 'нет', en: 'none' },
+    'bc.present': { uz: 'bor', ru: 'есть', en: 'present' },
+
+    // Factory
+    'bc.factoryWarn': { uz: 'Mahsulot ta\'qiqlangan mahsulotlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.', ru: 'Продукт произведён на оборудовании, где производятся запрещённые продукты.', en: 'Product manufactured on equipment where prohibited products are produced.' },
+    'bc.factoryOk': { uz: 'Mahsulot ishlab chiqarilgan zavod/uskunalarda ta\'qiqlangan mahsulotlar ishlatilmaydi.', ru: 'На заводе/оборудовании не производятся запрещённые продукты.', en: 'No prohibited products are manufactured on this equipment.' },
+
+    // Not found
+    'bc.notFound': { uz: 'Mahsulot topilmadi', ru: 'Продукт не найден', en: 'Product not found' },
+    'bc.notFoundDesc': { uz: 'Ma\'lumotlar bazasida ushbu mahsulot mavjud emas.', ru: 'Этот продукт отсутствует в базе данных.', en: 'This product is not in the database.' },
+    'bc.addProduct': { uz: '➕ Mahsulot qo\'shish', ru: '➕ Добавить продукт', en: '➕ Add product' },
+
+    // Discover
+    'bc.discoverTitle': { uz: '📦 Ma\'lumotlar bazasidan namunalar', ru: '📦 Примеры из базы данных', en: '📦 Samples from the database' },
+
+    // Wizard - steps
+    'bc.wiz.stepPhoto': { uz: 'Mahsulot rasmi', ru: 'Фото продукта', en: 'Product photo' },
+    'bc.wiz.stepReview': { uz: 'Rasmni tekshiring', ru: 'Проверьте фото', en: 'Review photo' },
+    'bc.wiz.stepFlags': { uz: 'Ta\'qiqlangan moddalar', ru: 'Запрещённые вещества', en: 'Prohibited substances' },
+    'bc.wiz.stepUploading': { uz: 'Yuborilmoqda', ru: 'Отправка', en: 'Uploading' },
+    'bc.wiz.stepDone': { uz: 'Yuborildi', ru: 'Отправлено', en: 'Submitted' },
+
+    // Wizard - Step 1
+    'bc.wiz.takePhoto': { uz: 'Mahsulot rasmini oling', ru: 'Сфотографируйте продукт', en: 'Take a product photo' },
+    'bc.wiz.takePhotoDesc': { uz: 'Mahsulotning umumiy ko\'rinishini aks ettirgan rasmini oling', ru: 'Сделайте фото общего вида продукта', en: 'Take a photo showing the overall product appearance' },
+    'bc.wiz.barcodeLabel': { uz: 'Shtrix-kod:', ru: 'Штрих-код:', en: 'Barcode:' },
+    'bc.wiz.cancel': { uz: '✕ Bekor qilish', ru: '✕ Отмена', en: '✕ Cancel' },
+
+    // Wizard - Step 1b
+    'bc.wiz.reviewPhoto': { uz: 'Rasmni tekshiring', ru: 'Проверьте фото', en: 'Review the photo' },
+    'bc.wiz.reviewPhotoDesc': { uz: 'Mahsulot aniq ko\'rinsa, davom eting', ru: 'Если продукт чётко виден, продолжайте', en: 'If the product is clearly visible, continue' },
+    'bc.wiz.newPhoto': { uz: '📸 Yangi rasm', ru: '📸 Новое фото', en: '📸 New photo' },
+    'bc.wiz.retake': { uz: '🔄 Qaytadan', ru: '🔄 Переснять', en: '🔄 Retake' },
+    'bc.wiz.continue': { uz: 'Davom etish →', ru: 'Продолжить →', en: 'Continue →' },
+
+    // Wizard - Step 2
+    'bc.wiz.flagsTitle': { uz: 'Ta\'qiqlangan moddalar belgilarini tanlang', ru: 'Выберите метки запрещённых веществ', en: 'Select prohibited substance flags' },
+    'bc.wiz.flagsDesc': { uz: 'Mahsulotga tegishli bo\'lgan belgilarni belgilang. Bir nechta tanlash mumkin.', ru: 'Отметьте применимые к продукту метки. Можно выбрать несколько.', en: 'Mark the flags applicable to the product. Multiple selections allowed.' },
+    'bc.wiz.or': { uz: 'yoki', ru: 'или', en: 'or' },
+    'bc.wiz.back': { uz: '← Orqaga', ru: '← Назад', en: '← Back' },
+    'bc.wiz.submit': { uz: 'Tayyor ✓', ru: 'Готово ✓', en: 'Done ✓' },
+
+    // Flag descriptions
+    'bc.flag.porkDesc': { uz: 'Cho\'chqa go\'shti yoki undan tayyorlangan moddalar', ru: 'Свинина или продукты из неё', en: 'Pork or pork-derived substances' },
+    'bc.flag.alcoholDesc': { uz: 'Spirtli moddalar (etanol, pivo, vino...)', ru: 'Спиртосодержащие вещества (этанол, пиво, вино...)', en: 'Alcoholic substances (ethanol, beer, wine...)' },
+    'bc.flag.meat': { uz: 'Boshqa go\'shtlar', ru: 'Другое мясо', en: 'Other meats' },
+    'bc.flag.meatDesc': { uz: 'Mol, tovuq, qo\'y yoki ulardan tayyorlangan ingredientlar', ru: 'Говядина, курица, баранина или производные ингредиенты', en: 'Beef, chicken, lamb or derived ingredients' },
+    'bc.flag.seafood': { uz: 'Dengiz mahsulotlari', ru: 'Морепродукты', en: 'Seafood' },
+    'bc.flag.seafoodDesc': { uz: 'Baliqdan tashqari: qisqichbaqa, kalmar, sakkizoyoq...', ru: 'Кроме рыбы: креветки, кальмары, осьминоги...', en: 'Except fish: shrimp, squid, octopus...' },
+    'bc.flag.factory': { uz: 'Bir zavodda', ru: 'На одном заводе', en: 'Same factory' },
+    'bc.flag.factoryDesc': { uz: 'Harom mahsulotlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan', ru: 'Произведено на оборудовании, где производятся запрещённые продукты', en: 'Produced on equipment where prohibited products are manufactured' },
+    'bc.flag.allJoiz': { uz: 'Barchasi Joiz', ru: 'Всё допустимо', en: 'All permissible' },
+    'bc.flag.allJoizDesc': { uz: 'Ta\'qiqlangan ingredientlar yo\'q, ishlab chiqarish ham toza', ru: 'Запрещённых ингредиентов нет, производство чистое', en: 'No prohibited ingredients, clean production' },
+
+    // Wizard - Step 3
+    'bc.wiz.uploading': { uz: 'Ma\'lumotlar yuborilmoqda...', ru: 'Данные отправляются...', en: 'Uploading data...' },
+    'bc.wiz.thanks': { uz: 'Rahmat!', ru: 'Спасибо!', en: 'Thank you!' },
+    'bc.wiz.thanksDesc': { uz: 'Ma\'lumot yuborildi. Admin tasdig\'idan o\'tgandan so\'ng ma\'lumotlar bazasiga qo\'shiladi.', ru: 'Данные отправлены. После проверки администратором они будут добавлены в базу.', en: 'Data submitted. It will be added to the database after admin approval.' },
+    'bc.wiz.scanAnother': { uz: '📷 Boshqa mahsulotni skanerlash', ru: '📷 Сканировать другой продукт', en: '📷 Scan another product' },
+
+    // Confirmation summary
+    'bc.confirm.barcode': { uz: 'Shtrix-kod', ru: 'Штрих-код', en: 'Barcode' },
+    'bc.confirm.photo': { uz: 'Rasm', ru: 'Фото', en: 'Photo' },
+    'bc.confirm.photoYes': { uz: 'Yuklangan', ru: 'Загружено', en: 'Uploaded' },
+    'bc.confirm.photoNo': { uz: 'Yo\'q', ru: 'Нет', en: 'None' },
+    'bc.confirm.status': { uz: 'Holati', ru: 'Статус', en: 'Status' },
+    'bc.confirm.flags': { uz: 'Belgilar', ru: 'Метки', en: 'Flags' },
+
+    // Disclaimer
+    'bc.disclaimer': { 
+      uz: 'Bu ma\'lumotlar faqat mahsulot tarkibi asosida taqdim etilgan bo\'lib, <strong>xatoliklar bo\'lishi mumkin</strong>. Biz rasmiy diniy hukm (fatvo) bermaymiz. Xatolik topsangiz <a href="https://t.me/MuslimVegukin">Telegram guruhimizga</a> o\'tib xabar bering.',
+      ru: 'Эта информация предоставлена только на основе состава продукта и <strong>может содержать ошибки</strong>. Мы не выносим официальных религиозных решений (фатва). Если нашли ошибку, сообщите в нашу <a href="https://t.me/MuslimVegukin">Telegram группу</a>.',
+      en: 'This information is provided based on product ingredients only and <strong>may contain errors</strong>. We do not issue official religious rulings (fatwa). If you find an error, please report it in our <a href="https://t.me/MuslimVegukin">Telegram group</a>.'
+    },
+  
   },
 
   init() {

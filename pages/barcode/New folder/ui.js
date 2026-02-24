@@ -1,5 +1,6 @@
 // ui.js — UI module
 // Handles: state switching, viewfinder controls, status, clipboard, sound
+// Product result rendering will be added in Milestone 3
 // Exposes: window.UI
 // ============================================
 
@@ -45,6 +46,8 @@ window.UI = (() => {
       ingredientsPanel: document.getElementById('ingredientsPanel'),
       ingredientsText:  document.getElementById('ingredientsText'),
       discoverSection:  document.getElementById('discoverSection'),
+      //tipBar:           document.getElementById('tipBar'),
+      // Wizard (referenced from add-product.js)
       addProductWizard: document.getElementById('addProductWizard')
     };
     return _els;
@@ -78,17 +81,19 @@ window.UI = (() => {
   function showProductModal(data) {
     const modal = document.getElementById('productModal');
     const verdictMap = {
-      halol:    { emoji: '✅', labelKey: 'bc.verdictJoiz', cls: 'joiz' },
-      harom:    { emoji: '⛔️', labelKey: 'bc.verdictTaqiqlangan', cls: 'taqiqlangan' },
-      shubhali: { emoji: '⚠️', labelKey: 'bc.verdictShubhali', cls: 'shubhali' }
+      halol:    { emoji: '✅', label: 'Joiz', cls: 'joiz' },
+      harom:    { emoji: '⛔️', label: 'Ta\'qiqlangan', cls: 'taqiqlangan' },
+      shubhali: { emoji: '⚠️', label: 'Shubhali', cls: 'shubhali' }
     };
     const v = verdictMap[data.verdict] || verdictMap.halol;
 
+    // Verdict badge
     const badge = document.getElementById('modalVerdict');
     badge.className = `modal-verdict modal-verdict--${v.cls}`;
     document.getElementById('modalVerdictEmoji').textContent = v.emoji;
-    document.getElementById('modalVerdictLabel').textContent = t(v.labelKey);
+    document.getElementById('modalVerdictLabel').textContent = v.label;
 
+    // Image
     const imgWrap = document.getElementById('modalImgWrap');
     if (data.image) {
       let modalImgSrc = data.image;
@@ -101,38 +106,41 @@ window.UI = (() => {
       imgWrap.style.display = 'none';
     }
 
+    // Name & barcode
     document.getElementById('modalName').textContent = data.name || '—';
     document.getElementById('modalBarcode').textContent = data.barcode || '—';
 
+    // Halal grid
     const grid = document.getElementById('modalHalalGrid');
     const checks = [
-      { icon: '🐖', labelKey: 'bc.flag.pork', bad: data.pork },
-      { icon: '🍷', labelKey: 'bc.flag.alcohol', bad: data.alcohol },
-      { icon: '🍗', labelKey: 'bc.grid.meat', bad: data.meat },
-      { icon: '🦐', labelKey: 'bc.grid.seafood', bad: data.seafood }
+      { icon: '🐖', label: "Cho'chqa", bad: data.pork },
+      { icon: '🍷', label: 'Alkogol', bad: data.alcohol },
+      { icon: '🍗', label: "Go'sht", bad: data.meat },
+      { icon: '🦐', label: 'Dengiz m.', bad: data.seafood }
     ];
     grid.innerHTML = '';
     checks.forEach(c => {
       const ok = !c.bad;
-      const label = t(c.labelKey);
       const el = document.createElement('div');
       el.className = `modal-halal-cell ${ok ? 'modal-halal-cell--ok' : 'modal-halal-cell--bad'}`;
-      el.innerHTML = `<span class="modal-halal-cell__icon">${c.icon}</span>${ok ? '✅ ' + label + ' ' + t('bc.absent') : '❌ ' + label + ' ' + t('bc.present')}`;
+      el.innerHTML = `<span class="modal-halal-cell__icon">${c.icon}</span>${ok ? "✅ " + c.label + " yo'q" : "❌ " + c.label + " bor"}`;
       grid.appendChild(el);
     });
 
+    // Factory
     const factory = document.getElementById('modalFactory');
     if (data.sameFactory !== undefined) {
       factory.className = `modal-factory ${data.sameFactory ? 'modal-factory--warn' : 'modal-factory--ok'}`;
       document.getElementById('modalFactoryIcon').textContent = data.sameFactory ? '🏭' : '✅';
       document.getElementById('modalFactoryText').textContent = data.sameFactory
-        ? t('bc.factoryWarn')
-        : t('bc.factoryOk');
+        ? "Harom mahsulotlar ishlab chiqariladigan zavod/uskunalarda tayyorlangan"
+        : "Mahsulot ishlab chiqarilgan zavod/uskunalarda harom mahsulotlar ishlatilmaydi.";
       factory.style.display = 'flex';
     } else {
       factory.style.display = 'none';
     }
 
+    // Ingredients
     const ingr = document.getElementById('modalIngredients');
     if (data.ingredients) {
       document.getElementById('modalIngredientsText').textContent = data.ingredients;
@@ -181,6 +189,7 @@ window.UI = (() => {
     setTimeout(() => fi.classList.remove('active'), 600);
   }
 
+  // --- Scan beam control ---
   function showScanBeam(visible) {
     const beam = els().scanBeam;
     if (beam) beam.style.display = visible ? 'block' : 'none';
@@ -191,6 +200,7 @@ window.UI = (() => {
     const e = els();
     e.resultSection.style.display = 'none';
     e.notFoundSection.style.display = 'none';
+    // Re-show viewfinder and status bar
     e.viewfinderWrap.style.display = '';
     document.querySelector('.status-bar').style.display = '';
   }
@@ -198,6 +208,7 @@ window.UI = (() => {
   function showNotFound(barcode) {
     const e = els();
     e.resultSection.style.display = 'none';
+    // Hide viewfinder — result replaces camera
     e.viewfinderWrap.style.display = 'none';
     document.querySelector('.status-bar').style.display = 'none';
 
@@ -209,24 +220,27 @@ window.UI = (() => {
   function showProductResult(data) {
     const e = els();
     e.notFoundSection.style.display = 'none';
+    // Hide viewfinder — result replaces camera
     e.viewfinderWrap.style.display = 'none';
     document.querySelector('.status-bar').style.display = 'none';
 
     // Verdict
     e.verdictBanner.className = `verdict verdict--${data.verdict === 'halol' ? 'joiz' : data.verdict === 'harom' ? 'taqiqlangan' : data.verdict}`;
     const verdictMap = {
-      halol:    { emoji: '✅', titleKey: 'bc.verdictJoiz', descKey: 'bc.verdictJoizDesc' },
-      harom:    { emoji: '⛔️', titleKey: 'bc.verdictTaqiqlangan', descKey: 'bc.verdictTaqiqlanganDesc' },
-      shubhali: { emoji: '⚠️', titleKey: 'bc.verdictShubhali', descKey: 'bc.verdictShubhaliDesc' }
+      halol:    { emoji: '✅', title: 'Joiz', desc: 'Tarkibida ta\'qiqlangan ingredientlar topilmadi' },
+      harom:    { emoji: '⛔️', title: 'Ta\'qiqlangan', desc: 'Tarkibida ta\'qiqlangan ingredientlar aniqlandi' },
+      shubhali: { emoji: '⚠️', title: 'Shubhali', desc: "Ta\'qiqlangan moddalar yo'q, lekin bir zavodda ishlab chiqarilgan" }
     };
     const v = verdictMap[data.verdict] || verdictMap.halol;
     e.verdictEmoji.textContent = v.emoji;
-    e.verdictTitle.textContent = t(v.titleKey);
-    e.verdictDesc.textContent = t(v.descKey);
+    e.verdictTitle.textContent = v.title;
+    e.verdictDesc.textContent = v.desc;
 
+    // Image — handle local paths served via API
     if (data.image) {
       let imgSrc = data.image;
       if (imgSrc.startsWith('/api/')) {
+        // Local photo served via Flask — need full URL
         imgSrc = (window._API_BASE || '') + imgSrc;
       }
       e.productImage.src = imgSrc;
@@ -235,13 +249,18 @@ window.UI = (() => {
       e.productImageWrap.style.display = 'none';
     }
 
+    // Name & barcode
     e.productName.textContent = data.name || '—';
     e.barcodeType.textContent = data.format || '—';
     e.barcodeNumber.textContent = data.barcode || '—';
 
+    // Halal grid
     _renderHalalGrid(data);
+
+    // Factory
     _renderFactoryNotice(data.sameFactory);
 
+    // Ingredients
     e.ingredientsText.textContent = data.ingredients || '';
     e.ingredientsPanel.style.display = 'none';
 
@@ -252,22 +271,21 @@ window.UI = (() => {
   function _renderHalalGrid(data) {
     const grid = els().halalGrid;
     const checks = [
-      { icon: '🐖', labelKey: 'bc.flag.pork',     bad: data.pork },
-      { icon: '🍷', labelKey: 'bc.flag.alcohol',   bad: data.alcohol },
-      { icon: '🍗', labelKey: 'bc.grid.meat',      bad: data.meat },
-      { icon: '🦐', labelKey: 'bc.grid.seafood',   bad: data.seafood }
+      { icon: '🐖', label: "Cho'chqa",      bad: data.pork },
+      { icon: '🍷', label: 'Alkogol',        bad: data.alcohol },
+      { icon: '🍗', label: "Boshqa go'sht",  bad: data.meat },
+      { icon: '🦐', label: 'Dengiz m.',      bad: data.seafood }
     ];
     grid.innerHTML = '';
     checks.forEach(c => {
       const ok = !c.bad;
-      const label = t(c.labelKey);
       const el = document.createElement('div');
       el.className = `halal-cell ${ok ? 'halal-cell--ok' : 'halal-cell--bad'}`;
       el.innerHTML = `
         <span class="halal-cell__icon">${c.icon}</span>
         <div class="halal-cell__info">
-          <span class="halal-cell__name">${label}</span>
-          <span class="halal-cell__tag">${ok ? '✅ ' + t('bc.absent') : '❌ ' + t('bc.present')}</span>
+          <span class="halal-cell__name">${c.label}</span>
+          <span class="halal-cell__tag">${ok ? "✅ Yo'q" : '❌ Bor'}</span>
         </div>`;
       grid.appendChild(el);
     });
@@ -278,11 +296,11 @@ window.UI = (() => {
     if (sameFactory) {
       e.factoryNotice.className = 'factory-bar factory-bar--warn';
       e.factoryIcon.textContent = '🏭';
-      e.factoryText.textContent = t('bc.factoryWarn');
+      e.factoryText.textContent = "Mahsulot harom mahsulotlar tayyorlanadigan zavod/uskunalardauskunalarda ishlab chiqarilgan.";
     } else {
       e.factoryNotice.className = 'factory-bar factory-bar--ok';
       e.factoryIcon.textContent = '✅';
-      e.factoryText.textContent = t('bc.factoryOk');
+      e.factoryText.textContent = "Mahsulot ishlab chiqarilgan zavod/uskunalarda harom mahsulotlar ishlatilmaydi.";
     }
     e.factoryNotice.style.display = 'flex';
   }
@@ -290,6 +308,7 @@ window.UI = (() => {
   // --- Discover section ---
   function showDiscover(visible) {
     els().discoverSection.style.display = visible ? 'block' : 'none';
+    //els().tipBar.style.display = visible ? 'block' : 'none';
   }
 
   // --- Clipboard ---
@@ -308,7 +327,7 @@ window.UI = (() => {
       e.copyBtn.classList.remove('copied');
       e.copyBtn.innerHTML = '<span>📋</span>';
     }, 1500);
-    if (tg && tg.showAlert) tg.showAlert(t('bc.copied'));
+    if (tg && tg.showAlert) tg.showAlert('Nusxalandi! ✅');
   }
 
   // --- Sound ---
@@ -325,24 +344,6 @@ window.UI = (() => {
     } catch (e) {}
   }
 
-  // --- i18n: apply translations to all data-i18n elements ---
-  function applyTranslations() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      const val = t(key);
-      if (val && val !== key) {
-        if (el.tagName === 'TITLE') document.title = val;
-        else el.textContent = val;
-      }
-    });
-    // HTML translations (for disclaimer with <strong>/<a>)
-    document.querySelectorAll('[data-i18n-html]').forEach(el => {
-      const key = el.getAttribute('data-i18n-html');
-      const val = t(key);
-      if (val && val !== key) el.innerHTML = val;
-    });
-  }
-
   function getVideoElement() { return els().videoElement; }
 
   return {
@@ -354,7 +355,6 @@ window.UI = (() => {
     showDiscover,
     showProductModal, hideProductModal,
     copyToClipboard, playSuccessSound,
-    applyTranslations,
     getVideoElement
   };
 })();

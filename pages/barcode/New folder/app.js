@@ -1,5 +1,5 @@
 // app.js — Main application controller
-// Glues: Camera, Scanner, UI, AddProduct, I18N
+// Glues: Camera, Scanner, UI, AddProduct
 // Handles: Telegram init, event binding, orchestration
 // ============================================
 
@@ -19,36 +19,56 @@
   // ============================================
   // BACK NAVIGATION — layered state machine
   // ============================================
+  // Priority (highest → lowest):
+  //   1. Product modal open        → close modal
+  //   2. Ingredients panel open     → close panel
+  //   3. Wizard step 3b (done)     → scan again
+  //   4. Wizard step 3 (uploading) → do nothing (wait)
+  //   5. Wizard step 2 (flags)     → go to step 1b
+  //   6. Wizard step 1b (preview)  → retake (step 1)
+  //   7. Wizard step 1 (camera)    → cancel wizard → back to not-found or scanner
+  //   8. Result / Not-found visible → scan again
+  //   9. Scanner (base state)      → exit to index.html
+
   function _handleBackNavigation() {
+    // 1. Modal open?
     const modal = document.getElementById('productModal');
     if (modal && modal.style.display !== 'none') {
       UI.hideProductModal();
       return;
     }
 
+    // 2. Ingredients panel open?
     const ingredients = document.getElementById('ingredientsPanel');
     if (ingredients && ingredients.style.display === 'block') {
       ingredients.style.display = 'none';
       return;
     }
 
+    // 3–7. Wizard active?
     const wizard = document.getElementById('addProductWizard');
     if (wizard && wizard.style.display !== 'none') {
       const currentStep = AddProduct.getCurrentStep();
       if (currentStep === '3b') {
+        // Done screen → scan again
         scanAgain();
       } else if (currentStep == 3) {
+        // Uploading — ignore back (can't cancel mid-upload)
         return;
       } else if (currentStep == 2) {
+        // Flags → back to photo preview
         AddProduct.goToStep('1b');
       } else if (currentStep === '1b') {
+        // Photo preview → retake
         AddProduct.retake();
       } else if (currentStep == 1) {
+        // Camera capture → cancel wizard entirely
         AddProduct.cancel();
       }
       return;
     }
 
+    // 8. Result or Not-found visible?
     const resultVisible = document.getElementById('resultSection').style.display !== 'none';
     const notFoundVisible = document.getElementById('notFoundSection').style.display !== 'none';
     if (resultVisible || notFoundVisible) {
@@ -56,16 +76,18 @@
       return;
     }
 
+    // 9. Base state (scanner / permission / error) → exit to index
     Scanner.stop();
     Camera.destroy();
     window.location.href = '../../index.html';
   }
 
-  // --- API base URL ---
+  // --- API base URL (change to your server's address) ---
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:5001'
-    : 'https://vegukin-api.duckdns.org';
+    : 'https://vegukin-api.duckdns.org';   // Your production server
 
+  // Expose for ui.js (local image URL resolution)
   window._API_BASE = API_BASE;
 
   // --- Current barcode state ---
@@ -88,6 +110,7 @@
       UI.showTorch(info.hasTorch);
       UI.showSwitchBtn(info.hasMultipleCameras);
       UI.showState('scanner');
+      // Discover stays visible (it's outside scannerDisplay)
 
       startScanning();
     } catch (error) {
@@ -97,7 +120,7 @@
 
   function startScanning() {
     const videoEl = UI.getVideoElement();
-    UI.updateStatus(t('bc.searching'), 'scanning');
+    UI.updateStatus('Qidirilmoqda...', 'scanning');
     UI.showScanBeam(true);
 
     Scanner.start(videoEl, (code, format) => {
@@ -106,7 +129,7 @@
 
       if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       UI.playSuccessSound();
-      UI.updateStatus(t('bc.found'), 'found');
+      UI.updateStatus('Topildi!', 'found');
       UI.showScanBeam(false);
       UI.showDiscover(false);
 
@@ -116,7 +139,7 @@
 
   async function lookupProduct(code, format) {
     const formatName = Scanner.getFormatName(format);
-    UI.updateStatus(t('bc.checking'), 'scanning');
+    UI.updateStatus('Tekshirilmoqda...', 'scanning');
 
     try {
       const resp = await fetch(`${API_BASE}/api/scanner/product/${encodeURIComponent(code)}`);
@@ -131,6 +154,7 @@
         _logInteraction('scanner_not_found', code);
       }
     } catch (err) {
+      // Network error — show not found with the barcode
       console.error('API lookup failed:', err);
       UI.showNotFound(code);
       _logInteraction('scanner_not_found', code);
@@ -142,6 +166,7 @@
     UI.hideAllResults();
     UI.showScanBeam(true);
     UI.showDiscover(true);
+    // Re-open camera and switch to scanner state
     openCameraAndScan();
   }
 
@@ -155,7 +180,7 @@
       UI.showTorch(info.hasTorch);
       startScanning();
     } catch (e) {
-      UI.showError(t('bc.errCameraSwitch'));
+      UI.showError("Kamerani almashtirib bo'lmadi.");
     }
   }
 
@@ -179,20 +204,20 @@
 
   function _handleCameraError(error) {
     if (error.message === 'NO_CAMERA') {
-      UI.showError(t('bc.errNoCamera'));
+      UI.showError('Kamera topilmadi.');
     } else if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
       UI.showState('permission');
     } else if (error.name === 'NotFoundError') {
-      UI.showError(t('bc.errNoCamera'));
+      UI.showError('Kamera topilmadi.');
     } else if (error.name === 'NotReadableError') {
-      UI.showError(t('bc.errCameraBusy'));
+      UI.showError('Kamera band. Boshqa ilovalarni yoping.');
     } else {
-      UI.showError(t('bc.errCamera') + ': ' + error.message);
+      UI.showError('Kamera xatoligi: ' + error.message);
     }
   }
 
   // ============================================
-  // DISCOVER
+  // DISCOVER — fetch random products from API
   // ============================================
 
   async function loadDiscover() {
@@ -201,9 +226,9 @@
       const data = await resp.json();
 
       const tagMap = {
-        halol:    { cls: 'joiz',        textKey: 'bc.badgeJoiz' },
-        shubhali: { cls: 'shubhali',    textKey: 'bc.badgeShubhali' },
-        harom:    { cls: 'taqiqlangan',  textKey: 'bc.badgeTaqiqlangan' }
+        halol: { cls: 'joiz', text: '✅ Joiz' },
+        shubhali: { cls: 'shubhali', text: '⚠️ Shubhali' },
+        harom: { cls: 'taqiqlangan', text: '⛔️ Ta\'qiqlangan' }
       };
 
       ['halol', 'shubhali', 'harom'].forEach(verdict => {
@@ -215,6 +240,7 @@
         }
         container.innerHTML = '';
         products.forEach(p => {
+          // Resolve image URL
           let imgSrc = p.image || '';
           if (imgSrc && imgSrc.startsWith('/api/')) imgSrc = API_BASE + imgSrc;
 
@@ -222,7 +248,7 @@
           const card = document.createElement('div');
           card.className = 'mini-card';
           card.setAttribute('data-product', JSON.stringify(p));
-          card.innerHTML = `<img class="mini-card__img" src="${imgSrc}" alt="" loading="lazy"><div class="mini-card__body"><p class="mini-card__name">${_escHtml(p.name)}</p><span class="mini-card__tag mini-card__tag--${tag.cls}">${t(tag.textKey)}</span></div>`;
+          card.innerHTML = `<img class="mini-card__img" src="${imgSrc}" alt="" loading="lazy"><div class="mini-card__body"><p class="mini-card__name">${_escHtml(p.name)}</p><span class="mini-card__tag mini-card__tag--${tag.cls}">${tag.text}</span></div>`;
           card.addEventListener('click', () => UI.showProductModal(p));
           container.appendChild(card);
         });
@@ -257,31 +283,22 @@
   }
 
   // ============================================
-  // i18n — apply translations to static DOM
-  // ============================================
-  function applyI18n() {
-    UI.applyTranslations();
-  }
-
-  // ============================================
   // EVENT LISTENERS
   // ============================================
 
   document.addEventListener('DOMContentLoaded', async () => {
-    // Init i18n and apply translations
-    if (window.I18N) I18N.init();
-    applyI18n();
-
     await Scanner.init();
 
+    // Load discover products immediately (no camera needed)
     loadDiscover();
 
+    // Check permission
     let perm = 'prompt';
     try { perm = (await navigator.permissions.query({ name: 'camera' })).state; }
     catch (e) {}
 
     if (perm === 'denied') {
-      UI.showError(t('bc.errPermDenied'));
+      UI.showError('Kamera ruxsati berilmagan. Brauzer sozlamalaridan ruxsat bering.');
     } else if (perm === 'granted') {
       await openCameraAndScan();
     } else {
@@ -351,19 +368,16 @@
     });
 
     // --- Browser / Android hardware back button ---
+    // Push a history entry so popstate fires instead of leaving the page
     _pushState('scanner');
     window.addEventListener('popstate', (e) => {
+      // Prevent default browser back (leaving page) — re-push state and handle internally
       _pushState('back');
       _handleBackNavigation();
     });
-
-    // --- Language change listener ---
-    window.addEventListener('languageChanged', () => {
-      applyI18n();
-      loadDiscover(); // Reload with new labels
-    });
   });
 
+  // Push a dummy history state to intercept back button
   function _pushState(label) {
     history.pushState({ page: label }, '', '');
   }
