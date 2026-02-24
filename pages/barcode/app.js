@@ -12,13 +12,75 @@
   try {
     if (tg.BackButton) {
       tg.BackButton.show();
-      tg.BackButton.onClick(() => {
-        Scanner.stop();
-        Camera.destroy();
-        window.location.href = '../../index.html';
-      });
+      tg.BackButton.onClick(() => _handleBackNavigation());
     }
   } catch (e) {}
+
+  // ============================================
+  // BACK NAVIGATION — layered state machine
+  // ============================================
+  // Priority (highest → lowest):
+  //   1. Product modal open        → close modal
+  //   2. Ingredients panel open     → close panel
+  //   3. Wizard step 3b (done)     → scan again
+  //   4. Wizard step 3 (uploading) → do nothing (wait)
+  //   5. Wizard step 2 (flags)     → go to step 1b
+  //   6. Wizard step 1b (preview)  → retake (step 1)
+  //   7. Wizard step 1 (camera)    → cancel wizard → back to not-found or scanner
+  //   8. Result / Not-found visible → scan again
+  //   9. Scanner (base state)      → exit to index.html
+
+  function _handleBackNavigation() {
+    // 1. Modal open?
+    const modal = document.getElementById('productModal');
+    if (modal && modal.style.display !== 'none') {
+      UI.hideProductModal();
+      return;
+    }
+
+    // 2. Ingredients panel open?
+    const ingredients = document.getElementById('ingredientsPanel');
+    if (ingredients && ingredients.style.display === 'block') {
+      ingredients.style.display = 'none';
+      return;
+    }
+
+    // 3–7. Wizard active?
+    const wizard = document.getElementById('addProductWizard');
+    if (wizard && wizard.style.display !== 'none') {
+      const currentStep = AddProduct.getCurrentStep();
+      if (currentStep === '3b') {
+        // Done screen → scan again
+        scanAgain();
+      } else if (currentStep == 3) {
+        // Uploading — ignore back (can't cancel mid-upload)
+        return;
+      } else if (currentStep == 2) {
+        // Flags → back to photo preview
+        AddProduct.goToStep('1b');
+      } else if (currentStep === '1b') {
+        // Photo preview → retake
+        AddProduct.retake();
+      } else if (currentStep == 1) {
+        // Camera capture → cancel wizard entirely
+        AddProduct.cancel();
+      }
+      return;
+    }
+
+    // 8. Result or Not-found visible?
+    const resultVisible = document.getElementById('resultSection').style.display !== 'none';
+    const notFoundVisible = document.getElementById('notFoundSection').style.display !== 'none';
+    if (resultVisible || notFoundVisible) {
+      scanAgain();
+      return;
+    }
+
+    // 9. Base state (scanner / permission / error) → exit to index
+    Scanner.stop();
+    Camera.destroy();
+    window.location.href = '../../index.html';
+  }
 
   // --- API base URL (change to your server's address) ---
   const API_BASE = window.location.hostname === 'localhost'
@@ -304,7 +366,21 @@
       Scanner.stop();
       Camera.destroy();
     });
+
+    // --- Browser / Android hardware back button ---
+    // Push a history entry so popstate fires instead of leaving the page
+    _pushState('scanner');
+    window.addEventListener('popstate', (e) => {
+      // Prevent default browser back (leaving page) — re-push state and handle internally
+      _pushState('back');
+      _handleBackNavigation();
+    });
   });
+
+  // Push a dummy history state to intercept back button
+  function _pushState(label) {
+    history.pushState({ page: label }, '', '');
+  }
 
   // Expose scanAgain for other modules
   window.AppActions = { scanAgain, openCameraAndScan, getCurrentBarcode: () => currentBarcode };

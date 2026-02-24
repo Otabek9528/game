@@ -8,6 +8,7 @@ window.AddProduct = (() => {
 
   let barcode = '';
   let photoBlob = null;
+  let currentStep = null;
   let flags = { pork: false, alcohol: false, meat: false, seafood: false, factory: false, allhalal: false };
 
   const FLAG_IDS = {
@@ -34,6 +35,7 @@ window.AddProduct = (() => {
 
   // === STEP NAVIGATION ===
   function _goToStep(step) {
+    currentStep = step;
     ['wizardStep1','wizardStep1b','wizardStep2','wizardStep3','wizardStep3b']
       .forEach(id => document.getElementById(id).style.display = 'none');
     document.getElementById(`wizardStep${step}`).style.display = 'block';
@@ -247,5 +249,11 @@ window.AddProduct = (() => {
     });
   }
 
-  return { init, start };
+  return {
+    init, start,
+    getCurrentStep: () => currentStep,
+    goToStep: _goToStep,
+    retake: _retakePhoto,
+    cancel: _cancel
+  };
 })();
