@@ -13,10 +13,12 @@
       <img src="assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
       <h1>Muslim Vegukin Bot</h1>
       
-      <!-- Add this RIGHT AFTER the closing </h1> tag -->
-      <button class="theme-toggle-btn" id="themeToggle" title="Toggle theme">
-        <span class="theme-icon" id="themeIcon">🌙</span>
-      </button>
+      <!-- Replace the old <button class="theme-toggle-btn"...> with this -->
+      <div class="theme-switch" id="themeToggle">
+        <div class="theme-switch-knob" id="themeKnob">
+          <span class="theme-switch-icon" id="themeIcon">☀️</span>
+        </div>
+      </div>
       
       <!-- Language flags in header - Smart 2-button display -->
       <div class="lang-flags" id="langFlags">
@@ -341,9 +343,9 @@
     document.body.classList.toggle('night-mode', isNight);
     const icon = document.getElementById('themeIcon');
     if (icon) {
-      icon.textContent = isNight ? '☀️' : '🌙';
+      icon.textContent = isNight ? '🌙' : '☀️';
     }
-  }
+  }}
 
   function toggleTheme() {
     const isNight = !document.body.classList.contains('night-mode');
