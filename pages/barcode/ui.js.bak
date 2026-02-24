@@ -133,8 +133,8 @@ window.UI = (() => {
       factory.className = `modal-factory ${data.sameFactory ? 'modal-factory--warn' : 'modal-factory--ok'}`;
       document.getElementById('modalFactoryIcon').textContent = data.sameFactory ? '🏭' : '✅';
       document.getElementById('modalFactoryText').textContent = data.sameFactory
-        ? "Harom mahsulotlar ishlab chiqariladigan zavod/uskunalarda tayyorlangan"
-        : "Mahsulot ishlab chiqarilgan zavod/uskunalarda harom mahsulotlar ishlatilmaydi.";
+        ? "Ta'qiqlangan mahsulotlar ishlab chiqarilgan uskunalarda tayyorlangan"
+        : "Toza ishlab chiqarish";
       factory.style.display = 'flex';
     } else {
       factory.style.display = 'none';
@@ -296,11 +296,11 @@ window.UI = (() => {
     if (sameFactory) {
       e.factoryNotice.className = 'factory-bar factory-bar--warn';
       e.factoryIcon.textContent = '🏭';
-      e.factoryText.textContent = "Mahsulot harom mahsulotlar tayyorlanadigan zavod/uskunalardauskunalarda ishlab chiqarilgan.";
+      e.factoryText.textContent = "Mahsulot ta'qiqlangan mahsulotlar tayyorlangan uskunalarda ishlab chiqarilgan.";
     } else {
       e.factoryNotice.className = 'factory-bar factory-bar--ok';
       e.factoryIcon.textContent = '✅';
-      e.factoryText.textContent = "Mahsulot ishlab chiqarilgan zavod/uskunalarda harom mahsulotlar ishlatilmaydi.";
+      e.factoryText.textContent = "Korxonada ta'qiqlangan mahsulotlar ishlatilinmaydi.";
     }
     e.factoryNotice.style.display = 'flex';
   }
