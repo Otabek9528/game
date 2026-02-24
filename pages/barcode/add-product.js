@@ -17,7 +17,7 @@ window.AddProduct = (() => {
 
   const STEP_LABELS = {
     1: '📸 Mahsulot rasmi', '1b': '📸 Rasmni tekshiring',
-    2: '🏷️ Haromlik belgilari', 3: '📤 Yuborilmoqda', '3b': '✅ Yuborildi'
+    2: '🏷️ Ta\'qiqlangan moddalar', 3: '📤 Yuborilmoqda', '3b': '✅ Yuborildi'
   };
 
   // === PUBLIC ===
@@ -193,8 +193,8 @@ window.AddProduct = (() => {
   }
 
   function _showConfirmation(result) {
-    let verdictText = '☪️ Halol';
-    if (result.verdict === 'harom') verdictText = '⛔️ Harom';
+    let verdictText = '✅ Joiz';
+    if (result.verdict === 'harom') verdictText = '⛔️ Ta\'qiqlangan';
     else if (result.verdict === 'shubhali') verdictText = '⚠️ Shubhali';
 
     const labels = [];
@@ -203,7 +203,7 @@ window.AddProduct = (() => {
     if (flags.meat) labels.push("🍗 Go'sht");
     if (flags.seafood) labels.push('🦐 Dengiz m.');
     if (flags.factory) labels.push('🏭 Bir zavod');
-    if (flags.allhalal) labels.push('☪️ Barchasi halol');
+    if (flags.allhalal) labels.push('✅ Barchasi joiz');
 
     document.getElementById('confirmSummary').innerHTML = `
       <div class="confirm-summary__row">

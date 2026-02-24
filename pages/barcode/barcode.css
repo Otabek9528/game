@@ -200,7 +200,7 @@ body {
   letter-spacing: 0.3px;
   white-space: nowrap;
 }
-.hero-badge--halol {
+.hero-badge--joiz {
   background: var(--green-100);
   color: var(--green-700);
   border: 1px solid var(--green-200);
@@ -212,7 +212,7 @@ body {
   border: 1px solid var(--amber-200);
   animation-delay: 1.3s;
 }
-.hero-badge--harom {
+.hero-badge--taqiqlangan {
   background: var(--red-100);
   color: var(--red-700);
   border: 1px solid #f5c6c0;
@@ -435,8 +435,8 @@ body {
   display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem;
   font-weight: 700; padding: 3px 9px 3px 7px; border-radius: 100px; margin: 0 0 7px 2px;
 }
-.discover__label--halol { background: var(--green-50); color: var(--green-700); }
-.discover__label--harom { background: var(--red-50); color: var(--red-700); }
+.discover__label--joiz { background: var(--green-50); color: var(--green-700); }
+.discover__label--taqiqlangan { background: var(--red-50); color: var(--red-700); }
 .discover__label--shubhali { background: var(--amber-50); color: var(--amber-700); }
 
 .discover__scroll {
@@ -470,8 +470,8 @@ body {
   font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 100px;
   display: inline-block;
 }
-.mini-card__tag--halol { background: var(--green-50); color: var(--green-700); }
-.mini-card__tag--harom { background: var(--red-50); color: var(--red-700); }
+.mini-card__tag--joiz { background: var(--green-50); color: var(--green-700); }
+.mini-card__tag--taqiqlangan { background: var(--red-50); color: var(--red-700); }
 .mini-card__tag--shubhali { background: var(--amber-50); color: var(--amber-700); }
 
 
@@ -500,11 +500,11 @@ body {
 }
 
 .verdict { padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
-.verdict--halol {
+.verdict--joiz {
   background: linear-gradient(135deg, var(--green-50), var(--green-100));
   border-bottom: 1px solid var(--green-200);
 }
-.verdict--harom {
+.verdict--taqiqlangan {
   background: linear-gradient(135deg, var(--red-50), var(--red-100));
   border-bottom: 1px solid #f5c6c0;
 }
@@ -514,8 +514,8 @@ body {
 }
 .verdict__emoji { font-size: 1.8rem; }
 .verdict__text h4 { margin: 0; font-size: 1rem; font-weight: 700; }
-.verdict--halol .verdict__text h4 { color: var(--green-700); }
-.verdict--harom .verdict__text h4 { color: var(--red-700); }
+.verdict--joiz .verdict__text h4 { color: var(--green-700); }
+.verdict--taqiqlangan .verdict__text h4 { color: var(--red-700); }
 .verdict--shubhali .verdict__text h4 { color: var(--amber-700); }
 .verdict__text p { margin: 2px 0 0; font-size: 0.8rem; color: var(--gray-500); }
 
@@ -848,8 +848,8 @@ body {
   padding: 4px 12px 4px 8px; border-radius: 100px;
   margin-bottom: 12px; font-size: 0.82rem; font-weight: 700;
 }
-.modal-verdict--halol { background: var(--green-50); color: var(--green-700); }
-.modal-verdict--harom { background: var(--red-50); color: var(--red-700); }
+.modal-verdict--joiz { background: var(--green-50); color: var(--green-700); }
+.modal-verdict--taqiqlangan { background: var(--red-50); color: var(--red-700); }
 .modal-verdict--shubhali { background: var(--amber-50); color: var(--amber-700); }
 .modal-verdict__emoji { font-size: 1rem; }
 
@@ -905,6 +905,46 @@ body {
   margin: 0; max-height: 100px; overflow-y: auto;
   padding: 8px 10px; background: var(--gray-50);
   border-radius: var(--r-sm); border: 1px solid var(--gray-150);
+}
+
+
+/* ========================================
+   DISCLAIMER FOOTER
+   ======================================== */
+.disclaimer {
+  margin: 20px 14px 8px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: linear-gradient(135deg, #f8f6f1, #f3f0e8);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--r-md);
+  position: relative;
+  overflow: hidden;
+}
+.disclaimer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3.5px; height: 100%;
+  background: linear-gradient(180deg, var(--amber-600), var(--amber-200));
+  border-radius: 2px 0 0 2px;
+}
+.disclaimer__icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.disclaimer__text {
+  font-size: 0.75rem;
+  color: var(--gray-600);
+  line-height: 1.6;
+  margin: 0;
+}
+.disclaimer__text strong {
+  color: var(--amber-700);
+  font-weight: 700;
 }
 
 

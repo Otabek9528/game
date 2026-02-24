@@ -81,8 +81,8 @@ window.UI = (() => {
   function showProductModal(data) {
     const modal = document.getElementById('productModal');
     const verdictMap = {
-      halol:    { emoji: '☪️', label: 'Halol', cls: 'halol' },
-      harom:    { emoji: '⛔️', label: 'Harom', cls: 'harom' },
+      halol:    { emoji: '✅', label: 'Joiz', cls: 'joiz' },
+      harom:    { emoji: '⛔️', label: 'Ta\'qiqlangan', cls: 'taqiqlangan' },
       shubhali: { emoji: '⚠️', label: 'Shubhali', cls: 'shubhali' }
     };
     const v = verdictMap[data.verdict] || verdictMap.halol;
@@ -133,7 +133,7 @@ window.UI = (() => {
       factory.className = `modal-factory ${data.sameFactory ? 'modal-factory--warn' : 'modal-factory--ok'}`;
       document.getElementById('modalFactoryIcon').textContent = data.sameFactory ? '🏭' : '✅';
       document.getElementById('modalFactoryText').textContent = data.sameFactory
-        ? "Harom mahsulotlar ishlab chiqarilgan uskunalarda tayyorlangan"
+        ? "Ta'qiqlangan mahsulotlar ishlab chiqarilgan uskunalarda tayyorlangan"
         : "Toza ishlab chiqarish";
       factory.style.display = 'flex';
     } else {
@@ -225,11 +225,11 @@ window.UI = (() => {
     document.querySelector('.status-bar').style.display = 'none';
 
     // Verdict
-    e.verdictBanner.className = `verdict verdict--${data.verdict}`;
+    e.verdictBanner.className = `verdict verdict--${data.verdict === 'halol' ? 'joiz' : data.verdict === 'harom' ? 'taqiqlangan' : data.verdict}`;
     const verdictMap = {
-      halol:    { emoji: '☪️', title: 'Halol', desc: 'Tarkibida harom ingredientlar topilmadi' },
-      harom:    { emoji: '⛔️', title: 'Harom', desc: 'Tarkibida harom ingredientlar aniqlandi' },
-      shubhali: { emoji: '⚠️', title: 'Shubhali', desc: "Harom moddalar yo'q, lekin bir zavodda ishlab chiqarilgan" }
+      halol:    { emoji: '✅', title: 'Joiz', desc: 'Tarkibida ta\'qiqlangan ingredientlar topilmadi' },
+      harom:    { emoji: '⛔️', title: 'Ta\'qiqlangan', desc: 'Tarkibida ta\'qiqlangan ingredientlar aniqlandi' },
+      shubhali: { emoji: '⚠️', title: 'Shubhali', desc: "Ta\'qiqlangan moddalar yo'q, lekin bir zavodda ishlab chiqarilgan" }
     };
     const v = verdictMap[data.verdict] || verdictMap.halol;
     e.verdictEmoji.textContent = v.emoji;
@@ -296,11 +296,11 @@ window.UI = (() => {
     if (sameFactory) {
       e.factoryNotice.className = 'factory-bar factory-bar--warn';
       e.factoryIcon.textContent = '🏭';
-      e.factoryText.textContent = "Mahsulot harom mahsulotlar tayyorlangan uskunalarda ishlab chiqarilgan.";
+      e.factoryText.textContent = "Mahsulot ta'qiqlangan mahsulotlar tayyorlangan uskunalarda ishlab chiqarilgan.";
     } else {
       e.factoryNotice.className = 'factory-bar factory-bar--ok';
       e.factoryIcon.textContent = '✅';
-      e.factoryText.textContent = "Korxonada harom mahsulotlar ishlatilinmaydi.";
+      e.factoryText.textContent = "Korxonada ta'qiqlangan mahsulotlar ishlatilinmaydi.";
     }
     e.factoryNotice.style.display = 'flex';
   }

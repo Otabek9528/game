@@ -164,9 +164,9 @@
       const data = await resp.json();
 
       const tagMap = {
-        halol: { cls: 'halol', text: '☪️ Halol' },
+        halol: { cls: 'joiz', text: '✅ Joiz' },
         shubhali: { cls: 'shubhali', text: '⚠️ Shubhali' },
-        harom: { cls: 'harom', text: '⛔️ Harom' }
+        harom: { cls: 'taqiqlangan', text: '⛔️ Ta\'qiqlangan' }
       };
 
       ['halol', 'shubhali', 'harom'].forEach(verdict => {
