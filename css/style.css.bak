@@ -99,6 +99,135 @@ body {
   flex-direction: column;
 }
 
+
+  /* Theme Toggle Button */
+.theme-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+  }
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+.theme-toggle-btn:active {
+    transform: scale(0.95);
+  }
+.theme-icon {
+    transition: transform 0.3s ease;
+  }
+
+  /* ===== NIGHT MODE ===== */
+body.night-mode {
+    --bg-base: #121212;
+    --bg-elevated: #1e1e1e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --text-muted: #777777;
+    --sand-50: #1a1a1a;
+    --sand-200: #2a2a2a;
+    --sand-300: #333333;
+  }
+
+body.night-mode .app__header {
+    background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+  }
+
+body.night-mode .prayer-card-timeline {
+    background: #1e1e1e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+body.night-mode .prayer-card-timeline::after {
+    background: radial-gradient(circle at top right, rgba(6, 78, 59, 0.15) 0%, transparent 70%);
+  }
+
+body.night-mode .right-side {
+    background: rgba(6, 78, 59, 0.25);
+  }
+
+body.night-mode .right-side .city-name {
+    color: var(--emerald-400);
+  }
+
+body.night-mode .progress-line::before,
+body.night-mode .progress-line::after {
+    box-shadow: 0 0 0 3px #1e1e1e, 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+body.night-mode .countdown-badge {
+    background: linear-gradient(135deg, rgba(181, 134, 10, 0.15) 0%, rgba(181, 134, 10, 0.08) 100%);
+    border-color: rgba(234, 185, 50, 0.4);
+  }
+
+body.night-mode .card {
+    background: #1e1e1e;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+body.night-mode .card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+body.night-mode .card:hover p {
+    color: var(--emerald-400);
+  }
+
+body.night-mode .card.new-feature {
+    border-color: rgba(4, 120, 87, 0.4);
+  }
+
+body.night-mode .ramadan-btn {
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+  }
+
+body.night-mode .scrollable-features::-webkit-scrollbar-thumb {
+    background: #444;
+  }
+
+  /* Prayer detail page night mode */
+body.night-mode .prayer-item {
+    background: #1e1e1e;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+body.night-mode .prayer-item.current-prayer {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.3) 0%, rgba(6, 78, 59, 0.15) 100%);
+    border-color: var(--emerald-600);
+  }
+
+body.night-mode .prayer-item.sunrise-marker {
+    background: linear-gradient(135deg, rgba(181, 134, 10, 0.12) 0%, rgba(181, 134, 10, 0.06) 100%);
+    border-color: rgba(234, 185, 50, 0.3);
+  }
+
+body.night-mode .next-prayer-countdown {
+    background: linear-gradient(135deg, rgba(181, 134, 10, 0.12) 0%, rgba(181, 134, 10, 0.06) 100%);
+    border-color: rgba(234, 185, 50, 0.3);
+  }
+
+body.night-mode .prayer-info-note {
+    background: #1e1e1e;
+    border-color: #2a2a2a;
+  }
+
+body.night-mode .advice-item {
+    background: #1a1a1a;
+    border-left-color: var(--emerald-600);
+  }
+
+
+
 /* =========================
    HEADER - Clean & Minimal
    ========================= */

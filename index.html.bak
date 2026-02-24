@@ -12,6 +12,12 @@
     <div class="header-content">
       <img src="assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
       <h1>Muslim Vegukin Bot</h1>
+      
+      <!-- Add this RIGHT AFTER the closing </h1> tag -->
+      <button class="theme-toggle-btn" id="themeToggle" title="Toggle theme">
+        <span class="theme-icon" id="themeIcon">🌙</span>
+      </button>
+      
       <!-- Language flags in header - Smart 2-button display -->
       <div class="lang-flags" id="langFlags">
         <button class="flag-btn" id="flagUz" data-lang="uz" title="O'zbek">🇺🇿</button>
@@ -320,6 +326,43 @@
       updateFeatureCards();
       console.log('✅ Main page initialized');
     });
+
+  // ============================================
+  // THEME (DAY/NIGHT) TOGGLE
+  // ============================================
+  
+  function initTheme() {
+    const saved = localStorage.getItem('theme');
+    const isNight = saved === 'night';
+    applyTheme(isNight);
+  }
+
+  function applyTheme(isNight) {
+    document.body.classList.toggle('night-mode', isNight);
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = isNight ? '☀️' : '🌙';
+    }
+  }
+
+  function toggleTheme() {
+    const isNight = !document.body.classList.contains('night-mode');
+    applyTheme(isNight);
+    localStorage.setItem('theme', isNight ? 'night' : 'day');
+    
+    // Haptic feedback
+    try {
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+    } catch (e) {}
+  }
+
+  // Bind toggle button
+  document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+  
+  // Apply saved theme immediately (before DOMContentLoaded to avoid flash)
+  initTheme();
   </script>
 </body>
 </html>
