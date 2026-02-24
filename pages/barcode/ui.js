@@ -46,7 +46,7 @@ window.UI = (() => {
       ingredientsPanel: document.getElementById('ingredientsPanel'),
       ingredientsText:  document.getElementById('ingredientsText'),
       discoverSection:  document.getElementById('discoverSection'),
-      tipBar:           document.getElementById('tipBar'),
+      //tipBar:           document.getElementById('tipBar'),
       // Wizard (referenced from add-product.js)
       addProductWizard: document.getElementById('addProductWizard')
     };
@@ -308,7 +308,7 @@ window.UI = (() => {
   // --- Discover section ---
   function showDiscover(visible) {
     els().discoverSection.style.display = visible ? 'block' : 'none';
-    els().tipBar.style.display = visible ? 'block' : 'none';
+    //els().tipBar.style.display = visible ? 'block' : 'none';
   }
 
   // --- Clipboard ---
