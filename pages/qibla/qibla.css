@@ -1166,3 +1166,183 @@ body {
     flex-direction: column;
   }
 }
+
+/* ========================================
+   NIGHT MODE
+   ======================================== */
+.night-mode,
+.night-mode body {
+  background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%);
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+}
+
+/* Header */
+.night-mode .title-uzbek {
+  color: #4ade80;
+}
+.night-mode .title-arabic {
+  color: #34d278;
+  text-shadow: 0 2px 4px rgba(0, 168, 132, 0.25);
+}
+
+/* State cards */
+.night-mode .state-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.night-mode .loading-state {
+  border-color: rgba(0, 168, 132, 0.2);
+}
+.night-mode .permission-state {
+  border-color: rgba(212, 175, 55, 0.15);
+}
+.night-mode .permission-badge {
+  background: #2a2a2a;
+}
+.night-mode .error-state {
+  border-color: rgba(211, 47, 47, 0.2);
+}
+.night-mode .error-icon-wrapper {
+  background: linear-gradient(135deg, #2a1a1a 0%, #251515 100%);
+}
+
+.night-mode .state-title {
+  color: #e0e0e0;
+}
+.night-mode .state-hint {
+  color: #777;
+}
+.night-mode .state-description {
+  color: #bbb;
+}
+.night-mode .state-note {
+  color: #777;
+}
+
+/* Calibration state */
+.night-mode .calibration-state {
+  border-color: rgba(0, 168, 132, 0.2);
+  background: linear-gradient(180deg, #1e1e1e 0%, #1a2a22 100%);
+}
+.night-mode .figure-eight-path {
+  border-color: rgba(0, 168, 132, 0.15);
+}
+.night-mode .figure-eight-path::before {
+  color: rgba(0, 168, 132, 0.1);
+}
+.night-mode .step-text {
+  color: #999;
+}
+.night-mode .progress-bar {
+  background: #333;
+}
+
+/* Compass display */
+.night-mode .turn-instruction-top {
+  background: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.night-mode .status-message {
+  color: #e0e0e0;
+}
+.night-mode .turn-degrees {
+  color: #ccc;
+}
+
+/* Qibla angle card */
+.night-mode .qibla-angle-card-top {
+  background: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.night-mode .angle-label {
+  color: #999;
+}
+.night-mode .angle-value {
+  color: #e0e0e0;
+}
+.night-mode .angle-divider {
+  background: #333;
+}
+
+/* Compass main */
+.night-mode .compass-bg {
+  background: #1a1a1a;
+}
+.night-mode .compass-outer-ring {
+  border-color: #333;
+}
+.night-mode .compass-inner-ring {
+  border-color: #2a2a2a;
+}
+.night-mode .cardinal-name {
+  color: #999;
+}
+.night-mode .degree-ticks::before {
+  opacity: 0.3;
+}
+
+/* Center hub */
+.night-mode .center-circle {
+  background: linear-gradient(145deg, #1e1e1e 0%, #252525 100%);
+  border-color: rgba(0, 168, 132, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+.night-mode .heading-label {
+  color: #777;
+}
+
+/* Device indicator */
+.night-mode .device-arrow {
+  border-bottom-color: #ccc;
+}
+
+/* Secondary info */
+.night-mode .secondary-info-card {
+  background: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.night-mode .sec-info-label {
+  color: #777;
+}
+.night-mode .sec-info-value {
+  color: #e0e0e0;
+}
+
+/* Quality bar */
+.night-mode .quality-bar {
+  background: rgba(30, 30, 30, 0.8);
+}
+.night-mode .quality-label {
+  color: #777;
+}
+.night-mode .quality-dots .dot {
+  background: #333;
+}
+
+/* Recalibrate button */
+.night-mode .recalibrate-btn {
+  background: #1e1e1e;
+  border-color: #333;
+  color: #999;
+}
+.night-mode .recalibrate-btn:hover {
+  background: #252525;
+  border-color: #00a884;
+  color: #00a884;
+}
+
+/* Tips section */
+.night-mode .tips-section {
+  background: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.night-mode .tips-title {
+  color: #4ade80;
+}
+.night-mode .tips-list li {
+  color: #bbb;
+  border-bottom-color: #2a2a2a;
+}
