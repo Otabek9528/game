@@ -45,7 +45,9 @@ window.UI = (() => {
       ingredientsPanel: document.getElementById('ingredientsPanel'),
       ingredientsText:  document.getElementById('ingredientsText'),
       discoverSection:  document.getElementById('discoverSection'),
-      addProductWizard: document.getElementById('addProductWizard')
+      addProductWizard: document.getElementById('addProductWizard'),
+      fullscreenViewer:  document.getElementById('fullscreenViewer'),
+      fullscreenImg:     document.getElementById('fullscreenImg')
     };
     return _els;
   }
@@ -345,6 +347,25 @@ window.UI = (() => {
 
   function getVideoElement() { return els().videoElement; }
 
+  // --- Fullscreen image viewer ---
+  function openFullscreenImage(src) {
+    const e = els();
+    e.fullscreenImg.src = src;
+    e.fullscreenViewer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFullscreenImage() {
+    const e = els();
+    e.fullscreenViewer.classList.remove('active');
+    e.fullscreenImg.src = '';
+    // Only restore scroll if modal isn't open behind it
+    const modal = document.getElementById('productModal');
+    if (!modal || modal.style.display === 'none') {
+      document.body.style.overflow = '';
+    }
+  }
+  
   return {
     showState, showError,
     updateStatus, updateCameraInfo,
@@ -354,7 +375,7 @@ window.UI = (() => {
     showDiscover,
     showProductModal, hideProductModal,
     copyToClipboard, playSuccessSound,
-    applyTranslations,
+    applyTranslations, openFullscreenImage, closeFullscreenImage,
     getVideoElement
   };
 })();

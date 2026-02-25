@@ -344,6 +344,22 @@
         startScanning();
       }
     });
+    
+    // --- Fullscreen image viewer ---
+    document.getElementById('productImage').addEventListener('click', () => {
+      const src = document.getElementById('productImage').src;
+      if (src) UI.openFullscreenImage(src);
+    });
+
+    document.getElementById('modalImg').addEventListener('click', () => {
+      const src = document.getElementById('modalImg').src;
+      if (src) UI.openFullscreenImage(src);
+    });
+
+    document.getElementById('fullscreenClose').addEventListener('click', () => UI.closeFullscreenImage());
+    document.getElementById('fullscreenViewer').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('fullscreenViewer')) UI.closeFullscreenImage();
+    });
 
     window.addEventListener('beforeunload', () => {
       Scanner.stop();

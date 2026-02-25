@@ -1281,3 +1281,59 @@ body {
   border-color: #333;
   border-top-color: var(--green-500);
 }
+
+/* ========================================
+   FULLSCREEN IMAGE VIEWER
+   ======================================== */
+.fullscreen-img-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.95);
+  justify-content: center;
+  align-items: center;
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease;
+}
+
+.fullscreen-img-overlay.active {
+  display: flex;
+}
+
+.fullscreen-img-overlay img {
+  max-width: 95%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.fullscreen-img-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.product-img,
+.modal-img {
+  cursor: zoom-in;
+}
