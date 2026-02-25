@@ -426,3 +426,97 @@
         flex-direction: column;
       }
     }
+
+/* ========================================
+   NIGHT MODE
+   ======================================== */
+.night-mode .detail-container {
+  background: #121212;
+}
+
+.night-mode .detail-loading p {
+  color: #999;
+}
+.night-mode .detail-spinner {
+  border-color: #333;
+  border-top-color: #00a884;
+}
+
+.night-mode .detail-error-text {
+  color: #e87c73;
+}
+.night-mode .detail-error-hint {
+  color: #999;
+}
+
+.night-mode .detail-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.night-mode .detail-photo-section {
+  background: linear-gradient(135deg, #1a2a22 0%, #162520 100%);
+}
+
+.night-mode .detail-combined-badge {
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.night-mode .detail-title {
+  color: #4ade80;
+}
+.night-mode .detail-subtitle {
+  color: #999;
+}
+.night-mode .detail-section-title {
+  color: #4ade80;
+}
+
+.night-mode .detail-info-item {
+  background: #252525;
+}
+.night-mode .detail-text {
+  color: #bbb;
+}
+.night-mode .detail-link {
+  color: #34d278;
+}
+.night-mode .detail-link:hover {
+  color: #6ee09c;
+}
+
+/* Reviews */
+.night-mode .review-card {
+  background: #252525;
+  border-left-color: #00a884;
+}
+.night-mode .review-date {
+  color: #777;
+}
+.night-mode .review-text {
+  color: #bbb;
+}
+.night-mode .no-reviews {
+  color: #777;
+}
+
+/* Review form */
+.night-mode .review-collapsible {
+  background: #1e1e1e;
+  border-color: #00a884;
+}
+.night-mode .review-textarea {
+  background: #252525;
+  border-color: #444;
+  color: #e0e0e0;
+}
+.night-mode .review-textarea:focus {
+  border-color: #00a884;
+}
+
+/* Nav buttons */
+.night-mode .nav-button {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}

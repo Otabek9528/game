@@ -933,3 +933,131 @@ body {
     font-size: 2rem;
   }
 }
+
+
+/* ========================================
+   NIGHT MODE
+   ======================================== */
+.night-mode {
+  --light-bg: #121212;
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+}
+
+.night-mode .places-container {
+  background: #121212;
+}
+
+/* Search buttons */
+.night-mode .address-input-section {
+  background: #1e1e1e;
+  border-color: #2a5a9e;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+.night-mode .search-bar {
+  background: #252525;
+  border-color: #444;
+  color: #e0e0e0;
+}
+.night-mode .search-bar:focus {
+  background: #2a2a2a;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+.night-mode .search-bar::placeholder {
+  color: #777;
+}
+
+.night-mode .search-hint {
+  color: #999;
+}
+
+/* Placeholder */
+.night-mode .search-placeholder {
+  background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+  border-color: #444;
+}
+.night-mode .placeholder-text {
+  color: #ccc;
+}
+.night-mode .placeholder-subtext {
+  color: #888;
+}
+
+/* Page title */
+.night-mode .places-page-title {
+  color: #4ade80;
+}
+
+/* Loading */
+.night-mode .loading-indicator .spinner {
+  border-color: #333;
+  border-top-color: #00a884;
+}
+.night-mode .loading-indicator p {
+  color: #999;
+}
+
+/* No results */
+.night-mode .no-results-text {
+  color: #ccc;
+}
+.night-mode .no-results-hint {
+  color: #888;
+}
+
+/* Place cards */
+.night-mode .place-card {
+  background: #1e1e1e;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+.night-mode .place-card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  border-color: rgba(0, 168, 132, 0.3);
+}
+
+.night-mode .place-rating-badge {
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.night-mode .place-name {
+  color: #e0e0e0;
+}
+.night-mode .place-name-ko {
+  color: #999;
+}
+.night-mode .info-text {
+  color: #aaa;
+}
+.night-mode .place-card-content {
+  color: #ccc;
+}
+
+/* Photo skeleton */
+.night-mode .detail-photo-skeleton,
+.night-mode .photo-skeleton {
+  background: linear-gradient(135deg, #252525 0%, #1a1a1a 100%);
+}
+.night-mode .skeleton-message {
+  color: #bbb;
+}
+.night-mode .skeleton-hint {
+  color: #888;
+}
+
+/* Info footer */
+.night-mode .info-footer {
+  background: linear-gradient(135deg, #1a2332 0%, #162030 100%);
+  border-color: rgba(33, 150, 243, 0.15);
+}
+.night-mode .info-footer-text {
+  color: #6db3f2;
+}
+.night-mode .info-footer-text a {
+  color: #90caf9;
+}
