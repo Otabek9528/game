@@ -501,3 +501,116 @@ body {
   color: #1a4d2e;
   margin: 0;
 }
+
+/* ========================================
+   NIGHT MODE
+   ======================================== */
+.night-mode {
+  background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%);
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+}
+
+/* Hero */
+.night-mode .hero-title {
+  color: #4ade80;
+}
+.night-mode .hero-subtitle {
+  color: #999;
+}
+
+/* Telegram card — already dark, just soften shadow */
+.night-mode .telegram-card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Info sections */
+.night-mode .info-section {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.night-mode .purpose-section {
+  background: linear-gradient(135deg, #1a2a22 0%, #1e1e1e 100%);
+  border-left-color: #00a884;
+}
+.night-mode .allowed-section {
+  background: linear-gradient(135deg, #1a2a1e 0%, #1e1e1e 100%);
+  border-left-color: #4caf50;
+}
+.night-mode .rules-section {
+  background: linear-gradient(135deg, #2a1a1a 0%, #1e1e1e 100%);
+  border-left-color: #f44336;
+}
+
+.night-mode .section-title-inline {
+  color: #4ade80;
+}
+.night-mode .section-text {
+  color: #bbb;
+}
+.night-mode .section-text strong {
+  color: #34d278;
+}
+
+/* Feature lists */
+.night-mode .list-text {
+  color: #bbb;
+}
+.night-mode .list-text strong {
+  color: #e0e0e0;
+}
+.night-mode .allowed-list li {
+  background: rgba(76, 175, 80, 0.06);
+  border-color: rgba(76, 175, 80, 0.12);
+}
+.night-mode .allowed-list li:hover {
+  background: rgba(76, 175, 80, 0.1);
+}
+.night-mode .prohibited-list li {
+  background: rgba(244, 67, 54, 0.05);
+  border-color: rgba(244, 67, 54, 0.1);
+}
+.night-mode .prohibited-list li:hover {
+  background: rgba(244, 67, 54, 0.08);
+}
+.night-mode .prohibited-list .list-text strong {
+  color: #e87c73;
+}
+
+/* Rules warning */
+.night-mode .rules-warning {
+  background: linear-gradient(135deg, #2a2010 0%, #2a1e0a 100%);
+  border-color: rgba(255, 152, 0, 0.4);
+}
+.night-mode .rules-warning .warning-text {
+  color: #ffb74d;
+}
+.night-mode .rules-warning .warning-text strong {
+  color: #ff9800;
+}
+
+/* Penalty card */
+.night-mode .penalty-card {
+  background: linear-gradient(135deg, #2a2510 0%, #251e08 100%);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+.night-mode .penalty-title {
+  color: #ffd54f;
+}
+.night-mode .penalty-text {
+  color: #bba860;
+}
+.night-mode .penalty-text strong {
+  color: #ffb74d;
+}
+
+/* CTA section */
+.night-mode .cta-section {
+  background: linear-gradient(135deg, #1a2a22 0%, #162520 100%);
+  border-color: rgba(0, 168, 132, 0.4);
+}
+.night-mode .cta-text {
+  color: #ccc;
+}
