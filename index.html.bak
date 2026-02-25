@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Halal Compass</title>
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+  if (localStorage.getItem('theme') === 'night') {
+    document.documentElement.classList.add('night-mode');
+  }
+  </script>
 </head>
 <body>
   <!-- HEADER (Panel 1) -->

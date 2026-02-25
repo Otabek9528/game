@@ -345,12 +345,13 @@
   }
 
   function applyTheme(isNight) {
-    document.body.classList.toggle('night-mode', isNight);
-    const icon = document.getElementById('themeIcon');
-    if (icon) {
-      icon.textContent = isNight ? '🌙' : '☀️';
+      document.documentElement.classList.toggle('night-mode', isNight);
+      document.body.classList.toggle('night-mode', isNight);
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.textContent = isNight ? '🌙' : '☀️';
+      }
     }
-  }
 
   function toggleTheme() {
     const isNight = !document.body.classList.contains('night-mode');
