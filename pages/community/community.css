@@ -505,7 +505,8 @@ body {
 /* ========================================
    NIGHT MODE
    ======================================== */
-.night-mode {
+.night-mode,
+.night-mode body {
   background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%);
 }
 
@@ -613,4 +614,12 @@ body {
 }
 .night-mode .cta-text {
   color: #ccc;
+}
+
+.night-mode .community-container {
+  background: transparent;
+}
+
+.night-mode .hero-icon {
+  opacity: 0.85;
 }

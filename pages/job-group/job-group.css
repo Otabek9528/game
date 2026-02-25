@@ -492,3 +492,118 @@ body {
     font-size: 0.8rem;
   }
 }
+
+
+/* ========================================
+   NIGHT MODE
+   ======================================== */
+.night-mode,
+.night-mode body {
+  background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%);
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+}
+
+/* Hero */
+.night-mode .hero-title {
+  color: #4ade80;
+}
+.night-mode .hero-subtitle {
+  color: #999;
+}
+
+/* Info cards */
+.night-mode .info-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.night-mode .info-title {
+  color: #e0e0e0;
+}
+.night-mode .info-list li {
+  color: #bbb;
+}
+.night-mode .info-list li strong {
+  color: #4ade80;
+}
+
+/* Action card */
+.night-mode .action-card {
+  background: linear-gradient(135deg, #1a2a22 0%, #162520 100%);
+  border-color: rgba(0, 168, 132, 0.4);
+}
+.night-mode .action-text {
+  color: #ccc;
+}
+
+/* Loading card */
+.night-mode .loading-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.night-mode .loading-spinner {
+  border-color: #333;
+  border-top-color: #00a884;
+}
+.night-mode .loading-text {
+  color: #999;
+}
+
+/* Link card */
+.night-mode .link-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.night-mode .timer-label {
+  color: #999;
+}
+.night-mode .timer-bg {
+  stroke: #333;
+}
+.night-mode .link-label {
+  color: #999;
+}
+.night-mode .link-box {
+  background: #252525;
+  border-color: #444;
+}
+.night-mode .link-text {
+  color: #ccc;
+}
+
+/* Warning box */
+.night-mode .warning-box {
+  background: linear-gradient(135deg, #2a2510 0%, #251e08 100%);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+.night-mode .warning-text {
+  color: #bba860;
+}
+
+/* Expired card */
+.night-mode .expired-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 152, 0, 0.4);
+}
+.night-mode .expired-title {
+  color: #ffb74d;
+}
+.night-mode .expired-text {
+  color: #999;
+}
+
+/* Error card */
+.night-mode .error-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+.night-mode .error-title {
+  color: #e87c73;
+}
+.night-mode .error-text {
+  color: #999;
+}

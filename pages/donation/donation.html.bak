@@ -6,13 +6,6 @@
   <title>Xayriya - Loyihani Qo'llab-Quvvatlash</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="donation.css" />
-
-  <script>
-  if (localStorage.getItem('theme') === 'night') {
-    document.documentElement.classList.add('night-mode');
-  }
-  </script>
-  
 </head>
 <body>
 
