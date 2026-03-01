@@ -6,13 +6,6 @@
   <title>Ish E'lonlari Guruhi</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="job-group.css" />
-  
-  <script>
-  if (localStorage.getItem('theme') === 'night') {
-    document.documentElement.classList.add('night-mode');
-  }
-  </script>
-  
 </head>
 <body>
 
@@ -30,45 +23,36 @@
     <!-- Hero Section -->
     <div class="job-hero">
       <div class="hero-icon">📢</div>
-      <h2 class="hero-title">Bot Maxsus Guruhlari</h2>
-      <p class="hero-subtitle">3 kunlik bepul sinov davri</p>
+      <h2 class="hero-title">Ish E'lonlari Guruhi</h2>
+      <p class="hero-subtitle">Bot foydalanuvchilari uchun maxsus xizmat</p>
     </div>
 
     <!-- Info Card -->
-    <!-- Job Group Card -->
     <div class="info-card">
-      <h3 class="info-title">💼 Ish E'lonlari Guruhi</h3>
+      <h3 class="info-title">🤖 Bot tomonidan:</h3>
       <ul class="info-list">
-        <li><span class="check-icon">✔️</span><span>50 dan ortiq guruhlardan <strong>ish e'lonlari</strong> ajratib olinadi</span></li>
-        <li><span class="check-icon">✔️</span><span>Kunda <strong>24 soat</strong> avtomatik kuzatiladi</span></li>
-      </ul>
-    </div>
-
-    <!-- Taxi Group Card -->
-    <div class="info-card" style="border-left-color: #2196f3;">
-      <h3 class="info-title">🚕 Taksi E'lonlari Guruhi</h3>
-      <ul class="info-list">
-        <li><span class="check-icon">✔️</span><span>Taksi bilan bog'liq <strong>barcha e'lonlar</strong> ajratib olinadi</span></li>
-        <li><span class="check-icon">✔️</span><span>Yo'lovchi va haydovchilar uchun <strong>qulay xizmat</strong></span></li>
-      </ul>
-    </div>
-
-    <!-- Trial Info -->
-    <div class="info-card" style="border-left-color: #ff9800;">
-      <h3 class="info-title">🎁 3 kunlik bepul sinov</h3>
-      <ul class="info-list">
-        <li><span class="check-icon">✔️</span><span>Ikkala guruhga <strong>3 kun bepul</strong> a'zo bo'ling</span></li>
-        <li><span class="check-icon">✔️</span><span>Keyingi oylik obuna: <strong>40 000 so'm/oy</strong></span></li>
+        <li>
+          <span class="check-icon">✔️</span>
+          <span>50 dan ortiq ish e'lon guruhlari sizning o'rningizga <strong>kunda 24 soat</strong> kuzatib boriladi</span>
+        </li>
+        <li>
+          <span class="check-icon">✔️</span>
+          <span>Faqat <strong>ish bilan bog'liq bo'lgan e'lonlar</strong> ajratib olinadi</span>
+        </li>
+        <li>
+          <span class="check-icon">✔️</span>
+          <span>Barcha ajratib olingan e'lonlar shu zahoti <strong>"Ish e'lonlari"</strong> guruhida e'lon qilib boriladi</span>
+        </li>
       </ul>
     </div>
 
     <!-- Initial State - Get Link Button -->
     <div class="action-section" id="initialState">
       <div class="action-card">
-        <p class="action-text">📨 Ikkala guruhga qo'shilish linklarini olish uchun quyidagi tugmani bosing</p>
+        <p class="action-text">📨 <strong>"Ish e'lonlari"</strong> guruhiga qo'shilish linkini olish uchun quyidagi tugmani bosing</p>
         <button class="get-link-btn" id="getLinkBtn">
           <span class="btn-icon">🔗</span>
-          <span class="btn-text">Guruhlarga qo'shilish</span>
+          <span class="btn-text">Guruh linkini olish</span>
         </button>
       </div>
     </div>
@@ -95,32 +79,19 @@
           <p class="timer-label">soniya qoldi</p>
         </div>
         
-        <!-- Job group link -->
         <div class="link-display">
-          <p class="link-label">💼 Ish e'lonlari guruhi:</p>
-          <div class="link-box">
-            <span class="link-text" id="jobLinkText">---</span>
-            <button class="copy-link-btn" onclick="copyToClipboard('job')">📋</button>
+          <p class="link-label">Sizning havolangiz:</p>
+          <div class="link-box" id="linkBox">
+            <span class="link-text" id="linkText">https://t.me/+ABC123xyz</span>
+            <button class="copy-link-btn" id="copyLinkBtn">
+              <span id="copyIcon">📋</span>
+            </button>
           </div>
         </div>
-
-        <a class="join-btn" id="jobJoinBtn" href="#" target="_blank">
-          <span class="join-icon">💼</span>
-          <span>Ish guruhiga qo'shilish</span>
-        </a>
-
-        <!-- Taxi group link -->
-        <div class="link-display">
-          <p class="link-label">🚕 Taksi e'lonlari guruhi:</p>
-          <div class="link-box">
-            <span class="link-text" id="taxiLinkText">---</span>
-            <button class="copy-link-btn" onclick="copyToClipboard('taxi')">📋</button>
-          </div>
-        </div>
-
-        <a class="join-btn" id="taxiJoinBtn" href="#" target="_blank" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); box-shadow: 0 4px 16px rgba(255,152,0,0.4);">
-          <span class="join-icon">🚕</span>
-          <span>Taksi guruhiga qo'shilish</span>
+        
+        <a class="join-btn" id="joinBtn" href="#" target="_blank">
+          <span class="join-icon">🚀</span>
+          <span class="join-text">Guruhga qo'shilish</span>
         </a>
         
         <div class="warning-box">
