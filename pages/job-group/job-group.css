@@ -514,97 +514,96 @@ body {
   color: #999;
 }
 
-/* Category buttons — already colorful, just soften shadows */
-.night-mode .category-btn.arbayt-btn {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+/* Info cards */
+.night-mode .info-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
-.night-mode .category-btn.korea-btn {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+.night-mode .info-title {
+  color: #e0e0e0;
+}
+.night-mode .info-list li {
+  color: #bbb;
+}
+.night-mode .info-list li strong {
+  color: #4ade80;
 }
 
-/* Section title */
-.night-mode .section-title {
+/* Action card */
+.night-mode .action-card {
+  background: linear-gradient(135deg, #1a2a22 0%, #162520 100%);
+  border-color: rgba(0, 168, 132, 0.4);
+}
+.night-mode .action-text {
+  color: #ccc;
+}
+
+/* Loading card */
+.night-mode .loading-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.night-mode .loading-spinner {
+  border-color: #333;
+  border-top-color: #00a884;
+}
+.night-mode .loading-text {
   color: #999;
 }
 
-/* Direct link cards */
-.night-mode .direct-link-card {
+/* Link card */
+.night-mode .link-card {
   background: #1e1e1e;
-  border-color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
-.night-mode .direct-link-card:hover {
-  border-color: #00a884;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+.night-mode .timer-label {
+  color: #999;
 }
-.night-mode .link-icon {
-  background: linear-gradient(135deg, #1a2a22 0%, #162520 100%);
+.night-mode .timer-bg {
+  stroke: #333;
 }
-.night-mode .link-title {
-  color: #e0e0e0;
+.night-mode .link-label {
+  color: #999;
 }
-.night-mode .link-subtitle {
-  color: #777;
-}
-
-/* Links list section */
-.night-mode .section-header {
-  border-bottom-color: #333;
-}
-.night-mode .section-heading {
-  color: #e0e0e0;
-}
-.night-mode .back-btn {
-  background: linear-gradient(135deg, #252525 0%, #1e1e1e 100%);
+.night-mode .link-box {
+  background: #252525;
   border-color: #444;
-  color: #ccc;
 }
-.night-mode .back-btn:hover {
-  background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
-}
-
-/* Link items */
-.night-mode .link-item {
-  background: #1e1e1e;
-  border-color: #2a2a2a;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-.night-mode .link-item:hover {
-  background: linear-gradient(135deg, #1a2a22 0%, #1e1e1e 100%);
-  border-color: #00a884;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-.night-mode .link-item-text {
+.night-mode .link-text {
   color: #ccc;
 }
 
-/* Region badge */
-.night-mode .link-item[data-region]::before {
-  background: #1a2332;
-  color: #6db3f2;
-}
-
-/* Info note */
-.night-mode .info-note {
+/* Warning box */
+.night-mode .warning-box {
   background: linear-gradient(135deg, #2a2510 0%, #251e08 100%);
   border-color: rgba(255, 193, 7, 0.3);
 }
-.night-mode .info-note p {
+.night-mode .warning-text {
   color: #bba860;
 }
-.night-mode .info-note a {
-  color: #ffc107;
+
+/* Expired card */
+.night-mode .expired-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 152, 0, 0.4);
+}
+.night-mode .expired-title {
+  color: #ffb74d;
+}
+.night-mode .expired-text {
+  color: #999;
 }
 
-/* Search box */
-.night-mode .search-input {
-  background: #252525;
-  border-color: #444;
-  color: #e0e0e0;
+/* Error card */
+.night-mode .error-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: rgba(244, 67, 54, 0.4);
 }
-.night-mode .search-input:focus {
-  border-color: #00a884;
-  box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.15);
+.night-mode .error-title {
+  color: #e87c73;
 }
-.night-mode .search-input::placeholder {
-  color: #777;
+.night-mode .error-text {
+  color: #999;
 }
