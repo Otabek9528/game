@@ -19,9 +19,8 @@ try {
 // STATE MANAGEMENT
 // ============================================
 
-let currentView = 'direction'; // 'direction', 'main', 'dates', 'cities', 'posts'
-let currentDirection = null;   // 0 = UZB→KOR, 1 = KOR→UZB
-let currentCountry = null;     // 'uzb' or 'kor'
+let currentView = 'main'; // 'main', 'dates', 'citySelect', 'cities', 'posts'
+let currentCountry = null; // 'uzb' or 'kor'
 let navigationHistory = [];
 
 // ============================================
@@ -29,19 +28,11 @@ let navigationHistory = [];
 // ============================================
 
 // Sections
-const directionSection = document.getElementById('directionSection');
 const searchMethods = document.getElementById('searchMethods');
 const datesSection = document.getElementById('datesSection');
+
 const citiesSection = document.getElementById('citiesSection');
 const postsSection = document.getElementById('postsSection');
-
-// Direction elements
-const dirBtnUzbKor = document.getElementById('dirBtnUzbKor');
-const dirBtnKorUzb = document.getElementById('dirBtnKorUzb');
-const activeDirection = document.getElementById('activeDirection');
-const activeDirFlags = document.getElementById('activeDirFlags');
-const activeDirText = document.getElementById('activeDirText');
-const changeDirBtn = document.getElementById('changeDirBtn');
 
 // Lists
 const datesList = document.getElementById('datesList');
@@ -57,14 +48,17 @@ const postsLoading = document.getElementById('postsLoading');
 const postsEmpty = document.getElementById('postsEmpty');
 
 // Headings
+const citiesHeading = document.getElementById('citiesHeading');
 const postsHeading = document.getElementById('postsHeading');
 
 // Buttons
 const searchByDateBtn = document.getElementById('searchByDateBtn');
 const searchByCityBtn = document.getElementById('searchByCityBtn');
 const datesBackBtn = document.getElementById('datesBackBtn');
+
 const citiesBackBtn = document.getElementById('citiesBackBtn');
 const postsBackBtn = document.getElementById('postsBackBtn');
+
 
 // ============================================
 // VIEW MANAGEMENT
@@ -72,17 +66,14 @@ const postsBackBtn = document.getElementById('postsBackBtn');
 
 function showView(viewName) {
   // Hide all sections
-  directionSection.style.display = 'none';
   searchMethods.style.display = 'none';
   datesSection.style.display = 'none';
+  
   citiesSection.style.display = 'none';
   postsSection.style.display = 'none';
   
   // Show requested section
   switch(viewName) {
-    case 'direction':
-      directionSection.style.display = 'block';
-      break;
     case 'main':
       searchMethods.style.display = 'block';
       break;
@@ -111,43 +102,8 @@ function navigateBack() {
     const previousView = navigationHistory.pop();
     showView(previousView);
   } else {
-    showView('direction');
+    showView('main');
   }
-}
-
-// ============================================
-// DIRECTION SELECTION
-// ============================================
-
-function selectDirection(direction) {
-  currentDirection = direction;
-  
-  // Update button states
-  dirBtnUzbKor.classList.toggle('selected', direction === 0);
-  dirBtnKorUzb.classList.toggle('selected', direction === 1);
-  
-  // Update the active direction indicator in the search methods view
-  if (direction === 0) {
-    activeDirFlags.textContent = '🇺🇿 → 🇰🇷';
-    activeDirText.textContent = "O'zbekistondan Koreyaga";
-  } else {
-    activeDirFlags.textContent = '🇰🇷 → 🇺🇿';
-    activeDirText.textContent = "Koreyadan O'zbekistonga";
-  }
-  
-  // Brief delay for visual feedback, then navigate
-  setTimeout(() => {
-    navigateTo('main');
-  }, 250);
-}
-
-function changeDirection() {
-  // Reset and go back to direction selection
-  currentDirection = null;
-  dirBtnUzbKor.classList.remove('selected');
-  dirBtnKorUzb.classList.remove('selected');
-  navigationHistory = [];
-  showView('direction');
 }
 
 // ============================================
@@ -156,12 +112,7 @@ function changeDirection() {
 
 async function fetchDates() {
   try {
-    let url = `${API_CONFIG.BASE_URL}/api/parcels/dates`;
-    if (currentDirection !== null) {
-      url += `?direction=${currentDirection}`;
-    }
-    
-    const response = await fetch(url, {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/parcels/dates`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
@@ -203,12 +154,7 @@ async function fetchPostsByDate(date) {
 
 async function fetchCities(country) {
   try {
-    let url = `${API_CONFIG.BASE_URL}/api/parcels/cities?country=${country}`;
-    if (currentDirection !== null) {
-      url += `&direction=${currentDirection}`;
-    }
-    
-    const response = await fetch(url, {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/parcels/cities?country=${country}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
@@ -251,15 +197,6 @@ async function fetchPostsByCity(city, country) {
 // ============================================
 // RENDER FUNCTIONS
 // ============================================
-
-function getDirectionBadgeHTML(direction) {
-  if (direction === 0) {
-    return '<span class="post-direction-badge dir-0">🇺🇿 → 🇰🇷</span>';
-  } else if (direction === 1) {
-    return '<span class="post-direction-badge dir-1">🇰🇷 → 🇺🇿</span>';
-  }
-  return '';
-}
 
 function renderDates(dates) {
   datesList.innerHTML = '';
@@ -362,11 +299,9 @@ function renderPosts(posts, title) {
       contactText = 'Telegram orqali bog\'lanish';
     }
     
+   
     // Clean and escape message text
     const cleanText = escapeHtml(post.message_text || '').replace(/\u00a0/g, ' ');
-    
-    // Direction badge
-    const dirBadge = getDirectionBadgeHTML(post.direction);
     
     // Build contact button - only show if username exists
     const contactBtnHTML = post.username ? `
@@ -385,7 +320,6 @@ function renderPosts(posts, title) {
           <span class="post-username">${post.username ? '@' + post.username.replace('@', '') : 'Kuryer kontakti xabarda ko\'rsatilgan'}</span>
           <span class="post-date">📅 ${post.flight_time || ''}</span>
         </div>
-        ${dirBadge}
       </div>
       <div class="post-body">
         <p class="post-text">${cleanText}</p>
@@ -444,7 +378,30 @@ async function loadPostsByDate(date, dateLabel) {
   }
 }
 
+async function loadCities(country) {
+  currentCountry = country;
+  navigateTo('cities');
+  
+  const countryLabel = country === 'uzb' ? '🇺🇿 O\'zbekiston' : '🇰🇷 Koreya';
+  citiesHeading.textContent = `${countryLabel} shaharlari`;
+  
+  citiesList.innerHTML = '';
+  citiesLoading.style.display = 'flex';
+  citiesEmpty.style.display = 'none';
+  
+  try {
+    const cities = await fetchCities(country);
+    citiesLoading.style.display = 'none';
+    renderCities(cities, country);
+  } catch (error) {
+    citiesLoading.style.display = 'none';
+    citiesEmpty.style.display = 'flex';
+    citiesEmpty.querySelector('p').textContent = 'Xatolik yuz berdi. Qaytadan urinib ko\'ring.';
+  }
+}
+
 async function loadCitiesWithTabs(country, isTabSwitch = false) {
+  // Only add to navigation history if not switching tabs
   if (!isTabSwitch) {
     navigateTo('cities');
   }
@@ -473,6 +430,7 @@ async function loadCitiesWithTabs(country, isTabSwitch = false) {
   }
 }
 
+
 async function loadPostsByCity(city, country) {
   navigateTo('posts');
   
@@ -498,35 +456,30 @@ async function loadPostsByCity(city, country) {
 // EVENT LISTENERS
 // ============================================
 
-// Direction buttons
-dirBtnUzbKor.addEventListener('click', () => selectDirection(0));
-dirBtnKorUzb.addEventListener('click', () => selectDirection(1));
-changeDirBtn.addEventListener('click', changeDirection);
-
 // Main buttons
 searchByDateBtn.addEventListener('click', loadDates);
 searchByCityBtn.addEventListener('click', () => {
-  // Default tab based on direction
-  const defaultCountry = currentDirection === 0 ? 'uzb' : 'kor';
-  currentCountry = defaultCountry;
-  loadCitiesWithTabs(defaultCountry);
+  currentCountry = 'uzb'; // Default to Uzbekistan
+  loadCitiesWithTabs('uzb');
 });
+
+
 
 // Back buttons
 datesBackBtn.addEventListener('click', navigateBack);
 citiesBackBtn.addEventListener('click', navigateBack);
 postsBackBtn.addEventListener('click', navigateBack);
 
+
 // Country tabs (isTabSwitch = true to prevent adding to navigation history)
 document.getElementById('tabUzb').addEventListener('click', () => loadCitiesWithTabs('uzb', true));
 document.getElementById('tabKor').addEventListener('click', () => loadCitiesWithTabs('kor', true));
-
 // ============================================
 // TELEGRAM BACK BUTTON
 // ============================================
 
 function handleTelegramBackButton() {
-  if (currentView === 'direction') {
+  if (currentView === 'main') {
     window.location.href = '../../index.html';
   } else {
     navigateBack();
@@ -562,7 +515,7 @@ function addHapticToButtons() {
 // ============================================
 
 function initParcelPage() {
-  showView('direction');
+  showView('main');
   addHapticToButtons();
   console.log('✅ Parcel page loaded');
 }

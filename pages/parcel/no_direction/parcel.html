@@ -6,6 +6,13 @@
   <title>Pochta Yuborish</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="parcel.css" />
+  
+  <script>
+  if (localStorage.getItem('theme') === 'night') {
+    document.documentElement.classList.add('night-mode');
+  }
+  </script>
+  
 </head>
 <body>
 
@@ -27,54 +34,9 @@
       <p class="hero-subtitle">Kuryer topib, pochtangizni yetkazing</p>
     </div>
 
-    <!-- ============================== -->
-    <!-- STEP 0: Direction Selection     -->
-    <!-- ============================== -->
-    <div class="direction-section" id="directionSection">
-      <p class="section-label">Yo'nalishni tanlang:</p>
-      <div class="direction-buttons">
-        <button class="direction-btn" id="dirBtnUzbKor" data-direction="0">
-          <div class="dir-flags">
-            <span class="dir-flag">🇺🇿</span>
-            <span class="dir-arrow-icon">
-              <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
-                <path d="M0 7H24M24 7L18 1M24 7L18 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <span class="dir-flag">🇰🇷</span>
-          </div>
-          <span class="dir-label">O'zbekistondan Koreyaga</span>
-        </button>
-        <button class="direction-btn" id="dirBtnKorUzb" data-direction="1">
-          <div class="dir-flags">
-            <span class="dir-flag">🇰🇷</span>
-            <span class="dir-arrow-icon">
-              <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
-                <path d="M0 7H24M24 7L18 1M24 7L18 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <span class="dir-flag">🇺🇿</span>
-          </div>
-          <span class="dir-label">Koreyadan O'zbekistonga</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- ============================== -->
-    <!-- STEP 1: Search Methods          -->
-    <!-- (Hidden until direction chosen) -->
-    <!-- ============================== -->
-    <div class="search-methods" id="searchMethods" style="display: none;">
+    <!-- Search Method Section (Main View) -->
+    <div class="search-methods" id="searchMethods">
       
-      <!-- Active Direction Indicator -->
-      <div class="active-direction" id="activeDirection">
-        <div class="active-dir-content">
-          <span class="active-dir-flags" id="activeDirFlags"></span>
-          <span class="active-dir-text" id="activeDirText"></span>
-        </div>
-        <button class="change-dir-btn" id="changeDirBtn">O'zgartirish</button>
-      </div>
-
       <p class="methods-hint">Qidiruv usulini tanlang:</p>
       
       <!-- Search Buttons -->
@@ -107,7 +69,7 @@
         <ul class="info-list">
           <li>
             <span class="step-num">1</span>
-            <span>Yo'nalish va qidiruv usulini tanlang</span>
+            <span>Sana yoki shahar bo'yicha kuryerlarni toping</span>
           </li>
           <li>
             <span class="step-num">2</span>
