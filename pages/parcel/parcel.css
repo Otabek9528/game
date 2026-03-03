@@ -938,3 +938,246 @@ body {
     padding: 16px 14px;
   }
 }
+
+
+/* ========================================
+   NIGHT MODE
+   ======================================== */
+.night-mode,
+.night-mode body {
+  background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%);
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+}
+
+/* Hero */
+.night-mode .hero-title {
+  color: #4ade80;
+}
+.night-mode .hero-subtitle {
+  color: #999;
+}
+.night-mode .methods-hint {
+  color: #999;
+}
+.night-mode .section-label {
+  color: #999;
+}
+
+/* Direction buttons */
+.night-mode .direction-btn {
+  background: #1e1e1e;
+  border-color: #333;
+}
+.night-mode .direction-btn:hover {
+  border-color: #555;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+.night-mode .direction-btn[data-direction="0"]::before {
+  background: linear-gradient(135deg, rgba(30, 136, 56, 0.1) 0%, rgba(0, 71, 160, 0.1) 100%);
+}
+.night-mode .direction-btn[data-direction="1"]::before {
+  background: linear-gradient(135deg, rgba(0, 71, 160, 0.1) 0%, rgba(30, 136, 56, 0.1) 100%);
+}
+.night-mode .direction-btn.selected {
+  border-color: #1a8838;
+  box-shadow: 0 4px 20px rgba(26, 136, 56, 0.3);
+}
+.night-mode .dir-arrow-icon {
+  color: #666;
+}
+.night-mode .direction-btn.selected .dir-arrow-icon {
+  color: #4ade80;
+}
+.night-mode .direction-btn[data-direction="1"].selected .dir-arrow-icon {
+  color: #6db3f2;
+}
+.night-mode .dir-label {
+  color: #bbb;
+}
+.night-mode .direction-btn.selected .dir-label {
+  color: #e0e0e0;
+}
+
+/* Active direction indicator */
+.night-mode .active-direction {
+  background: linear-gradient(135deg, #1a2a22 0%, #162520 100%);
+  border-color: rgba(0, 168, 132, 0.3);
+}
+.night-mode .active-dir-text {
+  color: #4ade80;
+}
+.night-mode .change-dir-btn {
+  background: #252525;
+  border-color: #444;
+  color: #bbb;
+}
+.night-mode .change-dir-btn:hover {
+  background: #2a2a2a;
+  border-color: #555;
+}
+
+/* Method buttons — already colorful, soften shadows */
+.night-mode .method-btn.date-btn {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+.night-mode .method-btn.city-btn {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Info card */
+.night-mode .info-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.night-mode .info-title {
+  color: #e0e0e0;
+}
+.night-mode .info-list li {
+  color: #bbb;
+}
+
+/* Section headers */
+.night-mode .section-header {
+  border-bottom-color: #333;
+}
+.night-mode .section-heading {
+  color: #e0e0e0;
+}
+.night-mode .back-btn {
+  background: linear-gradient(135deg, #252525 0%, #1e1e1e 100%);
+  border-color: #444;
+  color: #ccc;
+}
+.night-mode .back-btn:hover {
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
+}
+
+/* Country tabs */
+.night-mode .country-tabs {
+  background: #1a1a1a;
+}
+.night-mode .country-tab {
+  color: #999;
+}
+.night-mode .country-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.night-mode .country-tab.active {
+  background: #252525;
+  color: #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Country buttons */
+.night-mode .country-btn {
+  background: #1e1e1e;
+  border-color: #333;
+}
+.night-mode .country-btn:hover {
+  border-color: #00a884;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.night-mode .country-btn.uzb-btn:hover {
+  background: linear-gradient(135deg, #1a2a22 0%, #1e1e1e 100%);
+}
+.night-mode .country-btn.kor-btn:hover {
+  background: linear-gradient(135deg, #1a2232 0%, #1e1e1e 100%);
+}
+.night-mode .country-name {
+  color: #e0e0e0;
+}
+
+/* Date items */
+.night-mode .date-item {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+}
+.night-mode .date-item:hover {
+  border-color: #e91e63;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.night-mode .date-icon {
+  background: linear-gradient(135deg, #2a1a22 0%, #251520 100%);
+}
+.night-mode .date-full {
+  color: #e0e0e0;
+}
+.night-mode .date-weekday {
+  color: #777;
+}
+
+/* City items */
+.night-mode .city-item {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+}
+.night-mode .city-item:hover {
+  border-color: #3f51b5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.night-mode .city-icon {
+  background: linear-gradient(135deg, #1a1e2a 0%, #1a1a25 100%);
+}
+.night-mode .city-name {
+  color: #e0e0e0;
+}
+
+/* Post cards */
+.night-mode .post-card {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.night-mode .post-header {
+  background: linear-gradient(135deg, #252525 0%, #1a1a1a 100%);
+  border-bottom-color: #333;
+}
+.night-mode .post-username {
+  color: #e0e0e0;
+}
+.night-mode .post-date {
+  color: #777;
+}
+.night-mode .post-text {
+  color: #bbb;
+}
+.night-mode .post-tag {
+  background: #252525;
+  color: #999;
+}
+.night-mode .post-tag.uzb {
+  background: rgba(46, 125, 50, 0.12);
+  color: #6ee09c;
+}
+.night-mode .post-tag.kor {
+  background: rgba(21, 101, 192, 0.12);
+  color: #6db3f2;
+}
+.night-mode .post-footer {
+  border-top-color: #2a2a2a;
+}
+
+/* Direction badge on posts */
+.night-mode .post-direction-badge.dir-0 {
+  background: rgba(46, 125, 50, 0.15);
+  color: #6ee09c;
+}
+.night-mode .post-direction-badge.dir-1 {
+  background: rgba(21, 101, 192, 0.15);
+  color: #6db3f2;
+}
+
+/* Loading & empty */
+.night-mode .spinner {
+  border-color: #333;
+  border-top-color: #00a884;
+}
+.night-mode .loading-indicator p {
+  color: #999;
+}
+.night-mode .empty-state p {
+  color: #777;
+}
