@@ -182,7 +182,12 @@ async function fetchDates() {
 
 async function fetchPostsByDate(date) {
   try {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/parcels/by-date?date=${encodeURIComponent(date)}`, {
+    let url = `${API_CONFIG.BASE_URL}/api/parcels/by-date?date=${encodeURIComponent(date)}`;
+    if (currentDirection !== null) {
+      url += `&direction=${currentDirection}`;
+    }
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
@@ -229,7 +234,12 @@ async function fetchCities(country) {
 
 async function fetchPostsByCity(city, country) {
   try {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/parcels/by-city?city=${encodeURIComponent(city)}&country=${country}`, {
+    let url = `${API_CONFIG.BASE_URL}/api/parcels/by-city?city=${encodeURIComponent(city)}&country=${country}`;
+    if (currentDirection !== null) {
+      url += `&direction=${currentDirection}`;
+    }
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
