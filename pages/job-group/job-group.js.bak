@@ -160,9 +160,9 @@ async function requestInviteLink() {
             "Guruhlarga qayta qo'shilish uchun oylik obuna sotib oling:<br><br>" +
             "💰 <strong>5,900 won/oy</strong><br><br>" +
             "📌 To'lov ma'lumotlari:<br>" +
-            "🏦 Bank: KEB하나은행 (Hana Bank)<br>" +
-            "💳 Hisob raqam: 559-910261-05007<br>" +
-            "👤 Egasi: SATTAROV OTABEK<br><br>" +
+            "🏦 Bank: [BANK_NAME]<br>" +
+            "💳 Hisob raqam: [ACCOUNT_NUMBER]<br>" +
+            "👤 Egasi: [ACCOUNT_HOLDER]<br><br>" +
             "✅ To'lovni amalga oshirgach, skrinshotini " +
             "<a href='https://t.me/job_hunter_2bot' style='color:#00a884;font-weight:700;'>@job_hunter_acc</a>" +
             " ga yuboring.";
