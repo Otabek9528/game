@@ -153,10 +153,24 @@ async function requestInviteLink() {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       
-      if (errorData.error === 'trial_used') {
-        showError(errorData.message || "Sinov muddati tugagan");
+    if (errorData.error === 'trial_used') {
+        // Show payment instructions instead of generic error
+        document.getElementById('errorText').innerHTML = 
+            "<strong>Sizning sinov muddatingiz tugagan.</strong><br><br>" +
+            "Guruhlarga qayta qo'shilish uchun oylik obuna sotib oling:<br><br>" +
+            "💰 <strong>5,900 won/oy</strong><br><br>" +
+            "📌 To'lov ma'lumotlari:<br>" +
+            "🏦 Bank: [BANK_NAME]<br>" +
+            "💳 Hisob raqam: [ACCOUNT_NUMBER]<br>" +
+            "👤 Egasi: [ACCOUNT_HOLDER]<br><br>" +
+            "✅ To'lovni amalga oshirgach, skrinshotini " +
+            "<a href='https://t.me/job_hunter_2bot' style='color:#00a884;font-weight:700;'>@job_hunter_acc</a>" +
+            " ga yuboring.";
+        showState('error');
+        // Hide retry button since it won't help
+        document.getElementById('errorRetryBtn').style.display = 'none';
         return;
-      }
+    }
       
       throw new Error(errorData.message || `Server xatosi: ${response.status}`);
     }
