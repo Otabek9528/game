@@ -1,4 +1,4 @@
-// job-group.js - Job Group Invite Link functionality
+// job-group.js - Job & Taxi Group Invite Link functionality
 
 const tg = window.Telegram.WebApp;
 tg.ready();
@@ -12,7 +12,7 @@ try {
 // CONFIGURATION
 // ===========================================
 
-const API_BASE_URL = 'https://vegukin-api.duckdns.org/'; // Your API base URL
+const API_BASE_URL = 'https://vegukin-api.duckdns.org';
 const LINK_DURATION = 15; // seconds
 
 // ===========================================
@@ -28,13 +28,14 @@ const errorState = document.getElementById('errorState');
 const getLinkBtn = document.getElementById('getLinkBtn');
 const retryBtn = document.getElementById('retryBtn');
 const errorRetryBtn = document.getElementById('errorRetryBtn');
-const joinBtn = document.getElementById('joinBtn');
-const copyLinkBtn = document.getElementById('copyLinkBtn');
 
-const linkText = document.getElementById('linkText');
+const jobLinkText = document.getElementById('jobLinkText');
+const taxiLinkText = document.getElementById('taxiLinkText');
+const jobJoinBtn = document.getElementById('jobJoinBtn');
+const taxiJoinBtn = document.getElementById('taxiJoinBtn');
+
 const timerText = document.getElementById('timerText');
 const timerProgress = document.getElementById('timerProgress');
-const copyIcon = document.getElementById('copyIcon');
 const errorText = document.getElementById('errorText');
 
 // ===========================================
@@ -50,14 +51,12 @@ let timeRemaining = LINK_DURATION;
 // ===========================================
 
 function showState(stateName) {
-  // Hide all states
   initialState.style.display = 'none';
   loadingState.style.display = 'none';
   linkState.style.display = 'none';
   expiredState.style.display = 'none';
   errorState.style.display = 'none';
   
-  // Show requested state
   switch(stateName) {
     case 'initial':
       initialState.style.display = 'block';
@@ -98,14 +97,11 @@ function startTimer() {
 }
 
 function updateTimerDisplay() {
-  // Update text
   timerText.textContent = timeRemaining;
   
-  // Update progress circle (283 is circumference of circle with r=45)
   const progress = (timeRemaining / LINK_DURATION) * 283;
   timerProgress.style.strokeDashoffset = 283 - progress;
   
-  // Update colors based on time remaining
   timerText.classList.remove('warning', 'danger');
   timerProgress.classList.remove('warning', 'danger');
   
@@ -134,7 +130,6 @@ async function requestInviteLink() {
   stopTimer();
   
   try {
-    // Get user ID from Telegram WebApp
     const userId = tg.initDataUnsafe?.user?.id;
     
     if (!userId) {
@@ -147,19 +142,21 @@ async function requestInviteLink() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        user_id: userId
+        user_id: userId,
+        first_name: tg.initDataUnsafe?.user?.first_name || '',
+        last_name: tg.initDataUnsafe?.user?.last_name || '',
+        username: tg.initDataUnsafe?.user?.username || ''
       }),
-      signal: AbortSignal.timeout(15000) // 15 second timeout
+      signal: AbortSignal.timeout(15000)
     });
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      
       if (errorData.error === 'trial_used') {
-        // Show payment option instead of generic error
         showError(errorData.message || "Sinov muddati tugagan");
-        // TODO: Add payment button here in future
         return;
-    }
+      }
       
       throw new Error(errorData.message || `Server xatosi: ${response.status}`);
     }
@@ -178,34 +175,27 @@ async function requestInviteLink() {
     
   } catch (error) {
     console.error('Error requesting invite link:', error);
-    alert('Error: ' + error.message);  // Add this line temporarily
     showError(error.message || 'Link yaratishda xatolik yuz berdi');
   }
 }
 
 function displayLinks(links) {
-  document.getElementById('jobLinkText').textContent = links.job;
-  document.getElementById('jobJoinBtn').href = links.job;
-  document.getElementById('taxiLinkText').textContent = links.taxi;
-  document.getElementById('taxiJoinBtn').href = links.taxi;
+  jobLinkText.textContent = links.job;
+  jobJoinBtn.href = links.job;
+  taxiLinkText.textContent = links.taxi;
+  taxiJoinBtn.href = links.taxi;
   showState('link');
   startTimer();
-  if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-}
-
-function copyToClipboard(type) {
-  if (!currentLinks) return;
-  const link = type === 'job' ? currentLinks.job : currentLinks.taxi;
-  navigator.clipboard.writeText(link).then(() => {
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-  }).catch(err => console.error('Copy failed:', err));
+  
+  if (tg.HapticFeedback) {
+    tg.HapticFeedback.notificationOccurred('success');
+  }
 }
 
 function handleLinkExpired() {
   currentLinks = null;
   showState('expired');
   
-  // Haptic feedback
   if (tg.HapticFeedback) {
     tg.HapticFeedback.notificationOccurred('warning');
   }
@@ -215,7 +205,6 @@ function showError(message) {
   errorText.textContent = message;
   showState('error');
   
-  // Haptic feedback
   if (tg.HapticFeedback) {
     tg.HapticFeedback.notificationOccurred('error');
   }
@@ -225,41 +214,25 @@ function showError(message) {
 // COPY FUNCTIONALITY
 // ===========================================
 
-async function copyLink() {
-  if (!currentLink) return;
+function copyToClipboard(type) {
+  if (!currentLinks) return;
+  const link = type === 'job' ? currentLinks.job : currentLinks.taxi;
   
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(currentLink);
-    } else {
-      // Fallback
-      const textarea = document.createElement('textarea');
-      textarea.value = currentLink;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-    }
-    
-    // Show success feedback
-    copyIcon.textContent = '✅';
-    
-    if (tg.HapticFeedback) {
-      tg.HapticFeedback.impactOccurred('light');
-    }
-    
-    setTimeout(() => {
-      copyIcon.textContent = '📋';
-    }, 1500);
-    
-  } catch (err) {
-    console.error('Copy failed:', err);
-    copyIcon.textContent = '❌';
-    setTimeout(() => {
-      copyIcon.textContent = '📋';
-    }, 1500);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(() => {
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+    }).catch(err => console.error('Copy failed:', err));
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.value = link;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
   }
 }
 
@@ -284,13 +257,6 @@ try {
 getLinkBtn.addEventListener('click', requestInviteLink);
 retryBtn.addEventListener('click', requestInviteLink);
 errorRetryBtn.addEventListener('click', requestInviteLink);
-copyLinkBtn.addEventListener('click', copyLink);
-
-// Handle join button click - stop timer since user is joining
-joinBtn.addEventListener('click', () => {
-  // Don't stop timer - let it continue in case user comes back
-  // The server will handle link revocation on use
-});
 
 // ===========================================
 // INITIALIZATION
@@ -303,7 +269,6 @@ function initPage() {
 
 document.addEventListener('DOMContentLoaded', initPage);
 
-// Cleanup on page unload
 window.addEventListener('beforeunload', () => {
   stopTimer();
 });
