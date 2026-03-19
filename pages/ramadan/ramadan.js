@@ -456,13 +456,51 @@ async function updateTomorrowTab() {
   // Update date display
   document.getElementById('tomorrowDate').textContent = formatDate(tomorrow, true);
   
-  if (isRamadan(tomorrow)) {
+  const tomorrowIsRamadan = isRamadan(tomorrow);
+  const tomorrowIsEid = !tomorrowIsRamadan && ramadanDay === CONFIG.RAMADAN_DAYS + 1;
+  
+  if (tomorrowIsRamadan) {
     document.getElementById('tomorrowRamadan').textContent = `Ramazonning ${ramadanDay}-kuni`;
   } else if (ramadanDay === 1) {
     document.getElementById('tomorrowRamadan').textContent = 'Ramazonning 1-kuni';
   } else {
     document.getElementById('tomorrowRamadan').textContent = '';
   }
+  
+  // Handle Eid: hide suhur/iftar, show Eid message
+  const timesGrid = document.querySelector('#tabTomorrow .times-grid');
+  const adviceBox = document.querySelector('#tabTomorrow .tomorrow-advice');
+  const existingEid = document.getElementById('tomorrowEidMessage');
+  
+  if (tomorrowIsEid) {
+    // Hide suhur/iftar times and prep tips
+    if (timesGrid) timesGrid.style.display = 'none';
+    if (adviceBox) adviceBox.style.display = 'none';
+    
+    // Show Eid message if not already present
+    if (!existingEid) {
+      const eidDiv = document.createElement('div');
+      eidDiv.id = 'tomorrowEidMessage';
+      eidDiv.className = 'eid-message-box';
+      eidDiv.innerHTML = `
+        <div class="eid-emoji">🎉☪️🎉</div>
+        <h3 class="eid-title">Hayit Muborak!</h3>
+        <p class="eid-subtitle">Ertaga Roʻza hayit — muborak kun!</p>
+        <p class="eid-note">Ramazon oyi yakunlandi. Barcha roʻzalaringiz qabul boʻlsin!</p>
+      `;
+      const dayCard = document.querySelector('#tabTomorrow .day-card');
+      if (dayCard) dayCard.appendChild(eidDiv);
+    }
+    
+    // Update the tab header
+    document.getElementById('tomorrowRamadan').textContent = 'Roʻza hayit 🎉';
+    return;
+  }
+  
+  // Normal Ramadan day — ensure elements are visible (in case user navigated back)
+  if (timesGrid) timesGrid.style.display = '';
+  if (adviceBox) adviceBox.style.display = '';
+  if (existingEid) existingEid.remove();
   
   // Fetch times if not cached
   if (!State.tomorrowTimes) {
