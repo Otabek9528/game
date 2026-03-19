@@ -485,7 +485,7 @@ async function updateTomorrowTab() {
       eidDiv.innerHTML = `
         <div class="eid-emoji">🎉☪️🎉</div>
         <h3 class="eid-title">Hayit Muborak!</h3>
-        <p class="eid-subtitle">Ertaga Roʻza hayit — muborak kun!</p>
+        <p class="eid-subtitle">Ertaga Ramazon hayiti — muborak kun!</p>
         <p class="eid-note">Ramazon oyi yakunlandi. Barcha roʻzalaringiz qabul boʻlsin!</p>
       `;
       const dayCard = document.querySelector('#tabTomorrow .day-card');
@@ -493,7 +493,7 @@ async function updateTomorrowTab() {
     }
     
     // Update the tab header
-    document.getElementById('tomorrowRamadan').textContent = 'Roʻza hayit 🎉';
+    document.getElementById('tomorrowRamadan').textContent = 'Ramazon hayiti 🎉';
     return;
   }
   
