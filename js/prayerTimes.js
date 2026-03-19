@@ -62,12 +62,19 @@ function translateMonth(monthIndex) {
 }
 
 // ============================================
+// HIJRI DATE ADJUSTMENT
+// ============================================
+// Set to -1 when local moon sighting (e.g. Korea) is 1 day behind the calculated calendar.
+// Set to 0 when local and calculated dates align. Update this after each Ramadan/Eid announcement.
+const HIJRI_ADJUSTMENT = -1;
+
+// ============================================
 // PRAYER TIME CALCULATIONS
 // ============================================
 
 async function getPrayerTimes(lat, lon) {
   // Fetch Hanafi times (school=1)
-  const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=3&school=1`;
+  const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=3&school=1&adjustment=${HIJRI_ADJUSTMENT}`;
   const res = await fetch(url);
   const data = await res.json();
   return data.data;
@@ -76,7 +83,7 @@ async function getPrayerTimes(lat, lon) {
 // Fetch Asr time for Shafi'i/Maliki/Hanbali (school=0)
 async function getShafiiAsrTime(lat, lon) {
   try {
-    const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=3&school=0`;
+    const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=3&school=0&adjustment=${HIJRI_ADJUSTMENT}`;
     const res = await fetch(url);
     const data = await res.json();
     return data.data.timings.Asr;
