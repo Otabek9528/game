@@ -68,6 +68,66 @@ function translateMonth(monthIndex) {
 // Set to 0 when local and calculated dates align. Update this after each Ramadan/Eid announcement.
 const HIJRI_ADJUSTMENT = -1;
 
+// Hijri month names and max days for client-side correction
+const HIJRI_MONTHS = {
+  1:  { en: "Muḥarram",        days: 30 },
+  2:  { en: "Ṣafar",           days: 29 },
+  3:  { en: "Rabīʿ al-Awwal",  days: 30 },
+  4:  { en: "Rabīʿ al-Thānī",  days: 29 },
+  5:  { en: "Jumādá al-Ūlá",   days: 30 },
+  6:  { en: "Jumādá al-Ākhirah",days: 29 },
+  7:  { en: "Rajab",            days: 30 },
+  8:  { en: "Shaʿbān",          days: 29 },
+  9:  { en: "Ramaḍān",          days: 30 },
+  10: { en: "Shawwāl",          days: 29 },
+  11: { en: "Dhū al-Qaʿdah",   days: 30 },
+  12: { en: "Dhū al-Ḥijjah",   days: 29 }
+};
+
+// Apply client-side hijri date correction when API ignores adjustment param
+function adjustHijriDate(hijriObj) {
+  if (HIJRI_ADJUSTMENT === 0) return hijriObj;
+
+  let day = parseInt(hijriObj.day);
+  let monthNum = parseInt(hijriObj.month.number);
+  let year = parseInt(hijriObj.year);
+
+  day += HIJRI_ADJUSTMENT;
+
+  // Handle rolling back past month start (e.g., Shawwal 1 → Ramadan 30)
+  if (day < 1) {
+    monthNum -= 1;
+    if (monthNum < 1) {
+      monthNum = 12;
+      year -= 1;
+    }
+    day = HIJRI_MONTHS[monthNum].days + day; // day is negative, so this subtracts
+  }
+
+  // Handle rolling forward past month end
+  const maxDays = HIJRI_MONTHS[monthNum].days;
+  if (day > maxDays) {
+    day = day - maxDays;
+    monthNum += 1;
+    if (monthNum > 12) {
+      monthNum = 1;
+      year += 1;
+    }
+  }
+
+  // Return corrected copy (don't mutate original)
+  return {
+    ...hijriObj,
+    day: String(day).padStart(2, '0'),
+    month: {
+      ...hijriObj.month,
+      number: monthNum,
+      en: HIJRI_MONTHS[monthNum].en
+    },
+    year: String(year)
+  };
+}
+
 // ============================================
 // PRAYER TIME CALCULATIONS
 // ============================================
@@ -222,13 +282,12 @@ async function updatePrayerData(lat, lon, city) {
     const monthName = translateMonth(localDate.getMonth());
     const gregorianDate = `${localDate.getDate()}-${monthName}`;
     
+    // Apply client-side hijri correction (in case API ignores adjustment param)
+    const hijri = adjustHijriDate(data.date.hijri);
+    const hijriFormatted = `${parseInt(hijri.day)}-${hijri.month.en}, ${hijri.year}`;
+    console.log('📅 Hijri date (adjusted):', hijriFormatted);
+    
     if (document.getElementById("weekday")) {
-      // Format hijri: "day-monthName, year"
-      const hijriDay = data.date.hijri.day;
-      const hijriMonthName = data.date.hijri.month.en; // API provides month name
-      const hijriYear = data.date.hijri.year;
-      const hijriFormatted = `${parseInt(hijriDay)}-${hijriMonthName}, ${hijriYear}`;
-      
       document.getElementById("weekday").innerText = `${weekdayTranslated}, ${gregorianDate}`;
       
       const hijriElem = document.getElementById("hijri");
@@ -240,10 +299,6 @@ async function updatePrayerData(lat, lon, city) {
     // Update detailed page elements if they exist
     const todayDateElem = document.getElementById("todayDate");
     if (todayDateElem) {
-      const hijriDay = data.date.hijri.day;
-      const hijriMonthName = data.date.hijri.month.en;
-      const hijriYear = data.date.hijri.year;
-      const hijriFormatted = `${parseInt(hijriDay)}-${hijriMonthName}, ${hijriYear}`;
       todayDateElem.innerHTML = `${weekdayTranslated}, ${gregorianDate} <br> ${hijriFormatted}`;
     }
 
@@ -259,12 +314,13 @@ async function updatePrayerData(lat, lon, city) {
     updateAsrSchoolsDisplay(data.timings.Asr, shafiiAsrTime);
 
     // Dispatch event with prayer data for detailed page
+    const correctedDate = { ...data.date, hijri: hijri };
     window.dispatchEvent(new CustomEvent('prayerDataUpdated', {
       detail: {
         timings: data.timings,
         currentPrayer: current.name,
         nextPrayer: next.name,
-        date: data.date,
+        date: correctedDate,
         shafiiAsr: shafiiAsrTime
       }
     }));
