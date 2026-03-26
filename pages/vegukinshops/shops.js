@@ -135,5 +135,11 @@ function initCtaButton() {
 document.addEventListener('DOMContentLoaded', function() {
   renderDemoShops();
   initCtaButton();
+
+  // Log feature open (only if not coming from index — index already logs on click)
+  if (window.logInteraction && !document.referrer.includes('index.html')) {
+    window.logInteraction('vegukinShops');
+  }
+
   console.log('✅ Shops page loaded');
 });
