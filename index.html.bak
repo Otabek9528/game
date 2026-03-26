@@ -200,7 +200,7 @@
       if (!container) return;
       
       const availableFeatures = window.I18N ? I18N.getAvailableFeatures() : 
-        ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'vegukinShops', 'links', 'jobs', 'donation', 'barcode', 'community'];
+        ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'links', 'jobs', 'donation', 'barcode', 'community'];
       
       container.innerHTML = '';
       
