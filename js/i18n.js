@@ -6,7 +6,7 @@ const I18N = {
   STORAGE_KEY: 'vegukin_language',
 
   availableFeatures: {
-    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'parcel', 'links', 'jobs', 'donation', 'community', 'news', 'events', 'market'],
+    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'parcel', 'vegukinShops', 'links', 'jobs', 'donation', 'community', 'news', 'events', 'market'],
     ru: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community'],
     en: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community']
   },

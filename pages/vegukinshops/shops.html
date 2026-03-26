@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vegukin Shops</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="shops.css" />
+  <script>
+  if (localStorage.getItem('theme') === 'night') {
+    document.documentElement.classList.add('night-mode');
+  }
+  </script>
+</head>
+<body>
+
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <div class="shops-container">
+
+    <!-- Hero -->
+    <div class="shops-hero">
+      <div class="hero-icon">🛒</div>
+      <h2 class="hero-title">Vegukin Shops</h2>
+      <p class="hero-subtitle">Biznesingiz uchun onlayn ilova</p>
+    </div>
+
+    <!-- About -->
+    <div class="shops-message">
+      <p>Koreyada o'z biznesini yuritayotgan yurtdoshlarimiz uchun <strong>Vegukin Shops</strong> proyekti yo'lga qo'yildi.</p>
+      <p>Endi biznesingiz uchun <strong>Telegram ichida ishlaydigan avtomatlashgan onlayn do'kon</strong> ochishingiz mumkin!</p>
+      <p>Mijoz shunchaki do'koningiz havolasini bosadi va telefoniga <strong>hech narsa o'rnatmasdan</strong>, shu zahotiyoq do'koningiz ilovasiga kirib mahsulotlar katalogini ko'radi, savatga soladi va buyurtma beradi.</p>
+    </div>
+
+    <!-- Mijoz -->
+    <div class="shops-section">
+      <h3 class="section-label">📱 Mijoz nima qila oladi?</h3>
+      <div class="ability-card">
+        <div class="ability-row"><span class="ability-icon">🛒</span><span>Mahsulotlarni ko'rish, izlash va buyurtma berish</span></div>
+        <div class="ability-row"><span class="ability-icon">♡</span><span>Sevimli mahsulotlarni belgilash</span></div>
+        <div class="ability-row"><span class="ability-icon">📋</span><span>Buyurtmalar tarixini ko'rish va holatini kuzatish</span></div>
+        <div class="ability-row"><span class="ability-icon">✅</span><span>Buyurtmaga doir xabarlarni Telegram orqali qabul qilish</span></div>
+        <div class="ability-row"><span class="ability-icon">🏪</span><span>Do'kon haqida barcha ma'lumotlar: ish vaqti, aloqa, chegirmalar, yangiliklar</span></div>
+      </div>
+    </div>
+
+    <!-- Do'kon egasi -->
+    <div class="shops-section">
+      <h3 class="section-label">📊 Do'kon egasi nima qila oladi?</h3>
+      <div class="ability-card seller">
+        <div class="ability-row"><span class="ability-icon">📦</span><span>Buyurtmalarni boshqarish va holatini o'zgartirish</span></div>
+        <div class="ability-row"><span class="ability-icon">📱</span><span>Har bir buyurtma haqida Telegram orqali avtomatik xabar olish</span></div>
+        <div class="ability-row"><span class="ability-icon">🏷</span><span>Mahsulotlarni qo'shish, tahrirlash, rasmlarni yuklash</span></div>
+        <div class="ability-row"><span class="ability-icon">📊</span><span>Daromad, tashriflar va buyurtmalar statistikasi</span></div>
+        <div class="ability-row"><span class="ability-icon">🔔</span><span>Kunlik statistikani hisobot tarzida har kuni qabul qilish</span></div>
+      </div>
+    </div>
+
+    <!-- Demo Shops -->
+    <div class="shops-section">
+      <h3 class="section-label">👀 Demo do'konlar</h3>
+      <p class="demo-hint">Ilovani kimlar va qanday ko'rinishda ishlatishi haqida bilish uchun quyidagi demo do'konlarga kiring:</p>
+      <div class="demo-list" id="demoList"></div>
+      <div class="demo-note">
+        <p>⚠️ Yuqoridagi do'konlar faqatgina <strong>mijozlar oynasi</strong> hisoblanadi. Do'kon egasining imkoniyatlari berilgan <strong>admin panelni</strong> ko'rish uchun <a href="https://t.me/otabeksattarov" target="_blank">bot adminiga</a> yozing.</p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="shops-cta">
+      <div class="cta-card">
+        <h3 class="cta-title">💼 Biznesingizni raqamlashtiring</h3>
+        <p class="cta-text">Do'koningiz ma'lumotlari bot tarkibidagi <strong>Vegukin Shops</strong> menyusi orqali doimiy reklama qilib boriladi.</p>
+        <a href="https://t.me/otabeksattarov" target="_blank" class="cta-btn">💬 Do'kon ochish uchun adminga yozing</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/logger.js"></script>
+  <script src="shops.js"></script>
+
+</body>
+</html>

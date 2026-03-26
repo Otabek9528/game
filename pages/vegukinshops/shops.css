@@ -1,0 +1,423 @@
+/* =========================
+   VEGUKIN SHOPS PAGE STYLES
+   ========================= */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible !important;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #faf7f0 0%, #f0ebe0 100%);
+}
+
+.app__header {
+  flex-shrink: 0;
+}
+
+.shops-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 40px 16px;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================
+   HERO
+   ========================= */
+.shops-hero {
+  text-align: center;
+  padding: 24px 20px 20px;
+}
+
+.hero-icon {
+  font-size: 3.5rem;
+  margin-bottom: 10px;
+}
+
+.hero-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a4d2e;
+  margin: 0 0 6px 0;
+}
+
+.hero-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0;
+}
+
+/* =========================
+   SECTIONS
+   ========================= */
+.shops-section {
+  margin-bottom: 20px;
+}
+
+/* =========================
+   MESSAGE
+   ========================= */
+.shops-message {
+  background: #ffffff;
+  border: 2px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.shops-message p {
+  font-size: 0.93rem;
+  color: #444;
+  line-height: 1.7;
+  margin: 0 0 12px 0;
+}
+
+.shops-message p:last-child {
+  margin-bottom: 0;
+}
+
+.shops-message strong {
+  color: #1a4d2e;
+}
+
+/* =========================
+   ABILITY CARDS
+   ========================= */
+.ability-card {
+  background: #ffffff;
+  border: 2px solid #e8e8e8;
+  border-radius: 14px;
+  overflow: hidden;
+  border-top: 3px solid #3498db;
+}
+
+.ability-card.seller {
+  border-top-color: #1a9a5c;
+}
+
+.ability-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.ability-row:last-child {
+  border-bottom: none;
+}
+
+.ability-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+/* =========================
+   DEMO NOTE
+   ========================= */
+.demo-note {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+  border: 2px dashed #ffc107;
+  border-radius: 12px;
+}
+
+.demo-note p {
+  font-size: 0.84rem;
+  color: #5d4e00;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.demo-note strong {
+  color: #7a5a00;
+}
+
+.demo-note a {
+  color: #d68800;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* =========================
+   DEMO SHOPS
+   ========================= */
+.shops-demo {
+  margin-bottom: 24px;
+}
+
+.demo-hint {
+  font-size: 0.88rem;
+  color: #777;
+  margin: 0 0 12px 4px;
+}
+
+.demo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.demo-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px 18px;
+  background: #ffffff;
+  border: 2px solid #e8e8e8;
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.demo-card:hover {
+  border-color: #1a9a5c;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(26, 154, 92, 0.15);
+}
+
+.demo-card:active {
+  transform: scale(0.98);
+}
+
+.demo-icon {
+  font-size: 1.8rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f9f5 0%, #e0f5ea 100%);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.demo-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.demo-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.demo-desc {
+  font-size: 0.82rem;
+  color: #888;
+}
+
+.demo-arrow {
+  font-size: 1.2rem;
+  color: #1a9a5c;
+  opacity: 0.7;
+}
+
+/* =========================
+   CTA
+   ========================= */
+.shops-cta {
+  margin-bottom: 20px;
+}
+
+.cta-card {
+  background: linear-gradient(145deg, #f0fdf4 0%, #e0f5ea 100%);
+  border: 2px solid #b8e6cc;
+  border-radius: 18px;
+  padding: 22px 20px;
+  text-align: center;
+}
+
+.cta-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a4d2e;
+  margin: 0 0 8px 0;
+}
+
+.cta-text {
+  font-size: 0.86rem;
+  color: #3a7a50;
+  line-height: 1.55;
+  margin: 0 0 16px 0;
+}
+
+.cta-text strong {
+  color: #1a4d2e;
+}
+
+.cta-btn {
+  display: block;
+  background: linear-gradient(135deg, #1a9a5c 0%, #157a48 100%);
+  color: #fff;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(26, 154, 92, 0.3);
+  transition: all 0.2s ease;
+}
+
+.cta-btn:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   ANIMATION
+   ========================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 380px) {
+  .shops-container {
+    padding: 0 12px 40px 12px;
+  }
+}
+
+/* =========================
+   NIGHT MODE
+   ========================= */
+.night-mode,
+.night-mode body {
+  background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%);
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+}
+
+.night-mode .hero-title {
+  color: #4ade80;
+}
+
+.night-mode .hero-subtitle {
+  color: #999;
+}
+
+.night-mode .shops-message {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+.night-mode .shops-message p {
+  color: #bbb;
+}
+
+.night-mode .shops-message strong {
+  color: #4ade80;
+}
+
+.night-mode .section-label {
+  color: #e0e0e0;
+}
+
+.night-mode .ability-card {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+.night-mode .ability-card.seller {
+  border-top-color: #1a9a5c;
+}
+
+.night-mode .ability-row {
+  color: #bbb;
+  border-bottom-color: #2a2a2a;
+}
+
+.night-mode .demo-note {
+  background: linear-gradient(135deg, #2a2510 0%, #251e08 100%);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.night-mode .demo-note p {
+  color: #bba860;
+}
+
+.night-mode .demo-note strong {
+  color: #ffc107;
+}
+
+.night-mode .demo-note a {
+  color: #ffc107;
+}
+
+.night-mode .cta-text {
+  color: #88c8a0;
+}
+
+.night-mode .cta-text strong {
+  color: #4ade80;
+}
+
+.night-mode .demo-hint {
+  color: #888;
+}
+
+.night-mode .demo-card {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+.night-mode .demo-card:hover {
+  border-color: #1a9a5c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.night-mode .demo-icon {
+  background: linear-gradient(135deg, #1a2a22 0%, #162520 100%);
+}
+
+.night-mode .demo-name {
+  color: #e0e0e0;
+}
+
+.night-mode .demo-desc {
+  color: #777;
+}
+
+.night-mode .cta-card {
+  background: linear-gradient(145deg, #0d1f14 0%, #1e1e1e 100%);
+  border-color: rgba(26, 154, 92, 0.3);
+}
+
+.night-mode .cta-title {
+  color: #4ade80;
+}
+
+.night-mode .cta-btn {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+
