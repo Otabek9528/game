@@ -383,17 +383,19 @@ function renderMyPosts() {
   myPostsList.innerHTML = myPosts.map(post => {
     let actions = '';
     if (post.status === 'available') {
-      actions = `<button class="post-action-btn reserve" onclick="confirmAction('${post.id}','reserve')">🟡 Band qilish</button>`;
+      actions = `<div class="my-post-actions-row"><button class="post-action-btn reserve" onclick="confirmAction('${post.id}','reserve')">🟡 Band qilish</button></div>`;
     } else if (post.status === 'reserved') {
       const can = canFinish(post);
       const hint = can ? '' : `<div class="finish-hint">⏳ Yakunlash uchun: ${finishTimeLeft(post)}</div>`;
       actions = `
-        <button class="post-action-btn reopen" onclick="confirmAction('${post.id}','reopen')">↩️ Faol qilish</button>
-        <button class="post-action-btn finish" ${can ? '' : 'disabled'} onclick="confirmAction('${post.id}','finish')">✅ Yakunlash</button>
+        <div class="my-post-actions-row">
+          <button class="post-action-btn reopen" onclick="confirmAction('${post.id}','reopen')">↩️ Faol qilish</button>
+          <button class="post-action-btn finish" ${can ? '' : 'disabled'} onclick="confirmAction('${post.id}','finish')">✅ Yakunlash</button>
+        </div>
+        ${hint}
       `;
-      if (!can) actions += hint;
     } else {
-      actions = `<div class="ticket-earned">🎟 Lotereya chiptagiga qo'shildi</div>`;
+      actions = `<div class="ticket-earned">🎟 Lotereya chiptasiga qo'shildi</div>`;
     }
 
     return `
@@ -467,6 +469,19 @@ function executeAction(postId, action) {
 
   // TODO: API call to update status on server
 }
+
+// ===========================================
+// HOW IT WORKS — COLLAPSIBLE
+// ===========================================
+const hiwHeader = document.getElementById('hiwHeader');
+const hiwBody = document.getElementById('hiwBody');
+const hiwToggle = document.getElementById('hiwToggle');
+
+hiwHeader.addEventListener('click', () => {
+  const isOpen = hiwBody.classList.toggle('open');
+  hiwToggle.classList.toggle('open', isOpen);
+  if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+});
 
 // ===========================================
 // BACK BUTTON

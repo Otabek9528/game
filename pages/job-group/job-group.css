@@ -185,6 +185,47 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .guidelines-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
 .guidelines-text { font-size: 0.82rem; color: #4a6d8c; line-height: 1.5; }
 
+/* =========================
+   HOW IT WORKS CARD
+   ========================= */
+.how-it-works {
+  background: #fff; border-radius: 16px; padding: 18px; margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e8e4dc;
+}
+.hiw-header {
+  display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hiw-title { font-size: 0.95rem; font-weight: 700; color: #1a4d2e; }
+.hiw-toggle { font-size: 1.1rem; transition: transform 0.3s ease; color: #999; }
+.hiw-toggle.open { transform: rotate(180deg); }
+.hiw-body {
+  overflow: hidden; max-height: 0; transition: max-height 0.35s ease;
+}
+.hiw-body.open { max-height: 600px; }
+.hiw-steps { padding-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.hiw-step {
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.hiw-step-num {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #00a884 0%, #007b5e 100%);
+  color: #fff; font-size: 0.72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; margin-top: 1px;
+}
+.hiw-step-text { font-size: 0.85rem; color: #555; line-height: 1.5; }
+.hiw-step-text strong { color: #1a4d2e; }
+
+.hiw-highlight {
+  margin-top: 14px; padding: 12px 14px; border-radius: 12px;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border: 1px solid #ffc107;
+}
+.hiw-highlight-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.hiw-highlight-row:last-child { margin-bottom: 0; }
+.hiw-highlight-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+.hiw-highlight-text { font-size: 0.82rem; color: #5d4e00; line-height: 1.4; }
+
 /* Success */
 .success-card { background: #fff; border-radius: 20px; padding: 32px 24px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.08); border: 2px solid #00a884; }
 .success-icon { font-size: 3.5rem; margin-bottom: 12px; }
@@ -233,7 +274,8 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 
 .my-post-body { font-size: 0.9rem; color: #444; line-height: 1.5; margin-bottom: 14px; white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-.my-post-actions { display: flex; gap: 8px; }
+.my-post-actions { display: flex; flex-direction: column; gap: 8px; }
+.my-post-actions-row { display: flex; gap: 8px; }
 .post-action-btn {
   flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 0.85rem;
   font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-align: center;
@@ -384,3 +426,12 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .night-mode .confirm-title { color: #e0e0e0; }
 .night-mode .confirm-text { color: #999; }
 .night-mode .confirm-btn.cancel { background: #2a2a2a; color: #999; }
+
+/* How it works */
+.night-mode .how-it-works { background: #1e1e1e; border-color: #2a2a2a; }
+.night-mode .hiw-title { color: #4ade80; }
+.night-mode .hiw-toggle { color: #666; }
+.night-mode .hiw-step-text { color: #bbb; }
+.night-mode .hiw-step-text strong { color: #4ade80; }
+.night-mode .hiw-highlight { background: linear-gradient(135deg, #2a2510 0%, #251e08 100%); border-color: rgba(255,193,7,0.3); }
+.night-mode .hiw-highlight-text { color: #bba860; }
