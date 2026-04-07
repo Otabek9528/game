@@ -20,7 +20,8 @@ const LINK_DURATION = 15; // seconds
 // ===========================================
 
 const tabBtns = document.querySelectorAll('.tab-btn');
-const tabIndicator = document.querySelector('.tab-indicator');
+const tabSwipeTrack = document.getElementById('tabSwipeTrack');
+const tabSwipeContainer = document.getElementById('tabSwipeContainer');
 const tabJoin = document.getElementById('tabJoin');
 const tabPost = document.getElementById('tabPost');
 
@@ -82,36 +83,84 @@ let timeRemaining = LINK_DURATION;
 let userHasUsername = false;
 let telegramUsername = null;
 let useManualContact = false;
+let activeTab = 0; // 0 = join, 1 = post
 
 // ===========================================
-// TAB SWITCHING
+// TAB SWITCHING + SWIPE
 // ===========================================
 
-tabBtns.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab;
+function switchTab(index) {
+  activeTab = index;
+  tabSwipeTrack.style.transform = `translateX(-${index * 50}%)`;
 
-    // Update active button
-    tabBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    // Move indicator
-    if (tab === 'post') {
-      tabIndicator.classList.add('right');
-    } else {
-      tabIndicator.classList.remove('right');
-    }
-
-    // Switch content
-    if (tab === 'join') {
-      tabJoin.classList.add('active');
-      tabPost.classList.remove('active');
-    } else {
-      tabPost.classList.add('active');
-      tabJoin.classList.remove('active');
-    }
+  tabBtns.forEach((b, i) => {
+    b.classList.toggle('active', i === index);
   });
+
+  if (tg.HapticFeedback) {
+    tg.HapticFeedback.selectionChanged();
+  }
+}
+
+tabBtns.forEach((btn, i) => {
+  btn.addEventListener('click', () => switchTab(i));
 });
+
+// --- Touch swipe ---
+let swipeStartX = 0;
+let swipeStartY = 0;
+let swiping = false;
+let swipeDeltaX = 0;
+
+tabSwipeContainer.addEventListener('touchstart', (e) => {
+  swipeStartX = e.touches[0].clientX;
+  swipeStartY = e.touches[0].clientY;
+  swiping = false;
+  swipeDeltaX = 0;
+}, { passive: true });
+
+tabSwipeContainer.addEventListener('touchmove', (e) => {
+  const dx = e.touches[0].clientX - swipeStartX;
+  const dy = e.touches[0].clientY - swipeStartY;
+
+  // Only start swiping if horizontal movement dominates
+  if (!swiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    swiping = true;
+    tabSwipeTrack.classList.add('no-transition');
+  }
+
+  if (swiping) {
+    e.preventDefault();
+    swipeDeltaX = dx;
+    const baseOffset = activeTab * 50;
+    // Convert px to % of container width
+    const containerW = tabSwipeContainer.offsetWidth;
+    const pctDelta = (dx / containerW) * 50;
+    // Clamp so you can't over-scroll
+    const raw = -baseOffset + pctDelta;
+    const clamped = Math.max(-50, Math.min(0, raw));
+    tabSwipeTrack.style.transform = `translateX(${clamped}%)`;
+  }
+}, { passive: false });
+
+tabSwipeContainer.addEventListener('touchend', () => {
+  if (!swiping) return;
+  tabSwipeTrack.classList.remove('no-transition');
+
+  const threshold = tabSwipeContainer.offsetWidth * 0.2;
+
+  if (swipeDeltaX < -threshold && activeTab === 0) {
+    switchTab(1);
+  } else if (swipeDeltaX > threshold && activeTab === 1) {
+    switchTab(0);
+  } else {
+    // Snap back
+    tabSwipeTrack.style.transform = `translateX(-${activeTab * 50}%)`;
+  }
+
+  swiping = false;
+  swipeDeltaX = 0;
+}, { passive: true });
 
 // ===========================================
 // UI STATE MANAGEMENT — TAB 1 (JOIN)
