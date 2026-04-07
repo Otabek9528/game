@@ -78,34 +78,13 @@ let useManualContact = false;
 let activeTab = 0;
 
 // ===========================================
-// DUMMY DATA
+// POSTS DATA (loaded from API)
 // ===========================================
-let myPosts = [
-  {
-    id: 'd1',
-    text: "Restoranga oshpaz kerak\n📍 Manzil: Gangnam, Seoul\n👥 2 kishi\n🕐 09:00 – 18:00\n💰 Maosh: 170,000 won",
-    contact: '@poster_user',
-    status: 'available',
-    created_at: Date.now() - 2 * 60 * 60 * 1000,
-    reserved_at: null,
-  },
-  {
-    id: 'd2',
-    text: "Omborga yukchi kerak\n📍 Manzil: Bucheon\n👥 5 kishi\n🕐 20:00 – 06:00\n💰 Maosh: 150,000 won\n📋 Og'ir yuk ko'tara olishi kerak",
-    contact: '010-1234-5678',
-    status: 'reserved',
-    created_at: Date.now() - 5 * 60 * 60 * 1000,
-    reserved_at: Date.now() - 4 * 60 * 60 * 1000,
-  },
-  {
-    id: 'd3',
-    text: "Qurilish ishiga ishchi kerak\n📍 Manzil: Incheon\n👥 3 kishi\n🕐 08:00 – 17:00\n💰 Maosh: 180,000 won",
-    contact: '@builder_bek',
-    status: 'finished',
-    created_at: Date.now() - 26 * 60 * 60 * 1000,
-    reserved_at: Date.now() - 24 * 60 * 60 * 1000,
-  },
-];
+let myPosts = [];
+
+function getUserId() {
+  return tg.initDataUnsafe?.user?.id;
+}
 
 // ===========================================
 // TAB SWITCHING + SWIPE
@@ -163,8 +142,32 @@ function showSubView(view) {
     myPostsView.style.display = 'block';
     subnavFormBtn.classList.remove('active');
     subnavMyPostsBtn.classList.add('active');
-    renderMyPosts();
+    fetchMyPosts();
   }
+}
+
+async function fetchMyPosts() {
+  const userId = getUserId();
+  if (!userId) { renderMyPosts(); return; }
+  try {
+    const resp = await fetch(`${API_BASE_URL}/api/group/posts?user_id=${userId}`, { signal: AbortSignal.timeout(10000) });
+    const data = await resp.json();
+    if (data.success) {
+      myPosts = data.posts.map(p => ({
+        id: p.id,
+        text: p.message,
+        contact: p.contact,
+        status: p.status,
+        created_at: p.created_at,
+        reserved_at: p.reserved_at,
+        finished_at: p.finished_at,
+      }));
+      lotteryTickets.textContent = `Sizda: ${data.lottery_tickets} ta chipta`;
+    }
+  } catch (e) {
+    console.error('Failed to fetch posts:', e);
+  }
+  renderMyPosts();
 }
 
 subnavFormBtn.addEventListener('click', () => showSubView('form'));
@@ -317,8 +320,6 @@ async function submitPost() {
     if (!response.ok) { const d = await response.json().catch(() => ({})); throw new Error(d.message || `Server xatosi: ${response.status}`); }
     const data = await response.json();
     if (data.success) {
-      // Add to local list (dummy — in prod this comes from server)
-      myPosts.unshift({ id: 'p' + Date.now(), text: message, contact, status: 'available', created_at: Date.now(), reserved_at: null });
       updateBadge();
       showPostState('success');
       if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
@@ -340,8 +341,16 @@ function resetPostForm() {
 // ===========================================
 // MY POSTS — RENDERING
 // ===========================================
-function timeAgo(ts) {
-  const diff = Math.floor((Date.now() - ts) / 1000);
+function parseKST(dtStr) {
+  if (!dtStr) return null;
+  // dtStr is "YYYY-MM-DD HH:MM:SS" in KST (UTC+9)
+  return new Date(dtStr.replace(' ', 'T') + '+09:00');
+}
+
+function timeAgo(dtStr) {
+  const dt = parseKST(dtStr);
+  if (!dt) return '';
+  const diff = Math.floor((Date.now() - dt.getTime()) / 1000);
   if (diff < 60) return 'hozirgina';
   if (diff < 3600) return Math.floor(diff / 60) + ' daq. oldin';
   if (diff < 86400) return Math.floor(diff / 3600) + ' soat oldin';
@@ -350,12 +359,14 @@ function timeAgo(ts) {
 
 function canFinish(post) {
   if (post.status !== 'reserved' || !post.reserved_at) return false;
-  return (Date.now() - post.reserved_at) >= FINISH_DELAY_MS;
+  const dt = parseKST(post.reserved_at);
+  return (Date.now() - dt.getTime()) >= FINISH_DELAY_MS;
 }
 
 function finishTimeLeft(post) {
   if (!post.reserved_at) return '';
-  const remaining = FINISH_DELAY_MS - (Date.now() - post.reserved_at);
+  const dt = parseKST(post.reserved_at);
+  const remaining = FINISH_DELAY_MS - (Date.now() - dt.getTime());
   if (remaining <= 0) return '';
   const h = Math.floor(remaining / 3600000);
   const m = Math.floor((remaining % 3600000) / 60000);
@@ -450,24 +461,35 @@ function confirmAction(postId, action) {
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 }
 
-function executeAction(postId, action) {
-  const post = myPosts.find(p => p.id === postId);
-  if (!post) return;
+async function executeAction(postId, action) {
+  const userId = getUserId();
+  if (!userId) return;
 
-  if (action === 'reserve' && post.status === 'available') {
-    post.status = 'reserved';
-    post.reserved_at = Date.now();
-  } else if (action === 'reopen' && post.status === 'reserved') {
-    post.status = 'available';
-    post.reserved_at = null;
-  } else if (action === 'finish' && post.status === 'reserved' && canFinish(post)) {
-    post.status = 'finished';
+  const statusMap = { reserve: 'reserved', reopen: 'available', finish: 'finished' };
+  const newStatus = statusMap[action];
+  if (!newStatus) return;
+
+  try {
+    const resp = await fetch(`${API_BASE_URL}/api/group/post/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: postId, user_id: userId, status: newStatus }),
+      signal: AbortSignal.timeout(10000),
+    });
+    const data = await resp.json();
+
+    if (data.success) {
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      await fetchMyPosts();
+    } else {
+      alert(data.message || 'Xatolik yuz berdi');
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+    }
+  } catch (e) {
+    console.error('Status update error:', e);
+    alert("Tarmoq xatosi. Qayta urinib ko'ring.");
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
   }
-
-  if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-  renderMyPosts();
-
-  // TODO: API call to update status on server
 }
 
 // ===========================================
