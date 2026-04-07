@@ -1,4 +1,4 @@
-// job-group.js - Job Group Invite Link functionality
+// job-group.js - Job Group: Join + Post functionality
 
 const tg = window.Telegram.WebApp;
 tg.ready();
@@ -16,7 +16,16 @@ const API_BASE_URL = 'https://vegukin-api.duckdns.org/'; // Your API base URL
 const LINK_DURATION = 15; // seconds
 
 // ===========================================
-// DOM ELEMENTS
+// DOM ELEMENTS — TABS
+// ===========================================
+
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabIndicator = document.querySelector('.tab-indicator');
+const tabJoin = document.getElementById('tabJoin');
+const tabPost = document.getElementById('tabPost');
+
+// ===========================================
+// DOM ELEMENTS — TAB 1 (JOIN)
 // ===========================================
 
 const initialState = document.getElementById('initialState');
@@ -38,26 +47,83 @@ const copyIcon = document.getElementById('copyIcon');
 const errorText = document.getElementById('errorText');
 
 // ===========================================
+// DOM ELEMENTS — TAB 2 (POST)
+// ===========================================
+
+const postFormState = document.getElementById('postFormState');
+const postLoadingState = document.getElementById('postLoadingState');
+const postSuccessState = document.getElementById('postSuccessState');
+const postErrorState = document.getElementById('postErrorState');
+
+const postMessage = document.getElementById('postMessage');
+const postContact = document.getElementById('postContact');
+const charCount = document.getElementById('charCount');
+const postSubmitBtn = document.getElementById('postSubmitBtn');
+const postAgainBtn = document.getElementById('postAgainBtn');
+const postErrorRetryBtn = document.getElementById('postErrorRetryBtn');
+const postErrorText = document.getElementById('postErrorText');
+
+// Contact elements
+const contactAuto = document.getElementById('contactAuto');
+const contactManual = document.getElementById('contactManual');
+const contactUsername = document.getElementById('contactUsername');
+const contactLabel = document.getElementById('contactLabel');
+const contactToggleBtn = document.getElementById('contactToggleBtn');
+const contactToggleText = document.getElementById('contactToggleText');
+const contactBackBtn = document.getElementById('contactBackBtn');
+
+// ===========================================
 // STATE
 // ===========================================
 
 let currentLink = null;
 let timerInterval = null;
 let timeRemaining = LINK_DURATION;
+let userHasUsername = false;
+let telegramUsername = null;
+let useManualContact = false;
 
 // ===========================================
-// UI STATE MANAGEMENT
+// TAB SWITCHING
+// ===========================================
+
+tabBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+
+    // Update active button
+    tabBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Move indicator
+    if (tab === 'post') {
+      tabIndicator.classList.add('right');
+    } else {
+      tabIndicator.classList.remove('right');
+    }
+
+    // Switch content
+    if (tab === 'join') {
+      tabJoin.classList.add('active');
+      tabPost.classList.remove('active');
+    } else {
+      tabPost.classList.add('active');
+      tabJoin.classList.remove('active');
+    }
+  });
+});
+
+// ===========================================
+// UI STATE MANAGEMENT — TAB 1 (JOIN)
 // ===========================================
 
 function showState(stateName) {
-  // Hide all states
   initialState.style.display = 'none';
   loadingState.style.display = 'none';
   linkState.style.display = 'none';
   expiredState.style.display = 'none';
   errorState.style.display = 'none';
   
-  // Show requested state
   switch(stateName) {
     case 'initial':
       initialState.style.display = 'block';
@@ -73,6 +139,32 @@ function showState(stateName) {
       break;
     case 'error':
       errorState.style.display = 'block';
+      break;
+  }
+}
+
+// ===========================================
+// UI STATE MANAGEMENT — TAB 2 (POST)
+// ===========================================
+
+function showPostState(stateName) {
+  postFormState.style.display = 'none';
+  postLoadingState.style.display = 'none';
+  postSuccessState.style.display = 'none';
+  postErrorState.style.display = 'none';
+
+  switch(stateName) {
+    case 'form':
+      postFormState.style.display = 'block';
+      break;
+    case 'loading':
+      postLoadingState.style.display = 'block';
+      break;
+    case 'success':
+      postSuccessState.style.display = 'block';
+      break;
+    case 'error':
+      postErrorState.style.display = 'block';
       break;
   }
 }
@@ -98,14 +190,11 @@ function startTimer() {
 }
 
 function updateTimerDisplay() {
-  // Update text
   timerText.textContent = timeRemaining;
   
-  // Update progress circle (283 is circumference of circle with r=45)
   const progress = (timeRemaining / LINK_DURATION) * 283;
   timerProgress.style.strokeDashoffset = 283 - progress;
   
-  // Update colors based on time remaining
   timerText.classList.remove('warning', 'danger');
   timerProgress.classList.remove('warning', 'danger');
   
@@ -126,7 +215,7 @@ function stopTimer() {
 }
 
 // ===========================================
-// API FUNCTIONS
+// API FUNCTIONS — TAB 1 (JOIN)
 // ===========================================
 
 async function requestInviteLink() {
@@ -134,7 +223,6 @@ async function requestInviteLink() {
   stopTimer();
   
   try {
-    // Get user ID from Telegram WebApp
     const userId = tg.initDataUnsafe?.user?.id;
     
     if (!userId) {
@@ -149,7 +237,7 @@ async function requestInviteLink() {
       body: JSON.stringify({
         user_id: userId
       }),
-      signal: AbortSignal.timeout(15000) // 15 second timeout
+      signal: AbortSignal.timeout(15000)
     });
     
     if (!response.ok) {
@@ -178,7 +266,6 @@ function displayLink(link) {
   showState('link');
   startTimer();
   
-  // Haptic feedback
   if (tg.HapticFeedback) {
     tg.HapticFeedback.notificationOccurred('success');
   }
@@ -188,7 +275,6 @@ function handleLinkExpired() {
   currentLink = null;
   showState('expired');
   
-  // Haptic feedback
   if (tg.HapticFeedback) {
     tg.HapticFeedback.notificationOccurred('warning');
   }
@@ -198,7 +284,6 @@ function showError(message) {
   errorText.textContent = message;
   showState('error');
   
-  // Haptic feedback
   if (tg.HapticFeedback) {
     tg.HapticFeedback.notificationOccurred('error');
   }
@@ -215,7 +300,6 @@ async function copyLink() {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(currentLink);
     } else {
-      // Fallback
       const textarea = document.createElement('textarea');
       textarea.value = currentLink;
       textarea.style.position = 'fixed';
@@ -226,7 +310,6 @@ async function copyLink() {
       document.body.removeChild(textarea);
     }
     
-    // Show success feedback
     copyIcon.textContent = '✅';
     
     if (tg.HapticFeedback) {
@@ -247,6 +330,163 @@ async function copyLink() {
 }
 
 // ===========================================
+// POST FORM LOGIC (TAB 2)
+// ===========================================
+
+// --- Contact field setup ---
+function initContactField() {
+  const user = tg.initDataUnsafe?.user;
+  telegramUsername = user?.username || null;
+  userHasUsername = !!telegramUsername;
+
+  if (userHasUsername) {
+    // User has a Telegram username — show it pre-filled
+    contactUsername.textContent = telegramUsername;
+    contactAuto.style.display = 'block';
+    contactManual.style.display = 'none';
+    contactBackBtn.style.display = 'none';
+    useManualContact = false;
+  } else {
+    // No username — show manual input as required
+    contactAuto.style.display = 'none';
+    contactManual.style.display = 'block';
+    contactLabel.innerHTML = 'Aloqa <span class="optional-tag" style="color:#e65100; font-weight:600;">majburiy</span>';
+    postContact.placeholder = 'Tel raqam yoki Telegram username kiriting';
+  }
+}
+
+// Toggle: switch from username to manual phone input
+contactToggleBtn.addEventListener('click', () => {
+  useManualContact = true;
+  contactAuto.style.display = 'none';
+  contactManual.style.display = 'block';
+  contactBackBtn.style.display = 'flex';
+  postContact.focus();
+  validateForm();
+});
+
+// Toggle back: switch from manual back to username
+contactBackBtn.addEventListener('click', () => {
+  useManualContact = false;
+  contactAuto.style.display = 'block';
+  contactManual.style.display = 'none';
+  postContact.value = '';
+  validateForm();
+});
+
+// --- Form validation ---
+function validateForm() {
+  const msgLen = postMessage.value.trim().length;
+  const hasMessage = msgLen >= 10;
+
+  let hasContact = false;
+  if (userHasUsername && !useManualContact) {
+    // Using Telegram username — always valid
+    hasContact = true;
+  } else {
+    // Manual input required
+    hasContact = postContact.value.trim().length >= 3;
+  }
+
+  postSubmitBtn.disabled = !(hasMessage && hasContact);
+}
+
+// Character counter + validation
+postMessage.addEventListener('input', () => {
+  const len = postMessage.value.length;
+  charCount.textContent = `${len} / 1000`;
+
+  charCount.classList.remove('near-limit', 'at-limit');
+  if (len >= 1000) {
+    charCount.classList.add('at-limit');
+  } else if (len >= 800) {
+    charCount.classList.add('near-limit');
+  }
+
+  validateForm();
+});
+
+// Contact input validation
+postContact.addEventListener('input', validateForm);
+
+// --- Submit post ---
+async function submitPost() {
+  const message = postMessage.value.trim();
+  if (message.length < 10) return;
+
+  // Determine contact value
+  let contact;
+  if (userHasUsername && !useManualContact) {
+    contact = '@' + telegramUsername;
+  } else {
+    contact = postContact.value.trim();
+    if (contact.length < 3) return;
+  }
+
+  const userId = tg.initDataUnsafe?.user?.id;
+  const userName = tg.initDataUnsafe?.user?.first_name || '';
+
+  showPostState('loading');
+
+  try {
+    if (!userId) {
+      throw new Error('Telegram foydalanuvchi ID topilmadi');
+    }
+
+    // TODO: Replace with actual API call when backend is ready
+    const response = await fetch(`${API_BASE_URL}/api/group/post`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        user_name: userName,
+        message: message,
+        contact: contact
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Server xatosi: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      showPostState('success');
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.notificationOccurred('success');
+      }
+    } else {
+      throw new Error(data.message || "E'lon yuborishda xatolik");
+    }
+
+  } catch (error) {
+    console.error('Error submitting post:', error);
+    postErrorText.textContent = error.message || "E'lon yuborishda xatolik yuz berdi";
+    showPostState('error');
+    if (tg.HapticFeedback) {
+      tg.HapticFeedback.notificationOccurred('error');
+    }
+  }
+}
+
+// Reset form and go back to form state
+function resetPostForm() {
+  postMessage.value = '';
+  postContact.value = '';
+  charCount.textContent = '0 / 1000';
+  charCount.classList.remove('near-limit', 'at-limit');
+  postSubmitBtn.disabled = true;
+  useManualContact = false;
+  initContactField();
+  showPostState('form');
+}
+
+// ===========================================
 // BACK BUTTON
 // ===========================================
 
@@ -264,15 +504,21 @@ try {
 // EVENT LISTENERS
 // ===========================================
 
+// Tab 1
 getLinkBtn.addEventListener('click', requestInviteLink);
 retryBtn.addEventListener('click', requestInviteLink);
 errorRetryBtn.addEventListener('click', requestInviteLink);
 copyLinkBtn.addEventListener('click', copyLink);
 
-// Handle join button click - stop timer since user is joining
 joinBtn.addEventListener('click', () => {
-  // Don't stop timer - let it continue in case user comes back
-  // The server will handle link revocation on use
+  // Let the link open; server handles revocation
+});
+
+// Tab 2
+postSubmitBtn.addEventListener('click', submitPost);
+postAgainBtn.addEventListener('click', resetPostForm);
+postErrorRetryBtn.addEventListener('click', () => {
+  showPostState('form');
 });
 
 // ===========================================
@@ -281,6 +527,8 @@ joinBtn.addEventListener('click', () => {
 
 function initPage() {
   showState('initial');
+  showPostState('form');
+  initContactField();
   console.log('✅ Job Group page loaded');
 }
 
