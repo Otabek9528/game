@@ -65,6 +65,7 @@ const contactUsername = document.getElementById('contactUsername');
 const contactLabel = document.getElementById('contactLabel');
 const contactToggleBtn = document.getElementById('contactToggleBtn');
 const contactBackBtn = document.getElementById('contactBackBtn');
+const agreementCheckbox = document.getElementById('agreementCheckbox');
 
 // ===========================================
 // STATE
@@ -287,7 +288,8 @@ contactBackBtn.addEventListener('click', () => {
 function validateForm() {
   const hasMsg = postMessage.value.trim().length >= 10;
   const hasContact = (userHasUsername && !useManualContact) || postContact.value.trim().length >= 3;
-  postSubmitBtn.disabled = !(hasMsg && hasContact);
+  const agreed = agreementCheckbox.checked;
+  postSubmitBtn.disabled = !(hasMsg && hasContact && agreed);
 }
 postMessage.addEventListener('input', () => {
   const len = postMessage.value.length;
@@ -298,6 +300,7 @@ postMessage.addEventListener('input', () => {
   validateForm();
 });
 postContact.addEventListener('input', validateForm);
+agreementCheckbox.addEventListener('change', validateForm);
 
 // ===========================================
 // TAB 2 — SUBMIT POST
@@ -334,7 +337,9 @@ async function submitPost() {
 function resetPostForm() {
   postMessage.value = ''; postContact.value = '';
   charCount.textContent = '0 / 1000'; charCount.classList.remove('near-limit', 'at-limit');
-  postSubmitBtn.disabled = true; useManualContact = false; initContactField();
+  postSubmitBtn.disabled = true; useManualContact = false;
+  agreementCheckbox.checked = false;
+  initContactField();
   showPostState('form');
 }
 

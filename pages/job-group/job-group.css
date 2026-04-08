@@ -175,6 +175,30 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .post-input:focus { outline: none; border-color: #00a884; box-shadow: 0 0 0 3px rgba(0,168,132,0.12); background: #fff; }
 .post-input::placeholder { color: #b0b0b0; font-size: 0.9rem; }
 
+/* Agreement Checkbox */
+.agreement-check {
+  display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
+  padding: 14px 16px; background: #fef9ee; border: 2px solid #f0e6cc;
+  border-radius: 14px; margin-bottom: 16px; -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.25s ease;
+}
+.agreement-check:has(input:checked) { border-color: #00a884; background: #f0f9f6; }
+.agreement-check input { display: none; }
+.agreement-checkmark {
+  width: 22px; height: 22px; flex-shrink: 0; border: 2px solid #ccc;
+  border-radius: 6px; background: #fff; position: relative; margin-top: 1px;
+  transition: all 0.2s ease;
+}
+.agreement-check input:checked + .agreement-checkmark {
+  background: #00a884; border-color: #00a884;
+}
+.agreement-check input:checked + .agreement-checkmark::after {
+  content: ''; position: absolute; top: 3px; left: 6px;
+  width: 6px; height: 10px; border: solid #fff; border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+.agreement-text { font-size: 0.82rem; color: #5d4e00; line-height: 1.5; }
+
 /* Submit */
 .post-submit-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 18px 24px; background: linear-gradient(135deg, #00a884 0%, #007b5e 100%); color: white; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(0,168,132,0.4); margin-bottom: 16px; }
 .post-submit-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,168,132,0.5); }
@@ -386,6 +410,12 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .night-mode .post-textarea::placeholder, .night-mode .post-input::placeholder { color: #666; }
 .night-mode .char-count { color: #555; }
 .night-mode .post-submit-btn:disabled { background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%); }
+
+/* Agreement checkbox */
+.night-mode .agreement-check { background: #2a2510; border-color: rgba(240,230,204,0.15); }
+.night-mode .agreement-check:has(input:checked) { border-color: rgba(0,168,132,0.4); background: #1a2a22; }
+.night-mode .agreement-checkmark { background: #252525; border-color: #555; }
+.night-mode .agreement-text { color: #bba860; }
 .night-mode .post-guidelines { background: #1a2230; border-color: #253040; }
 .night-mode .guidelines-text { color: #7ba3c4; }
 .night-mode .hint-chip { background: #1a2a22; border-color: rgba(0,168,132,0.2); color: #6dbb96; }
