@@ -112,29 +112,29 @@
                   </div>
                   <div class="hiw-step">
                     <span class="hiw-step-num">2</span>
-                    <span class="hiw-step-text">E'loningiz faqat <strong>bot guruhiga</strong> joylanadi. Foydalanuvchilar siz bilan tez orada bog'lanishadi</span>
+                    <span class="hiw-step-text">E'loningiz faqat <strong>shu guruhga</strong> chiqadi — ishchilar siz bilan bog'lanadi</span>
                   </div>
                   <div class="hiw-step">
                     <span class="hiw-step-num">3</span>
-                    <span class="hiw-step-text">Odam topilgach, e'lonni <strong>"Band"</strong> deb belgilang</span>
+                    <span class="hiw-step-text">Ishchi topilgach, e'lonni <strong>"Band"</strong> deb belgilang</span>
                   </div>
-                  <!-- <div class="hiw-step">
+                  <div class="hiw-step">
                     <span class="hiw-step-num">4</span>
                     <span class="hiw-step-text">Ish tugagach, <strong>"Yakunlash"</strong> bosing — <strong>lotereya chiptasi</strong> oling 🎟</span>
-                  </div> -->
+                  </div>
                 </div>
                 <div class="hiw-highlight">
                   <div class="hiw-highlight-row">
                     <span class="hiw-highlight-icon">💰</span>
-                    <span class="hiw-highlight-text">Bir martalik komissiya: <strong>10,000 KRW</strong> - ishni olgan har bir kishi sizga to'laydi</span>
+                    <span class="hiw-highlight-text">Bir martalik komissiya: <strong>10,000 KRW</strong> — ishchi ish tugagandan so'ng to'laydi</span>
                   </div>
                   <div class="hiw-highlight-row">
                     <span class="hiw-highlight-icon">🎟</span>
-                    <span class="hiw-highlight-text">Sharti: E'lon faqat <strong>bot guruhida</strong> e'lon qilinib, boshqa guruhlarga joylanmasligi kerak</span>
+                    <span class="hiw-highlight-text">Har oyda 3 ta e'lon beruvchi <strong>$500</strong> dan yutib oladi! Qancha ko'p e'lon — shuncha ko'p imkoniyat</span>
                   </div>
                   <div class="hiw-highlight-row">
                     <span class="hiw-highlight-icon">⏳</span>
-                    <span class="hiw-highlight-text">Agar 2-3 soat ichida odam topilmasa, boshqa guruhlarda e'lon qilishingiz mumkin</span>
+                    <span class="hiw-highlight-text">Agar 2-3 soat ichida ishchi topilmasa, boshqa guruhlarga joylash mumkin</span>
                   </div>
                 </div>
               </div>
@@ -145,26 +145,26 @@
                 <div class="post-field">
                   <label class="post-label">E'lon matni</label>
                   <div class="textarea-wrapper">
-                    <textarea id="postMessage" class="post-textarea" placeholder="Restoranga oshpaz kerak&#10;📍 Manzil: 강남 서울시&#10;👥 2 kishi&#10;🕐 09:00 – 18:00&#10;💰 Maosh: 3,000,000 won&#10;📋 Tajriba talab qilinadi" rows="5" maxlength="1000"></textarea>
+                    <textarea id="postMessage" class="post-textarea" placeholder="Restoranga oshpaz kerak&#10;📍 Manzil: Gangnam, Seoul&#10;👥 2 kishi&#10;🕐 09:00 – 18:00&#10;💰 Maosh: 3,000,000 won&#10;📋 Tajriba talab qilinadi" rows="7" maxlength="1000"></textarea>
                     <span class="char-count" id="charCount">0 / 1000</span>
                   </div>
                   <div class="post-hints">
-                    <span class="hints-label">Xabarda qo'shsangiz yaxshi:</span>
+                    <span class="hints-label">Qo'shsangiz yaxshi:</span>
                     <div class="hint-chips">
                       <span class="hint-chip">📍 Manzil</span>
                       <span class="hint-chip">👥 Necha kishi</span>
                       <span class="hint-chip">🕐 Ish vaqti</span>
-                      <span class="hint-chip">💰 Puli</span>
-                      <span class="hint-chip">📋 Talablari</span>
-                      <span class="hint-chip">ℹ️ Qo'shimchalar</span>
+                      <span class="hint-chip">💰 Maosh</span>
+                      <span class="hint-chip">📋 Talablar</span>
+                      <span class="hint-chip">ℹ️ Qo'shimcha</span>
                     </div>
                   </div>
                 </div>
                 <div class="post-field" id="contactField">
-                  <label class="post-label" id="contactLabel">Bog'lanish uchun</label>
+                  <label class="post-label" id="contactLabel">Aloqa</label>
                   <div class="contact-auto" id="contactAuto" style="display:none;">
                     <div class="contact-username-box"><span class="contact-prefix">@</span><span class="contact-username" id="contactUsername"></span><span class="contact-badge">Telegram</span></div>
-                    <button class="contact-toggle-btn" id="contactToggleBtn" type="button"><span>🔄</span><span id="contactToggleText">Yoki telefon raqamni kiritish</span></button>
+                    <button class="contact-toggle-btn" id="contactToggleBtn" type="button"><span>🔄</span><span id="contactToggleText">Telefon raqamni kiritish</span></button>
                   </div>
                   <div class="contact-manual" id="contactManual" style="display:none;">
                     <input type="text" id="postContact" class="post-input" placeholder="Tel raqam yoki Telegram username" maxlength="100" />
@@ -175,11 +175,11 @@
                 <label class="agreement-check" id="agreementLabel">
                   <input type="checkbox" id="agreementCheckbox" />
                   <span class="agreement-checkmark"></span>
-                  <span class="agreement-text">Ushbu xabar <strong>ish bilan bog'liq</strong> e'lonligini tasdiqlayman va boshqa Telegram guruhlarga 2-3 soat ichida <strong>joylamayman.</strong></span>
+                  <span class="agreement-text">Men faqat <strong>ish bilan bog'liq</strong> e'lon joylayotganimni tasdiqlayman. Boshqa turdagi xabarlar o'chiriladi va foydalanuvchi <strong>bloklanadi</strong>.</span>
                 </label>
 
-                <button class="post-submit-btn" id="postSubmitBtn" disabled><span class="btn-icon">📤</span><span class="btn-text">E'lonni joylash</span></button>
-                <div class="post-guidelines"><span class="guidelines-icon">⚠️</span><span class="guidelines-text">Reklama, shaxsiy xabarlar yoki ish bilan bog'liq bo'lmagan e'lonlar davomiy qo'ygan foydalanuvchi bloklanadi.</span></div>
+                <button class="post-submit-btn" id="postSubmitBtn" disabled><span class="btn-icon">📤</span><span class="btn-text">E'lonni yuborish</span></button>
+                <div class="post-guidelines"><span class="guidelines-icon">⚠️</span><span class="guidelines-text">Reklama, shaxsiy xabarlar yoki ish bilan bog'liq bo'lmagan e'lonlar aniqlansa, foydalanuvchi doimiy bloklanadi.</span></div>
               </div>
             </div>
             <div class="action-section" id="postLoadingState" style="display:none;">
@@ -189,9 +189,9 @@
               <div class="success-card">
                 <div class="success-icon">✅</div>
                 <h3 class="success-title">E'lon yuborildi!</h3>
-                <p class="success-text">E'loningiz guruhga muvaffaqiyatli joylandi.</p>
+                <p class="success-text">Sizning e'loningiz guruhga muvaffaqiyatli joylandi.</p>
                 <button class="post-again-btn" id="postAgainBtn"><span class="btn-icon">✍️</span><span class="btn-text">Yana e'lon joylash</span></button>
-                <button class="view-posts-btn" id="viewPostsBtn"><span class="btn-icon">📋</span><span class="btn-text">E'lonlarim</span></button>
+                <button class="view-posts-btn" id="viewPostsBtn"><span class="btn-icon">📋</span><span class="btn-text">E'lonlarimni ko'rish</span></button>
               </div>
             </div>
             <div class="action-section" id="postErrorState" style="display:none;">
