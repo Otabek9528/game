@@ -6,7 +6,7 @@ const I18N = {
   STORAGE_KEY: 'vegukin_language',
 
   availableFeatures: {
-    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'parcel', 'vegukinShops', 'links', 'jobs', 'donation', 'community', 'news', 'events', 'market'],
+    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'jobs', 'parcel', 'vegukinShops', 'links', 'donation', 'community', 'news', 'events', 'market'],
     ru: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community'],
     en: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community']
   },
@@ -22,10 +22,10 @@ const I18N = {
     'feature.shops': { uz: 'Do\'konlar', ru: 'Магазины', en: 'Shops' },
     'feature.qibla': { uz: 'Qibla', ru: 'Кибла', en: 'Qibla' },
     'feature.qna': { uz: 'Zikr ahlidan so\'rang', ru: 'Zikr ahlidan so\'rang', en: 'Zikr ahlidan so\'rang' },
+    'feature.jobs': { uz: 'Ish e\'lonlari', ru: 'Вакансии', en: 'Job Listings' },
     'feature.parcel': { uz: 'Pochta', ru: 'Почта', en: 'Parcel' },
     'feature.vegukinShops': { uz: 'Vegukin Shops', ru: 'Vegukin Shops', en: 'Vegukin Shops' },    
     'feature.links': { uz: 'Foydali linklar', ru: 'Полезные ссылки', en: 'Useful Links' },
-    'feature.jobs': { uz: 'Ish e\'lonlari', ru: 'Вакансии', en: 'Job Listings' },
     'feature.donation': { uz: 'Qo\'llab-quvvatlash', ru: 'Поддержать', en: 'Support' },
     'feature.barcode': { uz: 'Mahsulot tarkibini tekshirish', ru: 'Проверка состава', en: 'Ingredient Check' },
     'feature.news': { uz: 'Yangiliklar', ru: 'Новости', en: 'News' },

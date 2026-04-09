@@ -129,9 +129,9 @@
       qibla: { icon: '🕋', labelKey: 'feature.qibla', href: 'pages/qibla/qibla.html', isNew: true}, // ← NEW FEATURE 
       qna: { icon: '🌐', labelKey: 'feature.qna', href: 'pages/questions/qna.html', isNew: true}, // ← NEW FEATURE
       barcode: { icon: '🧪', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html', isNew: true},  // ← NEW FEATURE
+      jobs: { icon: '💼', labelKey: 'feature.jobs', href: 'pages/job-group/job-group.html', isNew: true},
       parcel: { icon: '📦', labelKey: 'feature.parcel', href: 'pages/parcel/parcel.html' },
       vegukinShops: { icon: '🛒', labelKey: 'feature.vegukinShops', href: 'pages/vegukinshops/shops.html', isNew: true },
-      jobs: { icon: '💼', labelKey: 'feature.jobs', href: 'pages/job-group/job-group.html' },
       links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
       donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },
       //news: { icon: '📢', labelKey: 'feature.news', href: 'pages/questions/qna.html' },
@@ -227,6 +227,7 @@
           if (window.logInteraction) {
             window.logInteraction(featureKey);
           }
+          sessionStorage.setItem('logged_' + featureKey, '1');  
           
           // Navigate immediately (no URL parameter)
           window.location.href = feature.href;
