@@ -290,11 +290,6 @@ function validateForm() {
   const hasContact = (userHasUsername && !useManualContact) || postContact.value.trim().length >= 3;
   const agreed = agreementCheckbox.checked;
   postSubmitBtn.disabled = !(hasMsg && hasContact && agreed);
-
-  if (!postSubmitBtn.disabled) {
-    const hint = document.querySelector('.submit-hint');
-    if (hint) { hint.classList.remove('visible'); setTimeout(() => hint.remove(), 300); }
-  }
 }
 postMessage.addEventListener('input', () => {
   const len = postMessage.value.length;
@@ -534,36 +529,6 @@ errorRetryBtn.addEventListener('click', requestInviteLink);
 copyLinkBtn.addEventListener('click', copyLink);
 joinBtn.addEventListener('click', () => {});
 postSubmitBtn.addEventListener('click', submitPost);
-
-// Show hint when tapping disabled submit button
-postSubmitBtn.parentElement.addEventListener('click', (e) => {
-  if (!postSubmitBtn.disabled) return;
-  const hasMsg = postMessage.value.trim().length >= 10;
-  const hasContact = (userHasUsername && !useManualContact) || postContact.value.trim().length >= 3;
-  const agreed = agreementCheckbox.checked;
-
-  let hint = '';
-  if (!hasMsg) hint = 'E\'lon matni kamida 10 belgi bo\'lishi kerak';
-  else if (!hasContact) hint = 'Bog\'lanish uchun kontakt ma\'lumotini kiriting';
-  else if (!agreed) hint = 'Qoidalarga rozilik belgisini qo\'ying ☑️';
-
-  if (hint) showSubmitHint(hint);
-});
-
-function showSubmitHint(text) {
-  const old = document.querySelector('.submit-hint');
-  if (old) old.textContent = text; // Just update text if already showing
-  if (old) return;
-
-  const hint = document.createElement('div');
-  hint.className = 'submit-hint';
-  hint.textContent = text;
-  postSubmitBtn.insertAdjacentElement('afterend', hint);
-
-  if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
-
-  setTimeout(() => hint.classList.add('visible'), 10);
-}
 postAgainBtn.addEventListener('click', resetPostForm);
 postErrorRetryBtn.addEventListener('click', () => showPostState('form'));
 
