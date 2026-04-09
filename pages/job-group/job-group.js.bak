@@ -44,7 +44,7 @@ const myPostsView = document.getElementById('myPostsView');
 const myPostsBadge = document.getElementById('myPostsBadge');
 const myPostsList = document.getElementById('myPostsList');
 const emptyPosts = document.getElementById('emptyPosts');
-const lotteryTickets = document.getElementById('lotteryTickets');
+//const lotteryTickets = document.getElementById('lotteryTickets');
 
 const postFormState = document.getElementById('postFormState');
 const postLoadingState = document.getElementById('postLoadingState');
