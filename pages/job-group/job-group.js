@@ -268,7 +268,7 @@ function initContactField() {
     contactBackBtn.style.display = 'none'; useManualContact = false;
   } else {
     contactAuto.style.display = 'none'; contactManual.style.display = 'block';
-    contactLabel.innerHTML = 'Aloqa <span class="optional-tag" style="color:#e65100;font-weight:600;">majburiy</span>';
+    contactLabel.innerHTML = 'Bog\'lanish uchun kontakt: <span class="optional-tag" style="color:#e65100;font-weight:600;">majburiy</span>';
     postContact.placeholder = 'Tel raqam yoki Telegram username kiriting';
   }
 }
