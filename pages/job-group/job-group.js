@@ -440,7 +440,7 @@ function confirmAction(postId, action) {
   const messages = {
     reserve: { title: 'Band qilish', text: 'Ishchi topildimi? E\'lonni band sifatida belgilashni xohlaysizmi?' },
     reopen: { title: 'Qayta faollashtirish', text: 'E\'lonni qayta faol holatga o\'tkazmoqchimisiz?' },
-    finish: { title: 'Yakunlash', text: 'Ish bajarildi deb belgilamoqchimisiz? Bu qaytarib bo\'lmaydi va lotereya chiptasi beriladi.' },
+    finish: { title: 'Yakunlash', text: 'Ish bajarildi deb belgilamoqchimisiz? Bu qaytarib bo\'lmaydi.' },
   };
   const msg = messages[action];
 

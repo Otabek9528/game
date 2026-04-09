@@ -204,6 +204,16 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .post-submit-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,168,132,0.5); }
 .post-submit-btn:disabled { background: linear-gradient(135deg, #c8c8c8 0%, #aaa 100%); box-shadow: none; cursor: not-allowed; }
 
+/* Submit hint */
+.submit-hint {
+  text-align: center; font-size: 0.82rem; color: #e65100; font-weight: 600;
+  padding: 10px 14px; margin-top: -8px; margin-bottom: 8px;
+  background: #fff3e0; border: 1px solid #ffe0b2; border-radius: 10px;
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.submit-hint.visible { opacity: 1; transform: translateY(0); }
+
 /* Guidelines */
 .post-guidelines { display: flex; align-items: flex-start; gap: 8px; padding: 12px 14px; background: #f0f7ff; border-radius: 12px; border: 1px solid #d0e3f7; }
 .guidelines-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
@@ -410,6 +420,9 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .night-mode .post-textarea::placeholder, .night-mode .post-input::placeholder { color: #666; }
 .night-mode .char-count { color: #555; }
 .night-mode .post-submit-btn:disabled { background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%); }
+
+/* Submit hint */
+.night-mode .submit-hint { background: #2a2010; border-color: rgba(255,224,178,0.15); color: #ffb74d; }
 
 /* Agreement checkbox */
 .night-mode .agreement-check { background: #2a2510; border-color: rgba(240,230,204,0.15); }
