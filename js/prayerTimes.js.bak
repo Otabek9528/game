@@ -284,7 +284,7 @@ async function updatePrayerData(lat, lon, city) {
 
     const todayDateElem = document.getElementById("todayDate");
     if (todayDateElem) {
-      todayDateElem.innerHTML = `${weekdayTranslated}, ${gregorianDate} | ${hijriFormatted}`;
+      todayDateElem.innerHTML = `${weekdayTranslated}, ${gregorianDate} <br> ${hijriFormatted}`;
     }
 
     const nextPrayerNameElem = document.getElementById("nextPrayerName");
