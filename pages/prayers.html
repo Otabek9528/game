@@ -267,6 +267,30 @@
       font-weight: 500;
     }
 
+
+    .hadith-quote {
+      display: block;
+      margin-top: 10px;
+      padding: 10px 12px 10px 16px;
+      border-left: 3px solid var(--gold-400);
+      background: rgba(234, 185, 50, 0.06);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--gold-600);
+      line-height: 1.5;
+      position: relative;
+    }
+    .hadith-quote::before { content: '\201C'; }
+    .hadith-quote::after  { content: '\201D'; }
+
+    .night-mode .hadith-quote {
+      background: rgba(234, 185, 50, 0.08);
+      border-left-color: rgba(234, 185, 50, 0.5);
+      color: #facc15;
+    }
+    
+    
     /* Status pill — always shown */
     .sunnah-status-pill {
       font-size: 0.62rem;

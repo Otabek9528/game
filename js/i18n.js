@@ -160,9 +160,9 @@ const I18N = {
     },
 
     'prayer.sunnah.ishraq.desc': {
-      uz: 'Kim bomdodni jamoat bilan o\‘qisa, so\‘ngra quyosh chiqquncha Allohni zikr qilib o\‘tirsa, keyin ikki rakat namoz o\‘qisa, uning uchun haj va umraning ajridek bo\‘lur.',
-      ru: 'Тому, кто прочитал фаджр в джамаате, сидел в зикре до восхода солнца и затем совершил два ракаата намаза — даётся полная награда хаджа и умры.',
-      en: 'Whoever prays Fajr in congregation, remains in remembrance of Allah until sunrise, then prays two rak\'ahs — receives the full reward of Hajj and Umrah.'
+      uz: '<span class="hadith-quote">Kim bomdodni jamoat bilan o\‘qisa, so\‘ngra quyosh chiqquncha Allohni zikr qilib o\‘tirsa, keyin ikki rakat namoz o\‘qisa, uning uchun haj va umraning ajridek bo\‘lur.</span>',
+      ru: '<span class="hadith-quote">Тому, кто прочитал фаджр в джамаате, сидел в зикре до восхода солнца и затем совершил два ракаата намаза — даётся полная награда хаджа и умры.</span>',
+      en: '<span class="hadith-quote">Whoever prays Fajr in congregation, remains in remembrance of Allah until sunrise, then prays two rak\'ahs — receives the full reward of Hajj and Umrah.</span>'
     },
     'prayer.sunnah.ishraq.source': {
       uz: 'Manba: Termiziy — Muoz ibn Anas al-Juhaniy (r.a.)',
@@ -178,9 +178,9 @@ const I18N = {
     },
 
     'prayer.sunnah.duha.desc': {
-      uz: 'Quyosh bir nayza bo\'yi ko\'tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o\'qish. Eng afzal vaqti — nahorning to\'rtdan biri o\'tgandan keyin. "Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi."',
-      ru: 'Когда солнце поднимается на высоту копья, (время молитвы) начинается и продолжается до того, как до полудня остаётся один час. Предпочтительно совершить 4 ракаата. Наилучшее время — после того, как пройдет четверть утра. "Кто постоянно совершает молитву духа (чошгох), тому будут прощены грехи, даже если они подобны морской пене."',
-      en: 'When the sun rises to the height of a spear, it begins and continues until one hour remains before noon. It is most virtuous to pray 4 rak‘ahs. The most preferable time is after one quarter of the morning has passed. "Whoever consistently performs the Duha (forenoon) prayer, his sins will be forgiven even if they are as abundant as the foam of the sea."'
+      uz: 'Quyosh bir nayza bo\'yi ko\'tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o\'qish. Eng afzal vaqti — nahorning to\'rtdan biri o\'tgandan keyin.<span class="hadith-quote">Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi.</span>',
+      ru: 'Когда солнце поднимается на высоту копья, (время молитвы) начинается и продолжается до того, как до полудня остаётся один час. Предпочтительно совершить 4 ракаата. Наилучшее время — после того, как пройдет четверть утра.<span class="hadith-quote">Кто постоянно совершает молитву духа (чошгох), тому будут прощены грехи, даже если они подобны морской пене.</span>',
+      en: 'When the sun rises to the height of a spear, it begins and continues until one hour remains before noon. It is most virtuous to pray 4 rak‘ahs. The most preferable time is after one quarter of the morning has passed.<span class="hadith-quote">Whoever consistently performs the Duha (forenoon) prayer, his sins will be forgiven even if they are as abundant as the foam of the sea.</span>'
     },
     'prayer.sunnah.duha.source': {
       uz: 'Manba: Termiziy — Abu Hurayra (r.a.)',
@@ -196,9 +196,9 @@ const I18N = {
     },
 
     'prayer.sunnah.tahajjud.desc': {
-      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Ozi 2, ko\'pi 8 rakat. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt. "У Роббингизга қурбатдир, ёмонликларга каффоротдир, гуноҳларни қайтарувчидир."',
-      ru: 'Совершаемая после молитвы Иша, после сна. Минимум — 2 ракаата, максимум — 8 ракаатов. Наилучшее время — последняя треть ночи — время, когда принимаются мольбы. "Она приближает к вашему Господу, искупает дурные поступки и удерживает от грехов."',
-      en: 'Performed after the Isha prayer, following sleep. Its minimum is 2 rak‘ahs and its maximum is 8 rak‘ahs. The most virtuous time is the last third of the night — a time when supplications are accepted. "It brings one closer to your Lord, expiates bad deeds, and prevents sins."'
+      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Ozi 2, ko\'pi 8 rakat. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt.<span class="hadith-quote">U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.</span>',
+      ru: 'Совершаемая после молитвы Иша, после сна. Минимум — 2 ракаата, максимум — 8 ракаатов. Наилучшее время — последняя треть ночи — время, когда принимаются мольбы.<span class="hadith-quote">Она приближает к вашему Господу, искупает дурные поступки и удерживает от грехов.</span>',
+      en: 'Performed after the Isha prayer, following sleep. Its minimum is 2 rak‘ahs and its maximum is 8 rak‘ahs. The most virtuous time is the last third of the night — a time when supplications are accepted.<span class="hadith-quote">It brings one closer to your Lord, expiates bad deeds, and prevents sins.</span>'
     },
     'prayer.sunnah.tahajjud.source': {
       uz: 'Manba: Termiziy — Abu Umoma (r.a.)',
@@ -246,7 +246,7 @@ const I18N = {
       en: 'Now'
     },
     'prayer.status.passed': {
-      uz: 'Bugungi vaqti o\'tdi',
+      uz: 'Vaqti o\'tdi',
       ru: 'Прошло',
       en: 'Passed'
     },
