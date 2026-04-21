@@ -701,6 +701,10 @@
 
     <!-- Info note -->
     <div class="prayer-info-note">
+      <p class="info-header">ℹ️ <span data-i18n="prayer.infoTitle">Ma'lumot</span></p>
+      <p class="info-method" id="infoMethodLine" data-i18n="prayer.infoMethod">
+        Namoz vaqtlari <strong>Muslim World League</strong> usuli bilan hisoblab chiqildi.
+      </p>
       <div class="info-divider"></div>
       <p class="info-advice-title" data-i18n="prayer.adviceTitle">Ehtiyot chorasi sifatida:</p>
       <div class="info-advice">
