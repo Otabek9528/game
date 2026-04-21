@@ -112,11 +112,11 @@ const I18N = {
     },
      
     // ---------- Method short labels (shown in the pill) ----------
-    'prayer.method.3.name':     { uz: 'Muslim World League',     ru: 'Muslim World League',     en: 'Muslim World League' },
-    'prayer.method.1.name': { uz: 'Karachi', ru: 'Карачи',  en: 'Karachi' },
-    'prayer.method.4.name':  { uz: 'Makka',   ru: 'Мекка',   en: 'Makkah' },
-    'prayer.method.5.name':   { uz: 'Misr',    ru: 'Египет',  en: 'Egypt' },
-    'prayer.method.2.name':    { uz: 'ISNA',    ru: 'ISNA',    en: 'ISNA' },
+    'prayer.method.mwl.short':     { uz: 'Muslim World League',     ru: 'Muslim World League',     en: 'Muslim World League' },
+    'prayer.method.karachi.short': { uz: 'Karachi', ru: 'Карачи',  en: 'Karachi' },
+    'prayer.method.makkah.short':  { uz: 'Makka',   ru: 'Мекка',   en: 'Makkah' },
+    'prayer.method.egypt.short':   { uz: 'Misr',    ru: 'Египет',  en: 'Egypt' },
+    'prayer.method.isna.short':    { uz: 'ISNA',    ru: 'ISNA',    en: 'ISNA' },
      
     // ---------- Method hints (shown under name in sheet) ----------
     'prayer.method.mwl.hint': {

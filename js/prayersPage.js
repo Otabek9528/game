@@ -49,7 +49,8 @@ function updateMethodPillLabel() {
     : { method: '3', madhab: '1' };
 
   const methods = window.PRAYER_METHODS || {};
-  methodElem.textContent = methods[settings.method] || 'Muslim World League';
+  const fallbackName = methods[settings.method] || 'Muslim World League';
+  methodElem.textContent = t(`prayer.method.${settings.method}.name`, fallbackName);
   madhabElem.textContent = settings.madhab === '1'
     ? t('prayer.schoolHanafi', 'Hanafiy')
     : t('prayer.schoolOthers', 'Shofe\'iy');
@@ -62,7 +63,8 @@ function updateInfoMethodLine() {
     ? window.getPrayerSettings()
     : { method: '3' };
   const methods = window.PRAYER_METHODS || {};
-  const methodName = methods[settings.method] || 'Muslim World League';
+  const fallbackName = methods[settings.method] || 'Muslim World League';
+  const methodName = t(`prayer.method.${settings.method}.name`, fallbackName);
   const template = t('prayer.infoMethod',
     'Namoz vaqtlari <strong>{method}</strong> usuli bilan hisoblab chiqildi.');
   infoLine.innerHTML = template.replace(/<strong>.*?<\/strong>/, `<strong>${methodName}</strong>`);
@@ -86,13 +88,14 @@ function buildMethodOptions() {
     '2': t('prayer.method.isna.hint', 'Shimoliy Amerika uchun')
   };
 
-  Object.entries(methods).forEach(([key, name]) => {
+  Object.entries(methods).forEach(([key, fallbackName]) => {
     const row = document.createElement('div');
     row.className = 'option-row';
     row.dataset.methodKey = key;
+    const translatedName = t(`prayer.method.${key}.name`, fallbackName);
     row.innerHTML = `
       <div class="option-row-content">
-        <span class="option-row-name">${name}</span>
+        <span class="option-row-name">${translatedName}</span>
         <span class="option-row-hint">${hints[key] || ''}</span>
       </div>
       <div class="option-row-radio"></div>
