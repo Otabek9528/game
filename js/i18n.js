@@ -196,7 +196,7 @@ const I18N = {
     },
 
     'prayer.sunnah.tahajjud.desc': {
-      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Ozi 2, ko\'pi 8 rakat. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt.<span class="hadith-quote">U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.</span>',
+      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Ozi 2 rakat, ko\'pi 8 rakat. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt.<span class="hadith-quote">U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.</span>',
       ru: 'Совершаемая после молитвы Иша, после сна. Минимум — 2 ракаата, максимум — 8 ракаатов. Наилучшее время — последняя треть ночи — время, когда принимаются мольбы.<span class="hadith-quote">Она приближает к вашему Господу, искупает дурные поступки и удерживает от грехов.</span>',
       en: 'Performed after the Isha prayer, following sleep. Its minimum is 2 rak‘ahs and its maximum is 8 rak‘ahs. The most virtuous time is the last third of the night — a time when supplications are accepted.<span class="hadith-quote">It brings one closer to your Lord, expiates bad deeds, and prevents sins.</span>'
     },
