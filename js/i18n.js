@@ -154,9 +154,9 @@ const I18N = {
      
     // Ishraq
     'prayer.sunnah.ishraq.name': {
-      uz: 'Ishroq (Shuruq)',
-      ru: 'Ишрак (Шурук)',
-      en: 'Ishraq (Shuruq)'
+      uz: 'Ishroq (Shuruq) namozi',
+      ru: 'Ишрак (Шурук) намаз',
+      en: 'Ishraq (Shuruq) prayer'
     },
     'prayer.sunnah.ishraq.benefit': {
       uz: 'Haj va umra savobi — Termiziy',
@@ -176,9 +176,9 @@ const I18N = {
      
     // Duha / Chosht / Zuho
     'prayer.sunnah.duha.name': {
-      uz: 'Chosht (Zuho)',
-      ru: 'Духа (Чошт)',
-      en: 'Duha (Chosht)'
+      uz: 'Chosht (Zuho) namozi',
+      ru: 'Духа (Чошт) намаз',
+      en: 'Duha (Chosht) prayer'
     },
     'prayer.sunnah.duha.benefit': {
       uz: 'Gunohlar dengiz ko\'pigidek kechiriladi — Termiziy',
@@ -198,9 +198,9 @@ const I18N = {
      
     // Tahajjud
     'prayer.sunnah.tahajjud.name': {
-      uz: 'Tahajjud',
-      ru: 'Тахаджуд',
-      en: 'Tahajjud'
+      uz: 'Tahajjud namozi',
+      ru: 'Тахаджуд намаз',
+      en: 'Tahajjud prayer'
     },
     'prayer.sunnah.tahajjud.benefit': {
       uz: 'Farz namozlardan keyin eng afzal namoz — Muslim',
@@ -218,7 +218,12 @@ const I18N = {
       en: 'Source: Muslim, Bukhari'
     },
         
-        
+    'prayer.status.upcoming': {
+      uz: 'Kutilmoqda',
+      ru: 'Ожидается',
+      en: 'Upcoming'
+    },
+    
     'prayer.justNow': {
       uz: 'hozirgina',
       ru: 'только что',

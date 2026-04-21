@@ -370,7 +370,11 @@ function setSunnahRowUI(prefix, windowObj) {
   if (windowObj.start == null || windowObj.end == null) {
     startElem.textContent = '--:--';
     endElem.textContent = '--:--';
-    if (statusPill) statusPill.style.display = 'none';
+    if (statusPill) {
+      statusPill.textContent = '—';
+      statusPill.classList.remove('active', 'upcoming', 'passed');
+      statusPill.style.display = '';
+    }
     if (track) track.className = 'sunnah-progress-track';
     if (fill) fill.style.width = '0%';
     return;
@@ -381,27 +385,27 @@ function setSunnahRowUI(prefix, windowObj) {
 
   const { status, progress } = getWindowStatus(windowObj.start, windowObj.end);
 
-  // Status pill
+  // Status pill — always visible, three states
   if (statusPill) {
     statusPill.classList.remove('active', 'upcoming', 'passed');
     if (status === 'active') {
       statusPill.textContent = t('prayer.status.activeNow', 'Hozir');
       statusPill.classList.add('active');
-      statusPill.style.display = '';
     } else if (status === 'upcoming') {
-      statusPill.style.display = 'none';
+      statusPill.textContent = t('prayer.status.upcoming', 'Kutilmoqda');
+      statusPill.classList.add('upcoming');
     } else if (status === 'passed') {
       statusPill.textContent = t('prayer.status.passed', 'O\'tdi');
       statusPill.classList.add('passed');
-      statusPill.style.display = '';
     } else {
-      statusPill.style.display = 'none';
+      statusPill.textContent = '—';
     }
+    statusPill.style.display = '';
   }
 
   // Progress track
   if (track && fill) {
-    track.classList.remove('active', 'passed');
+    track.classList.remove('active', 'passed', 'upcoming');
     if (status === 'active') {
       track.classList.add('active');
       const pct = Math.round(progress * 100);
@@ -410,6 +414,9 @@ function setSunnahRowUI(prefix, windowObj) {
     } else if (status === 'passed') {
       track.classList.add('passed');
       fill.style.width = '100%';
+    } else if (status === 'upcoming') {
+      track.classList.add('upcoming');
+      fill.style.width = '0%';
     } else {
       fill.style.width = '0%';
     }
