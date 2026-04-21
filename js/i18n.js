@@ -240,6 +240,24 @@ const I18N = {
       en: 'd ago'
     },
     
+    'prayer.updated': {
+      uz: 'Yangilangan',
+      ru: 'Обновлено',
+      en: 'Updated'
+    },
+     
+    // Sunnah status pills
+    'prayer.status.activeNow': {
+      uz: 'Hozir',
+      ru: 'Сейчас',
+      en: 'Now'
+    },
+    'prayer.status.passed': {
+      uz: 'O\'tdi',
+      ru: 'Прошло',
+      en: 'Passed'
+    },
+        
     
     // Places page - Common
     'places.searchNearby': { uz: 'O\'z atrofimdan izlash', ru: 'Искать рядом со мной', en: 'Search nearby' },

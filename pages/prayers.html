@@ -43,18 +43,39 @@
       height: 40px;
       border-radius: 50%;
       border: none;
-      background: rgba(255, 255, 255, 0.18);
-      color: #fff;
-      font-size: 1.15rem;
+      background: #ffffff;
+      color: var(--emerald-700);
+      font-size: 1.2rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s ease, transform 0.2s ease;
+      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       z-index: 10;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      line-height: 1;
     }
-    .settings-gear-btn:hover { background: rgba(255, 255, 255, 0.28); }
+    .settings-gear-btn:hover {
+      background: #f6fdf9;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    }
     .settings-gear-btn:active { transform: translateY(-50%) scale(0.92); }
+    .settings-gear-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--emerald-700);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .night-mode .settings-gear-btn {
+      background: #1e1e1e;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+    .night-mode .settings-gear-btn svg {
+      stroke: #6ee7b7;
+    }
 
     /* ============================================
        COMPACT META ROW — method pill (L) | freshness (R)
@@ -95,10 +116,9 @@
     }
     .meta-method-sep { opacity: 0.45; }
     .meta-refresh-btn {
-      width: 26px; height: 26px;
+      width: 28px; height: 28px;
       border: none;
       background: transparent;
-      font-size: 0.85rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -106,25 +126,39 @@
       border-radius: 50%;
       transition: background var(--transition-fast);
       padding: 0;
+      color: var(--emerald-700);
+    }
+    .meta-refresh-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.2s ease;
     }
     .meta-refresh-btn:hover:not(:disabled) { background: var(--emerald-50); }
     .meta-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .meta-refresh-btn.stale { animation: meta-pulse 1.4s ease-in-out infinite; }
+    .meta-refresh-btn.spinning svg { animation: spin-arrow 0.8s linear infinite; }
+    .night-mode .meta-refresh-btn { color: #6ee7b7; }
+    .night-mode .meta-refresh-btn:hover:not(:disabled) { background: rgba(6, 78, 59, 0.25); }
+    @keyframes spin-arrow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
     @keyframes meta-pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.55; }
     }
     #metaTimestamp {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
-      white-space: nowrap;
+      line-height: 1.3;
+      text-align: right;
     }
     #metaTimestamp.stale { color: #e67e22; }
-    .spinning { animation: spin 0.9s linear infinite; display: inline-block; }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
 
     /* ============================================
        SUNNAH & NAFL SECTION
@@ -220,6 +254,120 @@
       display: inline-block;
     }
     .sunnah-item.expanded .sunnah-chevron { transform: rotate(180deg); }
+
+    /* --- Range row: time + status + progress bar --- */
+    .sunnah-range-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      min-width: 0;
+    }
+    .sunnah-range-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sunnah-range-text {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold-600);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sunnah-range-arrow {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+    .sunnah-status-pill {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+      line-height: 1.3;
+    }
+    .sunnah-status-pill.active {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      animation: gentle-breathe 2.4s ease-in-out infinite;
+    }
+    .sunnah-status-pill.upcoming {
+      background: rgba(234, 185, 50, 0.15);
+      color: var(--gold-600);
+      border: 1px solid rgba(234, 185, 50, 0.35);
+    }
+    .sunnah-status-pill.passed {
+      background: rgba(100, 100, 100, 0.1);
+      color: var(--text-muted);
+      border: 1px solid rgba(100, 100, 100, 0.2);
+    }
+    @keyframes gentle-breathe {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
+    }
+
+    .sunnah-progress-track {
+      width: 100px;
+      height: 4px;
+      background: rgba(234, 185, 50, 0.2);
+      border-radius: 2px;
+      position: relative;
+      overflow: visible;
+    }
+    .sunnah-progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-400), var(--gold-500));
+      border-radius: 2px;
+      transition: width 0.5s ease;
+      width: 0;
+    }
+    .sunnah-progress-track.active .sunnah-progress-fill {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+    .sunnah-progress-track.passed {
+      opacity: 0.4;
+    }
+    .sunnah-progress-dot {
+      position: absolute;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #10b981;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+      display: none;
+    }
+    .sunnah-progress-track.active .sunnah-progress-dot {
+      display: block;
+    }
+
+    .night-mode .sunnah-status-pill.upcoming {
+      background: rgba(234, 185, 50, 0.15);
+      color: #facc15;
+      border-color: rgba(234, 185, 50, 0.3);
+    }
+    .night-mode .sunnah-status-pill.passed {
+      background: rgba(180, 180, 180, 0.08);
+      color: #888;
+      border-color: rgba(180, 180, 180, 0.15);
+    }
+    .night-mode .sunnah-progress-track {
+      background: rgba(234, 185, 50, 0.18);
+    }
+    .night-mode .sunnah-progress-dot {
+      background: #1a1a1a;
+    }
     .sunnah-details {
       max-height: 0;
       overflow: hidden;
@@ -457,7 +605,12 @@
       <img src="../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
       <h1>Muslim Vegukin Bot</h1>
     </a>
-    <button id="settingsGearBtn" class="settings-gear-btn" aria-label="Settings" type="button">⚙️</button>
+    <button id="settingsGearBtn" class="settings-gear-btn" aria-label="Settings" type="button">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
   </header>
 
   <section class="prayers-detailed">
@@ -482,7 +635,10 @@
       <div class="meta-right">
         <span id="metaTimestamp"></span>
         <button id="refreshLocationBtn" class="meta-refresh-btn" aria-label="Refresh location" type="button">
-          <span id="refreshIcon">📍</span>
+          <svg id="refreshIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -505,9 +661,20 @@
               <span class="sunnah-benefit" data-i18n="prayer.sunnah.ishraq.benefit">Haj va umra savobi — Termiziy</span>
             </div>
           </div>
-          <div class="sunnah-time">
-            <span id="ishraqTime">--:-- → --:--</span>
-            <span class="sunnah-chevron">▼</span>
+          <div class="sunnah-range-row">
+            <div class="sunnah-range-top">
+              <span class="sunnah-status-pill" id="ishraqStatus" style="display:none;"></span>
+              <span class="sunnah-range-text">
+                <span id="ishraqStart">--:--</span>
+                <span class="sunnah-range-arrow">→</span>
+                <span id="ishraqEnd">--:--</span>
+              </span>
+              <span class="sunnah-chevron">▼</span>
+            </div>
+            <div class="sunnah-progress-track" id="ishraqTrack">
+              <div class="sunnah-progress-fill" id="ishraqFill"></div>
+              <div class="sunnah-progress-dot" id="ishraqDot"></div>
+            </div>
           </div>
         </div>
         <div class="sunnah-details">
@@ -525,9 +692,20 @@
               <span class="sunnah-benefit" data-i18n="prayer.sunnah.duha.benefit">Gunohlar dengiz ko'pigidek kechiriladi — Termiziy</span>
             </div>
           </div>
-          <div class="sunnah-time">
-            <span id="duhaTime">--:-- → --:--</span>
-            <span class="sunnah-chevron">▼</span>
+          <div class="sunnah-range-row">
+            <div class="sunnah-range-top">
+              <span class="sunnah-status-pill" id="duhaStatus" style="display:none;"></span>
+              <span class="sunnah-range-text">
+                <span id="duhaStart">--:--</span>
+                <span class="sunnah-range-arrow">→</span>
+                <span id="duhaEnd">--:--</span>
+              </span>
+              <span class="sunnah-chevron">▼</span>
+            </div>
+            <div class="sunnah-progress-track" id="duhaTrack">
+              <div class="sunnah-progress-fill" id="duhaFill"></div>
+              <div class="sunnah-progress-dot" id="duhaDot"></div>
+            </div>
           </div>
         </div>
         <div class="sunnah-details">
@@ -545,13 +723,24 @@
               <span class="sunnah-benefit" data-i18n="prayer.sunnah.tahajjud.benefit">Farz namozlardan keyin eng afzal namoz — Muslim</span>
             </div>
           </div>
-          <div class="sunnah-time">
-            <span id="tahajjudTime">--:--</span>
-            <span class="sunnah-chevron">▼</span>
+          <div class="sunnah-range-row">
+            <div class="sunnah-range-top">
+              <span class="sunnah-status-pill" id="tahajjudStatus" style="display:none;"></span>
+              <span class="sunnah-range-text">
+                <span id="tahajjudStart">--:--</span>
+                <span class="sunnah-range-arrow">→</span>
+                <span id="tahajjudEnd">--:--</span>
+              </span>
+              <span class="sunnah-chevron">▼</span>
+            </div>
+            <div class="sunnah-progress-track" id="tahajjudTrack">
+              <div class="sunnah-progress-fill" id="tahajjudFill"></div>
+              <div class="sunnah-progress-dot" id="tahajjudDot"></div>
+            </div>
           </div>
         </div>
         <div class="sunnah-details">
-          <p data-i18n="prayer.sunnah.tahajjud.desc">Xuftondan keyin, uyqudan so'ng o'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo'ladigan vaqt.</p>
+          <p data-i18n="prayer.sunnah.tahajjud.desc">Xuftondan keyin, uyqudan so'ng o'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri, bomdod kirguncha davom etadi. Duolar qabul bo'ladigan vaqt.</p>
           <p class="sunnah-source" data-i18n="prayer.sunnah.tahajjud.source">Manba: Muslim, Buxoriy</p>
         </div>
       </div>

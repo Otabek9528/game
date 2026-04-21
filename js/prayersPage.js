@@ -273,51 +273,158 @@ function parseHHMM(str) {
 
 function formatMinutes(totalMin) {
   const h = Math.floor(totalMin / 60) % 24;
-  const m = totalMin % 60;
+  const m = ((totalMin % 60) + 60) % 60;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function nowMinutes() {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+}
+
+// Window status relative to current time.
+// Handles windows that wrap past midnight (Tahajjud: e.g. 02:30 → 05:12 or 23:40 → 04:55).
+function getWindowStatus(startMin, endMin) {
+  if (startMin == null || endMin == null) {
+    return { status: 'unknown', progress: 0 };
+  }
+  const now = nowMinutes();
+  // If end < start, the window wraps across midnight. Normalize.
+  const wraps = endMin < startMin;
+
+  let inside;
+  if (!wraps) {
+    inside = now >= startMin && now < endMin;
+  } else {
+    // wrapped: either now >= start (same day) or now < end (after midnight)
+    inside = now >= startMin || now < endMin;
+  }
+
+  if (inside) {
+    // progress 0..1 through the window
+    let elapsed, total;
+    if (!wraps) {
+      elapsed = now - startMin;
+      total = endMin - startMin;
+    } else {
+      total = (1440 - startMin) + endMin;
+      elapsed = (now >= startMin) ? (now - startMin) : (1440 - startMin + now);
+    }
+    const progress = Math.max(0, Math.min(1, elapsed / total));
+    return { status: 'active', progress };
+  }
+
+  // Not inside. Determine upcoming vs passed.
+  // Upcoming if start is later today (and window hasn't wrapped into yesterday).
+  if (!wraps) {
+    if (now < startMin) return { status: 'upcoming', progress: 0 };
+    return { status: 'passed', progress: 1 };
+  }
+  // Wrapping window, not inside: "upcoming" if we're after end and before start today
+  if (now >= endMin && now < startMin) return { status: 'upcoming', progress: 0 };
+  return { status: 'passed', progress: 1 };
 }
 
 function computeSunnahTimes(timings) {
   const sunriseMin = parseHHMM(timings.Sunrise);
   const dhuhrMin = parseHHMM(timings.Dhuhr);
+  const fajrMin = parseHHMM(timings.Fajr);
   const lastThirdRaw = timings.Lastthird || timings.LastThird;
-  const result = { ishraqStart: null, ishraqEnd: null, duhaStart: null, duhaEnd: null, tahajjud: null };
+  const lastThirdMin = lastThirdRaw ? parseHHMM(lastThirdRaw) : null;
+
+  const result = {
+    ishraq: { start: null, end: null },
+    duha:   { start: null, end: null },
+    tahajjud: { start: null, end: null }
+  };
 
   if (sunriseMin != null && dhuhrMin != null) {
-    result.ishraqStart = sunriseMin + ISHRAQ_START_OFFSET_MIN;
-    result.ishraqEnd = result.ishraqStart + ISHRAQ_WINDOW_MIN;
-    result.duhaStart = result.ishraqEnd;
-    result.duhaEnd = dhuhrMin - DUHA_END_OFFSET_BEFORE_DHUHR_MIN;
-    if (result.duhaEnd <= result.duhaStart) {
-      result.duhaEnd = result.duhaStart + 30;
+    result.ishraq.start = sunriseMin + ISHRAQ_START_OFFSET_MIN;
+    result.ishraq.end   = result.ishraq.start + ISHRAQ_WINDOW_MIN;
+    result.duha.start   = result.ishraq.end;
+    result.duha.end     = dhuhrMin - DUHA_END_OFFSET_BEFORE_DHUHR_MIN;
+    if (result.duha.end <= result.duha.start) {
+      result.duha.end = result.duha.start + 30;
     }
   }
-  if (lastThirdRaw) result.tahajjud = parseHHMM(lastThirdRaw);
+
+  // Tahajjud: preferred window = Lastthird → Fajr (wraps across midnight)
+  if (lastThirdMin != null && fajrMin != null) {
+    result.tahajjud.start = lastThirdMin;
+    result.tahajjud.end = fajrMin;
+  }
+
   return result;
+}
+
+function setSunnahRowUI(prefix, windowObj) {
+  const startElem  = document.getElementById(`${prefix}Start`);
+  const endElem    = document.getElementById(`${prefix}End`);
+  const statusPill = document.getElementById(`${prefix}Status`);
+  const track      = document.getElementById(`${prefix}Track`);
+  const fill       = document.getElementById(`${prefix}Fill`);
+  const dot        = document.getElementById(`${prefix}Dot`);
+
+  if (!startElem || !endElem) return;
+
+  if (windowObj.start == null || windowObj.end == null) {
+    startElem.textContent = '--:--';
+    endElem.textContent = '--:--';
+    if (statusPill) statusPill.style.display = 'none';
+    if (track) track.className = 'sunnah-progress-track';
+    if (fill) fill.style.width = '0%';
+    return;
+  }
+
+  startElem.textContent = formatMinutes(windowObj.start);
+  endElem.textContent = formatMinutes(windowObj.end);
+
+  const { status, progress } = getWindowStatus(windowObj.start, windowObj.end);
+
+  // Status pill
+  if (statusPill) {
+    statusPill.classList.remove('active', 'upcoming', 'passed');
+    if (status === 'active') {
+      statusPill.textContent = t('prayer.status.activeNow', 'Hozir');
+      statusPill.classList.add('active');
+      statusPill.style.display = '';
+    } else if (status === 'upcoming') {
+      statusPill.style.display = 'none';
+    } else if (status === 'passed') {
+      statusPill.textContent = t('prayer.status.passed', 'O\'tdi');
+      statusPill.classList.add('passed');
+      statusPill.style.display = '';
+    } else {
+      statusPill.style.display = 'none';
+    }
+  }
+
+  // Progress track
+  if (track && fill) {
+    track.classList.remove('active', 'passed');
+    if (status === 'active') {
+      track.classList.add('active');
+      const pct = Math.round(progress * 100);
+      fill.style.width = pct + '%';
+      if (dot) dot.style.left = pct + '%';
+    } else if (status === 'passed') {
+      track.classList.add('passed');
+      fill.style.width = '100%';
+    } else {
+      fill.style.width = '0%';
+    }
+  }
 }
 
 function renderSunnahTimes(timings) {
   const times = computeSunnahTimes(timings);
-  const ishraqElem = document.getElementById('ishraqTime');
-  const duhaElem = document.getElementById('duhaTime');
-  const tahajjudElem = document.getElementById('tahajjudTime');
-
-  if (ishraqElem) {
-    ishraqElem.textContent = (times.ishraqStart != null)
-      ? `${formatMinutes(times.ishraqStart)} → ${formatMinutes(times.ishraqEnd)}`
-      : '--:-- → --:--';
-  }
-  if (duhaElem) {
-    duhaElem.textContent = (times.duhaStart != null)
-      ? `${formatMinutes(times.duhaStart)} → ${formatMinutes(times.duhaEnd)}`
-      : '--:-- → --:--';
-  }
-  if (tahajjudElem) {
-    tahajjudElem.textContent = (times.tahajjud != null)
-      ? formatMinutes(times.tahajjud)
-      : '--:--';
-  }
+  setSunnahRowUI('ishraq',   times.ishraq);
+  setSunnahRowUI('duha',     times.duha);
+  setSunnahRowUI('tahajjud', times.tahajjud);
 }
+
+// Keep a reference to the latest timings so we can re-render status periodically
+let _latestTimings = null;
 
 function wireSunnahExpanders() {
   const items = document.querySelectorAll('.sunnah-item');
@@ -341,19 +448,20 @@ function formatTimeShort(timestamp) {
   const now = new Date();
   const diffMs = now - date;
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return t('prayer.justNow', 'hozirgina');
-  if (diffMin < 60) return `${diffMin} ${t('prayer.minAgo', 'daqiqa oldin')}`;
+  const updatedWord = t('prayer.updated', 'Yangilangan');
+  if (diffMin < 1) return `${updatedWord}: ${t('prayer.justNow', 'hozirgina')}`;
+  if (diffMin < 60) return `${updatedWord}: ${diffMin} ${t('prayer.minAgo', 'daqiqa oldin')}`;
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr} ${t('prayer.hrAgo', 'soat oldin')}`;
+  if (diffHr < 24) return `${updatedWord}: ${diffHr} ${t('prayer.hrAgo', 'soat oldin')}`;
   const diffDay = Math.floor(diffHr / 24);
-  return `${diffDay} ${t('prayer.dayAgo', 'kun oldin')}`;
+  return `${updatedWord}: ${diffDay} ${t('prayer.dayAgo', 'kun oldin')}`;
 }
 
 function updateTimestampDisplay(timestamp) {
   const elem = document.getElementById('metaTimestamp');
   if (!elem) return;
   if (!timestamp) {
-    elem.textContent = t('prayer.never', 'Hech qachon');
+    elem.textContent = `${t('prayer.updated', 'Yangilangan')}: ${t('prayer.never', 'hech qachon')}`;
     return;
   }
   elem.textContent = formatTimeShort(timestamp);
@@ -427,32 +535,27 @@ function initPrayersPage() {
 
   // Location refresh
   const refreshBtn = document.getElementById('refreshLocationBtn');
-  const refreshIcon = document.getElementById('refreshIcon');
-  if (refreshBtn && refreshIcon) {
+  if (refreshBtn) {
     let isRefreshing = false;
     refreshBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (isRefreshing) return;
       isRefreshing = true;
-      refreshIcon.textContent = '🔄';
-      refreshIcon.classList.add('spinning');
-      refreshBtn.style.opacity = '0.5';
+      refreshBtn.classList.add('spinning');
+      refreshBtn.classList.remove('stale'); // stop pulse while actively refreshing
       refreshBtn.disabled = true;
       try {
         await LocationManager.manualRefresh();
-        refreshIcon.classList.remove('spinning');
-        refreshIcon.textContent = '✅';
-        setTimeout(() => { refreshIcon.textContent = '📍'; }, 2000);
       } catch (error) {
         console.error('Refresh error:', error);
-        refreshIcon.classList.remove('spinning');
-        refreshIcon.textContent = '❌';
-        setTimeout(() => { refreshIcon.textContent = '📍'; }, 2000);
       } finally {
-        refreshBtn.style.opacity = '1';
-        refreshBtn.disabled = false;
-        isRefreshing = false;
+        // Keep spin for a minimum of 500ms so it's visible even on fast networks
+        setTimeout(() => {
+          refreshBtn.classList.remove('spinning');
+          refreshBtn.disabled = false;
+          isRefreshing = false;
+        }, 500);
       }
     });
   }
@@ -551,10 +654,16 @@ function populateDetailedPrayerList(timings, currentPrayerName) {
 
 window.addEventListener('prayerDataUpdated', (event) => {
   if (event.detail?.timings && event.detail?.currentPrayer) {
+    _latestTimings = event.detail.timings;
     populateDetailedPrayerList(event.detail.timings, event.detail.currentPrayer);
     renderSunnahTimes(event.detail.timings);
   }
 });
+
+// Re-render sunnah status + progress every 30s so pills and bar stay live
+setInterval(() => {
+  if (_latestTimings) renderSunnahTimes(_latestTimings);
+}, 30000);
 
 window.addEventListener('languageChanged', () => {
   updateUITranslations();
