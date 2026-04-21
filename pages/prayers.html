@@ -71,52 +71,54 @@
     }
     .meta-method-sep { opacity: 0.45; }
 
-    /* Gear button — solid white circle with emerald icon, lives in the meta row */
+      /* Gear button — solid emerald pill matching the method pill style */
     .meta-gear-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid var(--emerald-200);
-      background: #ffffff;
-      color: var(--emerald-700);
-      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+      gap: 6px;
+      padding: 7px 12px 7px 10px;
+      background: linear-gradient(135deg, var(--emerald-600), var(--emerald-700));
+      color: #ffffff;
+      border: 1px solid var(--emerald-700);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
       flex-shrink: 0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 6px rgba(6, 95, 70, 0.25);
     }
     .meta-gear-btn:hover {
-      background: var(--emerald-50);
-      border-color: var(--emerald-400);
+      filter: brightness(1.08);
+      box-shadow: 0 3px 10px rgba(6, 95, 70, 0.35);
     }
-    .meta-gear-btn:active { transform: scale(0.92); }
+    .meta-gear-btn:active { transform: scale(0.94); }
     .meta-gear-btn svg {
       width: 17px;
       height: 17px;
-      stroke: currentColor;
+      stroke: #ffffff;
       fill: none;
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .night-mode .meta-gear-btn {
-      background: #1e1e1e;
-      border-color: rgba(6, 78, 59, 0.5);
-      color: #6ee7b7;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-    .night-mode .meta-gear-btn:hover {
-      background: rgba(6, 78, 59, 0.25);
-    }
+
+    /* Label sits next to the gear on the right side */
     .meta-gear-label {
       font-size: 0.82rem;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--emerald-700);
       white-space: nowrap;
     }
+
+    .night-mode .meta-gear-btn {
+      background: linear-gradient(135deg, var(--emerald-700), #064e3b);
+      border-color: #064e3b;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+    .night-mode .meta-gear-label {
+      color: #6ee7b7;
+    }
+
 
     /* ============================================
        SUNNAH & NAFL SECTION
