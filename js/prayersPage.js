@@ -48,14 +48,8 @@ function updateMethodPillLabel() {
     ? window.getPrayerSettings()
     : { method: '3', madhab: '1' };
 
-  const shortLabels = {
-    '3': t('prayer.method.mwl.short', 'MWL'),
-    '1': t('prayer.method.karachi.short', 'Karachi'),
-    '4': t('prayer.method.makkah.short', 'Makkah'),
-    '5': t('prayer.method.egypt.short', 'Egypt'),
-    '2': t('prayer.method.isna.short', 'ISNA')
-  };
-  methodElem.textContent = shortLabels[settings.method] || 'MWL';
+  const methods = window.PRAYER_METHODS || {};
+  methodElem.textContent = methods[settings.method] || 'Muslim World League';
   madhabElem.textContent = settings.madhab === '1'
     ? t('prayer.schoolHanafi', 'Hanafiy')
     : t('prayer.schoolOthers', 'Shofe\'iy');
@@ -450,36 +444,6 @@ function wireSunnahExpanders() {
 // TIMESTAMP / STALE DISPLAY
 // ============================================
 
-function formatTimeShort(timestamp) {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMin = Math.floor(diffMs / 60000);
-  const updatedWord = t('prayer.updated', 'Yangilangan');
-  if (diffMin < 1) return `${updatedWord}: ${t('prayer.justNow', 'hozirgina')}`;
-  if (diffMin < 60) return `${updatedWord}: ${diffMin} ${t('prayer.minAgo', 'daqiqa oldin')}`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${updatedWord}: ${diffHr} ${t('prayer.hrAgo', 'soat oldin')}`;
-  const diffDay = Math.floor(diffHr / 24);
-  return `${updatedWord}: ${diffDay} ${t('prayer.dayAgo', 'kun oldin')}`;
-}
-
-function updateTimestampDisplay(timestamp) {
-  const elem = document.getElementById('metaTimestamp');
-  if (!elem) return;
-  if (!timestamp) {
-    elem.textContent = `${t('prayer.updated', 'Yangilangan')}: ${t('prayer.never', 'hech qachon')}`;
-    return;
-  }
-  elem.textContent = formatTimeShort(timestamp);
-  elem.classList.remove('stale');
-}
-
-function showStaleLocationWarning() {
-  const elem = document.getElementById('metaTimestamp');
-  if (elem) elem.classList.add('stale');
-}
-
 // ============================================
 // INITIALIZATION
 // ============================================
@@ -540,26 +504,6 @@ function initPrayersPage() {
 
   wireSheetSwipe();
   wireSunnahExpanders();
-
-  // Initial timestamp
-  window.addEventListener('locationUpdated', (event) => {
-    updateTimestampDisplay(event.detail?.timestamp);
-  });
-  const location = LocationManager?.getStoredLocation?.();
-  if (location?.timestamp) {
-    updateTimestampDisplay(location.timestamp);
-  } else {
-    updateTimestampDisplay(null);
-  }
-  if (LocationManager?.isLocationStale?.()) {
-    showStaleLocationWarning();
-  }
-
-  // Refresh timestamp "x min ago" every 30s
-  setInterval(() => {
-    const loc = LocationManager?.getStoredLocation?.();
-    if (loc?.timestamp) updateTimestampDisplay(loc.timestamp);
-  }, 30000);
 
   console.log('✅ initPrayersPage done');
 }

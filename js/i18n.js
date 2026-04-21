@@ -238,6 +238,12 @@ const I18N = {
       ru: 'Обновлено',
       en: 'Updated'
     },
+    
+    'prayer.settings.short': {
+      uz: 'Sozlamalar',
+      ru: 'Настройки',
+      en: 'Settings'
+    },
      
     // Sunnah status pills
     'prayer.status.activeNow': {
