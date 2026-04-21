@@ -218,6 +218,27 @@ const I18N = {
       en: 'Source: Muslim, Bukhari'
     },
         
+        
+    'prayer.justNow': {
+      uz: 'hozirgina',
+      ru: 'только что',
+      en: 'just now'
+    },
+    'prayer.minAgo': {
+      uz: 'daqiqa oldin',
+      ru: 'мин назад',
+      en: 'min ago'
+    },
+    'prayer.hrAgo': {
+      uz: 'soat oldin',
+      ru: 'ч назад',
+      en: 'hr ago'
+    },
+    'prayer.dayAgo': {
+      uz: 'kun oldin',
+      ru: 'дн назад',
+      en: 'd ago'
+    },
     
     
     // Places page - Common

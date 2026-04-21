@@ -32,7 +32,7 @@
     }
 
     /* ============================================
-       SETTINGS GEAR ICON (header, top-right)
+       SETTINGS GEAR — sits OUTSIDE the <a> anchor
        ============================================ */
     .settings-gear-btn {
       position: absolute;
@@ -43,52 +43,87 @@
       height: 40px;
       border-radius: 50%;
       border: none;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.18);
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.2s ease, transform 0.2s ease;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      z-index: 10;
     }
-    .settings-gear-btn:hover {
-      background: rgba(255, 255, 255, 0.25);
-    }
-    .settings-gear-btn:active {
-      transform: translateY(-50%) scale(0.92);
-    }
+    .settings-gear-btn:hover { background: rgba(255, 255, 255, 0.28); }
+    .settings-gear-btn:active { transform: translateY(-50%) scale(0.92); }
 
     /* ============================================
-       METHOD SUMMARY PILL (below date, tappable)
+       COMPACT META ROW — method pill (L) | freshness (R)
        ============================================ */
-    .method-summary-pill {
-      display: inline-flex;
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      max-width: 500px;
+      margin: 4px auto 16px;
+      padding: 0 4px;
+    }
+    .meta-left, .meta-right {
+      display: flex;
       align-items: center;
       gap: 6px;
-      margin: 4px auto 16px;
-      padding: 6px 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .meta-method-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
       background: var(--emerald-50);
       border: 1px solid var(--emerald-200);
       border-radius: var(--radius-full);
-      font-size: 0.78rem;
       color: var(--emerald-700);
+      font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all var(--transition-fast);
+      transition: background var(--transition-fast), border-color var(--transition-fast);
     }
-    .method-summary-pill:hover,
-    .method-summary-pill:active {
+    .meta-method-btn:hover, .meta-method-btn:active {
       background: var(--emerald-100);
       border-color: var(--emerald-400);
     }
-    .method-summary-pill .pill-icon {
-      font-size: 0.9rem;
+    .meta-method-sep { opacity: 0.45; }
+    .meta-refresh-btn {
+      width: 26px; height: 26px;
+      border: none;
+      background: transparent;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background var(--transition-fast);
+      padding: 0;
     }
-    .method-summary-pill .pill-divider {
-      opacity: 0.4;
+    .meta-refresh-btn:hover:not(:disabled) { background: var(--emerald-50); }
+    .meta-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .meta-refresh-btn.stale { animation: meta-pulse 1.4s ease-in-out infinite; }
+    @keyframes meta-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+    #metaTimestamp {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    #metaTimestamp.stale { color: #e67e22; }
+    .spinning { animation: spin 0.9s linear infinite; display: inline-block; }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     /* ============================================
@@ -110,9 +145,7 @@
       padding-bottom: 10px;
       border-bottom: 1px dashed rgba(234, 185, 50, 0.3);
     }
-    .sunnah-section-icon {
-      font-size: 1.25rem;
-    }
+    .sunnah-section-icon { font-size: 1.25rem; }
     .sunnah-section-title {
       margin: 0;
       font-size: 0.95rem;
@@ -128,20 +161,19 @@
       margin-bottom: 8px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       cursor: pointer;
-      transition: all var(--transition-fast);
+      transition: box-shadow var(--transition-fast), background var(--transition-fast);
       overflow: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
-    .sunnah-item:last-child {
-      margin-bottom: 0;
-    }
-    .sunnah-item:active {
-      transform: scale(0.98);
-    }
+    .sunnah-item:last-child { margin-bottom: 0; }
+    .sunnah-item:active { background: #fafafa; }
     .sunnah-item-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      pointer-events: none;
     }
     .sunnah-left {
       display: flex;
@@ -150,10 +182,7 @@
       flex: 1;
       min-width: 0;
     }
-    .sunnah-emoji {
-      font-size: 1.35rem;
-      flex-shrink: 0;
-    }
+    .sunnah-emoji { font-size: 1.35rem; flex-shrink: 0; }
     .sunnah-text {
       display: flex;
       flex-direction: column;
@@ -165,12 +194,14 @@
       font-weight: 700;
       color: var(--text-primary);
       line-height: 1.25;
+      text-align: left;
     }
     .sunnah-benefit {
       font-size: 0.72rem;
       color: var(--gold-600);
       line-height: 1.3;
       font-style: italic;
+      text-align: left;
     }
     .sunnah-time {
       font-size: 0.9rem;
@@ -183,13 +214,12 @@
       gap: 6px;
     }
     .sunnah-chevron {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: var(--text-muted);
       transition: transform 0.25s ease;
+      display: inline-block;
     }
-    .sunnah-item.expanded .sunnah-chevron {
-      transform: rotate(180deg);
-    }
+    .sunnah-item.expanded .sunnah-chevron { transform: rotate(180deg); }
     .sunnah-details {
       max-height: 0;
       overflow: hidden;
@@ -197,16 +227,16 @@
       font-size: 0.8rem;
       color: var(--text-secondary);
       line-height: 1.55;
+      text-align: left;
+      pointer-events: none;
     }
     .sunnah-item.expanded .sunnah-details {
-      max-height: 400px;
+      max-height: 500px;
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px dashed rgba(0, 0, 0, 0.08);
     }
-    .sunnah-details p {
-      margin: 0 0 6px;
-    }
+    .sunnah-details p { margin: 0 0 6px; }
     .sunnah-details .sunnah-source {
       font-size: 0.72rem;
       color: var(--text-muted);
@@ -226,16 +256,11 @@
       transition: opacity 0.25s ease;
       z-index: 998;
     }
-    .sheet-backdrop.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .sheet-backdrop.visible { opacity: 1; pointer-events: auto; }
 
     .bottom-sheet {
       position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      left: 0; right: 0; bottom: 0;
       background: var(--bg-elevated);
       border-top-left-radius: 20px;
       border-top-right-radius: 20px;
@@ -248,9 +273,7 @@
       -webkit-overflow-scrolling: touch;
       padding-bottom: env(safe-area-inset-bottom, 20px);
     }
-    .bottom-sheet.visible {
-      transform: translateY(0);
-    }
+    .bottom-sheet.visible { transform: translateY(0); }
 
     .sheet-handle-wrap {
       padding: 10px 0 2px;
@@ -264,9 +287,7 @@
       background: #d1d5db;
       border-radius: 2px;
     }
-    .night-mode .sheet-handle {
-      background: #4a4a4a;
-    }
+    .night-mode .sheet-handle { background: #4a4a4a; }
 
     .sheet-header {
       padding: 8px 20px 16px;
@@ -285,9 +306,7 @@
       color: var(--text-muted);
     }
 
-    .sheet-section {
-      padding: 16px 20px 8px;
-    }
+    .sheet-section { padding: 16px 20px 8px; }
     .sheet-section-label {
       font-size: 0.7rem;
       font-weight: 700;
@@ -299,9 +318,7 @@
       align-items: center;
       gap: 6px;
     }
-    .sheet-section-label-icon {
-      font-size: 0.85rem;
-    }
+    .sheet-section-label-icon { font-size: 0.85rem; }
 
     .option-row {
       display: flex;
@@ -314,13 +331,10 @@
       border-radius: 12px;
       cursor: pointer;
       transition: all var(--transition-fast);
+      -webkit-tap-highlight-color: transparent;
     }
-    .option-row:hover {
-      background: var(--emerald-50);
-    }
-    .option-row:active {
-      transform: scale(0.98);
-    }
+    .option-row:hover { background: var(--emerald-50); }
+    .option-row:active { transform: scale(0.98); }
     .option-row.selected {
       background: var(--emerald-50);
       border-color: var(--emerald-400);
@@ -331,17 +345,20 @@
       gap: 2px;
       flex: 1;
       min-width: 0;
+      pointer-events: none;
     }
     .option-row-name {
       font-size: 0.92rem;
       font-weight: 600;
       color: var(--text-primary);
       line-height: 1.3;
+      text-align: left;
     }
     .option-row-hint {
       font-size: 0.72rem;
       color: var(--text-muted);
       line-height: 1.3;
+      text-align: left;
     }
     .option-row-radio {
       width: 20px;
@@ -352,24 +369,21 @@
       margin-left: 12px;
       position: relative;
       transition: all var(--transition-fast);
+      pointer-events: none;
     }
-    .option-row.selected .option-row-radio {
-      border-color: var(--emerald-600);
-    }
+    .option-row.selected .option-row-radio { border-color: var(--emerald-600); }
     .option-row.selected .option-row-radio::after {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 10px;
-      height: 10px;
+      width: 10px; height: 10px;
       border-radius: 50%;
       background: var(--emerald-600);
     }
 
     /* ============================================
-       NIGHT MODE OVERRIDES
+       NIGHT MODE
        ============================================ */
     .night-mode .prayer-item {
       background: #1e1e1e;
@@ -395,8 +409,14 @@
       background: #1a1a1a;
       border-left-color: var(--emerald-600);
     }
-
-    /* Sunnah section — night mode */
+    .night-mode .meta-method-btn {
+      background: rgba(6, 78, 59, 0.25);
+      border-color: rgba(6, 78, 59, 0.5);
+      color: #6ee7b7;
+    }
+    .night-mode .meta-refresh-btn:hover:not(:disabled) {
+      background: rgba(6, 78, 59, 0.25);
+    }
     .night-mode .sunnah-section {
       background: linear-gradient(135deg, #1d1a10 0%, #1a1709 100%);
       border-color: rgba(234, 185, 50, 0.2);
@@ -405,49 +425,23 @@
       background: #1e1e1e;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
     }
-    .night-mode .sunnah-name {
-      color: #e8e8e8;
-    }
-    .night-mode .sunnah-details {
-      color: #b8b8b8;
-    }
+    .night-mode .sunnah-item:active { background: #242424; }
+    .night-mode .sunnah-name { color: #e8e8e8; }
+    .night-mode .sunnah-details { color: #b8b8b8; }
     .night-mode .sunnah-item.expanded .sunnah-details {
       border-top-color: rgba(255, 255, 255, 0.08);
     }
-
-    /* Method pill — night mode */
-    .night-mode .method-summary-pill {
-      background: rgba(6, 78, 59, 0.25);
-      border-color: rgba(6, 78, 59, 0.5);
-      color: #6ee7b7;
-    }
-
-    /* Bottom sheet — night mode */
-    .night-mode .bottom-sheet {
-      background: #1a1a1a;
-    }
-    .night-mode .sheet-header {
-      border-bottom-color: #2a2a2a;
-    }
-    .night-mode .sheet-title {
-      color: #f0f0f0;
-    }
-    .night-mode .option-row {
-      background: #242424;
-    }
-    .night-mode .option-row:hover {
-      background: rgba(6, 78, 59, 0.25);
-    }
+    .night-mode .bottom-sheet { background: #1a1a1a; }
+    .night-mode .sheet-header { border-bottom-color: #2a2a2a; }
+    .night-mode .sheet-title { color: #f0f0f0; }
+    .night-mode .option-row { background: #242424; }
+    .night-mode .option-row:hover { background: rgba(6, 78, 59, 0.25); }
     .night-mode .option-row.selected {
       background: rgba(6, 78, 59, 0.3);
       border-color: var(--emerald-600);
     }
-    .night-mode .option-row-name {
-      color: #e8e8e8;
-    }
-    .night-mode .option-row-radio {
-      border-color: #555;
-    }
+    .night-mode .option-row-name { color: #e8e8e8; }
+    .night-mode .option-row-radio { border-color: #555; }
   </style>
 
   <script>
@@ -458,61 +452,50 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="app__header">
     <a href="../index.html" class="header-content" style="text-decoration: none; color: inherit;">
       <img src="../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
       <h1>Muslim Vegukin Bot</h1>
     </a>
-    <button id="settingsGearBtn" class="settings-gear-btn" aria-label="Settings" data-i18n-aria="prayer.settings.title">
-      ⚙️
-    </button>
+    <button id="settingsGearBtn" class="settings-gear-btn" aria-label="Settings" type="button">⚙️</button>
   </header>
 
-  <!-- PRAYER DETAILS -->
   <section class="prayers-detailed">
     <h2 id="cityName">Yuklanmoqda...</h2>
     <p id="todayDate" data-i18n="prayer.dateLoading">Sana yuklanmoqda...</p>
 
-    <!-- Method + Madhab summary pill (tappable, opens settings) -->
-    <div style="text-align: center;">
-      <button id="methodSummaryPill" class="method-summary-pill" aria-label="Open settings">
-        <span class="pill-icon">📐</span>
-        <span id="methodSummaryText">Muslim World League</span>
-        <span class="pill-divider">·</span>
-        <span id="madhabSummaryText" data-i18n="prayer.schoolHanafi">Hanafiy</span>
-      </button>
+    <!-- Countdown: original position, directly after date -->
+    <div class="next-prayer-countdown">
+      <p><span data-i18n="prayer.nextPrayer">Keyingi namoz</span>: <span id="nextPrayerName">Yuklanmoqda...</span></p>
+      <p class="countdown-text">⏳ <span id="countdown">--:--:--</span></p>
     </div>
 
-    <!-- Location refresh row -->
-    <div class="location-update-row">
-      <button id="refreshLocationBtn" class="inline-refresh-btn" aria-label="Refresh location">
-        <span id="refreshIcon">📍</span>
-      </button>
-      <span id="locationTimestamp"></span>
+    <!-- Compact meta row: method pill (L) | last update + refresh (R) -->
+    <div class="meta-row">
+      <div class="meta-left">
+        <button id="methodPillBtn" class="meta-method-btn" type="button">
+          <span id="methodSummaryText">MWL</span>
+          <span class="meta-method-sep">·</span>
+          <span id="madhabSummaryText" data-i18n="prayer.schoolHanafi">Hanafiy</span>
+        </button>
+      </div>
+      <div class="meta-right">
+        <span id="metaTimestamp"></span>
+        <button id="refreshLocationBtn" class="meta-refresh-btn" aria-label="Refresh location" type="button">
+          <span id="refreshIcon">📍</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Main prayer list (Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha) -->
     <div id="prayerList" class="prayer-list"></div>
 
-    <!-- Next prayer countdown -->
-    <div class="next-prayer-countdown">
-      <p data-i18n="prayer.nextPrayer">Keyingi namoz</p>
-      <p class="countdown-text">
-        <span id="nextPrayerName">--</span> — <span id="countdown">--:--:--</span>
-      </p>
-    </div>
-
-    <!-- =========================================
-         SUNNAH & NAFL PRAYERS (Ishraq, Duha, Tahajjud)
-         ========================================= -->
+    <!-- Sunnah & Nafl -->
     <div id="sunnahSection" class="sunnah-section">
       <div class="sunnah-section-header">
         <span class="sunnah-section-icon">✨</span>
         <h3 class="sunnah-section-title" data-i18n="prayer.sunnah.title">Sunnat va Nafl namozlari</h3>
       </div>
 
-      <!-- Ishraq (Shuruq) -->
       <div class="sunnah-item" data-sunnah="ishraq">
         <div class="sunnah-item-row">
           <div class="sunnah-left">
@@ -533,7 +516,6 @@
         </div>
       </div>
 
-      <!-- Duha (Chosht / Zuho) -->
       <div class="sunnah-item" data-sunnah="duha">
         <div class="sunnah-item-row">
           <div class="sunnah-left">
@@ -554,7 +536,6 @@
         </div>
       </div>
 
-      <!-- Tahajjud -->
       <div class="sunnah-item" data-sunnah="tahajjud">
         <div class="sunnah-item-row">
           <div class="sunnah-left">
@@ -578,30 +559,33 @@
 
     <!-- Info note -->
     <div class="prayer-info-note">
-      <h3 class="info-header" data-i18n="prayer.infoTitle">Ma'lumot</h3>
+      <p class="info-header">ℹ️ <span data-i18n="prayer.infoTitle">Ma'lumot</span></p>
       <p class="info-method" id="infoMethodLine" data-i18n="prayer.infoMethod">
         Namoz vaqtlari <strong>Muslim World League</strong> usuli bilan hisoblab chiqildi.
       </p>
       <div class="info-divider"></div>
-      <p class="advice-title" data-i18n="prayer.adviceTitle">Ehtiyot chorasi sifatida:</p>
-      <div class="advice-item" data-i18n="prayer.adviceSaharlik">
-        Saharlik: Bomdoddan <strong>5 daqiqa oldin</strong>
+      <p class="info-advice-title" data-i18n="prayer.adviceTitle">Ehtiyot chorasi sifatida:</p>
+      <div class="info-advice">
+        <div class="advice-item">
+          <span class="advice-emoji">🌙</span>
+          <span class="advice-text" data-i18n="prayer.adviceSaharlik">Saharlik: Bomdoddan <strong>5 daqiqa oldin</strong></span>
+        </div>
+        <div class="advice-item">
+          <span class="advice-emoji">🌅</span>
+          <span class="advice-text" data-i18n="prayer.adviceIftorlik">Iftorlik: Shomdan <strong>5 daqiqa keyin</strong></span>
+        </div>
+        <div class="advice-item">
+          <span class="advice-emoji">🕌</span>
+          <span class="advice-text" data-i18n="prayer.advicePrayers">Namozlar: Vaqt kirganidan <strong>10 daqiqa keyin</strong></span>
+        </div>
       </div>
-      <div class="advice-item" data-i18n="prayer.adviceIftorlik">
-        Iftorlik: Shomdan <strong>5 daqiqa keyin</strong>
-      </div>
-      <div class="advice-item" data-i18n="prayer.advicePrayers">
-        Namozlar: Vaqt kirganidan <strong>10 daqiqa keyin</strong>
-      </div>
-      <p class="info-recommendation" data-i18n="prayer.recommendation">
+      <p class="info-method" data-i18n="prayer.recommendation">
         qilib vaqt belgilashlikni maslahat beramiz.
       </p>
     </div>
   </section>
 
-  <!-- =========================================
-       BOTTOM SHEET: Settings (Method + Madhab)
-       ========================================= -->
+  <!-- BOTTOM SHEET -->
   <div id="sheetBackdrop" class="sheet-backdrop"></div>
   <div id="bottomSheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="sheet-handle-wrap" id="sheetHandleWrap">
@@ -611,8 +595,6 @@
       <h3 class="sheet-title" id="sheetTitle" data-i18n="prayer.settings.title">Namoz sozlamalari</h3>
       <p class="sheet-subtitle" data-i18n="prayer.settings.subtitle">Hisoblash usuli va mazhabingizni tanlang</p>
     </div>
-
-    <!-- Calculation method section -->
     <div class="sheet-section">
       <p class="sheet-section-label">
         <span class="sheet-section-label-icon">📐</span>
@@ -620,8 +602,6 @@
       </p>
       <div id="methodOptions"></div>
     </div>
-
-    <!-- Madhab section -->
     <div class="sheet-section">
       <p class="sheet-section-label">
         <span class="sheet-section-label-icon">🕌</span>

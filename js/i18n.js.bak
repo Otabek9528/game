@@ -89,6 +89,137 @@ const I18N = {
     'prayer.shafiiNote': { uz: 'Soya = 1x uzunlik', ru: 'Тень = 1× длина', en: 'Shadow = 1x length' },
     'prayer.asrHint': { uz: '💡 O\'z mazhabingizga mos vaqtni tanlang', ru: '💡 Выберите время по вашему мазхабу', en: '💡 Choose the time according to your school' },
 
+    // ---------- Settings bottom sheet ----------
+    'prayer.settings.title': {
+      uz: 'Namoz sozlamalari',
+      ru: 'Настройки намаза',
+      en: 'Prayer settings'
+    },
+    'prayer.settings.subtitle': {
+      uz: 'Hisoblash usuli va mazhabingizni tanlang',
+      ru: 'Выберите метод расчёта и мазхаб',
+      en: 'Choose your calculation method and madhab'
+    },
+    'prayer.settings.methodLabel': {
+      uz: 'Hisoblash usuli',
+      ru: 'Метод расчёта',
+      en: 'Calculation method'
+    },
+    'prayer.settings.madhabLabel': {
+      uz: 'Mazhab (Asr vaqti uchun)',
+      ru: 'Мазхаб (для времени Аср)',
+      en: 'Madhab (for Asr time)'
+    },
+     
+    // ---------- Method short labels (shown in the pill) ----------
+    'prayer.method.mwl.short':     { uz: 'MWL',     ru: 'MWL',     en: 'MWL' },
+    'prayer.method.karachi.short': { uz: 'Karachi', ru: 'Карачи',  en: 'Karachi' },
+    'prayer.method.makkah.short':  { uz: 'Makka',   ru: 'Мекка',   en: 'Makkah' },
+    'prayer.method.egypt.short':   { uz: 'Misr',    ru: 'Египет',  en: 'Egypt' },
+    'prayer.method.isna.short':    { uz: 'ISNA',    ru: 'ISNA',    en: 'ISNA' },
+     
+    // ---------- Method hints (shown under name in sheet) ----------
+    'prayer.method.mwl.hint': {
+      uz: 'Ko\'pchilik musulmon davlatlarida qo\'llaniladi',
+      ru: 'Используется в большинстве мусульманских стран',
+      en: 'Used in most Muslim countries'
+    },
+    'prayer.method.karachi.hint': {
+      uz: 'Pokiston, Hindiston, Bangladesh, Afg\'oniston',
+      ru: 'Пакистан, Индия, Бангладеш, Афганистан',
+      en: 'Pakistan, India, Bangladesh, Afghanistan'
+    },
+    'prayer.method.makkah.hint': {
+      uz: 'Saudiya Arabistoni uchun',
+      ru: 'Для Саудовской Аравии',
+      en: 'For Saudi Arabia'
+    },
+    'prayer.method.egypt.hint': {
+      uz: 'Misr va Afrika qismi uchun',
+      ru: 'Для Египта и части Африки',
+      en: 'For Egypt and parts of Africa'
+    },
+    'prayer.method.isna.hint': {
+      uz: 'Shimoliy Amerika uchun',
+      ru: 'Для Северной Америки',
+      en: 'For North America'
+    },
+     
+    // ---------- Sunnah & Nafl section ----------
+    'prayer.sunnah.title': {
+      uz: 'Sunnat va Nafl namozlari',
+      ru: 'Сунна и Нафль намазы',
+      en: 'Sunnah & Nafl prayers'
+    },
+     
+    // Ishraq
+    'prayer.sunnah.ishraq.name': {
+      uz: 'Ishroq (Shuruq)',
+      ru: 'Ишрак (Шурук)',
+      en: 'Ishraq (Shuruq)'
+    },
+    'prayer.sunnah.ishraq.benefit': {
+      uz: 'Haj va umra savobi — Termiziy',
+      ru: 'Награда хаджа и умры — Ат-Тирмизи',
+      en: 'Reward of Hajj and Umrah — Tirmidhi'
+    },
+    'prayer.sunnah.ishraq.desc': {
+      uz: 'Bomdodni jamoat bilan o\'qib, quyosh chiqquncha zikrda o\'tirgan va so\'ng ikki rakat namoz o\'qigan kishiga to\'liq haj va umra savobi beriladi.',
+      ru: 'Тому, кто прочитал фаджр в джамаате, сидел в зикре до восхода солнца и затем совершил два ракаата намаза — даётся полная награда хаджа и умры.',
+      en: 'Whoever prays Fajr in congregation, remains in remembrance of Allah until sunrise, then prays two rak\'ahs — receives the full reward of Hajj and Umrah.'
+    },
+    'prayer.sunnah.ishraq.source': {
+      uz: 'Manba: Termiziy, Abu Dovud — Muoz ibn Anas al-Juhaniy (r.a.)',
+      ru: 'Источник: Ат-Тирмизи, Абу Дауд — Муаз ибн Анас аль-Джухани (р.а.)',
+      en: 'Source: Tirmidhi, Abu Dawud — from Mu\'adh ibn Anas al-Juhani (r.a.)'
+    },
+     
+    // Duha / Chosht / Zuho
+    'prayer.sunnah.duha.name': {
+      uz: 'Chosht (Zuho)',
+      ru: 'Духа (Чошт)',
+      en: 'Duha (Chosht)'
+    },
+    'prayer.sunnah.duha.benefit': {
+      uz: 'Gunohlar dengiz ko\'pigidek kechiriladi — Termiziy',
+      ru: 'Грехи прощаются, даже если их как морская пена — Ат-Тирмизи',
+      en: 'Sins forgiven though they be as the foam of the sea — Tirmidhi'
+    },
+    'prayer.sunnah.duha.desc': {
+      uz: 'Quyosh bir nayza bo\'yi ko\'tarilganda kirib, zavolga bir soat qolguncha davom etadi. 2 dan 8 rakatgacha o\'qiladi, afzali 4 rakat. Eng afzal vaqti — nahorning to\'rtdan biri o\'tgandan keyin.',
+      ru: 'Время наступает, когда солнце поднимется на высоту копья, и продолжается до часа перед полуднем. Читается от 2 до 8 ракаатов, предпочтительнее 4. Лучшее время — после первой четверти дня.',
+      en: 'Begins when the sun has risen roughly a spear\'s length, continues until ~1 hour before Dhuhr. Prayed 2 to 8 rak\'ahs, preferably 4. Best time: after the first quarter of daytime.'
+    },
+    'prayer.sunnah.duha.source': {
+      uz: 'Manba: Termiziy — Abu Hurayra (r.a.)',
+      ru: 'Источник: Ат-Тирмизи — Абу Хурайра (р.а.)',
+      en: 'Source: Tirmidhi — from Abu Hurayra (r.a.)'
+    },
+     
+    // Tahajjud
+    'prayer.sunnah.tahajjud.name': {
+      uz: 'Tahajjud',
+      ru: 'Тахаджуд',
+      en: 'Tahajjud'
+    },
+    'prayer.sunnah.tahajjud.benefit': {
+      uz: 'Farz namozlardan keyin eng afzal namoz — Muslim',
+      ru: 'Лучший намаз после обязательных — Муслим',
+      en: 'The best prayer after the obligatory — Muslim'
+    },
+    'prayer.sunnah.tahajjud.desc': {
+      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt.',
+      ru: 'Добровольный ночной намаз, читаемый после сна. Лучшее время — последняя треть ночи. Время принятия мольб.',
+      en: 'Voluntary night prayer performed after sleep. Best time is the last third of the night — a time when supplications are accepted.'
+    },
+    'prayer.sunnah.tahajjud.source': {
+      uz: 'Manba: Muslim, Buxoriy',
+      ru: 'Источник: Муслим, Аль-Бухари',
+      en: 'Source: Muslim, Bukhari'
+    },
+        
+    
+    
     // Places page - Common
     'places.searchNearby': { uz: 'O\'z atrofimdan izlash', ru: 'Искать рядом со мной', en: 'Search nearby' },
     'places.searchByAddress': { uz: 'Boshqa manzil atrofidan izlash', ru: 'Искать по адресу', en: 'Search by address' },

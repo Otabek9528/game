@@ -1,4 +1,4 @@
-// prayersPage.js - Prayers page logic: list, sunnah times, settings bottom sheet
+// prayersPage.js — Prayers page logic: list, sunnah times, settings sheet
 
 // ============================================
 // I18N HELPER
@@ -31,23 +31,23 @@ function updateUITranslations() {
     }
   });
   document.title = t('prayer.pageTitle', 'Bugungi Namoz Vaqtlari');
-  updateMethodSummaryPill();
+  updateMethodPillLabel();
   updateInfoMethodLine();
 }
 
 // ============================================
-// METHOD SUMMARY PILL (header of page)
+// METHOD PILL (in meta row)
 // ============================================
 
-function updateMethodSummaryPill() {
+function updateMethodPillLabel() {
   const methodElem = document.getElementById('methodSummaryText');
   const madhabElem = document.getElementById('madhabSummaryText');
   if (!methodElem || !madhabElem) return;
 
-  const settings = window.getPrayerSettings ? getPrayerSettings() : { method: '3', madhab: '1' };
-  const methods = window.PRAYER_METHODS || {};
+  const settings = window.getPrayerSettings
+    ? window.getPrayerSettings()
+    : { method: '3', madhab: '1' };
 
-  // Short label for the pill
   const shortLabels = {
     '3': t('prayer.method.mwl.short', 'MWL'),
     '1': t('prayer.method.karachi.short', 'Karachi'),
@@ -55,7 +55,7 @@ function updateMethodSummaryPill() {
     '5': t('prayer.method.egypt.short', 'Egypt'),
     '2': t('prayer.method.isna.short', 'ISNA')
   };
-  methodElem.textContent = shortLabels[settings.method] || methods[settings.method] || 'MWL';
+  methodElem.textContent = shortLabels[settings.method] || 'MWL';
   madhabElem.textContent = settings.madhab === '1'
     ? t('prayer.schoolHanafi', 'Hanafiy')
     : t('prayer.schoolOthers', 'Shofe\'iy');
@@ -64,11 +64,14 @@ function updateMethodSummaryPill() {
 function updateInfoMethodLine() {
   const infoLine = document.getElementById('infoMethodLine');
   if (!infoLine) return;
-  const settings = window.getPrayerSettings ? getPrayerSettings() : { method: '3' };
-  const methodName = (window.PRAYER_METHODS || {})[settings.method] || 'Muslim World League';
+  const settings = window.getPrayerSettings
+    ? window.getPrayerSettings()
+    : { method: '3' };
+  const methods = window.PRAYER_METHODS || {};
+  const methodName = methods[settings.method] || 'Muslim World League';
   const template = t('prayer.infoMethod',
     'Namoz vaqtlari <strong>{method}</strong> usuli bilan hisoblab chiqildi.');
-  infoLine.innerHTML = template.replace('{method}', methodName);
+  infoLine.innerHTML = template.replace(/<strong>.*?<\/strong>/, `<strong>${methodName}</strong>`);
 }
 
 // ============================================
@@ -100,10 +103,12 @@ function buildMethodOptions() {
       </div>
       <div class="option-row-radio"></div>
     `;
-    row.addEventListener('click', () => selectMethod(key));
+    row.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectMethod(key);
+    });
     container.appendChild(row);
   });
-
   refreshSelectedStates();
 }
 
@@ -136,16 +141,19 @@ function buildMadhabOptions() {
       </div>
       <div class="option-row-radio"></div>
     `;
-    row.addEventListener('click', () => selectMadhab(opt.key));
+    row.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectMadhab(opt.key);
+    });
     container.appendChild(row);
   });
-
   refreshSelectedStates();
 }
 
 function refreshSelectedStates() {
-  const settings = window.getPrayerSettings ? getPrayerSettings() : { method: '3', madhab: '1' };
-
+  const settings = window.getPrayerSettings
+    ? window.getPrayerSettings()
+    : { method: '3', madhab: '1' };
   document.querySelectorAll('#methodOptions .option-row').forEach(row => {
     row.classList.toggle('selected', row.dataset.methodKey === settings.method);
   });
@@ -155,26 +163,25 @@ function refreshSelectedStates() {
 }
 
 function selectMethod(methodKey) {
-  const current = getPrayerSettings();
+  const current = window.getPrayerSettings();
   if (current.method === methodKey) {
     closeSheet();
     return;
   }
-  savePrayerSettings({ method: methodKey, madhab: current.madhab });
+  window.savePrayerSettings({ method: methodKey, madhab: current.madhab });
   refreshSelectedStates();
   hapticSelection();
   window.dispatchEvent(new CustomEvent('prayerSettingsChanged'));
-  // Auto-close after brief delay (visual confirmation)
   setTimeout(closeSheet, 350);
 }
 
 function selectMadhab(madhabKey) {
-  const current = getPrayerSettings();
+  const current = window.getPrayerSettings();
   if (current.madhab === madhabKey) {
     closeSheet();
     return;
   }
-  savePrayerSettings({ method: current.method, madhab: madhabKey });
+  window.savePrayerSettings({ method: current.method, madhab: madhabKey });
   refreshSelectedStates();
   hapticSelection();
   window.dispatchEvent(new CustomEvent('prayerSettingsChanged'));
@@ -184,22 +191,22 @@ function selectMadhab(madhabKey) {
 function hapticSelection() {
   try {
     const tg = window.Telegram?.WebApp;
-    if (tg?.HapticFeedback) {
-      tg.HapticFeedback.selectionChanged();
-    }
+    if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
   } catch (e) {}
 }
 
 function openSheet() {
+  console.log('🪟 openSheet called');
   const sheet = document.getElementById('bottomSheet');
   const backdrop = document.getElementById('sheetBackdrop');
-  if (!sheet || !backdrop) return;
+  if (!sheet || !backdrop) {
+    console.error('❌ Sheet elements not found');
+    return;
+  }
   buildMethodOptions();
   buildMadhabOptions();
   backdrop.classList.add('visible');
-  // Trigger reflow before adding class so transition fires
   requestAnimationFrame(() => sheet.classList.add('visible'));
-  document.body.style.overflow = 'hidden';
 }
 
 function closeSheet() {
@@ -208,10 +215,8 @@ function closeSheet() {
   if (!sheet || !backdrop) return;
   sheet.classList.remove('visible');
   backdrop.classList.remove('visible');
-  document.body.style.overflow = '';
 }
 
-// Simple swipe-down to dismiss on the handle
 function wireSheetSwipe() {
   const handle = document.getElementById('sheetHandleWrap');
   const sheet = document.getElementById('bottomSheet');
@@ -251,13 +256,8 @@ function wireSheetSwipe() {
 }
 
 // ============================================
-// SUNNAH & NAFL TIME CALCULATIONS
+// SUNNAH TIMES
 // ============================================
-// Derivations from Uzbek scholarly source:
-// - Ishraq (Shuruq): ~30 min after Sunrise; window ~15 min
-// - Duha (Chosht): starts ~30 min after Sunrise (overlap with Ishraq end),
-//   ends ~1 hour before Dhuhr. Preferred: after first 1/4 of sunrise→dhuhr span.
-// - Tahajjud: Aladhan's Lastthird (last third of night).
 
 const ISHRAQ_START_OFFSET_MIN = 30;
 const ISHRAQ_WINDOW_MIN = 15;
@@ -265,7 +265,6 @@ const DUHA_END_OFFSET_BEFORE_DHUHR_MIN = 60;
 
 function parseHHMM(str) {
   if (!str || typeof str !== 'string') return null;
-  // Aladhan sometimes returns "HH:MM (TZ)" — strip parenthetical part
   const clean = str.split(' ')[0];
   const [h, m] = clean.split(':').map(Number);
   if (isNaN(h) || isNaN(m)) return null;
@@ -282,37 +281,23 @@ function computeSunnahTimes(timings) {
   const sunriseMin = parseHHMM(timings.Sunrise);
   const dhuhrMin = parseHHMM(timings.Dhuhr);
   const lastThirdRaw = timings.Lastthird || timings.LastThird;
-
-  const result = {
-    ishraqStart: null,
-    ishraqEnd: null,
-    duhaStart: null,
-    duhaEnd: null,
-    tahajjud: null
-  };
+  const result = { ishraqStart: null, ishraqEnd: null, duhaStart: null, duhaEnd: null, tahajjud: null };
 
   if (sunriseMin != null && dhuhrMin != null) {
     result.ishraqStart = sunriseMin + ISHRAQ_START_OFFSET_MIN;
     result.ishraqEnd = result.ishraqStart + ISHRAQ_WINDOW_MIN;
-    // Duha: starts at end of ishraq window, ends 1h before Dhuhr
     result.duhaStart = result.ishraqEnd;
     result.duhaEnd = dhuhrMin - DUHA_END_OFFSET_BEFORE_DHUHR_MIN;
     if (result.duhaEnd <= result.duhaStart) {
-      // Fallback: show at least a 30-min window
       result.duhaEnd = result.duhaStart + 30;
     }
   }
-
-  if (lastThirdRaw) {
-    result.tahajjud = parseHHMM(lastThirdRaw);
-  }
-
+  if (lastThirdRaw) result.tahajjud = parseHHMM(lastThirdRaw);
   return result;
 }
 
 function renderSunnahTimes(timings) {
   const times = computeSunnahTimes(timings);
-
   const ishraqElem = document.getElementById('ishraqTime');
   const duhaElem = document.getElementById('duhaTime');
   const tahajjudElem = document.getElementById('tahajjudTime');
@@ -334,10 +319,13 @@ function renderSunnahTimes(timings) {
   }
 }
 
-// Expandable sunnah info cards
 function wireSunnahExpanders() {
-  document.querySelectorAll('.sunnah-item').forEach(item => {
-    item.addEventListener('click', () => {
+  const items = document.querySelectorAll('.sunnah-item');
+  console.log(`🔧 wireSunnahExpanders: found ${items.length} items`);
+  items.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      console.log('📖 sunnah item tapped:', item.dataset.sunnah);
       item.classList.toggle('expanded');
       hapticSelection();
     });
@@ -345,17 +333,56 @@ function wireSunnahExpanders() {
 }
 
 // ============================================
+// TIMESTAMP / STALE DISPLAY
+// ============================================
+
+function formatTimeShort(timestamp) {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return t('prayer.justNow', 'hozirgina');
+  if (diffMin < 60) return `${diffMin} ${t('prayer.minAgo', 'daqiqa oldin')}`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr} ${t('prayer.hrAgo', 'soat oldin')}`;
+  const diffDay = Math.floor(diffHr / 24);
+  return `${diffDay} ${t('prayer.dayAgo', 'kun oldin')}`;
+}
+
+function updateTimestampDisplay(timestamp) {
+  const elem = document.getElementById('metaTimestamp');
+  if (!elem) return;
+  if (!timestamp) {
+    elem.textContent = t('prayer.never', 'Hech qachon');
+    return;
+  }
+  elem.textContent = formatTimeShort(timestamp);
+  elem.classList.remove('stale');
+  const refreshBtn = document.getElementById('refreshLocationBtn');
+  if (refreshBtn) refreshBtn.classList.remove('stale');
+}
+
+function showStaleLocationWarning() {
+  const elem = document.getElementById('metaTimestamp');
+  if (elem) elem.classList.add('stale');
+  const refreshBtn = document.getElementById('refreshLocationBtn');
+  if (refreshBtn) refreshBtn.classList.add('stale');
+}
+
+// ============================================
 // INITIALIZATION
 // ============================================
 
 function initPrayersPage() {
-  const tg = window.Telegram.WebApp;
+  console.log('🔧 initPrayersPage starting');
+  const tg = window.Telegram?.WebApp;
 
-  updateUITranslations();
+  // Translations
+  try { updateUITranslations(); } catch (e) { console.error('UI translation error:', e); }
 
   // Back button
   try {
-    if (tg.BackButton) {
+    if (tg?.BackButton) {
       tg.BackButton.show();
       tg.onEvent('backButtonClicked', () => {
         window.location.href = "../index.html";
@@ -364,6 +391,39 @@ function initPrayersPage() {
   } catch (e) {
     console.error('BackButton setup error:', e);
   }
+
+  // Gear + pill → open sheet
+  const gear = document.getElementById('settingsGearBtn');
+  const pill = document.getElementById('methodPillBtn');
+  console.log('🔧 gear:', !!gear, 'pill:', !!pill);
+  if (gear) {
+    gear.addEventListener('click', (e) => {
+      console.log('⚙️ gear clicked');
+      e.preventDefault();
+      e.stopPropagation();
+      openSheet();
+    });
+  }
+  if (pill) {
+    pill.addEventListener('click', (e) => {
+      console.log('💊 pill clicked');
+      e.preventDefault();
+      e.stopPropagation();
+      openSheet();
+    });
+  }
+
+  // Backdrop → close
+  const backdrop = document.getElementById('sheetBackdrop');
+  if (backdrop) backdrop.addEventListener('click', closeSheet);
+
+  // Esc key closes sheet
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSheet();
+  });
+
+  wireSheetSwipe();
+  wireSunnahExpanders();
 
   // Location refresh
   const refreshBtn = document.getElementById('refreshLocationBtn');
@@ -375,20 +435,20 @@ function initPrayersPage() {
       e.stopPropagation();
       if (isRefreshing) return;
       isRefreshing = true;
-      refreshIcon.innerText = '🔄';
+      refreshIcon.textContent = '🔄';
       refreshIcon.classList.add('spinning');
       refreshBtn.style.opacity = '0.5';
       refreshBtn.disabled = true;
       try {
         await LocationManager.manualRefresh();
         refreshIcon.classList.remove('spinning');
-        refreshIcon.innerText = '✅';
-        setTimeout(() => { refreshIcon.innerText = '📍'; }, 2000);
+        refreshIcon.textContent = '✅';
+        setTimeout(() => { refreshIcon.textContent = '📍'; }, 2000);
       } catch (error) {
         console.error('Refresh error:', error);
         refreshIcon.classList.remove('spinning');
-        refreshIcon.innerText = '❌';
-        setTimeout(() => { refreshIcon.innerText = '📍'; }, 2000);
+        refreshIcon.textContent = '❌';
+        setTimeout(() => { refreshIcon.textContent = '📍'; }, 2000);
       } finally {
         refreshBtn.style.opacity = '1';
         refreshBtn.disabled = false;
@@ -397,68 +457,27 @@ function initPrayersPage() {
     });
   }
 
-  // Timestamp display
+  // Initial timestamp
   window.addEventListener('locationUpdated', (event) => {
-    updateTimestampDisplay(event.detail.timestamp);
+    updateTimestampDisplay(event.detail?.timestamp);
   });
-  const location = LocationManager.getStoredLocation();
-  if (location && location.timestamp) {
+  const location = LocationManager?.getStoredLocation?.();
+  if (location?.timestamp) {
     updateTimestampDisplay(location.timestamp);
   } else {
-    const timestampElem = document.getElementById('locationTimestamp');
-    if (timestampElem) {
-      const lastUpdateText = t('prayer.lastUpdate', 'Oxirgi yangilanish');
-      const neverText = t('prayer.never', 'Hech qachon');
-      timestampElem.innerText = `${lastUpdateText}: ${neverText}`;
-    }
+    updateTimestampDisplay(null);
   }
-  if (LocationManager.isLocationStale()) {
+  if (LocationManager?.isLocationStale?.()) {
     showStaleLocationWarning();
   }
 
-  // Settings gear + sheet
-  const gear = document.getElementById('settingsGearBtn');
-  const backdrop = document.getElementById('sheetBackdrop');
-  const methodPill = document.getElementById('methodSummaryPill');
-  if (gear) gear.addEventListener('click', openSheet);
-  if (methodPill) methodPill.addEventListener('click', openSheet);
-  if (backdrop) backdrop.addEventListener('click', closeSheet);
+  // Refresh timestamp "x min ago" every 30s
+  setInterval(() => {
+    const loc = LocationManager?.getStoredLocation?.();
+    if (loc?.timestamp) updateTimestampDisplay(loc.timestamp);
+  }, 30000);
 
-  // Esc key closes sheet (desktop)
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeSheet();
-  });
-
-  wireSheetSwipe();
-  wireSunnahExpanders();
-}
-
-// ============================================
-// TIMESTAMP / STALE DISPLAY
-// ============================================
-
-function updateTimestampDisplay(timestamp) {
-  const timestampElem = document.getElementById('locationTimestamp');
-  if (timestampElem && timestamp) {
-    const date = new Date(timestamp);
-    const timeString = date.toLocaleTimeString();
-    const dateString = date.toLocaleDateString();
-    const lastUpdateText = t('prayer.lastUpdate', 'Oxirgi yangilanish');
-    timestampElem.innerText = `${lastUpdateText}: ${timeString}, ${dateString}`;
-    timestampElem.style.color = '';
-    timestampElem.style.fontWeight = '';
-  }
-}
-
-function showStaleLocationWarning() {
-  const timestampElem = document.getElementById('locationTimestamp');
-  if (timestampElem) {
-    timestampElem.style.color = '#ff9800';
-    const warningText = t('prayer.staleWarning', 'Yangilashni maslahat beramiz');
-    timestampElem.innerHTML += ` ⚠️ <small>(${warningText})</small>`;
-  }
-  const refreshBtn = document.getElementById('refreshLocationBtn');
-  if (refreshBtn) refreshBtn.classList.add('stale');
+  console.log('✅ initPrayersPage done');
 }
 
 // ============================================
@@ -473,7 +492,6 @@ function populateDetailedPrayerList(timings, currentPrayerName) {
     "Fajr": "🌅", "Sunrise": "🌄", "Dhuhr": "☀️",
     "Asr": "🌤️", "Maghrib": "🌇", "Isha": "🌙"
   };
-
   const prayerComments = {
     "Fajr": t('prayer.comment.fajr', 'Xufton vaqti tugaydi'),
     "Sunrise": t('prayer.comment.sunrise', 'Bomdod vaqti tugaydi'),
@@ -532,7 +550,7 @@ function populateDetailedPrayerList(timings, currentPrayerName) {
 // ============================================
 
 window.addEventListener('prayerDataUpdated', (event) => {
-  if (event.detail && event.detail.timings && event.detail.currentPrayer) {
+  if (event.detail?.timings && event.detail?.currentPrayer) {
     populateDetailedPrayerList(event.detail.timings, event.detail.currentPrayer);
     renderSunnahTimes(event.detail.timings);
   }
@@ -543,7 +561,7 @@ window.addEventListener('languageChanged', () => {
 });
 
 window.addEventListener('prayerSettingsChanged', () => {
-  updateMethodSummaryPill();
+  updateMethodPillLabel();
   updateInfoMethodLine();
 });
 
