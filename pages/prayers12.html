@@ -32,7 +32,53 @@
     }
 
     /* ============================================
-       COMPACT META ROW — method pill (L) | freshness + gear (R)
+       SETTINGS GEAR — sits OUTSIDE the <a> anchor
+       ============================================ */
+    .settings-gear-btn {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #ffffff;
+      color: var(--emerald-700);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      line-height: 1;
+    }
+    .settings-gear-btn:hover {
+      background: #f6fdf9;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    }
+    .settings-gear-btn:active { transform: translateY(-50%) scale(0.92); }
+    .settings-gear-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--emerald-700);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .night-mode .settings-gear-btn {
+      background: #1e1e1e;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+    .night-mode .settings-gear-btn svg {
+      stroke: #6ee7b7;
+    }
+
+    /* ============================================
+       COMPACT META ROW — method pill (L) | freshness (R)
        ============================================ */
     .meta-row {
       display: flex;
@@ -46,20 +92,20 @@
     .meta-left, .meta-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-size: 0.78rem;
       color: var(--text-muted);
     }
     .meta-method-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
+      gap: 5px;
+      padding: 4px 10px;
       background: var(--emerald-50);
       border: 1px solid var(--emerald-200);
       border-radius: var(--radius-full);
       color: var(--emerald-700);
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
       transition: background var(--transition-fast), border-color var(--transition-fast);
@@ -69,46 +115,38 @@
       border-color: var(--emerald-400);
     }
     .meta-method-sep { opacity: 0.45; }
-
-    /* Gear button — solid white circle with emerald icon, lives in the meta row */
-    .meta-gear-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid var(--emerald-200);
-      background: #ffffff;
-      color: var(--emerald-700);
+    .meta-refresh-btn {
+      width: 28px; height: 28px;
+      border: none;
+      background: transparent;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      border-radius: 50%;
+      transition: background var(--transition-fast);
       padding: 0;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-      flex-shrink: 0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      color: var(--emerald-700);
     }
-    .meta-gear-btn:hover {
-      background: var(--emerald-50);
-      border-color: var(--emerald-400);
-    }
-    .meta-gear-btn:active { transform: scale(0.92); }
-    .meta-gear-btn svg {
-      width: 17px;
-      height: 17px;
-      stroke: currentColor;
+    .meta-refresh-btn svg {
+      width: 16px;
+      height: 16px;
       fill: none;
-      stroke-width: 2;
+      stroke: currentColor;
+      stroke-width: 2.2;
       stroke-linecap: round;
       stroke-linejoin: round;
+      transition: transform 0.2s ease;
     }
-    .night-mode .meta-gear-btn {
-      background: #1e1e1e;
-      border-color: rgba(6, 78, 59, 0.5);
-      color: #6ee7b7;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-    .night-mode .meta-gear-btn:hover {
-      background: rgba(6, 78, 59, 0.25);
+    .meta-refresh-btn:hover:not(:disabled) { background: var(--emerald-50); }
+    .meta-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .meta-refresh-btn.stale { animation: meta-pulse 1.4s ease-in-out infinite; }
+    .meta-refresh-btn.spinning svg { animation: spin-arrow 0.8s linear infinite; }
+    .night-mode .meta-refresh-btn { color: #6ee7b7; }
+    .night-mode .meta-refresh-btn:hover:not(:disabled) { background: rgba(6, 78, 59, 0.25); }
+    @keyframes spin-arrow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
     @keyframes meta-pulse {
       0%, 100% { opacity: 1; }
@@ -120,10 +158,7 @@
       line-height: 1.3;
       text-align: right;
     }
-    #metaTimestamp.stale {
-      color: #e67e22;
-      animation: meta-pulse 1.8s ease-in-out infinite;
-    }
+    #metaTimestamp.stale { color: #e67e22; }
 
     /* ============================================
        SUNNAH & NAFL SECTION
@@ -232,6 +267,30 @@
       font-weight: 500;
     }
 
+
+    .hadith-quote {
+      display: block;
+      margin-top: 10px;
+      padding: 10px 12px 10px 16px;
+      border-left: 3px solid var(--gold-400);
+      background: rgba(234, 185, 50, 0.06);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--gold-600);
+      line-height: 1.5;
+      position: relative;
+    }
+    .hadith-quote::before { content: '\201C'; }
+    .hadith-quote::after  { content: '\201D'; }
+
+    .night-mode .hadith-quote {
+      background: rgba(234, 185, 50, 0.08);
+      border-left-color: rgba(234, 185, 50, 0.5);
+      color: #facc15;
+    }
+    
+    
     /* Status pill — always shown */
     .sunnah-status-pill {
       font-size: 0.62rem;
@@ -521,6 +580,9 @@
       border-color: rgba(6, 78, 59, 0.5);
       color: #6ee7b7;
     }
+    .night-mode .meta-refresh-btn:hover:not(:disabled) {
+      background: rgba(6, 78, 59, 0.25);
+    }
     .night-mode .sunnah-section {
       background: linear-gradient(135deg, #1d1a10 0%, #1a1709 100%);
       border-color: rgba(234, 185, 50, 0.2);
@@ -561,6 +623,12 @@
       <img src="../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
       <h1>Muslim Vegukin Bot</h1>
     </a>
+    <button id="settingsGearBtn" class="settings-gear-btn" aria-label="Settings" type="button">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
   </header>
 
   <section class="prayers-detailed">
@@ -573,7 +641,7 @@
       <p class="countdown-text">⏳ <span id="countdown">--:--:--</span></p>
     </div>
 
-    <!-- Compact meta row: method pill (L) | last update + gear (R) -->
+    <!-- Compact meta row: method pill (L) | last update + refresh (R) -->
     <div class="meta-row">
       <div class="meta-left">
         <button id="methodPillBtn" class="meta-method-btn" type="button">
@@ -584,10 +652,10 @@
       </div>
       <div class="meta-right">
         <span id="metaTimestamp"></span>
-        <button id="settingsGearBtn" class="meta-gear-btn" aria-label="Settings" type="button">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        <button id="refreshLocationBtn" class="meta-refresh-btn" aria-label="Refresh location" type="button">
+          <svg id="refreshIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
           </svg>
         </button>
       </div>
@@ -602,6 +670,32 @@
         <h3 class="sunnah-section-title" data-i18n="prayer.sunnah.title">Sunnat va Nafl namozlari</h3>
       </div>
 
+      <div class="sunnah-item" data-sunnah="tahajjud">
+        <div class="sunnah-item-row">
+          <span class="sunnah-emoji">🌙</span>
+          <div class="sunnah-body">
+            <div class="sunnah-header-row">
+              <span class="sunnah-name" data-i18n="prayer.sunnah.tahajjud.name">Tahajjud namozi</span>
+              <span class="sunnah-chevron">▼</span>
+            </div>
+            <div class="sunnah-meta-row">
+              <span class="sunnah-range-text">
+                <span id="tahajjudStart">--:--</span><span class="sunnah-range-sep">—</span><span id="tahajjudEnd">--:--</span>
+              </span>
+              <span class="sunnah-status-pill" id="tahajjudStatus">—</span>
+            </div>
+            <div class="sunnah-progress-track" id="tahajjudTrack">
+              <div class="sunnah-progress-fill" id="tahajjudFill"></div>
+              <div class="sunnah-progress-dot" id="tahajjudDot"></div>
+            </div>
+          </div>
+        </div>
+        <div class="sunnah-details">
+          <p data-i18n="prayer.sunnah.tahajjud.desc">Xuftondan keyin, uyqudan so'ng o'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri, bomdod kirguncha davom etadi. Duolar qabul bo'ladigan vaqt.</p>
+          <p class="sunnah-source" data-i18n="prayer.sunnah.tahajjud.source">Manba: Muslim, Buxoriy</p>
+        </div>
+      </div>
+      
       <div class="sunnah-item" data-sunnah="ishraq">
         <div class="sunnah-item-row">
           <span class="sunnah-emoji">🌄</span>
@@ -654,31 +748,6 @@
         </div>
       </div>
 
-      <div class="sunnah-item" data-sunnah="tahajjud">
-        <div class="sunnah-item-row">
-          <span class="sunnah-emoji">🌙</span>
-          <div class="sunnah-body">
-            <div class="sunnah-header-row">
-              <span class="sunnah-name" data-i18n="prayer.sunnah.tahajjud.name">Tahajjud namozi</span>
-              <span class="sunnah-chevron">▼</span>
-            </div>
-            <div class="sunnah-meta-row">
-              <span class="sunnah-range-text">
-                <span id="tahajjudStart">--:--</span><span class="sunnah-range-sep">—</span><span id="tahajjudEnd">--:--</span>
-              </span>
-              <span class="sunnah-status-pill" id="tahajjudStatus">—</span>
-            </div>
-            <div class="sunnah-progress-track" id="tahajjudTrack">
-              <div class="sunnah-progress-fill" id="tahajjudFill"></div>
-              <div class="sunnah-progress-dot" id="tahajjudDot"></div>
-            </div>
-          </div>
-        </div>
-        <div class="sunnah-details">
-          <p data-i18n="prayer.sunnah.tahajjud.desc">Xuftondan keyin, uyqudan so'ng o'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri, bomdod kirguncha davom etadi. Duolar qabul bo'ladigan vaqt.</p>
-          <p class="sunnah-source" data-i18n="prayer.sunnah.tahajjud.source">Manba: Muslim, Buxoriy</p>
-        </div>
-      </div>
     </div>
 
     <!-- Info note -->

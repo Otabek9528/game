@@ -22,7 +22,7 @@ function updateUITranslations() {
     if (window.I18N) {
       const trans = I18N.t(key);
       if (trans !== key) {
-        if (trans.includes('<strong>') || trans.includes('</strong>')) {
+        if (/<[a-z]/i.test(trans)) {
           el.innerHTML = trans;
         } else {
           el.textContent = trans;
@@ -473,11 +473,15 @@ function updateTimestampDisplay(timestamp) {
   }
   elem.textContent = formatTimeShort(timestamp);
   elem.classList.remove('stale');
+  const refreshBtn = document.getElementById('refreshLocationBtn');
+  if (refreshBtn) refreshBtn.classList.remove('stale');
 }
 
 function showStaleLocationWarning() {
   const elem = document.getElementById('metaTimestamp');
   if (elem) elem.classList.add('stale');
+  const refreshBtn = document.getElementById('refreshLocationBtn');
+  if (refreshBtn) refreshBtn.classList.add('stale');
 }
 
 // ============================================
@@ -540,6 +544,33 @@ function initPrayersPage() {
 
   wireSheetSwipe();
   wireSunnahExpanders();
+
+  // Location refresh
+  const refreshBtn = document.getElementById('refreshLocationBtn');
+  if (refreshBtn) {
+    let isRefreshing = false;
+    refreshBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isRefreshing) return;
+      isRefreshing = true;
+      refreshBtn.classList.add('spinning');
+      refreshBtn.classList.remove('stale'); // stop pulse while actively refreshing
+      refreshBtn.disabled = true;
+      try {
+        await LocationManager.manualRefresh();
+      } catch (error) {
+        console.error('Refresh error:', error);
+      } finally {
+        // Keep spin for a minimum of 500ms so it's visible even on fast networks
+        setTimeout(() => {
+          refreshBtn.classList.remove('spinning');
+          refreshBtn.disabled = false;
+          isRefreshing = false;
+        }, 500);
+      }
+    });
+  }
 
   // Initial timestamp
   window.addEventListener('locationUpdated', (event) => {
