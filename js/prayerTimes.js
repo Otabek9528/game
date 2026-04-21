@@ -199,6 +199,58 @@ function formatCountdown(nextTime) {
   return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 }
 
+// Update the home-page progress line: fill % = elapsed(curStart→now) / total(curStart→nextStart).
+// Badge slides along the line at the fill's leading edge.
+function updateProgressLine(timings, currentName, nextName) {
+  const track = document.querySelector('.progress-line');
+  const badge = document.querySelector('.countdown-badge');
+  if (!track) return;
+
+  const toMin = (str) => {
+    if (!str) return null;
+    const clean = str.split(' ')[0];
+    const [h, m] = clean.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  const curStart = toMin(timings[currentName]);
+  const nextStart = toMin(timings[nextName]);
+  if (curStart == null || nextStart == null) return;
+
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+
+  // Handle wrap: when current is Isha and next is Fajr, the window crosses midnight.
+  let total, elapsed;
+  if (nextStart > curStart) {
+    total = nextStart - curStart;
+    if (nowMin >= curStart) {
+      elapsed = nowMin - curStart;
+    } else {
+      // Shouldn't happen in normal flow, but guard.
+      elapsed = 0;
+    }
+  } else {
+    // Wrapping window (Isha→Fajr): minutes from curStart through midnight to nextStart.
+    total = (1440 - curStart) + nextStart;
+    if (nowMin >= curStart) {
+      elapsed = nowMin - curStart;
+    } else {
+      // We're after midnight, before Fajr.
+      elapsed = (1440 - curStart) + nowMin;
+    }
+  }
+
+  const pct = Math.max(0, Math.min(1, elapsed / total));
+  track.style.setProperty('--progress', (pct * 100).toFixed(2) + '%');
+
+  // Slide badge along the line at the leading edge of fill.
+  // We position via CSS variable rather than `left: X%` so CSS can choose whether to use it.
+  if (badge) {
+    badge.style.setProperty('--progress', (pct * 100).toFixed(2) + '%');
+  }
+}
+
 // ============================================
 // UPDATE PRAYER DATA
 // ============================================
@@ -233,15 +285,7 @@ async function updatePrayerData(lat, lon, city) {
     if (nextEmojiElem) nextEmojiElem.innerText = prayerEmojis[next.name] || '🕌';
     if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = data.timings[next.name];
 
-    function updateCountdown() {
-      if (countdownElem) {
-        countdownElem.innerText = formatCountdown(data.timings[next.name]);
-      }
-    }
-    updateCountdown();
-    if (window.prayerCountdownInterval) clearInterval(window.prayerCountdownInterval);
-    window.prayerCountdownInterval = setInterval(updateCountdown, 1000);
-
+    // Date / Hijri setup (used inside tick when rollover dispatches event)
     const localDate = new Date();
     const weekdayEnglish = localDate.toLocaleDateString('en-US', { weekday: 'long' });
     const weekdayTranslated = translateWeekday(weekdayEnglish);
@@ -249,6 +293,7 @@ async function updatePrayerData(lat, lon, city) {
     const gregorianDate = `${localDate.getDate()}-${monthName}`;
     const hijri = adjustHijriDate(data.date.hijri);
     const hijriFormatted = `${parseInt(hijri.day)}-${hijri.month.en}, ${hijri.year}`;
+    const correctedDate = { ...data.date, hijri };
 
     if (document.getElementById("weekday")) {
       document.getElementById("weekday").innerText = `${weekdayTranslated}, ${gregorianDate}`;
@@ -264,8 +309,66 @@ async function updatePrayerData(lat, lon, city) {
     const nextPrayerNameElem = document.getElementById("nextPrayerName");
     if (nextPrayerNameElem) nextPrayerNameElem.innerText = translatePrayer(next.name);
 
+    // -------- Stateful tick: handles countdown + prayer rollover + progress line --------
+    // The tick is idempotent — it recomputes current/next from `data.timings` every second
+    // based on the wall clock, so when a prayer time passes, labels and countdown flip
+    // automatically. When the day rolls over (Isha → Fajr of next day), it refetches.
+    let _lastPrayerName = current.name;
+    let _refetchInFlight = false;
+
+    async function tick() {
+      const { current: curNow, next: nextNow } = getCurrentPrayer(data.timings);
+
+      // Prayer boundary crossed — update names, emojis, times on both index.html and prayers.html
+      if (curNow.name !== _lastPrayerName) {
+        if (currentPrayerElem) currentPrayerElem.innerText = translatePrayer(curNow.name);
+        if (prayerTimeElem)   prayerTimeElem.innerText   = data.timings[curNow.name];
+        if (currentEmojiElem) currentEmojiElem.innerText = prayerEmojis[curNow.name] || '🕌';
+        if (nextPrayerElem)   nextPrayerElem.innerText   = translatePrayer(nextNow.name);
+        if (nextEmojiElem)    nextEmojiElem.innerText    = prayerEmojis[nextNow.name] || '🕌';
+        if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = data.timings[nextNow.name];
+        if (nextPrayerNameElem) nextPrayerNameElem.innerText = translatePrayer(nextNow.name);
+
+        // Re-dispatch so prayers.html list re-renders its "current prayer" highlight
+        window.dispatchEvent(new CustomEvent('prayerDataUpdated', {
+          detail: {
+            timings: data.timings,
+            currentPrayer: curNow.name,
+            nextPrayer: nextNow.name,
+            date: correctedDate
+          }
+        }));
+
+        _lastPrayerName = curNow.name;
+
+        // Detect true day-rollover: transition into Fajr means yesterday's `data.timings`
+        // is stale for today. Refetch to pick up new Hijri date, DST changes, new times.
+        if (curNow.name === 'Fajr' && !_refetchInFlight) {
+          _refetchInFlight = true;
+          console.log('🔄 Entered Fajr — refetching timings for new day');
+          try {
+            await updatePrayerData(lat, lon, city);
+          } catch (e) {
+            console.error('Rollover refetch failed:', e);
+          }
+          return; // updatePrayerData restarts the interval with fresh data
+        }
+      }
+
+      // Countdown text
+      if (countdownElem) {
+        countdownElem.innerText = formatCountdown(data.timings[nextNow.name]);
+      }
+
+      // Progress line: fraction elapsed from curNow start to nextNow start
+      updateProgressLine(data.timings, curNow.name, nextNow.name);
+    }
+
+    tick();
+    if (window.prayerCountdownInterval) clearInterval(window.prayerCountdownInterval);
+    window.prayerCountdownInterval = setInterval(tick, 1000);
+
     // Dispatch event with prayer data for detailed page
-    const correctedDate = { ...data.date, hijri };
     window.dispatchEvent(new CustomEvent('prayerDataUpdated', {
       detail: {
         timings: data.timings,
