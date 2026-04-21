@@ -203,7 +203,6 @@ function formatCountdown(nextTime) {
 // Badge slides along the line at the fill's leading edge.
 function updateProgressLine(timings, currentName, nextName) {
   const track = document.querySelector('.progress-line');
-  const badge = document.querySelector('.countdown-badge');
   if (!track) return;
 
   const toMin = (str) => {
@@ -220,35 +219,17 @@ function updateProgressLine(timings, currentName, nextName) {
   const now = new Date();
   const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
 
-  // Handle wrap: when current is Isha and next is Fajr, the window crosses midnight.
   let total, elapsed;
   if (nextStart > curStart) {
     total = nextStart - curStart;
-    if (nowMin >= curStart) {
-      elapsed = nowMin - curStart;
-    } else {
-      // Shouldn't happen in normal flow, but guard.
-      elapsed = 0;
-    }
+    elapsed = nowMin >= curStart ? nowMin - curStart : 0;
   } else {
-    // Wrapping window (Isha→Fajr): minutes from curStart through midnight to nextStart.
     total = (1440 - curStart) + nextStart;
-    if (nowMin >= curStart) {
-      elapsed = nowMin - curStart;
-    } else {
-      // We're after midnight, before Fajr.
-      elapsed = (1440 - curStart) + nowMin;
-    }
+    elapsed = nowMin >= curStart ? nowMin - curStart : (1440 - curStart) + nowMin;
   }
 
   const pct = Math.max(0, Math.min(1, elapsed / total));
   track.style.setProperty('--progress', (pct * 100).toFixed(2) + '%');
-
-  // Slide badge along the line at the leading edge of fill.
-  // We position via CSS variable rather than `left: X%` so CSS can choose whether to use it.
-  if (badge) {
-    badge.style.setProperty('--progress', (pct * 100).toFixed(2) + '%');
-  }
 }
 
 // ============================================

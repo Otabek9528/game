@@ -186,6 +186,11 @@ body {
     rgba(255, 255, 255, 0.08) 100%
   );
 }
+.night-mode .progress-line .progress-dot {
+  background: #1e1e1e;
+  box-shadow: 0 0 0 3px #1e1e1e, 0 0 0 5px rgba(16, 185, 129, 0.3);
+}
+ 
 
 
 .night-mode .progress-line::before,
@@ -514,11 +519,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   padding: 0 8px;
   min-width: 120px;
   flex: 0 0 auto;
-  position: relative;
-  height: 56px;
 }
 
 .progress-line {
@@ -531,8 +535,8 @@ body {
     90deg,
     var(--emerald-500) 0%,
     var(--emerald-400) var(--progress),
-    rgba(6, 95, 70, 0.15) var(--progress),
-    rgba(6, 95, 70, 0.15) 100%
+    rgba(6, 95, 70, 0.18) var(--progress),
+    rgba(6, 95, 70, 0.18) 100%
   );
   transition: background 0.9s linear;
 }
@@ -553,12 +557,22 @@ body {
 .progress-line::before { left: -5px; }
 .progress-line::after  { right: -5px; }
 
-.countdown-badge {
-  --progress: 0%;
+.progress-line .progress-dot {
   position: absolute;
   top: 50%;
   left: var(--progress);
   transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--emerald-600);
+  box-shadow: 0 0 0 3px var(--bg-elevated), 0 0 0 5px rgba(16, 185, 129, 0.25);
+  transition: left 0.9s linear;
+  z-index: 2;
+}
+
+.countdown-badge {
   background: linear-gradient(135deg, var(--gold-100) 0%, #fff8e7 100%);
   border: 2px solid var(--gold-400);
   border-radius: var(--radius-full);
@@ -570,9 +584,7 @@ body {
   white-space: nowrap;
   letter-spacing: 0.3px;
   box-shadow: 0 2px 8px rgba(212, 162, 26, 0.25);
-  transition: left 0.9s linear; /* smooth slide matching the per-second tick */
-  z-index: 2;
-  animation: none; /* disables any subtle-pulse left elsewhere */
+  animation: none;
 }
 
 /* =========================
@@ -1065,7 +1077,6 @@ body {
   
   .timeline-progress {
     min-width: 100px;
-    height: 52px;
   }
   .countdown-badge {
     font-size: 0.85rem;
