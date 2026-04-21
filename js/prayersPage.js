@@ -495,11 +495,16 @@ function initPrayersPage() {
   // Translations
   try { updateUITranslations(); } catch (e) { console.error('UI translation error:', e); }
 
-  // Back button
+  // Back button — if sheet is open, close it first; otherwise navigate home
   try {
     if (tg?.BackButton) {
       tg.BackButton.show();
       tg.onEvent('backButtonClicked', () => {
+        const sheet = document.getElementById('bottomSheet');
+        if (sheet && sheet.classList.contains('visible')) {
+          closeSheet();
+          return;
+        }
         window.location.href = "../index.html";
       });
     }
