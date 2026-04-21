@@ -112,7 +112,7 @@ const I18N = {
     },
      
     // ---------- Method short labels (shown in the pill) ----------
-    'prayer.method.mwl.short':     { uz: 'MWL',     ru: 'MWL',     en: 'MWL' },
+    'prayer.method.mwl.short':     { uz: 'Muslim World League',     ru: 'Muslim World League',     en: 'Muslim World League' },
     'prayer.method.karachi.short': { uz: 'Karachi', ru: 'Карачи',  en: 'Karachi' },
     'prayer.method.makkah.short':  { uz: 'Makka',   ru: 'Мекка',   en: 'Makkah' },
     'prayer.method.egypt.short':   { uz: 'Misr',    ru: 'Египет',  en: 'Egypt' },
@@ -120,75 +120,67 @@ const I18N = {
      
     // ---------- Method hints (shown under name in sheet) ----------
     'prayer.method.mwl.hint': {
-      uz: 'Ko\'pchilik musulmon davlatlarida qo\'llaniladi',
-      ru: 'Используется в большинстве мусульманских стран',
-      en: 'Used in most Muslim countries'
+      uz: 'Bomdod 18°, Xufton 17°',
+      ru: 'Фаджр 18°, Иша 17°',
+      en: 'Fajr 18°, Isha 17°'
     },
     'prayer.method.karachi.hint': {
-      uz: 'Pokiston, Hindiston, Bangladesh, Afg\'oniston',
-      ru: 'Пакистан, Индия, Бангладеш, Афганистан',
-      en: 'Pakistan, India, Bangladesh, Afghanistan'
+      uz: 'Bomdod 18°, Xufton 18°',
+      ru: 'Фаджр 18°, Иша 18°',
+      en: 'Fajr 18°, Isha 18°'
     },
     'prayer.method.makkah.hint': {
-      uz: 'Saudiya Arabistoni uchun',
-      ru: 'Для Саудовской Аравии',
-      en: 'For Saudi Arabia'
+      uz: 'Bomdod 18.5°, Xufton — Shomdan 90 daqiqa keyin',
+      ru: 'Фаджр 18.5°, Иша — через 90 мин после Магриба',
+      en: 'Fajr 18.5°, Isha — 90 min after Maghrib'
     },
     'prayer.method.egypt.hint': {
-      uz: 'Misr va Afrika qismi uchun',
-      ru: 'Для Египта и части Африки',
-      en: 'For Egypt and parts of Africa'
+      uz: 'Bomdod 19.5°, Xufton 17.5°',
+      ru: 'Фаджр 19.5°, Иша 17.5°',
+      en: 'Fajr 19.5°, Isha 17.5°'
     },
     'prayer.method.isna.hint': {
-      uz: 'Shimoliy Amerika uchun',
-      ru: 'Для Северной Америки',
-      en: 'For North America'
+      uz: 'Bomdod 15°, Xufton 15°',
+      ru: 'Фаджр 15°, Иша 15°',
+      en: 'Fajr 15°, Isha 15°'
     },
      
     // ---------- Sunnah & Nafl section ----------
     'prayer.sunnah.title': {
-      uz: 'Sunnat va Nafl namozlari',
-      ru: 'Сунна и Нафль намазы',
-      en: 'Sunnah & Nafl prayers'
+      uz: 'Nafl namoz vaqtlari',
+      ru: 'Время добровольных (нафль) молитв',
+      en: 'Times of voluntary (nafl) prayers'
     },
      
     // Ishraq
     'prayer.sunnah.ishraq.name': {
-      uz: 'Ishroq (Shuruq) namozi',
-      ru: 'Ишрак (Шурук) намаз',
-      en: 'Ishraq (Shuruq) prayer'
+      uz: 'Shuruq (Ishroq) namozi',
+      ru: 'Шурук (Ишрак) намаз',
+      en: 'Shuruq (Ishraq) prayer'
     },
-    'prayer.sunnah.ishraq.benefit': {
-      uz: 'Haj va umra savobi — Termiziy',
-      ru: 'Награда хаджа и умры — Ат-Тирмизи',
-      en: 'Reward of Hajj and Umrah — Tirmidhi'
-    },
+
     'prayer.sunnah.ishraq.desc': {
-      uz: 'Bomdodni jamoat bilan o\'qib, quyosh chiqquncha zikrda o\'tirgan va so\'ng ikki rakat namoz o\'qigan kishiga to\'liq haj va umra savobi beriladi.',
+      uz: 'Kim bomdodni jamoat bilan o\‘qisa, so\‘ngra quyosh chiqquncha Allohni zikr qilib o\‘tirsa, keyin ikki rakat namoz o\‘qisa, uning uchun haj va umraning ajridek bo\‘lur.',
       ru: 'Тому, кто прочитал фаджр в джамаате, сидел в зикре до восхода солнца и затем совершил два ракаата намаза — даётся полная награда хаджа и умры.',
       en: 'Whoever prays Fajr in congregation, remains in remembrance of Allah until sunrise, then prays two rak\'ahs — receives the full reward of Hajj and Umrah.'
     },
     'prayer.sunnah.ishraq.source': {
-      uz: 'Manba: Termiziy, Abu Dovud — Muoz ibn Anas al-Juhaniy (r.a.)',
-      ru: 'Источник: Ат-Тирмизи, Абу Дауд — Муаз ибн Анас аль-Джухани (р.а.)',
-      en: 'Source: Tirmidhi, Abu Dawud — from Mu\'adh ibn Anas al-Juhani (r.a.)'
+      uz: 'Manba: Termiziy — Muoz ibn Anas al-Juhaniy (r.a.)',
+      ru: 'Источник: Ат-Тирмизи — Муаз ибн Анас аль-Джухани (р.а.)',
+      en: 'Source: Tirmidhi — from Mu\'adh ibn Anas al-Juhani (r.a.)'
     },
      
     // Duha / Chosht / Zuho
     'prayer.sunnah.duha.name': {
-      uz: 'Chosht (Zuho) namozi',
-      ru: 'Духа (Чошт) намаз',
-      en: 'Duha (Chosht) prayer'
+      uz: 'Zuho (Choshgoh) namozi',
+      ru: 'Духа намаз',
+      en: 'Duha prayer'
     },
-    'prayer.sunnah.duha.benefit': {
-      uz: 'Gunohlar dengiz ko\'pigidek kechiriladi — Termiziy',
-      ru: 'Грехи прощаются, даже если их как морская пена — Ат-Тирмизи',
-      en: 'Sins forgiven though they be as the foam of the sea — Tirmidhi'
-    },
+
     'prayer.sunnah.duha.desc': {
-      uz: 'Quyosh bir nayza bo\'yi ko\'tarilganda kirib, zavolga bir soat qolguncha davom etadi. 2 dan 8 rakatgacha o\'qiladi, afzali 4 rakat. Eng afzal vaqti — nahorning to\'rtdan biri o\'tgandan keyin.',
-      ru: 'Время наступает, когда солнце поднимется на высоту копья, и продолжается до часа перед полуднем. Читается от 2 до 8 ракаатов, предпочтительнее 4. Лучшее время — после первой четверти дня.',
-      en: 'Begins when the sun has risen roughly a spear\'s length, continues until ~1 hour before Dhuhr. Prayed 2 to 8 rak\'ahs, preferably 4. Best time: after the first quarter of daytime.'
+      uz: 'Quyosh bir nayza bo\'yi ko\'tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o\'qish. Eng afzal vaqti — nahorning to\'rtdan biri o\'tgandan keyin. "Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi."',
+      ru: 'Когда солнце поднимается на высоту копья, (время молитвы) начинается и продолжается до того, как до полудня остаётся один час. Предпочтительно совершить 4 ракаата. Наилучшее время — после того, как пройдет четверть утра. "Кто постоянно совершает молитву духа (чошгох), тому будут прощены грехи, даже если они подобны морской пене."',
+      en: 'When the sun rises to the height of a spear, it begins and continues until one hour remains before noon. It is most virtuous to pray 4 rak‘ahs. The most preferable time is after one quarter of the morning has passed. "Whoever consistently performs the Duha (forenoon) prayer, his sins will be forgiven even if they are as abundant as the foam of the sea."'
     },
     'prayer.sunnah.duha.source': {
       uz: 'Manba: Termiziy — Abu Hurayra (r.a.)',
@@ -202,20 +194,16 @@ const I18N = {
       ru: 'Тахаджуд намаз',
       en: 'Tahajjud prayer'
     },
-    'prayer.sunnah.tahajjud.benefit': {
-      uz: 'Farz namozlardan keyin eng afzal namoz — Muslim',
-      ru: 'Лучший намаз после обязательных — Муслим',
-      en: 'The best prayer after the obligatory — Muslim'
-    },
+
     'prayer.sunnah.tahajjud.desc': {
-      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt.',
-      ru: 'Добровольный ночной намаз, читаемый после сна. Лучшее время — последняя треть ночи. Время принятия мольб.',
-      en: 'Voluntary night prayer performed after sleep. Best time is the last third of the night — a time when supplications are accepted.'
+      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Ozi 2, ko\'pi 8 rakat. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt. "У Роббингизга қурбатдир, ёмонликларга каффоротдир, гуноҳларни қайтарувчидир."',
+      ru: 'Совершаемая после молитвы Иша, после сна. Минимум — 2 ракаата, максимум — 8 ракаатов. Наилучшее время — последняя треть ночи — время, когда принимаются мольбы. "Она приближает к вашему Господу, искупает дурные поступки и удерживает от грехов."',
+      en: 'Performed after the Isha prayer, following sleep. Its minimum is 2 rak‘ahs and its maximum is 8 rak‘ahs. The most virtuous time is the last third of the night — a time when supplications are accepted. "It brings one closer to your Lord, expiates bad deeds, and prevents sins."'
     },
     'prayer.sunnah.tahajjud.source': {
-      uz: 'Manba: Muslim, Buxoriy',
-      ru: 'Источник: Муслим, Аль-Бухари',
-      en: 'Source: Muslim, Bukhari'
+      uz: 'Manba: Termiziy — Abu Umoma (r.a.)',
+      ru: 'Источник: Ат-Тирмизи — Абу Умома (р.а.)',
+      en: 'Source: Tirmidhi — from Abu Umoma (r.a.)'
     },
         
     'prayer.status.upcoming': {
@@ -253,12 +241,12 @@ const I18N = {
      
     // Sunnah status pills
     'prayer.status.activeNow': {
-      uz: 'Hozir',
+      uz: 'Ayni vaqti',
       ru: 'Сейчас',
       en: 'Now'
     },
     'prayer.status.passed': {
-      uz: 'O\'tdi',
+      uz: 'Bugungi vaqti o\'tdi',
       ru: 'Прошло',
       en: 'Passed'
     },
