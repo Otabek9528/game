@@ -22,7 +22,7 @@ function updateUITranslations() {
     if (window.I18N) {
       const trans = I18N.t(key);
       if (trans !== key) {
-        if (trans.includes('<strong>') || trans.includes('</strong>')) {
+        if (/<[a-z]/i.test(trans)) {
           el.innerHTML = trans;
         } else {
           el.textContent = trans;

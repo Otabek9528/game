@@ -226,6 +226,28 @@
       margin: 0 3px;
       font-weight: 500;
     }
+    
+    .hadith-quote {
+      display: block;
+      margin-top: 10px;
+      padding: 10px 12px 10px 16px;
+      border-left: 3px solid var(--gold-400);
+      background: rgba(234, 185, 50, 0.06);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--gold-600);
+      line-height: 1.5;
+      position: relative;
+    }
+    .hadith-quote::before { content: '\201C'; }
+    .hadith-quote::after  { content: '\201D'; }
+
+    .night-mode .hadith-quote {
+      background: rgba(234, 185, 50, 0.08);
+      border-left-color: rgba(234, 185, 50, 0.5);
+      color: #facc15;
+    }
 
     /* Status pill — always shown */
     .sunnah-status-pill {
@@ -597,6 +619,32 @@
         <h3 class="sunnah-section-title" data-i18n="prayer.sunnah.title">Sunnat va Nafl namozlari</h3>
       </div>
 
+      <div class="sunnah-item" data-sunnah="tahajjud">
+        <div class="sunnah-item-row">
+          <span class="sunnah-emoji">🌙</span>
+          <div class="sunnah-body">
+            <div class="sunnah-header-row">
+              <span class="sunnah-name" data-i18n="prayer.sunnah.tahajjud.name">Tahajjud namozi</span>
+              <span class="sunnah-chevron">▼</span>
+            </div>
+            <div class="sunnah-meta-row">
+              <span class="sunnah-range-text">
+                <span id="tahajjudStart">--:--</span><span class="sunnah-range-sep">—</span><span id="tahajjudEnd">--:--</span>
+              </span>
+              <span class="sunnah-status-pill" id="tahajjudStatus">—</span>
+            </div>
+            <div class="sunnah-progress-track" id="tahajjudTrack">
+              <div class="sunnah-progress-fill" id="tahajjudFill"></div>
+              <div class="sunnah-progress-dot" id="tahajjudDot"></div>
+            </div>
+          </div>
+        </div>
+        <div class="sunnah-details">
+          <p data-i18n="prayer.sunnah.tahajjud.desc">Xuftondan keyin, uyqudan so'ng o'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri, bomdod kirguncha davom etadi. Duolar qabul bo'ladigan vaqt.</p>
+          <p class="sunnah-source" data-i18n="prayer.sunnah.tahajjud.source">Manba: Muslim, Buxoriy</p>
+        </div>
+      </div>
+      
       <div class="sunnah-item" data-sunnah="ishraq">
         <div class="sunnah-item-row">
           <span class="sunnah-emoji">🌄</span>
@@ -649,31 +697,6 @@
         </div>
       </div>
 
-      <div class="sunnah-item" data-sunnah="tahajjud">
-        <div class="sunnah-item-row">
-          <span class="sunnah-emoji">🌙</span>
-          <div class="sunnah-body">
-            <div class="sunnah-header-row">
-              <span class="sunnah-name" data-i18n="prayer.sunnah.tahajjud.name">Tahajjud namozi</span>
-              <span class="sunnah-chevron">▼</span>
-            </div>
-            <div class="sunnah-meta-row">
-              <span class="sunnah-range-text">
-                <span id="tahajjudStart">--:--</span><span class="sunnah-range-sep">—</span><span id="tahajjudEnd">--:--</span>
-              </span>
-              <span class="sunnah-status-pill" id="tahajjudStatus">—</span>
-            </div>
-            <div class="sunnah-progress-track" id="tahajjudTrack">
-              <div class="sunnah-progress-fill" id="tahajjudFill"></div>
-              <div class="sunnah-progress-dot" id="tahajjudDot"></div>
-            </div>
-          </div>
-        </div>
-        <div class="sunnah-details">
-          <p data-i18n="prayer.sunnah.tahajjud.desc">Xuftondan keyin, uyqudan so'ng o'qiladigan nafl namoz. Eng afzal vaqti — kechaning oxirgi uchdan biri, bomdod kirguncha davom etadi. Duolar qabul bo'ladigan vaqt.</p>
-          <p class="sunnah-source" data-i18n="prayer.sunnah.tahajjud.source">Manba: Muslim, Buxoriy</p>
-        </div>
-      </div>
     </div>
 
     <!-- Info note -->
