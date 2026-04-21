@@ -1,19 +1,67 @@
-// prayerTimes.js - Updated with I18N support and USER'S LOCAL TIMEZONE
+// prayerTimes.js - Updated with I18N, LOCAL TIMEZONE, and USER-CONFIGURABLE method + madhab
 Telegram.WebApp.ready();
 Telegram.WebApp.disableVerticalSwipes();
+
+// ============================================
+// PRAYER SETTINGS (method + madhab)
+// ============================================
+
+const PRAYER_METHODS = {
+  '3': 'Muslim World League',
+  '1': 'Karachi, Islamic Sciences Univ',
+  '4': 'Umm Al-Qura, Makkah',
+  '5': 'Egyptian General Authority',
+  '2': 'Islamic Society of North America'
+};
+
+// Defaults: MWL + Hanafi (as requested)
+const DEFAULT_METHOD = '3';
+const DEFAULT_MADHAB = '1'; // 1 = Hanafi, 0 = Shafi'i/Maliki/Hanbali
+
+const SETTINGS_STORAGE_KEY = 'prayerSettings';
+
+function getPrayerSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        method: PRAYER_METHODS[parsed.method] ? parsed.method : DEFAULT_METHOD,
+        madhab: (parsed.madhab === '0' || parsed.madhab === '1') ? parsed.madhab : DEFAULT_MADHAB
+      };
+    }
+  } catch (e) {
+    console.warn('⚠️ Failed to read prayer settings, using defaults:', e);
+  }
+  return { method: DEFAULT_METHOD, madhab: DEFAULT_MADHAB };
+}
+
+function savePrayerSettings(settings) {
+  try {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({
+      method: settings.method,
+      madhab: settings.madhab
+    }));
+  } catch (e) {
+    console.error('❌ Failed to save prayer settings:', e);
+  }
+}
+
+// Expose globally so prayersPage.js can read/write settings
+window.PRAYER_METHODS = PRAYER_METHODS;
+window.getPrayerSettings = getPrayerSettings;
+window.savePrayerSettings = savePrayerSettings;
 
 // ============================================
 // I18N HELPER FUNCTIONS
 // ============================================
 
-// Translate prayer name using I18N system
 function translatePrayer(prayerName) {
   if (window.I18N) {
     const key = `prayer.${prayerName.toLowerCase()}`;
     const trans = I18N.t(key);
     if (trans !== key) return trans;
   }
-  // Fallback to original Uzbek translations
   const FALLBACK = {
     "Fajr": "Bomdod",
     "Dhuhr": "Peshin",
@@ -25,34 +73,25 @@ function translatePrayer(prayerName) {
   return FALLBACK[prayerName] || prayerName;
 }
 
-// Translate weekday using I18N system
 function translateWeekday(weekdayEnglish) {
   if (window.I18N) {
     const key = `weekday.${weekdayEnglish.toLowerCase()}`;
     const trans = I18N.t(key);
     if (trans !== key) return trans;
   }
-  // Fallback to original Uzbek translations
   const FALLBACK = {
-    "Monday": "Dushanba",
-    "Tuesday": "Seshanba",
-    "Wednesday": "Chorshanba",
-    "Thursday": "Payshanba",
-    "Friday": "Juma",
-    "Saturday": "Shanba",
-    "Sunday": "Yakshanba"
+    "Monday": "Dushanba", "Tuesday": "Seshanba", "Wednesday": "Chorshanba",
+    "Thursday": "Payshanba", "Friday": "Juma", "Saturday": "Shanba", "Sunday": "Yakshanba"
   };
   return FALLBACK[weekdayEnglish] || weekdayEnglish;
 }
 
-// Get translated month name
 function translateMonth(monthIndex) {
   if (window.I18N) {
     const key = `month.${monthIndex}`;
     const trans = I18N.t(key);
     if (trans !== key) return trans;
   }
-  // Fallback to original Uzbek month names
   const FALLBACK = {
     0: "Yanvar", 1: "Fevral", 2: "Mart", 3: "Aprel",
     4: "May", 5: "Iyun", 6: "Iyul", 7: "Avgust",
@@ -64,11 +103,8 @@ function translateMonth(monthIndex) {
 // ============================================
 // HIJRI DATE ADJUSTMENT
 // ============================================
-// Set to -1 when local moon sighting (e.g. Korea) is 1 day behind the calculated calendar.
-// Set to 0 when local and calculated dates align. Update this after each Ramadan/Eid announcement.
 const HIJRI_ADJUSTMENT = -1;
 
-// Hijri month names and max days for client-side correction
 const HIJRI_MONTHS = {
   1:  { en: "Muḥarram",        days: 30 },
   2:  { en: "Ṣafar",           days: 29 },
@@ -84,46 +120,27 @@ const HIJRI_MONTHS = {
   12: { en: "Dhū al-Ḥijjah",   days: 29 }
 };
 
-// Apply client-side hijri date correction when API ignores adjustment param
 function adjustHijriDate(hijriObj) {
   if (HIJRI_ADJUSTMENT === 0) return hijriObj;
-
   let day = parseInt(hijriObj.day);
   let monthNum = parseInt(hijriObj.month.number);
   let year = parseInt(hijriObj.year);
-
   day += HIJRI_ADJUSTMENT;
-
-  // Handle rolling back past month start (e.g., Shawwal 1 → Ramadan 30)
   if (day < 1) {
     monthNum -= 1;
-    if (monthNum < 1) {
-      monthNum = 12;
-      year -= 1;
-    }
-    day = HIJRI_MONTHS[monthNum].days + day; // day is negative, so this subtracts
+    if (monthNum < 1) { monthNum = 12; year -= 1; }
+    day = HIJRI_MONTHS[monthNum].days + day;
   }
-
-  // Handle rolling forward past month end
   const maxDays = HIJRI_MONTHS[monthNum].days;
   if (day > maxDays) {
     day = day - maxDays;
     monthNum += 1;
-    if (monthNum > 12) {
-      monthNum = 1;
-      year += 1;
-    }
+    if (monthNum > 12) { monthNum = 1; year += 1; }
   }
-
-  // Return corrected copy (don't mutate original)
   return {
     ...hijriObj,
     day: String(day).padStart(2, '0'),
-    month: {
-      ...hijriObj.month,
-      number: monthNum,
-      en: HIJRI_MONTHS[monthNum].en
-    },
+    month: { ...hijriObj.month, number: monthNum, en: HIJRI_MONTHS[monthNum].en },
     year: String(year)
   };
 }
@@ -133,55 +150,31 @@ function adjustHijriDate(hijriObj) {
 // ============================================
 
 async function getPrayerTimes(lat, lon) {
-  // Fetch Hanafi times (school=1)
-  const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=3&school=1&adjustment=${HIJRI_ADJUSTMENT}`;
+  const { method, madhab } = getPrayerSettings();
+  const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=${method}&school=${madhab}&adjustment=${HIJRI_ADJUSTMENT}`;
+  console.log('📿 Aladhan URL:', url);
   const res = await fetch(url);
   const data = await res.json();
   return data.data;
 }
 
-// Fetch Asr time for Shafi'i/Maliki/Hanbali (school=0)
-async function getShafiiAsrTime(lat, lon) {
-  try {
-    const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=3&school=0&adjustment=${HIJRI_ADJUSTMENT}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    return data.data.timings.Asr;
-  } catch (error) {
-    console.error('Error fetching Shafi\'i Asr time:', error);
-    return null;
-  }
-}
-
 function getCurrentPrayer(timings) {
-  // CRITICAL: Use user's local time, not server time
   const now = new Date();
   const currentTime = now.getHours() * 60 + now.getMinutes();
-  
-  console.log('🕐 Current local time:', now.toLocaleTimeString(), '(' + currentTime + ' minutes)');
-
   const prayerOrder = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
   const times = prayerOrder.map((p) => {
     const [h, m] = timings[p].split(":").map(Number);
-    const totalMinutes = h * 60 + m;
-    console.log(`   ${p}: ${timings[p]} (${totalMinutes} minutes)`);
-    return { name: p, total: totalMinutes };
+    return { name: p, total: h * 60 + m };
   });
 
   let current, next;
-
-  // Before Fajr (midnight to Fajr) = still Isha time
   if (currentTime < times[0].total) {
-    current = times[times.length - 1]; // Isha
-    next = times[0]; // Fajr
-  } 
-  // After Isha = Isha until next day's Fajr
-  else if (currentTime >= times[times.length - 1].total) {
-    current = times[times.length - 1]; // Isha
-    next = times[0]; // Fajr
-  } 
-  // Normal daytime prayers
-  else {
+    current = times[times.length - 1];
+    next = times[0];
+  } else if (currentTime >= times[times.length - 1].total) {
+    current = times[times.length - 1];
+    next = times[0];
+  } else {
     for (let i = 0; i < times.length - 1; i++) {
       if (currentTime >= times[i].total && currentTime < times[i + 1].total) {
         current = times[i];
@@ -190,62 +183,44 @@ function getCurrentPrayer(timings) {
       }
     }
   }
-
-  console.log('✅ Current prayer:', current.name, '| Next prayer:', next.name);
   return { current, next };
 }
 
 function formatCountdown(nextTime) {
-  // CRITICAL: Use user's local time, not server time
   const now = new Date();
   const [h, m] = nextTime.split(":").map(Number);
   const next = new Date();
   next.setHours(h, m, 0, 0);
-  
   let diff = (next - now) / 1000;
-  if (diff < 0) diff += 24 * 3600; // Add 24 hours if next prayer is tomorrow
-  
+  if (diff < 0) diff += 24 * 3600;
   const hrs = Math.floor(diff / 3600);
   const mins = Math.floor((diff % 3600) / 60);
   const secs = Math.floor(diff % 60);
-  
-  return `${hrs.toString().padStart(2, "0")}:${mins
-    .toString()
-    .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 }
 
 // ============================================
-// UPDATE PRAYER DATA (with I18N)
+// UPDATE PRAYER DATA
 // ============================================
 
 async function updatePrayerData(lat, lon, city) {
   try {
     console.log('📿 Fetching prayer times for:', city, '(' + lat + ', ' + lon + ')');
-    
-    // Update city name display
     const cityNameElem = document.getElementById("cityName");
-    if (cityNameElem && city) {
-      cityNameElem.innerText = city;
-      console.log('🏙️ City name updated to:', city);
-    }
-    
+    if (cityNameElem && city) cityNameElem.innerText = city;
+
     const data = await getPrayerTimes(lat, lon);
     const { current, next } = getCurrentPrayer(data.timings);
 
-    // Prayer emoji mapping
     const prayerEmojis = {
-      "Fajr": "🌅",
-      "Dhuhr": "☀️",
-      "Asr": "🌤️",
-      "Maghrib": "🌇",
-      "Isha": "🌙"
+      "Fajr": "🌅", "Dhuhr": "☀️", "Asr": "🌤️",
+      "Maghrib": "🌇", "Isha": "🌙"
     };
 
-    // Update current prayer display with translated names
+    // Home page elements (if present)
     const currentPrayerElem = document.getElementById("currentPrayer");
     const prayerTimeElem = document.getElementById("prayerTime");
     const currentEmojiElem = document.getElementById("currentEmoji");
-    
     const nextPrayerElem = document.getElementById("nextPrayer");
     const countdownElem = document.getElementById("countdown");
     const nextEmojiElem = document.getElementById("nextEmoji");
@@ -254,74 +229,49 @@ async function updatePrayerData(lat, lon, city) {
     if (currentPrayerElem) currentPrayerElem.innerText = translatePrayer(current.name);
     if (prayerTimeElem) prayerTimeElem.innerText = data.timings[current.name];
     if (currentEmojiElem) currentEmojiElem.innerText = prayerEmojis[current.name] || '🕌';
-    
     if (nextPrayerElem) nextPrayerElem.innerText = translatePrayer(next.name);
     if (nextEmojiElem) nextEmojiElem.innerText = prayerEmojis[next.name] || '🕌';
     if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = data.timings[next.name];
 
-    // Update countdown every second (using local time)
     function updateCountdown() {
       if (countdownElem) {
         countdownElem.innerText = formatCountdown(data.timings[next.name]);
       }
     }
     updateCountdown();
-    
-    // Clear any existing interval to prevent duplicates
-    if (window.prayerCountdownInterval) {
-      clearInterval(window.prayerCountdownInterval);
-    }
+    if (window.prayerCountdownInterval) clearInterval(window.prayerCountdownInterval);
     window.prayerCountdownInterval = setInterval(updateCountdown, 1000);
 
-    // Update date displays (using local time) with translated weekday
     const localDate = new Date();
     const weekdayEnglish = localDate.toLocaleDateString('en-US', { weekday: 'long' });
     const weekdayTranslated = translateWeekday(weekdayEnglish);
-    
-    // Translated month names
     const monthName = translateMonth(localDate.getMonth());
     const gregorianDate = `${localDate.getDate()}-${monthName}`;
-    
-    // Apply client-side hijri correction (in case API ignores adjustment param)
     const hijri = adjustHijriDate(data.date.hijri);
     const hijriFormatted = `${parseInt(hijri.day)}-${hijri.month.en}, ${hijri.year}`;
-    console.log('📅 Hijri date (adjusted):', hijriFormatted);
-    
+
     if (document.getElementById("weekday")) {
       document.getElementById("weekday").innerText = `${weekdayTranslated}, ${gregorianDate}`;
-      
       const hijriElem = document.getElementById("hijri");
-      if (hijriElem) {
-        hijriElem.innerText = hijriFormatted;
-      }
+      if (hijriElem) hijriElem.innerText = hijriFormatted;
     }
 
-    // Update detailed page elements if they exist
     const todayDateElem = document.getElementById("todayDate");
     if (todayDateElem) {
       todayDateElem.innerHTML = `${weekdayTranslated}, ${gregorianDate} <br> ${hijriFormatted}`;
     }
 
     const nextPrayerNameElem = document.getElementById("nextPrayerName");
-    if (nextPrayerNameElem) {
-      nextPrayerNameElem.innerText = translatePrayer(next.name);
-    }
-
-    // Fetch Shafi'i/Maliki/Hanbali Asr time (they use the same calculation)
-    const shafiiAsrTime = await getShafiiAsrTime(lat, lon);
-    
-    // Update Asr schools comparison section if it exists
-    updateAsrSchoolsDisplay(data.timings.Asr, shafiiAsrTime);
+    if (nextPrayerNameElem) nextPrayerNameElem.innerText = translatePrayer(next.name);
 
     // Dispatch event with prayer data for detailed page
-    const correctedDate = { ...data.date, hijri: hijri };
+    const correctedDate = { ...data.date, hijri };
     window.dispatchEvent(new CustomEvent('prayerDataUpdated', {
       detail: {
         timings: data.timings,
         currentPrayer: current.name,
         nextPrayer: next.name,
-        date: correctedDate,
-        shafiiAsr: shafiiAsrTime
+        date: correctedDate
       }
     }));
 
@@ -334,15 +284,12 @@ async function updatePrayerData(lat, lon, city) {
 // EVENT LISTENERS
 // ============================================
 
-// Listen for location updates from LocationManager
 window.addEventListener('locationUpdated', (event) => {
   const { lat, lon, city } = event.detail;
   updatePrayerData(lat, lon, city);
 });
 
-// Listen for language changes and re-render
 window.addEventListener('languageChanged', () => {
-  // Re-trigger prayer data update if we have location
   if (window.LocationManager) {
     const location = LocationManager.getCurrentLocation();
     if (location && location.lat && location.lon) {
@@ -351,36 +298,18 @@ window.addEventListener('languageChanged', () => {
   }
 });
 
-// Make updatePrayerData available globally for LocationManager
+// Listen for settings changes (dispatched by prayersPage.js)
+window.addEventListener('prayerSettingsChanged', () => {
+  console.log('⚙️ Prayer settings changed — refetching times');
+  if (window.LocationManager) {
+    const location = LocationManager.getCurrentLocation();
+    if (location && location.lat && location.lon) {
+      updatePrayerData(location.lat, location.lon, location.city);
+    }
+  }
+});
+
 window.updatePrayerData = updatePrayerData;
-
-// ============================================
-// ASR SCHOOLS DISPLAY
-// ============================================
-
-function updateAsrSchoolsDisplay(hanafiAsr, shafiiAsr) {
-  const asrSchoolsSection = document.getElementById('asrSchoolsSection');
-  if (!asrSchoolsSection) return;
-  
-  // Show the section
-  asrSchoolsSection.style.display = 'block';
-  
-  // Update Hanafi time
-  const hanafiTimeElem = document.getElementById('hanafiAsrTime');
-  if (hanafiTimeElem) {
-    hanafiTimeElem.textContent = hanafiAsr || '--:--';
-  }
-  
-  // Update Shafi'i/Maliki/Hanbali time
-  const shafiiTimeElem = document.getElementById('shafiiAsrTime');
-  if (shafiiTimeElem) {
-    shafiiTimeElem.textContent = shafiiAsr || '--:--';
-  }
-  
-  console.log('🕌 Asr times updated - Hanafi:', hanafiAsr, '| Shafi\'i/Maliki/Hanbali:', shafiiAsr);
-}
-
-// Make translation functions available globally
 window.translatePrayer = translatePrayer;
 window.translateWeekday = translateWeekday;
 window.translateMonth = translateMonth;
