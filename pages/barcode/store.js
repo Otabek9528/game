@@ -88,6 +88,7 @@
 
     _renderHero();
     _bindVerdictTabs();
+    _bindCatPanelToggle();
     _bindLoadMore();
     _bindModalClose();
     _bindFullscreen();
@@ -145,46 +146,109 @@
   }
 
   // =============================================================
-  // CATEGORY CHIPS
+  // CATEGORY PANEL (M9) — grid + collapsible
   // =============================================================
+  const CAT_ICONS = {
+    'Drinks':            '🥤',
+    'Snacks':            '🍿',
+    'Sweets':            '🍬',
+    'Ice Cream':         '🍦',
+    'Baked Goods':       '🥐',
+    'Cup Noodles/Ramen': '🍜',
+    'Lunchbox/Dosirak':  '🍱',
+    'Dairy':             '🥛',
+    'Canned Food':       '🥫',
+    'Frozen Food':       '🧊',
+    'Condiments/Sauces': '🧂',
+    'Fruits/Vegetables': '🥗',
+    'Dried Food':        '🌾',
+  };
+
   function _renderChips() {
-    const chipsRow = document.getElementById('catChips');
-    if (!chipsRow) return;
+    const grid = document.getElementById('catPanelGrid');
+    const activeLabel = document.getElementById('catPanelActiveLabel');
+    if (!grid) return;
     const meta = state.meta || { byCategory: [] };
 
-    // Count for "All" = sum for current verdict (or grand total when all verdicts)
-    let allCount;
     const v = meta.byVerdict || {};
-    allCount = v[state.verdict] || 0;
+    const allCount = v[state.verdict] || 0;
 
-    chipsRow.innerHTML = `
-      <button class="cat-chip ${!state.category ? 'is-active' : ''}" data-category="" type="button">
-        <span>${esc(t('bc.store.allCats', 'Hammasi'))}</span>
-        <span class="cat-chip__count">${allCount}</span>
+    const items = [
+      { category: '', icon: '🗂', label: t('bc.store.allCats', 'Hammasi'), count: allCount, active: !state.category },
+      ...(meta.byCategory || [])
+        .map(cat => {
+          const count = (cat.byVerdict || {})[state.verdict] || 0;
+          return {
+            category: cat.category,
+            icon:     CAT_ICONS[cat.category] || '📦',
+            label:    cat.category,
+            count,
+            active:   cat.category === state.category,
+          };
+        })
+        .filter(it => it.count > 0),
+    ];
+
+    grid.innerHTML = items.map(it => `
+      <button class="cat-tile ${it.active ? 'is-active' : ''}"
+              data-category="${esc(it.category)}" type="button">
+        <span class="cat-tile__icon">${it.icon}</span>
+        <span class="cat-tile__label">${esc(it.label)}</span>
+        <span class="cat-tile__count">${it.count}</span>
       </button>
-    ` + (meta.byCategory || []).map(cat => {
-      const byV = cat.byVerdict || {};
-      const count = byV[state.verdict] || 0;
-      // Hide chips that have 0 products for the active verdict
-      if (count === 0) return '';
-      const active = cat.category === state.category ? 'is-active' : '';
-      return `
-        <button class="cat-chip ${active}" data-category="${esc(cat.category)}" type="button">
-          <span>${esc(cat.category)}</span>
-          <span class="cat-chip__count">${count}</span>
-        </button>
-      `;
-    }).join('');
+    `).join('');
 
-    chipsRow.querySelectorAll('.cat-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const cat = chip.getAttribute('data-category') || '';
+    // Update toggle label to reflect active filter
+    const activeItem = items.find(it => it.active);
+    if (activeLabel && activeItem) {
+      activeLabel.textContent = activeItem.label;
+    }
+
+    grid.querySelectorAll('.cat-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        const cat = tile.getAttribute('data-category') || '';
         if (cat === state.category) return;
         state.category = cat;
-        chipsRow.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('is-active'));
-        chip.classList.add('is-active');
+        grid.querySelectorAll('.cat-tile').forEach(c => c.classList.remove('is-active'));
+        tile.classList.add('is-active');
+        if (activeLabel) {
+          const t2 = tile.querySelector('.cat-tile__label');
+          if (t2) activeLabel.textContent = t2.textContent;
+        }
+        // Auto-collapse after a selection (clean UX)
+        _setCatPanelOpen(false);
         _resetAndReload();
       });
+    });
+  }
+
+  function _setCatPanelOpen(open) {
+    const grid = document.getElementById('catPanelGrid');
+    const toggle = document.getElementById('catPanelToggle');
+    const chev = document.getElementById('catPanelChev');
+    if (!grid || !toggle) return;
+    if (open) {
+      grid.hidden = false;
+      grid.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      if (chev) chev.textContent = '▴';
+    } else {
+      grid.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      if (chev) chev.textContent = '▾';
+      // Wait for transition before hidden
+      setTimeout(() => {
+        if (toggle.getAttribute('aria-expanded') === 'false') grid.hidden = true;
+      }, 220);
+    }
+  }
+
+  function _bindCatPanelToggle() {
+    const toggle = document.getElementById('catPanelToggle');
+    if (!toggle) return;
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      _setCatPanelOpen(!open);
     });
   }
 
