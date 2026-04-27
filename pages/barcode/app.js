@@ -253,10 +253,18 @@
       }
       clearErr();
       input.blur();
-      Scanner.stop();          // pause camera scanning while we look up manual entry
+      try { Scanner.stop(); } catch (e) {}    // pause camera if it's running
+      try { Camera.destroy(); } catch (e) {}  // release camera if held by permission state
       currentBarcode = v.code;
       currentFormat  = 'manual';
+      // Reveal scanner display so result/notFound sections become visible
+      UI.showState('scanner');
       UI.showScanBeam(false);
+      // Hide viewfinder & status bar — no camera is running for manual lookup
+      const vf = document.getElementById('viewfinderWrap');
+      const sb = document.querySelector('.status-bar');
+      if (vf) vf.style.display = 'none';
+      if (sb) sb.style.display = 'none';
       lookupProduct(v.code, 'manual');
     }
 
@@ -341,9 +349,10 @@
     document.getElementById('modalCloseBtn').addEventListener('click', () => UI.hideProductModal());
     document.getElementById('modalBackdrop').addEventListener('click', () => UI.hideProductModal());
 
-    // Manual barcode entry — both instances (scanner view + error view)
-    _bindManualEntry('');     // ids: manualBarcodeInput / manualBarcodeBtn / manualBarcodeError
-    _bindManualEntry('Err');  // ids: manualBarcodeInputErr / manualBarcodeBtnErr / manualBarcodeErrorErr
+    // Manual barcode entry — three instances (permission view + scanner view + error view)
+    _bindManualEntry('Perm');  // ids: manualBarcodeInputPerm / manualBarcodeBtnPerm / manualBarcodeErrorPerm
+    _bindManualEntry('');      // ids: manualBarcodeInput / manualBarcodeBtn / manualBarcodeError
+    _bindManualEntry('Err');   // ids: manualBarcodeInputErr / manualBarcodeBtnErr / manualBarcodeErrorErr
 
     document.addEventListener('visibilitychange', () => {
       const scannerVisible = document.getElementById('scannerDisplay').style.display === 'block';

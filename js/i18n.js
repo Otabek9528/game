@@ -552,9 +552,10 @@ const I18N = {
     'bc.manual.hint':        { uz: 'Skanerlash qiyin bo\'lyaptimi?',                                    ru: 'Не удаётся отсканировать?',                                    en: 'Trouble scanning?' },
     'bc.manual.label':       { uz: 'Shtrix-kodni qo\'lda kiriting:',                                    ru: 'Введите штрих-код вручную:',                                    en: 'Enter the barcode manually:' },
     'bc.manual.labelErr':    { uz: 'Yoki shtrix-kodni qo\'lda kiriting:',                               ru: 'Или введите штрих-код вручную:',                                en: 'Or enter the barcode manually:' },
-    'bc.manual.placeholder': { uz: 'masalan, 8801234567890',                                            ru: 'например, 8801234567890',                                       en: 'e.g. 8801234567890' },
+    'bc.manual.placeholder': { uz: '8801234567890',                                            ru: '8801234567890',                                       en: 'e.g. 8801234567890' },
     'bc.manual.submit':      { uz: 'Qidirish',                                                          ru: 'Найти',                                                         en: 'Search' },
- 
+    
+    'bc.manual.labelPerm':   { uz: 'Yoki shtrix-kodni qo\'lda kiriting:',                                ru: 'Или введите штрих-код вручную:',                                en: 'Or enter the barcode manually:' },
     // Validation errors
     'bc.manual.errEmpty':    { uz: 'Shtrix-kod kiriting.',                                              ru: 'Введите штрих-код.',                                            en: 'Please enter a barcode.' },
     'bc.manual.errNonDigit': { uz: 'Faqat raqamlar kiriting.',                                          ru: 'Используйте только цифры.',                                     en: 'Digits only.' },

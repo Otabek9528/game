@@ -71,6 +71,25 @@
           <span data-i18n="bc.startScan">Skanerlashni boshlash</span>
           <span class="scanner-hero__btn-arrow">→</span>
         </button>
+        <div class="manual-entry manual-entry--perm">
+          <p class="manual-entry__label" data-i18n="bc.manual.labelPerm">Yoki shtrix-kodni qo'lda kiriting:</p>
+          <div class="manual-entry__row">
+            <input type="text"
+                   id="manualBarcodeInputPerm"
+                   class="manual-entry__input"
+                   inputmode="numeric"
+                   pattern="[0-9]*"
+                   maxlength="14"
+                   autocomplete="off"
+                   data-i18n-placeholder="bc.manual.placeholder"
+                   placeholder="8801234567890" />
+            <button type="button"
+                    id="manualBarcodeBtnPerm"
+                    class="manual-entry__btn"
+                    data-i18n="bc.manual.submit">Qidirish</button>
+          </div>
+          <p class="manual-entry__error" id="manualBarcodeErrorPerm"></p>
+        </div>
       </div>
     </div>
 
