@@ -548,7 +548,7 @@ const I18N = {
     // BARCODE — Contributor recruitment banner (M4)
     // ============================================
     'bc.contrib.title': { uz: 'Halol baza yig\'ishga sherik bo\'ling',                                                                                         ru: 'Помогите нам собрать халяль-базу',                                                                                              en: 'Help us build the halal database' },
-    'bc.contrib.body':  { uz: 'Mahsulotlar tarkibini o\'qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24 va No Brand do\'konlaridagi halol mahsulotlar bazasini birgalikda yig\'amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — katta savobli ish.', ru: 'Для тех, кто умеет читать состав продуктов: вместе собираем халяль-базу для GS25, CU, 7-Eleven, Emart24 и No Brand. Каждая запись помогает тысячам людей.', en: 'For those who can read product ingredients: together we collect a halal database for GS25, CU, 7-Eleven, Emart24, and No Brand convenience stores. Every entry reaches thousands of people.' },
+    'bc.contrib.body':  { uz: 'Mahsulotlar tarkibini o\'qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do\'konlaridagi halol mahsulotlar bazasini birgalikda yig\'amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — ortingizdan sadaqa-i joriyangizni qoldiring.', ru: 'Для тех, кто умеет читать состав продуктов: вместе собираем халяль-базу для GS25, CU, 7-Eleven, Emart24, No Brand и Daiso. Каждая запись помогает тысячам людей.', en: 'For those who can read product ingredients: together we collect a halal database for GS25, CU, 7-Eleven, Emart24, No Brand, and Daiso convenience stores. Every entry reaches thousands of people.' },
     'bc.contrib.cta':   { uz: 'Adminga yozish',                                                                                                                ru: 'Написать админу',                                                                                                                en: 'Contact admin' },
  
     // Product result
@@ -572,11 +572,10 @@ const I18N = {
 
     // Not found
     'bc.notFound': { uz: 'Mahsulot topilmadi', ru: 'Продукт не найден', en: 'Product not found' },
-    'bc.notFoundDesc': { uz: 'Ma\'lumotlar bazasida ushbu mahsulot mavjud emas.', ru: 'Этот продукт отсутствует в базе данных.', en: 'This product is not in the database.' },
-    'bc.addProduct': { uz: '➕ Mahsulot qo\'shish', ru: '➕ Добавить продукт', en: '➕ Add product' },
+    'bc.notFoundDesc': { uz: 'Ushbu mahsulot hozircha bazada yo\'q. Tez orada qo\'shilishi mumkin.', ru: 'Этот продукт пока отсутствует в базе. Возможно, он будет добавлен позже.', en: 'This product is not in the database yet. It may be added later.' },
+    
 
-    // Discover
-    'bc.discoverTitle': { uz: '📦 Ma\'lumotlar bazasidan namunalar', ru: '📦 Примеры из базы данных', en: '📦 Samples from the database' },
+    
  
     // ============================================
     // BARCODE — Stores section (M2)
@@ -599,59 +598,10 @@ const I18N = {
     'bc.store.loadMore':   { uz: 'Ko\'proq ko\'rsatish', ru: 'Показать ещё', en: 'Show more' },
     
     
-    // Wizard - steps
-    'bc.wiz.stepPhoto': { uz: 'Mahsulot rasmi', ru: 'Фото продукта', en: 'Product photo' },
-    'bc.wiz.stepReview': { uz: 'Rasmni tekshiring', ru: 'Проверьте фото', en: 'Review photo' },
-    'bc.wiz.stepFlags': { uz: 'Ta\'qiqlangan moddalar', ru: 'Запрещённые вещества', en: 'Prohibited substances' },
-    'bc.wiz.stepUploading': { uz: 'Yuborilmoqda', ru: 'Отправка', en: 'Uploading' },
-    'bc.wiz.stepDone': { uz: 'Yuborildi', ru: 'Отправлено', en: 'Submitted' },
-
-    // Wizard - Step 1
-    'bc.wiz.takePhoto': { uz: 'Mahsulot rasmini oling', ru: 'Сфотографируйте продукт', en: 'Take a product photo' },
-    'bc.wiz.takePhotoDesc': { uz: 'Mahsulotning umumiy ko\'rinishini aks ettirgan rasmini oling', ru: 'Сделайте фото общего вида продукта', en: 'Take a photo showing the overall product appearance' },
-    'bc.wiz.barcodeLabel': { uz: 'Shtrix-kod:', ru: 'Штрих-код:', en: 'Barcode:' },
-    'bc.wiz.cancel': { uz: '✕ Bekor qilish', ru: '✕ Отмена', en: '✕ Cancel' },
-
-    // Wizard - Step 1b
-    'bc.wiz.reviewPhoto': { uz: 'Rasmni tekshiring', ru: 'Проверьте фото', en: 'Review the photo' },
-    'bc.wiz.reviewPhotoDesc': { uz: 'Mahsulot aniq ko\'rinsa, davom eting', ru: 'Если продукт чётко виден, продолжайте', en: 'If the product is clearly visible, continue' },
-    'bc.wiz.newPhoto': { uz: '📸 Yangi rasm', ru: '📸 Новое фото', en: '📸 New photo' },
-    'bc.wiz.retake': { uz: '🔄 Qaytadan', ru: '🔄 Переснять', en: '🔄 Retake' },
-    'bc.wiz.continue': { uz: 'Davom etish →', ru: 'Продолжить →', en: 'Continue →' },
-
-    // Wizard - Step 2
-    'bc.wiz.flagsTitle': { uz: 'Ta\'qiqlangan moddalar belgilarini tanlang', ru: 'Выберите метки запрещённых веществ', en: 'Select prohibited substance flags' },
-    'bc.wiz.flagsDesc': { uz: 'Mahsulotga tegishli bo\'lgan belgilarni belgilang. Bir nechta tanlash mumkin.', ru: 'Отметьте применимые к продукту метки. Можно выбрать несколько.', en: 'Mark the flags applicable to the product. Multiple selections allowed.' },
-    'bc.wiz.or': { uz: 'yoki', ru: 'или', en: 'or' },
-    'bc.wiz.back': { uz: '← Orqaga', ru: '← Назад', en: '← Back' },
-    'bc.wiz.submit': { uz: 'Tayyor ✓', ru: 'Готово ✓', en: 'Done ✓' },
-
-    // Flag descriptions
-    'bc.flag.porkDesc': { uz: 'Cho\'chqa go\'shti yoki undan tayyorlangan moddalar', ru: 'Свинина или продукты из неё', en: 'Pork or pork-derived substances' },
-    'bc.flag.alcoholDesc': { uz: 'Spirtli moddalar (etanol, pivo, vino...)', ru: 'Спиртосодержащие вещества (этанол, пиво, вино...)', en: 'Alcoholic substances (ethanol, beer, wine...)' },
+    
     'bc.flag.meat': { uz: 'Boshqa go\'shtlar', ru: 'Другое мясо', en: 'Other meats' },
-    'bc.flag.meatDesc': { uz: 'Mol, tovuq, qo\'y yoki ulardan tayyorlangan ingredientlar', ru: 'Говядина, курица, баранина или производные ингредиенты', en: 'Beef, chicken, lamb or derived ingredients' },
     'bc.flag.seafood': { uz: 'Dengiz mahsulotlari', ru: 'Морепродукты', en: 'Seafood' },
-    'bc.flag.seafoodDesc': { uz: 'Baliqdan tashqari: qisqichbaqa, kalmar, sakkizoyoq...', ru: 'Кроме рыбы: креветки, кальмары, осьминоги...', en: 'Except fish: shrimp, squid, octopus...' },
-    'bc.flag.factory': { uz: 'Bir zavodda', ru: 'На одном заводе', en: 'Same factory' },
-    'bc.flag.factoryDesc': { uz: 'Harom mahsulotlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan', ru: 'Произведено на оборудовании, где производятся запрещённые продукты', en: 'Produced on equipment where prohibited products are manufactured' },
-    'bc.flag.allJoiz': { uz: 'Barchasi Joiz', ru: 'Всё допустимо', en: 'All permissible' },
-    'bc.flag.allJoizDesc': { uz: 'Ta\'qiqlangan ingredientlar yo\'q, ishlab chiqarish ham toza', ru: 'Запрещённых ингредиентов нет, производство чистое', en: 'No prohibited ingredients, clean production' },
-
-    // Wizard - Step 3
-    'bc.wiz.uploading': { uz: 'Ma\'lumotlar yuborilmoqda...', ru: 'Данные отправляются...', en: 'Uploading data...' },
-    'bc.wiz.thanks': { uz: 'Rahmat!', ru: 'Спасибо!', en: 'Thank you!' },
-    'bc.wiz.thanksDesc': { uz: 'Ma\'lumot yuborildi. Admin tasdig\'idan o\'tgandan so\'ng ma\'lumotlar bazasiga qo\'shiladi.', ru: 'Данные отправлены. После проверки администратором они будут добавлены в базу.', en: 'Data submitted. It will be added to the database after admin approval.' },
-    'bc.wiz.scanAnother': { uz: '📷 Boshqa mahsulotni skanerlash', ru: '📷 Сканировать другой продукт', en: '📷 Scan another product' },
-
-    // Confirmation summary
-    'bc.confirm.barcode': { uz: 'Shtrix-kod', ru: 'Штрих-код', en: 'Barcode' },
-    'bc.confirm.photo': { uz: 'Rasm', ru: 'Фото', en: 'Photo' },
-    'bc.confirm.photoYes': { uz: 'Yuklangan', ru: 'Загружено', en: 'Uploaded' },
-    'bc.confirm.photoNo': { uz: 'Yo\'q', ru: 'Нет', en: 'None' },
-    'bc.confirm.status': { uz: 'Holati', ru: 'Статус', en: 'Status' },
-    'bc.confirm.flags': { uz: 'Belgilar', ru: 'Метки', en: 'Flags' },
-
+        
     // Disclaimer
     'bc.disclaimer': { 
       uz: 'Bu ma\'lumotlar faqat mahsulot tarkibi asosida taqdim etilgan bo\'lib, <strong>xatoliklar bo\'lishi mumkin</strong>. Biz rasmiy diniy hukm (fatvo) bermaymiz. Xatolik topsangiz <a href="https://t.me/MuslimVegukin">Telegram guruhimizga</a> o\'tib xabar bering.',

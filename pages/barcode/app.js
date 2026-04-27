@@ -1,6 +1,6 @@
-// app.js — Main application controller (M4)
-// Glues: Camera, Scanner, UI, AddProduct, I18N, Stores
-// Handles: Telegram init, event binding, orchestration, store-scoped scanning
+// app.js — Main application controller (M5)
+// Glues: Camera, Scanner, UI, I18N, Stores
+// Wizard removed in M5. Store-scoped scanning preserved from M4.
 // ============================================
 
 (function () {
@@ -17,7 +17,7 @@
   } catch (e) {}
 
   // ============================================
-  // STORE CONTEXT (M4) — read ?store=X from URL
+  // STORE CONTEXT — read ?store=X from URL
   // ============================================
   const ALLOWED_STORES = ['No Brand', 'Emart24', '7-Eleven', 'GS25', 'CU', 'Daiso'];
   const EMBLEM_FILES = {
@@ -49,23 +49,6 @@
       return;
     }
 
-    const wizard = document.getElementById('addProductWizard');
-    if (wizard && wizard.style.display !== 'none') {
-      const currentStep = AddProduct.getCurrentStep();
-      if (currentStep === '3b') {
-        scanAgain();
-      } else if (currentStep == 3) {
-        return;
-      } else if (currentStep == 2) {
-        AddProduct.goToStep('1b');
-      } else if (currentStep === '1b') {
-        AddProduct.retake();
-      } else if (currentStep == 1) {
-        AddProduct.cancel();
-      }
-      return;
-    }
-
     const resultVisible = document.getElementById('resultSection').style.display !== 'none';
     const notFoundVisible = document.getElementById('notFoundSection').style.display !== 'none';
     if (resultVisible || notFoundVisible) {
@@ -75,7 +58,6 @@
 
     Scanner.stop();
     Camera.destroy();
-    // If scoped, return to the store page; else home
     if (currentStore) {
       window.location.href = `store.html?id=${encodeURIComponent(currentStore)}`;
     } else {
@@ -137,7 +119,7 @@
   }
 
   // ============================================
-  // PRODUCT LOOKUP — uses unified v2 endpoint (M4)
+  // PRODUCT LOOKUP — unified v2 endpoint
   // ============================================
   async function lookupProduct(code, format) {
     const formatName = Scanner.getFormatName(format);
@@ -152,7 +134,6 @@
 
       if (data.found) {
         data.format = formatName;
-        // Pass store context to UI so it can render the right info banner
         data._currentStore = currentStore;
         UI.showProductResult(data);
         _logInteraction('scanner_found', code);
@@ -221,7 +202,7 @@
   }
 
   // ============================================
-  // SCOPED BANNER (M4) — visible only when ?store=X is in URL
+  // SCOPED BANNER
   // ============================================
   function _renderScopedBanner() {
     const banner = document.getElementById('scopedBanner');
@@ -267,12 +248,7 @@
     } catch (e) {}
   }
 
-  // ============================================
-  // i18n — apply translations to static DOM
-  // ============================================
-  function applyI18n() {
-    UI.applyTranslations();
-  }
+  function applyI18n() { UI.applyTranslations(); }
 
   // ============================================
   // EVENT LISTENERS
@@ -283,12 +259,10 @@
 
     await Scanner.init();
 
-    // Stores grid (only on landing, not when scoped)
     if (window.Stores && typeof Stores.load === 'function') {
       try { Stores.load(); } catch (e) { console.error('Stores.load failed:', e); }
     }
 
-    // Hide stores grid + contributor banner when in scoped mode
     if (currentStore) {
       const storesSection = document.getElementById('storesSection');
       const contribBanner = document.getElementById('contribBanner');
@@ -300,7 +274,6 @@
     try { perm = (await navigator.permissions.query({ name: 'camera' })).state; }
     catch (e) {}
 
-    // M4: auto-launch scanner when in scoped mode (skip the permission CTA)
     if (perm === 'denied') {
       UI.showError(t('bc.errPermDenied'));
     } else if (perm === 'granted' || currentStore) {
@@ -309,31 +282,25 @@
       UI.showState('permission');
     }
 
-    // --- Permission & error buttons ---
     document.getElementById('requestPermissionBtn').addEventListener('click', () => openCameraAndScan());
     document.getElementById('retryBtn').addEventListener('click', () => openCameraAndScan());
 
-    // --- Viewfinder controls ---
     document.getElementById('switchCameraBtn').addEventListener('click', () => cycleCamera());
     document.getElementById('restartCameraBtn').addEventListener('click', () => restartCamera());
     document.getElementById('torchBtn').addEventListener('click', () => toggleTorch());
     document.getElementById('cameraContainer').addEventListener('click', () => triggerFocus());
 
-    // --- Scoped banner exit (M4) ---
     const scopedExit = document.getElementById('scopedBannerExit');
     if (scopedExit) scopedExit.addEventListener('click', _exitScopedScan);
 
-    // --- Scan again buttons ---
     document.getElementById('scanAgainBtn').addEventListener('click', () => scanAgain());
     document.getElementById('scanAgainBtn2').addEventListener('click', () => scanAgain());
 
-    // --- Copy barcode ---
     document.getElementById('copyBtn').addEventListener('click', () => {
       const code = document.getElementById('barcodeNumber').textContent;
       if (code && code !== '—') UI.copyToClipboard(code, tg);
     });
 
-    // --- Ingredients toggle ---
     document.getElementById('showIngredientsBtn').addEventListener('click', () => {
       const panel = document.getElementById('ingredientsPanel');
       panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -342,20 +309,9 @@
       document.getElementById('ingredientsPanel').style.display = 'none';
     });
 
-    // --- Add product button removed in M4 (wizard removal in M5) ---
-
-    // --- Wizard done button (still wired during transition) ---
-    const wizDone = document.getElementById('wizardDoneBtn');
-    if (wizDone) wizDone.addEventListener('click', () => scanAgain());
-
-    // --- Init Add Product wizard (still alive until M5) ---
-    if (window.AddProduct && typeof AddProduct.init === 'function') AddProduct.init();
-
-    // --- Modal close ---
     document.getElementById('modalCloseBtn').addEventListener('click', () => UI.hideProductModal());
     document.getElementById('modalBackdrop').addEventListener('click', () => UI.hideProductModal());
 
-    // --- Visibility change ---
     document.addEventListener('visibilitychange', () => {
       const scannerVisible = document.getElementById('scannerDisplay').style.display === 'block';
       const resultVisible = document.getElementById('resultSection').style.display !== 'none';
@@ -367,7 +323,6 @@
       }
     });
 
-    // --- Fullscreen image viewer ---
     document.getElementById('productImage').addEventListener('click', () => {
       const src = document.getElementById('productImage').src;
       if (src) UI.openFullscreenImage(src);
@@ -388,7 +343,6 @@
       Camera.destroy();
     });
 
-    // --- Browser / Android hardware back button ---
     if (!history.state || history.state.page !== 'scanner') {
       try { history.replaceState({ page: 'scanner' }, ''); } catch (e) {}
     }
@@ -401,14 +355,12 @@
       setTimeout(() => { _handlingBack = false; }, 100);
     });
 
-    // --- Language change listener ---
     window.addEventListener('languageChanged', () => {
       applyI18n();
       if (window.Stores && typeof Stores.load === 'function') Stores.load();
     });
   });
 
-  // Expose for other modules
   window.AppActions = {
     scanAgain, openCameraAndScan,
     getCurrentBarcode: () => currentBarcode,
