@@ -1377,23 +1377,6 @@ body {
   font-variant-numeric: tabular-nums;
   margin-right: 2px;
 }
-.store-hero__scan {
-  flex-shrink: 0;
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 14px;
-  border: none; border-radius: 100px;
-  background: var(--green-700); color: white;
-  font-family: var(--font); font-size: 0.8rem; font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(20,92,52,0.22);
-  transition: transform 0.15s var(--ease), box-shadow 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.store-hero__scan:active {
-  transform: scale(0.96);
-  box-shadow: 0 1px 6px rgba(20,92,52,0.18);
-}
-.store-hero__scan-icon { font-size: 0.95rem; }
 
 
 /* ========================================
@@ -1785,53 +1768,7 @@ body {
 .night-mode .store-empty__desc  { color: #888; }
 
 
-/* ========================================
-   M4 — Scoped scan banner (top of scanner)
-   ======================================== */
-.scoped-banner {
-  margin: 10px 14px 0;
-  padding: 8px 10px 8px 12px;
-  background: var(--green-50);
-  border: 1px solid var(--green-200);
-  border-radius: var(--r-md);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: card-up 0.3s var(--ease);
-}
-.scoped-banner__emblem {
-  width: 26px; height: 26px;
-  object-fit: contain;
-  background: var(--white);
-  border-radius: 6px;
-  padding: 3px;
-  flex-shrink: 0;
-}
-.scoped-banner__text {
-  flex: 1;
-  font-size: 0.78rem;
-  color: var(--green-700);
-  line-height: 1.3;
-}
-.scoped-banner__text strong {
-  font-weight: 700;
-  color: var(--gray-900);
-  margin-left: 4px;
-}
-.scoped-banner__exit {
-  flex-shrink: 0;
-  width: 24px; height: 24px;
-  border: none; background: transparent;
-  color: var(--gray-500);
-  font-size: 0.85rem;
-  cursor: pointer;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-}
-.scoped-banner__exit:active { background: var(--gray-100); }
- 
- 
+
 /* ========================================
    M4 — Store info banner (inside result section)
    ======================================== */
@@ -1851,10 +1788,7 @@ body {
   border: 1px solid var(--green-200);
   color: var(--green-700);
 }
-.store-info-banner--foundElsewhere {
-  background: var(--amber-50);
-  border: 1px solid var(--amber-200);
-  color: var(--amber-700);
+
 }
 .store-info-banner--general {
   background: var(--gray-50);
@@ -2009,28 +1943,14 @@ body {
 }
  
  
-/* ========================================
-   M4 — Night mode
-   ======================================== */
-.night-mode .scoped-banner {
-  background: rgba(34,161,90,0.12);
-  border-color: rgba(34,161,90,0.35);
-}
-.night-mode .scoped-banner__text { color: var(--green-500); }
-.night-mode .scoped-banner__text strong { color: #e8e8e8; }
-.night-mode .scoped-banner__emblem { background: #1e1e1e; }
-.night-mode .scoped-banner__exit { color: #888; }
-.night-mode .scoped-banner__exit:active { background: #2a2a2a; }
+
  
 .night-mode .store-info-banner--inThisStore {
   background: rgba(34,161,90,0.12);
   border-color: rgba(34,161,90,0.35);
   color: var(--green-500);
 }
-.night-mode .store-info-banner--foundElsewhere {
-  background: rgba(245,158,11,0.12);
-  border-color: rgba(245,158,11,0.4);
-  color: var(--amber-600);
+
 }
 .night-mode .store-info-banner--general {
   background: #1e1e1e;
@@ -2169,4 +2089,129 @@ body {
 }
 .night-mode .store-toast--err {
   background: #991b1b;
+}
+
+
+.manual-entry {
+  margin: 16px 14px 4px;
+  padding: 14px 14px 12px;
+  background: var(--white);
+  border: 1.5px solid var(--gray-150);
+  border-radius: var(--r-md);
+  animation: card-up 0.3s var(--ease);
+}
+.manual-entry--err {
+  margin-top: 14px;
+}
+.manual-entry__hint {
+  font-size: 0.74rem;
+  color: var(--gray-500);
+  margin: 0 0 4px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+.manual-entry__label {
+  font-size: 0.82rem;
+  color: var(--gray-800);
+  margin: 0 0 8px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.manual-entry__row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.manual-entry__input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--r-md);
+  background: var(--gray-50);
+  color: var(--gray-900);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.manual-entry__input:focus {
+  border-color: var(--green-500);
+  background: var(--white);
+}
+.manual-entry__input::placeholder {
+  color: var(--gray-300);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.manual-entry__input--err {
+  border-color: var(--red-500, #ef4444);
+  background: var(--red-50);
+}
+.manual-entry__btn {
+  flex-shrink: 0;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--r-md);
+  background: var(--green-700);
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s, background 0.15s;
+  box-shadow: 0 2px 8px rgba(20,92,52,0.18);
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.manual-entry__btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px rgba(20,92,52,0.15);
+}
+.manual-entry__error {
+  display: none;
+  margin: 8px 0 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--red-700, #b91c1c);
+  line-height: 1.35;
+}
+ 
+ 
+/* ========================================
+   M7 — Night mode
+   ======================================== */
+.night-mode .manual-entry {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+}
+.night-mode .manual-entry__hint  { color: #888; }
+.night-mode .manual-entry__label { color: #d8d8d8; }
+.night-mode .manual-entry__input {
+  background: #252525;
+  border-color: #2a2a2a;
+  color: #e8e8e8;
+}
+.night-mode .manual-entry__input:focus {
+  border-color: var(--green-500);
+  background: #1e1e1e;
+}
+.night-mode .manual-entry__input::placeholder { color: #555; }
+.night-mode .manual-entry__input--err {
+  border-color: #b91c1c;
+  background: rgba(220,38,38,0.1);
+}
+.night-mode .manual-entry__error { color: #f87171; }
+ 
+ 
+/* ========================================
+   M7 — Small screens
+   ======================================== */
+@media (max-width: 380px) {
+  .manual-entry { margin: 14px 10px 4px; padding: 12px 10px; }
+  .manual-entry__btn { padding: 0 14px; font-size: 0.8rem; }
 }

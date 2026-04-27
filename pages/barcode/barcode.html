@@ -83,6 +83,26 @@
         <p class="notice-bar__text" id="errorMessage" data-i18n="bc.cameraError">Kameraga ulanib bo'lmadi.</p>
       </div>
       <button class="btn btn--secondary btn--sm" id="retryBtn" data-i18n="bc.retry">🔄 Qaytadan</button>
+      
+      <div class="manual-entry manual-entry--err">
+        <p class="manual-entry__label" data-i18n="bc.manual.labelErr">Yoki shtrix-kodni qo'lda kiriting:</p>
+        <div class="manual-entry__row">
+          <input type="text"
+                 id="manualBarcodeInputErr"
+                 class="manual-entry__input"
+                 inputmode="numeric"
+                 pattern="[0-9]*"
+                 maxlength="14"
+                 autocomplete="off"
+                 data-i18n-placeholder="bc.manual.placeholder"
+                 placeholder="masalan, 8801234567890" />
+          <button type="button"
+                  id="manualBarcodeBtnErr"
+                  class="manual-entry__btn"
+                  data-i18n="bc.manual.submit">Qidirish</button>
+        </div>
+        <p class="manual-entry__error" id="manualBarcodeErrorErr"></p>
+      </div>      
     </div>
 
     <!-- ========================================
@@ -90,15 +110,6 @@
          ======================================== -->
     <div id="scannerDisplay" style="display:none;">
     
-      <div class="scoped-banner" id="scopedBanner" style="display:none;">
-        <img class="scoped-banner__emblem" id="scopedBannerEmblem" src="" alt="" />
-        <span class="scoped-banner__text">
-          <span data-i18n="bc.store.scoped.scanningIn">Skanerlash:</span>
-          <strong id="scopedBannerStore">—</strong>
-        </span>
-        <button class="scoped-banner__exit" id="scopedBannerExit" type="button" aria-label="Exit scoped scan">✕</button>
-      </div>
-
       <!-- Viewfinder — HERO -->
       <div class="viewfinder" id="viewfinderWrap">
         <div class="viewfinder__screen" id="cameraContainer">
@@ -200,6 +211,27 @@
         </div>
       </div>
 
+      <div class="manual-entry" id="manualEntry">
+        <p class="manual-entry__hint" data-i18n="bc.manual.hint">Skanerlash qiyin bo'lyaptimi?</p>
+        <p class="manual-entry__label" data-i18n="bc.manual.label">Shtrix-kodni qo'lda kiriting:</p>
+        <div class="manual-entry__row">
+          <input type="text"
+                 id="manualBarcodeInput"
+                 class="manual-entry__input"
+                 inputmode="numeric"
+                 pattern="[0-9]*"
+                 maxlength="14"
+                 autocomplete="off"
+                 data-i18n-placeholder="bc.manual.placeholder"
+                 placeholder="masalan, 8801234567890" />
+          <button type="button"
+                  id="manualBarcodeBtn"
+                  class="manual-entry__btn"
+                  data-i18n="bc.manual.submit">Qidirish</button>
+        </div>
+        <p class="manual-entry__error" id="manualBarcodeError"></p>
+      </div>    
+    
     </div><!-- /scannerDisplay -->
 
     <!-- ========================================

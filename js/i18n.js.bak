@@ -528,12 +528,18 @@ const I18N = {
     'bc.verdictTaqiqlanganDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar aniqlandi', ru: 'Обнаружены запрещённые ингредиенты', en: 'Prohibited ingredients detected' },
     'bc.verdictShubhaliDesc': { uz: 'Ta\'qiqlangan moddalar yo\'q, lekin bir zavodda ishlab chiqarilgan', ru: 'Запрещённых веществ нет, но произведено на одном заводе', en: 'No prohibited substances, but produced in same factory' },
 
+    // ============================================
+    // BARCODE — Scoped scan banner (M4)
+    // ============================================
+    'bc.store.scoped.scanningIn': { uz: 'Skanerlash:',          ru: 'Сканирование:',           en: 'Scanning:' },
  
     // ============================================
     // BARCODE — Result info banners (M4)
     // ============================================
     'bc.store.foundIn':       { uz: 'Topildi:',                                          ru: 'Найдено:',                                                en: 'Found in:' },
-    
+    'bc.store.notInThis':     { uz: 'Bu mahsulot',                                       ru: 'Этот товар не зарегистрирован в',                          en: 'This product is not registered for' },
+    'bc.store.notInThisMid':  { uz: 'da emas, lekin',                                    ru: ', но есть в',                                              en: ', but it is in' },
+    'bc.store.notInThisEnd':  { uz: 'da bor.',                                           ru: '.',                                                        en: '.' },
     'bc.store.generalDb':     { uz: 'Umumiy ma\'lumotlar bazasi',                        ru: 'Общая база данных',                                        en: 'General database' },
     'bc.store.storeUnknown':  { uz: '· Do\'kon belgilanmagan',                           ru: '· Магазин не указан',                                      en: '· Store not specified' },
     'bc.store.alsoAt':        { uz: 'Boshqa do\'konlarda ham bor:',                      ru: 'Также есть в этих магазинах:',                            en: 'Also available at:' },
@@ -545,22 +551,6 @@ const I18N = {
     'bc.store.productsError':   { uz: 'Mahsulotlar yuklanmadi',                              ru: 'Не удалось загрузить товары',                                 en: "Couldn't load products" },
     'bc.store.checkConnection': { uz: 'Internetni tekshirib, qayta urinib ko\'ring.',        ru: 'Проверьте подключение и попробуйте снова.',                    en: 'Check your connection and try again.' },
     'bc.store.retry':           { uz: 'Qayta urinish',                                        ru: 'Повторить',                                                    en: 'Retry' },    
-    
-    // ============================================
-    // BARCODE — Manual entry (M7)
-    // ============================================
-    'bc.manual.hint':        { uz: 'Skanerlash qiyin bo\'lyaptimi?',                                    ru: 'Не удаётся отсканировать?',                                    en: 'Trouble scanning?' },
-    'bc.manual.label':       { uz: 'Shtrix-kodni qo\'lda kiriting:',                                    ru: 'Введите штрих-код вручную:',                                    en: 'Enter the barcode manually:' },
-    'bc.manual.labelErr':    { uz: 'Yoki shtrix-kodni qo\'lda kiriting:',                               ru: 'Или введите штрих-код вручную:',                                en: 'Or enter the barcode manually:' },
-    'bc.manual.placeholder': { uz: 'masalan, 8801234567890',                                            ru: 'например, 8801234567890',                                       en: 'e.g. 8801234567890' },
-    'bc.manual.submit':      { uz: 'Qidirish',                                                          ru: 'Найти',                                                         en: 'Search' },
- 
-    // Validation errors
-    'bc.manual.errEmpty':    { uz: 'Shtrix-kod kiriting.',                                              ru: 'Введите штрих-код.',                                            en: 'Please enter a barcode.' },
-    'bc.manual.errNonDigit': { uz: 'Faqat raqamlar kiriting.',                                          ru: 'Используйте только цифры.',                                     en: 'Digits only.' },
-    'bc.manual.errLength':   { uz: 'Shtrix-kod 8 dan 14 tagacha raqamdan iborat bo\'lishi kerak.',      ru: 'Штрих-код должен содержать от 8 до 14 цифр.',                   en: 'Barcode must be 8 to 14 digits.' },
-    'bc.manual.errChecksum': { uz: 'Shtrix-kod noto\'g\'ri. Raqamlarni tekshiring.',                    ru: 'Штрих-код некорректен. Проверьте цифры.',                       en: 'Invalid barcode. Check the digits.' },
-    'bc.manual.errInvalid':  { uz: 'Shtrix-kod noto\'g\'ri.',                                           ru: 'Некорректный штрих-код.',                                       en: 'Invalid barcode.' },
  
     // ============================================
     // BARCODE — Contributor recruitment banner (M4)
@@ -609,7 +599,7 @@ const I18N = {
     // BARCODE — Store detail page (M3)
     // ============================================
     'bc.store.pageTitle':  { uz: 'Do\'kon Mahsulotlari', ru: 'Товары магазина', en: 'Store Products' },
-    
+    'bc.store.scanHere':   { uz: 'Skanerlash', ru: 'Сканировать', en: 'Scan' },
     'bc.store.allCats':    { uz: 'Hammasi', ru: 'Все', en: 'All' },
     'bc.store.emptyTitle': { uz: 'Mahsulot topilmadi', ru: 'Товары не найдены', en: 'No products found' },
     'bc.store.emptyDesc':  { uz: 'Boshqa turkum yoki hukm bo\'yicha qidiring.', ru: 'Попробуйте другую категорию или вердикт.', en: 'Try another category or verdict.' },

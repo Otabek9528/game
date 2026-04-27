@@ -1,6 +1,5 @@
-// ui.js — UI module (M4)
-// Handles: state switching, viewfinder controls, status, clipboard, sound,
-//          unified product result rendering (joiz/shubhali/nojoiz vocabulary).
+// ui.js — UI module (M7)
+// M7: store-scope branching removed. Found-in banner simplified.
 // Exposes: window.UI
 // ============================================
 
@@ -25,7 +24,6 @@ window.UI = (() => {
       videoElement:     document.getElementById('videoElement'),
       scanBeam:         document.getElementById('scanBeam'),
       viewfinderWrap:   document.getElementById('viewfinderWrap'),
-      // Product result elements
       resultSection:    document.getElementById('resultSection'),
       notFoundSection:  document.getElementById('notFoundSection'),
       notFoundBarcode:  document.getElementById('notFoundBarcode'),
@@ -45,7 +43,6 @@ window.UI = (() => {
       factoryText:      document.getElementById('factoryText'),
       ingredientsPanel: document.getElementById('ingredientsPanel'),
       ingredientsText:  document.getElementById('ingredientsText'),
-      addProductWizard: document.getElementById('addProductWizard'),
       fullscreenViewer:  document.getElementById('fullscreenViewer'),
       fullscreenImg:     document.getElementById('fullscreenImg')
     };
@@ -53,7 +50,7 @@ window.UI = (() => {
   }
 
   // ============================================
-  // M4: Verdict / store helpers (joiz / shubhali / nojoiz vocabulary)
+  // Verdict / store helpers
   // ============================================
   const VERDICT_MAP = {
     joiz:     { emoji: '✅', cls: 'joiz',        labelKey: 'bc.verdictJoiz',        descKey: 'bc.verdictJoizDesc' },
@@ -88,15 +85,11 @@ window.UI = (() => {
     e.permissionState.style.display = 'none';
     e.errorState.style.display = 'none';
     e.scannerDisplay.style.display = 'none';
-    if (e.addProductWizard) e.addProductWizard.style.display = 'none';
 
     switch (state) {
       case 'permission': e.permissionState.style.display = 'flex'; break;
       case 'error':      e.errorState.style.display = 'flex'; break;
       case 'scanner':    e.scannerDisplay.style.display = 'block'; break;
-      case 'wizard':
-        e.addProductWizard.style.display = 'block';
-        break;
     }
   }
 
@@ -106,7 +99,7 @@ window.UI = (() => {
   }
 
   // ============================================
-  // M4: Product Detail Modal — joiz/nojoiz/shubhali only
+  // Product Detail Modal
   // ============================================
   function showProductModal(data) {
     const modal = document.getElementById('productModal');
@@ -182,7 +175,6 @@ window.UI = (() => {
     e.statusIndicator.className = `status-pill ${type}`;
   }
 
-  // --- Camera info ---
   function updateCameraInfo(index, total) {
     const badge = els().cameraInfoBadge;
     if (badge && total > 1) {
@@ -218,9 +210,8 @@ window.UI = (() => {
     e.notFoundSection.style.display = 'none';
     e.viewfinderWrap.style.display = '';
     document.querySelector('.status-bar').style.display = '';
-    // Clean up any M4 info banner injected into the result section
-    const infoBanner = document.getElementById('storeInfoBanner');
-    if (infoBanner) infoBanner.remove();
+    const foundBanner = document.getElementById('foundInBanner');
+    if (foundBanner) foundBanner.remove();
     const otherStripe = document.getElementById('otherStoresStripe');
     if (otherStripe) otherStripe.remove();
   }
@@ -237,7 +228,7 @@ window.UI = (() => {
   }
 
   // ============================================
-  // M4: Product result — handles all four states
+  // Product result — M7: simplified store info
   // ============================================
   function showProductResult(data) {
     const e = els();
@@ -245,14 +236,12 @@ window.UI = (() => {
     e.viewfinderWrap.style.display = 'none';
     document.querySelector('.status-bar').style.display = 'none';
 
-    // Verdict banner — always uses joiz/nojoiz/shubhali vocabulary now
     const v = _verdictConf(data.verdict);
     e.verdictBanner.className = `verdict verdict--${v.cls}`;
     e.verdictEmoji.textContent = v.emoji;
     e.verdictTitle.textContent = t(v.labelKey);
     e.verdictDesc.textContent = t(v.descKey);
 
-    // Image
     const imgSrc = _resolveImg(data.image);
     if (imgSrc) {
       e.productImage.src = imgSrc;
@@ -271,62 +260,31 @@ window.UI = (() => {
     e.ingredientsText.textContent = data.ingredients || '';
     e.ingredientsPanel.style.display = 'none';
 
-    // M4: render store-state info banner (4 cases)
-    _renderStoreInfoBanner(data);
+    _renderFoundInBanner(data);
     _renderOtherStoresStripe(data);
 
     e.resultSection.style.display = 'block';
     e.resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Info banner reflects the four states from /api/v2/product
-  function _renderStoreInfoBanner(data) {
+  // M7: simplified — only "Topildi: <store>" or "Umumiy ma'lumotlar bazasi"
+  function _renderFoundInBanner(data) {
     const result = els().resultSection;
     if (!result) return;
-    // Remove any previous banner
-    const prev = document.getElementById('storeInfoBanner');
+    const prev = document.getElementById('foundInBanner');
     if (prev) prev.remove();
 
-    const source = data.source;
-    const cur = data._currentStore || null;
-    const exact = data.exactStoreMatch;
-
-    let kind = null;            // 'inThisStore' | 'foundElsewhere' | 'general'
-    let html = '';
-
-    if (source === 'store_products') {
-      if (cur && exact === true) {
-        kind = 'inThisStore';
-        const file = EMBLEM_FILES[data.store];
-        html = `
-          ${file ? `<img class="store-info-banner__emblem" src="../../assets/stores/${file}" alt="" onerror="this.style.display='none'">` : ''}
-          <span class="store-info-banner__text">
-            <span data-i18n="bc.store.foundIn">Topildi:</span>
-            <strong>${_esc(data.store)}</strong>
-          </span>`;
-      } else if (cur && exact === false) {
-        kind = 'foundElsewhere';
-        const file = EMBLEM_FILES[data.store];
-        html = `
-          ${file ? `<img class="store-info-banner__emblem" src="../../assets/stores/${file}" alt="" onerror="this.style.display='none'">` : ''}
-          <span class="store-info-banner__text">
-            <span data-i18n="bc.store.notInThis">Bu mahsulot</span>
-            <strong>${_esc(cur)}</strong>
-            <span data-i18n="bc.store.notInThisMid">da ro'yxatdan o'tkazilmagan, lekin</span>
-            <strong>${_esc(data.store)}</strong>
-            <span data-i18n="bc.store.notInThisEnd">da bor.</span>
-          </span>`;
-      } else if (!cur) {
-        kind = 'inThisStore';
-        const file = EMBLEM_FILES[data.store];
-        html = `
-          ${file ? `<img class="store-info-banner__emblem" src="../../assets/stores/${file}" alt="" onerror="this.style.display='none'">` : ''}
-          <span class="store-info-banner__text">
-            <span data-i18n="bc.store.foundIn">Topildi:</span>
-            <strong>${_esc(data.store)}</strong>
-          </span>`;
-      }
-    } else if (source === 'general') {
+    let kind, html;
+    if (data.source === 'store_products' && data.store) {
+      kind = 'inStore';
+      const file = EMBLEM_FILES[data.store];
+      html = `
+        ${file ? `<img class="store-info-banner__emblem" src="../../assets/stores/${file}" alt="" onerror="this.style.display='none'">` : ''}
+        <span class="store-info-banner__text">
+          <span data-i18n="bc.store.foundIn">Topildi:</span>
+          <strong>${_esc(data.store)}</strong>
+        </span>`;
+    } else if (data.source === 'general') {
       kind = 'general';
       html = `
         <span class="store-info-banner__icon">📚</span>
@@ -334,20 +292,17 @@ window.UI = (() => {
           <span data-i18n="bc.store.generalDb">Umumiy ma'lumotlar bazasi</span>
           <span class="store-info-banner__sub" data-i18n="bc.store.storeUnknown">· Do'kon belgilanmagan</span>
         </span>`;
+    } else {
+      return;
     }
 
-    if (!kind) return;
-
     const banner = document.createElement('div');
-    banner.id = 'storeInfoBanner';
-    banner.className = `store-info-banner store-info-banner--${kind}`;
+    banner.id = 'foundInBanner';
+    banner.className = `store-info-banner store-info-banner--${kind === 'inStore' ? 'inThisStore' : 'general'}`;
     banner.innerHTML = html;
-
-    // Insert at the top of the result section
     result.insertBefore(banner, result.firstChild);
   }
 
-  // Strip of other-store badges (when same product exists in multiple stores)
   function _renderOtherStoresStripe(data) {
     const result = els().resultSection;
     if (!result) return;
@@ -417,12 +372,6 @@ window.UI = (() => {
     e.factoryNotice.style.display = 'flex';
   }
 
-  // --- Discover section (legacy stub — no-op after M2) ---
-  function showDiscover(visible) {
-    const el = document.getElementById('discoverSection');
-    if (el) el.style.display = visible ? 'block' : 'none';
-  }
-
   // --- Clipboard ---
   async function copyToClipboard(text, tg) {
     const e = els();
@@ -471,11 +420,16 @@ window.UI = (() => {
       const val = t(key);
       if (val && val !== key) el.innerHTML = val;
     });
+    // Manual entry placeholder
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      const val = t(key);
+      if (val && val !== key) el.setAttribute('placeholder', val);
+    });
   }
 
   function getVideoElement() { return els().videoElement; }
 
-  // --- Fullscreen image viewer ---
   function openFullscreenImage(src) {
     const e = els();
     e.fullscreenImg.src = src;
@@ -499,7 +453,6 @@ window.UI = (() => {
     showTorch, updateTorchIcon, showSwitchBtn,
     flashFocusIndicator, showScanBeam,
     hideAllResults, showNotFound, showProductResult,
-    showDiscover,
     showProductModal, hideProductModal,
     copyToClipboard, playSuccessSound,
     applyTranslations, openFullscreenImage, closeFullscreenImage,

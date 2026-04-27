@@ -1,6 +1,6 @@
-// app.js — Main application controller (M5)
+// app.js — Main application controller (M7)
 // Glues: Camera, Scanner, UI, I18N, Stores
-// Wizard removed in M5. Store-scoped scanning preserved from M4.
+// M7: scoped scanning fully removed. Manual barcode entry added.
 // ============================================
 
 (function () {
@@ -15,23 +15,6 @@
       tg.BackButton.onClick(() => _handleBackNavigation());
     }
   } catch (e) {}
-
-  // ============================================
-  // STORE CONTEXT — read ?store=X from URL
-  // ============================================
-  const ALLOWED_STORES = ['No Brand', 'Emart24', '7-Eleven', 'GS25', 'CU', 'Daiso'];
-  const EMBLEM_FILES = {
-    'No Brand': 'nobrand.png', 'Emart24': 'emart24.png', '7-Eleven': '7_11.png',
-    'GS25': 'gs25.png', 'CU': 'cu.png', 'Daiso': 'daiso.png'
-  };
-  let currentStore = null;
-  (function _initStoreContext() {
-    try {
-      const qs = new URLSearchParams(window.location.search);
-      const s = qs.get('store');
-      if (s && ALLOWED_STORES.includes(s)) currentStore = s;
-    } catch (e) {}
-  })();
 
   // ============================================
   // BACK NAVIGATION — layered state machine
@@ -58,11 +41,7 @@
 
     Scanner.stop();
     Camera.destroy();
-    if (currentStore) {
-      window.location.href = `store.html?id=${encodeURIComponent(currentStore)}`;
-    } else {
-      window.location.href = '../../index.html';
-    }
+    window.location.href = '../../index.html';
   }
 
   // --- API base URL ---
@@ -92,7 +71,6 @@
       UI.showTorch(info.hasTorch);
       UI.showSwitchBtn(info.hasMultipleCameras);
       UI.showState('scanner');
-      _renderScopedBanner();
 
       startScanning();
     } catch (error) {
@@ -122,19 +100,18 @@
   // PRODUCT LOOKUP — unified v2 endpoint
   // ============================================
   async function lookupProduct(code, format) {
-    const formatName = Scanner.getFormatName(format);
+    const formatName = (format === 'manual')
+      ? 'Manual'
+      : Scanner.getFormatName(format);
     UI.updateStatus(t('bc.checking'), 'scanning');
 
     try {
-      let url = `${API_BASE}/api/v2/product/${encodeURIComponent(code)}`;
-      if (currentStore) url += `?store=${encodeURIComponent(currentStore)}`;
-
+      const url = `${API_BASE}/api/v2/product/${encodeURIComponent(code)}`;
       const resp = await fetch(url);
       const data = await resp.json();
 
       if (data.found) {
         data.format = formatName;
-        data._currentStore = currentStore;
         UI.showProductResult(data);
         _logInteraction('scanner_found', code);
       } else {
@@ -202,31 +179,94 @@
   }
 
   // ============================================
-  // SCOPED BANNER
+  // MANUAL BARCODE ENTRY (M7)
   // ============================================
-  function _renderScopedBanner() {
-    const banner = document.getElementById('scopedBanner');
-    if (!banner) return;
-    if (!currentStore) {
-      banner.style.display = 'none';
-      return;
+  // Validation: digits only, length 8–14, optional EAN-13/EAN-8/UPC-A checksum.
+  function _validateManualBarcode(raw) {
+    const code = (raw || '').trim();
+    if (!code) {
+      return { ok: false, reason: 'empty' };
     }
-    const emblem = document.getElementById('scopedBannerEmblem');
-    const file = EMBLEM_FILES[currentStore];
-    if (file) {
-      emblem.src = `../../assets/stores/${file}`;
-      emblem.style.display = '';
-      emblem.onerror = () => { emblem.style.display = 'none'; };
-    } else {
-      emblem.style.display = 'none';
+    if (!/^\d+$/.test(code)) {
+      return { ok: false, reason: 'nondigit' };
     }
-    document.getElementById('scopedBannerStore').textContent = currentStore;
-    banner.style.display = 'flex';
+    if (code.length < 8 || code.length > 14) {
+      return { ok: false, reason: 'length' };
+    }
+    // Checksum check for standard lengths
+    if (code.length === 13 || code.length === 12 || code.length === 8) {
+      if (!_isValidEanChecksum(code)) {
+        return { ok: false, reason: 'checksum' };
+      }
+    }
+    return { ok: true, code };
   }
 
-  function _exitScopedScan() {
-    if (!currentStore) return;
-    window.location.href = `store.html?id=${encodeURIComponent(currentStore)}`;
+  // EAN-13 / EAN-8 / UPC-A use mod-10 checksum on alternating weights.
+  function _isValidEanChecksum(code) {
+    const digits = code.split('').map(Number);
+    const check = digits.pop();
+    let sum = 0;
+    // EAN-13 / UPC-A weighting: rightmost data digit weight 3, alternating
+    for (let i = digits.length - 1, w = 3; i >= 0; i--, w = (w === 3 ? 1 : 3)) {
+      sum += digits[i] * w;
+    }
+    const calc = (10 - (sum % 10)) % 10;
+    return calc === check;
+  }
+
+  function _bindManualEntry(suffix) {
+    const input = document.getElementById('manualBarcodeInput' + suffix);
+    const btn   = document.getElementById('manualBarcodeBtn'   + suffix);
+    const errEl = document.getElementById('manualBarcodeError' + suffix);
+    if (!input || !btn || !errEl) return;
+
+    function clearErr() {
+      errEl.textContent = '';
+      errEl.style.display = 'none';
+      input.classList.remove('manual-entry__input--err');
+    }
+    function showErr(reason) {
+      const map = {
+        empty:    'bc.manual.errEmpty',
+        nondigit: 'bc.manual.errNonDigit',
+        length:   'bc.manual.errLength',
+        checksum: 'bc.manual.errChecksum',
+      };
+      errEl.textContent = t(map[reason] || 'bc.manual.errInvalid');
+      errEl.style.display = 'block';
+      input.classList.add('manual-entry__input--err');
+    }
+
+    // Sanitize live (strip non-digits as user types)
+    input.addEventListener('input', () => {
+      const cleaned = input.value.replace(/\D+/g, '');
+      if (cleaned !== input.value) input.value = cleaned;
+      if (errEl.style.display === 'block') clearErr();
+    });
+
+    function submit() {
+      const v = _validateManualBarcode(input.value);
+      if (!v.ok) {
+        showErr(v.reason);
+        return;
+      }
+      clearErr();
+      input.blur();
+      Scanner.stop();          // pause camera scanning while we look up manual entry
+      currentBarcode = v.code;
+      currentFormat  = 'manual';
+      UI.showScanBeam(false);
+      lookupProduct(v.code, 'manual');
+    }
+
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submit();
+      }
+    });
   }
 
   // ============================================
@@ -235,14 +275,13 @@
   function _logInteraction(action, barcode) {
     try {
       const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-      const suffix = currentStore ? `:${currentStore}` : '';
       fetch(`${API_BASE}/api/log-interaction`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: tgUser ? String(tgUser.id) : 'unknown',
           username: tgUser?.username || 'unknown',
-          action: `${action}:${barcode}${suffix}`
+          action: `${action}:${barcode}`
         })
       }).catch(() => {});
     } catch (e) {}
@@ -263,20 +302,13 @@
       try { Stores.load(); } catch (e) { console.error('Stores.load failed:', e); }
     }
 
-    if (currentStore) {
-      const storesSection = document.getElementById('storesSection');
-      const contribBanner = document.getElementById('contribBanner');
-      if (storesSection) storesSection.style.display = 'none';
-      if (contribBanner) contribBanner.style.display = 'none';
-    }
-
     let perm = 'prompt';
     try { perm = (await navigator.permissions.query({ name: 'camera' })).state; }
     catch (e) {}
 
     if (perm === 'denied') {
       UI.showError(t('bc.errPermDenied'));
-    } else if (perm === 'granted' || currentStore) {
+    } else if (perm === 'granted') {
       await openCameraAndScan();
     } else {
       UI.showState('permission');
@@ -289,9 +321,6 @@
     document.getElementById('restartCameraBtn').addEventListener('click', () => restartCamera());
     document.getElementById('torchBtn').addEventListener('click', () => toggleTorch());
     document.getElementById('cameraContainer').addEventListener('click', () => triggerFocus());
-
-    const scopedExit = document.getElementById('scopedBannerExit');
-    if (scopedExit) scopedExit.addEventListener('click', _exitScopedScan);
 
     document.getElementById('scanAgainBtn').addEventListener('click', () => scanAgain());
     document.getElementById('scanAgainBtn2').addEventListener('click', () => scanAgain());
@@ -311,6 +340,10 @@
 
     document.getElementById('modalCloseBtn').addEventListener('click', () => UI.hideProductModal());
     document.getElementById('modalBackdrop').addEventListener('click', () => UI.hideProductModal());
+
+    // Manual barcode entry — both instances (scanner view + error view)
+    _bindManualEntry('');     // ids: manualBarcodeInput / manualBarcodeBtn / manualBarcodeError
+    _bindManualEntry('Err');  // ids: manualBarcodeInputErr / manualBarcodeBtnErr / manualBarcodeErrorErr
 
     document.addEventListener('visibilitychange', () => {
       const scannerVisible = document.getElementById('scannerDisplay').style.display === 'block';
@@ -364,7 +397,6 @@
   window.AppActions = {
     scanAgain, openCameraAndScan,
     getCurrentBarcode: () => currentBarcode,
-    getCurrentStore:   () => currentStore,
   };
 
 })();

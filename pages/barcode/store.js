@@ -87,7 +87,6 @@
     if (c) state.category = c;
 
     _renderHero();
-    _bindHeroScan();
     _bindVerdictTabs();
     _bindLoadMore();
     _bindModalClose();
@@ -118,14 +117,6 @@
     }
     emblem.onerror = () => { emblem.style.display = 'none'; };
     document.getElementById('storeHeroName').textContent = state.store;
-  }
-
-  function _bindHeroScan() {
-    const btn = document.getElementById('storeScanBtn');
-    btn.addEventListener('click', () => {
-      // Wired properly in M4; for now navigate back to scanner with store param
-      window.location.href = `barcode.html?store=${encodeURIComponent(state.store)}`;
-    });
   }
 
   // =============================================================
