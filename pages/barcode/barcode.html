@@ -196,30 +196,15 @@
     </div><!-- /scannerDisplay -->
 
     <!-- ========================================
-         DISCOVER SECTION
+         STORES SECTION (new — M2)
          ======================================== -->
-    <div class="discover" id="discoverSection">
-      <h3 class="discover__title" data-i18n="bc.discoverTitle">📦 Ma'lumotlar bazasidan namunalar</h3>
-
-      <div class="discover__group">
-        <div class="discover__label discover__label--joiz" data-i18n="bc.badgeJoiz">✅ Joiz</div>
-        <div class="discover__scroll" id="discoverHalol">
-          <p class="discover__loading" data-i18n="common.loading">Yuklanmoqda...</p>
-        </div>
+    <div class="stores" id="storesSection">
+      <div class="stores__head">
+        <h3 class="stores__title" data-i18n="bc.stores.title">🏪 Do'konlar</h3>
+        <p class="stores__sub" data-i18n="bc.stores.sub">Do'kon tanlang va mahsulotlarini ko'ring</p>
       </div>
-
-      <div class="discover__group">
-        <div class="discover__label discover__label--shubhali" data-i18n="bc.badgeShubhali">⚠️ Shubhali</div>
-        <div class="discover__scroll" id="discoverShubhali">
-          <p class="discover__loading" data-i18n="common.loading">Yuklanmoqda...</p>
-        </div>
-      </div>
-
-      <div class="discover__group">
-        <div class="discover__label discover__label--taqiqlangan" data-i18n="bc.badgeTaqiqlangan">⛔️ Ta'qiqlangan</div>
-        <div class="discover__scroll" id="discoverHarom">
-          <p class="discover__loading" data-i18n="common.loading">Yuklanmoqda...</p>
-        </div>
+      <div class="stores__grid" id="storesGrid">
+        <!-- Populated by stores.js -->
       </div>
     </div>
 
@@ -424,6 +409,7 @@
   <script src="scanner.js"></script>
   <script src="ui.js"></script>
   <script src="add-product.js"></script>
+  <script src="stores.js"></script>
   <script src="app.js"></script>
 
 </body>

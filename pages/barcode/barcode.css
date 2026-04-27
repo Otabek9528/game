@@ -418,61 +418,230 @@ body {
   color: var(--green-700); padding: 2px 8px; border-radius: 100px;
 }
 
+/* ========================================
+   STORES — Landing page store cards (M2)
+   ======================================== */
+.stores {
+  margin-top: 18px;
+  padding: 0 14px;
+}
+
+.stores__head {
+  margin: 0 2px 14px;
+}
+.stores__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0 0 2px;
+  letter-spacing: -0.1px;
+}
+.stores__sub {
+  font-size: 0.78rem;
+  color: var(--gray-500);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.stores__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.stores__error,
+.stores__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--gray-400);
+  padding: 24px 12px;
+  margin: 0;
+}
+
+/* ---- Store card ---- */
+.store-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px 14px;
+  background: var(--white);
+  border: 1.5px solid var(--gray-150);
+  border-radius: var(--r-xl);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+  text-align: center;
+  overflow: hidden;
+}
+.store-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-color: var(--green-200);
+}
+
+.store-card__emblem-wrap {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-50);
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.store-card__emblem {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.store-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+}
+.store-card__name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.25;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.store-card__count {
+  font-size: 0.74rem;
+  color: var(--gray-500);
+  line-height: 1.3;
+}
+.store-card__count strong {
+  font-weight: 700;
+  color: var(--green-700);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Low-count / "Yaqinda" state ---- */
+.store-card--low {
+  opacity: 0.62;
+  border-style: dashed;
+  border-color: var(--gray-200);
+}
+.store-card--low .store-card__count strong {
+  color: var(--gray-500);
+}
+.store-card__soon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: var(--amber-50);
+  color: var(--amber-700);
+  border: 1px solid var(--amber-200);
+  padding: 2px 7px;
+  border-radius: 100px;
+  line-height: 1.3;
+}
+
+/* ---- Skeleton while loading ---- */
+.store-card--skeleton {
+  pointer-events: none;
+  cursor: default;
+}
+.store-card--skeleton .store-card__emblem-wrap {
+  background: var(--gray-100);
+  animation: skeleton-pulse 1.3s ease-in-out infinite;
+}
+.store-card__name-skel,
+.store-card__count-skel {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--gray-100);
+  animation: skeleton-pulse 1.3s ease-in-out infinite;
+}
+.store-card__name-skel { width: 70%; }
+.store-card__count-skel { width: 50%; height: 10px; }
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* ---- Small screens ---- */
+@media (max-width: 380px) {
+  .stores { padding: 0 10px; }
+  .stores__grid { gap: 8px; }
+  .store-card { padding: 14px 10px 12px; }
+  .store-card__emblem-wrap { width: 48px; height: 48px; border-radius: 12px; }
+  .store-card__name { font-size: 0.82rem; }
+}
+
 
 /* ========================================
-   DISCOVER — Compact, below scanner
+   NIGHT MODE — Stores (M2)
    ======================================== */
-.discover {
-  margin-top: 16px; padding: 0 14px;
+.night-mode .stores__title {
+  color: #e0e0e0;
 }
-.discover__title {
-  font-size: 0.8rem; font-weight: 700; color: var(--gray-500);
-  margin: 0 0 12px 2px;
-  text-transform: uppercase; letter-spacing: 0.6px;
-}
-.discover__group { margin-bottom: 12px; }
-.discover__label {
-  display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem;
-  font-weight: 700; padding: 3px 9px 3px 7px; border-radius: 100px; margin: 0 0 7px 2px;
-}
-.discover__label--joiz { background: var(--green-50); color: var(--green-700); }
-.discover__label--taqiqlangan { background: var(--red-50); color: var(--red-700); }
-.discover__label--shubhali { background: var(--amber-50); color: var(--amber-700); }
-
-.discover__scroll {
-  display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch; padding: 2px 2px 4px; scrollbar-width: none;
-}
-.discover__scroll::-webkit-scrollbar { display: none; }
-.discover__loading {
-  font-size: 0.78rem; color: var(--gray-400); margin: 0; padding: 20px 0;
-  text-align: center; width: 100%;
+.night-mode .stores__sub {
+  color: #888;
 }
 
-.mini-card {
-  flex: 0 0 125px; scroll-snap-align: start; background: var(--white);
-  border-radius: var(--r-sm); border: 1px solid var(--gray-150);
-  overflow: hidden; cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+.night-mode .store-card {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
 }
-.mini-card:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-.mini-card__img {
-  width: 100%; height: 80px; object-fit: contain; background: var(--gray-50); display: block;
+.night-mode .store-card:active {
+  border-color: var(--green-500);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
-.mini-card__body { padding: 7px 9px; }
-.mini-card__name {
-  font-size: 0.72rem; font-weight: 600; color: var(--gray-800); line-height: 1.25;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  overflow: hidden; margin: 0 0 3px;
+.night-mode .store-card__emblem-wrap {
+  background: #252525;
 }
-.mini-card__tag {
-  font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 100px;
-  display: inline-block;
+.night-mode .store-card__name {
+  color: #e0e0e0;
 }
-.mini-card__tag--joiz { background: var(--green-50); color: var(--green-700); }
-.mini-card__tag--taqiqlangan { background: var(--red-50); color: var(--red-700); }
-.mini-card__tag--shubhali { background: var(--amber-50); color: var(--amber-700); }
+.night-mode .store-card__count {
+  color: #999;
+}
+.night-mode .store-card__count strong {
+  color: var(--green-500);
+}
+.night-mode .store-card--low {
+  border-color: #333;
+}
+.night-mode .store-card--low .store-card__count strong {
+  color: #888;
+}
+.night-mode .store-card__soon {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--amber-600);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.night-mode .store-card--skeleton .store-card__emblem-wrap,
+.night-mode .store-card__name-skel,
+.night-mode .store-card__count-skel {
+  background: #252525;
+}
+.night-mode .stores__error,
+.night-mode .stores__empty {
+  color: #777;
+}
 
 
 /* ========================================

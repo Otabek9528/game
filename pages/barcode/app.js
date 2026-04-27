@@ -108,7 +108,7 @@
       UI.playSuccessSound();
       UI.updateStatus(t('bc.found'), 'found');
       UI.showScanBeam(false);
-      UI.showDiscover(false);
+      
 
       lookupProduct(code, format);
     });
@@ -141,7 +141,7 @@
     Scanner.resetLastScanned();
     UI.hideAllResults();
     UI.showScanBeam(true);
-    UI.showDiscover(true);
+    
     openCameraAndScan();
   }
 
@@ -192,53 +192,6 @@
   }
 
   // ============================================
-  // DISCOVER
-  // ============================================
-
-  async function loadDiscover() {
-    try {
-      const resp = await fetch(`${API_BASE}/api/scanner/discover?count=10`);
-      const data = await resp.json();
-
-      const tagMap = {
-        halol:    { cls: 'joiz',        textKey: 'bc.badgeJoiz' },
-        shubhali: { cls: 'shubhali',    textKey: 'bc.badgeShubhali' },
-        harom:    { cls: 'taqiqlangan',  textKey: 'bc.badgeTaqiqlangan' }
-      };
-
-      ['halol', 'shubhali', 'harom'].forEach(verdict => {
-        const container = document.getElementById('discover' + verdict.charAt(0).toUpperCase() + verdict.slice(1));
-        const products = data[verdict] || [];
-        if (products.length === 0) {
-          container.innerHTML = '<p class="discover__loading">—</p>';
-          return;
-        }
-        container.innerHTML = '';
-        products.forEach(p => {
-          let imgSrc = p.image || '';
-          if (imgSrc && imgSrc.startsWith('/api/')) imgSrc = API_BASE + imgSrc;
-
-          const tag = tagMap[verdict];
-          const card = document.createElement('div');
-          card.className = 'mini-card';
-          card.setAttribute('data-product', JSON.stringify(p));
-          card.innerHTML = `<img class="mini-card__img" src="${imgSrc}" alt="" loading="lazy"><div class="mini-card__body"><p class="mini-card__name">${_escHtml(p.name)}</p><span class="mini-card__tag mini-card__tag--${tag.cls}">${t(tag.textKey)}</span></div>`;
-          card.addEventListener('click', () => UI.showProductModal(p));
-          container.appendChild(card);
-        });
-      });
-    } catch (e) {
-      console.error('Discover fetch failed:', e);
-    }
-  }
-
-  function _escHtml(s) {
-    const d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
-  }
-
-  // ============================================
   // LOGGING
   // ============================================
   function _logInteraction(action, barcode) {
@@ -274,7 +227,7 @@
 
     await Scanner.init();
 
-    loadDiscover();
+    Stores.load();
 
     let perm = 'prompt';
     try { perm = (await navigator.permissions.query({ name: 'camera' })).state; }
@@ -374,10 +327,10 @@
     });
 
     // --- Language change listener ---
-    window.addEventListener('languageChanged', () => {
-      applyI18n();
-      loadDiscover(); // Reload with new labels
-    });
+     window.addEventListener('languageChanged', () => {
+       applyI18n();
+       Stores.load(); // Re-render with translated labels
+     });
   });
 
   function _pushState(label) {
