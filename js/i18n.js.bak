@@ -528,29 +528,6 @@ const I18N = {
     'bc.verdictTaqiqlanganDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar aniqlandi', ru: 'Обнаружены запрещённые ингредиенты', en: 'Prohibited ingredients detected' },
     'bc.verdictShubhaliDesc': { uz: 'Ta\'qiqlangan moddalar yo\'q, lekin bir zavodda ishlab chiqarilgan', ru: 'Запрещённых веществ нет, но произведено на одном заводе', en: 'No prohibited substances, but produced in same factory' },
 
-    // ============================================
-    // BARCODE — Scoped scan banner (M4)
-    // ============================================
-    'bc.store.scoped.scanningIn': { uz: 'Skanerlash:',          ru: 'Сканирование:',           en: 'Scanning:' },
- 
-    // ============================================
-    // BARCODE — Result info banners (M4)
-    // ============================================
-    'bc.store.foundIn':       { uz: 'Topildi:',                                          ru: 'Найдено:',                                                en: 'Found in:' },
-    'bc.store.notInThis':     { uz: 'Bu mahsulot',                                       ru: 'Этот товар не зарегистрирован в',                          en: 'This product is not registered for' },
-    'bc.store.notInThisMid':  { uz: 'da emas, lekin',                                    ru: ', но есть в',                                              en: ', but it is in' },
-    'bc.store.notInThisEnd':  { uz: 'da bor.',                                           ru: '.',                                                        en: '.' },
-    'bc.store.generalDb':     { uz: 'Umumiy ma\'lumotlar bazasi',                        ru: 'Общая база данных',                                        en: 'General database' },
-    'bc.store.storeUnknown':  { uz: '· Do\'kon belgilanmagan',                           ru: '· Магазин не указан',                                      en: '· Store not specified' },
-    'bc.store.alsoAt':        { uz: 'Boshqa do\'konlarda ham bor:',                      ru: 'Также есть в этих магазинах:',                            en: 'Also available at:' },
- 
-    // ============================================
-    // BARCODE — Contributor recruitment banner (M4)
-    // ============================================
-    'bc.contrib.title': { uz: 'Halol baza yig\'ishga sherik bo\'ling',                                                                                         ru: 'Помогите нам собрать халяль-базу',                                                                                              en: 'Help us build the halal database' },
-    'bc.contrib.body':  { uz: 'Mahsulotlar tarkibini o\'qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24 va No Brand do\'konlaridagi halol mahsulotlar bazasini birgalikda yig\'amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — katta savobli ish.', ru: 'Для тех, кто умеет читать состав продуктов: вместе собираем халяль-базу для GS25, CU, 7-Eleven, Emart24 и No Brand. Каждая запись помогает тысячам людей.', en: 'For those who can read product ingredients: together we collect a halal database for GS25, CU, 7-Eleven, Emart24, and No Brand convenience stores. Every entry reaches thousands of people.' },
-    'bc.contrib.cta':   { uz: 'Adminga yozish',                                                                                                                ru: 'Написать админу',                                                                                                                en: 'Contact admin' },
- 
     // Product result
     'bc.ingredients': { uz: '🧪 Tarkibi', ru: '🧪 Состав', en: '🧪 Ingredients' },
     'bc.ingredientsTitle': { uz: '🧪 Mahsulot tarkibi', ru: '🧪 Состав продукта', en: '🧪 Product ingredients' },

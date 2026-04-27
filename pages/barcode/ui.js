@@ -1,5 +1,6 @@
-// ui.js — UI module
-// Handles: state switching, viewfinder controls, status, clipboard, sound
+// ui.js — UI module (M4)
+// Handles: state switching, viewfinder controls, status, clipboard, sound,
+//          unified product result rendering (joiz/shubhali/nojoiz vocabulary).
 // Exposes: window.UI
 // ============================================
 
@@ -44,12 +45,41 @@ window.UI = (() => {
       factoryText:      document.getElementById('factoryText'),
       ingredientsPanel: document.getElementById('ingredientsPanel'),
       ingredientsText:  document.getElementById('ingredientsText'),
-      discoverSection:  document.getElementById('discoverSection'),
       addProductWizard: document.getElementById('addProductWizard'),
       fullscreenViewer:  document.getElementById('fullscreenViewer'),
       fullscreenImg:     document.getElementById('fullscreenImg')
     };
     return _els;
+  }
+
+  // ============================================
+  // M4: Verdict / store helpers (joiz / shubhali / nojoiz vocabulary)
+  // ============================================
+  const VERDICT_MAP = {
+    joiz:     { emoji: '✅', cls: 'joiz',        labelKey: 'bc.verdictJoiz',        descKey: 'bc.verdictJoizDesc' },
+    nojoiz:   { emoji: '⛔️', cls: 'taqiqlangan', labelKey: 'bc.verdictTaqiqlangan', descKey: 'bc.verdictTaqiqlanganDesc' },
+    shubhali: { emoji: '⚠️', cls: 'shubhali',    labelKey: 'bc.verdictShubhali',    descKey: 'bc.verdictShubhaliDesc' }
+  };
+
+  const EMBLEM_FILES = {
+    'No Brand': 'nobrand.png', 'Emart24': 'emart24.png', '7-Eleven': '7_11.png',
+    'GS25': 'gs25.png', 'CU': 'cu.png', 'Daiso': 'daiso.png'
+  };
+
+  function _verdictConf(v) {
+    return VERDICT_MAP[(v || '').toLowerCase()] || VERDICT_MAP.joiz;
+  }
+
+  function _esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+
+  function _resolveImg(src) {
+    if (!src) return '';
+    if (src.startsWith('/api/')) return (window._API_BASE || '') + src;
+    return src;
   }
 
   // --- State switching ---
@@ -66,7 +96,6 @@ window.UI = (() => {
       case 'scanner':    e.scannerDisplay.style.display = 'block'; break;
       case 'wizard':
         e.addProductWizard.style.display = 'block';
-        showDiscover(false);
         break;
     }
   }
@@ -76,15 +105,12 @@ window.UI = (() => {
     showState('error');
   }
 
-  // --- Product Detail Modal ---
+  // ============================================
+  // M4: Product Detail Modal — joiz/nojoiz/shubhali only
+  // ============================================
   function showProductModal(data) {
     const modal = document.getElementById('productModal');
-    const verdictMap = {
-      halol:    { emoji: '✅', labelKey: 'bc.verdictJoiz', cls: 'joiz' },
-      harom:    { emoji: '⛔️', labelKey: 'bc.verdictTaqiqlangan', cls: 'taqiqlangan' },
-      shubhali: { emoji: '⚠️', labelKey: 'bc.verdictShubhali', cls: 'shubhali' }
-    };
-    const v = verdictMap[data.verdict] || verdictMap.halol;
+    const v = _verdictConf(data.verdict);
 
     const badge = document.getElementById('modalVerdict');
     badge.className = `modal-verdict modal-verdict--${v.cls}`;
@@ -92,26 +118,23 @@ window.UI = (() => {
     document.getElementById('modalVerdictLabel').textContent = t(v.labelKey);
 
     const imgWrap = document.getElementById('modalImgWrap');
-    if (data.image) {
-      let modalImgSrc = data.image;
-      if (modalImgSrc && modalImgSrc.startsWith('/api/')) {
-        modalImgSrc = (window._API_BASE || '') + modalImgSrc;
-      }
-      document.getElementById('modalImg').src = modalImgSrc;
+    const imgSrc = _resolveImg(data.image);
+    if (imgSrc) {
+      document.getElementById('modalImg').src = imgSrc;
       imgWrap.style.display = 'block';
     } else {
       imgWrap.style.display = 'none';
     }
 
-    document.getElementById('modalName').textContent = data.name || '—';
+    document.getElementById('modalName').textContent = data.name || data.nameEnglish || '—';
     document.getElementById('modalBarcode').textContent = data.barcode || '—';
 
     const grid = document.getElementById('modalHalalGrid');
     const checks = [
-      { icon: '🐖', labelKey: 'bc.flag.pork', bad: data.pork },
-      { icon: '🍷', labelKey: 'bc.flag.alcohol', bad: data.alcohol },
-      { icon: '🍗', labelKey: 'bc.grid.meat', bad: data.meat },
-      { icon: '🦐', labelKey: 'bc.grid.seafood', bad: data.seafood }
+      { icon: '🐖', labelKey: 'bc.flag.pork',    bad: !!data.pork },
+      { icon: '🍷', labelKey: 'bc.flag.alcohol', bad: !!data.alcohol },
+      { icon: '🍗', labelKey: 'bc.grid.meat',    bad: !!data.meat },
+      { icon: '🦐', labelKey: 'bc.grid.seafood', bad: !!data.seafood }
     ];
     grid.innerHTML = '';
     checks.forEach(c => {
@@ -124,7 +147,7 @@ window.UI = (() => {
     });
 
     const factory = document.getElementById('modalFactory');
-    if (data.sameFactory !== undefined) {
+    if (data.sameFactory !== undefined && data.sameFactory !== null) {
       factory.className = `modal-factory ${data.sameFactory ? 'modal-factory--warn' : 'modal-factory--ok'}`;
       document.getElementById('modalFactoryIcon').textContent = data.sameFactory ? '🏭' : '✅';
       document.getElementById('modalFactoryText').textContent = data.sameFactory
@@ -195,6 +218,11 @@ window.UI = (() => {
     e.notFoundSection.style.display = 'none';
     e.viewfinderWrap.style.display = '';
     document.querySelector('.status-bar').style.display = '';
+    // Clean up any M4 info banner injected into the result section
+    const infoBanner = document.getElementById('storeInfoBanner');
+    if (infoBanner) infoBanner.remove();
+    const otherStripe = document.getElementById('otherStoresStripe');
+    if (otherStripe) otherStripe.remove();
   }
 
   function showNotFound(barcode) {
@@ -208,36 +236,32 @@ window.UI = (() => {
     e.notFoundSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  // ============================================
+  // M4: Product result — handles all four states
+  // ============================================
   function showProductResult(data) {
     const e = els();
     e.notFoundSection.style.display = 'none';
     e.viewfinderWrap.style.display = 'none';
     document.querySelector('.status-bar').style.display = 'none';
 
-    // Verdict
-    e.verdictBanner.className = `verdict verdict--${data.verdict === 'halol' ? 'joiz' : data.verdict === 'harom' ? 'taqiqlangan' : data.verdict}`;
-    const verdictMap = {
-      halol:    { emoji: '✅', titleKey: 'bc.verdictJoiz', descKey: 'bc.verdictJoizDesc' },
-      harom:    { emoji: '⛔️', titleKey: 'bc.verdictTaqiqlangan', descKey: 'bc.verdictTaqiqlanganDesc' },
-      shubhali: { emoji: '⚠️', titleKey: 'bc.verdictShubhali', descKey: 'bc.verdictShubhaliDesc' }
-    };
-    const v = verdictMap[data.verdict] || verdictMap.halol;
+    // Verdict banner — always uses joiz/nojoiz/shubhali vocabulary now
+    const v = _verdictConf(data.verdict);
+    e.verdictBanner.className = `verdict verdict--${v.cls}`;
     e.verdictEmoji.textContent = v.emoji;
-    e.verdictTitle.textContent = t(v.titleKey);
+    e.verdictTitle.textContent = t(v.labelKey);
     e.verdictDesc.textContent = t(v.descKey);
 
-    if (data.image) {
-      let imgSrc = data.image;
-      if (imgSrc.startsWith('/api/')) {
-        imgSrc = (window._API_BASE || '') + imgSrc;
-      }
+    // Image
+    const imgSrc = _resolveImg(data.image);
+    if (imgSrc) {
       e.productImage.src = imgSrc;
       e.productImageWrap.style.display = 'block';
     } else {
       e.productImageWrap.style.display = 'none';
     }
 
-    e.productName.textContent = data.name || '—';
+    e.productName.textContent = data.name || data.nameEnglish || '—';
     e.barcodeType.textContent = data.format || '—';
     e.barcodeNumber.textContent = data.barcode || '—';
 
@@ -247,17 +271,117 @@ window.UI = (() => {
     e.ingredientsText.textContent = data.ingredients || '';
     e.ingredientsPanel.style.display = 'none';
 
+    // M4: render store-state info banner (4 cases)
+    _renderStoreInfoBanner(data);
+    _renderOtherStoresStripe(data);
+
     e.resultSection.style.display = 'block';
     e.resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Info banner reflects the four states from /api/v2/product
+  function _renderStoreInfoBanner(data) {
+    const result = els().resultSection;
+    if (!result) return;
+    // Remove any previous banner
+    const prev = document.getElementById('storeInfoBanner');
+    if (prev) prev.remove();
+
+    const source = data.source;
+    const cur = data._currentStore || null;
+    const exact = data.exactStoreMatch;
+
+    let kind = null;            // 'inThisStore' | 'foundElsewhere' | 'general'
+    let html = '';
+
+    if (source === 'store_products') {
+      if (cur && exact === true) {
+        kind = 'inThisStore';
+        const file = EMBLEM_FILES[data.store];
+        html = `
+          ${file ? `<img class="store-info-banner__emblem" src="../../assets/stores/${file}" alt="" onerror="this.style.display='none'">` : ''}
+          <span class="store-info-banner__text">
+            <span data-i18n="bc.store.foundIn">Topildi:</span>
+            <strong>${_esc(data.store)}</strong>
+          </span>`;
+      } else if (cur && exact === false) {
+        kind = 'foundElsewhere';
+        const file = EMBLEM_FILES[data.store];
+        html = `
+          ${file ? `<img class="store-info-banner__emblem" src="../../assets/stores/${file}" alt="" onerror="this.style.display='none'">` : ''}
+          <span class="store-info-banner__text">
+            <span data-i18n="bc.store.notInThis">Bu mahsulot</span>
+            <strong>${_esc(cur)}</strong>
+            <span data-i18n="bc.store.notInThisMid">da ro'yxatdan o'tkazilmagan, lekin</span>
+            <strong>${_esc(data.store)}</strong>
+            <span data-i18n="bc.store.notInThisEnd">da bor.</span>
+          </span>`;
+      } else if (!cur) {
+        kind = 'inThisStore';
+        const file = EMBLEM_FILES[data.store];
+        html = `
+          ${file ? `<img class="store-info-banner__emblem" src="../../assets/stores/${file}" alt="" onerror="this.style.display='none'">` : ''}
+          <span class="store-info-banner__text">
+            <span data-i18n="bc.store.foundIn">Topildi:</span>
+            <strong>${_esc(data.store)}</strong>
+          </span>`;
+      }
+    } else if (source === 'general') {
+      kind = 'general';
+      html = `
+        <span class="store-info-banner__icon">📚</span>
+        <span class="store-info-banner__text">
+          <span data-i18n="bc.store.generalDb">Umumiy ma'lumotlar bazasi</span>
+          <span class="store-info-banner__sub" data-i18n="bc.store.storeUnknown">· Do'kon belgilanmagan</span>
+        </span>`;
+    }
+
+    if (!kind) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'storeInfoBanner';
+    banner.className = `store-info-banner store-info-banner--${kind}`;
+    banner.innerHTML = html;
+
+    // Insert at the top of the result section
+    result.insertBefore(banner, result.firstChild);
+  }
+
+  // Strip of other-store badges (when same product exists in multiple stores)
+  function _renderOtherStoresStripe(data) {
+    const result = els().resultSection;
+    if (!result) return;
+    const prev = document.getElementById('otherStoresStripe');
+    if (prev) prev.remove();
+
+    const others = Array.isArray(data.otherStores) ? data.otherStores : [];
+    if (others.length === 0) return;
+
+    const stripe = document.createElement('div');
+    stripe.id = 'otherStoresStripe';
+    stripe.className = 'other-stores-stripe';
+
+    const label = `<span class="other-stores-stripe__label" data-i18n="bc.store.alsoAt">Boshqa do'konlarda ham bor:</span>`;
+    const chips = others.map(o => {
+      const file = EMBLEM_FILES[o.store];
+      const safe = _esc(o.store);
+      const emblemHtml = file
+        ? `<img class="other-stores-stripe__emblem" src="../../assets/stores/${file}" alt="${safe}" onerror="this.style.display='none'">`
+        : '';
+      return `<span class="other-stores-stripe__chip" title="${safe}">${emblemHtml}<span>${safe}</span></span>`;
+    }).join('');
+
+    stripe.innerHTML = label + `<div class="other-stores-stripe__chips">${chips}</div>`;
+    result.appendChild(stripe);
   }
 
   function _renderHalalGrid(data) {
     const grid = els().halalGrid;
     const checks = [
-      { icon: '🐖', labelKey: 'bc.flag.pork',     bad: data.pork },
-      { icon: '🍷', labelKey: 'bc.flag.alcohol',   bad: data.alcohol },
-      { icon: '🍗', labelKey: 'bc.grid.meat',      bad: data.meat },
-      { icon: '🦐', labelKey: 'bc.grid.seafood',   bad: data.seafood }
+      { icon: '🐖', labelKey: 'bc.flag.pork',     bad: !!data.pork },
+      { icon: '🍷', labelKey: 'bc.flag.alcohol',   bad: !!data.alcohol },
+      { icon: '🍗', labelKey: 'bc.grid.meat',      bad: !!data.meat },
+      { icon: '🦐', labelKey: 'bc.grid.seafood',   bad: !!data.seafood }
     ];
     grid.innerHTML = '';
     checks.forEach(c => {
@@ -277,6 +401,10 @@ window.UI = (() => {
 
   function _renderFactoryNotice(sameFactory) {
     const e = els();
+    if (sameFactory === undefined || sameFactory === null) {
+      e.factoryNotice.style.display = 'none';
+      return;
+    }
     if (sameFactory) {
       e.factoryNotice.className = 'factory-bar factory-bar--warn';
       e.factoryIcon.textContent = '🏭';
@@ -289,9 +417,10 @@ window.UI = (() => {
     e.factoryNotice.style.display = 'flex';
   }
 
-  // --- Discover section ---
+  // --- Discover section (legacy stub — no-op after M2) ---
   function showDiscover(visible) {
-    els().discoverSection.style.display = visible ? 'block' : 'none';
+    const el = document.getElementById('discoverSection');
+    if (el) el.style.display = visible ? 'block' : 'none';
   }
 
   // --- Clipboard ---
@@ -327,7 +456,7 @@ window.UI = (() => {
     } catch (e) {}
   }
 
-  // --- i18n: apply translations to all data-i18n elements ---
+  // --- i18n ---
   function applyTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
@@ -337,7 +466,6 @@ window.UI = (() => {
         else el.textContent = val;
       }
     });
-    // HTML translations (for disclaimer with <strong>/<a>)
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
       const key = el.getAttribute('data-i18n-html');
       const val = t(key);
@@ -359,13 +487,12 @@ window.UI = (() => {
     const e = els();
     e.fullscreenViewer.classList.remove('active');
     e.fullscreenImg.src = '';
-    // Only restore scroll if modal isn't open behind it
     const modal = document.getElementById('productModal');
     if (!modal || modal.style.display === 'none') {
       document.body.style.overflow = '';
     }
   }
-  
+
   return {
     showState, showError,
     updateStatus, updateCameraInfo,

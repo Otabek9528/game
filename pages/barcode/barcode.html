@@ -132,6 +132,15 @@
          STATE: SCANNER (main working state)
          ======================================== -->
     <div id="scannerDisplay" style="display:none;">
+    
+      <div class="scoped-banner" id="scopedBanner" style="display:none;">
+        <img class="scoped-banner__emblem" id="scopedBannerEmblem" src="" alt="" />
+        <span class="scoped-banner__text">
+          <span data-i18n="bc.store.scoped.scanningIn">Skanerlash:</span>
+          <strong id="scopedBannerStore">—</strong>
+        </span>
+        <button class="scoped-banner__exit" id="scopedBannerExit" type="button" aria-label="Exit scoped scan">✕</button>
+      </div>
 
       <!-- Viewfinder — HERO -->
       <div class="viewfinder" id="viewfinderWrap">
@@ -229,8 +238,7 @@
           <code class="empty-card__code" id="notFoundBarcode">—</code>
           <p class="empty-card__desc" data-i18n="bc.notFoundDesc">Ma'lumotlar bazasida ushbu mahsulot mavjud emas.</p>
           <div class="empty-card__actions">
-            <button class="btn btn--primary btn--full" id="addProductBtn" data-i18n="bc.addProduct">➕ Mahsulot qo'shish</button>
-            <button class="btn btn--ghost btn--full" id="scanAgainBtn2" data-i18n="bc.scanAgain">📷 Qayta skanerlash</button>
+            <button class="btn btn--primary btn--full" id="scanAgainBtn2" data-i18n="bc.scanAgain">📷 Qayta skanerlash</button>
           </div>
         </div>
       </div>
@@ -249,6 +257,23 @@
         <!-- Populated by stores.js -->
       </div>
     </div>
+    
+    <!-- ========================================
+         CONTRIBUTOR INFO BANNER (M4)
+         ======================================== -->
+    <div class="contrib-banner" id="contribBanner">
+      <div class="contrib-banner__head">
+        <span class="contrib-banner__icon">🤝</span>
+        <h3 class="contrib-banner__title" data-i18n="bc.contrib.title">Halol baza yig'ishga sherik bo'ling</h3>
+      </div>
+      <p class="contrib-banner__body" data-i18n="bc.contrib.body">
+        Mahsulotlar tarkibini o'qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do'konlaridagi halol mahsulotlar bazasini birgalikda yig'amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — katta savobli ish.
+      </p>
+      <a class="contrib-banner__cta" id="contribBannerBtn" href="https://t.me/MuslimVegukin" target="_blank" rel="noopener">
+        <span data-i18n="bc.contrib.cta">Adminga yozish</span>
+        <span class="contrib-banner__arrow">→</span>
+      </a>
+    </div>    
 
     
     <!-- ========================================

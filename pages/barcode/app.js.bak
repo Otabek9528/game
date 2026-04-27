@@ -1,6 +1,6 @@
-// app.js — Main application controller (M4)
-// Glues: Camera, Scanner, UI, AddProduct, I18N, Stores
-// Handles: Telegram init, event binding, orchestration, store-scoped scanning
+// app.js — Main application controller
+// Glues: Camera, Scanner, UI, AddProduct, I18N
+// Handles: Telegram init, event binding, orchestration
 // ============================================
 
 (function () {
@@ -15,23 +15,6 @@
       tg.BackButton.onClick(() => _handleBackNavigation());
     }
   } catch (e) {}
-
-  // ============================================
-  // STORE CONTEXT (M4) — read ?store=X from URL
-  // ============================================
-  const ALLOWED_STORES = ['No Brand', 'Emart24', '7-Eleven', 'GS25', 'CU', 'Daiso'];
-  const EMBLEM_FILES = {
-    'No Brand': 'nobrand.png', 'Emart24': 'emart24.png', '7-Eleven': '7_11.png',
-    'GS25': 'gs25.png', 'CU': 'cu.png', 'Daiso': 'daiso.png'
-  };
-  let currentStore = null;
-  (function _initStoreContext() {
-    try {
-      const qs = new URLSearchParams(window.location.search);
-      const s = qs.get('store');
-      if (s && ALLOWED_STORES.includes(s)) currentStore = s;
-    } catch (e) {}
-  })();
 
   // ============================================
   // BACK NAVIGATION — layered state machine
@@ -75,12 +58,7 @@
 
     Scanner.stop();
     Camera.destroy();
-    // If scoped, return to the store page; else home
-    if (currentStore) {
-      window.location.href = `store.html?id=${encodeURIComponent(currentStore)}`;
-    } else {
-      window.location.href = '../../index.html';
-    }
+    window.location.href = '../../index.html';
   }
 
   // --- API base URL ---
@@ -110,7 +88,6 @@
       UI.showTorch(info.hasTorch);
       UI.showSwitchBtn(info.hasMultipleCameras);
       UI.showState('scanner');
-      _renderScopedBanner();
 
       startScanning();
     } catch (error) {
@@ -131,29 +108,22 @@
       UI.playSuccessSound();
       UI.updateStatus(t('bc.found'), 'found');
       UI.showScanBeam(false);
+      
 
       lookupProduct(code, format);
     });
   }
 
-  // ============================================
-  // PRODUCT LOOKUP — uses unified v2 endpoint (M4)
-  // ============================================
   async function lookupProduct(code, format) {
     const formatName = Scanner.getFormatName(format);
     UI.updateStatus(t('bc.checking'), 'scanning');
 
     try {
-      let url = `${API_BASE}/api/v2/product/${encodeURIComponent(code)}`;
-      if (currentStore) url += `?store=${encodeURIComponent(currentStore)}`;
-
-      const resp = await fetch(url);
+      const resp = await fetch(`${API_BASE}/api/scanner/product/${encodeURIComponent(code)}`);
       const data = await resp.json();
 
       if (data.found) {
         data.format = formatName;
-        // Pass store context to UI so it can render the right info banner
-        data._currentStore = currentStore;
         UI.showProductResult(data);
         _logInteraction('scanner_found', code);
       } else {
@@ -171,6 +141,7 @@
     Scanner.resetLastScanned();
     UI.hideAllResults();
     UI.showScanBeam(true);
+    
     openCameraAndScan();
   }
 
@@ -221,47 +192,18 @@
   }
 
   // ============================================
-  // SCOPED BANNER (M4) — visible only when ?store=X is in URL
-  // ============================================
-  function _renderScopedBanner() {
-    const banner = document.getElementById('scopedBanner');
-    if (!banner) return;
-    if (!currentStore) {
-      banner.style.display = 'none';
-      return;
-    }
-    const emblem = document.getElementById('scopedBannerEmblem');
-    const file = EMBLEM_FILES[currentStore];
-    if (file) {
-      emblem.src = `../../assets/stores/${file}`;
-      emblem.style.display = '';
-      emblem.onerror = () => { emblem.style.display = 'none'; };
-    } else {
-      emblem.style.display = 'none';
-    }
-    document.getElementById('scopedBannerStore').textContent = currentStore;
-    banner.style.display = 'flex';
-  }
-
-  function _exitScopedScan() {
-    if (!currentStore) return;
-    window.location.href = `store.html?id=${encodeURIComponent(currentStore)}`;
-  }
-
-  // ============================================
   // LOGGING
   // ============================================
   function _logInteraction(action, barcode) {
     try {
       const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-      const suffix = currentStore ? `:${currentStore}` : '';
       fetch(`${API_BASE}/api/log-interaction`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: tgUser ? String(tgUser.id) : 'unknown',
           username: tgUser?.username || 'unknown',
-          action: `${action}:${barcode}${suffix}`
+          action: `${action}:${barcode}`
         })
       }).catch(() => {});
     } catch (e) {}
@@ -277,33 +219,26 @@
   // ============================================
   // EVENT LISTENERS
   // ============================================
+
   document.addEventListener('DOMContentLoaded', async () => {
+    // Init i18n and apply translations
     if (window.I18N) I18N.init();
     applyI18n();
 
     await Scanner.init();
-
-    // Stores grid (only on landing, not when scoped)
     if (window.Stores && typeof Stores.load === 'function') {
-      try { Stores.load(); } catch (e) { console.error('Stores.load failed:', e); }
-    }
-
-    // Hide stores grid + contributor banner when in scoped mode
-    if (currentStore) {
-      const storesSection = document.getElementById('storesSection');
-      const contribBanner = document.getElementById('contribBanner');
-      if (storesSection) storesSection.style.display = 'none';
-      if (contribBanner) contribBanner.style.display = 'none';
+      try { Stores.load(); } catch(e) { console.error('Stores.load failed:', e); }
+    } else {
+      console.error('Stores module not available');
     }
 
     let perm = 'prompt';
     try { perm = (await navigator.permissions.query({ name: 'camera' })).state; }
     catch (e) {}
 
-    // M4: auto-launch scanner when in scoped mode (skip the permission CTA)
     if (perm === 'denied') {
       UI.showError(t('bc.errPermDenied'));
-    } else if (perm === 'granted' || currentStore) {
+    } else if (perm === 'granted') {
       await openCameraAndScan();
     } else {
       UI.showState('permission');
@@ -318,10 +253,6 @@
     document.getElementById('restartCameraBtn').addEventListener('click', () => restartCamera());
     document.getElementById('torchBtn').addEventListener('click', () => toggleTorch());
     document.getElementById('cameraContainer').addEventListener('click', () => triggerFocus());
-
-    // --- Scoped banner exit (M4) ---
-    const scopedExit = document.getElementById('scopedBannerExit');
-    if (scopedExit) scopedExit.addEventListener('click', _exitScopedScan);
 
     // --- Scan again buttons ---
     document.getElementById('scanAgainBtn').addEventListener('click', () => scanAgain());
@@ -342,14 +273,17 @@
       document.getElementById('ingredientsPanel').style.display = 'none';
     });
 
-    // --- Add product button removed in M4 (wizard removal in M5) ---
+    // --- Add product button ---
+    document.getElementById('addProductBtn').addEventListener('click', () => {
+      const bc = currentBarcode || document.getElementById('notFoundBarcode').textContent;
+      if (bc) AddProduct.start(bc);
+    });
 
-    // --- Wizard done button (still wired during transition) ---
-    const wizDone = document.getElementById('wizardDoneBtn');
-    if (wizDone) wizDone.addEventListener('click', () => scanAgain());
+    // --- Wizard done button ---
+    document.getElementById('wizardDoneBtn').addEventListener('click', () => scanAgain());
 
-    // --- Init Add Product wizard (still alive until M5) ---
-    if (window.AddProduct && typeof AddProduct.init === 'function') AddProduct.init();
+    // --- Init Add Product wizard ---
+    AddProduct.init();
 
     // --- Modal close ---
     document.getElementById('modalCloseBtn').addEventListener('click', () => UI.hideProductModal());
@@ -366,7 +300,7 @@
         startScanning();
       }
     });
-
+    
     // --- Fullscreen image viewer ---
     document.getElementById('productImage').addEventListener('click', () => {
       const src = document.getElementById('productImage').src;
@@ -388,31 +322,34 @@
       Camera.destroy();
     });
 
-    // --- Browser / Android hardware back button ---
+// --- Browser / Android hardware back button ---
+    // Push initial state ONCE, only if no state exists yet
     if (!history.state || history.state.page !== 'scanner') {
-      try { history.replaceState({ page: 'scanner' }, ''); } catch (e) {}
+      try { history.replaceState({ page: 'scanner' }, ''); } catch(e) {}
     }
+    
     let _handlingBack = false;
-    window.addEventListener('popstate', () => {
-      if (_handlingBack) return;
+    window.addEventListener('popstate', (e) => {
+      if (_handlingBack) return;     // re-entry guard
       _handlingBack = true;
-      try { history.pushState({ page: 'scanner' }, ''); } catch (e) {}
+      // Re-push state so we don't actually navigate away
+      try { history.pushState({ page: 'scanner' }, ''); } catch(e) {}
       _handleBackNavigation();
       setTimeout(() => { _handlingBack = false; }, 100);
     });
 
     // --- Language change listener ---
-    window.addEventListener('languageChanged', () => {
-      applyI18n();
-      if (window.Stores && typeof Stores.load === 'function') Stores.load();
-    });
+     window.addEventListener('languageChanged', () => {
+       applyI18n();
+       Stores.load(); // Re-render with translated labels
+     });
   });
 
-  // Expose for other modules
-  window.AppActions = {
-    scanAgain, openCameraAndScan,
-    getCurrentBarcode: () => currentBarcode,
-    getCurrentStore:   () => currentStore,
-  };
+  function _pushState(label) {
+    history.pushState({ page: label }, '', '');
+  }
+
+  // Expose scanAgain for other modules
+  window.AppActions = { scanAgain, openCameraAndScan, getCurrentBarcode: () => currentBarcode };
 
 })();
