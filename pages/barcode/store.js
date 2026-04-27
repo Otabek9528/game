@@ -155,7 +155,7 @@
     'Ice Cream':         '🍦',
     'Baked Goods':       '🥐',
     'Cup Noodles/Ramen': '🍜',
-    'Lunchbox/Dosirak':  '🍱',
+    'Lunchbox/Dosirak':  '🍩',
     'Dairy':             '🥛',
     'Canned Food':       '🥫',
     'Frozen Food':       '🧊',
