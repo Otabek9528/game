@@ -614,6 +614,44 @@ const I18N = {
       ru: 'Эта информация предоставлена только на основе состава продукта и <strong>может содержать ошибки</strong>. Мы не выносим официальных религиозных решений (фатва). Если нашли ошибку, сообщите в нашу <a href="https://t.me/MuslimVegukin">Telegram группу</a>.',
       en: 'This information is provided based on product ingredients only and <strong>may contain errors</strong>. We do not issue official religious rulings (fatwa). If you find an error, please report it in our <a href="https://t.me/MuslimVegukin">Telegram group</a>.'
     },
+    
+    bc: {
+      // ... existing keys ...
+      stores: {
+        title:      "🏪 Do'konlar",
+        sub:        "Do'kon tanlang va mahsulotlarini ko'ring",
+        products:   "ta mahsulot",
+        soon:       "Yaqinda",
+        loadError:  "Do'konlar yuklanmadi",
+        empty:      "Hozircha do'konlar mavjud emas"
+      }
+    }
+
+    // ---- Russian (ru) ----
+    bc: {
+      // ... existing keys ...
+      stores: {
+        title:      "🏪 Магазины",
+        sub:        "Выберите магазин, чтобы увидеть его товары",
+        products:   "товаров",
+        soon:       "Скоро",
+        loadError:  "Не удалось загрузить магазины",
+        empty:      "Магазинов пока нет"
+      }
+    }
+
+    // ---- English (en) ----
+    bc: {
+      // ... existing keys ...
+      stores: {
+        title:      "🏪 Stores",
+        sub:        "Pick a store to browse its products",
+        products:   "products",
+        soon:       "Soon",
+        loadError:  "Could not load stores",
+        empty:      "No stores available yet"
+      }
+    },
   
   },
 

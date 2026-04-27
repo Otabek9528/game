@@ -623,7 +623,13 @@ const I18N = {
         products:   "ta mahsulot",
         soon:       "Yaqinda",
         loadError:  "Do'konlar yuklanmadi",
-        empty:      "Hozircha do'konlar mavjud emas"
+        empty:      "Hozircha do'konlar mavjud emas",
+        pageTitle: "Do'kon Mahsulotlari",
+        scanHere:  "Skanerlash",
+        allCats:   "Hammasi",
+        emptyTitle:"Mahsulot topilmadi",
+        emptyDesc: "Boshqa turkum yoki hukm bo'yicha qidiring.",
+        loadMore:  "Ko'proq ko'rsatish"
       }
     }
 
@@ -636,7 +642,13 @@ const I18N = {
         products:   "товаров",
         soon:       "Скоро",
         loadError:  "Не удалось загрузить магазины",
-        empty:      "Магазинов пока нет"
+        empty:      "Магазинов пока нет",
+        pageTitle: "Товары магазина",
+        scanHere:  "Сканировать",
+        allCats:   "Все",
+        emptyTitle:"Товары не найдены",
+        emptyDesc: "Попробуйте другую категорию или вердикт.",
+        loadMore:  "Показать ещё"
       }
     }
 
@@ -649,7 +661,13 @@ const I18N = {
         products:   "products",
         soon:       "Soon",
         loadError:  "Could not load stores",
-        empty:      "No stores available yet"
+        empty:      "No stores available yet",
+        pageTitle: "Store Products",
+        scanHere:  "Scan",
+        allCats:   "All",
+        emptyTitle:"No products found",
+        emptyDesc: "Try another category or verdict.",
+        loadMore:  "Show more"        
       }
     },
   
