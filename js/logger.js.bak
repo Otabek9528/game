@@ -141,25 +141,6 @@
     const action = detectPageAction();
     
     if (action) {
-      // Skip if index.html already logged this action pre-navigation
-      const guardKey = 'logged_' + action;
-      try {
-        if (sessionStorage.getItem(guardKey) === '1') {
-          sessionStorage.removeItem(guardKey);
-          console.log('ℹ️ Skipping auto-log — already logged pre-navigation:', action);
-          // Still clean URL if action param exists
-          const params = new URLSearchParams(window.location.search);
-          if (params.has('action')) {
-            params.delete('action');
-            const cleanUrl = params.toString()
-              ? `${window.location.pathname}?${params.toString()}`
-              : window.location.pathname;
-            window.history.replaceState({}, '', cleanUrl);
-          }
-          return;
-        }
-      } catch (e) { /* sessionStorage unavailable — fall through and log */ }
-      
       console.log('📍 Auto-logging action:', action);
       logInteraction(action);
       

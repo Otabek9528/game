@@ -268,7 +268,6 @@
         if (window.logInteraction) {
           window.logInteraction('prayers');
         }
-        sessionStorage.setItem('logged_prayers', '1');
         
         // Navigate immediately (no waiting!)
         window.location.href = 'pages/prayers.html';
@@ -292,7 +291,6 @@
         if (window.logInteraction) {
           window.logInteraction('ramadan');
         }
-        sessionStorage.setItem('logged_ramadan', '1');
         
         // Navigate to Ramadan page
         window.location.href = 'pages/ramadan/ramadan.html';
