@@ -543,6 +543,14 @@ const I18N = {
     'bc.store.generalDb':     { uz: 'Umumiy ma\'lumotlar bazasi',                        ru: 'Общая база данных',                                        en: 'General database' },
     'bc.store.storeUnknown':  { uz: '· Do\'kon belgilanmagan',                           ru: '· Магазин не указан',                                      en: '· Store not specified' },
     'bc.store.alsoAt':        { uz: 'Boshqa do\'konlarda ham bor:',                      ru: 'Также есть в этих магазинах:',                            en: 'Also available at:' },
+    
+    // ============================================
+    // BARCODE — Store error states (M6)
+    // ============================================
+    'bc.store.metaError':       { uz: 'Do\'kon ma\'lumotlari yuklanmadi',                    ru: 'Не удалось загрузить данные магазина',                       en: "Couldn't load store data" },
+    'bc.store.productsError':   { uz: 'Mahsulotlar yuklanmadi',                              ru: 'Не удалось загрузить товары',                                 en: "Couldn't load products" },
+    'bc.store.checkConnection': { uz: 'Internetni tekshirib, qayta urinib ko\'ring.',        ru: 'Проверьте подключение и попробуйте снова.',                    en: 'Check your connection and try again.' },
+    'bc.store.retry':           { uz: 'Qayta urinish',                                        ru: 'Повторить',                                                    en: 'Retry' },    
  
     // ============================================
     // BARCODE — Contributor recruitment banner (M4)

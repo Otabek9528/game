@@ -2074,3 +2074,99 @@ body {
     margin-left: 10px; margin-right: 10px;
   }
 }
+
+
+
+/* ============================================================
+   M6 PATCH — barcode.css
+   APPEND to the bottom of barcode.css.
+   ============================================================ */
+
+
+/* ========================================
+   M6 — Inline error card (in product grid)
+   ======================================== */
+.store-error {
+  grid-column: 1 / -1;
+  margin: 16px 0;
+  padding: 28px 20px;
+  background: var(--white);
+  border: 1.5px dashed var(--red-100);
+  border-radius: var(--r-xl);
+  text-align: center;
+}
+.store-error__emoji {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+.store-error__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--red-700);
+  margin: 0 0 4px;
+}
+.store-error__desc {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+.store-error #storeRetryBtn {
+  min-width: 140px;
+}
+
+
+/* ========================================
+   M6 — Toast (non-blocking)
+   ======================================== */
+.store-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(20px);
+  max-width: calc(100vw - 32px);
+  padding: 11px 18px;
+  background: var(--gray-800);
+  color: var(--white);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 100px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.22);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+  text-align: center;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+}
+.store-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.store-toast--err {
+  background: var(--red-700, #b91c1c);
+}
+.store-toast--info {
+  background: var(--gray-800);
+}
+
+
+/* ========================================
+   M6 — Night mode
+   ======================================== */
+.night-mode .store-error {
+  background: #1e1e1e;
+  border-color: rgba(220,38,38,0.4);
+}
+.night-mode .store-error__title { color: #f87171; }
+.night-mode .store-error__desc  { color: #888; }
+
+.night-mode .store-toast {
+  background: #2a2a2a;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+}
+.night-mode .store-toast--err {
+  background: #991b1b;
+}
