@@ -610,7 +610,7 @@ const I18N = {
     // BARCODE — Store detail page (M3)
     // ============================================
     'bc.store.pageTitle':  { uz: 'Do\'kon Mahsulotlari', ru: 'Товары магазина', en: 'Store Products' },
-    
+    'bc.store.category': { uz: 'Turkum', ru: 'Категория', en: 'Category' },
     'bc.store.allCats':    { uz: 'Hammasi', ru: 'Все', en: 'All' },
     'bc.store.emptyTitle': { uz: 'Mahsulot topilmadi', ru: 'Товары не найдены', en: 'No products found' },
     'bc.store.emptyDesc':  { uz: 'Boshqa turkum yoki hukm bo\'yicha qidiring.', ru: 'Попробуйте другую категорию или вердикт.', en: 'Try another category or verdict.' },

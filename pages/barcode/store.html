@@ -71,15 +71,19 @@
     </div>
 
     <!-- ========================================
-         CATEGORY CHIPS
+         CATEGORY PANEL (M9)
          ======================================== -->
-    <div class="cat-chips__wrap">
-      <div class="cat-chips" id="catChips" role="tablist">
-        <button class="cat-chip is-active" data-category="" type="button">
-          <span data-i18n="bc.store.allCats">Hammasi</span>
-          <span class="cat-chip__count" id="chipCountAll">0</span>
-        </button>
-        <!-- Dynamic chips inserted here by store.js -->
+    <div class="cat-panel" id="catPanel">
+      <button class="cat-panel__toggle" id="catPanelToggle" type="button" aria-expanded="false">
+        <span class="cat-panel__toggle-left">
+          <span class="cat-panel__toggle-icon">🗂</span>
+          <span class="cat-panel__toggle-label" data-i18n="bc.store.category">Turkum</span>
+          <span class="cat-panel__toggle-active" id="catPanelActiveLabel" data-i18n="bc.store.allCats">Hammasi</span>
+        </span>
+        <span class="cat-panel__toggle-chev" id="catPanelChev">▾</span>
+      </button>
+      <div class="cat-panel__grid" id="catPanelGrid" hidden>
+        <!-- Populated by store.js -->
       </div>
     </div>
 
