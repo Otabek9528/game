@@ -554,7 +554,28 @@ const I18N = {
 
     // Discover
     'bc.discoverTitle': { uz: '📦 Ma\'lumotlar bazasidan namunalar', ru: '📦 Примеры из базы данных', en: '📦 Samples from the database' },
-
+ 
+    // ============================================
+    // BARCODE — Stores section (M2)
+    // ============================================
+    'bc.stores.title':     { uz: '🏪 Do\'konlar', ru: '🏪 Магазины', en: '🏪 Stores' },
+    'bc.stores.sub':       { uz: 'Do\'kon tanlang va mahsulotlarini ko\'ring', ru: 'Выберите магазин, чтобы увидеть его товары', en: 'Pick a store to browse its products' },
+    'bc.stores.products':  { uz: 'ta mahsulot', ru: 'товаров', en: 'products' },
+    'bc.stores.soon':      { uz: 'Yaqinda', ru: 'Скоро', en: 'Soon' },
+    'bc.stores.loadError': { uz: 'Do\'konlar yuklanmadi', ru: 'Не удалось загрузить магазины', en: 'Could not load stores' },
+    'bc.stores.empty':     { uz: 'Hozircha do\'konlar mavjud emas', ru: 'Магазинов пока нет', en: 'No stores available yet' },
+ 
+    // ============================================
+    // BARCODE — Store detail page (M3)
+    // ============================================
+    'bc.store.pageTitle':  { uz: 'Do\'kon Mahsulotlari', ru: 'Товары магазина', en: 'Store Products' },
+    'bc.store.scanHere':   { uz: 'Skanerlash', ru: 'Сканировать', en: 'Scan' },
+    'bc.store.allCats':    { uz: 'Hammasi', ru: 'Все', en: 'All' },
+    'bc.store.emptyTitle': { uz: 'Mahsulot topilmadi', ru: 'Товары не найдены', en: 'No products found' },
+    'bc.store.emptyDesc':  { uz: 'Boshqa turkum yoki hukm bo\'yicha qidiring.', ru: 'Попробуйте другую категорию или вердикт.', en: 'Try another category or verdict.' },
+    'bc.store.loadMore':   { uz: 'Ko\'proq ko\'rsatish', ru: 'Показать ещё', en: 'Show more' },
+    
+    
     // Wizard - steps
     'bc.wiz.stepPhoto': { uz: 'Mahsulot rasmi', ru: 'Фото продукта', en: 'Product photo' },
     'bc.wiz.stepReview': { uz: 'Rasmni tekshiring', ru: 'Проверьте фото', en: 'Review photo' },
@@ -614,63 +635,6 @@ const I18N = {
       ru: 'Эта информация предоставлена только на основе состава продукта и <strong>может содержать ошибки</strong>. Мы не выносим официальных религиозных решений (фатва). Если нашли ошибку, сообщите в нашу <a href="https://t.me/MuslimVegukin">Telegram группу</a>.',
       en: 'This information is provided based on product ingredients only and <strong>may contain errors</strong>. We do not issue official religious rulings (fatwa). If you find an error, please report it in our <a href="https://t.me/MuslimVegukin">Telegram group</a>.'
     },
-    
-    bc: {
-      // ... existing keys ...
-      stores: {
-        title:      "🏪 Do'konlar",
-        sub:        "Do'kon tanlang va mahsulotlarini ko'ring",
-        products:   "ta mahsulot",
-        soon:       "Yaqinda",
-        loadError:  "Do'konlar yuklanmadi",
-        empty:      "Hozircha do'konlar mavjud emas",
-        pageTitle: "Do'kon Mahsulotlari",
-        scanHere:  "Skanerlash",
-        allCats:   "Hammasi",
-        emptyTitle:"Mahsulot topilmadi",
-        emptyDesc: "Boshqa turkum yoki hukm bo'yicha qidiring.",
-        loadMore:  "Ko'proq ko'rsatish"
-      }
-    }
-
-    // ---- Russian (ru) ----
-    bc: {
-      // ... existing keys ...
-      stores: {
-        title:      "🏪 Магазины",
-        sub:        "Выберите магазин, чтобы увидеть его товары",
-        products:   "товаров",
-        soon:       "Скоро",
-        loadError:  "Не удалось загрузить магазины",
-        empty:      "Магазинов пока нет",
-        pageTitle: "Товары магазина",
-        scanHere:  "Сканировать",
-        allCats:   "Все",
-        emptyTitle:"Товары не найдены",
-        emptyDesc: "Попробуйте другую категорию или вердикт.",
-        loadMore:  "Показать ещё"
-      }
-    }
-
-    // ---- English (en) ----
-    bc: {
-      // ... existing keys ...
-      stores: {
-        title:      "🏪 Stores",
-        sub:        "Pick a store to browse its products",
-        products:   "products",
-        soon:       "Soon",
-        loadError:  "Could not load stores",
-        empty:      "No stores available yet",
-        pageTitle: "Store Products",
-        scanHere:  "Scan",
-        allCats:   "All",
-        emptyTitle:"No products found",
-        emptyDesc: "Try another category or verdict.",
-        loadMore:  "Show more"        
-      }
-    },
-  
   },
 
   init() {
