@@ -181,7 +181,7 @@
           return {
             category: cat.category,
             icon:     CAT_ICONS[cat.category] || '📦',
-            label:    cat.category,
+            label:    t('bc.cat.' + cat.category, cat.category),
             count,
             active:   cat.category === state.category,
           };
@@ -358,7 +358,7 @@
     if (img && img.startsWith('/api/')) img = API_BASE + img;
 
     const name = p.name || p.nameEnglish || p.barcode || '—';
-    const category = p.category ? esc(p.category) : '';
+    const category = p.category ? esc(t('bc.cat.' + p.category, p.category)) : '';
 
     return `
       <div class="prod-card prod-card--${verdictClass}" data-barcode="${esc(p.barcode)}">

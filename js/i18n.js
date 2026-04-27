@@ -527,6 +527,21 @@ const I18N = {
     'bc.verdictJoizDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar topilmadi', ru: 'Запрещённые ингредиенты не обнаружены', en: 'No prohibited ingredients found' },
     'bc.verdictTaqiqlanganDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar aniqlandi', ru: 'Обнаружены запрещённые ингредиенты', en: 'Prohibited ingredients detected' },
     'bc.verdictShubhaliDesc': { uz: 'Ta\'qiqlangan moddalar yo\'q, lekin bir zavodda ishlab chiqarilgan', ru: 'Запрещённых веществ нет, но произведено на одном заводе', en: 'No prohibited substances, but produced in same factory' },
+    
+    
+    'bc.cat.Drinks':            { uz: 'Ichimliklar',         ru: 'Напитки',           en: 'Drinks' },
+    'bc.cat.Snacks':            { uz: 'Yengil ovqatlar',     ru: 'Снеки',              en: 'Snacks' },
+    'bc.cat.Sweets':            { uz: 'Shirinliklar',        ru: 'Сладости',           en: 'Sweets' },
+    'bc.cat.Ice Cream':         { uz: 'Muzqaymoq',           ru: 'Мороженое',          en: 'Ice Cream' },
+    'bc.cat.Baked Goods':       { uz: 'Non mahsulotlari',    ru: 'Выпечка',            en: 'Baked Goods' },
+    'bc.cat.Cup Noodles/Ramen': { uz: 'Lagʻmon/Ramen',     ru: 'Лапша / Рамен',      en: 'Noodles / Ramen' },
+    'bc.cat.Lunchbox/Dosirak':  { uz: 'Pechenya/Pishiriqlar',   ru: 'Печенье/Выпечка', en: 'Cookies/Pastry' },
+    'bc.cat.Dairy':             { uz: 'Sut mahsulotlari',    ru: 'Молочные',           en: 'Dairy' },
+    'bc.cat.Canned Food':       { uz: 'Konserva',            ru: 'Консервы',           en: 'Canned Food' },
+    'bc.cat.Frozen Food':       { uz: 'Muzlatilgan',         ru: 'Замороженные',       en: 'Frozen Food' },
+    'bc.cat.Condiments/Sauces': { uz: 'Ziravor/Souslar',   ru: 'Приправы / Соусы',   en: 'Condiments / Sauces' },
+    'bc.cat.Fruits/Vegetables': { uz: 'Meva/Sabzavot',     ru: 'Фрукты / Овощи',     en: 'Fruits / Vegetables' },
+    'bc.cat.Dried Food':        { uz: 'Quritilgan',          ru: 'Сушёные',            en: 'Dried Food' },
 
  
     // ============================================
