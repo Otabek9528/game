@@ -483,8 +483,13 @@
   }
 
   function _bindModalClose() {
-    document.getElementById('modalCloseBtn').addEventListener('click', _hideProductModal);
-    document.getElementById('modalBackdrop').addEventListener('click', _hideProductModal);
+    function userClose() {
+      // Use history.back so the pushed 'modal' state is consumed.
+      // popstate handler will call _hideProductModal via _handleBack.
+      try { history.back(); } catch (e) { _hideProductModal(); }
+    }
+    document.getElementById('modalCloseBtn').addEventListener('click', userClose);
+    document.getElementById('modalBackdrop').addEventListener('click', userClose);
   }
 
   // =============================================================
@@ -501,6 +506,7 @@
       viewerImg.src = src;
       viewer.classList.add('active');
       document.body.style.overflow = 'hidden';
+      _pushState('fullscreen');
     });
 
     function close() {
@@ -511,36 +517,52 @@
         document.body.style.overflow = '';
       }
     }
-    closeBtn.addEventListener('click', close);
-    viewer.addEventListener('click', (e) => {
-      if (e.target === viewer) close();
+    closeBtn.addEventListener('click', () => {
+      // Pop the fullscreen history entry so back stays in sync
+      try { history.back(); } catch (e) { close(); }
     });
+    viewer.addEventListener('click', (e) => {
+      if (e.target === viewer) {
+        try { history.back(); } catch (err) { close(); }
+      }
+    });
+
+    // Expose for _handleBack
+    _closeFullscreenInternal = close;
   }
+  let _closeFullscreenInternal = null;
 
   // =============================================================
   // BACK NAVIGATION
   // =============================================================
   function _bindBackHistory() {
-    _pushState('store');
+    if (!history.state || history.state.page !== 'store') {
+      try { history.replaceState({ page: 'store' }, ''); } catch (e) {}
+    }
+    let _handlingBack = false;
     window.addEventListener('popstate', () => {
-      _pushState('back');
+      if (_handlingBack) return;
+      _handlingBack = true;
       _handleBack();
+      setTimeout(() => { _handlingBack = false; }, 100);
     });
   }
 
   function _pushState(label) {
-    try { history.pushState({ page: label }, '', ''); } catch (e) {}
+    try { history.pushState({ page: label }, ''); } catch (e) {}
   }
 
   function _handleBack() {
+    // Topmost layer wins. Order matters: fullscreen → modal → page exit.
+    const viewer = document.getElementById('fullscreenViewer');
+    if (viewer && viewer.classList.contains('active')) {
+      if (typeof _closeFullscreenInternal === 'function') _closeFullscreenInternal();
+      else viewer.classList.remove('active');
+      return;
+    }
     const modal = document.getElementById('productModal');
     if (modal && modal.style.display !== 'none') {
       _hideProductModal();
-      return;
-    }
-    const viewer = document.getElementById('fullscreenViewer');
-    if (viewer && viewer.classList.contains('active')) {
-      viewer.classList.remove('active');
       return;
     }
     window.location.href = 'barcode.html';
