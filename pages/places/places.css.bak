@@ -1061,3 +1061,130 @@ body {
 .night-mode .info-footer-text a {
   color: #90caf9;
 }
+
+
+
+.place-card.has-menu {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(135deg, #ffd86b 0%, #ff9a3c 50%, #00a884 100%) border-box;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.place-card.has-menu:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 24px rgba(255, 154, 60, 0.18),
+    0 4px 12px rgba(0, 168, 132, 0.12);
+}
+
+.menu-photo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ff9a3c 0%, #ff6b35 100%);
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow:
+    0 4px 12px rgba(255, 107, 53, 0.45),
+    0 0 0 2px rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.menu-photo-badge .pill-icon { font-size: 0.9rem; line-height: 1; }
+
+.menu-strip {
+  background: linear-gradient(180deg, #fff8ed 0%, #ffffff 100%);
+  border-top: 1px dashed rgba(255, 154, 60, 0.35);
+  padding: 12px 0 14px 0;
+  position: relative;
+  min-height: 60px;
+}
+.menu-strip-header { padding: 0 16px 10px 16px; }
+.menu-strip-title {
+  font-size: 0.85rem; font-weight: 700;
+  color: #b8541a;
+  display: flex; align-items: center; gap: 6px;
+  letter-spacing: 0.2px;
+}
+.menu-strip-title .title-icon { font-size: 0.95rem; }
+.menu-items-scroll {
+  display: flex; gap: 10px;
+  overflow-x: auto; overflow-y: hidden;
+  padding: 0 16px 4px 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.menu-items-scroll::-webkit-scrollbar { display: none; }
+
+.menu-item-chip {
+  flex-shrink: 0;
+  width: 110px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+.menu-item-chip-image { width: 100%; height: 70px; background: #f5e8d8; overflow: hidden; }
+.menu-item-chip-image img { width: 100%; height: 100%; object-fit: cover; }
+.menu-item-chip-image-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #fff5e8 0%, #ffe8d4 100%);
+  font-size: 1.6rem;
+  opacity: 0.6;
+}
+.menu-item-chip-info { padding: 6px 8px 8px 8px; }
+.menu-item-chip-name {
+  font-size: 0.78rem; font-weight: 600;
+  color: #2c5e2e; line-height: 1.2;
+  margin: 0 0 3px 0;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.menu-item-chip-price {
+  font-size: 0.78rem; font-weight: 700;
+  color: #ff6b35;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.menu-item-chip.more-chip {
+  background: linear-gradient(135deg, #fff5e8 0%, #ffe8d4 100%);
+  border: 1px dashed rgba(255, 107, 53, 0.4);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 124px; padding: 8px;
+}
+.menu-item-chip.more-chip .more-icon { font-size: 1.4rem; margin-bottom: 4px; }
+.menu-item-chip.more-chip .more-text {
+  font-size: 0.75rem; font-weight: 700; color: #b8541a;
+  text-align: center; line-height: 1.2;
+}
+
+/* Loading skeleton chip */
+.menu-item-chip.skeleton { pointer-events: none; }
+.menu-item-chip.skeleton .menu-item-chip-image,
+.menu-item-chip.skeleton .menu-item-chip-name,
+.menu-item-chip.skeleton .menu-item-chip-price {
+  background: linear-gradient(90deg, #f5e8d8 0%, #faf3e8 50%, #f5e8d8 100%);
+  background-size: 200% 100%;
+  animation: stripSkeleton 1.4s ease-in-out infinite;
+  color: transparent !important;
+}
+.menu-item-chip.skeleton .menu-item-chip-name { height: 14px; border-radius: 4px; margin-bottom: 4px; }
+.menu-item-chip.skeleton .menu-item-chip-price { height: 12px; border-radius: 4px; width: 60%; }
+@keyframes stripSkeleton {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
