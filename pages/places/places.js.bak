@@ -44,24 +44,6 @@ const PLACE_CONFIGS = {
   }
 };
 
-
-// Extract shop_id from a Telegram menu URL:
-//   https://t.me/muslim_vegukin_bot/shop?startapp=toshkent_halal
-function extractShopIdFromMenuUrl(menuUrl) {
-  if (!menuUrl) return null;
-  try {
-    const url = new URL(menuUrl);
-    return url.searchParams.get('startapp') || null;
-  } catch (e) { return null; }
-}
-
-function escapeHtmlSimple(s) {
-  if (s == null) return '';
-  const d = document.createElement('div');
-  d.textContent = String(s);
-  return d.innerHTML;
-}
-
 // Get translated config based on current language
 function getTranslatedConfig(placeType) {
   const base = PLACE_CONFIGS[placeType] || PLACE_CONFIGS.mosque;
@@ -898,12 +880,6 @@ async function renderPlaceCards(places) {
 	const distanceDisplay = (place.distance !== null && place.distance !== undefined) ? place.distance.toFixed(2) : 'N/A';
     const phoneDisplay = place.phone || noInfoText;
     
-const hasMenu = !!(place.menuUrl && place.buildingType === 'Oshxona');
-    if (hasMenu) card.classList.add('has-menu');
-    const shopIdForMenu = hasMenu ? extractShopIdFromMenuUrl(place.menuUrl) : null;
-    const menuLabel    = window.I18N ? I18N.t('places.menuAvailable') : 'Menyu mavjud';
-    const previewLabel = window.I18N ? I18N.t('places.menuPreview')   : 'Menyudan namunalar';
-
     card.innerHTML = `
       <div class="card-top-badges">
         <div class="place-rating-badge">
@@ -914,39 +890,11 @@ const hasMenu = !!(place.menuUrl && place.buildingType === 'Oshxona');
           <span>${distanceDisplay} km</span>
         </div>
       </div>
-
+      
       <div class="place-card-image">
-        ${hasMenu ? `
-          <div class="menu-photo-badge">
-            <span class="pill-icon">📋</span>
-            <span>${menuLabel}</span>
-          </div>
-        ` : ''}
         ${createSkeletonCard(place.id)}
       </div>
-
-      ${hasMenu && shopIdForMenu ? `
-        <div class="menu-strip" data-menu-strip data-shop-id="${shopIdForMenu}">
-          <div class="menu-strip-header">
-            <div class="menu-strip-title">
-              <span class="title-icon">🍽️</span>
-              <span>${previewLabel}</span>
-            </div>
-          </div>
-          <div class="menu-items-scroll">
-            ${[0,1,2,3].map(() => `
-              <div class="menu-item-chip skeleton">
-                <div class="menu-item-chip-image"></div>
-                <div class="menu-item-chip-info">
-                  <p class="menu-item-chip-name">&nbsp;</p>
-                  <p class="menu-item-chip-price">&nbsp;</p>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      ` : ''}
-
+      
       <div class="place-card-content">
         <h3 class="place-name">${place.name}</h3>
         <p class="place-name-ko">${place.city || 'Unknown City'}</p>
@@ -962,29 +910,15 @@ const hasMenu = !!(place.menuUrl && place.buildingType === 'Oshxona');
         </div>
       </div>
     `;
-
+    
     // Add click handler to the card (works even while loading)
     card.addEventListener('click', (e) => {
+      // Don't navigate if clicking on carousel photo (to open modal)
       if (e.target.closest('.carousel-photo') || e.target.closest('.place-photo-single')) {
         return;
       }
       saveSearchState();
       sessionStorage.setItem('comingFromDetail', 'true');
-
-      // Restaurants with a menu: open Telegram WebApp menu directly
-      if (hasMenu) {
-        try {
-          if (window.Telegram?.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-          }
-          window.Telegram.WebApp.openTelegramLink(place.menuUrl);
-          return;
-        } catch (err) {
-          window.open(place.menuUrl, '_blank');
-          return;
-        }
-      }
-
       window.location.href = `places-detail.html?type=${PLACE_TYPE}&id=${place.id}`;
     });
     
@@ -997,69 +931,7 @@ const hasMenu = !!(place.menuUrl && place.buildingType === 'Oshxona');
   currentPlaces = places;
   updatePageTitle();
   loadingIndicator.style.display = 'none';
-  // Lazy-load menu preview strips for restaurants with menuUrl — non-blocking
-  loadMenuStrips();
 }
-
-
-function loadMenuStrips() {
-  document.querySelectorAll('[data-menu-strip]').forEach(stripEl => {
-    const shopId = stripEl.getAttribute('data-shop-id');
-    if (shopId) fetchAndInjectStrip(shopId, stripEl);
-  });
-}
-
-async function fetchAndInjectStrip(shopId, stripEl) {
-  try {
-    const resp = await fetch(
-      `${MENU_API_BASE}/shop/${encodeURIComponent(shopId)}/api/restaurant/preview-dishes?limit=4`,
-      { signal: AbortSignal.timeout(8000) }
-    );
-    if (!resp.ok) throw new Error('Preview fetch failed: ' + resp.status);
-    const data = await resp.json();
-    renderStripDishes(stripEl, shopId, data.dishes || [], data.total || 0);
-  } catch (err) {
-    console.warn('Menu strip failed for', shopId, err);
-    stripEl.style.display = 'none';  // fail silently
-  }
-}
-
-function renderStripDishes(stripEl, shopId, dishes, total) {
-  if (!dishes.length) { stripEl.style.display = 'none'; return; }
-  const scrollEl = stripEl.querySelector('.menu-items-scroll');
-  if (!scrollEl) return;
-
-  const moreText = window.I18N ? I18N.t('places.viewAllDishes') : 'Hammasini ko\'rish';
-  const noPhoto = '🍽️';
-
-  const chipsHTML = dishes.map(d => {
-    const photoHTML = d.image_path
-      ? `<img src="${MENU_API_BASE}/shop/${encodeURIComponent(shopId)}/uploads/${encodeURIComponent(d.image_path)}" alt="${escapeHtmlSimple(d.name)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;menu-item-chip-image-fallback&quot;>${noPhoto}</div>'" />`
-      : `<div class="menu-item-chip-image-fallback">${noPhoto}</div>`;
-    const priceFormatted = (d.price != null)
-      ? `${Math.round(d.price).toLocaleString()} ₩`
-      : '';
-    return `
-      <div class="menu-item-chip">
-        <div class="menu-item-chip-image">${photoHTML}</div>
-        <div class="menu-item-chip-info">
-          <p class="menu-item-chip-name">${escapeHtmlSimple(d.name)}</p>
-          <p class="menu-item-chip-price">${priceFormatted}</p>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  const moreChip = (total > dishes.length) ? `
-    <div class="menu-item-chip more-chip">
-      <span class="more-icon">→</span>
-      <span class="more-text">${moreText}</span>
-    </div>
-  ` : '';
-
-  scrollEl.innerHTML = chipsHTML + moreChip;
-}
-
 
 function showError(message) {
   loadingIndicator.style.display = 'none';
