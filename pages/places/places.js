@@ -909,17 +909,18 @@ const hasMenu = !!(place.menuUrl && place.buildingType === 'Oshxona');
             <div class="place-rating-badge">
               ${starRatingHTML}
             </div>
-            ${hasMenu ? `
-              <div class="menu-photo-badge">
-                <span class="pill-icon">📋</span>
-                <span>${menuLabel}</span>
-              </div>
-            ` : ''}
             <div class="place-distance-badge">
               <span>📍</span>
               <span>${distanceDisplay} km</span>
             </div>
           </div>
+
+          ${hasMenu ? `
+            <div class="menu-photo-badge">
+              <span class="pill-icon">📋</span>
+              <span>${menuLabel}</span>
+            </div>
+          ` : ''}
 
           <div class="place-card-image">
             ${createSkeletonCard(place.id)}

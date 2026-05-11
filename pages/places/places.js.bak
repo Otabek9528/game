@@ -905,25 +905,25 @@ const hasMenu = !!(place.menuUrl && place.buildingType === 'Oshxona');
     const previewLabel = window.I18N ? I18N.t('places.menuPreview')   : 'Menyudan namunalar';
 
     card.innerHTML = `
-      <div class="card-top-badges">
-        <div class="place-rating-badge">
-          ${starRatingHTML}
-        </div>
-        <div class="place-distance-badge">
-          <span>📍</span>
-          <span>${distanceDisplay} km</span>
-        </div>
-      </div>
-
-      <div class="place-card-image">
-        ${hasMenu ? `
-          <div class="menu-photo-badge">
-            <span class="pill-icon">📋</span>
-            <span>${menuLabel}</span>
+          <div class="card-top-badges">
+            <div class="place-rating-badge">
+              ${starRatingHTML}
+            </div>
+            ${hasMenu ? `
+              <div class="menu-photo-badge">
+                <span class="pill-icon">📋</span>
+                <span>${menuLabel}</span>
+              </div>
+            ` : ''}
+            <div class="place-distance-badge">
+              <span>📍</span>
+              <span>${distanceDisplay} km</span>
+            </div>
           </div>
-        ` : ''}
-        ${createSkeletonCard(place.id)}
-      </div>
+
+          <div class="place-card-image">
+            ${createSkeletonCard(place.id)}
+          </div>
 
       ${hasMenu && shopIdForMenu ? `
         <div class="menu-strip" data-menu-strip data-shop-id="${shopIdForMenu}">
