@@ -305,6 +305,10 @@ const I18N = {
     'places.restaurant.pageTitle': { uz: 'Sizga eng yaqin 5 oshxona', ru: '5 ближайших ресторанов', en: '5 nearest restaurants' },
     'places.restaurant.searchedTitle': { uz: 'Izlangan joyga eng yaqinlari', ru: 'Ближайшие к искомому месту', en: 'Nearest to searched location' },
     'places.restaurant.noResults': { uz: 'Hech qanday oshxona topilmadi', ru: 'Рестораны не найдены', en: 'No restaurants found' },
+    
+    'places.menuAvailable': { uz: 'Menyu mavjud',         ru: 'Меню доступно',     en: 'Menu available' },
+    'places.menuPreview':   { uz: 'Menyudan namunalar',   ru: 'Из меню',           en: 'From the menu' },
+    'places.viewAllDishes': { uz: 'Hammasini ko\'rish',   ru: 'Все блюда',         en: 'View all' },
 
     // Places - Shop specific
     'places.shop.name': { uz: 'Do\'kon', ru: 'Магазин', en: 'Shop' },

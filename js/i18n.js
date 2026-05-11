@@ -309,6 +309,13 @@ const I18N = {
     'places.menuAvailable': { uz: 'Menyu mavjud',         ru: 'Меню доступно',     en: 'Menu available' },
     'places.menuPreview':   { uz: 'Menyudan namunalar',   ru: 'Из меню',           en: 'From the menu' },
     'places.viewAllDishes': { uz: 'Hammasini ko\'rish',   ru: 'Все блюда',         en: 'View all' },
+    
+    'detail.menuCtaTitle':  { uz: 'Menyu va onlayn buyurtma',                              ru: 'Меню и онлайн-заказ',                       en: 'Menu & online order' },
+'detail.menuCtaSub':    { uz: 'Stoldan yoki olib ketish uchun buyurtma bering',         ru: 'Закажите в зале или на вынос',              en: 'Order for dine-in or takeout' },
+'detail.menuInfoLabel': { uz: 'RESTORAN EGASIMISIZ?',                                   ru: 'ВЫ ВЛАДЕЛЕЦ?',                              en: 'ARE YOU THE OWNER?' },
+'detail.menuInfoText':  { uz: "Menyungizni Muslim Vegukin orqali onlayn taqdim qilish va mijozlardan to'g'ridan-to'g'ri buyurtma qabul qilishni xohlasangiz, biz bilan bog'laning.",
+                          ru: 'Если вы хотите представить свое меню онлайн через Muslim Vegukin и принимать заказы напрямую от клиентов, свяжитесь с нами.',
+                          en: 'If you would like to showcase your menu online through Muslim Vegukin and accept orders directly from customers, contact us.' },
 
     // Places - Shop specific
     'places.shop.name': { uz: 'Do\'kon', ru: 'Магазин', en: 'Shop' },

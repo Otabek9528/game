@@ -964,30 +964,14 @@ const hasMenu = !!(place.menuUrl && place.buildingType === 'Oshxona');
       </div>
     `;
 
-    // Add click handler to the card (works even while loading)
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.carousel-photo') || e.target.closest('.place-photo-single')) {
-        return;
-      }
-      saveSearchState();
-      sessionStorage.setItem('comingFromDetail', 'true');
-
-      // Restaurants with a menu: open Telegram WebApp menu directly
-      if (hasMenu) {
-        try {
-          if (window.Telegram?.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+          if (e.target.closest('.carousel-photo') || e.target.closest('.place-photo-single')) {
+            return;
           }
-          window.Telegram.WebApp.openTelegramLink(place.menuUrl);
-          return;
-        } catch (err) {
-          window.open(place.menuUrl, '_blank');
-          return;
-        }
-      }
-
-      window.location.href = `places-detail.html?type=${PLACE_TYPE}&id=${place.id}`;
-    });
+          saveSearchState();
+          sessionStorage.setItem('comingFromDetail', 'true');
+          window.location.href = `places-detail.html?type=${PLACE_TYPE}&id=${place.id}`;
+        });
     
     placeCardsContainer.appendChild(card);
     
