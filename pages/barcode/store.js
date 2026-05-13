@@ -425,6 +425,7 @@
     document.getElementById('modalBarcode').textContent = p.barcode || '—';
 
     _renderModalHalalGrid(p);
+    _renderModalAmbiguous(p);
     _renderModalFactory(p);
 
     const ingrBox = document.getElementById('modalIngredients');
@@ -461,6 +462,19 @@
         </div>`;
       grid.appendChild(el);
     });
+  }
+
+  function _renderModalAmbiguous(data) {
+    const box = document.getElementById('modalAmbiguous');
+    if (!box) return;
+    if (data.ambiguousIngredient) {
+      document.getElementById('modalAmbiguousText').textContent =
+        t('bc.ambiguousWarn',
+          "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 mavjud — o'simlik yoki hayvondan olinishi mumkin.");
+      box.style.display = 'flex';
+    } else {
+      box.style.display = 'none';
+    }
   }
 
   function _renderModalFactory(data) {
