@@ -41,8 +41,6 @@ window.UI = (() => {
       factoryNotice:    document.getElementById('factoryNotice'),
       factoryIcon:      document.getElementById('factoryIcon'),
       factoryText:      document.getElementById('factoryText'),
-      ambiguousNotice:  document.getElementById('ambiguousNotice'),
-      ambiguousText:    document.getElementById('ambiguousText'),
       ingredientsPanel: document.getElementById('ingredientsPanel'),
       ingredientsText:  document.getElementById('ingredientsText'),
       fullscreenViewer:  document.getElementById('fullscreenViewer'),
@@ -140,16 +138,6 @@ window.UI = (() => {
       el.innerHTML = `<span class="modal-halal-cell__icon">${c.icon}</span>${ok ? '✅ ' + label + ' ' + t('bc.absent') : '❌ ' + label + ' ' + t('bc.present')}`;
       grid.appendChild(el);
     });
-
-    const ambig = document.getElementById('modalAmbiguous');
-    if (ambig) {
-      if (data.ambiguousIngredient) {
-        document.getElementById('modalAmbiguousText').textContent = t('bc.ambiguousWarn');
-        ambig.style.display = 'flex';
-      } else {
-        ambig.style.display = 'none';
-      }
-    }
 
     const factory = document.getElementById('modalFactory');
     if (data.sameFactory !== undefined && data.sameFactory !== null) {
@@ -267,7 +255,6 @@ window.UI = (() => {
     e.barcodeNumber.textContent = data.barcode || '—';
 
     _renderHalalGrid(data);
-    _renderAmbiguousNotice(data.ambiguousIngredient);
     _renderFactoryNotice(data.sameFactory);
 
     e.ingredientsText.textContent = data.ingredients || '';
@@ -383,19 +370,6 @@ window.UI = (() => {
       e.factoryText.textContent = t('bc.factoryOk');
     }
     e.factoryNotice.style.display = 'flex';
-  }
-
-  // One-way warning: only shown when ambiguousIngredient is true.
-  // Otherwise stays hidden — we don't clutter the result with a green "no ambiguous" row.
-  function _renderAmbiguousNotice(ambiguous) {
-    const e = els();
-    if (!e.ambiguousNotice) return;
-    if (ambiguous) {
-      e.ambiguousText.textContent = t('bc.ambiguousWarn');
-      e.ambiguousNotice.style.display = 'flex';
-    } else {
-      e.ambiguousNotice.style.display = 'none';
-    }
   }
 
   // --- Clipboard ---

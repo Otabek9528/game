@@ -724,6 +724,20 @@ async function renderPlaceDetail(place) {
           </div>
         </div>
         
+        
+        ${PLACE_TYPE === 'restaurant' && place.menuUrl ? `
+          <a href="${place.menuUrl}" class="menu-cta-card" onclick="openMenuApp(event, '${place.menuUrl}')">
+            <div class="menu-cta-icon">📋</div>
+            <div class="menu-cta-body">
+              <h4 class="menu-cta-title">${window.I18N ? I18N.t('detail.menuCtaTitle') : 'Menyu va onlayn buyurtma'}</h4>
+              <p class="menu-cta-sub">${window.I18N ? I18N.t('detail.menuCtaSub') : 'Stoldan yoki olib ketish uchun buyurtma bering'}</p>
+            </div>
+            <div class="menu-cta-arrow">→</div>
+          </a>
+        ` : ''}
+        
+        
+        
         <div class="detail-section">
           <h3 class="detail-section-title">📍 ${addressTitle}</h3>
           <div class="detail-info-item" style="cursor: pointer;" onclick="copyAddress('${(place.address || '').replace(/'/g, "\\'")}', event)">
@@ -759,6 +773,23 @@ async function renderPlaceDetail(place) {
             ` : ''}
           </div>
         </div>
+        
+        
+        ${PLACE_TYPE === 'restaurant' && !place.menuUrl ? `
+          <div class="menu-info-card">
+            <div class="menu-info-header">
+              <span class="menu-info-icon">💡</span>
+              <span class="menu-info-label">${window.I18N ? I18N.t('detail.menuInfoLabel') : "RESTORAN EGASIMISIZ?"}</span>
+            </div>
+            <p class="menu-info-text">${window.I18N ? I18N.t('detail.menuInfoText') : "Menyungizni Muslim Vegukin orqali onlayn taqdim qilish va mijozlardan to'g'ridan-to'g'ri buyurtma qabul qilishni xohlasangiz, biz bilan bog'laning."}</p>
+            <a href="https://t.me/otabeksattarov" class="menu-info-link" onclick="openAdminContact(event)">
+              <span class="info-link-icon">💬</span>
+              <span class="info-link-text">Bog'lanish</span>
+              <span class="info-link-arrow">→</span>
+            </a>
+          </div>
+        ` : ''}
+        
         
         <div class="detail-section review-section">
           <div class="review-collapsible">
@@ -809,6 +840,28 @@ async function renderPlaceDetail(place) {
   }
 
   initReviewSubmission(place.id);      
+}
+
+
+function openMenuApp(e, menuUrl) {
+  e.preventDefault();
+  try {
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    }
+    window.Telegram.WebApp.openTelegramLink(menuUrl);
+  } catch (err) {
+    window.open(menuUrl, '_blank');
+  }
+}
+
+function openAdminContact(e) {
+  e.preventDefault();
+  try {
+    window.Telegram.WebApp.openTelegramLink('https://t.me/otabeksattarov');
+  } catch (err) {
+    window.open('https://t.me/otabeksattarov', '_blank');
+  }
 }
 
 

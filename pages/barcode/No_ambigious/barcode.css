@@ -724,14 +724,6 @@ body {
 .factory-bar__icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 1px; }
 .factory-bar__text { font-size: 0.82rem; color: var(--gray-700); margin: 0; line-height: 1.5; }
 
-.ambiguous-bar {
-  margin: 0 18px 14px; display: flex; align-items: flex-start; gap: 10px;
-  padding: 11px 14px; border-radius: var(--r-md);
-  background: var(--amber-50); border-left: 3.5px solid var(--amber-600);
-}
-.ambiguous-bar__icon { font-size: 1.15rem; flex-shrink: 0; margin-top: 1px; }
-.ambiguous-bar__text { font-size: 0.82rem; color: var(--gray-700); margin: 0; line-height: 1.5; }
-
 .card-actions { display: flex; gap: 8px; padding: 4px 18px 16px; }
 .card-actions .btn { flex: 1; font-size: 0.85rem; padding: 12px 8px; }
 
@@ -896,15 +888,6 @@ body {
 .modal-factory--warn { background: var(--amber-50); color: var(--amber-700); }
 .modal-factory--ok { background: var(--green-50); color: var(--green-700); }
 .modal-factory__text { line-height: 1.4; }
-
-/* Modal ambiguous (shubhali-tier, amber tone) */
-.modal-ambiguous {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border-radius: var(--r-sm);
-  margin-bottom: 10px; font-size: 0.78rem;
-  background: var(--amber-50); color: var(--amber-700);
-}
-.modal-ambiguous__text { line-height: 1.4; }
 
 /* Modal ingredients */
 .modal-ingredients { margin-bottom: 4px; }
@@ -1092,14 +1075,6 @@ body {
   color: #bbb;
 }
 
-/* Ambiguous bar */
-.night-mode .ambiguous-bar {
-  background: rgba(184, 134, 11, 0.1);
-}
-.night-mode .ambiguous-bar__text {
-  color: #bbb;
-}
-
 /* Ingredients */
 .night-mode .ingredients {
   background: #1a1a1a;
@@ -1261,10 +1236,6 @@ body {
 }
 .night-mode .modal-factory--warn {
   background: rgba(184, 134, 11, 0.1);
-}
-.night-mode .modal-ambiguous {
-  background: rgba(184, 134, 11, 0.1);
-  color: var(--amber-600, #d4a21a);
 }
 .night-mode .modal-factory--ok {
   background: rgba(20, 92, 52, 0.1);

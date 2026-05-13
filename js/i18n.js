@@ -612,6 +612,10 @@ const I18N = {
     'bc.present': { uz: 'bor', ru: 'есть', en: 'present' },
 
     // Factory
+    'bc.flag.ambiguous': {uz: "Manbasi noma'lum", ru: "Неизвестное происхождение", en: "Unknown source"},
+    'bc.ambiguousWarn': {uz: "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 mavjud — o'simlik yoki hayvon YO\'G\Idan olinishi mumkin.", ru: "Содержит 트랜스지방, 쇼트닝, 향료 или 글리세린 — может быть растительного или животного  происхождения (жир).", en: "Contains 트랜스지방, 쇼트닝, 향료 or 글리세린 — may be of plant or animal FAT origin."},
+    
+    
     'bc.factoryWarn': { uz: 'Mahsulot ta\'qiqlangan mahsulotlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.', ru: 'Продукт произведён на оборудовании, где производятся запрещённые продукты.', en: 'Product manufactured on equipment where prohibited products are produced.' },
     'bc.factoryOk': { uz: 'Mahsulot ishlab chiqarilgan zavod/uskunalarda ta\'qiqlangan mahsulotlar ishlatilmaydi.', ru: 'На заводе/оборудовании не производятся запрещённые продукты.', en: 'No prohibited products are manufactured on this equipment.' },
 

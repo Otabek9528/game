@@ -781,10 +781,10 @@ async function renderPlaceDetail(place) {
               <span class="menu-info-icon">💡</span>
               <span class="menu-info-label">${window.I18N ? I18N.t('detail.menuInfoLabel') : "RESTORAN EGASIMISIZ?"}</span>
             </div>
-            <p class="menu-info-text">${window.I18N ? I18N.t('detail.menuInfoText') : "Menyungizni Muslim Vegukin orqali onlayn taqdim qilish va mijozlardan to'g'ridan-to'g'ri buyurtma qabul qilishni xohlasangiz, biz bilan bog'laning."}</p>
+            <p class="menu-info-text">${window.I18N ? I18N.t('detail.menuInfoText') : "Restoran menyusini onlayn taqdim qilish va mijozlardan to'g'ridan-to'g'ri buyurtma qabul qilishni xohlasangiz, biz bilan bog'laning."}</p>
             <a href="https://t.me/otabeksattarov" class="menu-info-link" onclick="openAdminContact(event)">
               <span class="info-link-icon">💬</span>
-              <span class="info-link-text">@otabeksattarov</span>
+              <span class="info-link-text">Bog'lanish</span>
               <span class="info-link-arrow">→</span>
             </a>
           </div>
