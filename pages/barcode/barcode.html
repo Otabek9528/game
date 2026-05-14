@@ -354,6 +354,41 @@
   
   <script src="stores.js"></script>
   <script src="app.js"></script>
+    <script>
+    // Boot skeleton remover (M12)
+    // Removes the scanner-area boot skeleton as soon as a real
+    // state (permission / error / scanner) becomes visible.
+    (function() {
+      const skel = document.getElementById('bootSkeleton');
+      if (!skel) return;
+      const states = ['permissionState', 'errorState', 'scannerDisplay'];
+      let removed = false;
+      function remove() {
+        if (removed) return;
+        removed = true;
+        skel.style.opacity = '0';
+        setTimeout(() => { skel.remove(); }, 200);
+      }
+      function checkVisible() {
+        for (const id of states) {
+          const el = document.getElementById(id);
+          if (el && el.style.display !== 'none' && el.style.display !== '') {
+            remove();
+            return true;
+          }
+        }
+        return false;
+      }
+      // Poll briefly until a state becomes visible, then stop
+      if (!checkVisible()) {
+        const t = setInterval(() => {
+          if (checkVisible() || removed) clearInterval(t);
+        }, 80);
+        // Hard cap: remove after 8s no matter what (prevents stuck skeleton)
+        setTimeout(() => { clearInterval(t); remove(); }, 8000);
+      }
+    })();
+    </script>
 
 </body>
 </html>
