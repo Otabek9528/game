@@ -461,6 +461,7 @@ window.UI = (() => {
     e.fullscreenImg.src = src;
     e.fullscreenViewer.classList.add('active');
     document.body.style.overflow = 'hidden';
+    try { history.pushState({ page: 'fullscreen' }, ''); } catch (err) {}  // ← ADD
   }
 
   function closeFullscreenImage() {

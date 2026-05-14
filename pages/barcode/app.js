@@ -20,15 +20,16 @@
   // BACK NAVIGATION — layered state machine
   // ============================================
   function _handleBackNavigation() {
-    const modal = document.getElementById('productModal');
-    if (modal && modal.style.display !== 'none') {
-      UI.hideProductModal();
+    // Topmost layer first — fullscreen
+    const viewer = document.getElementById('fullscreenViewer');
+    if (viewer && viewer.classList.contains('active')) {
+      UI.closeFullscreenImage();
       return;
     }
 
-    const ingredients = document.getElementById('ingredientsPanel');
-    if (ingredients && ingredients.style.display === 'block') {
-      ingredients.style.display = 'none';
+    const modal = document.getElementById('productModal');
+    if (modal && modal.style.display !== 'none') {
+      UI.hideProductModal();
       return;
     }
 
@@ -375,9 +376,13 @@
       if (src) UI.openFullscreenImage(src);
     });
 
-    document.getElementById('fullscreenClose').addEventListener('click', () => UI.closeFullscreenImage());
+    document.getElementById('fullscreenClose').addEventListener('click', () => {
+      try { history.back(); } catch (e) { UI.closeFullscreenImage(); }
+    });
     document.getElementById('fullscreenViewer').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('fullscreenViewer')) UI.closeFullscreenImage();
+      if (e.target === document.getElementById('fullscreenViewer')) {
+        try { history.back(); } catch (err) { UI.closeFullscreenImage(); }
+      }
     });
 
     window.addEventListener('beforeunload', () => {
