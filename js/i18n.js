@@ -533,11 +533,11 @@ const I18N = {
 
     // Verdict labels
     'bc.verdictJoiz': { uz: 'Joiz', ru: 'Допустимо', en: 'Permissible' },
-    'bc.verdictTaqiqlangan': { uz: 'Ta\'qiqlangan', ru: 'Запрещено', en: 'Prohibited' },
+    'bc.verdictTaqiqlangan': { uz: 'Joiz emas', ru: 'Запрещено', en: 'Prohibited' },
     'bc.verdictShubhali': { uz: 'Shubhali', ru: 'Сомнительно', en: 'Doubtful' },
     'bc.verdictJoizDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar topilmadi', ru: 'Запрещённые ингредиенты не обнаружены', en: 'No prohibited ingredients found' },
     'bc.verdictTaqiqlanganDesc': { uz: 'Tarkibida ta\'qiqlangan ingredientlar aniqlandi', ru: 'Обнаружены запрещённые ингредиенты', en: 'Prohibited ingredients detected' },
-    'bc.verdictShubhaliDesc': { uz: 'Ta\'qiqlangan moddalar yo\'q, lekin bir zavodda ishlab chiqarilgan', ru: 'Запрещённых веществ нет, но произведено на одном заводе', en: 'No prohibited substances, but produced in same factory' },
+    'bc.verdictShubhaliDesc': { uz: 'Ta\'qiqlangan moddalar yo\'q, lekin bir zavodda ishlab chiqarilgan yoki ayrim ingredientlar o\'zagi HAYVONlardan olingan bo\'lishi mumkin.', ru: 'Запрещенных веществ нет, но продукт произведен на том же заводе, или же некоторые ингредиенты МОГУТ быть животного происхождения.', en: 'No prohibited substances, but produced in same factory or the source of some ingredients MIGHT BE from the animal.' },
     
     
     'bc.cat.Drinks':            { uz: 'Ichimliklar',         ru: 'Напитки',           en: 'Drinks' },
@@ -613,10 +613,10 @@ const I18N = {
 
     // Factory
     'bc.flag.ambiguous': {uz: "Manbasi noma'lum", ru: "Неизвестное происхождение", en: "Unknown source"},
-    'bc.ambiguousWarn': {uz: "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 mavjud — o'simlik yoki hayvon YO\'G\Idan olinishi mumkin.", ru: "Содержит 트랜스지방, 쇼트닝, 향료 или 글리세린 — может быть растительного или животного  происхождения (жир).", en: "Contains 트랜스지방, 쇼트닝, 향료 or 글리세린 — may be of plant or animal FAT origin."},
+    'bc.ambiguousWarn': {uz: "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 mavjud — o'simlik yoki HAYVON YO\'G\'Idan olinishi mumkin.", ru: "Содержит 트랜스지방, 쇼트닝, 향료 или 글리세린 — может быть растительного или животного  происхождения (жир).", en: "Contains 트랜스지방, 쇼트닝, 향료 or 글리세린 — may be of plant or animal FAT origin."},
     
     
-    'bc.factoryWarn': { uz: 'Mahsulot ta\'qiqlangan mahsulotlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.', ru: 'Продукт произведён на оборудовании, где производятся запрещённые продукты.', en: 'Product manufactured on equipment where prohibited products are produced.' },
+    'bc.factoryWarn': { uz: 'Mahsulot ta\'qiqlangan ingredientlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.', ru: 'Продукт произведён на оборудовании, где производятся запрещённые продукты.', en: 'Product manufactured on equipment where prohibited products are produced.' },
     'bc.factoryOk': { uz: 'Mahsulot ishlab chiqarilgan zavod/uskunalarda ta\'qiqlangan mahsulotlar ishlatilmaydi.', ru: 'На заводе/оборудовании не производятся запрещённые продукты.', en: 'No prohibited products are manufactured on this equipment.' },
 
     // Not found
