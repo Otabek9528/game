@@ -122,22 +122,23 @@ window.Stores = (() => {
     });
   }
 
+  // Hardcoded to mirror logger.js — avoids race with app.js setting window._API_BASE.
+  const LOG_ENDPOINT = 'https://vegukin-api.duckdns.org/api/log-interaction';
+
   function _logStoreOpen(store) {
     try {
-      const apiBase = window._API_BASE || '';
       const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      if (!tgUser) return; // mirror logger.js — skip when no user
       const payload = JSON.stringify({
-        user_id: tgUser ? String(tgUser.id) : 'unknown',
-        username: tgUser?.username || 'unknown',
+        user_id: tgUser.id,
+        username: tgUser.username || tgUser.first_name || 'unknown',
         action: `store_opened:${store}`
       });
-      const url = `${apiBase}/api/log-interaction`;
-      // sendBeacon survives the navigation that follows; fall back to keepalive fetch.
       if (navigator.sendBeacon) {
         const blob = new Blob([payload], { type: 'application/json' });
-        navigator.sendBeacon(url, blob);
+        navigator.sendBeacon(LOG_ENDPOINT, blob);
       } else {
-        fetch(url, {
+        fetch(LOG_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: payload,
@@ -150,7 +151,9 @@ window.Stores = (() => {
   function _navigateToStore(store) {
     if (!store) return;
     _logStoreOpen(store);
-    // store.html will be created in M3
+    // Guard so logger.js autoLog() won't re-log 'barcode' when user returns
+    // from store.html -> barcode.html. autoLog() consumes the key once.
+    try { sessionStorage.setItem('logged_barcode', '1'); } catch (e) {}
     const url = `store.html?id=${encodeURIComponent(store)}`;
     window.location.href = url;
   }
