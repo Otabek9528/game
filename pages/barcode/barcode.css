@@ -557,8 +557,9 @@ body {
   color: var(--gray-500);
   line-height: 1.25;
   display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
   white-space: nowrap;
 }
 .store-card__count strong {
@@ -567,6 +568,8 @@ body {
   color: var(--brand);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.3px;
+  line-height: 1.1;
+  margin-bottom: 1px;
 }
 
 /* ---- Low-count / "Yaqinda" state — calm, not broken ---- */
