@@ -126,27 +126,32 @@ window.Stores = (() => {
   const LOG_ENDPOINT = 'https://vegukin-api.duckdns.org/api/log-interaction';
 
   function _logStoreOpen(store) {
-    try {
-      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-      if (!tgUser) return; // mirror logger.js — skip when no user
-      const payload = JSON.stringify({
-        user_id: tgUser.id,
-        username: tgUser.username || tgUser.first_name || 'unknown',
-        action: `store_opened:${store}`
-      });
-      if (navigator.sendBeacon) {
-        const blob = new Blob([payload], { type: 'application/json' });
-        navigator.sendBeacon(LOG_ENDPOINT, blob);
-      } else {
-        fetch(LOG_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: payload,
-          keepalive: true
-        }).catch(() => {});
+      try {
+        const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+        alert('logStoreOpen called. store=' + store + ' tgUser=' + (tgUser ? tgUser.id : 'NULL'));
+        if (!tgUser) return;
+        const payload = JSON.stringify({
+          user_id: tgUser.id,
+          username: tgUser.username || tgUser.first_name || 'unknown',
+          action: `store_opened:${store}`
+        });
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' });
+          const sent = navigator.sendBeacon(LOG_ENDPOINT, blob);
+          alert('sendBeacon returned: ' + sent);
+        } else {
+          alert('no sendBeacon, using fetch');
+          fetch(LOG_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload,
+            keepalive: true
+          }).catch((e) => alert('fetch err: ' + e.message));
+        }
+      } catch (e) {
+        alert('exception: ' + e.message);
       }
-    } catch (e) {}
-  }
+    }
 
   function _navigateToStore(store) {
     if (!store) return;
