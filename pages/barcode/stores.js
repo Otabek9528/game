@@ -122,8 +122,34 @@ window.Stores = (() => {
     });
   }
 
+  function _logStoreOpen(store) {
+    try {
+      const apiBase = window._API_BASE || '';
+      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      const payload = JSON.stringify({
+        user_id: tgUser ? String(tgUser.id) : 'unknown',
+        username: tgUser?.username || 'unknown',
+        action: `store_opened:${store}`
+      });
+      const url = `${apiBase}/api/log-interaction`;
+      // sendBeacon survives the navigation that follows; fall back to keepalive fetch.
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+      } else {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        }).catch(() => {});
+      }
+    } catch (e) {}
+  }
+
   function _navigateToStore(store) {
     if (!store) return;
+    _logStoreOpen(store);
     // store.html will be created in M3
     const url = `store.html?id=${encodeURIComponent(store)}`;
     window.location.href = url;
