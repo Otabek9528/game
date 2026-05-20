@@ -419,22 +419,32 @@ body {
 }
 
 /* ========================================
-   STORES — Landing page store cards (M2)
+   STORES — Landing page store cards (M2 · redesign)
    ======================================== */
+
+/* Per-store brand tokens — used only on the card emblem tile + accent. */
+.store-card[data-store="GS25"]      { --brand: #00aedd; --brand-tint: rgba(0,174,221,0.10);  --brand-tint-strong: rgba(0,174,221,0.18); }
+.store-card[data-store="CU"]        { --brand: #6f4dbf; --brand-tint: rgba(111,77,191,0.10); --brand-tint-strong: rgba(111,77,191,0.18); }
+.store-card[data-store="7-Eleven"]  { --brand: #008a44; --brand-tint: rgba(0,138,68,0.10);   --brand-tint-strong: rgba(0,138,68,0.18); }
+.store-card[data-store="Emart24"]   { --brand: #f8a30d; --brand-tint: rgba(248,163,13,0.12); --brand-tint-strong: rgba(248,163,13,0.22); }
+.store-card[data-store="No Brand"]  { --brand: #ffcb05; --brand-tint: rgba(255,203,5,0.14);  --brand-tint-strong: rgba(255,203,5,0.25); }
+.store-card[data-store="Daiso"]     { --brand: #d62631; --brand-tint: rgba(214,38,49,0.10);  --brand-tint-strong: rgba(214,38,49,0.18); }
+/* Fallback for any unknown store */
+.store-card { --brand: var(--green-600); --brand-tint: var(--green-50); --brand-tint-strong: var(--green-100); }
+
 .stores {
   margin-top: 18px;
   padding: 0 14px;
 }
-
 .stores__head {
   margin: 0 2px 14px;
 }
 .stores__title {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--gray-900);
   margin: 0 0 2px;
-  letter-spacing: -0.1px;
+  letter-spacing: -0.2px;
 }
 .stores__sub {
   font-size: 0.78rem;
@@ -458,29 +468,50 @@ body {
   margin: 0;
 }
 
-/* ---- Store card ---- */
+/* ---- Store card (horizontal layout, branded accent) ---- */
 .store-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 56px 1fr;
   align-items: center;
-  gap: 8px;
-  padding: 16px 12px 14px;
+  gap: 12px;
+  padding: 12px 12px 12px 14px;
   background: var(--white);
-  border: 1.5px solid var(--gray-150);
-  border-radius: var(--r-xl);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  border: 1px solid var(--gray-150);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--r-lg);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 3px 10px rgba(0,0,0,0.035);
   cursor: pointer;
-  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), border-color 0.15s;
+  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), border-color 0.18s;
   -webkit-tap-highlight-color: transparent;
   font-family: inherit;
-  text-align: center;
+  text-align: left;
   overflow: hidden;
+  isolation: isolate;
 }
+/* Soft brand wash in the corner — adds identity without yelling */
+.store-card::before {
+  content: '';
+  position: absolute;
+  top: -28px; right: -28px;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: var(--brand-tint);
+  pointer-events: none;
+  z-index: 0;
+}
+.store-card > * { position: relative; z-index: 1; }
+
 .store-card:active {
-  transform: scale(0.97);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  border-color: var(--green-200);
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.06);
+}
+@media (hover: hover) {
+  .store-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 10px 24px rgba(0,0,0,0.07);
+    border-color: var(--gray-200);
+  }
 }
 
 .store-card__emblem-wrap {
@@ -489,7 +520,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--gray-50);
+  background: var(--brand-tint-strong);
   border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
@@ -498,45 +529,62 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 6px;
+  padding: 8px;
   box-sizing: border-box;
 }
 
 .store-card__body {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 2px;
-  width: 100%;
   min-width: 0;
+  width: 100%;
 }
 .store-card__name {
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--gray-900);
-  line-height: 1.25;
-  letter-spacing: -0.1px;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
 }
 .store-card__count {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: var(--gray-500);
-  line-height: 1.3;
+  line-height: 1.25;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
 }
 .store-card__count strong {
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--green-700);
+  color: var(--brand);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
 }
 
-/* ---- Low-count / "Yaqinda" state ---- */
+/* ---- Low-count / "Yaqinda" state — calm, not broken ---- */
 .store-card--low {
-  opacity: 0.62;
-  border-style: dashed;
-  border-color: var(--gray-200);
+  border-left-color: var(--gray-200);
+}
+.store-card--low::before {
+  background: var(--gray-50);
+}
+.store-card--low .store-card__emblem-wrap {
+  background: var(--gray-50);
+}
+.store-card--low .store-card__emblem {
+  filter: grayscale(0.4);
+  opacity: 0.85;
+}
+.store-card--low .store-card__name {
+  color: var(--gray-600);
 }
 .store-card--low .store-card__count strong {
   color: var(--gray-500);
@@ -545,23 +593,26 @@ body {
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   background: var(--amber-50);
   color: var(--amber-700);
   border: 1px solid var(--amber-200);
   padding: 2px 7px;
   border-radius: 100px;
   line-height: 1.3;
+  z-index: 2;
 }
 
 /* ---- Skeleton while loading ---- */
 .store-card--skeleton {
   pointer-events: none;
   cursor: default;
+  border-left-color: var(--gray-150);
 }
+.store-card--skeleton::before { display: none; }
 .store-card--skeleton .store-card__emblem-wrap {
   background: var(--gray-100);
   animation: skeleton-pulse 1.3s ease-in-out infinite;
@@ -585,52 +636,56 @@ body {
 @media (max-width: 380px) {
   .stores { padding: 0 10px; }
   .stores__grid { gap: 8px; }
-  .store-card { padding: 14px 10px 12px; }
+  .store-card {
+    grid-template-columns: 48px 1fr;
+    gap: 10px;
+    padding: 10px 10px 10px 12px;
+  }
   .store-card__emblem-wrap { width: 48px; height: 48px; border-radius: 12px; }
-  .store-card__name { font-size: 0.82rem; }
+  .store-card__emblem { padding: 6px; }
+  .store-card__name { font-size: 0.88rem; }
+  .store-card__count strong { font-size: 0.94rem; }
 }
 
 
 /* ========================================
-   NIGHT MODE — Stores (M2)
+   NIGHT MODE — Stores (M2 · redesign)
    ======================================== */
-.night-mode .stores__title {
-  color: #e0e0e0;
-}
-.night-mode .stores__sub {
-  color: #888;
-}
+.night-mode .stores__title { color: #e6e6e6; }
+.night-mode .stores__sub   { color: #888; }
 
 .night-mode .store-card {
-  background: #1e1e1e;
+  background: #1c1c1c;
   border-color: #2a2a2a;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.night-mode .store-card::before {
+  /* slightly stronger tint on dark surfaces so brand color reads */
+  opacity: 1.35;
+  mix-blend-mode: screen;
 }
 .night-mode .store-card:active {
-  border-color: var(--green-500);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 .night-mode .store-card__emblem-wrap {
-  background: #252525;
+  /* layer brand tint over a dark base so emblems stay legible */
+  background: #242424;
+  box-shadow: inset 0 0 0 9999px var(--brand-tint);
 }
-.night-mode .store-card__name {
-  color: #e0e0e0;
+.night-mode .store-card__name  { color: #ececec; }
+.night-mode .store-card__count { color: #9a9a9a; }
+
+.night-mode .store-card--low { border-left-color: #333; }
+.night-mode .store-card--low::before { background: rgba(255,255,255,0.02); }
+.night-mode .store-card--low .store-card__emblem-wrap {
+  background: #222; box-shadow: none;
 }
-.night-mode .store-card__count {
-  color: #999;
-}
-.night-mode .store-card__count strong {
-  color: var(--green-500);
-}
-.night-mode .store-card--low {
-  border-color: #333;
-}
-.night-mode .store-card--low .store-card__count strong {
-  color: #888;
-}
+.night-mode .store-card--low .store-card__name  { color: #999; }
+.night-mode .store-card--low .store-card__count strong { color: #888; }
+
 .night-mode .store-card__soon {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--amber-600);
+  background: rgba(245, 158, 11, 0.16);
+  color: #f5c878;
   border-color: rgba(245, 158, 11, 0.3);
 }
 .night-mode .store-card--skeleton .store-card__emblem-wrap,
@@ -642,6 +697,7 @@ body {
 .night-mode .stores__empty {
   color: #777;
 }
+
 
 
 /* ========================================
