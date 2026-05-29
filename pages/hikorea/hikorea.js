@@ -1,7 +1,7 @@
 // =====================================================================
-// hikorea.js — HiKorea Slot Watcher (Phase 3 frontend)
-// State machine across 6 sections: entry → office → booth → calendar/alarm → my-alarms.
-// Talks to /api/hikorea/* on vegukin-api.duckdns.org (see hikorea_api.py).
+// hikorea.js — HiKorea Slot Watcher (redesigned frontend)
+// Flow: home → booth → calendar (→ date detail sheet OR watch setup)
+//                    → my watches
 // =====================================================================
 
 (function () {
@@ -14,22 +14,23 @@
   const API_BASE = 'https://vegukin-api.duckdns.org/api/hikorea';
 
   const SECTIONS = [
-    'entry', 'office', 'booth', 'calendar', 'alarm', 'my-alarms',
+    'home', 'by-address', 'booth', 'calendar', 'watch', 'watches',
   ];
 
   const state = {
-    mode: null,            // 'calendar' | 'alarm'  — set on entry
-    offices: [],           // cached office catalog (loaded once)
-    provinces: [],         // cached province list
-    selectedOffice: null,  // {office_id, name_en, name_ko, desks: [...]}
-    selectedDesk: null,    // {desk_seq, booth, details, office_*}
-    user: null,            // tg user {id, username, first_name}
-    navStack: ['entry'],   // back-button history
+    offices: [],
+    provinces: [],
+    selectedOffice: null,
+    selectedDesk: null,
+    deskSlots: null,     // cached slots payload for the current desk
+    user: null,
+    navStack: ['home'],
+    sheetOpen: false,
     overlayOpen: false,
   };
 
   // ---------------------------------------------------------------------
-  // TELEGRAM WEBAPP INIT
+  // TELEGRAM WEBAPP
   // ---------------------------------------------------------------------
 
   const tg = window.Telegram?.WebApp;
@@ -38,39 +39,32 @@
     try { tg.expand(); } catch (e) {}
     try { tg.disableVerticalSwipes(); } catch (e) {}
   }
-
-  // Capture user identity from Telegram WebApp init data.
   if (tg?.initDataUnsafe?.user) {
     const u = tg.initDataUnsafe.user;
-    state.user = {
-      id: u.id,
-      username: u.username || null,
-      first_name: u.first_name || null,
-    };
+    state.user = { id: u.id, username: u.username || null, first_name: u.first_name || null };
   }
 
   // ---------------------------------------------------------------------
   // SMALL HELPERS
   // ---------------------------------------------------------------------
 
-  function $(id) { return document.getElementById(id); }
-  function $$(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
+  function $(id)  { return document.getElementById(id); }
+  function $$(s, root) { return Array.from((root || document).querySelectorAll(s)); }
 
   function haptic(kind) {
     try {
       if (!tg?.HapticFeedback) return;
-      if (kind === 'select')   tg.HapticFeedback.selectionChanged();
+      if (kind === 'select') tg.HapticFeedback.selectionChanged();
       else if (kind === 'ok')  tg.HapticFeedback.notificationOccurred('success');
       else if (kind === 'err') tg.HapticFeedback.notificationOccurred('error');
       else                     tg.HapticFeedback.impactOccurred(kind || 'light');
     } catch (e) {}
   }
 
-  function escapeHtml(s) {
+  function esc(s) {
     if (s == null) return '';
-    return String(s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   function t(key, fallback) {
@@ -81,23 +75,7 @@
     return fallback;
   }
 
-  function fmtYmd(ymd) {
-    // "20260601" -> "2026-06-01"
-    if (!ymd || ymd.length !== 8) return ymd || '';
-    return ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8);
-  }
-
-  function fmtPrettyDate(ymd) {
-    // "20260601" -> "Jun 1"
-    if (!ymd || ymd.length !== 8) return ymd || '';
-    const d = new Date(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8));
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  }
-
-  function dowLabel(ymd) {
-    const d = new Date(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8));
-    return d.toLocaleDateString(undefined, { weekday: 'short' });
-  }
+  // -- Date helpers --
 
   function ymdToDate(ymd) {
     return new Date(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8));
@@ -110,26 +88,83 @@
     return `${y}${m}${day}`;
   }
 
+  function dateToInputValue(d) {
+    // YYYY-MM-DD for <input type="date">
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function addDays(d, n) {
+    const r = new Date(d);
+    r.setDate(r.getDate() + n);
+    return r;
+  }
+
   function todayYmd() { return dateToYmd(new Date()); }
 
-  function addDays(date, n) {
-    const d = new Date(date);
-    d.setDate(d.getDate() + n);
-    return d;
+  function fmtLongDate(ymd) {
+    return ymdToDate(ymd).toLocaleDateString(undefined, {
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    });
   }
 
-  function monthLabel(ymd) {
-    const d = ymdToDate(ymd);
-    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+  function fmtShortDate(ymd) {
+    return ymdToDate(ymd).toLocaleDateString(undefined, {
+      month: 'short', day: 'numeric',
+    });
   }
 
-  function availClass(avail, capacity) {
-    if (avail == null || capacity == null) return 'full';
-    if (avail <= 0) return 'full';
-    const pct = avail / capacity;
+  function dowName(ymd) {
+    return ymdToDate(ymd).toLocaleDateString(undefined, { weekday: 'long' });
+  }
+
+  function monthLabel(y, m /* 0-indexed */) {
+    return new Date(y, m, 1).toLocaleDateString(undefined, {
+      month: 'long', year: 'numeric',
+    });
+  }
+
+  function relativeTime(iso) {
+    try {
+      const then = new Date(iso).getTime();
+      const diff = Math.max(0, Date.now() - then);
+      const m = Math.floor(diff / 60000);
+      if (m < 1) return t('hk.time.now', 'just now');
+      if (m < 60) return `${m}m ${t('hk.time.ago', 'ago')}`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ${t('hk.time.ago', 'ago')}`;
+      return `${Math.floor(h / 24)}d ${t('hk.time.ago', 'ago')}`;
+    } catch (e) { return ''; }
+  }
+
+  function availTier(available, capacity) {
+    if (available == null || capacity == null || available <= 0) return 'full';
+    const pct = available / capacity;
     if (pct >= 0.5) return 'high';
-    if (pct >= 0.2) return 'medium';
+    if (pct >= 0.2) return 'med';
     return 'low';
+  }
+
+  function availPhrase(available, capacity) {
+    // Plain language for the bottom sheet
+    if (available == null) return { tier: 'full', text: t('hk.phrase.unknown', "No info — check HiKorea") };
+    if (available <= 0)    return { tier: 'full', text: t('hk.phrase.full', 'Fully booked') };
+    if (capacity && available / capacity < 0.2) return {
+      tier: 'low',
+      text: available === 1
+        ? t('hk.phrase.lastOne', 'Just 1 spot left — grab it!')
+        : `${available} ${t('hk.phrase.spotsLeftHurry', 'spots left — hurry!')}`,
+    };
+    if (capacity && available / capacity < 0.5) return {
+      tier: 'med',
+      text: `${available} ${t('hk.phrase.spotsLeft', 'spots left')}`,
+    };
+    return {
+      tier: 'high',
+      text: `${available} ${t('hk.phrase.spotsOpen', 'spots open')}`,
+    };
   }
 
   // ---------------------------------------------------------------------
@@ -137,9 +172,9 @@
   // ---------------------------------------------------------------------
 
   let toastTimer = null;
-  function toast(message, kind) {
+  function toast(msg, kind) {
     const el = $('toast');
-    el.textContent = message;
+    el.textContent = msg;
     el.className = 'hk-toast';
     if (kind) el.classList.add(kind);
     el.hidden = false;
@@ -152,38 +187,32 @@
   }
 
   // ---------------------------------------------------------------------
-  // API CLIENT
+  // API
   // ---------------------------------------------------------------------
 
   async function api(path, opts) {
     opts = opts || {};
-    const url = API_BASE + path;
     const init = {
       method: opts.method || 'GET',
       headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
     };
     if (opts.body) init.body = JSON.stringify(opts.body);
-
     let res, data;
     try {
-      res = await fetch(url, init);
+      res = await fetch(API_BASE + path, init);
       data = await res.json().catch(() => ({}));
     } catch (e) {
-      const err = new Error('network_error');
-      err.status = 0;
-      throw err;
+      const err = new Error('network_error'); err.status = 0; throw err;
     }
     if (!res.ok) {
       const err = new Error(data.error || `http_${res.status}`);
-      err.status = res.status;
-      err.data = data;
-      throw err;
+      err.status = res.status; err.data = data; throw err;
     }
     return data;
   }
 
   // ---------------------------------------------------------------------
-  // NAVIGATION (in-page section switching)
+  // NAVIGATION (in-page sections)
   // ---------------------------------------------------------------------
 
   function showSection(name, opts) {
@@ -199,18 +228,10 @@
   }
 
   function handleBack() {
-    // Dismiss overlay first
-    if (state.overlayOpen) {
-      $('successOverlay').hidden = true;
-      state.overlayOpen = false;
-      return;
-    }
-    // Dismiss inline warning card if visible
+    if (state.sheetOpen)   { closeSheet(); return; }
+    if (state.overlayOpen) { closeOverlay(); return; }
     const warn = $('availableWarn');
-    if (warn && !warn.hidden) {
-      warn.hidden = true;
-      return;
-    }
+    if (warn && !warn.hidden) { warn.hidden = true; return; }
     if (state.navStack.length > 1) {
       state.navStack.pop();
       showSection(state.navStack[state.navStack.length - 1], { silent: true });
@@ -221,131 +242,35 @@
   }
 
   if (tg?.BackButton) {
-    try {
-      tg.BackButton.show();
-      tg.BackButton.onClick(handleBack);
-    } catch (e) {}
+    try { tg.BackButton.show(); tg.BackButton.onClick(handleBack); } catch (e) {}
   }
 
   // ---------------------------------------------------------------------
-  // STATUS PILL (watcher health)
+  // OFFICE CATALOG
   // ---------------------------------------------------------------------
-
-  async function refreshStatusPill() {
-    try {
-      const data = await api('/status');
-      const pill = $('statusPill');
-      const dot = $('statusDot');
-      const text = $('statusText');
-      pill.hidden = false;
-
-      if (data.session_alive === false) {
-        dot.className = 'hk-status-dot error';
-        text.textContent = t('hk.status.offline',
-          'Watcher offline — admin notified');
-        return;
-      }
-      if (data.desks_failing && data.desks_failing > 0) {
-        dot.className = 'hk-status-dot warn';
-        text.textContent = `${data.desks_failing} ${t('hk.status.deskIssues', 'desk(s) with issues')}`;
-        return;
-      }
-      dot.className = 'hk-status-dot ok';
-      if (data.last_successful_poll) {
-        text.textContent = `${t('hk.status.updated', 'Updated')} ${relativeTime(data.last_successful_poll)}`;
-      } else {
-        text.textContent = t('hk.status.ready', 'Watcher online');
-      }
-    } catch (e) {
-      // Quiet failure — pill stays hidden.
-      console.warn('Status check failed:', e);
-    }
-  }
-
-  function relativeTime(iso) {
-    try {
-      const then = new Date(iso).getTime();
-      const diff = Math.max(0, Date.now() - then);
-      const m = Math.floor(diff / 60000);
-      if (m < 1) return t('hk.time.now', 'just now');
-      if (m < 60) return `${m}m ${t('hk.time.ago', 'ago')}`;
-      const h = Math.floor(m / 60);
-      if (h < 24) return `${h}h ${t('hk.time.ago', 'ago')}`;
-      const d = Math.floor(h / 24);
-      return `${d}d ${t('hk.time.ago', 'ago')}`;
-    } catch (e) { return ''; }
-  }
-
-  // ---------------------------------------------------------------------
-  // SECTION 1: ENTRY
-  // ---------------------------------------------------------------------
-
-  function bindEntry() {
-    $$('.hk-action-card[data-action]').forEach((el) => {
-      el.addEventListener('click', () => {
-        const action = el.dataset.action;
-        haptic('light');
-        if (action === 'calendar' || action === 'alarm') {
-          state.mode = action;
-          enterOfficePicker();
-        } else if (action === 'my-alarms') {
-          enterMyAlarms();
-        }
-      });
-    });
-  }
-
-  async function refreshMyAlarmsCount() {
-    if (!state.user) return;
-    try {
-      const data = await api(
-        `/watches?telegram_user_id=${encodeURIComponent(state.user.id)}&status=active`
-      );
-      const count = (data.watches || []).length;
-      $('myAlarmsCount').textContent = String(count);
-      $('myAlarmsEntry').hidden = count === 0;
-    } catch (e) {
-      $('myAlarmsEntry').hidden = true;
-    }
-  }
-
-  // ---------------------------------------------------------------------
-  // SECTION 2: OFFICE PICKER
-  // ---------------------------------------------------------------------
-
-  async function enterOfficePicker() {
-    showSection('office');
-    await ensureOfficesLoaded();
-    renderOfficeList($('officeSearch').value || '');
-    renderProvinces();
-  }
 
   async function ensureOfficesLoaded() {
     if (state.offices.length > 0) return;
     try {
-      const [officesRes, provRes] = await Promise.all([
+      const [oRes, pRes] = await Promise.all([
         api('/offices'),
         api('/provinces'),
       ]);
-      state.offices = officesRes.offices || [];
-      state.provinces = provRes.provinces || [];
+      state.offices = oRes.offices || [];
+      state.provinces = pRes.provinces || [];
     } catch (e) {
-      toast(t('hk.err.loadOffices', 'Could not load offices'), 'error');
-      console.error(e);
+      toast(t('hk.err.offices', "Couldn't load offices — try again"), 'error');
     }
   }
 
-  function bindOfficePickerTabs() {
-    $$('.hk-tab').forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const target = tab.dataset.tab;
-        $$('.hk-tab').forEach((t2) => t2.classList.toggle('active', t2 === tab));
-        $$('.hk-tab-panel').forEach((p) => {
-          p.classList.toggle('active', p.id === 'tab-' + target);
-        });
-        haptic('light');
-      });
-    });
+  // ---------------------------------------------------------------------
+  // SECTION: HOME
+  // ---------------------------------------------------------------------
+
+  async function renderHome() {
+    await ensureOfficesLoaded();
+    renderOfficeList($('officeSearch').value || '');
+    await refreshMyWatchesChip();
   }
 
   function renderOfficeList(filter) {
@@ -362,40 +287,54 @@
 
     if (rows.length === 0) {
       container.innerHTML = `
-        <div class="hk-resolve-empty">${escapeHtml(t('hk.office.noMatch', 'No offices match your search.'))}</div>
-      `;
+        <div class="hk-list-empty">${esc(t('hk.home.noMatch',
+          "No offices match. Try a different word, or use 'Find by address' above."))}</div>`;
       return;
     }
 
     container.innerHTML = rows.map((o) => {
-      const deskCount = (o.desks || []).length;
-      const deskLabel = deskCount === 1
-        ? t('hk.office.boothOne', '1 booth')
-        : `${deskCount} ${t('hk.office.boothMany', 'booths')}`;
+      const n = (o.desks || []).length;
+      const counter = n === 1
+        ? t('hk.home.oneCounter', '1 counter')
+        : `${n} ${t('hk.home.manyCounters', 'counters')}`;
       return `
-        <button class="hk-list-item" data-office-id="${escapeHtml(o.office_id)}">
+        <button class="hk-list-item" data-office-id="${esc(o.office_id)}">
           <span class="hk-item-icon">🏢</span>
           <span class="hk-item-body">
-            <span class="hk-item-title">${escapeHtml(o.name_en || o.name_ko)}</span>
-            <span class="hk-item-sub">${escapeHtml(o.name_ko || '')} · ${escapeHtml(deskLabel)}</span>
+            <span class="hk-item-title">${esc(o.name_en || o.name_ko)}</span>
+            <span class="hk-item-sub">${esc(o.name_ko || '')} · ${esc(counter)}</span>
           </span>
           <span class="hk-item-arrow">→</span>
-        </button>
-      `;
+        </button>`;
     }).join('');
 
     $$('.hk-list-item', container).forEach((btn) => {
       btn.addEventListener('click', () => {
-        const id = btn.dataset.officeId;
-        const office = state.offices.find((o) => o.office_id === id);
+        const office = state.offices.find((o) => o.office_id === btn.dataset.officeId);
         if (office) selectOffice(office);
       });
     });
   }
 
+  async function refreshMyWatchesChip() {
+    if (!state.user) return;
+    try {
+      const data = await api(`/watches?telegram_user_id=${encodeURIComponent(state.user.id)}&status=active`);
+      const count = (data.watches || []).length;
+      $('myWatchesCount').textContent = String(count);
+      $('myWatchesChip').hidden = count === 0;
+    } catch (e) {
+      $('myWatchesChip').hidden = true;
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // SECTION: BY-ADDRESS
+  // ---------------------------------------------------------------------
+
   function renderProvinces() {
     const sel = $('provinceSelect');
-    if (sel.options.length > 1) return;  // already populated
+    if (sel.options.length > 1) return;
     state.provinces.forEach((p) => {
       const opt = document.createElement('option');
       opt.value = p.ko;
@@ -412,70 +351,66 @@
     resultsEl.innerHTML = '';
 
     if (!province) {
-      toast(t('hk.office.provinceRequired', 'Please pick a province first.'), 'error');
+      toast(t('hk.address.needProvince', 'Pick your province first'), 'error');
       return;
     }
     if (!address) {
-      toast(t('hk.office.addressRequired', 'Please enter your address.'), 'error');
+      toast(t('hk.address.needAddress', 'Enter your address'), 'error');
       return;
     }
 
     try {
       const data = await api(
-        `/resolve-office?province=${encodeURIComponent(province)}&address=${encodeURIComponent(address)}`
+        `/resolve-office?province=${encodeURIComponent(province)}&address=${encodeURIComponent(address)}`,
       );
       const matches = data.matches || [];
       resultsEl.hidden = false;
 
       if (matches.length === 0) {
         resultsEl.innerHTML = `
-          <div class="hk-resolve-empty">
-            ${escapeHtml(t('hk.office.noResolveMatch',
-              "Couldn't match your address to an office. Try picking from the list instead."))}
-          </div>
-        `;
+          <div class="hk-list-empty">
+            ${esc(t('hk.address.noMatch', "Couldn't find an office for that address. Try picking from the list on the home screen."))}
+          </div>`;
         return;
       }
 
       const hint = matches.length === 1
-        ? t('hk.office.oneMatch', 'We found your office:')
-        : t('hk.office.manyMatches', 'Multiple matches — pick one:');
+        ? t('hk.address.foundOne', "Here's your office:")
+        : t('hk.address.foundMany', 'Pick the one that matches:');
 
       resultsEl.innerHTML = `
-        <p class="hk-resolve-hint">${escapeHtml(hint)}</p>
+        <p class="hk-resolve-hint">${esc(hint)}</p>
         ${matches.map((m) => `
-          <button class="hk-list-item" data-office-id="${escapeHtml(m.office_id)}">
+          <button class="hk-list-item" data-office-id="${esc(m.office_id)}">
             <span class="hk-item-icon">📍</span>
             <span class="hk-item-body">
-              <span class="hk-item-title">${escapeHtml(m.name_en)}</span>
-              <span class="hk-item-sub">${escapeHtml(m.name_ko || '')} · ${escapeHtml(m.matched_district || '')}</span>
+              <span class="hk-item-title">${esc(m.name_en)}</span>
+              <span class="hk-item-sub">${esc(m.name_ko || '')} · ${esc(m.matched_district || '')}</span>
             </span>
             <span class="hk-item-arrow">→</span>
           </button>
-        `).join('')}
-      `;
+        `).join('')}`;
+
       $$('.hk-list-item', resultsEl).forEach((btn) => {
         btn.addEventListener('click', () => {
-          const id = btn.dataset.officeId;
-          const office = state.offices.find((o) => o.office_id === id);
+          const office = state.offices.find((o) => o.office_id === btn.dataset.officeId);
           if (office) selectOffice(office);
         });
       });
     } catch (e) {
-      toast(t('hk.err.resolve', 'Could not look up office'), 'error');
-      console.error(e);
+      toast(t('hk.err.resolve', "Couldn't look up office — try again"), 'error');
     }
   }
+
+  // ---------------------------------------------------------------------
+  // SECTION: BOOTH PICKER
+  // ---------------------------------------------------------------------
 
   function selectOffice(office) {
     state.selectedOffice = office;
     haptic('select');
     enterBoothPicker();
   }
-
-  // ---------------------------------------------------------------------
-  // SECTION 3: BOOTH PICKER
-  // ---------------------------------------------------------------------
 
   function enterBoothPicker() {
     const o = state.selectedOffice;
@@ -484,290 +419,390 @@
     showSection('booth');
   }
 
+  // Many booths are labelled "... AFTER 09:36" by HiKorea — that's their
+  // internal jargon for the afternoon shift. Reframe in plain language.
+  function prettifyBoothName(rawBooth) {
+    if (!rawBooth) return null;
+    let s = rawBooth;
+    // Strip parenthetical dates like "(2023.10.14.~)"
+    s = s.replace(/\s*\([\d.~\s]+\)\s*/g, ' ').trim();
+    if (/AFTER\s*0?9:36/i.test(s)) {
+      s = s.replace(/\(?\s*AFTER\s*0?9:36\s*\)?/i, '').trim();
+      s = s.replace(/\s{2,}/g, ' ');
+      return { primary: s, secondary: t('hk.booth.afternoon', 'Afternoon hours (after 09:36)') };
+    }
+    return { primary: s, secondary: null };
+  }
+
   function renderBoothList(desks) {
     const container = $('boothList');
     if (!desks.length) {
       container.innerHTML = `
-        <div class="hk-resolve-empty">${escapeHtml(t('hk.booth.none', 'No booths available for this office.'))}</div>
-      `;
+        <div class="hk-list-empty">${esc(t('hk.booth.none', 'No counters available for this office.'))}</div>`;
       return;
     }
-    container.innerHTML = desks.map((d) => `
-      <button class="hk-list-item" data-desk-seq="${d.desk_seq}">
-        <span class="hk-item-icon">🎫</span>
-        <span class="hk-item-body">
-          <span class="hk-item-title">${escapeHtml(d.booth || ('Desk ' + d.desk_seq))}</span>
-          ${d.details ? `<span class="hk-item-sub">${escapeHtml(d.details)}</span>` : ''}
-        </span>
-        <span class="hk-item-arrow">→</span>
-      </button>
-    `).join('');
+    container.innerHTML = desks.map((d) => {
+      const pretty = prettifyBoothName(d.booth) || { primary: 'Counter ' + d.desk_seq, secondary: null };
+      const details = d.details || pretty.secondary || '';
+      return `
+        <button class="hk-list-item" data-desk-seq="${d.desk_seq}">
+          <span class="hk-item-icon">🎫</span>
+          <span class="hk-item-body">
+            <span class="hk-item-title">${esc(pretty.primary)}</span>
+            ${details ? `<span class="hk-item-sub">${esc(details)}</span>` : ''}
+            ${pretty.secondary && pretty.secondary !== details
+              ? `<span class="hk-item-sub">⏰ ${esc(pretty.secondary)}</span>` : ''}
+          </span>
+          <span class="hk-item-arrow">→</span>
+        </button>`;
+    }).join('');
 
     $$('.hk-list-item', container).forEach((btn) => {
       btn.addEventListener('click', () => {
-        const seq = parseInt(btn.dataset.deskSeq, 10);
-        const desk = desks.find((d) => d.desk_seq === seq);
+        const desk = desks.find((d) => d.desk_seq === parseInt(btn.dataset.deskSeq, 10));
         if (desk) selectDesk(desk);
       });
     });
   }
 
   function selectDesk(desk) {
+    const pretty = prettifyBoothName(desk.booth) || { primary: 'Counter ' + desk.desk_seq, secondary: null };
     state.selectedDesk = {
       desk_seq: desk.desk_seq,
-      booth: desk.booth,
+      booth_raw: desk.booth,
+      booth_pretty: pretty.primary,
+      booth_note: pretty.secondary,
       details: desk.details,
-      office_id:      state.selectedOffice.office_id,
+      office_id: state.selectedOffice.office_id,
       office_name_en: state.selectedOffice.name_en,
       office_name_ko: state.selectedOffice.name_ko,
     };
     haptic('select');
-    if (state.mode === 'calendar') enterCalendar();
-    else                            enterAlarmSetup();
+    enterCalendar();
   }
 
   // ---------------------------------------------------------------------
-  // SECTION 4: CALENDAR VIEW
+  // SECTION: CALENDAR (real grid)
   // ---------------------------------------------------------------------
 
   async function enterCalendar() {
     const d = state.selectedDesk;
     $('calOfficeName').textContent = d.office_name_en;
-    $('calBoothName').textContent  = d.booth || ('Desk ' + d.desk_seq);
-    $('calList').innerHTML = `
-      <div class="hk-skeleton-row"></div>
-      <div class="hk-skeleton-row"></div>
-      <div class="hk-skeleton-row"></div>
-    `;
+    $('calBoothName').textContent = d.booth_pretty;
+    $('calMonths').innerHTML = '<div class="hk-skeleton-cal"></div>';
+    $('calMeta').innerHTML = '';
     showSection('calendar');
 
     try {
       const data = await api(`/desks/${d.desk_seq}/slots`);
+      state.deskSlots = data;
       renderCalendar(data);
     } catch (e) {
-      $('calList').innerHTML = `
-        <div class="hk-cal-empty">
-          <div class="hk-cal-empty-icon">⚠️</div>
-          <p class="hk-cal-empty-title">${escapeHtml(t('hk.err.slotsTitle', "Couldn't load slots"))}</p>
-          <p class="hk-cal-empty-sub">${escapeHtml(t('hk.err.slotsSub', 'Try again in a moment.'))}</p>
-        </div>
-      `;
-      console.error(e);
+      $('calMonths').innerHTML = `
+        <div class="hk-list-empty">${esc(t('hk.err.slots', "Couldn't load this counter's calendar. Try again in a moment."))}</div>`;
     }
   }
 
   function renderCalendar(data) {
+    // Meta chips
     const meta = $('calMeta');
-    const list = $('calList');
-
     const chips = [];
     if (data.capacity != null) {
-      chips.push(`<span class="hk-meta-chip">📊 ${t('hk.cal.capacity', 'Capacity')}: ${data.capacity}</span>`);
+      chips.push(`<span class="hk-meta-chip">${t('hk.cal.maxPerDay', 'Max/day')}: ${data.capacity}</span>`);
     }
     if (data.last_polled_at) {
-      chips.push(`<span class="hk-meta-chip">🕒 ${relativeTime(data.last_polled_at)}</span>`);
+      chips.push(`<span class="hk-meta-chip">🔄 ${esc(t('hk.cal.checked', 'Checked'))} ${esc(relativeTime(data.last_polled_at))}</span>`);
     }
     meta.innerHTML = chips.join('');
 
-    const dates = data.dates || [];
-    if (!dates.length) {
-      list.innerHTML = `
-        <div class="hk-cal-empty">
-          <div class="hk-cal-empty-icon">📅</div>
-          <p class="hk-cal-empty-title">${escapeHtml(t('hk.cal.emptyTitle', 'No open dates right now'))}</p>
-          <p class="hk-cal-empty-sub">${escapeHtml(t('hk.cal.emptySub', 'All visible dates are fully booked. Set an alarm and we\'ll watch for openings.'))}</p>
-        </div>
-      `;
-      return;
+    // Build a lookup: ymd -> {taken, available}
+    const slotMap = {};
+    (data.dates || []).forEach((row) => {
+      slotMap[row.visi_ymd] = row;
+    });
+
+    // Determine which months to show:
+    //  - current month
+    //  - any month with at least one row in the response
+    //  - cap at 3 months total
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const monthsSet = new Set();
+    monthsSet.add(`${today.getFullYear()}-${today.getMonth()}`);
+    Object.keys(slotMap).forEach((ymd) => {
+      const d = ymdToDate(ymd);
+      monthsSet.add(`${d.getFullYear()}-${d.getMonth()}`);
+    });
+    const months = Array.from(monthsSet)
+      .map((k) => k.split('-').map(Number))
+      .sort((a, b) => a[0] - b[0] || a[1] - b[1])
+      .slice(0, 3);
+
+    if (months.length === 0) {
+      months.push([today.getFullYear(), today.getMonth()]);
     }
 
-    // Group rows by month label
-    const out = [];
-    let lastMonth = null;
-    dates.forEach((row) => {
-      const month = monthLabel(row.visi_ymd);
-      if (month !== lastMonth) {
-        out.push(`<div class="hk-cal-month">${escapeHtml(month)}</div>`);
-        lastMonth = month;
+    const container = $('calMonths');
+    container.innerHTML = months
+      .map(([y, m]) => renderOneMonth(y, m, slotMap, data.capacity, today))
+      .join('');
+
+    // Empty-state message if literally no available slots anywhere
+    const anyAvailable = (data.dates || []).some((r) => (r.available || 0) > 0);
+    if (!anyAvailable) {
+      const note = document.createElement('div');
+      note.className = 'hk-cal-cta-note';
+      note.innerHTML = `🌙 ${esc(t('hk.cal.allFullNote', "Looks like every visible date is full right now. That's exactly when a watch helps — we'll ping you the moment something opens."))}`;
+      container.appendChild(note);
+    }
+
+    // Wire cell taps
+    $$('.hk-cal-cell-bookable', container).forEach((cell) => {
+      cell.addEventListener('click', () => openDateSheet(cell.dataset.ymd, slotMap, data.capacity));
+    });
+  }
+
+  function renderOneMonth(year, month0, slotMap, capacity, today) {
+    const dowsShort = [];
+    // Week starts Monday for the Korean context.
+    const weekOrder = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun
+    for (const dow of weekOrder) {
+      const sample = new Date(2024, 0, dow === 0 ? 7 : dow); // 2024-01-01 was Mon
+      dowsShort.push(sample.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2));
+    }
+
+    const firstOfMonth = new Date(year, month0, 1);
+    const daysInMonth = new Date(year, month0 + 1, 0).getDate();
+
+    // Leading blanks: number of cells before day 1 (Mon-first week).
+    const dow0 = firstOfMonth.getDay(); // 0..6 (Sun..Sat)
+    const leading = (dow0 + 6) % 7;     // Mon=0, Sun=6
+
+    const cells = [];
+    for (let i = 0; i < leading; i++) {
+      cells.push(`<div class="hk-cal-cell empty"></div>`);
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(year, month0, day);
+      const ymd = dateToYmd(d);
+      const isPast = d < today;
+      const isToday = d.getTime() === today.getTime();
+      const slot = slotMap[ymd];
+
+      let cls = ['hk-cal-cell'];
+      let mark = '';
+
+      if (isToday) cls.push('today');
+
+      if (isPast) {
+        cls.push('past');
+      } else if (slot) {
+        cls.push('has-slots', availTier(slot.available, capacity));
+        cls.push('hk-cal-cell-bookable');
+        if (slot.available != null) mark = `${slot.available}`;
+      } else {
+        cls.push('full');
       }
-      const avail = row.available;
-      const cap   = data.capacity;
-      const klass = availClass(avail, cap);
-      const badge = (avail != null && cap != null)
-        ? `${avail} / ${cap}`
-        : `${t('hk.cal.taken', 'taken')}: ${row.taken}`;
-      out.push(`
-        <div class="hk-cal-row">
-          <div class="hk-cal-date">
-            <span class="hk-cal-day">${escapeHtml(fmtPrettyDate(row.visi_ymd))}</span>
-            <span class="hk-cal-dow">${escapeHtml(dowLabel(row.visi_ymd))}</span>
-          </div>
-          <span class="hk-avail-badge ${klass}">${escapeHtml(badge)}</span>
+
+      cells.push(`
+        <button type="button" class="${cls.join(' ')}"
+                ${slot && !isPast ? `data-ymd="${ymd}"` : ''}
+                ${isPast ? 'disabled' : ''}>
+          <span class="hk-cal-day-num">${day}</span>
+          ${mark ? `<span class="hk-cal-day-mark">${mark}</span>` : ''}
+        </button>`);
+    }
+
+    // Trailing to fill the last row (optional, helps grid alignment)
+    const total = leading + daysInMonth;
+    const trailing = (7 - (total % 7)) % 7;
+    for (let i = 0; i < trailing; i++) {
+      cells.push(`<div class="hk-cal-cell empty"></div>`);
+    }
+
+    return `
+      <div class="hk-cal-month">
+        <div class="hk-cal-month-title">${esc(monthLabel(year, month0))}</div>
+        <div class="hk-cal-dows">
+          ${dowsShort.map((d) => `<div class="hk-cal-dow-label">${esc(d)}</div>`).join('')}
         </div>
-      `);
-    });
-    list.innerHTML = out.join('');
-  }
-
-  function bindCalendar() {
-    $('goToAlarmBtn').addEventListener('click', () => {
-      haptic('light');
-      state.mode = 'alarm';
-      enterAlarmSetup();
-    });
+        <div class="hk-cal-grid">${cells.join('')}</div>
+      </div>`;
   }
 
   // ---------------------------------------------------------------------
-  // SECTION 5: ALARM SETUP
+  // BOTTOM SHEET (date detail)
   // ---------------------------------------------------------------------
 
-  function enterAlarmSetup() {
+  function openDateSheet(ymd, slotMap, capacity) {
+    const slot = slotMap[ymd];
+    if (!slot) return;
+
+    const phrase = availPhrase(slot.available, capacity);
+
+    $('sheetDay').textContent  = dowName(ymd);
+    $('sheetDate').textContent = ymdToDate(ymd).toLocaleDateString(undefined, {
+      month: 'long', day: 'numeric', year: 'numeric',
+    });
+
+    const stat = $('sheetStat');
+    stat.className = `hk-sheet-stat ${phrase.tier}`;
+    stat.innerHTML = `
+      <span class="pill-num">${esc(phrase.text)}</span>
+      <span class="hk-sheet-stat-msg">
+        ${esc(slot.available > 0
+          ? t('hk.sheet.bookCue', 'Book on HiKorea before someone else grabs it.')
+          : t('hk.sheet.fullCue', 'No spots right now — set a watch and we\'ll tell you when one opens.'))}
+      </span>`;
+
+    $('sheetBookBtn').style.display = slot.available > 0 ? '' : 'none';
+
+    $('sheetBackdrop').hidden = false;
+    $('dateSheet').hidden = false;
+    state.sheetOpen = true;
+    haptic('light');
+  }
+
+  function closeSheet() {
+    $('sheetBackdrop').hidden = true;
+    $('dateSheet').hidden = true;
+    state.sheetOpen = false;
+  }
+
+  function bindSheet() {
+    $('sheetBackdrop').addEventListener('click', closeSheet);
+    $('sheetCloseBtn').addEventListener('click', closeSheet);
+  }
+
+  // ---------------------------------------------------------------------
+  // SECTION: WATCH SETUP
+  // ---------------------------------------------------------------------
+
+  function enterWatchSetup() {
     const d = state.selectedDesk;
-    $('alOfficeName').textContent = d.office_name_en;
-    $('alBoothName').textContent  = d.booth || ('Desk ' + d.desk_seq);
-
-    // Default dates: tomorrow → +14 days
-    const tomorrow = addDays(new Date(), 1);
-    const inTwoWeeks = addDays(new Date(), 14);
-    $('alStartDate').valueAsDate = tomorrow;
-    $('alEndDate').valueAsDate   = inTwoWeeks;
-    $('alStartDate').min = dateToIsoDateInput(new Date());
-    $('alEndDate').min   = dateToIsoDateInput(new Date());
-
+    $('watchOfficeName').textContent = d.office_name_en;
+    $('watchBoothName').textContent  = d.booth_pretty;
     $('availableWarn').hidden = true;
-    updatePresetSelection();
-    updatePreview();
-    showSection('alarm');
+
+    // Sensible default: next 14 days, starting tomorrow
+    const tomorrow = addDays(new Date(), 1);
+    const plus14   = addDays(new Date(), 14);
+    $('watchStartDate').valueAsDate = tomorrow;
+    $('watchEndDate').valueAsDate   = plus14;
+    $('watchStartDate').min = dateToInputValue(new Date());
+    $('watchEndDate').min   = dateToInputValue(new Date());
+
+    setActivePreset('14');
+    updateWatchPreview();
+    showSection('watch');
   }
 
-  function dateToIsoDateInput(d) {
-    // YYYY-MM-DD for <input type="date">
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
-
-  function bindAlarmSetup() {
-    $$('.hk-preset').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const preset = btn.dataset.preset;
-        haptic('light');
-        if (preset === 'custom') {
-          updatePresetSelection('custom');
-          return;
-        }
-        const days = parseInt(preset, 10);
-        const start = addDays(new Date(), 1);
-        const end   = addDays(new Date(), days);
-        $('alStartDate').valueAsDate = start;
-        $('alEndDate').valueAsDate   = end;
-        updatePresetSelection(preset);
-        updatePreview();
-      });
-    });
-
-    ['alStartDate', 'alEndDate'].forEach((id) => {
-      $(id).addEventListener('change', () => {
-        updatePresetSelection('custom');
-        updatePreview();
-      });
-    });
-
-    $('submitAlarmBtn').addEventListener('click', () => submitAlarm(false));
-    $('forceAlarmBtn').addEventListener('click', () => submitAlarm(true));
-
-    $('successOk').addEventListener('click', () => {
-      $('successOverlay').hidden = true;
-      state.overlayOpen = false;
-      // Reset the back-stack — pressing Back from "My Alarms" should land
-      // on Entry, not walk back through the wizard.
-      state.navStack = ['entry'];
-      enterMyAlarms();
-    });
-  }
-
-  function updatePresetSelection(preset) {
+  function setActivePreset(preset) {
     $$('.hk-preset').forEach((btn) => {
       btn.classList.toggle('active', preset && btn.dataset.preset === preset);
     });
   }
 
-  function updatePreview() {
-    const startStr = $('alStartDate').value;
-    const endStr   = $('alEndDate').value;
+  function updateWatchPreview() {
+    const startStr = $('watchStartDate').value;
+    const endStr   = $('watchEndDate').value;
     if (!startStr || !endStr) {
-      $('alarmPreview').hidden = true;
+      $('watchPreview').hidden = true;
       return;
     }
-    const start = new Date(startStr);
-    const end   = new Date(endStr);
-    if (isNaN(start) || isNaN(end) || end < start) {
-      $('alarmPreview').hidden = true;
+    const s = new Date(startStr), e = new Date(endStr);
+    if (isNaN(s) || isNaN(e) || e < s) {
+      $('watchPreview').hidden = true;
       return;
     }
-    $('alarmPreview').hidden = false;
-    const days = Math.round((end - start) / 86400000) + 1;
-    $('previewRange').textContent = `${dateToIsoDateInput(start)} → ${dateToIsoDateInput(end)}`;
-    $('previewDays').textContent = `${days} ${t('hk.alarm.daysWord', 'day(s)')}`;
+    $('watchPreview').hidden = false;
+    const days = Math.round((e - s) / 86400000) + 1;
+    const sLabel = s.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const eLabel = e.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    $('previewSummary').textContent =
+      `${t('hk.preview.watching', 'Watching')} ${sLabel} → ${eLabel}`;
+    $('previewDetail').textContent =
+      days === 1
+        ? t('hk.preview.oneDay', '1 day in your window')
+        : `${days} ${t('hk.preview.days', 'days in your window')}`;
   }
 
-  function startEndYmds() {
-    const start = $('alStartDate').value;  // "YYYY-MM-DD"
-    const end   = $('alEndDate').value;
-    if (!start || !end) return null;
-    return {
-      start_ymd: start.replace(/-/g, ''),
-      end_ymd:   end.replace(/-/g, ''),
-    };
+  function bindWatchSetup() {
+    $$('.hk-preset').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const days = parseInt(btn.dataset.preset, 10);
+        $('watchStartDate').valueAsDate = addDays(new Date(), 1);
+        $('watchEndDate').valueAsDate   = addDays(new Date(), days);
+        setActivePreset(btn.dataset.preset);
+        updateWatchPreview();
+        haptic('light');
+      });
+    });
+    ['watchStartDate', 'watchEndDate'].forEach((id) => {
+      $(id).addEventListener('change', () => {
+        setActivePreset(null);
+        updateWatchPreview();
+      });
+    });
+    $('submitWatchBtn').addEventListener('click', () => submitWatch(false));
+    $('forceWatchBtn').addEventListener('click', () => submitWatch(true));
+    $('successOkBtn').addEventListener('click', () => {
+      closeOverlay();
+      state.navStack = ['home'];
+      enterMyWatches();
+    });
   }
 
-  async function submitAlarm(force) {
+  async function submitWatch(force) {
     if (!state.user) {
-      toast(t('hk.err.noUser', 'Open this page via the Telegram bot first.'), 'error');
+      toast(t('hk.err.noUser', 'Open this page from the Telegram bot first.'), 'error');
       return;
     }
-    const ymds = startEndYmds();
-    if (!ymds) {
-      toast(t('hk.alarm.pickDates', 'Pick a start and end date.'), 'error');
+    const startStr = $('watchStartDate').value;
+    const endStr   = $('watchEndDate').value;
+    if (!startStr || !endStr) {
+      toast(t('hk.err.pickDates', 'Pick a start and end date'), 'error');
       return;
     }
+    const startYmd = startStr.replace(/-/g, '');
+    const endYmd   = endStr.replace(/-/g, '');
 
-    const btn = $('submitAlarmBtn');
+    const btn = $('submitWatchBtn');
     btn.disabled = true;
 
     try {
-      const body = {
-        telegram_user_id:  state.user.id,
-        telegram_username: state.user.username,
-        desk_seq:          state.selectedDesk.desk_seq,
-        start_ymd:         ymds.start_ymd,
-        end_ymd:           ymds.end_ymd,
-        force:             !!force,
-      };
-      await api('/watches', { method: 'POST', body });
+      await api('/watches', {
+        method: 'POST',
+        body: {
+          telegram_user_id:  state.user.id,
+          telegram_username: state.user.username,
+          desk_seq:          state.selectedDesk.desk_seq,
+          start_ymd:         startYmd,
+          end_ymd:           endYmd,
+          force:             !!force,
+        },
+      });
       haptic('ok');
       $('availableWarn').hidden = true;
       $('successOverlay').hidden = false;
       state.overlayOpen = true;
-      refreshMyAlarmsCount();
+      refreshMyWatchesChip();
     } catch (e) {
-      console.error(e);
-      if (e.status === 409 && e.data && e.data.error === 'available_slots_in_range') {
-        renderAvailableWarn(e.data.available_dates || []);
+      if (e.status === 409 && e.data?.error === 'available_slots_in_range') {
+        renderWarn(e.data.available_dates || []);
         haptic('warning');
-      } else if (e.status === 409 && e.data && e.data.error === 'duplicate_watch') {
-        toast(t('hk.alarm.dupErr', 'You already have an identical alarm.'), 'error');
+      } else if (e.status === 409 && e.data?.error === 'duplicate_watch') {
+        toast(t('hk.err.dup', "You've already set this watch"), 'error');
         haptic('err');
-      } else if (e.status === 409 && e.data && e.data.error === 'max_watches_reached') {
-        toast(t('hk.alarm.maxErr', 'Maximum 10 alarms reached. Cancel one first.'), 'error');
+      } else if (e.status === 409 && e.data?.error === 'max_watches_reached') {
+        toast(t('hk.err.max', "You've hit the limit (10). Cancel one first."), 'error');
         haptic('err');
-      } else if (e.status === 400 && e.data && e.data.fields) {
+      } else if (e.status === 400 && e.data?.fields) {
         const first = Object.values(e.data.fields)[0];
-        toast(first || t('hk.alarm.validation', 'Check your inputs.'), 'error');
+        toast(first || t('hk.err.input', 'Check your dates'), 'error');
         haptic('err');
       } else {
-        toast(t('hk.alarm.submitErr', "Couldn't create alarm. Try again."), 'error');
+        toast(t('hk.err.create', "Couldn't create the watch — try again"), 'error');
         haptic('err');
       }
     } finally {
@@ -775,89 +810,104 @@
     }
   }
 
-  function renderAvailableWarn(availableDates) {
+  function renderWarn(availableDates) {
     const warn = $('availableWarn');
-    const datesEl = $('availableWarnDates');
-    datesEl.innerHTML = availableDates.map((d) => `
-      <span class="hk-warn-date">${escapeHtml(fmtPrettyDate(d.visi_ymd))} — ${d.available}/${d.capacity}</span>
-    `).join('');
+    const dates = $('availableWarnDates');
+    dates.innerHTML = availableDates.map((d) => {
+      const txt = `${ymdToDate(d.visi_ymd).toLocaleDateString(undefined, {
+        month: 'short', day: 'numeric',
+      })} — ${d.available} ${t('hk.phrase.open', 'open')}`;
+      return `<span class="hk-warn-date">${esc(txt)}</span>`;
+    }).join('');
     warn.hidden = false;
     warn.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  function closeOverlay() {
+    $('successOverlay').hidden = true;
+    state.overlayOpen = false;
+  }
+
   // ---------------------------------------------------------------------
-  // SECTION 6: MY ALARMS
+  // SECTION: MY WATCHES
   // ---------------------------------------------------------------------
 
-  async function enterMyAlarms() {
-    showSection('my-alarms');
-    $('myAlarmsList').innerHTML = `<div class="hk-skeleton-row"></div><div class="hk-skeleton-row"></div>`;
-    $('myAlarmsEmpty').hidden = true;
+  async function enterMyWatches() {
+    showSection('watches');
+    $('watchList').innerHTML = '<div class="hk-skeleton-row"></div><div class="hk-skeleton-row"></div>';
+    $('watchesEmpty').hidden = true;
 
     if (!state.user) {
-      $('myAlarmsList').innerHTML = '';
-      $('myAlarmsEmpty').hidden = false;
-      $('myAlarmsEmpty').querySelector('.hk-empty-title').textContent =
-        t('hk.err.noUser', 'Open this page via the Telegram bot first.');
-      $('myAlarmsEmpty').querySelector('.hk-empty-sub').textContent = '';
+      $('watchList').innerHTML = '';
+      $('watchesEmpty').hidden = false;
+      $('watchesEmpty').querySelector('.hk-empty-title').textContent =
+        t('hk.err.noUser', 'Open this page from the Telegram bot first.');
+      $('watchesEmpty').querySelector('.hk-empty-sub').textContent = '';
       return;
     }
 
     try {
       const data = await api(
-        `/watches?telegram_user_id=${encodeURIComponent(state.user.id)}&status=active`
+        `/watches?telegram_user_id=${encodeURIComponent(state.user.id)}&status=active`,
       );
-      renderMyAlarms(data.watches || []);
+      renderWatchList(data.watches || []);
     } catch (e) {
-      $('myAlarmsList').innerHTML = `
-        <div class="hk-resolve-empty">${escapeHtml(t('hk.err.loadAlarms', 'Could not load your alarms'))}</div>
-      `;
-      console.error(e);
+      $('watchList').innerHTML = `
+        <div class="hk-list-empty">${esc(t('hk.err.watches', "Couldn't load your watches"))}</div>`;
     }
   }
 
-  function renderMyAlarms(watches) {
-    const list = $('myAlarmsList');
+  function renderWatchList(watches) {
+    const list = $('watchList');
     if (!watches.length) {
       list.innerHTML = '';
-      $('myAlarmsEmpty').hidden = false;
+      $('watchesEmpty').hidden = false;
       return;
     }
-    $('myAlarmsEmpty').hidden = true;
-    list.innerHTML = watches.map((w) => `
-      <div class="hk-alarm-card status-${escapeHtml(w.status)}">
-        <div class="hk-alarm-head">
-          <div>
-            <div class="hk-alarm-office">${escapeHtml(w.office_name_en || '?')}</div>
-            <div class="hk-alarm-booth">${escapeHtml(w.booth || ('Desk ' + w.desk_seq))}</div>
+    $('watchesEmpty').hidden = true;
+
+    list.innerHTML = watches.map((w) => {
+      const pretty = prettifyBoothName(w.booth) || { primary: 'Counter ' + w.desk_seq };
+      return `
+        <div class="hk-watch-card status-${esc(w.status)}">
+          <div class="hk-watch-head">
+            <div>
+              <div class="hk-watch-office">${esc(w.office_name_en || '?')}</div>
+              <div class="hk-watch-booth">${esc(pretty.primary)}</div>
+            </div>
+            <span class="hk-watch-pill ${esc(w.status)}">${esc(w.status)}</span>
           </div>
-          <span class="hk-alarm-status ${escapeHtml(w.status)}">${escapeHtml(w.status)}</span>
-        </div>
-        <div class="hk-alarm-range">
-          📅 ${escapeHtml(fmtPrettyDate(w.start_ymd))} → ${escapeHtml(fmtPrettyDate(w.end_ymd))}
-        </div>
-        <div class="hk-alarm-actions">
-          <button class="hk-cancel-btn" data-watch-id="${w.id}">
-            ${escapeHtml(t('hk.myAlarms.cancel', 'Cancel'))}
-          </button>
-        </div>
-      </div>
-    `).join('');
+          <div class="hk-watch-range">
+            <span class="hk-watch-range-icon">📅</span>
+            <span>
+              <strong>${esc(fmtShortDate(w.start_ymd))}</strong>
+              → <strong>${esc(fmtShortDate(w.end_ymd))}</strong>
+            </span>
+          </div>
+          <div class="hk-watch-actions">
+            <button class="hk-cancel-btn" data-watch-id="${w.id}">
+              ${esc(t('hk.watches.cancel', 'Stop watching'))}
+            </button>
+          </div>
+        </div>`;
+    }).join('');
 
     $$('.hk-cancel-btn', list).forEach((btn) => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.watchId;
         btn.disabled = true;
         try {
-          await api(`/watches/${id}?telegram_user_id=${encodeURIComponent(state.user.id)}`,
-                    { method: 'DELETE' });
+          await api(
+            `/watches/${id}?telegram_user_id=${encodeURIComponent(state.user.id)}`,
+            { method: 'DELETE' },
+          );
           haptic('ok');
-          toast(t('hk.myAlarms.cancelled', 'Alarm cancelled'), 'success');
-          enterMyAlarms();
-          refreshMyAlarmsCount();
+          toast(t('hk.watches.stopped', 'Watch stopped'), 'success');
+          enterMyWatches();
+          refreshMyWatchesChip();
         } catch (e) {
           btn.disabled = false;
-          toast(t('hk.err.cancel', "Couldn't cancel alarm"), 'error');
+          toast(t('hk.err.cancel', "Couldn't stop the watch — try again"), 'error');
           haptic('err');
         }
       });
@@ -865,42 +915,30 @@
   }
 
   // ---------------------------------------------------------------------
-  // I18N — update labels after init
+  // I18N application
   // ---------------------------------------------------------------------
 
   function applyTranslations() {
     $$('[data-i18n]').forEach((el) => {
       const key = el.getAttribute('data-i18n');
-      const trans = t(key, null);
-      if (trans !== null) {
-        if (trans.includes('<') && trans.includes('>')) el.innerHTML = trans;
-        else el.textContent = trans;
+      const v = t(key, null);
+      if (v !== null) {
+        if (v.includes('<') && v.includes('>')) el.innerHTML = v;
+        else el.textContent = v;
       }
     });
     $$('[data-i18n-placeholder]').forEach((el) => {
       const key = el.getAttribute('data-i18n-placeholder');
-      const trans = t(key, null);
-      if (trans !== null) el.setAttribute('placeholder', trans);
+      const v = t(key, null);
+      if (v !== null) el.setAttribute('placeholder', v);
     });
-
     const titleKey = document.querySelector('title')?.getAttribute('data-i18n');
     if (titleKey) {
       const tr = t(titleKey, null);
       if (tr) document.title = tr;
     }
   }
-
   window.addEventListener('languageChanged', applyTranslations);
-
-  // ---------------------------------------------------------------------
-  // BACK-BUTTON BINDING (in-page "← Back" buttons)
-  // ---------------------------------------------------------------------
-
-  function bindInPageBackButtons() {
-    $$('[data-back]').forEach((el) => {
-      el.addEventListener('click', handleBack);
-    });
-  }
 
   // ---------------------------------------------------------------------
   // INIT
@@ -908,26 +946,42 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     applyTranslations();
-    bindEntry();
-    bindOfficePickerTabs();
-    bindCalendar();
-    bindAlarmSetup();
-    bindInPageBackButtons();
+    bindSheet();
+    bindWatchSetup();
 
     $('officeSearch').addEventListener('input', (e) => {
       renderOfficeList(e.target.value);
     });
+
+    $('byAddressLink').addEventListener('click', async () => {
+      haptic('light');
+      await ensureOfficesLoaded();
+      renderProvinces();
+      showSection('by-address');
+    });
+
+    $('myWatchesChip').addEventListener('click', () => {
+      haptic('light');
+      enterMyWatches();
+    });
+
     $('resolveBtn').addEventListener('click', doResolveOffice);
     $('addressInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') doResolveOffice();
     });
 
-    showSection('entry', { silent: true });
-    refreshStatusPill();
-    refreshMyAlarmsCount();
+    $('goToWatchBtn').addEventListener('click', () => {
+      haptic('light');
+      enterWatchSetup();
+    });
 
-    console.log('✅ HiKorea page loaded',
-                state.user ? `user=${state.user.id}` : '(no telegram user)');
+    $$('[data-back]').forEach((el) => el.addEventListener('click', handleBack));
+
+    showSection('home', { silent: true });
+    renderHome();
+
+    console.log('✅ HiKorea page (v2) loaded',
+                state.user ? `user=${state.user.id}` : '(no tg user)');
   });
 
 })();

@@ -658,194 +658,230 @@ const I18N = {
       en: 'This information is provided based on product ingredients only and <strong>may contain errors</strong>. We do not issue official religious rulings (fatwa). If you find an error, please report it in our <a href="https://t.me/MuslimVegukin">Telegram group</a>.'
     },
     
-    // Feature card label
-    'feature.hikorea': { uz: 'HiKorea', ru: 'HiKorea', en: 'HiKorea' },
-
-    // Page title (browser tab + Telegram header)
+    // Page title
     'hk.pageTitle': {
-      uz: 'HiKorea — Joy kuzatuvchi',
-      ru: 'HiKorea — Слежение за слотами',
-      en: 'HiKorea — Slot Watcher',
-    },
-
-    // Hero
-    'hk.heroTitle': {
-      uz: 'HiKorea Slot Kuzatuvchi',
-      ru: 'HiKorea Слот Трекер',
-      en: 'HiKorea Slot Watcher',
-    },
-    'hk.heroSubtitle': {
-      uz: "Bo'sh joylarni kuzatib boring, vaqt ochilganda xabardor bo'ling",
-      ru: 'Отслеживайте свободные слоты и получайте уведомления о новых',
-      en: 'Watch open slots and get pinged when one opens up',
-    },
-
-    // Entry actions
-    'hk.entry.calendar.title': {
-      uz: "Bo'sh joylarni ko'rish",
-      ru: 'Посмотреть свободные слоты',
-      en: 'Check available slots',
-    },
-    'hk.entry.calendar.sub': {
-      uz: "Idoralar bo'yicha ochiq sanalarni ko'ring",
-      ru: 'Открытые даты по офисам',
-      en: 'See open dates by office',
-    },
-    'hk.entry.alarm.title': {
-      uz: "Signal o'rnatish",
-      ru: 'Установить уведомление',
-      en: 'Set up an alarm',
-    },
-    'hk.entry.alarm.sub': {
-      uz: 'Joy ochilganda Telegram orqali xabar oling',
-      ru: 'Получите пинг в Telegram, когда откроется слот',
-      en: 'Get pinged when a slot opens',
-    },
-    'hk.entry.myAlarms.title': {
-      uz: 'Mening signallarim',
-      ru: 'Мои уведомления',
-      en: 'My alarms',
-    },
-    'hk.entry.myAlarms.active': { uz: 'faol', ru: 'активн.', en: 'active' },
-    'hk.entry.note': {
-      uz: '💡 Biz HiKorea’ni har 5 daqiqada tekshiramiz va sizning sanalaringizda joy ochilganda Telegram orqali xabar yuboramiz.',
-      ru: '💡 Мы проверяем HiKorea каждые 5 минут и пишем в Telegram, как только в ваших датах появляется слот.',
-      en: "💡 We poll HiKorea every 5 minutes and ping you on Telegram when a slot opens in your date range.",
+      uz: 'HiKorea — joy kuzatuvchi',
+      ru: 'HiKorea — слежение за слотами',
+      en: 'HiKorea — your slot watcher',
     },
 
     // Generic
     'hk.back': { uz: 'Orqaga', ru: 'Назад', en: 'Back' },
+    'hk.time.now': { uz: 'hozir', ru: 'только что', en: 'just now' },
+    'hk.time.ago': { uz: 'oldin', ru: 'назад',      en: 'ago' },
 
-    // Office picker
-    'hk.office.title': {
-      uz: 'Idorangizni tanlang', ru: 'Выберите офис', en: 'Choose your office',
+    // HOME
+    'hk.home.title': {
+      uz: 'Uchrashuv vaqtingizni toping',
+      ru: 'Найдите время записи',
+      en: 'Find your appointment slot',
     },
-    'hk.office.sub': {
-      uz: "Ro'yxatdan tanlang yoki manzilingiz bo'yicha toping",
-      ru: 'Выберите из списка или найдите по вашему адресу',
-      en: 'Pick from the list, or find by your address',
+    'hk.home.lede': {
+      uz: 'Biz HiKorea sahifasini 24/7 kuzatamiz. Joy ochilishi bilan Telegram orqali xabar yuboramiz.',
+      ru: 'Мы следим за HiKorea круглосуточно. Как только появится слот, напишем в Telegram.',
+      en: "We watch HiKorea around the clock. The moment a slot opens, we'll message you on Telegram.",
     },
-    'hk.office.tab.list':    { uz: "Ro'yxat", ru: 'Список',   en: 'By list' },
-    'hk.office.tab.address': { uz: 'Manzil',  ru: 'По адресу', en: 'By address' },
-    'hk.office.searchPlaceholder': {
-      uz: 'Idora nomini izlash...', ru: 'Поиск офиса...', en: 'Search offices...',
+    'hk.home.watchingPre':  { uz: 'Kuzatilmoqda', ru: 'Слежу за', en: 'Watching' },
+    'hk.home.watchingPost': { uz: 'davr(lar)',    ru: 'диапазон(ов)', en: 'slot range(s)' },
+    'hk.home.step1': { uz: 'Idorangizni tanlang',       ru: 'Выберите офис',          en: 'Pick your office' },
+    'hk.home.step2': { uz: "Bo'sh sanalarni ko'ring",   ru: 'Посмотрите свободные даты', en: 'See open dates' },
+    'hk.home.step3': {
+      uz: 'Joy ochilganda Telegram orqali xabar oling',
+      ru: 'Получите ping в Telegram, когда появится слот',
+      en: 'Get a Telegram ping when a slot opens',
     },
-    'hk.office.provinceLabel':      { uz: 'Viloyat',   ru: 'Провинция',  en: 'Province' },
-    'hk.office.provincePlaceholder':{ uz: '— tanlang —', ru: '— выбрать —', en: '— select —' },
-    'hk.office.addressLabel': {
-      uz: 'Manzilingiz (koreyscha)', ru: 'Ваш адрес (на корейском)', en: 'Your address (in Korean)',
+    'hk.home.searchLabel': {
+      uz: 'Sizning ishingizni qaysi idora hal qiladi?',
+      ru: 'Какой офис обрабатывает вашу заявку?',
+      en: 'Which office handles your case?',
     },
-    'hk.office.addressHint': {
-      uz: 'Maslahat: hududingiz (구) nomi ham kiriting (masalan 강남구).',
-      ru: 'Совет: укажите название района (구), напр. 강남구.',
-      en: 'Tip: include your district name (e.g. 강남구).',
+    'hk.home.searchPlaceholder': {
+      uz: 'Idora nomini izlash...',
+      ru: 'Поиск офиса...',
+      en: 'Search by office name...',
     },
-    'hk.office.resolveBtn':    { uz: 'Idoramni topish', ru: 'Найти офис',     en: 'Find my office' },
-    'hk.office.oneMatch':      { uz: 'Sizning idorangiz:', ru: 'Ваш офис:',   en: 'We found your office:' },
-    'hk.office.manyMatches':   { uz: 'Bir nechta moslik — bittasini tanlang:', ru: 'Несколько совпадений — выберите:', en: 'Multiple matches — pick one:' },
-    'hk.office.noMatch':       { uz: 'Hech qanday idora topilmadi.', ru: 'Офисы не найдены.', en: 'No offices match your search.' },
-    'hk.office.noResolveMatch':{ uz: "Manzilingizdan idorani topa olmadik. Ro'yxatdan tanlab ko'ring.", ru: 'Не смогли определить офис по адресу. Попробуйте выбрать из списка.', en: "Couldn't match your address to an office. Try the list instead." },
-    'hk.office.provinceRequired': { uz: 'Avval viloyatni tanlang.', ru: 'Сначала выберите провинцию.', en: 'Please pick a province first.' },
-    'hk.office.addressRequired':  { uz: 'Manzilingizni kiriting.', ru: 'Введите ваш адрес.', en: 'Please enter your address.' },
-    'hk.office.boothOne':  { uz: '1 oyna',     ru: '1 окно',      en: '1 booth' },
-    'hk.office.boothMany': { uz: 'oyna',       ru: 'окон',        en: 'booths' },
+    'hk.home.addressLink': {
+      uz: 'Idorangizni bilmaysizmi? Uy manzilingiz bo\'yicha toping →',
+      ru: 'Не знаете свой офис? Найдите по домашнему адресу →',
+      en: "Don't know your office? Find it by your home address →",
+    },
+    'hk.home.noMatch': {
+      uz: 'Hech qanday idora topilmadi. Boshqa so\'z bilan izlang yoki yuqoridagi "Manzil bo\'yicha topish" havolasini bosing.',
+      ru: 'Ничего не найдено. Попробуйте другое слово или нажмите "Найти по адресу" выше.',
+      en: "No offices match. Try a different word, or use 'Find by address' above.",
+    },
+    'hk.home.oneCounter':   { uz: '1 oyna',  ru: '1 окно',  en: '1 counter'   },
+    'hk.home.manyCounters': { uz: 'oyna',    ru: 'окон',     en: 'counters'   },
 
-    // Booth picker
-    'hk.booth.title': { uz: 'Oynani tanlang',          ru: 'Выберите окно',           en: 'Select a booth' },
-    'hk.booth.sub':   { uz: "So'rovingiz turiga mos oynani tanlang", ru: 'Выберите окно подходящего типа', en: 'Pick the booth that handles your request type' },
-    'hk.booth.none':  { uz: 'Ushbu idorada oyna mavjud emas.', ru: 'У этого офиса нет доступных окон.', en: 'No booths available for this office.' },
+    // BY-ADDRESS
+    'hk.address.title': {
+      uz: 'Manzilingiz bo\'yicha idorangizni toping',
+      ru: 'Найти офис по адресу',
+      en: 'Find your office by address',
+    },
+    'hk.address.lede': {
+      uz: 'Har bir idora muayyan tumanlarga xizmat ko\'rsatadi. Yashash manzilingizni ayting, biz mosini topamiz.',
+      ru: 'Каждый офис обслуживает определённые районы. Скажите, где живёте, и мы подберём.',
+      en: "Each office serves specific districts. Tell us where you live and we'll match it.",
+    },
+    'hk.address.provinceLabel': {
+      uz: '1. Viloyat / shaharingizni tanlang',
+      ru: '1. Выберите провинцию / город',
+      en: '1. Pick your province / city',
+    },
+    'hk.address.provincePlaceholder': { uz: '— tanlang —', ru: '— выбрать —', en: '— select —' },
+    'hk.address.addressLabel': {
+      uz: '2. Uy manzilingizni koreyscha kiriting',
+      ru: '2. Введите домашний адрес на корейском',
+      en: '2. Type your home address in Korean',
+    },
+    'hk.address.hint': {
+      uz: '💡 Tumaningiz (masalan 강남구) ham yozsangiz, eng yaxshi natija beradi.',
+      ru: '💡 Укажите район (например 강남구) — так совпадение будет точнее.',
+      en: '💡 Including your district (e.g. 강남구) gives us the best match.',
+    },
+    'hk.address.findBtn':      { uz: 'Idoramni topish',       ru: 'Найти мой офис',           en: 'Find my office' },
+    'hk.address.needProvince': { uz: 'Avval viloyatni tanlang.', ru: 'Сначала выберите провинцию.', en: 'Pick your province first' },
+    'hk.address.needAddress':  { uz: 'Manzilingizni kiriting.',  ru: 'Введите адрес.',              en: 'Enter your address' },
 
-    // Calendar
-    'hk.calendar.title': { uz: "Bo'sh sanalar", ru: 'Свободные даты', en: 'Available dates' },
-    'hk.cal.capacity':   { uz: 'Sig\'im',       ru: 'Вместимость',    en: 'Capacity' },
-    'hk.cal.taken':      { uz: 'band',          ru: 'занято',         en: 'taken' },
-    'hk.cal.emptyTitle': { uz: "Hozir bo'sh sana yo'q", ru: 'Сейчас нет свободных дат', en: 'No open dates right now' },
-    'hk.cal.emptySub':   {
-      uz: "Barcha ko'rinadigan sanalar to'liq band. Signal o'rnating, biz kuzatib boramiz.",
-      ru: 'Все видимые даты заняты. Установите уведомление, и мы будем следить.',
-      en: "All visible dates are fully booked. Set an alarm and we'll watch for openings.",
-    },
-    'hk.calendar.setAlarmCta': {
-      uz: "Bu oyna uchun signal o'rnatish",
-      ru: 'Установить уведомление для этого окна',
-      en: 'Set an alarm for this booth',
+    'hk.address.foundOne':     { uz: 'Mana sizning idorangiz:',  ru: 'Вот ваш офис:',                en: "Here's your office:" },
+    'hk.address.foundMany':    { uz: 'Mosini tanlang:',           ru: 'Выберите подходящий:',         en: 'Pick the one that matches:' },
+    'hk.address.noMatch': {
+      uz: 'Ushbu manzil uchun idora topilmadi. Bosh sahifadagi ro\'yxatdan tanlab ko\'ring.',
+      ru: 'Не нашли офис для этого адреса. Попробуйте выбрать из списка на главной.',
+      en: "Couldn't find an office for that address. Try picking from the list on the home screen.",
     },
 
-    // Alarm setup
-    'hk.alarm.title': { uz: "Signal o'rnatish", ru: 'Установить уведомление', en: 'Set up alarm' },
-    'hk.alarm.sub': {
-      uz: "Sizning sanalaringizda joy ochilishi bilan Telegram'ga xabar yuboramiz",
-      ru: 'Сразу напишем в Telegram, как только появится слот в вашем диапазоне',
-      en: "We'll notify you on Telegram the moment a slot opens in your range",
+    // BOOTH PICKER
+    'hk.booth.title': { uz: 'Sizga qaysi oyna kerak?', ru: 'Какое окно вам нужно?', en: 'Which counter do you need?' },
+    'hk.booth.lede': {
+      uz: 'Har bir oyna har xil so\'rovlarni qabul qiladi. Bilmasangiz birinchisini tanlang — odatda eng keng tarqalgan holatlarni qamrab oladi.',
+      ru: 'Каждое окно работает с разными запросами. Если не уверены — выберите первое, оно покрывает большинство случаев.',
+      en: "Each counter handles different kinds of requests. If you're not sure, pick the first one — it usually covers the most common cases.",
     },
-    'hk.alarm.preset.week':     { uz: 'Yaqin 7 kun',  ru: '7 дней',  en: 'Next 7 days' },
-    'hk.alarm.preset.twoWeeks': { uz: 'Yaqin 14 kun', ru: '14 дней', en: 'Next 14 days' },
-    'hk.alarm.preset.month':    { uz: 'Yaqin 30 kun', ru: '30 дней', en: 'Next 30 days' },
-    'hk.alarm.preset.custom':   { uz: 'Maxsus',       ru: 'Свой',    en: 'Custom' },
-    'hk.alarm.from':            { uz: 'Dan',          ru: 'С',       en: 'From' },
-    'hk.alarm.to':              { uz: 'Gacha',        ru: 'По',      en: 'To' },
-    'hk.alarm.previewRange':    { uz: 'Davr',         ru: 'Диапазон',en: 'Range' },
-    'hk.alarm.previewDays':     { uz: 'Kunlar',       ru: 'Дней',    en: 'Days' },
-    'hk.alarm.daysWord':        { uz: 'kun',          ru: 'дн.',     en: 'day(s)' },
-    'hk.alarm.submit':          { uz: "Signal o'rnatish", ru: 'Создать уведомление', en: 'Create alarm' },
-    'hk.alarm.alreadyAvailable':{
-      uz: "Sizning davringizda allaqachon joy bor",
-      ru: 'В вашем диапазоне уже есть свободные слоты',
-      en: 'Slots are already open in your range',
-    },
-    'hk.alarm.alreadyAvailableSub': {
-      uz: "Hoziroq band qilishingiz mumkin. Yoki signalni baribir o'rnating — balki nimadir bilarsiz.",
-      ru: 'Можете попробовать забронировать сейчас. Или всё равно установите уведомление — вам виднее.',
-      en: "You might be able to book one right now. Or set the alarm anyway — maybe you know something we don't.",
-    },
-    'hk.alarm.bookNow':     { uz: "HiKorea'da band qilish →", ru: 'Забронировать на HiKorea →', en: 'Book on HiKorea →' },
-    'hk.alarm.forceAnyway': { uz: "Baribir o'rnatish", ru: 'Установить всё равно', en: 'Set alarm anyway' },
-    'hk.alarm.successTitle':{ uz: "Signal o'rnatildi", ru: 'Уведомление установлено', en: 'Alarm created' },
-    'hk.alarm.successText': {
-      uz: "Joy ochilishi bilan Telegram orqali xabar yuboramiz.",
-      ru: 'Мы напишем в Telegram, как только появится свободный слот.',
-      en: "We'll send you a Telegram message the moment a slot opens.",
-    },
-    'hk.alarm.successOk':   { uz: 'Tushundim',  ru: 'Понятно', en: 'Got it' },
-    'hk.alarm.pickDates':   { uz: 'Sana tanlang.', ru: 'Выберите даты.', en: 'Pick a start and end date.' },
-    'hk.alarm.dupErr':      {
-      uz: 'Sizda allaqachon bunday signal mavjud.',
-      ru: 'У вас уже есть такое уведомление.',
-      en: 'You already have an identical alarm.',
-    },
-    'hk.alarm.maxErr': {
-      uz: "Maksimal 10 ta signal. Avval bittasini bekor qiling.",
-      ru: 'Максимум 10 уведомлений. Сначала отмените одно.',
-      en: 'Maximum 10 alarms reached. Cancel one first.',
-    },
-    'hk.alarm.validation':  { uz: "Ma'lumotlarni tekshiring.", ru: 'Проверьте ввод.', en: 'Check your inputs.' },
-    'hk.alarm.submitErr':   { uz: "Signalni o'rnatib bo'lmadi. Qayta urinib ko'ring.", ru: 'Не удалось создать уведомление. Попробуйте ещё раз.', en: "Couldn't create alarm. Try again." },
+    'hk.booth.none':      { uz: 'Bu idorada oyna mavjud emas.', ru: 'У офиса нет доступных окон.', en: 'No counters available for this office.' },
+    'hk.booth.afternoon': { uz: 'Tushdan keyingi smena (09:36 dan keyin)', ru: 'Послеобеденная смена (после 09:36)', en: 'Afternoon hours (after 09:36)' },
 
-    // My alarms
-    'hk.myAlarms.title':     { uz: 'Mening signallarim', ru: 'Мои уведомления', en: 'My alarms' },
-    'hk.myAlarms.sub':       { uz: 'Faol obunalar. Istalgan vaqtda bekor qiling.', ru: 'Активные подписки. Можно отменить в любой момент.', en: 'Active subscriptions. Cancel any time.' },
-    'hk.myAlarms.emptyTitle':{ uz: "Hali signal yo'q",  ru: 'Уведомлений ещё нет',  en: 'No alarms yet' },
-    'hk.myAlarms.emptySub':  { uz: "Birini o'rnating, biz kuzatamiz.", ru: 'Установите — будем следить за вас.', en: "Set one and we'll keep watch for you." },
-    'hk.myAlarms.cancel':    { uz: 'Bekor qilish', ru: 'Отменить',  en: 'Cancel' },
-    'hk.myAlarms.cancelled': { uz: 'Bekor qilindi', ru: 'Отменено', en: 'Alarm cancelled' },
+    // CALENDAR
+    'hk.cal.lede': {
+      uz: "Sanani bosib, joylar borligini ko'ring. Yo'q bo'lsa pastdagi tugmani bosing — joy ochilganda xabar yuboramiz.",
+      ru: 'Нажмите на любую дату, чтобы увидеть слоты. Нет нужной? Жмите кнопку ниже — напишем, когда появится.',
+      en: "Tap any date to see if it's bookable. Don't see what you want? Tap the button below — we'll notify you the moment a slot opens.",
+    },
+    'hk.cal.maxPerDay': { uz: 'Kuniga max',          ru: 'Макс/день',           en: 'Max/day' },
+    'hk.cal.checked':   { uz: 'Tekshirildi',          ru: 'Проверено',           en: 'Checked' },
+    'hk.cal.legHigh':   { uz: "Ko'p joy",             ru: 'Много мест',          en: 'Plenty' },
+    'hk.cal.legMed':    { uz: 'Bir nechta',           ru: 'Несколько',           en: 'Few' },
+    'hk.cal.legLow':    { uz: "To'lay deb qolgan",    ru: 'Почти полно',         en: 'Almost full' },
+    'hk.cal.legNone':   { uz: 'To\'la / yopiq',       ru: 'Занято / закрыто',    en: 'Full / closed' },
+    'hk.cal.notifyCta': {
+      uz: 'Joy ochilganda xabar bering',
+      ru: 'Сообщите, когда появится слот',
+      en: 'Notify me when a slot opens',
+    },
+    'hk.cal.allFullNote': {
+      uz: "Hozir hamma sana to'la — aynan shu paytda kuzatish kerak. Joy ochilishi bilan xabar yuboramiz.",
+      ru: 'Сейчас всё занято — самое время поставить слежение. Напишем, как только что-то освободится.',
+      en: "Looks like every visible date is full right now. That's exactly when a watch helps — we'll ping you the moment something opens.",
+    },
 
-    // Status pill
-    'hk.status.offline':    { uz: 'Kuzatuvchi ishlamayapti', ru: 'Слежение приостановлено', en: 'Watcher offline' },
-    'hk.status.deskIssues': { uz: 'oyna(lar)da muammo', ru: 'окон с проблемами', en: 'desk(s) with issues' },
-    'hk.status.updated':    { uz: 'Yangilandi',   ru: 'Обновлено',  en: 'Updated' },
-    'hk.status.ready':      { uz: 'Kuzatuvchi ishlayapti', ru: 'Слежение активно', en: 'Watcher online' },
-    'hk.time.now':          { uz: 'hozir',        ru: 'только что', en: 'just now' },
-    'hk.time.ago':          { uz: 'oldin',        ru: 'назад',      en: 'ago' },
+    // DATE SHEET (plain-language phrases)
+    'hk.phrase.unknown':      { uz: "Ma'lumot yo'q — HiKorea'da ko'rib chiqing", ru: 'Нет данных — проверьте на HiKorea', en: 'No info — check HiKorea' },
+    'hk.phrase.full':         { uz: "To'la band qilingan",     ru: 'Полностью занято',         en: 'Fully booked' },
+    'hk.phrase.lastOne':      { uz: "Faqat 1 ta joy — ulgurish kerak!", ru: 'Только 1 место — успейте!', en: 'Just 1 spot left — grab it!' },
+    'hk.phrase.spotsLeftHurry':{uz: "ta joy qoldi — ulguring!", ru: 'мест — поспешите!',         en: 'spots left — hurry!' },
+    'hk.phrase.spotsLeft':    { uz: 'ta joy qoldi',             ru: 'мест осталось',             en: 'spots left' },
+    'hk.phrase.spotsOpen':    { uz: "ta joy bo'sh",             ru: 'свободных мест',            en: 'spots open' },
+    'hk.phrase.open':         { uz: "bo'sh",                    ru: 'свободно',                  en: 'open' },
+    'hk.sheet.bookNow':       { uz: "HiKorea'da band qilish →", ru: 'Забронировать на HiKorea →', en: 'Book on HiKorea →' },
 
-    // Generic errors
-    'hk.err.loadOffices': { uz: 'Idoralarni yuklab bo\'lmadi', ru: 'Не удалось загрузить офисы', en: 'Could not load offices' },
-    'hk.err.resolve':     { uz: 'Idorani topib bo\'lmadi',     ru: 'Не удалось найти офис',     en: 'Could not look up office' },
-    'hk.err.slotsTitle':  { uz: 'Sanalarni yuklab bo\'lmadi',  ru: 'Не удалось загрузить даты', en: "Couldn't load slots" },
-    'hk.err.slotsSub':    { uz: 'Bir oz vaqtdan keyin urinib ko\'ring.', ru: 'Попробуйте через минуту.', en: 'Try again in a moment.' },
-    'hk.err.loadAlarms':  { uz: 'Signallarni yuklab bo\'lmadi', ru: 'Не удалось загрузить уведомления', en: 'Could not load your alarms' },
-    'hk.err.cancel':      { uz: 'Signalni bekor qilib bo\'lmadi', ru: 'Не удалось отменить', en: "Couldn't cancel alarm" },
-    'hk.err.noUser':      { uz: 'Telegram bot orqali oching.', ru: 'Откройте через Telegram-бота.', en: 'Open this page via the Telegram bot first.' },
-      },
+    'hk.sheet.close':         { uz: 'Yopish',                   ru: 'Закрыть',                   en: 'Close' },
+    'hk.sheet.bookCue': {
+      uz: 'Boshqalar olib qo\'yishidan oldin HiKorea\'da band qiling.',
+      ru: 'Бронируйте на HiKorea, пока не разобрали.',
+      en: 'Book on HiKorea before someone else grabs it.',
+    },
+    'hk.sheet.fullCue': {
+      uz: "Hozir bo'sh joy yo'q — kuzatishni yoqing, ochilganda xabar beramiz.",
+      ru: 'Сейчас мест нет — поставьте слежение, и мы напишем, как откроется.',
+      en: "No spots right now — set a watch and we'll tell you when one opens.",
+    },
+
+    // WATCH SETUP
+    'hk.watch.title': { uz: 'Qachon kuzataylik?', ru: 'Когда следить?', en: 'When should we watch?' },
+    'hk.watch.lede': {
+      uz: 'Siz tayyor bo\'lgan sanalarni tanlang. Shu davr ichida joy ochilsa, darhol Telegram orqali xabar yuboramiz.',
+      ru: 'Выберите даты, которые вам подходят. Если в этом диапазоне появится слот, тут же напишем в Telegram.',
+      en: "Pick the dates you're flexible with. If a slot opens within this range, we'll send you a Telegram message right away.",
+    },
+    'hk.watch.quickLabel': { uz: "⚡ Tezkor tanlash", ru: '⚡ Быстрый выбор', en: '⚡ Quick pick' },
+    'hk.watch.orLabel':    { uz: 'yoki aniq sanalarni tanlang', ru: 'или выберите конкретные даты', en: 'or pick specific dates' },
+    'hk.watch.p7':  { uz: 'Yaqin 7 kun',  ru: '7 дней',  en: 'Next 7 days'  },
+    'hk.watch.p14': { uz: 'Yaqin 14 kun', ru: '14 дней', en: 'Next 14 days' },
+    'hk.watch.p30': { uz: 'Yaqin 30 kun', ru: '30 дней', en: 'Next 30 days' },
+    'hk.watch.p60': { uz: 'Yaqin 60 kun', ru: '60 дней', en: 'Next 60 days' },
+    'hk.watch.fromLabel': { uz: 'Dan',   ru: 'С',  en: 'From' },
+    'hk.watch.toLabel':   { uz: 'Gacha', ru: 'По', en: 'To'   },
+    'hk.preview.watching':{ uz: 'Kuzatilmoqda',   ru: 'Слежу за',       en: 'Watching' },
+    'hk.preview.days':    { uz: 'kun ichida',     ru: 'дней в окне',    en: 'days in your window' },
+    'hk.preview.oneDay':  { uz: '1 kun ichida',   ru: '1 день в окне',  en: '1 day in your window' },
+    'hk.watch.createBtn': { uz: 'Kuzatishni boshlash', ru: 'Начать слежение', en: 'Start watching' },
+    'hk.watch.warnTitle': {
+      uz: "Diqqat — hozir ham ba'zi sanalar bo'sh",
+      ru: 'Внимание — некоторые даты уже свободны',
+      en: 'Heads up — some dates are open right now',
+    },
+    'hk.watch.warnText': {
+      uz: 'Kutmasdan, hoziroq ulardan birini band qilishingiz mumkin:',
+      ru: 'Можно забронировать прямо сейчас, не дожидаясь:',
+      en: 'You might be able to book one of these today instead of waiting:',
+    },
+    'hk.watch.bookNow':     { uz: 'Hoziroq HiKorea\'ga →', ru: 'Перейти на HiKorea →', en: 'Go to HiKorea now →' },
+    'hk.watch.watchAnyway': {
+      uz: 'Baribir kuzatish kerakmi? Belgilang',
+      ru: 'Всё равно хотите ping? Поставьте слежение',
+      en: 'Still want a heads-up? Set the watch anyway',
+    },
+
+    // SUCCESS
+    'hk.success.title': { uz: 'Hammasi tayyor', ru: 'Готово!',           en: "You're all set" },
+    'hk.success.text':  {
+      uz: 'Sizning davringizda joy ochilishi bilan Telegram orqali xabar yuboramiz. Kuzatishlaringizni boshqarish uchun istalgan vaqtda qaytib keling.',
+      ru: 'Напишем в Telegram, как только в вашем диапазоне появится слот. В любой момент можете вернуться и управлять слежениями.',
+      en: "We'll send you a Telegram message the moment a slot opens in your range. You can come back any time to manage your watches.",
+    },
+    'hk.success.ok': { uz: 'Kuzatishlarimni ko\'rish', ru: 'Мои слежения', en: 'See my watches' },
+
+    // MY WATCHES
+    'hk.watches.title': { uz: 'Faol kuzatishlar', ru: 'Активные слежения', en: 'Your active watches' },
+    'hk.watches.lede': {
+      uz: "Quyidagi davrlarni kuzatib turamiz. Joy ochilishi bilan Telegram'ga yozamiz.",
+      ru: 'Следим за этими датами. Напишем в Telegram, как только появится слот.',
+      en: "We're keeping an eye on these date ranges. We'll message you on Telegram the moment a slot opens.",
+      
+    },
+    'hk.watches.emptyTitle': { uz: "Hali kuzatish yo'q",  ru: 'Пока ничего',          en: 'No watches yet' },
+    'hk.watches.emptySub': {
+      uz: 'Idorani tanlab, birinchi kuzatishingizni o\'rnating.',
+      ru: 'Выберите офис и поставьте первое слежение.',
+      en: 'Pick an office and set your first one.',
+    },
+    'hk.watches.cancel':  { uz: "To'xtatish",  ru: 'Остановить',  en: 'Stop watching' },
+    'hk.watches.stopped': { uz: "To'xtatildi", ru: 'Остановлено', en: 'Watch stopped' },
+
+    // ERRORS
+    'hk.err.offices':   { uz: "Idoralarni yuklay olmadik — qayta urinib ko'ring", ru: 'Не смогли загрузить офисы — попробуйте ещё', en: "Couldn't load offices — try again" },
+    'hk.err.resolve':   { uz: "Idorani topa olmadik — qayta urinib ko'ring",     ru: 'Не смогли найти офис — попробуйте ещё',     en: "Couldn't look up office — try again" },
+    'hk.err.slots':     { uz: "Bu oynaning kalendarini yuklay olmadik. Bir lahzadan keyin urinib ko'ring.", ru: 'Не смогли загрузить календарь окна. Попробуйте через минуту.', en: "Couldn't load this counter's calendar. Try again in a moment." },
+    'hk.err.watches':   { uz: "Kuzatishlaringizni yuklay olmadik", ru: 'Не смогли загрузить ваши слежения', en: "Couldn't load your watches" },
+    'hk.err.cancel':    { uz: "Kuzatishni to'xtatib bo'lmadi",    ru: 'Не удалось остановить',              en: "Couldn't stop the watch — try again" },
+    'hk.err.create':    { uz: "Kuzatishni yarata olmadik — qayta urinib ko'ring", ru: 'Не смогли создать — попробуйте ещё', en: "Couldn't create the watch — try again" },
+    'hk.err.dup':       { uz: 'Bunday kuzatish allaqachon bor',   ru: 'Такое слежение уже есть',          en: "You've already set this watch" },
+    'hk.err.max':       { uz: "Maksimal 10 ta — bittasini to'xtating", ru: 'Максимум 10 — остановите одно', en: "You've hit the limit (10). Cancel one first." },
+    'hk.err.input':     { uz: 'Sanalarni tekshiring',              ru: 'Проверьте даты',                    en: 'Check your dates' },
+    'hk.err.pickDates': { uz: "Sana tanlang",                      ru: 'Выберите даты',                    en: 'Pick a start and end date' },
+    'hk.err.noUser':    { uz: 'Bu sahifani Telegram bot orqali oching.', ru: 'Откройте эту страницу через Telegram-бота.', en: 'Open this page from the Telegram bot first.' },
+  },
 
   init() {
     const saved = localStorage.getItem(this.STORAGE_KEY);
