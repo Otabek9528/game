@@ -136,7 +136,6 @@
       //vegukinShops: { icon: '🛒', labelKey: 'feature.vegukinShops', href: 'pages/vegukinshops/shops.html', isNew: true },
       links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
       donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },
-      hikorea: {icon: '🛂',labelKey: 'feature.hikorea',href: 'pages/hikorea/hikorea.html',isNew: true},
       //news: { icon: '📢', labelKey: 'feature.news', href: 'pages/questions/qna.html' },
       //events: { icon: '📅', labelKey: 'feature.events', href: '#', comingSoon: true },
       //market: { icon: '🛒', labelKey: 'feature.market', href: '#', comingSoon: true },

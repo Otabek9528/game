@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title data-i18n="hk.pageTitle">HiKorea Slot Watcher</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="hikorea.css" />
+
+  <script>
+    if (localStorage.getItem('theme') === 'night') {
+      document.documentElement.classList.add('night-mode');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ===== APP HEADER (shared) ===== -->
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <!-- ===== MAIN CONTAINER ===== -->
+  <div class="hk-container">
+
+    <!-- =========================================================
+         HERO
+         ========================================================= -->
+    <div class="hk-hero">
+      <div class="hero-icon">🛂</div>
+      <h2 class="hero-title" data-i18n="hk.heroTitle">HiKorea Slot Watcher</h2>
+      <p class="hero-subtitle" data-i18n="hk.heroSubtitle">
+        Bo'sh joylarni kuzatib boring, vaqt ochilganda xabardor bo'ling
+      </p>
+
+      <!-- Status pill: subtle indicator of watcher health -->
+      <div class="hk-status-pill" id="statusPill" hidden>
+        <span class="hk-status-dot" id="statusDot"></span>
+        <span class="hk-status-text" id="statusText"></span>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         SECTION 1: ENTRY (choose what to do)
+         ========================================================= -->
+    <section class="hk-section" id="section-entry">
+      <button class="hk-action-card hk-action-primary" data-action="calendar">
+        <span class="hk-action-icon">📅</span>
+        <div class="hk-action-body">
+          <span class="hk-action-title" data-i18n="hk.entry.calendar.title">Check available slots</span>
+          <span class="hk-action-sub" data-i18n="hk.entry.calendar.sub">See open dates by office</span>
+        </div>
+        <span class="hk-action-arrow">→</span>
+      </button>
+
+      <button class="hk-action-card hk-action-secondary" data-action="alarm">
+        <span class="hk-action-icon">🔔</span>
+        <div class="hk-action-body">
+          <span class="hk-action-title" data-i18n="hk.entry.alarm.title">Set up an alarm</span>
+          <span class="hk-action-sub" data-i18n="hk.entry.alarm.sub">Get pinged when a slot opens</span>
+        </div>
+        <span class="hk-action-arrow">→</span>
+      </button>
+
+      <button class="hk-action-card hk-action-tertiary" data-action="my-alarms" id="myAlarmsEntry" hidden>
+        <span class="hk-action-icon">📋</span>
+        <div class="hk-action-body">
+          <span class="hk-action-title" data-i18n="hk.entry.myAlarms.title">My alarms</span>
+          <span class="hk-action-sub">
+            <span id="myAlarmsCount">0</span>
+            <span data-i18n="hk.entry.myAlarms.active">active</span>
+          </span>
+        </div>
+        <span class="hk-action-arrow">→</span>
+      </button>
+
+      <!-- Helper note at the bottom -->
+      <p class="hk-note" data-i18n="hk.entry.note">
+        💡 We poll HiKorea every 5 minutes and notify you on Telegram when a slot
+        opens in your chosen date range.
+      </p>
+    </section>
+
+    <!-- =========================================================
+         SECTION 2: OFFICE PICKER
+         ========================================================= -->
+    <section class="hk-section" id="section-office" hidden>
+      <button class="hk-back" data-back>
+        <span>←</span><span data-i18n="hk.back">Back</span>
+      </button>
+
+      <h3 class="hk-section-title" data-i18n="hk.office.title">Choose your office</h3>
+      <p class="hk-section-sub" data-i18n="hk.office.sub">
+        Pick from the list, or find your office by your address
+      </p>
+
+      <!-- Tab switcher -->
+      <div class="hk-tabs" role="tablist">
+        <button class="hk-tab active" data-tab="list" role="tab" data-i18n="hk.office.tab.list">By list</button>
+        <button class="hk-tab" data-tab="address" role="tab" data-i18n="hk.office.tab.address">By address</button>
+      </div>
+
+      <!-- Tab panel: list -->
+      <div class="hk-tab-panel active" id="tab-list">
+        <div class="hk-search-wrap">
+          <span class="hk-search-icon">🔍</span>
+          <input type="search" class="hk-search" id="officeSearch"
+                 placeholder="" data-i18n-placeholder="hk.office.searchPlaceholder" />
+        </div>
+        <div class="hk-list" id="officeList">
+          <div class="hk-skeleton-row"></div>
+          <div class="hk-skeleton-row"></div>
+          <div class="hk-skeleton-row"></div>
+        </div>
+      </div>
+
+      <!-- Tab panel: by-address -->
+      <div class="hk-tab-panel" id="tab-address">
+        <label class="hk-field-label" data-i18n="hk.office.provinceLabel">Province</label>
+        <div class="hk-select-wrap">
+          <select class="hk-select" id="provinceSelect">
+            <option value="" data-i18n="hk.office.provincePlaceholder">— select —</option>
+          </select>
+        </div>
+
+        <label class="hk-field-label" data-i18n="hk.office.addressLabel">
+          Your address (in Korean)
+        </label>
+        <input type="text" class="hk-input" id="addressInput"
+               placeholder="예: 서울시 강남구 역삼동 123-45" />
+        <p class="hk-field-hint" data-i18n="hk.office.addressHint">
+          Tip: include your district name (e.g. 강남구).
+        </p>
+
+        <button class="hk-btn-primary" id="resolveBtn">
+          <span data-i18n="hk.office.resolveBtn">Find my office</span>
+        </button>
+
+        <div class="hk-resolve-results" id="resolveResults" hidden></div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 3: BOOTH PICKER
+         ========================================================= -->
+    <section class="hk-section" id="section-booth" hidden>
+      <button class="hk-back" data-back>
+        <span>←</span><span data-i18n="hk.back">Back</span>
+      </button>
+
+      <div class="hk-breadcrumb">
+        <span class="hk-crumb-office" id="boothOfficeName"></span>
+      </div>
+
+      <h3 class="hk-section-title" data-i18n="hk.booth.title">Select a booth</h3>
+      <p class="hk-section-sub" data-i18n="hk.booth.sub">
+        Pick the booth that handles your request type
+      </p>
+
+      <div class="hk-list" id="boothList"></div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 4: CALENDAR VIEW (slot inventory for one booth)
+         ========================================================= -->
+    <section class="hk-section" id="section-calendar" hidden>
+      <button class="hk-back" data-back>
+        <span>←</span><span data-i18n="hk.back">Back</span>
+      </button>
+
+      <div class="hk-breadcrumb">
+        <span class="hk-crumb-office" id="calOfficeName"></span>
+        <span class="hk-crumb-sep">•</span>
+        <span class="hk-crumb-booth" id="calBoothName"></span>
+      </div>
+
+      <h3 class="hk-section-title" data-i18n="hk.calendar.title">Available dates</h3>
+      <div class="hk-cal-meta" id="calMeta"></div>
+
+      <div class="hk-cal-list" id="calList">
+        <div class="hk-skeleton-row"></div>
+        <div class="hk-skeleton-row"></div>
+        <div class="hk-skeleton-row"></div>
+      </div>
+
+      <!-- Sticky CTA: switch to alarm setup for this booth -->
+      <button class="hk-cta-sticky" id="goToAlarmBtn">
+        <span class="hk-cta-icon">🔔</span>
+        <span class="hk-cta-text" data-i18n="hk.calendar.setAlarmCta">
+          Set an alarm for this booth
+        </span>
+      </button>
+    </section>
+
+    <!-- =========================================================
+         SECTION 5: ALARM SETUP
+         ========================================================= -->
+    <section class="hk-section" id="section-alarm" hidden>
+      <button class="hk-back" data-back>
+        <span>←</span><span data-i18n="hk.back">Back</span>
+      </button>
+
+      <div class="hk-breadcrumb">
+        <span class="hk-crumb-office" id="alOfficeName"></span>
+        <span class="hk-crumb-sep">•</span>
+        <span class="hk-crumb-booth" id="alBoothName"></span>
+      </div>
+
+      <h3 class="hk-section-title" data-i18n="hk.alarm.title">Set up alarm</h3>
+      <p class="hk-section-sub" data-i18n="hk.alarm.sub">
+        We'll notify you on Telegram the moment a slot opens in your range
+      </p>
+
+      <!-- Preset chips -->
+      <div class="hk-preset-grid" id="presetGrid">
+        <button class="hk-preset" data-preset="7" data-i18n="hk.alarm.preset.week">Next 7 days</button>
+        <button class="hk-preset" data-preset="14" data-i18n="hk.alarm.preset.twoWeeks">Next 14 days</button>
+        <button class="hk-preset" data-preset="30" data-i18n="hk.alarm.preset.month">Next 30 days</button>
+        <button class="hk-preset" data-preset="custom" data-i18n="hk.alarm.preset.custom">Custom</button>
+      </div>
+
+      <!-- Custom range inputs (always present, just visually emphasized in 'custom' mode) -->
+      <div class="hk-range-inputs">
+        <label class="hk-field-label">
+          <span data-i18n="hk.alarm.from">From</span>
+          <input type="date" class="hk-date-input" id="alStartDate" />
+        </label>
+        <label class="hk-field-label">
+          <span data-i18n="hk.alarm.to">To</span>
+          <input type="date" class="hk-date-input" id="alEndDate" />
+        </label>
+      </div>
+
+      <!-- Live preview -->
+      <div class="hk-preview" id="alarmPreview" hidden>
+        <div class="hk-preview-row">
+          <span class="hk-preview-label" data-i18n="hk.alarm.previewRange">Range</span>
+          <span class="hk-preview-value" id="previewRange"></span>
+        </div>
+        <div class="hk-preview-row">
+          <span class="hk-preview-label" data-i18n="hk.alarm.previewDays">Days</span>
+          <span class="hk-preview-value" id="previewDays"></span>
+        </div>
+      </div>
+
+      <button class="hk-btn-primary" id="submitAlarmBtn">
+        <span data-i18n="hk.alarm.submit">Create alarm</span>
+      </button>
+
+      <!-- Inline guardrail: shown after API returns 409 "available_slots_in_range" -->
+      <div class="hk-warn-card" id="availableWarn" hidden>
+        <div class="hk-warn-head">
+          <span class="hk-warn-icon">⏰</span>
+          <strong data-i18n="hk.alarm.alreadyAvailable">Slots are already open in your range</strong>
+        </div>
+        <p class="hk-warn-text" data-i18n="hk.alarm.alreadyAvailableSub">
+          You might be able to book one right now. Otherwise, set an alarm anyway —
+          maybe you know something the others don't.
+        </p>
+        <div class="hk-warn-dates" id="availableWarnDates"></div>
+        <div class="hk-warn-actions">
+          <a href="https://www.hikorea.go.kr/" target="_blank"
+             rel="noopener noreferrer" class="hk-btn-primary hk-btn-compact">
+            <span data-i18n="hk.alarm.bookNow">Book on HiKorea →</span>
+          </a>
+          <button class="hk-btn-text" id="forceAlarmBtn"
+                  data-i18n="hk.alarm.forceAnyway">Set alarm anyway</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 6: MY ALARMS
+         ========================================================= -->
+    <section class="hk-section" id="section-my-alarms" hidden>
+      <button class="hk-back" data-back>
+        <span>←</span><span data-i18n="hk.back">Back</span>
+      </button>
+
+      <h3 class="hk-section-title" data-i18n="hk.myAlarms.title">My alarms</h3>
+      <p class="hk-section-sub" data-i18n="hk.myAlarms.sub">
+        Active subscriptions. Cancel any time.
+      </p>
+
+      <div class="hk-list" id="myAlarmsList">
+        <div class="hk-skeleton-row"></div>
+      </div>
+
+      <div class="hk-empty" id="myAlarmsEmpty" hidden>
+        <div class="hk-empty-icon">🔔</div>
+        <p class="hk-empty-title" data-i18n="hk.myAlarms.emptyTitle">No alarms yet</p>
+        <p class="hk-empty-sub" data-i18n="hk.myAlarms.emptySub">
+          Set one and we'll keep watch for you.
+        </p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         FULL-PAGE STATES (success / error)
+         ========================================================= -->
+    <div class="hk-overlay" id="successOverlay" hidden>
+      <div class="hk-overlay-card">
+        <div class="hk-overlay-icon">✅</div>
+        <h3 class="hk-overlay-title" data-i18n="hk.alarm.successTitle">Alarm created</h3>
+        <p class="hk-overlay-text" data-i18n="hk.alarm.successText">
+          We'll send you a Telegram message the moment a slot opens.
+        </p>
+        <button class="hk-btn-primary" id="successOk" data-i18n="hk.alarm.successOk">
+          Got it
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast (transient feedback) -->
+  <div class="hk-toast" id="toast" hidden></div>
+
+  <!-- ===== Scripts ===== -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/logger.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="hikorea.js"></script>
+</body>
+</html>
