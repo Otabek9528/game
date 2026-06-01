@@ -519,10 +519,9 @@
 
   function renderOneMonth(year, month0, slotMap, today) {
     const dowsShort = [];
-    // Week starts Monday for the Korean context.
-    const weekOrder = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun
+    const weekOrder = [1, 2, 3, 4, 5, 6, 0];
     for (const dow of weekOrder) {
-      const sample = new Date(2024, 0, dow === 0 ? 7 : dow); // 2024-01-01 was Mon
+      const sample = new Date(2024, 0, dow === 0 ? 7 : dow);
       dowsShort.push(sample.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2));
     }
 
@@ -544,16 +543,25 @@
       const isWeekend = (d.getDay() === 0 || d.getDay() === 6);
 
       let cls = ['hk-cal-cell'];
+      let badge = '';
       if (isToday) cls.push('today');
 
       if (isPast) {
         cls.push('past');
       } else if (slot) {
-        // We don't know per-date capacity here, so cells are a single
-        // "in HiKorea's booking window" state. Real availability comes
-        // from the live-fetch when the user taps.
+        // We have `taken` from the calendar overview but not per-date
+        // capacity (capacity varies by day and is only known live). Show
+        // taken count and a coarse coloring: 0 taken = definitely open;
+        // any taken = some bookings exist. Real availability comes from
+        // tapping the cell (live fetch).
         cls.push('in-window', 'hk-cal-cell-bookable');
         if (isWeekend) cls.push('weekend');
+        if (slot.taken === 0) {
+          cls.push('empty-booked'); // fully open
+        } else {
+          cls.push('has-bookings');
+          badge = `<span class="hk-cal-day-mark">${slot.taken}</span>`;
+        }
       } else {
         cls.push('closed');
       }
@@ -563,6 +571,7 @@
                 ${slot && !isPast ? `data-ymd="${ymd}"` : ''}
                 ${isPast || !slot ? 'disabled' : ''}>
           <span class="hk-cal-day-num">${day}</span>
+          ${badge}
         </button>`);
     }
 

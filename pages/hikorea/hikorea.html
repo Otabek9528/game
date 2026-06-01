@@ -196,12 +196,14 @@
 
       <div class="hk-meta-row" id="calMeta"></div>
 
-      <!-- Legend: 2 states — tap any in-window date to see live availability -->
+      <!-- Legend: 3 states — green=no bookings yet, teal=has bookings (tap for detail), gray=closed -->
       <div class="hk-legend">
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-empty"></span>
+          <span data-i18n="hk.cal.legEmpty">No bookings yet</span></span>
         <span class="hk-legend-item"><span class="hk-legend-sw hk-c-window"></span>
-          <span data-i18n="hk.cal.legWindow">Bookable — tap to check</span></span>
+          <span data-i18n="hk.cal.legWindow">Has bookings — tap to check</span></span>
         <span class="hk-legend-item"><span class="hk-legend-sw hk-c-closed"></span>
-          <span data-i18n="hk.cal.legClosed">Closed / past the window</span></span>
+          <span data-i18n="hk.cal.legClosed">Closed</span></span>
       </div>
 
       <!-- Calendar months are rendered here -->
@@ -320,7 +322,9 @@
         <div class="hk-sheet-day" id="sheetDay">—</div>
         <div class="hk-sheet-date" id="sheetDate">—</div>
       </div>
-      <div class="hk-sheet-stat" id="sheetStat"></div>
+      <div class="hk-sheet-body">
+        <div class="hk-sheet-stat" id="sheetStat"></div>
+      </div>
       <div class="hk-sheet-actions">
         <a href="https://www.hikorea.go.kr/" target="_blank" rel="noopener noreferrer"
            class="hk-btn-primary" id="sheetBookBtn">

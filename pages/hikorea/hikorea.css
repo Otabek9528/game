@@ -636,25 +636,32 @@ body {
 }
 
 .hk-cal-day-mark {
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 700;
   line-height: 1;
-  opacity: 0.78;
+  opacity: 0.85;
   font-variant-numeric: tabular-nums;
+  margin-top: 1px;
 }
 
-/* Cell variants — only two states now: in HiKorea's booking window vs not.
-   Real availability for any given date is loaded live when the user taps. */
+/* Cell variants */
 .hk-cal-cell.empty  { background: transparent; }
 .hk-cal-cell.past   { background: transparent; color: #d1d5db; }
 .hk-cal-cell.today  { box-shadow: inset 0 0 0 2px #0d9488; }
 
-.hk-c-window, .hk-cal-cell.in-window {
+/* Definitely open: no bookings yet on this date. */
+.hk-c-empty, .hk-cal-cell.empty-booked {
+  background: linear-gradient(180deg, #6ee7b7 0%, #34d399 100%);
+  color: #064e3b;
+}
+
+/* In booking window with some bookings — tap for live detail. */
+.hk-c-window, .hk-cal-cell.in-window.has-bookings {
   background: linear-gradient(180deg, #99f6e4 0%, #5eead4 100%);
   color: #134e4a;
 }
-/* Weekends in-window: differentiate visually (often reduced hours). */
-.hk-cal-cell.in-window.weekend {
+/* Weekend variant for has-bookings (lighter — fewer slots typical). */
+.hk-cal-cell.in-window.has-bookings.weekend {
   background: linear-gradient(180deg, #cffafe 0%, #a5f3fc 100%);
   color: #155e75;
 }
@@ -992,12 +999,36 @@ body {
   background: #fff;
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
-  padding: 12px 22px 26px;
+  padding: 12px 0 0;            /* horizontal padding moves into inner sections */
   z-index: 100;
   box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.18);
   animation: hkSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   max-width: 560px;
   margin: 0 auto;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hk-sheet-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 22px;
+}
+
+.hk-sheet-head,
+.hk-sheet-actions {
+  flex-shrink: 0;
+  padding-left: 22px;
+  padding-right: 22px;
+}
+
+.hk-sheet-actions {
+  padding-top: 8px;
+  padding-bottom: 26px;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 @keyframes hkSlideUp {
@@ -1347,11 +1378,15 @@ body {
 .night-mode .hk-cal-month-title { color: #5eead4; }
 .night-mode .hk-cal-dow-label { color: #6b7280; }
 .night-mode .hk-cal-cell.past { color: #4b5563; }
-.night-mode .hk-cal-cell.in-window {
+.night-mode .hk-cal-cell.empty-booked {
+  background: linear-gradient(180deg, #047857 0%, #065f46 100%);
+  color: #d1fae5;
+}
+.night-mode .hk-cal-cell.in-window.has-bookings {
   background: linear-gradient(180deg, #0f766e 0%, #115e59 100%);
   color: #ccfbf1;
 }
-.night-mode .hk-cal-cell.in-window.weekend {
+.night-mode .hk-cal-cell.in-window.has-bookings.weekend {
   background: linear-gradient(180deg, #155e75 0%, #164e63 100%);
   color: #cffafe;
 }
@@ -1414,6 +1449,10 @@ body {
 .night-mode .hk-empty-sub { color: #6b7280; }
 
 .night-mode .hk-sheet { background: #1e1e1e; }
+.night-mode .hk-sheet-actions {
+  background: #1e1e1e;
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
 .night-mode .hk-sheet-handle { background: #4b5563; }
 .night-mode .hk-sheet-day { color: #9ca3af; }
 .night-mode .hk-sheet-date { color: #5eead4; }
