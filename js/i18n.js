@@ -915,18 +915,12 @@ const I18N = {
     'hk.err.input':     { uz: 'Sanalarni tekshiring',              ru: 'Проверьте даты',                    en: 'Check your dates' },
     'hk.err.pickDates': { uz: "Sana tanlang",                      ru: 'Выберите даты',                    en: 'Pick a start and end date' },
     'hk.err.noUser':    { uz: 'Bu sahifani Telegram bot orqali oching.', ru: 'Откройте эту страницу через Telegram-бота.', en: 'Open this page from the Telegram bot first.' },
-    
-    // Calendar legend (replaces previous 3-state set)
-    'hk.cal.legEmpty':  { uz: "Bo'sh", ru: 'Свободно', en: 'Wide open' },
-    'hk.cal.legLight':  { uz: 'Kam band', ru: 'Мало занято', en: 'Light' },
-    'hk.cal.legHalf':   { uz: "To'layapti", ru: 'Заполняется', en: 'Filling up' },
-    'hk.cal.legFull':   { uz: "To'lay deb qolgan", ru: 'Почти заполнено', en: 'Looking full' },
-    'hk.cal.legClosed': { uz: 'Yopiq', ru: 'Закрыто', en: 'Closed' },
+        
+    'hk.cal.legEmpty':   { uz: "Bo'sh",         ru: 'Свободно',     en: 'Wide open' },
+    'hk.cal.legPartial': { uz: 'Bandlik bor',   ru: 'Есть брони',   en: 'Some bookings' },
+    'hk.cal.legFull':    { uz: "To'la band",    ru: 'Полностью занято', en: 'Fully booked' },
+    'hk.cal.legClosed':  { uz: 'Yopiq',         ru: 'Закрыто',      en: 'Closed' },
 
-    // Calendar summary banner
-    'hk.summary.empty':   { uz: "to'liq bo'sh kun", ru: 'свободных дней', en: 'wide open' },
-    'hk.summary.partial': { uz: "joy bor", ru: 'есть места', en: 'with availability' },
-    'hk.summary.full':    { uz: "to'la deb qolgan", ru: 'почти заполнено', en: 'looking full' },
 
     // Sheet morning/afternoon labels
     'hk.sheet.morning':   { uz: '🌅 Ertalab',     ru: '🌅 Утро',     en: '🌅 Morning' },
@@ -955,6 +949,51 @@ const I18N = {
       ru: 'Не удалось отправить. Запустите бота в Telegram и попробуйте снова.',
       en: "Couldn't send. Make sure you've started the bot in Telegram, then try again.",
     },
+    'hk.dow.mon': { uz: 'Du', ru: 'Пн', en: 'Mo' },
+    'hk.dow.tue': { uz: 'Se', ru: 'Вт', en: 'Tu' },
+    'hk.dow.wed': { uz: 'Ch', ru: 'Ср', en: 'We' },
+    'hk.dow.thu': { uz: 'Pa', ru: 'Чт', en: 'Th' },
+    'hk.dow.fri': { uz: 'Ju', ru: 'Пт', en: 'Fr' },
+    'hk.dow.sat': { uz: 'Sh', ru: 'Сб', en: 'Sa' },
+    'hk.dow.sun': { uz: 'Ya', ru: 'Вс', en: 'Su' },
+    'hk.dowFull.mon': { uz: 'Dushanba',  ru: 'Понедельник', en: 'Monday' },
+    'hk.dowFull.tue': { uz: 'Seshanba',  ru: 'Вторник',     en: 'Tuesday' },
+    'hk.dowFull.wed': { uz: 'Chorshanba',ru: 'Среда',       en: 'Wednesday' },
+    'hk.dowFull.thu': { uz: 'Payshanba', ru: 'Четверг',     en: 'Thursday' },
+    'hk.dowFull.fri': { uz: 'Juma',      ru: 'Пятница',     en: 'Friday' },
+    'hk.dowFull.sat': { uz: 'Shanba',    ru: 'Суббота',     en: 'Saturday' },
+    'hk.dowFull.sun': { uz: 'Yakshanba', ru: 'Воскресенье', en: 'Sunday' },
+    'hk.month.1':  { uz: 'Yanvar',   ru: 'Январь',   en: 'January'   },
+    'hk.month.2':  { uz: 'Fevral',   ru: 'Февраль',  en: 'February'  },
+    'hk.month.3':  { uz: 'Mart',     ru: 'Март',     en: 'March'     },
+    'hk.month.4':  { uz: 'Aprel',    ru: 'Апрель',   en: 'April'     },
+    'hk.month.5':  { uz: 'May',      ru: 'Май',      en: 'May'       },
+    'hk.month.6':  { uz: 'Iyun',     ru: 'Июнь',     en: 'June'      },
+    'hk.month.7':  { uz: 'Iyul',     ru: 'Июль',     en: 'July'      },
+    'hk.month.8':  { uz: 'Avgust',   ru: 'Август',   en: 'August'    },
+    'hk.month.9':  { uz: 'Sentabr',  ru: 'Сентябрь', en: 'September' },
+    'hk.month.10': { uz: 'Oktabr',   ru: 'Октябрь',  en: 'October'   },
+    'hk.month.11': { uz: 'Noyabr',   ru: 'Ноябрь',   en: 'November'  },
+    'hk.month.12': { uz: 'Dekabr',   ru: 'Декабрь',  en: 'December'  },
+    'hk.summary.earliestLabel': {
+      uz: 'Eng erta joy bor', ru: 'Ближайший слот', en: 'Earliest opening',
+    },
+    'hk.summary.bookableDays': {
+      uz: "kun band qilish mumkin",
+      ru: 'дней доступно для записи',
+      en: 'bookable days in your window',
+    },
+    'hk.summary.allFull': {
+      uz: "Hozir hamma sana to'la",
+      ru: 'Сейчас всё занято',
+      en: 'Everything is fully booked',
+    },
+    'hk.summary.setWatch': {
+      uz: "Kuzatish o'rnating — joy ochilishi bilan xabar yuboramiz.",
+      ru: 'Поставьте слежение — напишем, как только освободится.',
+      en: "Set a watch — we'll ping you when a slot opens.",
+    },
+    'hk.watch.tapPick': { uz: 'Sanani tanlang', ru: 'Выберите дату', en: 'Tap to pick' },
   },
 
   init() {

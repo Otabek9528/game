@@ -77,6 +77,31 @@
 
   // -- Date helpers --
 
+  // i18n-aware day/month names. Browser locale can't be trusted (often
+  // English even on Korean devices), so we pull from our own i18n dictionary
+  // with toLocaleDateString as a last-ditch fallback.
+  const DOW_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+  function fmtDowShort(date) {
+    const key = 'hk.dow.' + DOW_KEYS[date.getDay()];
+    return t(key, date.toLocaleDateString(undefined, { weekday: 'short' }));
+  }
+  function fmtDowFull(date) {
+    const key = 'hk.dowFull.' + DOW_KEYS[date.getDay()];
+    return t(key, date.toLocaleDateString(undefined, { weekday: 'long' }));
+  }
+  function fmtMonthFull(date) {
+    const key = 'hk.month.' + (date.getMonth() + 1);
+    return t(key, date.toLocaleDateString(undefined, { month: 'long' }));
+  }
+  function fmtMonthYear(date) {
+    return fmtMonthFull(date) + ' ' + date.getFullYear();
+  }
+  // "2-Iyun" style — day + full localized month name with a hyphen.
+  function fmtDayMonth(date) {
+    return date.getDate() + '-' + fmtMonthFull(date);
+  }
+
   function ymdToDate(ymd) {
     return new Date(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8));
   }
@@ -105,25 +130,20 @@
   function todayYmd() { return dateToYmd(new Date()); }
 
   function fmtLongDate(ymd) {
-    return ymdToDate(ymd).toLocaleDateString(undefined, {
-      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-    });
+    const d = ymdToDate(ymd);
+    return `${fmtDowFull(d)}, ${d.getDate()} ${fmtMonthFull(d)} ${d.getFullYear()}`;
   }
 
   function fmtShortDate(ymd) {
-    return ymdToDate(ymd).toLocaleDateString(undefined, {
-      month: 'short', day: 'numeric',
-    });
+    return fmtDayMonth(ymdToDate(ymd));
   }
 
   function dowName(ymd) {
-    return ymdToDate(ymd).toLocaleDateString(undefined, { weekday: 'long' });
+    return fmtDowFull(ymdToDate(ymd));
   }
 
   function monthLabel(y, m /* 0-indexed */) {
-    return new Date(y, m, 1).toLocaleDateString(undefined, {
-      month: 'long', year: 'numeric',
-    });
+    return fmtMonthYear(new Date(y, m, 1));
   }
 
   function relativeTime(iso) {
@@ -494,12 +514,16 @@
   }
 
   function fillTier(taken, maxForDow) {
+    // 3 honest tiers:
+    //   empty:   taken == 0  -> definitely bookable, no one has booked yet
+    //   partial: 0 < taken < max_for_dow -> bookings exist but slots remain
+    //   full:    taken >= max_for_dow -> matches the busiest day-of-week
+    //            we've observed; treated as "no slots available"
     if (taken === 0) return { name: 'empty', ratio: 0 };
     if (maxForDow <= 0) return { name: 'partial', ratio: 0.3 };
     const ratio = Math.min(taken / maxForDow, 1);
-    if (ratio >= 0.95) return { name: 'full',  ratio };
-    if (ratio >= 0.5)  return { name: 'half',  ratio };
-    return { name: 'light', ratio };
+    if (ratio >= 1) return { name: 'full', ratio: 1 };
+    return { name: 'partial', ratio };
   }
 
   // ---------------------------------------------------------------------
@@ -552,16 +576,16 @@
   function renderSummaryBanner(dates, maxByDow) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const future = dates.filter((r) => ymdToDate(r.visi_ymd) >= today);
+    const future = (dates || []).filter((r) => ymdToDate(r.visi_ymd) >= today);
 
-    let empty = 0, partial = 0, fullish = 0;
-    for (const r of future) {
+    // "Bookable" = wide-open or partial (anything where taken < max_for_dow).
+    const bookable = future.filter((r) => {
       const dow = ymdToDate(r.visi_ymd).getDay();
-      const tier = fillTier(r.taken, maxByDow[dow]);
-      if (tier.name === 'empty') empty++;
-      else if (tier.name === 'full') fullish++;
-      else partial++;
-    }
+      return fillTier(r.taken, maxByDow[dow]).name !== 'full';
+    });
+    const earliest = bookable.length
+      ? bookable.reduce((a, b) => (a.visi_ymd <= b.visi_ymd ? a : b))
+      : null;
 
     const summary = $('calSummary');
     if (!future.length) {
@@ -569,28 +593,38 @@
       return;
     }
     summary.hidden = false;
-    summary.innerHTML = `
-      <div class="hk-summary-stat">
-        <span class="hk-summary-num">${empty}</span>
-        <span class="hk-summary-label" data-i18n="hk.summary.empty">wide open</span>
-      </div>
-      <div class="hk-summary-divider"></div>
-      <div class="hk-summary-stat">
-        <span class="hk-summary-num">${partial}</span>
-        <span class="hk-summary-label" data-i18n="hk.summary.partial">with availability</span>
-      </div>
-      <div class="hk-summary-divider"></div>
-      <div class="hk-summary-stat">
-        <span class="hk-summary-num">${fullish}</span>
-        <span class="hk-summary-label" data-i18n="hk.summary.full">looking full</span>
-      </div>
-    `;
-    // Re-apply translations for the newly inserted nodes
-    $$('[data-i18n]', summary).forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      const v = t(key, null);
-      if (v !== null) el.textContent = v;
-    });
+
+    if (earliest) {
+      const d = ymdToDate(earliest.visi_ymd);
+      summary.className = 'hk-cal-summary good';
+      summary.innerHTML = `
+        <div class="hk-summary-icon">⚡</div>
+        <div class="hk-summary-body">
+          <div class="hk-summary-headline">
+            <span class="hk-summary-headline-label">${esc(t('hk.summary.earliestLabel', 'Earliest opening'))}</span>
+            <span class="hk-summary-headline-value">
+              ${esc(fmtDowShort(d))}, ${esc(fmtDayMonth(d))}
+            </span>
+          </div>
+          <div class="hk-summary-sub">
+            ${bookable.length} ${esc(t('hk.summary.bookableDays', 'bookable days in your window'))}
+          </div>
+        </div>`;
+    } else {
+      summary.className = 'hk-cal-summary muted';
+      summary.innerHTML = `
+        <div class="hk-summary-icon">🌙</div>
+        <div class="hk-summary-body">
+          <div class="hk-summary-headline">
+            <span class="hk-summary-headline-value">
+              ${esc(t('hk.summary.allFull', 'Everything is fully booked'))}
+            </span>
+          </div>
+          <div class="hk-summary-sub">
+            ${esc(t('hk.summary.setWatch', "Set a watch — we'll ping you when a slot opens."))}
+          </div>
+        </div>`;
+    }
   }
 
   function renderOneMonth(year, month0, slotMap, maxByDow, today) {
@@ -838,6 +872,23 @@
   function updateWatchPreview() {
     const startStr = $('watchStartDate').value;
     const endStr   = $('watchEndDate').value;
+
+    // Always update the date-trigger labels (always-visible, even when
+    // the preview card is hidden).
+    const startLabel = $('watchStartLabel');
+    const endLabel   = $('watchEndLabel');
+    const placeholder = t('hk.watch.tapPick', 'Tap to pick');
+    if (startLabel) {
+      startLabel.textContent = startStr
+        ? fmtDayMonth(new Date(startStr))
+        : placeholder;
+    }
+    if (endLabel) {
+      endLabel.textContent = endStr
+        ? fmtDayMonth(new Date(endStr))
+        : placeholder;
+    }
+
     if (!startStr || !endStr) {
       $('watchPreview').hidden = true;
       return;
@@ -849,10 +900,8 @@
     }
     $('watchPreview').hidden = false;
     const days = Math.round((e - s) / 86400000) + 1;
-    const sLabel = s.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    const eLabel = e.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     $('previewSummary').textContent =
-      `${t('hk.preview.watching', 'Watching')} ${sLabel} → ${eLabel}`;
+      `${t('hk.preview.watching', 'Watching')} ${fmtDayMonth(s)} → ${fmtDayMonth(e)}`;
     $('previewDetail').textContent =
       days === 1
         ? t('hk.preview.oneDay', '1 day in your window')
@@ -874,6 +923,20 @@
       $(id).addEventListener('change', () => {
         setActivePreset(null);
         updateWatchPreview();
+      });
+    });
+    // Tap the formatted date label -> open native picker
+    $$('.hk-date-trigger').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const input = $(btn.dataset.target);
+        if (!input) return;
+        if (typeof input.showPicker === 'function') {
+          try { input.showPicker(); return; } catch (_) {}
+        }
+        // Fallback: focus + click — opens on most mobile browsers.
+        input.focus();
+        input.click();
       });
     });
     $('submitWatchBtn').addEventListener('click', () => submitWatch());

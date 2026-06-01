@@ -658,35 +658,35 @@ body {
 .hk-cal-cell.past   { background: transparent; color: #d1d5db; }
 .hk-cal-cell.today  { box-shadow: inset 0 0 0 2px #0d9488; }
 
-/* 4 fullness tiers + closed. Colors go from bright green (wide open)
-   → teal (light) → amber (filling up) → coral (looking full) → gray (closed) */
+/* 3 honest tiers + closed.
+   - empty   (no bookings yet)         -> bright green
+   - partial (some bookings, can book) -> amber/teal blend
+   - full    (taken == max for DoW)    -> coral, de-emphasized
+   - closed  (not in HiKorea window)   -> gray  */
 .hk-c-empty, .hk-cal-cell.tier-empty {
   background: linear-gradient(180deg, #6ee7b7 0%, #34d399 100%);
   color: #064e3b;
 }
-.hk-c-light, .hk-cal-cell.tier-light,
-.hk-cal-cell.tier-partial {
-  background: linear-gradient(180deg, #99f6e4 0%, #5eead4 100%);
-  color: #134e4a;
-}
-.hk-c-half, .hk-cal-cell.tier-half {
+.hk-c-partial, .hk-cal-cell.tier-partial,
+.hk-cal-cell.tier-light, .hk-cal-cell.tier-half {
   background: linear-gradient(180deg, #fde68a 0%, #fbbf24 100%);
   color: #78350f;
 }
 .hk-c-full, .hk-cal-cell.tier-full {
   background: linear-gradient(180deg, #fca5a5 0%, #f87171 100%);
   color: #7f1d1d;
+  opacity: 0.65;
 }
 .hk-c-closed, .hk-cal-cell.closed {
   background: #f3f4f6;
   color: #9ca3af;
 }
 
-/* Fill-bar color tweaks per tier (subtle but matched) */
-.hk-cal-cell.tier-light .hk-cal-fill > span,
-.hk-cal-cell.tier-partial .hk-cal-fill > span { background: #0f766e; }
-.hk-cal-cell.tier-half  .hk-cal-fill > span  { background: #b45309; }
-.hk-cal-cell.tier-full  .hk-cal-fill > span  { background: #b91c1c; }
+/* Fill-bar color per tier */
+.hk-cal-cell.tier-partial .hk-cal-fill > span,
+.hk-cal-cell.tier-light   .hk-cal-fill > span,
+.hk-cal-cell.tier-half    .hk-cal-fill > span { background: #b45309; }
+.hk-cal-cell.tier-full    .hk-cal-fill > span { background: #b91c1c; }
 
 /* Helper-message after the calendar when no slots at all */
 .hk-cal-cta-note {
@@ -1399,18 +1399,16 @@ body {
   background: linear-gradient(180deg, #047857 0%, #065f46 100%);
   color: #d1fae5;
 }
+.night-mode .hk-cal-cell.tier-partial,
 .night-mode .hk-cal-cell.tier-light,
-.night-mode .hk-cal-cell.tier-partial {
-  background: linear-gradient(180deg, #0f766e 0%, #115e59 100%);
-  color: #ccfbf1;
-}
 .night-mode .hk-cal-cell.tier-half {
   background: linear-gradient(180deg, #b45309 0%, #92400e 100%);
   color: #fef3c7;
 }
 .night-mode .hk-cal-cell.tier-full {
-  background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
-  color: #fee2e2;
+  background: linear-gradient(180deg, #7f1d1d 0%, #6b1818 100%);
+  color: #fecaca;
+  opacity: 0.55;
 }
 .night-mode .hk-cal-cell.closed { background: #2a2a2a; color: #6b7280; }
 .night-mode .hk-cal-fill { background: rgba(255, 255, 255, 0.08); }
@@ -1540,45 +1538,56 @@ body {
 .hk-cal-summary {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  padding: 14px 8px;
+  gap: 14px;
+  padding: 14px 16px;
   margin-bottom: 12px;
-  background: #fff;
-  border: 1px solid rgba(15, 118, 110, 0.12);
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #6ee7b7;
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.06);
 }
-.hk-summary-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
+.hk-cal-summary.muted {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fcd34d;
 }
-.hk-summary-num {
+.hk-summary-icon {
   font-size: 1.6rem;
-  font-weight: 800;
-  color: #134e4a;
   line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-.hk-summary-label {
-  font-size: 0.7rem;
-  color: #6b7280;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  text-align: center;
-  line-height: 1.2;
-}
-.hk-summary-divider {
-  width: 1px;
-  height: 32px;
-  background: rgba(15, 118, 110, 0.15);
   flex-shrink: 0;
 }
+.hk-summary-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.hk-summary-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hk-summary-headline-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #047857;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.hk-cal-summary.muted .hk-summary-headline-label { color: #92400e; }
+.hk-summary-headline-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #064e3b;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.hk-cal-summary.muted .hk-summary-headline-value { color: #78350f; }
+.hk-summary-sub {
+  font-size: 0.82rem;
+  color: #047857;
+  font-weight: 600;
+}
+.hk-cal-summary.muted .hk-summary-sub { color: #92400e; }
 
 /* Sheet progress bar */
 .hk-sheet-progress { margin-top: 14px; }
@@ -1712,3 +1721,72 @@ body {
   color: #6ee7b7;
 }
 .night-mode .hk-overlay-fineprint { color: #6b7280; }
+
+/* =====================================================================
+   v10 additions: night-mode summary, date trigger (i18n date display)
+   ===================================================================== */
+
+.night-mode .hk-cal-summary {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.10) 0%, rgba(16, 185, 129, 0.06) 100%);
+  border-color: rgba(110, 231, 183, 0.35);
+}
+.night-mode .hk-cal-summary.muted {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.10) 0%, rgba(217, 119, 6, 0.06) 100%);
+  border-color: rgba(252, 211, 77, 0.4);
+}
+.night-mode .hk-summary-headline-label { color: #6ee7b7; }
+.night-mode .hk-cal-summary.muted .hk-summary-headline-label { color: #fcd34d; }
+.night-mode .hk-summary-headline-value { color: #d1fae5; }
+.night-mode .hk-cal-summary.muted .hk-summary-headline-value { color: #fde68a; }
+.night-mode .hk-summary-sub { color: #6ee7b7; }
+.night-mode .hk-cal-summary.muted .hk-summary-sub { color: #fcd34d; }
+
+/* Date trigger — friendly i18n date display replacing the OS mm/dd/yyyy.
+   The native <input type="date"> sits invisibly on top so taps still open
+   the platform-native picker. */
+.hk-date-wrap {
+  position: relative;
+}
+.hk-date-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 13px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.hk-date-trigger:hover  { border-color: #0d9488; }
+.hk-date-trigger:focus,
+.hk-date-trigger:active { outline: none; border-color: #0d9488; box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.12); }
+.hk-date-trigger-label { flex: 1; }
+.hk-date-trigger-icon  { font-size: 1rem; opacity: 0.7; flex-shrink: 0; }
+
+/* Native input becomes invisible but still receives showPicker() */
+.hk-date-wrap .hk-date-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;  /* trigger handles taps */
+  border: 0;
+}
+
+.night-mode .hk-date-trigger {
+  background: #1e1e1e;
+  border-color: #3a3a3a;
+  color: #e5e7eb;
+}
+.night-mode .hk-date-trigger:hover  { border-color: #5eead4; }
+.night-mode .hk-date-trigger:focus,
+.night-mode .hk-date-trigger:active { border-color: #5eead4; box-shadow: 0 0 0 4px rgba(94, 234, 212, 0.15); }
