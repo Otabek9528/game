@@ -196,12 +196,16 @@
 
       <div class="hk-meta-row" id="calMeta"></div>
 
-      <!-- Legend: 2 states — tap any in-window date to see live availability -->
+      <!-- Legend -->
       <div class="hk-legend">
-        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-window"></span>
-          <span data-i18n="hk.cal.legWindow">Bookable — tap to check</span></span>
-        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-closed"></span>
-          <span data-i18n="hk.cal.legClosed">Closed / past the window</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-high"></span>
+          <span data-i18n="hk.cal.legHigh">Plenty</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-med"></span>
+          <span data-i18n="hk.cal.legMed">Few</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-low"></span>
+          <span data-i18n="hk.cal.legLow">Almost full</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-none"></span>
+          <span data-i18n="hk.cal.legNone">Full / closed</span></span>
       </div>
 
       <!-- Calendar months are rendered here -->
@@ -276,6 +280,28 @@
       <button class="hk-btn-primary hk-btn-big" id="submitWatchBtn">
         <span data-i18n="hk.watch.createBtn">Start watching</span>
       </button>
+
+      <!-- "Already available" guardrail -->
+      <div class="hk-warn-card" id="availableWarn" hidden>
+        <div class="hk-warn-head">
+          <span class="hk-warn-icon">⏰</span>
+          <strong data-i18n="hk.watch.warnTitle">
+            Heads up — some dates are open right now
+          </strong>
+        </div>
+        <p class="hk-warn-text" data-i18n="hk.watch.warnText">
+          You might be able to book one of these today instead of waiting:
+        </p>
+        <div class="hk-warn-dates" id="availableWarnDates"></div>
+        <a href="https://www.hikorea.go.kr/" target="_blank" rel="noopener noreferrer"
+           class="hk-btn-primary hk-btn-warm">
+          <span data-i18n="hk.watch.bookNow">Go to HiKorea now →</span>
+        </a>
+        <button class="hk-btn-text" id="forceWatchBtn"
+                data-i18n="hk.watch.watchAnyway">
+          Still want a heads-up? Set the watch anyway
+        </button>
+      </div>
     </section>
 
     <!-- =================================================================

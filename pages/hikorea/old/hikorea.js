@@ -139,6 +139,34 @@
     } catch (e) { return ''; }
   }
 
+  function availTier(available, capacity) {
+    if (available == null || capacity == null || available <= 0) return 'full';
+    const pct = available / capacity;
+    if (pct >= 0.5) return 'high';
+    if (pct >= 0.2) return 'med';
+    return 'low';
+  }
+
+  function availPhrase(available, capacity) {
+    // Plain language for the bottom sheet
+    if (available == null) return { tier: 'full', text: t('hk.phrase.unknown', "No info — check HiKorea") };
+    if (available <= 0)    return { tier: 'full', text: t('hk.phrase.full', 'Fully booked') };
+    if (capacity && available / capacity < 0.2) return {
+      tier: 'low',
+      text: available === 1
+        ? t('hk.phrase.lastOne', 'Just 1 spot left — grab it!')
+        : `${available} ${t('hk.phrase.spotsLeftHurry', 'spots left — hurry!')}`,
+    };
+    if (capacity && available / capacity < 0.5) return {
+      tier: 'med',
+      text: `${available} ${t('hk.phrase.spotsLeft', 'spots left')}`,
+    };
+    return {
+      tier: 'high',
+      text: `${available} ${t('hk.phrase.spotsOpen', 'spots open')}`,
+    };
+  }
+
   // ---------------------------------------------------------------------
   // TOAST
   // ---------------------------------------------------------------------
@@ -202,6 +230,8 @@
   function handleBack() {
     if (state.sheetOpen)   { closeSheet(); return; }
     if (state.overlayOpen) { closeOverlay(); return; }
+    const warn = $('availableWarn');
+    if (warn && !warn.hidden) { warn.hidden = true; return; }
     if (state.navStack.length > 1) {
       state.navStack.pop();
       showSection(state.navStack[state.navStack.length - 1], { silent: true });
@@ -477,47 +507,62 @@
     // Meta chips
     const meta = $('calMeta');
     const chips = [];
+    if (data.capacity != null) {
+      chips.push(`<span class="hk-meta-chip">${t('hk.cal.maxPerDay', 'Max/day')}: ${data.capacity}</span>`);
+    }
     if (data.last_polled_at) {
       chips.push(`<span class="hk-meta-chip">🔄 ${esc(t('hk.cal.checked', 'Checked'))} ${esc(relativeTime(data.last_polled_at))}</span>`);
     }
     meta.innerHTML = chips.join('');
 
-    // Lookup: ymd -> {visi_ymd, taken}
+    // Build a lookup: ymd -> {taken, available}
     const slotMap = {};
     (data.dates || []).forEach((row) => {
       slotMap[row.visi_ymd] = row;
     });
 
-    // Always render a fixed 3-month window so the calendar shape is
-    // consistent across offices.
+    // Determine which months to show:
+    //  - current month
+    //  - any month with at least one row in the response
+    //  - cap at 3 months total
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const months = [];
-    for (let i = 0; i < 3; i++) {
-      const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
-      months.push([d.getFullYear(), d.getMonth()]);
+    const monthsSet = new Set();
+    monthsSet.add(`${today.getFullYear()}-${today.getMonth()}`);
+    Object.keys(slotMap).forEach((ymd) => {
+      const d = ymdToDate(ymd);
+      monthsSet.add(`${d.getFullYear()}-${d.getMonth()}`);
+    });
+    const months = Array.from(monthsSet)
+      .map((k) => k.split('-').map(Number))
+      .sort((a, b) => a[0] - b[0] || a[1] - b[1])
+      .slice(0, 3);
+
+    if (months.length === 0) {
+      months.push([today.getFullYear(), today.getMonth()]);
     }
 
     const container = $('calMonths');
     container.innerHTML = months
-      .map(([y, m]) => renderOneMonth(y, m, slotMap, today))
+      .map(([y, m]) => renderOneMonth(y, m, slotMap, data.capacity, today))
       .join('');
 
-    // If the desk has no in-window dates at all, nudge user toward setting a watch.
-    if (!(data.dates || []).length) {
+    // Empty-state message if literally no available slots anywhere
+    const anyAvailable = (data.dates || []).some((r) => (r.available || 0) > 0);
+    if (!anyAvailable) {
       const note = document.createElement('div');
       note.className = 'hk-cal-cta-note';
-      note.innerHTML = `🌙 ${esc(t('hk.cal.allFullNote', "No dates visible right now. Set a watch and we'll ping you the moment one opens."))}`;
+      note.innerHTML = `🌙 ${esc(t('hk.cal.allFullNote', "Looks like every visible date is full right now. That's exactly when a watch helps — we'll ping you the moment something opens."))}`;
       container.appendChild(note);
     }
 
-    // Wire cell taps — fetch live detail.
+    // Wire cell taps
     $$('.hk-cal-cell-bookable', container).forEach((cell) => {
-      cell.addEventListener('click', () => openDateSheet(cell.dataset.ymd));
+      cell.addEventListener('click', () => openDateSheet(cell.dataset.ymd, slotMap, data.capacity));
     });
   }
 
-  function renderOneMonth(year, month0, slotMap, today) {
+  function renderOneMonth(year, month0, slotMap, capacity, today) {
     const dowsShort = [];
     // Week starts Monday for the Korean context.
     const weekOrder = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun
@@ -528,8 +573,10 @@
 
     const firstOfMonth = new Date(year, month0, 1);
     const daysInMonth = new Date(year, month0 + 1, 0).getDate();
-    const dow0 = firstOfMonth.getDay();
-    const leading = (dow0 + 6) % 7;
+
+    // Leading blanks: number of cells before day 1 (Mon-first week).
+    const dow0 = firstOfMonth.getDay(); // 0..6 (Sun..Sat)
+    const leading = (dow0 + 6) % 7;     // Mon=0, Sun=6
 
     const cells = [];
     for (let i = 0; i < leading; i++) {
@@ -541,31 +588,32 @@
       const isPast = d < today;
       const isToday = d.getTime() === today.getTime();
       const slot = slotMap[ymd];
-      const isWeekend = (d.getDay() === 0 || d.getDay() === 6);
 
       let cls = ['hk-cal-cell'];
+      let mark = '';
+
       if (isToday) cls.push('today');
 
       if (isPast) {
         cls.push('past');
       } else if (slot) {
-        // We don't know per-date capacity here, so cells are a single
-        // "in HiKorea's booking window" state. Real availability comes
-        // from the live-fetch when the user taps.
-        cls.push('in-window', 'hk-cal-cell-bookable');
-        if (isWeekend) cls.push('weekend');
+        cls.push('has-slots', availTier(slot.available, capacity));
+        cls.push('hk-cal-cell-bookable');
+        if (slot.available != null) mark = `${slot.available}`;
       } else {
-        cls.push('closed');
+        cls.push('full');
       }
 
       cells.push(`
         <button type="button" class="${cls.join(' ')}"
                 ${slot && !isPast ? `data-ymd="${ymd}"` : ''}
-                ${isPast || !slot ? 'disabled' : ''}>
+                ${isPast ? 'disabled' : ''}>
           <span class="hk-cal-day-num">${day}</span>
+          ${mark ? `<span class="hk-cal-day-mark">${mark}</span>` : ''}
         </button>`);
     }
 
+    // Trailing to fill the last row (optional, helps grid alignment)
     const total = leading + daysInMonth;
     const trailing = (7 - (total % 7)) % 7;
     for (let i = 0; i < trailing; i++) {
@@ -583,109 +631,36 @@
   }
 
   // ---------------------------------------------------------------------
-  // BOTTOM SHEET (live per-date detail)
+  // BOTTOM SHEET (date detail)
   // ---------------------------------------------------------------------
 
-  async function openDateSheet(ymd) {
-    const d = state.selectedDesk;
+  function openDateSheet(ymd, slotMap, capacity) {
+    const slot = slotMap[ymd];
+    if (!slot) return;
+
+    const phrase = availPhrase(slot.available, capacity);
 
     $('sheetDay').textContent  = dowName(ymd);
     $('sheetDate').textContent = ymdToDate(ymd).toLocaleDateString(undefined, {
       month: 'long', day: 'numeric', year: 'numeric',
     });
 
-    // Show loading state immediately — live HTTP can take 1–3s
     const stat = $('sheetStat');
-    stat.className = 'hk-sheet-stat loading';
+    stat.className = `hk-sheet-stat ${phrase.tier}`;
     stat.innerHTML = `
-      <span class="hk-sheet-loading">
-        <span class="hk-sheet-spinner"></span>
-        ${esc(t('hk.sheet.loading', 'Checking HiKorea right now…'))}
+      <span class="pill-num">${esc(phrase.text)}</span>
+      <span class="hk-sheet-stat-msg">
+        ${esc(slot.available > 0
+          ? t('hk.sheet.bookCue', 'Book on HiKorea before someone else grabs it.')
+          : t('hk.sheet.fullCue', 'No spots right now — set a watch and we\'ll tell you when one opens.'))}
       </span>`;
-    $('sheetBookBtn').style.display = 'none';
+
+    $('sheetBookBtn').style.display = slot.available > 0 ? '' : 'none';
 
     $('sheetBackdrop').hidden = false;
     $('dateSheet').hidden = false;
     state.sheetOpen = true;
     haptic('light');
-
-    let detail;
-    try {
-      detail = await api(`/desks/${d.desk_seq}/dates/${ymd}`);
-    } catch (e) {
-      stat.className = 'hk-sheet-stat error';
-      const msg = (e.status === 502 && e.data?.error === 'session_expired')
-        ? t('hk.sheet.sessionExpired',
-            "Our HiKorea login needs refreshing — the admin has been notified. Try again in a moment.")
-        : t('hk.sheet.fetchFail',
-            "Couldn't reach HiKorea just now. Try again in a moment.");
-      stat.innerHTML = `<span class="hk-sheet-loading">⚠️ ${esc(msg)}</span>`;
-      return;
-    }
-
-    renderSheetDetail(detail);
-  }
-
-  function renderSheetDetail(detail) {
-    const stat = $('sheetStat');
-    const totalCap   = detail.total_capacity   || 0;
-    const totalTaken = detail.total_taken      || 0;
-    const totalAvail = detail.total_available  || 0;
-    const slots      = detail.time_slots       || [];
-
-    // Headline tier based on REAL capacity for this date.
-    let tier = 'full', pillText;
-    if (totalCap === 0) {
-      tier = 'full';
-      pillText = t('hk.sheet.closed', 'Office closed this day');
-    } else if (totalAvail <= 0) {
-      tier = 'full';
-      pillText = t('hk.sheet.fullyBooked', 'Fully booked');
-    } else if (totalAvail / totalCap < 0.2) {
-      tier = 'low';
-      pillText = (totalAvail === 1
-        ? t('hk.sheet.lastOne', 'Just 1 slot left — grab it!')
-        : `${totalAvail} ${t('hk.sheet.fewLeft', 'slots left — hurry!')}`);
-    } else if (totalAvail / totalCap < 0.5) {
-      tier = 'med';
-      pillText = `${totalAvail} ${t('hk.sheet.slotsLeft', 'slots left')}`;
-    } else {
-      tier = 'high';
-      pillText = `${totalAvail} ${t('hk.sheet.slotsOpen', 'slots open')} (of ${totalCap})`;
-    }
-
-    // Time-slot rows (only show slots that have any capacity).
-    const realSlots = slots.filter((s) => s.capacity > 0);
-    const slotsHtml = realSlots.length
-      ? `
-        <div class="hk-sheet-times">
-          <div class="hk-sheet-times-head" data-i18n="hk.sheet.timesHead">By time of day</div>
-          <div class="hk-sheet-times-grid">
-            ${realSlots.map((s) => {
-              const slotClass = s.available <= 0 ? 'full'
-                              : s.available === s.capacity ? 'high'
-                              : 'partial';
-              return `
-                <div class="hk-sheet-time-row ${slotClass}">
-                  <span class="hk-sheet-time-label">${esc(s.time)}</span>
-                  <span class="hk-sheet-time-stat">${s.available} / ${s.capacity}</span>
-                </div>`;
-            }).join('')}
-          </div>
-        </div>` : '';
-
-    stat.className = `hk-sheet-stat ${tier}`;
-    stat.innerHTML = `
-      <span class="pill-num">${esc(pillText)}</span>
-      <span class="hk-sheet-stat-msg">
-        ${esc(totalAvail > 0
-          ? t('hk.sheet.bookCue', 'Book on HiKorea before someone else grabs it.')
-          : t('hk.sheet.fullCue', "Set a watch and we'll ping you when a slot opens."))}
-      </span>
-      ${slotsHtml}
-    `;
-
-    $('sheetBookBtn').style.display = totalAvail > 0 ? '' : 'none';
   }
 
   function closeSheet() {
@@ -707,6 +682,7 @@
     const d = state.selectedDesk;
     $('watchOfficeName').textContent = d.office_name_en;
     $('watchBoothName').textContent  = d.booth_pretty;
+    $('availableWarn').hidden = true;
 
     // Sensible default: next 14 days, starting tomorrow
     const tomorrow = addDays(new Date(), 1);
@@ -768,7 +744,8 @@
         updateWatchPreview();
       });
     });
-    $('submitWatchBtn').addEventListener('click', () => submitWatch());
+    $('submitWatchBtn').addEventListener('click', () => submitWatch(false));
+    $('forceWatchBtn').addEventListener('click', () => submitWatch(true));
     $('successOkBtn').addEventListener('click', () => {
       closeOverlay();
       state.navStack = ['home'];
@@ -776,7 +753,7 @@
     });
   }
 
-  async function submitWatch() {
+  async function submitWatch(force) {
     if (!state.user) {
       toast(t('hk.err.noUser', 'Open this page from the Telegram bot first.'), 'error');
       return;
@@ -802,14 +779,19 @@
           desk_seq:          state.selectedDesk.desk_seq,
           start_ymd:         startYmd,
           end_ymd:           endYmd,
+          force:             !!force,
         },
       });
       haptic('ok');
+      $('availableWarn').hidden = true;
       $('successOverlay').hidden = false;
       state.overlayOpen = true;
       refreshMyWatchesChip();
     } catch (e) {
-      if (e.status === 409 && e.data?.error === 'duplicate_watch') {
+      if (e.status === 409 && e.data?.error === 'available_slots_in_range') {
+        renderWarn(e.data.available_dates || []);
+        haptic('warning');
+      } else if (e.status === 409 && e.data?.error === 'duplicate_watch') {
         toast(t('hk.err.dup', "You've already set this watch"), 'error');
         haptic('err');
       } else if (e.status === 409 && e.data?.error === 'max_watches_reached') {
@@ -826,6 +808,19 @@
     } finally {
       btn.disabled = false;
     }
+  }
+
+  function renderWarn(availableDates) {
+    const warn = $('availableWarn');
+    const dates = $('availableWarnDates');
+    dates.innerHTML = availableDates.map((d) => {
+      const txt = `${ymdToDate(d.visi_ymd).toLocaleDateString(undefined, {
+        month: 'short', day: 'numeric',
+      })} — ${d.available} ${t('hk.phrase.open', 'open')}`;
+      return `<span class="hk-warn-date">${esc(txt)}</span>`;
+    }).join('');
+    warn.hidden = false;
+    warn.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function closeOverlay() {

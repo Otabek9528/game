@@ -768,12 +768,8 @@ const I18N = {
       ru: 'Нажмите на любую дату, чтобы увидеть слоты. Нет нужной? Жмите кнопку ниже — напишем, когда появится.',
       en: "Tap any date to see if it's bookable. Don't see what you want? Tap the button below — we'll notify you the moment a slot opens.",
     },
-    'hk.cal.maxPerDay': { uz: 'Kuniga max',          ru: 'Макс/день',           en: 'Max/day' },
+
     'hk.cal.checked':   { uz: 'Tekshirildi',          ru: 'Проверено',           en: 'Checked' },
-    'hk.cal.legHigh':   { uz: "Ko'p joy",             ru: 'Много мест',          en: 'Plenty' },
-    'hk.cal.legMed':    { uz: 'Bir nechta',           ru: 'Несколько',           en: 'Few' },
-    'hk.cal.legLow':    { uz: "To'lay deb qolgan",    ru: 'Почти полно',         en: 'Almost full' },
-    'hk.cal.legNone':   { uz: 'To\'la / yopiq',       ru: 'Занято / закрыто',    en: 'Full / closed' },
     'hk.cal.notifyCta': {
       uz: 'Joy ochilganda xabar bering',
       ru: 'Сообщите, когда появится слот',
@@ -786,13 +782,6 @@ const I18N = {
     },
 
     // DATE SHEET (plain-language phrases)
-    'hk.phrase.unknown':      { uz: "Ma'lumot yo'q — HiKorea'da ko'rib chiqing", ru: 'Нет данных — проверьте на HiKorea', en: 'No info — check HiKorea' },
-    'hk.phrase.full':         { uz: "To'la band qilingan",     ru: 'Полностью занято',         en: 'Fully booked' },
-    'hk.phrase.lastOne':      { uz: "Faqat 1 ta joy — ulgurish kerak!", ru: 'Только 1 место — успейте!', en: 'Just 1 spot left — grab it!' },
-    'hk.phrase.spotsLeftHurry':{uz: "ta joy qoldi — ulguring!", ru: 'мест — поспешите!',         en: 'spots left — hurry!' },
-    'hk.phrase.spotsLeft':    { uz: 'ta joy qoldi',             ru: 'мест осталось',             en: 'spots left' },
-    'hk.phrase.spotsOpen':    { uz: "ta joy bo'sh",             ru: 'свободных мест',            en: 'spots open' },
-    'hk.phrase.open':         { uz: "bo'sh",                    ru: 'свободно',                  en: 'open' },
     'hk.sheet.bookNow':       { uz: "HiKorea'da band qilish →", ru: 'Забронировать на HiKorea →', en: 'Book on HiKorea →' },
 
     'hk.sheet.close':         { uz: 'Yopish',                   ru: 'Закрыть',                   en: 'Close' },
@@ -826,23 +815,76 @@ const I18N = {
     'hk.preview.days':    { uz: 'kun ichida',     ru: 'дней в окне',    en: 'days in your window' },
     'hk.preview.oneDay':  { uz: '1 kun ichida',   ru: '1 день в окне',  en: '1 day in your window' },
     'hk.watch.createBtn': { uz: 'Kuzatishni boshlash', ru: 'Начать слежение', en: 'Start watching' },
-    'hk.watch.warnTitle': {
-      uz: "Diqqat — hozir ham ba'zi sanalar bo'sh",
-      ru: 'Внимание — некоторые даты уже свободны',
-      en: 'Heads up — some dates are open right now',
+    
+    
+    // Calendar legend (replaces hk.cal.legHigh / legMed / legLow / legNone)
+    'hk.cal.legWindow': {
+      uz: 'Band qilish mumkin — bosing',
+      ru: 'Доступна — нажмите',
+      en: 'Bookable — tap to check',
     },
-    'hk.watch.warnText': {
-      uz: 'Kutmasdan, hoziroq ulardan birini band qilishingiz mumkin:',
-      ru: 'Можно забронировать прямо сейчас, не дожидаясь:',
-      en: 'You might be able to book one of these today instead of waiting:',
+    'hk.cal.legClosed': {
+      uz: 'Yopiq / oyna tashqarisida',
+      ru: 'Закрыто / вне окна',
+      en: 'Closed / past the window',
     },
-    'hk.watch.bookNow':     { uz: 'Hoziroq HiKorea\'ga →', ru: 'Перейти на HiKorea →', en: 'Go to HiKorea now →' },
-    'hk.watch.watchAnyway': {
-      uz: 'Baribir kuzatish kerakmi? Belgilang',
-      ru: 'Всё равно хотите ping? Поставьте слежение',
-      en: 'Still want a heads-up? Set the watch anyway',
+    'hk.cal.allFullNote': {
+      uz: "Hozir hech qanday sana ko'rinmayapti. Kuzatish o'rnating — joy ochilishi bilan xabar yuboramiz.",
+      ru: 'Сейчас нет доступных дат. Поставьте слежение — напишем, как только что-то появится.',
+      en: "No dates visible right now. Set a watch and we'll ping you the moment one opens.",
     },
 
+    // Date sheet — live fetch states (new)
+    'hk.sheet.loading': {
+      uz: 'HiKorea\'dan tekshirilmoqda…',
+      ru: 'Проверяем HiKorea…',
+      en: 'Checking HiKorea right now…',
+    },
+    'hk.sheet.fetchFail': {
+      uz: 'HiKorea\'ga ulanib bo\'lmadi. Bir lahzadan keyin urinib ko\'ring.',
+      ru: 'Не удалось связаться с HiKorea. Попробуйте через минуту.',
+      en: "Couldn't reach HiKorea just now. Try again in a moment.",
+    },
+    'hk.sheet.sessionExpired': {
+      uz: 'HiKorea seansimiz yangilanishi kerak — administratorga xabar berildi. Bir lahzadan keyin urinib ko\'ring.',
+      ru: 'Сессия HiKorea просрочена — администратор уведомлён. Попробуйте через минуту.',
+      en: "Our HiKorea login needs refreshing — the admin has been notified. Try again in a moment.",
+    },
+    'hk.sheet.closed': {
+      uz: 'Bu kuni idora yopiq',
+      ru: 'Офис в этот день закрыт',
+      en: 'Office closed this day',
+    },
+    'hk.sheet.fullyBooked': {
+      uz: "To'la band qilingan",
+      ru: 'Полностью занято',
+      en: 'Fully booked',
+    },
+    'hk.sheet.lastOne': {
+      uz: 'Faqat 1 ta joy — ulgurish kerak!',
+      ru: 'Только 1 место — успейте!',
+      en: 'Just 1 slot left — grab it!',
+    },
+    'hk.sheet.fewLeft': {
+      uz: 'ta joy — ulguring!',
+      ru: 'мест — поспешите!',
+      en: 'slots left — hurry!',
+    },
+    'hk.sheet.slotsLeft': {
+      uz: 'ta joy qoldi',
+      ru: 'мест осталось',
+      en: 'slots left',
+    },
+    'hk.sheet.slotsOpen': {
+      uz: "ta joy bo'sh",
+      ru: 'свободных мест',
+      en: 'slots open',
+    },
+    'hk.sheet.timesHead': {
+      uz: 'Vaqt bo\'yicha',
+      ru: 'По времени',
+      en: 'By time of day',
+    },
     // SUCCESS
     'hk.success.title': { uz: 'Hammasi tayyor', ru: 'Готово!',           en: "You're all set" },
     'hk.success.text':  {

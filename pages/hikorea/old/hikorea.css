@@ -643,23 +643,30 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Cell variants — only two states now: in HiKorea's booking window vs not.
-   Real availability for any given date is loaded live when the user taps. */
-.hk-cal-cell.empty  { background: transparent; }
-.hk-cal-cell.past   { background: transparent; color: #d1d5db; }
-.hk-cal-cell.today  { box-shadow: inset 0 0 0 2px #0d9488; }
+/* Cell variants */
+.hk-cal-cell.empty       { background: transparent; }     /* leading/trailing pad */
+.hk-cal-cell.past        { background: transparent; color: #d1d5db; }
+.hk-cal-cell.today       { box-shadow: inset 0 0 0 2px #0d9488; }
 
-.hk-c-window, .hk-cal-cell.in-window {
-  background: linear-gradient(180deg, #99f6e4 0%, #5eead4 100%);
+.hk-cal-cell.has-slots {
+  /* default for has-slots, overridden by .high/.med/.low */
+  background: #f0fdfa;
   color: #134e4a;
 }
-/* Weekends in-window: differentiate visually (often reduced hours). */
-.hk-cal-cell.in-window.weekend {
-  background: linear-gradient(180deg, #cffafe 0%, #a5f3fc 100%);
-  color: #155e75;
-}
 
-.hk-c-closed, .hk-cal-cell.closed {
+.hk-c-high, .hk-cal-cell.high {
+  background: linear-gradient(180deg, #6ee7b7 0%, #34d399 100%);
+  color: #064e3b;
+}
+.hk-c-med, .hk-cal-cell.med {
+  background: linear-gradient(180deg, #fde68a 0%, #fbbf24 100%);
+  color: #78350f;
+}
+.hk-c-low, .hk-cal-cell.low {
+  background: linear-gradient(180deg, #fca5a5 0%, #f87171 100%);
+  color: #7f1d1d;
+}
+.hk-c-none, .hk-cal-cell.full {
   background: #f3f4f6;
   color: #9ca3af;
 }
@@ -1061,33 +1068,6 @@ body {
 .hk-sheet-stat.low   .pill-num { background: #fee2e2; color: #b91c1c; }
 .hk-sheet-stat.full  .pill-num { background: #f3f4f6; color: #6b7280; }
 
-/* Loading / error states for live HiKorea fetch */
-.hk-sheet-stat.loading,
-.hk-sheet-stat.error {
-  background: #f9fafb;
-}
-.hk-sheet-loading {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.92rem;
-  color: #4b5563;
-  font-weight: 600;
-}
-.hk-sheet-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #d1d5db;
-  border-top-color: #0d9488;
-  border-radius: 50%;
-  animation: hkSpin 0.7s linear infinite;
-  display: inline-block;
-}
-@keyframes hkSpin {
-  to { transform: rotate(360deg); }
-}
-.hk-sheet-stat.error .hk-sheet-loading { color: #b45309; }
-
 .hk-sheet-stat-msg {
   display: block;
   margin-top: 6px;
@@ -1095,51 +1075,6 @@ body {
   color: #6b7280;
   font-weight: 500;
 }
-
-/* Per-time-slot grid inside the date sheet (live data) */
-.hk-sheet-times {
-  margin-top: 14px;
-  text-align: left;
-}
-.hk-sheet-times-head {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 4px 8px;
-}
-.hk-sheet-times-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 6px;
-}
-.hk-sheet-time-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 10px;
-  border-radius: 9px;
-  font-size: 0.84rem;
-  font-variant-numeric: tabular-nums;
-  border: 1px solid transparent;
-}
-.hk-sheet-time-row.high {
-  background: #ecfdf5;
-  border-color: #6ee7b7;
-  color: #047857;
-}
-.hk-sheet-time-row.partial {
-  background: #fefce8;
-  border-color: #fde68a;
-  color: #92400e;
-}
-.hk-sheet-time-row.full {
-  background: #f3f4f6;
-  color: #9ca3af;
-}
-.hk-sheet-time-label { font-weight: 700; }
-.hk-sheet-time-stat  { font-weight: 600; }
 
 .hk-sheet-actions {
   display: flex;
@@ -1347,15 +1282,20 @@ body {
 .night-mode .hk-cal-month-title { color: #5eead4; }
 .night-mode .hk-cal-dow-label { color: #6b7280; }
 .night-mode .hk-cal-cell.past { color: #4b5563; }
-.night-mode .hk-cal-cell.in-window {
-  background: linear-gradient(180deg, #0f766e 0%, #115e59 100%);
-  color: #ccfbf1;
+.night-mode .hk-cal-cell.has-slots { background: rgba(94, 234, 212, 0.1); color: #ccfbf1; }
+.night-mode .hk-cal-cell.high {
+  background: linear-gradient(180deg, #047857 0%, #065f46 100%);
+  color: #d1fae5;
 }
-.night-mode .hk-cal-cell.in-window.weekend {
-  background: linear-gradient(180deg, #155e75 0%, #164e63 100%);
-  color: #cffafe;
+.night-mode .hk-cal-cell.med {
+  background: linear-gradient(180deg, #b45309 0%, #92400e 100%);
+  color: #fef3c7;
 }
-.night-mode .hk-cal-cell.closed { background: #2a2a2a; color: #6b7280; }
+.night-mode .hk-cal-cell.low {
+  background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
+  color: #fee2e2;
+}
+.night-mode .hk-cal-cell.full { background: #2a2a2a; color: #6b7280; }
 
 .night-mode .hk-cal-cta-note {
   background: rgba(251, 191, 36, 0.08);
@@ -1425,26 +1365,6 @@ body {
 .night-mode .hk-sheet-stat.low  .pill-num { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
 .night-mode .hk-sheet-stat.full .pill-num { background: rgba(255, 255, 255, 0.05); color: #9ca3af; }
 .night-mode .hk-sheet-stat-msg { color: #9ca3af; }
-
-.night-mode .hk-sheet-loading { color: #d1d5db; }
-.night-mode .hk-sheet-spinner { border-color: #3a3a3a; border-top-color: #5eead4; }
-.night-mode .hk-sheet-stat.error .hk-sheet-loading { color: #fcd34d; }
-
-.night-mode .hk-sheet-times-head { color: #9ca3af; }
-.night-mode .hk-sheet-time-row.high {
-  background: rgba(34, 197, 94, 0.10);
-  border-color: rgba(110, 231, 183, 0.35);
-  color: #6ee7b7;
-}
-.night-mode .hk-sheet-time-row.partial {
-  background: rgba(245, 158, 11, 0.10);
-  border-color: rgba(253, 230, 138, 0.35);
-  color: #fcd34d;
-}
-.night-mode .hk-sheet-time-row.full {
-  background: rgba(255, 255, 255, 0.04);
-  color: #6b7280;
-}
 
 .night-mode .hk-overlay-card { background: #1e1e1e; }
 .night-mode .hk-overlay-title { color: #5eead4; }
