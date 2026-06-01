@@ -399,6 +399,15 @@
   function selectOffice(office) {
     state.selectedOffice = office;
     haptic('select');
+    // Skip the booth picker entirely when there's nothing to pick.
+    // Saves a tap and removes a confusing "what counter?" decision for
+    // people who don't know what booths are. They can still see/change
+    // it on the calendar header.
+    const desks = office.desks || [];
+    if (desks.length === 1) {
+      selectDesk(desks[0]);
+      return;
+    }
     enterBoothPicker();
   }
 
@@ -762,7 +771,7 @@
       pillText = `${totalAvail} ${t('hk.sheet.slotsLeft', 'slots left')}`;
     } else {
       tier = 'high';
-      pillText = `${totalAvail} ${t('hk.sheet.slotsOpen', 'slots open')} (${t('hk.sheet.of', 'of')} ${totalCap})`;
+      pillText = `${totalAvail} ${t('hk.sheet.slotsOpen', 'slots open')}`;
     }
 
     // Visual progress bar showing capacity utilization
@@ -790,19 +799,34 @@
         <div class="hk-sheet-time-group">
           <div class="hk-sheet-time-group-head">
             <span class="hk-sheet-time-group-label">${esc(label)}</span>
-            <span class="hk-sheet-time-group-count">${openCount} / ${list.length}</span>
+            <span class="hk-sheet-time-group-count">
+              ${openCount > 0
+                ? `${openCount} ${esc(t('hk.sheet.openOfTotal', 'open'))}`
+                : esc(t('hk.sheet.allFull', 'all full'))}
+            </span>
           </div>
           <div class="hk-sheet-times-grid">
             ${list.map((s) => {
               const slotClass = s.available <= 0 ? 'full' :
                                 s.available === s.capacity ? 'open' : 'partial';
-              const stat = s.available > 0
-                ? `<span class="hk-sheet-time-avail">${s.available}/${s.capacity}</span>`
-                : `<span class="hk-sheet-time-avail">·</span>`;
+              // Plain-language label. Drops the X/Y ratio that was hard to
+              // parse at a glance. "3 left" / "Full" reads instantly.
+              const statHtml = s.available > 0
+                ? `<span class="hk-sheet-time-avail">
+                     <strong>${s.available}</strong>
+                     <span class="hk-sheet-time-avail-suffix">
+                       ${esc(s.available === 1
+                          ? t('hk.sheet.leftOne', 'left')
+                          : t('hk.sheet.leftMany', 'left'))}
+                     </span>
+                   </span>`
+                : `<span class="hk-sheet-time-avail muted">
+                     ${esc(t('hk.sheet.slotFull', 'Full'))}
+                   </span>`;
               return `
                 <div class="hk-sheet-time-row ${slotClass}">
                   <span class="hk-sheet-time-label">${esc(s.time)}</span>
-                  ${stat}
+                  ${statHtml}
                 </div>`;
             }).join('')}
           </div>
@@ -1077,7 +1101,7 @@
               <div class="hk-watch-office">${esc(w.office_name_en || '?')}</div>
               <div class="hk-watch-booth">${esc(pretty.primary)}</div>
             </div>
-            <span class="hk-watch-pill ${esc(w.status)}">${esc(w.status)}</span>
+            <span class="hk-watch-pill ${esc(w.status)}">${esc(t('hk.watches.status.' + w.status, w.status))}</span>
           </div>
           <div class="hk-watch-range">
             <span class="hk-watch-range-icon">📅</span>

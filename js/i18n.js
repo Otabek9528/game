@@ -921,6 +921,36 @@ const I18N = {
     'hk.cal.legFull':    { uz: "To'la band",    ru: 'Полностью занято', en: 'Fully booked' },
     'hk.cal.legClosed':  { uz: 'Yopiq',         ru: 'Закрыто',      en: 'Closed' },
 
+    'hk.watches.status.active': {
+      uz: 'Faol',         ru: 'Активно',     en: 'Active',
+    },
+    'hk.watches.status.undeliverable': {
+      uz: 'Yetkazilmadi', ru: 'Не доставлено', en: 'Undeliverable',
+    },
+    'hk.watches.status.cancelled': {
+      uz: "To'xtatilgan", ru: 'Остановлено', en: 'Cancelled',
+    },
+    'hk.watches.status.expired': {
+      uz: 'Muddati tugagan', ru: 'Истекло',  en: 'Expired',
+    },
+
+    'hk.sheet.leftOne': {
+      uz: "qoldi",  ru: 'осталось', en: 'left',
+    },
+    'hk.sheet.leftMany': {
+      uz: "qoldi",  ru: 'осталось', en: 'left',
+    },
+    'hk.sheet.slotFull': {
+      uz: "Band",   ru: 'Занято',   en: 'Full',
+    },
+    'hk.sheet.openOfTotal': {
+      uz: "bo'sh",   ru: 'свободно', en: 'open',
+    },
+    'hk.sheet.allFull': {
+      uz: "hammasi band",
+      ru: 'всё занято',
+      en: 'all full',
+    },
 
     // Sheet morning/afternoon labels
     'hk.sheet.morning':   { uz: '🌅 Ertalab',     ru: '🌅 Утро',     en: '🌅 Morning' },

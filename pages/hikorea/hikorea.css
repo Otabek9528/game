@@ -739,33 +739,40 @@ body {
 
 .hk-quick-label,
 .hk-or-label {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin: 12px 4px 8px;
+  margin: 10px 4px 6px;
 }
 
-.hk-or-label { margin-top: 20px; }
+.hk-or-label { margin-top: 16px; }
 
 .hk-preset-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
 
 .hk-preset {
-  padding: 14px 12px;
+  padding: 11px 6px;
   border: 1.5px solid #e5e7eb;
   background: #fff;
-  border-radius: 12px;
-  font-size: 0.92rem;
+  border-radius: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #374151;
   cursor: pointer;
   transition: all 0.16s ease;
   font-family: inherit;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (max-width: 380px) {
+  .hk-preset-grid { grid-template-columns: repeat(2, 1fr); }
+  .hk-preset      { padding: 12px 6px; }
 }
 
 .hk-preset:hover { border-color: #0d9488; color: #134e4a; }
@@ -1159,18 +1166,20 @@ body {
 }
 .hk-sheet-times-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
 }
 .hk-sheet-time-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 10px;
-  border-radius: 9px;
-  font-size: 0.84rem;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 0.86rem;
   font-variant-numeric: tabular-nums;
   border: 1px solid transparent;
+  transition: transform 0.12s ease;
 }
 .hk-sheet-time-row.high {
   background: #ecfdf5;
@@ -1183,11 +1192,39 @@ body {
   color: #92400e;
 }
 .hk-sheet-time-row.full {
-  background: #f3f4f6;
+  background: #f9fafb;
+  border-color: transparent;
   color: #9ca3af;
 }
-.hk-sheet-time-label { font-weight: 700; }
+.hk-sheet-time-label { font-weight: 700; font-size: 0.92rem; }
 .hk-sheet-time-stat  { font-weight: 600; }
+
+/* Plain-language availability ("3 left" / "Full") */
+.hk-sheet-time-avail {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+.hk-sheet-time-avail strong {
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.hk-sheet-time-avail-suffix {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.85;
+  text-transform: lowercase;
+}
+.hk-sheet-time-avail.muted {
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
 
 .hk-sheet-actions {
   display: flex;
@@ -1790,3 +1827,27 @@ body {
 .night-mode .hk-date-trigger:hover  { border-color: #5eead4; }
 .night-mode .hk-date-trigger:focus,
 .night-mode .hk-date-trigger:active { border-color: #5eead4; box-shadow: 0 0 0 4px rgba(94, 234, 212, 0.15); }
+
+/* =====================================================================
+   v11 polish: floating CTA spacing, watch pill translations
+   ===================================================================== */
+
+/* When the calendar's floating CTA is visible, reserve extra bottom space
+   in the scroll container so the last week of the bottom month isn't
+   covered by the pill. */
+#section-calendar { padding-bottom: 90px; }
+
+/* Move legend below months as a fine-print footer (set in HTML, but
+   tighten the look here). */
+#section-calendar .hk-legend {
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 0.74rem;
+  opacity: 0.9;
+}
+
+/* Sheet headline pill: slightly larger, more breathing room */
+.hk-sheet-stat .pill-num {
+  padding: 5px 14px;
+  font-size: 1rem;
+}
