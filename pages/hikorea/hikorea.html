@@ -196,12 +196,19 @@
 
       <div class="hk-meta-row" id="calMeta"></div>
 
-      <!-- Legend: 3 states — green=no bookings yet, teal=has bookings (tap for detail), gray=closed -->
+      <!-- At-a-glance summary -->
+      <div class="hk-cal-summary" id="calSummary" hidden></div>
+
+      <!-- Legend: 4 tiers from "wide open" to "fully booked" -->
       <div class="hk-legend">
         <span class="hk-legend-item"><span class="hk-legend-sw hk-c-empty"></span>
-          <span data-i18n="hk.cal.legEmpty">No bookings yet</span></span>
-        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-window"></span>
-          <span data-i18n="hk.cal.legWindow">Has bookings — tap to check</span></span>
+          <span data-i18n="hk.cal.legEmpty">Wide open</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-light"></span>
+          <span data-i18n="hk.cal.legLight">Light</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-half"></span>
+          <span data-i18n="hk.cal.legHalf">Filling up</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-full"></span>
+          <span data-i18n="hk.cal.legFull">Looking full</span></span>
         <span class="hk-legend-item"><span class="hk-legend-sw hk-c-closed"></span>
           <span data-i18n="hk.cal.legClosed">Closed</span></span>
       </div>
@@ -350,6 +357,12 @@
         </p>
         <button class="hk-btn-primary" id="successOkBtn"
                 data-i18n="hk.success.ok">See my watches</button>
+        <button class="hk-btn-secondary" id="testNotifBtn">
+          <span data-i18n="hk.success.testBtn">📨 Send me a test notification</span>
+        </button>
+        <p class="hk-overlay-fineprint" data-i18n="hk.success.testHint">
+          See exactly what a real alert will look like in Telegram.
+        </p>
       </div>
     </div>
 

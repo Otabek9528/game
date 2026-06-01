@@ -473,6 +473,39 @@
     }
   }
 
+  // ---------------------------------------------------------------------
+  // CAPACITY HEURISTIC
+  //
+  // The /slots endpoint gives us `taken` per date but NOT per-date capacity.
+  // Capacity varies by day-of-week (Mon ~36, Sat ~3, etc.). We approximate by
+  // taking the max `taken` we've seen for each DoW in the visible window —
+  // that's a lower bound on capacity. Lets us color cells by approximate
+  // fullness without an extra HTTP round-trip per cell. The user always
+  // gets the truth when they tap (live fetch).
+  // ---------------------------------------------------------------------
+
+  function computeMaxTakenByDow(dates) {
+    const max = [0, 0, 0, 0, 0, 0, 0]; // index by Date.getDay() (Sun=0..Sat=6)
+    for (const r of (dates || [])) {
+      const dow = ymdToDate(r.visi_ymd).getDay();
+      if (r.taken > max[dow]) max[dow] = r.taken;
+    }
+    return max;
+  }
+
+  function fillTier(taken, maxForDow) {
+    if (taken === 0) return { name: 'empty', ratio: 0 };
+    if (maxForDow <= 0) return { name: 'partial', ratio: 0.3 };
+    const ratio = Math.min(taken / maxForDow, 1);
+    if (ratio >= 0.95) return { name: 'full',  ratio };
+    if (ratio >= 0.5)  return { name: 'half',  ratio };
+    return { name: 'light', ratio };
+  }
+
+  // ---------------------------------------------------------------------
+  // CALENDAR
+  // ---------------------------------------------------------------------
+
   function renderCalendar(data) {
     // Meta chips
     const meta = $('calMeta');
@@ -482,14 +515,15 @@
     }
     meta.innerHTML = chips.join('');
 
-    // Lookup: ymd -> {visi_ymd, taken}
     const slotMap = {};
-    (data.dates || []).forEach((row) => {
-      slotMap[row.visi_ymd] = row;
-    });
+    (data.dates || []).forEach((row) => { slotMap[row.visi_ymd] = row; });
 
-    // Always render a fixed 3-month window so the calendar shape is
-    // consistent across offices.
+    // Per-DoW capacity heuristic for the visible window
+    const maxByDow = computeMaxTakenByDow(data.dates);
+
+    // Summary banner — at-a-glance numbers above the months
+    renderSummaryBanner(data.dates || [], maxByDow);
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const months = [];
@@ -500,10 +534,9 @@
 
     const container = $('calMonths');
     container.innerHTML = months
-      .map(([y, m]) => renderOneMonth(y, m, slotMap, today))
+      .map(([y, m]) => renderOneMonth(y, m, slotMap, maxByDow, today))
       .join('');
 
-    // If the desk has no in-window dates at all, nudge user toward setting a watch.
     if (!(data.dates || []).length) {
       const note = document.createElement('div');
       note.className = 'hk-cal-cta-note';
@@ -511,13 +544,56 @@
       container.appendChild(note);
     }
 
-    // Wire cell taps — fetch live detail.
     $$('.hk-cal-cell-bookable', container).forEach((cell) => {
       cell.addEventListener('click', () => openDateSheet(cell.dataset.ymd));
     });
   }
 
-  function renderOneMonth(year, month0, slotMap, today) {
+  function renderSummaryBanner(dates, maxByDow) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const future = dates.filter((r) => ymdToDate(r.visi_ymd) >= today);
+
+    let empty = 0, partial = 0, fullish = 0;
+    for (const r of future) {
+      const dow = ymdToDate(r.visi_ymd).getDay();
+      const tier = fillTier(r.taken, maxByDow[dow]);
+      if (tier.name === 'empty') empty++;
+      else if (tier.name === 'full') fullish++;
+      else partial++;
+    }
+
+    const summary = $('calSummary');
+    if (!future.length) {
+      summary.hidden = true;
+      return;
+    }
+    summary.hidden = false;
+    summary.innerHTML = `
+      <div class="hk-summary-stat">
+        <span class="hk-summary-num">${empty}</span>
+        <span class="hk-summary-label" data-i18n="hk.summary.empty">wide open</span>
+      </div>
+      <div class="hk-summary-divider"></div>
+      <div class="hk-summary-stat">
+        <span class="hk-summary-num">${partial}</span>
+        <span class="hk-summary-label" data-i18n="hk.summary.partial">with availability</span>
+      </div>
+      <div class="hk-summary-divider"></div>
+      <div class="hk-summary-stat">
+        <span class="hk-summary-num">${fullish}</span>
+        <span class="hk-summary-label" data-i18n="hk.summary.full">looking full</span>
+      </div>
+    `;
+    // Re-apply translations for the newly inserted nodes
+    $$('[data-i18n]', summary).forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      const v = t(key, null);
+      if (v !== null) el.textContent = v;
+    });
+  }
+
+  function renderOneMonth(year, month0, slotMap, maxByDow, today) {
     const dowsShort = [];
     const weekOrder = [1, 2, 3, 4, 5, 6, 0];
     for (const dow of weekOrder) {
@@ -540,27 +616,20 @@
       const isPast = d < today;
       const isToday = d.getTime() === today.getTime();
       const slot = slotMap[ymd];
-      const isWeekend = (d.getDay() === 0 || d.getDay() === 6);
 
       let cls = ['hk-cal-cell'];
-      let badge = '';
+      let fillBar = '';
       if (isToday) cls.push('today');
 
       if (isPast) {
         cls.push('past');
       } else if (slot) {
-        // We have `taken` from the calendar overview but not per-date
-        // capacity (capacity varies by day and is only known live). Show
-        // taken count and a coarse coloring: 0 taken = definitely open;
-        // any taken = some bookings exist. Real availability comes from
-        // tapping the cell (live fetch).
         cls.push('in-window', 'hk-cal-cell-bookable');
-        if (isWeekend) cls.push('weekend');
-        if (slot.taken === 0) {
-          cls.push('empty-booked'); // fully open
-        } else {
-          cls.push('has-bookings');
-          badge = `<span class="hk-cal-day-mark">${slot.taken}</span>`;
+        const tier = fillTier(slot.taken, maxByDow[d.getDay()]);
+        cls.push('tier-' + tier.name);
+        if (tier.name !== 'empty') {
+          const pct = Math.round(tier.ratio * 100);
+          fillBar = `<span class="hk-cal-fill"><span style="width:${pct}%"></span></span>`;
         }
       } else {
         cls.push('closed');
@@ -571,7 +640,7 @@
                 ${slot && !isPast ? `data-ymd="${ymd}"` : ''}
                 ${isPast || !slot ? 'disabled' : ''}>
           <span class="hk-cal-day-num">${day}</span>
-          ${badge}
+          ${fillBar}
         </button>`);
     }
 
@@ -642,8 +711,7 @@
     const totalAvail = detail.total_available  || 0;
     const slots      = detail.time_slots       || [];
 
-    // Headline tier based on REAL capacity for this date.
-    let tier = 'full', pillText;
+    let tier, pillText;
     if (totalCap === 0) {
       tier = 'full';
       pillText = t('hk.sheet.closed', 'Office closed this day');
@@ -660,28 +728,58 @@
       pillText = `${totalAvail} ${t('hk.sheet.slotsLeft', 'slots left')}`;
     } else {
       tier = 'high';
-      pillText = `${totalAvail} ${t('hk.sheet.slotsOpen', 'slots open')} (of ${totalCap})`;
+      pillText = `${totalAvail} ${t('hk.sheet.slotsOpen', 'slots open')} (${t('hk.sheet.of', 'of')} ${totalCap})`;
     }
 
-    // Time-slot rows (only show slots that have any capacity).
+    // Visual progress bar showing capacity utilization
+    const fillPct = totalCap > 0 ? Math.round((totalTaken / totalCap) * 100) : 0;
+    const progressHtml = totalCap > 0 ? `
+      <div class="hk-sheet-progress">
+        <div class="hk-sheet-progress-bar">
+          <div class="hk-sheet-progress-fill ${tier}" style="width:${fillPct}%"></div>
+        </div>
+        <div class="hk-sheet-progress-meta">
+          <span>${totalTaken} ${t('hk.sheet.booked', 'booked')}</span>
+          <span>${totalAvail} ${t('hk.sheet.openLabel', 'open')}</span>
+        </div>
+      </div>` : '';
+
+    // Group slots morning/afternoon for easier scanning
     const realSlots = slots.filter((s) => s.capacity > 0);
-    const slotsHtml = realSlots.length
-      ? `
-        <div class="hk-sheet-times">
-          <div class="hk-sheet-times-head" data-i18n="hk.sheet.timesHead">By time of day</div>
+    const morning   = realSlots.filter((s) => parseInt(s.time.split(':')[0], 10) < 12);
+    const afternoon = realSlots.filter((s) => parseInt(s.time.split(':')[0], 10) >= 12);
+
+    function renderSlotGroup(label, list) {
+      if (!list.length) return '';
+      const openCount = list.filter((s) => s.available > 0).length;
+      return `
+        <div class="hk-sheet-time-group">
+          <div class="hk-sheet-time-group-head">
+            <span class="hk-sheet-time-group-label">${esc(label)}</span>
+            <span class="hk-sheet-time-group-count">${openCount} / ${list.length}</span>
+          </div>
           <div class="hk-sheet-times-grid">
-            ${realSlots.map((s) => {
-              const slotClass = s.available <= 0 ? 'full'
-                              : s.available === s.capacity ? 'high'
-                              : 'partial';
+            ${list.map((s) => {
+              const slotClass = s.available <= 0 ? 'full' :
+                                s.available === s.capacity ? 'open' : 'partial';
+              const stat = s.available > 0
+                ? `<span class="hk-sheet-time-avail">${s.available}/${s.capacity}</span>`
+                : `<span class="hk-sheet-time-avail">·</span>`;
               return `
                 <div class="hk-sheet-time-row ${slotClass}">
                   <span class="hk-sheet-time-label">${esc(s.time)}</span>
-                  <span class="hk-sheet-time-stat">${s.available} / ${s.capacity}</span>
+                  ${stat}
                 </div>`;
             }).join('')}
           </div>
-        </div>` : '';
+        </div>`;
+    }
+
+    const slotsHtml = realSlots.length ? `
+      <div class="hk-sheet-times">
+        ${renderSlotGroup(t('hk.sheet.morning',   '🌅 Morning'),   morning)}
+        ${renderSlotGroup(t('hk.sheet.afternoon', '🌇 Afternoon'), afternoon)}
+      </div>` : '';
 
     stat.className = `hk-sheet-stat ${tier}`;
     stat.innerHTML = `
@@ -691,6 +789,7 @@
           ? t('hk.sheet.bookCue', 'Book on HiKorea before someone else grabs it.')
           : t('hk.sheet.fullCue', "Set a watch and we'll ping you when a slot opens."))}
       </span>
+      ${progressHtml}
       ${slotsHtml}
     `;
 
@@ -783,6 +882,32 @@
       state.navStack = ['home'];
       enterMyWatches();
     });
+    $('testNotifBtn').addEventListener('click', sendTestNotification);
+  }
+
+  async function sendTestNotification() {
+    if (!state.user) return;
+    const btn = $('testNotifBtn');
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="hk-spinner-small"></span> ${esc(t('hk.success.testSending', 'Sending…'))}`;
+    try {
+      await api('/test-notification', {
+        method: 'POST',
+        body: {
+          telegram_user_id:  state.user.id,
+          telegram_username: state.user.username,
+        },
+      });
+      haptic('ok');
+      btn.classList.add('sent');
+      btn.innerHTML = `✓ ${esc(t('hk.success.testSent', 'Check your Telegram'))}`;
+    } catch (e) {
+      haptic('err');
+      btn.innerHTML = original;
+      btn.disabled = false;
+      toast(t('hk.success.testFail', "Couldn't send. Try again."), 'error');
+    }
   }
 
   async function submitWatch() {

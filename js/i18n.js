@@ -818,11 +818,7 @@ const I18N = {
     
     
     // Calendar legend (replaces hk.cal.legHigh / legMed / legLow / legNone)
-    'hk.cal.legWindow': {
-      uz: 'Band qilish mumkin — bosing',
-      ru: 'Доступна — нажмите',
-      en: 'Bookable — tap to check',
-    },
+
     'hk.cal.legClosed': {
       uz: 'Yopiq / oyna tashqarisida',
       ru: 'Закрыто / вне окна',
@@ -880,11 +876,7 @@ const I18N = {
       ru: 'свободных мест',
       en: 'slots open',
     },
-    'hk.sheet.timesHead': {
-      uz: 'Vaqt bo\'yicha',
-      ru: 'По времени',
-      en: 'By time of day',
-    },
+
     // SUCCESS
     'hk.success.title': { uz: 'Hammasi tayyor', ru: 'Готово!',           en: "You're all set" },
     'hk.success.text':  {
@@ -923,6 +915,46 @@ const I18N = {
     'hk.err.input':     { uz: 'Sanalarni tekshiring',              ru: 'Проверьте даты',                    en: 'Check your dates' },
     'hk.err.pickDates': { uz: "Sana tanlang",                      ru: 'Выберите даты',                    en: 'Pick a start and end date' },
     'hk.err.noUser':    { uz: 'Bu sahifani Telegram bot orqali oching.', ru: 'Откройте эту страницу через Telegram-бота.', en: 'Open this page from the Telegram bot first.' },
+    
+    // Calendar legend (replaces previous 3-state set)
+    'hk.cal.legEmpty':  { uz: "Bo'sh", ru: 'Свободно', en: 'Wide open' },
+    'hk.cal.legLight':  { uz: 'Kam band', ru: 'Мало занято', en: 'Light' },
+    'hk.cal.legHalf':   { uz: "To'layapti", ru: 'Заполняется', en: 'Filling up' },
+    'hk.cal.legFull':   { uz: "To'lay deb qolgan", ru: 'Почти заполнено', en: 'Looking full' },
+    'hk.cal.legClosed': { uz: 'Yopiq', ru: 'Закрыто', en: 'Closed' },
+
+    // Calendar summary banner
+    'hk.summary.empty':   { uz: "to'liq bo'sh kun", ru: 'свободных дней', en: 'wide open' },
+    'hk.summary.partial': { uz: "joy bor", ru: 'есть места', en: 'with availability' },
+    'hk.summary.full':    { uz: "to'la deb qolgan", ru: 'почти заполнено', en: 'looking full' },
+
+    // Sheet morning/afternoon labels
+    'hk.sheet.morning':   { uz: '🌅 Ertalab',     ru: '🌅 Утро',     en: '🌅 Morning' },
+    'hk.sheet.afternoon': { uz: '🌇 Tushdan keyin', ru: '🌇 День',    en: '🌇 Afternoon' },
+
+    // Sheet progress meta
+    'hk.sheet.booked':    { uz: 'band',  ru: 'занято', en: 'booked' },
+    'hk.sheet.openLabel': { uz: "bo'sh", ru: 'свободно', en: 'open' },
+    'hk.sheet.of':        { uz: 'dan',   ru: 'из',     en: 'of' },
+
+    // Success overlay — test notification
+    'hk.success.testBtn': {
+      uz: '📨 Sinov xabarini yuborish',
+      ru: '📨 Отправить тестовое уведомление',
+      en: '📨 Send me a test notification',
+    },
+    'hk.success.testHint': {
+      uz: "Telegram'da haqiqiy bildirishnoma qanday ko'rinishini ko'ring.",
+      ru: 'Посмотрите, как реальное уведомление будет выглядеть в Telegram.',
+      en: 'See exactly what a real alert will look like in Telegram.',
+    },
+    'hk.success.testSending': { uz: 'Yuborilmoqda…',  ru: 'Отправляем…', en: 'Sending…' },
+    'hk.success.testSent':    { uz: "Telegram'ni tekshiring", ru: 'Проверьте Telegram', en: 'Check your Telegram' },
+    'hk.success.testFail':    {
+      uz: "Yuborib bo'lmadi. Botni Telegram'da ishga tushirib, qayta urinib ko'ring.",
+      ru: 'Не удалось отправить. Запустите бота в Telegram и попробуйте снова.',
+      en: "Couldn't send. Make sure you've started the bot in Telegram, then try again.",
+    },
   },
 
   init() {
