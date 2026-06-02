@@ -75,6 +75,33 @@
     return fallback;
   }
 
+  function currentLang() {
+    // The site's i18n module API isn't standardized in this codebase, so
+    // try the common shapes in order. Falls back to the <html lang>
+    // attribute, then 'en'.
+    if (window.I18N) {
+      if (typeof I18N.getLang === 'function') return I18N.getLang();
+      if (typeof I18N.lang === 'string')      return I18N.lang;
+      if (typeof I18N.currentLang === 'string') return I18N.currentLang;
+    }
+    const htmlLang = document.documentElement.getAttribute('lang');
+    if (htmlLang) return htmlLang.split('-')[0].toLowerCase();
+    return 'en';
+  }
+
+  /**
+   * Pick a localized string from an i18n field shaped {en, uz, ru, ...}
+   * (booth descriptions, details, etc.) Falls back to English when the
+   * requested language is missing/empty. Tolerates plain strings too.
+   */
+  function pickI18n(field) {
+    if (field == null) return '';
+    if (typeof field === 'string') return field;
+    if (typeof field !== 'object')  return '';
+    const lang = currentLang();
+    return (field[lang] && field[lang].trim()) || field.en || '';
+  }
+
   // -- Date helpers --
 
   // i18n-aware day/month names. Browser locale can't be trusted (often
@@ -426,9 +453,11 @@
 
   // Many booths are labelled "... AFTER 09:36" by HiKorea — that's their
   // internal jargon for the afternoon shift. Reframe in plain language.
+  // Accepts either a raw string (legacy) or an i18n field {en, uz, ru}.
   function prettifyBoothName(rawBooth) {
-    if (!rawBooth) return null;
-    let s = rawBooth;
+    const s0 = pickI18n(rawBooth);
+    if (!s0) return null;
+    let s = s0;
     // Strip parenthetical dates like "(2023.10.14.~)"
     s = s.replace(/\s*\([\d.~\s]+\)\s*/g, ' ').trim();
     if (/AFTER\s*0?9:36/i.test(s)) {
@@ -448,7 +477,7 @@
     }
     container.innerHTML = desks.map((d) => {
       const pretty = prettifyBoothName(d.booth) || { primary: 'Counter ' + d.desk_seq, secondary: null };
-      const details = d.details || pretty.secondary || '';
+      const details = pickI18n(d.details) || pretty.secondary || '';
       return `
         <button class="hk-list-item" data-desk-seq="${d.desk_seq}">
           <span class="hk-item-icon">🎫</span>
@@ -477,7 +506,7 @@
       booth_raw: desk.booth,
       booth_pretty: pretty.primary,
       booth_note: pretty.secondary,
-      details: desk.details,
+      details: pickI18n(desk.details),
       office_id: state.selectedOffice.office_id,
       office_name_en: state.selectedOffice.name_en,
       office_name_ko: state.selectedOffice.name_ko,
