@@ -658,7 +658,7 @@ const I18N = {
       en: 'This information is provided based on product ingredients only and <strong>may contain errors</strong>. We do not issue official religious rulings (fatwa). If you find an error, please report it in our <a href="https://t.me/MuslimVegukin">Telegram group</a>.'
     },
     
-    // Page title
+// Page title
     'hk.pageTitle': {
       uz: 'HiKorea — joy kuzatuvchi',
       ru: 'HiKorea — слежение за слотами',
@@ -682,7 +682,7 @@ const I18N = {
       en: "We watch HiKorea around the clock. The moment a slot opens, we'll message you on Telegram.",
     },
     'hk.home.watchingPre':  { uz: 'Kuzatilmoqda', ru: 'Слежу за', en: 'Watching' },
-    'hk.home.watchingPost': { uz: 'davr(lar)',    ru: 'диапазон(ов)', en: 'slot range(s)' },
+    'hk.home.watchingPost': { uz: 'oraliq(lar)',  ru: 'диапазон(ов)', en: 'slot range(s)' },
     'hk.home.step1': { uz: 'Idorangizni tanlang',       ru: 'Выберите офис',          en: 'Pick your office' },
     'hk.home.step2': { uz: "Bo'sh sanalarni ko'ring",   ru: 'Посмотрите свободные даты', en: 'See open dates' },
     'hk.home.step3': {
@@ -760,7 +760,7 @@ const I18N = {
       en: "Each counter handles different kinds of requests. If you're not sure, pick the first one — it usually covers the most common cases.",
     },
     'hk.booth.none':      { uz: 'Bu idorada oyna mavjud emas.', ru: 'У офиса нет доступных окон.', en: 'No counters available for this office.' },
-    'hk.booth.afternoon': { uz: 'Tushdan keyingi smena (09:36 dan keyin)', ru: 'Послеобеденная смена (после 09:36)', en: 'Afternoon hours (after 09:36)' },
+    'hk.booth.afternoon': { uz: 'Tushdan keyingi qabul (09:36 dan keyin)', ru: 'Послеобеденная смена (после 09:36)', en: 'Afternoon hours (after 09:36)' },
 
     // CALENDAR
     'hk.cal.lede': {
@@ -799,18 +799,18 @@ const I18N = {
     // WATCH SETUP
     'hk.watch.title': { uz: 'Qachon kuzataylik?', ru: 'Когда следить?', en: 'When should we watch?' },
     'hk.watch.lede': {
-      uz: 'Siz tayyor bo\'lgan sanalarni tanlang. Shu davr ichida joy ochilsa, darhol Telegram orqali xabar yuboramiz.',
+      uz: 'Siz tayyor bo\'lgan sanalarni tanlang. Shu oraliqda joy ochilsa, darhol Telegram orqali xabar yuboramiz.',
       ru: 'Выберите даты, которые вам подходят. Если в этом диапазоне появится слот, тут же напишем в Telegram.',
       en: "Pick the dates you're flexible with. If a slot opens within this range, we'll send you a Telegram message right away.",
     },
     'hk.watch.quickLabel': { uz: "⚡ Tezkor tanlash", ru: '⚡ Быстрый выбор', en: '⚡ Quick pick' },
     'hk.watch.orLabel':    { uz: 'yoki aniq sanalarni tanlang', ru: 'или выберите конкретные даты', en: 'or pick specific dates' },
-    'hk.watch.p7':  { uz: 'Yaqin 7 kun',  ru: '7 дней',  en: 'Next 7 days'  },
-    'hk.watch.p14': { uz: 'Yaqin 14 kun', ru: '14 дней', en: 'Next 14 days' },
-    'hk.watch.p30': { uz: 'Yaqin 30 kun', ru: '30 дней', en: 'Next 30 days' },
-    'hk.watch.p60': { uz: 'Yaqin 60 kun', ru: '60 дней', en: 'Next 60 days' },
-    'hk.watch.fromLabel': { uz: 'Dan',   ru: 'С',  en: 'From' },
-    'hk.watch.toLabel':   { uz: 'Gacha', ru: 'По', en: 'To'   },
+    'hk.watch.p7':  { uz: 'Keyingi 7 kun',  ru: '7 дней',  en: 'Next 7 days'  },
+    'hk.watch.p14': { uz: 'Keyingi 14 kun', ru: '14 дней', en: 'Next 14 days' },
+    'hk.watch.p30': { uz: 'Keyingi 30 kun', ru: '30 дней', en: 'Next 30 days' },
+    'hk.watch.p60': { uz: 'Keyingi 60 kun', ru: '60 дней', en: 'Next 60 days' },
+    'hk.watch.fromLabel': { uz: 'Boshlanishi', ru: 'С',  en: 'From' },
+    'hk.watch.toLabel':   { uz: 'Tugashi',     ru: 'По', en: 'To'   },
     'hk.preview.watching':{ uz: 'Kuzatilmoqda',   ru: 'Слежу за',       en: 'Watching' },
     'hk.preview.days':    { uz: 'kun ichida',     ru: 'дней в окне',    en: 'days in your window' },
     'hk.preview.oneDay':  { uz: '1 kun ichida',   ru: '1 день в окне',  en: '1 day in your window' },
@@ -880,7 +880,7 @@ const I18N = {
     // SUCCESS
     'hk.success.title': { uz: 'Hammasi tayyor', ru: 'Готово!',           en: "You're all set" },
     'hk.success.text':  {
-      uz: 'Sizning davringizda joy ochilishi bilan Telegram orqali xabar yuboramiz. Kuzatishlaringizni boshqarish uchun istalgan vaqtda qaytib keling.',
+      uz: "Tanlagan oralig'ingizda joy ochilishi bilan Telegram orqali xabar yuboramiz. Kuzatishlaringizni boshqarish uchun istalgan vaqtda qaytib keling.",
       ru: 'Напишем в Telegram, как только в вашем диапазоне появится слот. В любой момент можете вернуться и управлять слежениями.',
       en: "We'll send you a Telegram message the moment a slot opens in your range. You can come back any time to manage your watches.",
     },
@@ -889,7 +889,7 @@ const I18N = {
     // MY WATCHES
     'hk.watches.title': { uz: 'Faol kuzatishlar', ru: 'Активные слежения', en: 'Your active watches' },
     'hk.watches.lede': {
-      uz: "Quyidagi davrlarni kuzatib turamiz. Joy ochilishi bilan Telegram'ga yozamiz.",
+      uz: "Quyidagi sana oraliqlarini kuzatib turamiz. Joy ochilishi bilan Telegram'ga yozamiz.",
       ru: 'Следим за этими датами. Напишем в Telegram, как только появится слот.',
       en: "We're keeping an eye on these date ranges. We'll message you on Telegram the moment a slot opens.",
       
@@ -959,7 +959,7 @@ const I18N = {
     // Sheet progress meta
     'hk.sheet.booked':    { uz: 'band',  ru: 'занято', en: 'booked' },
     'hk.sheet.openLabel': { uz: "bo'sh", ru: 'свободно', en: 'open' },
-    'hk.sheet.of':        { uz: 'dan',   ru: 'из',     en: 'of' },
+    
 
     // Success overlay — test notification
     'hk.success.testBtn': {
