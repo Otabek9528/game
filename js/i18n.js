@@ -130,9 +130,9 @@ const I18N = {
       en: 'Fajr 18°, Isha 18°'
     },
     'prayer.method.makkah.hint': {
-      uz: 'Bomdod 18.5°, Xufton — Shomdan 90 daqiqa keyin',
-      ru: 'Фаджр 18.5°, Иша — через 90 мин после Магриба',
-      en: 'Fajr 18.5°, Isha — 90 min after Maghrib'
+      uz: 'Bomdod 18.5°, Xufton - Shomdan 90 daqiqa keyin',
+      ru: 'Фаджр 18.5°, Иша - через 90 мин после Магриба',
+      en: 'Fajr 18.5°, Isha - 90 min after Maghrib'
     },
     'prayer.method.egypt.hint': {
       uz: 'Bomdod 19.5°, Xufton 17.5°',
@@ -161,13 +161,13 @@ const I18N = {
 
     'prayer.sunnah.ishraq.desc': {
       uz: '<span class="hadith-quote">Kim bomdodni jamoat bilan o\‘qisa, so\‘ngra quyosh chiqquncha Allohni zikr qilib o\‘tirsa, keyin ikki rakat namoz o\‘qisa, uning uchun haj va umraning ajridek bo\‘lur.</span>',
-      ru: '<span class="hadith-quote">Тому, кто прочитал фаджр в джамаате, сидел в зикре до восхода солнца и затем совершил два ракаата намаза — даётся полная награда хаджа и умры.</span>',
-      en: '<span class="hadith-quote">Whoever prays Fajr in congregation, remains in remembrance of Allah until sunrise, then prays two rak\'ahs — receives the full reward of Hajj and Umrah.</span>'
+      ru: '<span class="hadith-quote">Тому, кто прочитал фаджр в джамаате, сидел в зикре до восхода солнца и затем совершил два ракаата намаза - даётся полная награда хаджа и умры.</span>',
+      en: '<span class="hadith-quote">Whoever prays Fajr in congregation, remains in remembrance of Allah until sunrise, then prays two rak\'ahs - receives the full reward of Hajj and Umrah.</span>'
     },
     'prayer.sunnah.ishraq.source': {
-      uz: 'Manba: Termiziy — Muoz ibn Anas al-Juhaniy (r.a.)',
-      ru: 'Источник: Ат-Тирмизи — Муаз ибн Анас аль-Джухани (р.а.)',
-      en: 'Source: Tirmidhi — from Mu\'adh ibn Anas al-Juhani (r.a.)'
+      uz: 'Manba: Termiziy - Muoz ibn Anas al-Juhaniy (r.a.)',
+      ru: 'Источник: Ат-Тирмизи - Муаз ибн Анас аль-Джухани (р.а.)',
+      en: 'Source: Tirmidhi - from Mu\'adh ibn Anas al-Juhani (r.a.)'
     },
      
     // Duha / Chosht / Zuho
@@ -178,14 +178,14 @@ const I18N = {
     },
 
     'prayer.sunnah.duha.desc': {
-      uz: 'Quyosh bir nayza bo\'yi ko\'tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o\'qish. Eng afzal vaqti — nahorning to\'rtdan biri o\'tgandan keyin.<span class="hadith-quote">Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi.</span>',
-      ru: 'Когда солнце поднимается на высоту копья, (время молитвы) начинается и продолжается до того, как до полудня остаётся один час. Предпочтительно совершить 4 ракаата. Наилучшее время — после того, как пройдет четверть утра.<span class="hadith-quote">Кто постоянно совершает молитву духа (чошгох), тому будут прощены грехи, даже если они подобны морской пене.</span>',
+      uz: 'Quyosh bir nayza bo\'yi ko\'tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o\'qish. Eng afzal vaqti - nahorning to\'rtdan biri o\'tgandan keyin.<span class="hadith-quote">Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi.</span>',
+      ru: 'Когда солнце поднимается на высоту копья, (время молитвы) начинается и продолжается до того, как до полудня остаётся один час. Предпочтительно совершить 4 ракаата. Наилучшее время - после того, как пройдет четверть утра.<span class="hadith-quote">Кто постоянно совершает молитву духа (чошгох), тому будут прощены грехи, даже если они подобны морской пене.</span>',
       en: 'When the sun rises to the height of a spear, it begins and continues until one hour remains before noon. It is most virtuous to pray 4 rak‘ahs. The most preferable time is after one quarter of the morning has passed.<span class="hadith-quote">Whoever consistently performs the Duha (forenoon) prayer, his sins will be forgiven even if they are as abundant as the foam of the sea.</span>'
     },
     'prayer.sunnah.duha.source': {
-      uz: 'Manba: Termiziy — Abu Hurayra (r.a.)',
-      ru: 'Источник: Ат-Тирмизи — Абу Хурайра (р.а.)',
-      en: 'Source: Tirmidhi — from Abu Hurayra (r.a.)'
+      uz: 'Manba: Termiziy - Abu Hurayra (r.a.)',
+      ru: 'Источник: Ат-Тирмизи - Абу Хурайра (р.а.)',
+      en: 'Source: Tirmidhi - from Abu Hurayra (r.a.)'
     },
      
     // Tahajjud
@@ -196,14 +196,14 @@ const I18N = {
     },
 
     'prayer.sunnah.tahajjud.desc': {
-      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Ozi 2 rakat, ko\'pi 8 rakat. Eng afzal vaqti — kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt.<span class="hadith-quote">U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.</span>',
-      ru: 'Совершаемая после молитвы Иша, после сна. Минимум — 2 ракаата, максимум — 8 ракаатов. Наилучшее время — последняя треть ночи — время, когда принимаются мольбы.<span class="hadith-quote">Она приближает к вашему Господу, искупает дурные поступки и удерживает от грехов.</span>',
-      en: 'Performed after the Isha prayer, following sleep. Its minimum is 2 rak‘ahs and its maximum is 8 rak‘ahs. The most virtuous time is the last third of the night — a time when supplications are accepted.<span class="hadith-quote">It brings one closer to your Lord, expiates bad deeds, and prevents sins.</span>'
+      uz: 'Xuftondan keyin, uyqudan so\'ng o\'qiladigan nafl namoz. Ozi 2 rakat, ko\'pi 8 rakat. Eng afzal vaqti - kechaning oxirgi uchdan biri. Duolar qabul bo\'ladigan vaqt.<span class="hadith-quote">U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.</span>',
+      ru: 'Совершаемая после молитвы Иша, после сна. Минимум - 2 ракаата, максимум - 8 ракаатов. Наилучшее время - последняя треть ночи - время, когда принимаются мольбы.<span class="hadith-quote">Она приближает к вашему Господу, искупает дурные поступки и удерживает от грехов.</span>',
+      en: 'Performed after the Isha prayer, following sleep. Its minimum is 2 rak‘ahs and its maximum is 8 rak‘ahs. The most virtuous time is the last third of the night - a time when supplications are accepted.<span class="hadith-quote">It brings one closer to your Lord, expiates bad deeds, and prevents sins.</span>'
     },
     'prayer.sunnah.tahajjud.source': {
-      uz: 'Manba: Termiziy — Abu Umoma (r.a.)',
-      ru: 'Источник: Ат-Тирмизи — Абу Умома (р.а.)',
-      en: 'Source: Tirmidhi — from Abu Umoma (r.a.)'
+      uz: 'Manba: Termiziy - Abu Umoma (r.a.)',
+      ru: 'Источник: Ат-Тирмизи - Абу Умома (р.а.)',
+      en: 'Source: Tirmidhi - from Abu Umoma (r.a.)'
     },
         
     'prayer.status.upcoming': {
@@ -397,20 +397,20 @@ const I18N = {
     'community.purposeTitle': { uz: 'Guruh maqsadi', ru: 'Цель группы', en: 'Group purpose' },
     'community.purposeText': { uz: 'Ushbu guruh <strong>Muslim Vegukin Bot</strong> foydalanuvchilari uchun rasmiy muhokama maydonidir. Bu yerda bot bilan bog\'liq barcha masalalarni muhokama qilishingiz mumkin.', ru: 'Эта группа является официальной площадкой для обсуждения пользователями <strong>Muslim Vegukin Bot</strong>. Здесь вы можете обсудить все вопросы, связанные с ботом.', en: 'This group is the official discussion platform for <strong>Muslim Vegukin Bot</strong> users. Here you can discuss all bot-related topics.' },
     'community.allowedTitle': { uz: 'Guruh muhokama mavzulari:', ru: 'Темы для обсуждения в группе:', en: 'Group discussion topics:' },
-    'community.allowed1': { uz: '<strong>Yangi manzillar haqida xabar berish</strong> — yangi masjid, restoran yoki do\'kon qo\'shilishi kerak bo\'lsa', ru: '<strong>Сообщения о новых адресах</strong> — если нужно добавить новую мечеть, ресторан или магазин', en: '<strong>Report new locations</strong> — if a new mosque, restaurant or shop needs to be added' },
-    'community.allowed2': { uz: '<strong>Takliflar va g\'oyalar</strong> — botni yaxshilash uchun fikrlaringiz', ru: '<strong>Предложения и идеи</strong> — ваши мысли по улучшению бота', en: '<strong>Suggestions and ideas</strong> — your thoughts on improving the bot' },
-    'community.allowed3': { uz: '<strong>Xatolar haqida xabar berish</strong> — agar botda muammo topsangiz', ru: '<strong>Сообщения об ошибках</strong> — если вы нашли проблему в боте', en: '<strong>Bug reports</strong> — if you find a problem in the bot' },
-    'community.allowed4': { uz: '<strong>Bot yangiliklari</strong> — yangi funksiyalar va o\'zgarishlar haqida e\'lonlar', ru: '<strong>Новости бота</strong> — объявления о новых функциях и изменениях', en: '<strong>Bot news</strong> — announcements about new features and changes' },
-    'community.allowed5': { uz: '<strong>Beta versiyalar muhokamasi</strong> — yangi funksiyalarni ommaga chiqarishdan oldin sinab ko\'rish', ru: '<strong>Обсуждение бета-версий</strong> — тестирование новых функций перед публичным релизом', en: '<strong>Beta version discussions</strong> — testing new features before public release' },
-    'community.allowed6': { uz: '<strong>Bot haqida savollar</strong> — qanday ishlatish, funksiyalar haqida', ru: '<strong>Вопросы о боте</strong> — как использовать, о функциях', en: '<strong>Questions about the bot</strong> — how to use, about features' },
-    'community.allowed7': { uz: '<strong>Jamiyat bilan muloqot</strong> — boshqa foydalanuvchilar bilan tajriba almashish', ru: '<strong>Общение с сообществом</strong> — обмен опытом с другими пользователями', en: '<strong>Community interaction</strong> — sharing experiences with other users' },
+    'community.allowed1': { uz: '<strong>Yangi manzillar haqida xabar berish</strong> - yangi masjid, restoran yoki do\'kon qo\'shilishi kerak bo\'lsa', ru: '<strong>Сообщения о новых адресах</strong> - если нужно добавить новую мечеть, ресторан или магазин', en: '<strong>Report new locations</strong> - if a new mosque, restaurant or shop needs to be added' },
+    'community.allowed2': { uz: '<strong>Takliflar va g\'oyalar</strong> - botni yaxshilash uchun fikrlaringiz', ru: '<strong>Предложения и идеи</strong> - ваши мысли по улучшению бота', en: '<strong>Suggestions and ideas</strong> - your thoughts on improving the bot' },
+    'community.allowed3': { uz: '<strong>Xatolar haqida xabar berish</strong> - agar botda muammo topsangiz', ru: '<strong>Сообщения об ошибках</strong> - если вы нашли проблему в боте', en: '<strong>Bug reports</strong> - if you find a problem in the bot' },
+    'community.allowed4': { uz: '<strong>Bot yangiliklari</strong> - yangi funksiyalar va o\'zgarishlar haqida e\'lonlar', ru: '<strong>Новости бота</strong> - объявления о новых функциях и изменениях', en: '<strong>Bot news</strong> - announcements about new features and changes' },
+    'community.allowed5': { uz: '<strong>Beta versiyalar muhokamasi</strong> - yangi funksiyalarni ommaga chiqarishdan oldin sinab ko\'rish', ru: '<strong>Обсуждение бета-версий</strong> - тестирование новых функций перед публичным релизом', en: '<strong>Beta version discussions</strong> - testing new features before public release' },
+    'community.allowed6': { uz: '<strong>Bot haqida savollar</strong> - qanday ishlatish, funksiyalar haqida', ru: '<strong>Вопросы о боте</strong> - как использовать, о функциях', en: '<strong>Questions about the bot</strong> - how to use, about features' },
+    'community.allowed7': { uz: '<strong>Jamiyat bilan muloqot</strong> - boshqa foydalanuvchilar bilan tajriba almashish', ru: '<strong>Общение с сообществом</strong> - обмен опытом с другими пользователями', en: '<strong>Community interaction</strong> - sharing experiences with other users' },
     'community.rulesTitle': { uz: 'Guruh qoidalari', ru: 'Правила группы', en: 'Group rules' },
     'community.rulesWarning': { uz: 'Quyidagi turdagi xabarlar <strong>o\'chirib tashlanadi</strong>:', ru: 'Следующие типы сообщений <strong>будут удалены</strong>:', en: 'The following types of messages <strong>will be deleted</strong>:' },
-    'community.prohibited1': { uz: '<strong>Reklama va savdo e\'lonlari</strong> — har qanday turdagi sotish yoki xarid e\'lonlari', ru: '<strong>Реклама и торговые объявления</strong> — любые объявления о продаже или покупке', en: '<strong>Ads and sales announcements</strong> — any buy or sell advertisements' },
-    'community.prohibited2': { uz: '<strong>O\'quv kurslari reklamasi</strong> — til kurslari, o\'quv markazlari va boshqalar', ru: '<strong>Реклама курсов</strong> — языковые курсы, учебные центры и прочее', en: '<strong>Course advertisements</strong> — language courses, learning centers, etc.' },
-    'community.prohibited3': { uz: '<strong>Bot bilan bog\'liq bo\'lmagan savollar</strong> — umumiy savollar uchun boshqa guruhlardan foydalaning', ru: '<strong>Вопросы не о боте</strong> — для общих вопросов используйте другие группы', en: '<strong>Non-bot related questions</strong> — use other groups for general questions' },
-    'community.prohibited4': { uz: '<strong>Spam va takroriy xabarlar</strong> — bir xil xabarlarni qayta-qayta yozish', ru: '<strong>Спам и повторяющиеся сообщения</strong> — многократная отправка одинаковых сообщений', en: '<strong>Spam and repetitive messages</strong> — sending the same messages repeatedly' },
-    'community.prohibited5': { uz: '<strong>Mavzudan tashqari munozaralar</strong> — bot bilan aloqasi bo\'lmagan suhbatlar', ru: '<strong>Оффтопик дискуссии</strong> — разговоры не связанные с ботом', en: '<strong>Off-topic discussions</strong> — conversations unrelated to the bot' },
+    'community.prohibited1': { uz: '<strong>Reklama va savdo e\'lonlari</strong> - har qanday turdagi sotish yoki xarid e\'lonlari', ru: '<strong>Реклама и торговые объявления</strong> - любые объявления о продаже или покупке', en: '<strong>Ads and sales announcements</strong> - any buy or sell advertisements' },
+    'community.prohibited2': { uz: '<strong>O\'quv kurslari reklamasi</strong> - til kurslari, o\'quv markazlari va boshqalar', ru: '<strong>Реклама курсов</strong> - языковые курсы, учебные центры и прочее', en: '<strong>Course advertisements</strong> - language courses, learning centers, etc.' },
+    'community.prohibited3': { uz: '<strong>Bot bilan bog\'liq bo\'lmagan savollar</strong> - umumiy savollar uchun boshqa guruhlardan foydalaning', ru: '<strong>Вопросы не о боте</strong> - для общих вопросов используйте другие группы', en: '<strong>Non-bot related questions</strong> - use other groups for general questions' },
+    'community.prohibited4': { uz: '<strong>Spam va takroriy xabarlar</strong> - bir xil xabarlarni qayta-qayta yozish', ru: '<strong>Спам и повторяющиеся сообщения</strong> - многократная отправка одинаковых сообщений', en: '<strong>Spam and repetitive messages</strong> - sending the same messages repeatedly' },
+    'community.prohibited5': { uz: '<strong>Mavzudan tashqari munozaralar</strong> - bot bilan aloqasi bo\'lmagan suhbatlar', ru: '<strong>Оффтопик дискуссии</strong> - разговоры не связанные с ботом', en: '<strong>Off-topic discussions</strong> - conversations unrelated to the bot' },
     'community.penaltyTitle': { uz: 'Ogohlantirish', ru: 'Предупреждение', en: 'Warning' },
     'community.penaltyText': { uz: 'Qoidalarga zid xabarlar <strong>o\'chiriladi</strong>. Agar o\'chirilgan xabar qayta yozilsa, foydalanuvchi guruhda yozish huquqidan <strong>cheklanadi</strong> (restrict).', ru: 'Сообщения, нарушающие правила, <strong>будут удалены</strong>. При повторном нарушении пользователь <strong>будет ограничен</strong> в правах на отправку сообщений.', en: 'Messages violating rules <strong>will be deleted</strong>. If repeated, the user <strong>will be restricted</strong> from sending messages.' },
     'community.ctaText': { uz: '🌟 Qoidalarga rioya qilgan holda guruhga qo\'shilishingizni so\'rab qolamiz!', ru: '🌟 Приглашаем вас присоединиться к группе, соблюдая правила!', en: '🌟 We invite you to join the group while following the rules!' },
@@ -509,9 +509,9 @@ const I18N = {
     'bc.badgeTaqiqlangan': { uz: '⛔ Ta\'qiqlangan', ru: '⛔ Запрещено', en: '⛔ Prohibited' },
     'bc.heroTitle': { uz: 'Mahsulotni skanerlang', ru: 'Сканируйте продукт', en: 'Scan a product' },
     'bc.heroDesc': { 
-      uz: 'Shtrix kodni kameraga ko\'rsating — tarkibida ta\'qiqlangan moddalar bor-yo\'qligini bir zumda bilib oling', 
-      ru: 'Наведите камеру на штрих-код — мгновенно узнайте, содержит ли продукт запрещённые ингредиенты', 
-      en: 'Point your camera at a barcode — instantly find out if the product contains prohibited ingredients' 
+      uz: 'Shtrix kodni kameraga ko\'rsating - tarkibida ta\'qiqlangan moddalar bor-yo\'qligini bir zumda bilib oling', 
+      ru: 'Наведите камеру на штрих-код - мгновенно узнайте, содержит ли продукт запрещённые ингредиенты', 
+      en: 'Point your camera at a barcode - instantly find out if the product contains prohibited ingredients' 
     },
     'bc.startScan': { uz: 'Skanerlashni boshlash', ru: 'Начать сканирование', en: 'Start scanning' },
 
@@ -556,7 +556,7 @@ const I18N = {
 
  
     // ============================================
-    // BARCODE — Result info banners (M4)
+    // BARCODE - Result info banners (M4)
     // ============================================
     'bc.store.foundIn':       { uz: 'Topildi:',                                          ru: 'Найдено:',                                                en: 'Found in:' },
     
@@ -565,7 +565,7 @@ const I18N = {
     'bc.store.alsoAt':        { uz: 'Boshqa do\'konlarda ham bor:',                      ru: 'Также есть в этих магазинах:',                            en: 'Also available at:' },
     
     // ============================================
-    // BARCODE — Store error states (M6)
+    // BARCODE - Store error states (M6)
     // ============================================
     'bc.store.metaError':       { uz: 'Do\'kon ma\'lumotlari yuklanmadi',                    ru: 'Не удалось загрузить данные магазина',                       en: "Couldn't load store data" },
     'bc.store.productsError':   { uz: 'Mahsulotlar yuklanmadi',                              ru: 'Не удалось загрузить товары',                                 en: "Couldn't load products" },
@@ -573,7 +573,7 @@ const I18N = {
     'bc.store.retry':           { uz: 'Qayta urinish',                                        ru: 'Повторить',                                                    en: 'Retry' },    
     
     // ============================================
-    // BARCODE — Manual entry (M7)
+    // BARCODE - Manual entry (M7)
     // ============================================
     'bc.manual.hint':        { uz: 'Skanerlash qiyin bo\'lyaptimi?',                                    ru: 'Не удаётся отсканировать?',                                    en: 'Trouble scanning?' },
     'bc.manual.label':       { uz: 'Shtrix-kodni qo\'lda kiriting:',                                    ru: 'Введите штрих-код вручную:',                                    en: 'Enter the barcode manually:' },
@@ -590,10 +590,10 @@ const I18N = {
     'bc.manual.errInvalid':  { uz: 'Shtrix-kod noto\'g\'ri.',                                           ru: 'Некорректный штрих-код.',                                       en: 'Invalid barcode.' },
  
     // ============================================
-    // BARCODE — Contributor recruitment banner (M4)
+    // BARCODE - Contributor recruitment banner (M4)
     // ============================================
     'bc.contrib.title': { uz: 'Halol baza yig\'ishga sherik bo\'ling',                                                                                         ru: 'Помогите нам собрать халяль-базу',                                                                                              en: 'Help us build the halal database' },
-    'bc.contrib.body':  { uz: 'Mahsulotlar tarkibini o\'qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do\'konlaridagi halol mahsulotlar bazasini birgalikda yig\'amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — ortingizdan sadaqa-i joriyangizni qoldiring.', ru: 'Для тех, кто умеет читать состав продуктов: вместе собираем халяль-базу для GS25, CU, 7-Eleven, Emart24, No Brand и Daiso. Каждая запись помогает тысячам людей.', en: 'For those who can read product ingredients: together we collect a halal database for GS25, CU, 7-Eleven, Emart24, No Brand, and Daiso convenience stores. Every entry reaches thousands of people.' },
+    'bc.contrib.body':  { uz: 'Mahsulotlar tarkibini o\'qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do\'konlaridagi halol mahsulotlar bazasini birgalikda yig\'amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi - ortingizdan sadaqa-i joriyangizni qoldiring.', ru: 'Для тех, кто умеет читать состав продуктов: вместе собираем халяль-базу для GS25, CU, 7-Eleven, Emart24, No Brand и Daiso. Каждая запись помогает тысячам людей.', en: 'For those who can read product ingredients: together we collect a halal database for GS25, CU, 7-Eleven, Emart24, No Brand, and Daiso convenience stores. Every entry reaches thousands of people.' },
     'bc.contrib.cta':   { uz: 'Adminga yozish',                                                                                                                ru: 'Написать админу',                                                                                                                en: 'Contact admin' },
  
     // Product result
@@ -613,7 +613,7 @@ const I18N = {
 
     // Factory
     'bc.flag.ambiguous': {uz: "Manbasi noma'lum", ru: "Неизвестное происхождение", en: "Unknown source"},
-    'bc.ambiguousWarn': {uz: "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 mavjud — o'simlik yoki HAYVON YO\'G\'Idan olinishi mumkin.", ru: "Содержит 트랜스지방, 쇼트닝, 향료 или 글리세린 — может быть растительного или животного  происхождения (жир).", en: "Contains 트랜스지방, 쇼트닝, 향료 or 글리세린 — may be of plant or animal FAT origin."},
+    'bc.ambiguousWarn': {uz: "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 mavjud - o'simlik yoki HAYVON YO\'G\'Idan olinishi mumkin.", ru: "Содержит 트랜스지방, 쇼트닝, 향료 или 글리세린 - может быть растительного или животного  происхождения (жир).", en: "Contains 트랜스지방, 쇼트닝, 향료 or 글리세린 - may be of plant or animal FAT origin."},
     
     
     'bc.factoryWarn': { uz: 'Mahsulot ta\'qiqlangan ingredientlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.', ru: 'Продукт произведён на оборудовании, где производятся запрещённые продукты.', en: 'Product manufactured on equipment where prohibited products are produced.' },
@@ -627,7 +627,7 @@ const I18N = {
     
  
     // ============================================
-    // BARCODE — Stores section (M2)
+    // BARCODE - Stores section (M2)
     // ============================================
     'bc.stores.title':     { uz: '🏪 Do\'konlar', ru: '🏪 Магазины', en: '🏪 Stores' },
     'bc.stores.sub':       { uz: 'Do\'kon tanlang va mahsulotlarini ko\'ring', ru: 'Выберите магазин, чтобы увидеть его товары', en: 'Pick a store to browse its products' },
@@ -637,7 +637,7 @@ const I18N = {
     'bc.stores.empty':     { uz: 'Hozircha do\'konlar mavjud emas', ru: 'Магазинов пока нет', en: 'No stores available yet' },
  
     // ============================================
-    // BARCODE — Store detail page (M3)
+    // BARCODE - Store detail page (M3)
     // ============================================
     'bc.store.pageTitle':  { uz: 'Do\'kon Mahsulotlari', ru: 'Товары магазина', en: 'Store Products' },
     'bc.store.category': { uz: 'Turkum', ru: 'Категория', en: 'Category' },
@@ -660,9 +660,9 @@ const I18N = {
     
 // Page title
     'hk.pageTitle': {
-      uz: 'HiKorea — joy kuzatuvchi',
-      ru: 'HiKorea — слежение за слотами',
-      en: 'HiKorea — your slot watcher',
+      uz: 'HiKorea - joy kuzatuvchi',
+      ru: 'HiKorea - слежение за слотами',
+      en: 'HiKorea - your slot watcher',
     },
 
     // Generic
@@ -672,41 +672,42 @@ const I18N = {
 
     // HOME
     'hk.home.title': {
-      uz: 'Uchrashuv vaqtingizni toping',
+      uz: 'Immigratsiya bilan uchrashuv vaqtini tanlang',
       ru: 'Найдите время записи',
       en: 'Find your appointment slot',
     },
     'hk.home.lede': {
-      uz: 'Biz HiKorea sahifasini 24/7 kuzatamiz. Joy ochilishi bilan Telegram orqali xabar yuboramiz.',
-      ru: 'Мы следим за HiKorea круглосуточно. Как только появится слот, напишем в Telegram.',
-      en: "We watch HiKorea around the clock. The moment a slot opens, we'll message you on Telegram.",
+      uz: 'Bot HiKorea websahifasini 24/7 kuzatib, sizga belgilagan vaqtingiz oralig\'ida joy ochilishi bilan Telegram orqali xabar yuboradi.',
+      ru: 'Бот круглосуточно отслеживает сайт HiKorea и отправляет вам уведомление через Telegram, когда появляется свободное место в указанный вами период времени.',
+      en: "Bot monitors the HiKorea website 24/7 and sends you a message via Telegram when a spot opens up during the time period you specify.",
     },
-    'hk.home.watchingPre':  { uz: 'Kuzatilmoqda', ru: 'Слежу за', en: 'Watching' },
-    'hk.home.watchingPost': { uz: 'oraliq(lar)',  ru: 'диапазон(ов)', en: 'slot range(s)' },
-    'hk.home.step1': { uz: 'Idorangizni tanlang',       ru: 'Выберите офис',          en: 'Pick your office' },
-    'hk.home.step2': { uz: "Bo'sh sanalarni ko'ring",   ru: 'Посмотрите свободные даты', en: 'See open dates' },
+    
+    'hk.home.watchingPre':  { uz: 'Faol kuzatuvlar soni:', ru: 'Слежу за', en: 'Watching' },
+    'hk.home.watchingPost': { uz: 'ta',  ru: 'диапазон(ов)', en: 'slot range(s)' },
+    'hk.home.step1': { uz: 'Tegishli immigratsiya ofisini tanlang',       ru: 'Выберите офис',          en: 'Pick your office' },
+    'hk.home.step2': { uz: "Mavjud sanalarni ko'ring",   ru: 'Посмотрите свободные даты', en: 'See open dates' },
     'hk.home.step3': {
       uz: 'Joy ochilganda Telegram orqali xabar oling',
       ru: 'Получите ping в Telegram, когда появится слот',
       en: 'Get a Telegram ping when a slot opens',
     },
     'hk.home.searchLabel': {
-      uz: 'Sizning ishingizni qaysi idora hal qiladi?',
+      uz: 'Qaysi immigratsiya ofisiga borasiz?',
       ru: 'Какой офис обрабатывает вашу заявку?',
       en: 'Which office handles your case?',
     },
     'hk.home.searchPlaceholder': {
-      uz: 'Idora nomini izlash...',
+      uz: 'Ofis nomini izlash...',
       ru: 'Поиск офиса...',
       en: 'Search by office name...',
     },
     'hk.home.addressLink': {
-      uz: 'Idorangizni bilmaysizmi? Uy manzilingiz bo\'yicha toping →',
+      uz: 'Uy manzilingizni kiritish orqali tegishli ofisni aniqlash →',
       ru: 'Не знаете свой офис? Найдите по домашнему адресу →',
       en: "Don't know your office? Find it by your home address →",
     },
     'hk.home.noMatch': {
-      uz: 'Hech qanday idora topilmadi. Boshqa so\'z bilan izlang yoki yuqoridagi "Manzil bo\'yicha topish" havolasini bosing.',
+      uz: 'Hech qanday ofis topilmadi. Boshqa so\'z bilan izlang yoki yuqoridagi "Uy manzili orqali topish" havolasini bosing.',
       ru: 'Ничего не найдено. Попробуйте другое слово или нажмите "Найти по адресу" выше.',
       en: "No offices match. Try a different word, or use 'Find by address' above.",
     },
@@ -715,70 +716,70 @@ const I18N = {
 
     // BY-ADDRESS
     'hk.address.title': {
-      uz: 'Manzilingiz bo\'yicha idorangizni toping',
+      uz: 'Uy manzili bo\'yicha immigratsiya ofisini izlash',
       ru: 'Найти офис по адресу',
       en: 'Find your office by address',
     },
     'hk.address.lede': {
-      uz: 'Har bir idora muayyan tumanlarga xizmat ko\'rsatadi. Yashash manzilingizni ayting, biz mosini topamiz.',
+      uz: 'Har bir ofis muayyan tumanlarga xizmat ko\'rsatadi. Yashash manzilingizni kiritish orqali tegishli ofisni topish.',
       ru: 'Каждый офис обслуживает определённые районы. Скажите, где живёте, и мы подберём.',
       en: "Each office serves specific districts. Tell us where you live and we'll match it.",
     },
     'hk.address.provinceLabel': {
-      uz: '1. Viloyat / shaharingizni tanlang',
-      ru: '1. Выберите провинцию / город',
-      en: '1. Pick your province / city',
+      uz: '1. Viloyatingizni tanlang',
+      ru: '1. Выберите провинцию',
+      en: '1. Pick your province',
     },
-    'hk.address.provincePlaceholder': { uz: '— tanlang —', ru: '— выбрать —', en: '— select —' },
+    'hk.address.provincePlaceholder': { uz: '- tanlang -', ru: '- выбрать -', en: '- select -' },
     'hk.address.addressLabel': {
-      uz: '2. Uy manzilingizni koreyscha kiriting',
+      uz: '2. To\'liq uy manzilingizni koreys tilida kiriting',
       ru: '2. Введите домашний адрес на корейском',
       en: '2. Type your home address in Korean',
     },
     'hk.address.hint': {
-      uz: '💡 Tumaningiz (masalan 강남구) ham yozsangiz, eng yaxshi natija beradi.',
-      ru: '💡 Укажите район (например 강남구) — так совпадение будет точнее.',
-      en: '💡 Including your district (e.g. 강남구) gives us the best match.',
+      uz: '💡 Manzilingizda tegishli shahar/tuman nomi (-시/-구/-군) bo\'lishi shart, masalan 강남구, 성남시 yoki 원주군.',
+      ru: '💡 В вашем адресе должно быть указано соответствующее название города/района (-시/-구/-군), например, 강남구, 성남시 или 원주군.',
+      en: '💡 Your address must contain the appropriate city/district name (-시/-구/-군), such as 강남구, 성남시, or 원주군.',
     },
-    'hk.address.findBtn':      { uz: 'Idoramni topish',       ru: 'Найти мой офис',           en: 'Find my office' },
+    'hk.address.findBtn':      { uz: 'Ofisni izlash',       ru: 'Найти мой офис',           en: 'Find my office' },
     'hk.address.needProvince': { uz: 'Avval viloyatni tanlang.', ru: 'Сначала выберите провинцию.', en: 'Pick your province first' },
     'hk.address.needAddress':  { uz: 'Manzilingizni kiriting.',  ru: 'Введите адрес.',              en: 'Enter your address' },
 
-    'hk.address.foundOne':     { uz: 'Mana sizning idorangiz:',  ru: 'Вот ваш офис:',                en: "Here's your office:" },
+    'hk.address.foundOne':     { uz: 'Immigratsiya ofisi:',  ru: 'Иммиграционная служба::',                en: "Immigration office:" },
     'hk.address.foundMany':    { uz: 'Mosini tanlang:',           ru: 'Выберите подходящий:',         en: 'Pick the one that matches:' },
     'hk.address.noMatch': {
-      uz: 'Ushbu manzil uchun idora topilmadi. Bosh sahifadagi ro\'yxatdan tanlab ko\'ring.',
-      ru: 'Не нашли офис для этого адреса. Попробуйте выбрать из списка на главной.',
-      en: "Couldn't find an office for that address. Try picking from the list on the home screen.",
+      uz: 'Ushbu manzil uchun ofis topilmadi. Manzil to\'liq kiritilgan bo\'lishi kerak.',
+      ru: 'Офис по этому адресу не найден. Адрес необходимо ввести полностью.',
+      en: "No office was found for this address. The address must be entered in full.",
     },
 
     // BOOTH PICKER
-    'hk.booth.title': { uz: 'Sizga qaysi oyna kerak?', ru: 'Какое окно вам нужно?', en: 'Which counter do you need?' },
+    'hk.booth.title': { uz: 'Bir nechta bo\'limlar mavjud.', ru: 'Какое окно вам нужно?', en: 'Which counter do you need?' },
     'hk.booth.lede': {
-      uz: 'Har bir oyna har xil so\'rovlarni qabul qiladi. Bilmasangiz birinchisini tanlang — odatda eng keng tarqalgan holatlarni qamrab oladi.',
-      ru: 'Каждое окно работает с разными запросами. Если не уверены — выберите первое, оно покрывает большинство случаев.',
-      en: "Each counter handles different kinds of requests. If you're not sure, pick the first one — it usually covers the most common cases.",
-    },
-    'hk.booth.none':      { uz: 'Bu idorada oyna mavjud emas.', ru: 'У офиса нет доступных окон.', en: 'No counters available for this office.' },
-    'hk.booth.afternoon': { uz: 'Tushdan keyingi qabul (09:36 dan keyin)', ru: 'Послеобеденная смена (после 09:36)', en: 'Afternoon hours (after 09:36)' },
+          uz: 'Mavjud bo\'limlar o\'zining joylashuvi, qavati yoki ro\'yxat ochilish vaqti bilan farq qilishi mumkin. Lekin bir xil ishni bajaradi. Har birining kalendarini ko\'rib, o\'zingizga qulayini tanlang. Diqqat: ba\'zi bo\'limlar turli manzillarda joylashgan, shuning uchun tanlashdan oldin tegishli tavsifni o\'qing.',
+          ru: 'Окна одного офиса могут отличаться расположением, этажом или временем начала записи - но выполняют одну и ту же работу. Посмотрите календарь каждого и выберите удобное. Важно: в некоторых офисах окна находятся в разных местах, поэтому перед выбором прочитайте описание.',
+          en: "Counters at the same office can differ by location, floor, or when registration opens - but they do the same job. Check each one's calendar and pick whichever suits you. Note: at some offices the counters are in different places, so read the description before choosing.",
+        },
+    'hk.booth.none':      { uz: 'Bu ofisda bo\'lim mavjud emas.', ru: 'У офиса нет доступных окон.', en: 'No counters available for this office.' },
+    'hk.booth.afternoon': { uz: 'Qabul 09:36 dan keyin boshlanadi.', ru: 'Регистрация начинается после 09:36.', en: 'Reception starts after 09:36.' },
 
     // CALENDAR
     'hk.cal.lede': {
-      uz: "Sanani bosib, joylar borligini ko'ring. Yo'q bo'lsa pastdagi tugmani bosing — joy ochilganda xabar yuboramiz.",
-      ru: 'Нажмите на любую дату, чтобы увидеть слоты. Нет нужной? Жмите кнопку ниже — напишем, когда появится.',
-      en: "Tap any date to see if it's bookable. Don't see what you want? Tap the button below — we'll notify you the moment a slot opens.",
+      uz: "Sanani bosib, joylar borligini ko'ring. Yo'q bo'lsa pastdagi xabar berish tugmasini bosing. Joy ochilganda xabar yuboramiz.",
+      ru: 'Нажмите на любую дату, чтобы увидеть слоты. Нет нужной? Жмите кнопку ниже - напишем, когда появится.',
+      en: "Tap any date to see if it's bookable. Don't see what you want? Tap the button below - we'll notify you the moment a slot opens.",
     },
 
-    'hk.cal.checked':   { uz: 'Tekshirildi',          ru: 'Проверено',           en: 'Checked' },
+    'hk.cal.checked':   { uz: 'Tekshirildi:',          ru: 'Проверено:',           en: 'Checked:' },
     'hk.cal.notifyCta': {
-      uz: 'Joy ochilganda xabar bering',
+      uz: 'Joy ochilganda xabar berish',
       ru: 'Сообщите, когда появится слот',
       en: 'Notify me when a slot opens',
     },
     'hk.cal.allFullNote': {
-      uz: "Hozir hamma sana to'la — aynan shu paytda kuzatish kerak. Joy ochilishi bilan xabar yuboramiz.",
-      ru: 'Сейчас всё занято — самое время поставить слежение. Напишем, как только что-то освободится.',
-      en: "Looks like every visible date is full right now. That's exactly when a watch helps — we'll ping you the moment something opens.",
+      uz: "Hozirda hamma sana band qilingan. Kimdir bekor qilishi ortidan joy ochilishi bilan sizga xabar yuboriladi.",
+      ru: 'Сейчас всё занято - самое время поставить слежение. Напишем, как только что-то освободится.',
+      en: "Looks like every visible date is full right now. That's exactly when a watch helps - we'll ping you the moment something opens.",
     },
 
     // DATE SHEET (plain-language phrases)
@@ -786,20 +787,20 @@ const I18N = {
 
     'hk.sheet.close':         { uz: 'Yopish',                   ru: 'Закрыть',                   en: 'Close' },
     'hk.sheet.bookCue': {
-      uz: 'Boshqalar olib qo\'yishidan oldin HiKorea\'da band qiling.',
-      ru: 'Бронируйте на HiKorea, пока не разобрали.',
-      en: 'Book on HiKorea before someone else grabs it.',
+      uz: 'Tegishli vaqtni band qilish uchun HiKorea\' websaytiga o\'ting.',
+      ru: 'Чтобы забронировать подходящее время, зайдите на сайт HiKorea.',
+      en: 'To book a suitable time, go to HiKorea\'s website.',
     },
     'hk.sheet.fullCue': {
-      uz: "Hozir bo'sh joy yo'q — kuzatishni yoqing, ochilganda xabar beramiz.",
-      ru: 'Сейчас мест нет — поставьте слежение, и мы напишем, как откроется.',
-      en: "No spots right now — set a watch and we'll tell you when one opens.",
+      uz: "Hozirda bo'sh joy yo'q. Kuzatishni yoqib qo'ysangiz, bo'sh joy ochilganda Telegram orqali xabar yuboriladi.",
+      ru: 'В данный момент свободных мест нет - установите таймер, и мы пришлем вам уведомление, когда появится свободное место.',
+      en: "No spots right now - set a watch and we'll send you a message when one opens.",
     },
 
     // WATCH SETUP
-    'hk.watch.title': { uz: 'Qachon kuzataylik?', ru: 'Когда следить?', en: 'When should we watch?' },
+    'hk.watch.title': { uz: 'Kuzatuv muddati:', ru: 'Период наблюдения:', en: 'Watch period:' },
     'hk.watch.lede': {
-      uz: 'Siz tayyor bo\'lgan sanalarni tanlang. Shu oraliqda joy ochilsa, darhol Telegram orqali xabar yuboramiz.',
+      uz: 'Sizga kerakli sanalarni tanlang. Shu oraliqda joy ochilsa, darhol Telegram orqali xabar yuboriladi.',
       ru: 'Выберите даты, которые вам подходят. Если в этом диапазоне появится слот, тут же напишем в Telegram.',
       en: "Pick the dates you're flexible with. If a slot opens within this range, we'll send you a Telegram message right away.",
     },
@@ -817,7 +818,7 @@ const I18N = {
     'hk.watch.createBtn': { uz: 'Kuzatishni boshlash', ru: 'Начать слежение', en: 'Start watching' },
     
     
-    // Calendar legend (replaces hk.cal.legHigh / legMed / legLow / legNone)
+    // Calendar legend
 
     'hk.cal.legClosed': {
       uz: 'Yopiq / oyna tashqarisida',
@@ -825,29 +826,29 @@ const I18N = {
       en: 'Closed / past the window',
     },
     'hk.cal.allFullNote': {
-      uz: "Hozir hech qanday sana ko'rinmayapti. Kuzatish o'rnating — joy ochilishi bilan xabar yuboramiz.",
-      ru: 'Сейчас нет доступных дат. Поставьте слежение — напишем, как только что-то появится.',
+      uz: "Hozir hech qanday sana ko'rinmayapti. Kuzatish funksiyasini yoqing. Joy ochilishi bilan xabar yuboramiz.",
+      ru: 'Сейчас нет доступных дат. Поставьте слежение - напишем, как только что-то появится.',
       en: "No dates visible right now. Set a watch and we'll ping you the moment one opens.",
     },
 
-    // Date sheet — live fetch states (new)
+    // Date sheet - live fetch states (new)
     'hk.sheet.loading': {
       uz: 'HiKorea\'dan tekshirilmoqda…',
       ru: 'Проверяем HiKorea…',
       en: 'Checking HiKorea right now…',
     },
     'hk.sheet.fetchFail': {
-      uz: 'HiKorea\'ga ulanib bo\'lmadi. Bir lahzadan keyin urinib ko\'ring.',
+      uz: 'HiKorea\'ga ulanib bo\'lmadi. Bir ozdan keyin urinib ko\'ring.',
       ru: 'Не удалось связаться с HiKorea. Попробуйте через минуту.',
       en: "Couldn't reach HiKorea just now. Try again in a moment.",
     },
     'hk.sheet.sessionExpired': {
-      uz: 'HiKorea seansimiz yangilanishi kerak — administratorga xabar berildi. Bir lahzadan keyin urinib ko\'ring.',
-      ru: 'Сессия HiKorea просрочена — администратор уведомлён. Попробуйте через минуту.',
-      en: "Our HiKorea login needs refreshing — the admin has been notified. Try again in a moment.",
+      uz: 'HiKorea seansimiz yangilanishi kerak - administratorga xabar berildi. Bir muddatdan keyin urinib ko\'ring.',
+      ru: 'Сессия HiKorea просрочена - администратор уведомлён. Попробуйте через минуту.',
+      en: "Our HiKorea login needs refreshing - the admin has been notified. Try again in a moment.",
     },
     'hk.sheet.closed': {
-      uz: 'Bu kuni idora yopiq',
+      uz: 'Bu kunda ofis ishlamaydi',
       ru: 'Офис в этот день закрыт',
       en: 'Office closed this day',
     },
@@ -857,14 +858,14 @@ const I18N = {
       en: 'Fully booked',
     },
     'hk.sheet.lastOne': {
-      uz: 'Faqat 1 ta joy — ulgurish kerak!',
-      ru: 'Только 1 место — успейте!',
-      en: 'Just 1 slot left — grab it!',
+      uz: 'Faqat 1 ta joy - shoshiling',
+      ru: 'Только 1 место - успейте!',
+      en: 'Just 1 slot left - grab it!',
     },
     'hk.sheet.fewLeft': {
-      uz: 'ta joy — ulguring!',
-      ru: 'мест — поспешите!',
-      en: 'slots left — hurry!',
+      uz: 'ta joy - shoshiling',
+      ru: 'мест - поспешите!',
+      en: 'slots left - hurry!',
     },
     'hk.sheet.slotsLeft': {
       uz: 'ta joy qoldi',
@@ -878,25 +879,25 @@ const I18N = {
     },
 
     // SUCCESS
-    'hk.success.title': { uz: 'Hammasi tayyor', ru: 'Готово!',           en: "You're all set" },
+    'hk.success.title': { uz: 'Tayyor', ru: 'Готово!',           en: "You're all set" },
     'hk.success.text':  {
-      uz: "Tanlagan oralig'ingizda joy ochilishi bilan Telegram orqali xabar yuboramiz. Kuzatishlaringizni boshqarish uchun istalgan vaqtda qaytib keling.",
-      ru: 'Напишем в Telegram, как только в вашем диапазоне появится слот. В любой момент можете вернуться и управлять слежениями.',
-      en: "We'll send you a Telegram message the moment a slot opens in your range. You can come back any time to manage your watches.",
+      uz: "Tanlagan oralig'ingizda joy ochilishi bilan Telegram orqali xabar yuboramiz. Kuzatishlaringizni boshqarish uchun quyidagi tugmani bosing.",
+      ru: 'Напишем в Telegram, как только в вашем диапазоне появится слот. Нажмите кнопку ниже, чтобы управлять своими слежениями.',
+      en: "We'll send you a Telegram message the moment a slot opens in your range. Click the button below to manage your watches.",
     },
     'hk.success.ok': { uz: 'Kuzatishlarimni ko\'rish', ru: 'Мои слежения', en: 'See my watches' },
 
     // MY WATCHES
     'hk.watches.title': { uz: 'Faol kuzatishlar', ru: 'Активные слежения', en: 'Your active watches' },
     'hk.watches.lede': {
-      uz: "Quyidagi sana oraliqlarini kuzatib turamiz. Joy ochilishi bilan Telegram'ga yozamiz.",
-      ru: 'Следим за этими датами. Напишем в Telegram, как только появится слот.',
-      en: "We're keeping an eye on these date ranges. We'll message you on Telegram the moment a slot opens.",
+      uz: "Quyidagi sana oraliqlarini kuzatib turilmoqda. Joy ochilishi bilan Telegram orqali xabar beriladi.",
+      ru: 'Отслеживаются следующие временные рамки. Уведомления будут отправлены через Telegram, как только появится свободное время.',
+      en: "The following date ranges are being monitored. Notifications will be sent via Telegram as soon as a slot becomes available.",
       
     },
     'hk.watches.emptyTitle': { uz: "Hali kuzatish yo'q",  ru: 'Пока ничего',          en: 'No watches yet' },
     'hk.watches.emptySub': {
-      uz: 'Idorani tanlab, birinchi kuzatishingizni o\'rnating.',
+      uz: 'Immigratsiya ofisini tanlab, birinchi kuzatishingizni o\'rnating.',
       ru: 'Выберите офис и поставьте первое слежение.',
       en: 'Pick an office and set your first one.',
     },
@@ -904,14 +905,14 @@ const I18N = {
     'hk.watches.stopped': { uz: "To'xtatildi", ru: 'Остановлено', en: 'Watch stopped' },
 
     // ERRORS
-    'hk.err.offices':   { uz: "Idoralarni yuklay olmadik — qayta urinib ko'ring", ru: 'Не смогли загрузить офисы — попробуйте ещё', en: "Couldn't load offices — try again" },
-    'hk.err.resolve':   { uz: "Idorani topa olmadik — qayta urinib ko'ring",     ru: 'Не смогли найти офис — попробуйте ещё',     en: "Couldn't look up office — try again" },
-    'hk.err.slots':     { uz: "Bu oynaning kalendarini yuklay olmadik. Bir lahzadan keyin urinib ko'ring.", ru: 'Не смогли загрузить календарь окна. Попробуйте через минуту.', en: "Couldn't load this counter's calendar. Try again in a moment." },
-    'hk.err.watches':   { uz: "Kuzatishlaringizni yuklay olmadik", ru: 'Не смогли загрузить ваши слежения', en: "Couldn't load your watches" },
-    'hk.err.cancel':    { uz: "Kuzatishni to'xtatib bo'lmadi",    ru: 'Не удалось остановить',              en: "Couldn't stop the watch — try again" },
-    'hk.err.create':    { uz: "Kuzatishni yarata olmadik — qayta urinib ko'ring", ru: 'Не смогли создать — попробуйте ещё', en: "Couldn't create the watch — try again" },
+    'hk.err.offices':   { uz: "Ofislarni yuklashda xatolik - qayta urinib ko'ring", ru: 'Ошибка загрузки офисы — пожалуйста, попробуйте еще раз.', en: "Couldn't load offices - please try again" },
+    'hk.err.resolve':   { uz: "Ofisni topa olmadik - qayta urinib ko'ring",     ru: 'Не смогли найти офис - попробуйте ещё',     en: "Couldn't look up office - try again" },
+    'hk.err.slots':     { uz: "Bu bo\'lim kalendarini yuklanmadi. Bir ozdan keyin urinib ko'ring.", ru: 'Не смогли загрузить календарь окна. Попробуйте через минуту.', en: "Couldn't load this counter's calendar. Try again in a moment." },
+    'hk.err.watches':   { uz: "Kuzatishlaringizni yuklashda xatolik", ru: 'Не смогли загрузить ваши слежения', en: "Couldn't load your watches" },
+    'hk.err.cancel':    { uz: "Kuzatishni to'xtatib bo'lmadi",    ru: 'Не удалось остановить',              en: "Couldn't stop the watch - try again" },
+    'hk.err.create':    { uz: "Kuzatish yaratishda xatolik - qayta urinib ko'ring", ru: 'Не смогли создать - попробуйте ещё', en: "Couldn't create the watch - try again" },
     'hk.err.dup':       { uz: 'Bunday kuzatish allaqachon bor',   ru: 'Такое слежение уже есть',          en: "You've already set this watch" },
-    'hk.err.max':       { uz: "Maksimal 10 ta — bittasini to'xtating", ru: 'Максимум 10 — остановите одно', en: "You've hit the limit (10). Cancel one first." },
+    'hk.err.max':       { uz: "Maksimal 10 ta - bittasini to'xtating", ru: 'Максимум 10 - остановите одно', en: "You've hit the limit (10). Cancel one first." },
     'hk.err.input':     { uz: 'Sanalarni tekshiring',              ru: 'Проверьте даты',                    en: 'Check your dates' },
     'hk.err.pickDates': { uz: "Sana tanlang",                      ru: 'Выберите даты',                    en: 'Pick a start and end date' },
     'hk.err.noUser':    { uz: 'Bu sahifani Telegram bot orqali oching.', ru: 'Откройте эту страницу через Telegram-бота.', en: 'Open this page from the Telegram bot first.' },
@@ -935,10 +936,10 @@ const I18N = {
     },
 
     'hk.sheet.leftOne': {
-      uz: "qoldi",  ru: 'осталось', en: 'left',
+      uz: "ta qoldi",  ru: 'осталось', en: 'left',
     },
     'hk.sheet.leftMany': {
-      uz: "qoldi",  ru: 'осталось', en: 'left',
+      uz: "ta qoldi",  ru: 'осталось', en: 'left',
     },
     'hk.sheet.slotFull': {
       uz: "Band",   ru: 'Занято',   en: 'Full',
@@ -957,11 +958,11 @@ const I18N = {
     'hk.sheet.afternoon': { uz: '🌇 Tushdan keyin', ru: '🌇 День',    en: '🌇 Afternoon' },
 
     // Sheet progress meta
-    'hk.sheet.booked':    { uz: 'band',  ru: 'занято', en: 'booked' },
-    'hk.sheet.openLabel': { uz: "bo'sh", ru: 'свободно', en: 'open' },
+    'hk.sheet.booked':    { uz: 'ta band',  ru: 'занято', en: 'booked' },
+    'hk.sheet.openLabel': { uz: "ta bo'sh", ru: 'свободно', en: 'open' },
     
 
-    // Success overlay — test notification
+    // Success overlay - test notification
     'hk.success.testBtn': {
       uz: '📨 Sinov xabarini yuborish',
       ru: '📨 Отправить тестовое уведомление',
@@ -1006,7 +1007,7 @@ const I18N = {
     'hk.month.11': { uz: 'Noyabr',   ru: 'Ноябрь',   en: 'November'  },
     'hk.month.12': { uz: 'Dekabr',   ru: 'Декабрь',  en: 'December'  },
     'hk.summary.earliestLabel': {
-      uz: 'Eng erta joy bor', ru: 'Ближайший слот', en: 'Earliest opening',
+      uz: 'Bron qilish uchun eng erta joy bor sana:', ru: 'Ближайший слот', en: 'Earliest opening',
     },
 
     'hk.summary.allFull': {
@@ -1015,13 +1016,13 @@ const I18N = {
       en: 'Everything is fully booked',
     },
     'hk.summary.setWatch': {
-      uz: "Kuzatish o'rnating — joy ochilishi bilan xabar yuboramiz.",
-      ru: 'Поставьте слежение — напишем, как только освободится.',
-      en: "Set a watch — we'll ping you when a slot opens.",
+      uz: "Kuzatish o'rnating - joy ochilishi bilan xabar yuboramiz.",
+      ru: 'Поставьте слежение - напишем, как только освободится.',
+      en: "Set a watch - we'll ping you when a slot opens.",
     },
     'hk.watch.tapPick': { uz: 'Sanani tanlang', ru: 'Выберите дату', en: 'Tap to pick' },
-    'hk.cal.pullToRefresh':    { uz: 'Yangilash uchun torting',   ru: 'Потяните для обновления', en: 'Pull to refresh' },
-    'hk.cal.releaseToRefresh': { uz: 'Yangilash uchun qo\'yvoring', ru: 'Отпустите для обновления', en: 'Release to refresh' },
+    'hk.cal.pullToRefresh':    { uz: 'Yangilash',   ru: 'Oбновления', en: 'Refresh' },
+    'hk.cal.releaseToRefresh': { uz: 'Yangilash', ru: 'Oбновления', en: 'Refresh'},
     'hk.cal.refreshing':       { uz: 'Yangilanmoqda…',            ru: 'Обновление…',             en: 'Refreshing…' },
   },
 
