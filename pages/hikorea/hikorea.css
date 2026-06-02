@@ -24,6 +24,8 @@ body {
 
 .hk-container {
   flex: 1;
+  position: relative;       /* anchor for absolutely-positioned children
+                                like the pull-to-refresh indicator */
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -1837,17 +1839,90 @@ body {
    covered by the pill. */
 #section-calendar { padding-bottom: 90px; }
 
-/* Move legend below months as a fine-print footer (set in HTML, but
-   tighten the look here). */
-#section-calendar .hk-legend {
-  margin-top: 8px;
-  margin-bottom: 0;
-  font-size: 0.74rem;
-  opacity: 0.9;
-}
-
 /* Sheet headline pill: slightly larger, more breathing room */
 .hk-sheet-stat .pill-num {
   padding: 5px 14px;
   font-size: 1rem;
+}
+
+/* =====================================================================
+   v12: pull-to-refresh indicator
+   ===================================================================== */
+
+.hk-pull-indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0d9488;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.18);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  white-space: nowrap;
+}
+.hk-pull-indicator.visible { opacity: 1; }
+
+.hk-pull-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #d1d5db;
+  border-top-color: #0d9488;
+  border-radius: 50%;
+}
+.hk-pull-indicator.refreshing .hk-pull-spinner {
+  animation: hkSpin 0.7s linear infinite;
+}
+
+.hk-pull-arrow {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 800;
+  transition: transform 0.18s ease;
+}
+.hk-pull-indicator.armed .hk-pull-arrow {
+  transform: rotate(180deg);
+}
+.hk-pull-indicator.refreshing .hk-pull-arrow,
+.hk-pull-indicator.refreshing .hk-pull-text,
+.hk-pull-indicator.refreshing .hk-pull-text-armed { display: none; }
+.hk-pull-indicator.refreshing .hk-pull-spinner    { display: inline-block; }
+
+.hk-pull-indicator .hk-pull-spinner            { display: none; }
+.hk-pull-indicator .hk-pull-arrow              { display: inline-block; }
+.hk-pull-indicator .hk-pull-text               { display: inline; }
+.hk-pull-indicator .hk-pull-text-armed         { display: none; }
+.hk-pull-indicator .hk-pull-text-loading       { display: none; }
+
+.hk-pull-indicator.armed:not(.refreshing) .hk-pull-text       { display: none; }
+.hk-pull-indicator.armed:not(.refreshing) .hk-pull-text-armed { display: inline; }
+
+.hk-pull-indicator.refreshing .hk-pull-text-loading { display: inline; }
+
+.night-mode .hk-pull-indicator {
+  background: #1e1e1e;
+  border-color: rgba(94, 234, 212, 0.3);
+  color: #5eead4;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.night-mode .hk-pull-spinner {
+  border-color: #3a3a3a;
+  border-top-color: #5eead4;
+}
+
+/* Wider DoW headers to accommodate 3-4 char native labels */
+.hk-cal-dow-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
 }

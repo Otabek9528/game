@@ -979,13 +979,13 @@ const I18N = {
       ru: 'Не удалось отправить. Запустите бота в Telegram и попробуйте снова.',
       en: "Couldn't send. Make sure you've started the bot in Telegram, then try again.",
     },
-    'hk.dow.mon': { uz: 'Dush', ru: 'Пон', en: 'Mon' },
-    'hk.dow.tue': { uz: 'Sesh', ru: 'Втр', en: 'Tue' },
-    'hk.dow.wed': { uz: 'Chor', ru: 'Срд', en: 'Wed' },
-    'hk.dow.thu': { uz: 'Pay',  ru: 'Чтв', en: 'Thu' },
-    'hk.dow.fri': { uz: 'Juma', ru: 'Птн', en: 'Fri' },
-    'hk.dow.sat': { uz: 'Shan', ru: 'Сбт', en: 'Sat' },
-    'hk.dow.sun': { uz: 'Yak',  ru: 'Вск', en: 'Sun' },
+    'hk.dow.mon': { uz: 'Du', ru: 'Пн', en: 'Mo' },
+    'hk.dow.tue': { uz: 'Se', ru: 'Вт', en: 'Tu' },
+    'hk.dow.wed': { uz: 'Ch', ru: 'Ср', en: 'We' },
+    'hk.dow.thu': { uz: 'Pa', ru: 'Чт', en: 'Th' },
+    'hk.dow.fri': { uz: 'Ju', ru: 'Пт', en: 'Fr' },
+    'hk.dow.sat': { uz: 'Sh', ru: 'Сб', en: 'Sa' },
+    'hk.dow.sun': { uz: 'Ya', ru: 'Вс', en: 'Su' },
     'hk.dowFull.mon': { uz: 'Dushanba',  ru: 'Понедельник', en: 'Monday' },
     'hk.dowFull.tue': { uz: 'Seshanba',  ru: 'Вторник',     en: 'Tuesday' },
     'hk.dowFull.wed': { uz: 'Chorshanba',ru: 'Среда',       en: 'Wednesday' },
@@ -1008,7 +1008,11 @@ const I18N = {
     'hk.summary.earliestLabel': {
       uz: 'Eng erta joy bor', ru: 'Ближайший слот', en: 'Earliest opening',
     },
-
+    'hk.summary.bookableDays': {
+      uz: "kun band qilish mumkin",
+      ru: 'дней доступно для записи',
+      en: 'bookable days in your window',
+    },
     'hk.summary.allFull': {
       uz: "Hozir hamma sana to'la",
       ru: 'Сейчас всё занято',
@@ -1020,9 +1024,6 @@ const I18N = {
       en: "Set a watch — we'll ping you when a slot opens.",
     },
     'hk.watch.tapPick': { uz: 'Sanani tanlang', ru: 'Выберите дату', en: 'Tap to pick' },
-    'hk.cal.pullToRefresh':    { uz: 'Yangilash uchun torting',   ru: 'Потяните для обновления', en: 'Pull to refresh' },
-    'hk.cal.releaseToRefresh': { uz: 'Yangilash uchun qo\'yvoring', ru: 'Отпустите для обновления', en: 'Release to refresh' },
-    'hk.cal.refreshing':       { uz: 'Yangilanmoqda…',            ru: 'Обновление…',             en: 'Refreshing…' },
   },
 
   init() {

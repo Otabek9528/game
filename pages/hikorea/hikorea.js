@@ -216,7 +216,13 @@
     if (!opts.silent && state.navStack[state.navStack.length - 1] !== name) {
       state.navStack.push(name);
     }
-    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    // The scroll container is .hk-container (it has overflow-y: auto),
+    // not the window. Reset its scroll on every section change so the
+    // user lands at the top of each new screen.
+    const container = document.querySelector('.hk-container');
+    if (container) container.scrollTop = 0;
+    window.scrollTo(0, 0); // belt-and-suspenders for any cases where the
+                           // document itself is the scroller (rare here).
   }
 
   function handleBack() {
@@ -491,7 +497,14 @@
     $('calMonths').innerHTML = '<div class="hk-skeleton-cal"></div>';
     $('calMeta').innerHTML = '';
     showSection('calendar');
+    await loadCalendarData();
+  }
 
+  async function loadCalendarData() {
+    const d = state.selectedDesk;
+    if (!d) return;
+    if (state.calendarLoading) return;
+    state.calendarLoading = true;
     try {
       const data = await api(`/desks/${d.desk_seq}/slots`);
       state.deskSlots = data;
@@ -499,7 +512,74 @@
     } catch (e) {
       $('calMonths').innerHTML = `
         <div class="hk-list-empty">${esc(t('hk.err.slots', "Couldn't load this counter's calendar. Try again in a moment."))}</div>`;
+    } finally {
+      state.calendarLoading = false;
     }
+  }
+
+  // -- Pull-to-refresh on calendar --
+  //
+  // When the user is at the top of the calendar's scroll container and
+  // drags downward, show a small indicator and fire loadCalendarData()
+  // on release. Standard mobile gesture, no library.
+  function setupPullToRefresh() {
+    const container = document.querySelector('.hk-container');
+    const indicator = $('pullIndicator');
+    if (!container || !indicator) return;
+
+    const THRESHOLD = 70;   // px drag distance that triggers a refresh
+    const MAX_PULL  = 120;  // visual cap on how far the indicator moves
+
+    let startY = 0;
+    let pulling = false;
+    let pulled  = 0;
+
+    container.addEventListener('touchstart', (e) => {
+      // Only engage on the calendar screen, at the very top of scroll.
+      if ($('section-calendar').hidden) return;
+      if (container.scrollTop > 0) return;
+      startY = e.touches[0].clientY;
+      pulling = true;
+      pulled  = 0;
+      indicator.classList.remove('refreshing', 'visible');
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+      if (!pulling) return;
+      const dy = e.touches[0].clientY - startY;
+      if (dy <= 0) {
+        // Pulled back up — cancel
+        pulled = 0;
+        indicator.style.transform = `translateY(-100%)`;
+        indicator.classList.remove('visible');
+        return;
+      }
+      pulled = Math.min(dy * 0.6, MAX_PULL); // dampen by 0.6 for a natural feel
+      indicator.classList.add('visible');
+      indicator.style.transform = `translateY(${pulled - 40}px)`;
+      indicator.classList.toggle('armed', pulled >= THRESHOLD);
+    }, { passive: true });
+
+    container.addEventListener('touchend', () => {
+      if (!pulling) return;
+      pulling = false;
+      if (pulled >= THRESHOLD) {
+        indicator.classList.add('refreshing');
+        indicator.style.transform = `translateY(20px)`;
+        haptic('light');
+        loadCalendarData().finally(() => {
+          // Small delay so the spin is visible even on fast networks
+          setTimeout(() => {
+            indicator.classList.remove('visible', 'refreshing', 'armed');
+            indicator.style.transform = '';
+          }, 400);
+        });
+      } else {
+        // Snap back
+        indicator.classList.remove('visible', 'armed');
+        indicator.style.transform = '';
+      }
+    });
   }
 
   // ---------------------------------------------------------------------
@@ -612,11 +692,8 @@
           <div class="hk-summary-headline">
             <span class="hk-summary-headline-label">${esc(t('hk.summary.earliestLabel', 'Earliest opening'))}</span>
             <span class="hk-summary-headline-value">
-              ${esc(fmtDowShort(d))}, ${esc(fmtDayMonth(d))}
+              ${esc(fmtDowFull(d))}, ${esc(fmtDayMonth(d))}
             </span>
-          </div>
-          <div class="hk-summary-sub">
-            ${bookable.length} ${esc(t('hk.summary.bookableDays', 'bookable days in your window'))}
           </div>
         </div>`;
     } else {
@@ -637,11 +714,14 @@
   }
 
   function renderOneMonth(year, month0, slotMap, maxByDow, today) {
+    // Day-of-week header labels. Use full i18n value (no slice) — the
+    // i18n keys hold short native names (e.g. "Dush", "Sesh", "Chor") that
+    // are readable without being cryptic two-letter abbreviations.
     const dowsShort = [];
     const weekOrder = [1, 2, 3, 4, 5, 6, 0];
     for (const dow of weekOrder) {
       const sample = new Date(2024, 0, dow === 0 ? 7 : dow);
-      dowsShort.push(sample.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2));
+      dowsShort.push(fmtDowShort(sample));
     }
 
     const firstOfMonth = new Date(year, month0, 1);
@@ -1174,6 +1254,7 @@
     applyTranslations();
     bindSheet();
     bindWatchSetup();
+    setupPullToRefresh();
 
     $('officeSearch').addEventListener('input', (e) => {
       renderOfficeList(e.target.value);
