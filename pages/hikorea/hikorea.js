@@ -1121,6 +1121,7 @@
         body: {
           telegram_user_id:  state.user.id,
           telegram_username: state.user.username,
+          lang:              currentLang(),
         },
       });
       haptic('ok');
@@ -1160,6 +1161,7 @@
           desk_seq:          state.selectedDesk.desk_seq,
           start_ymd:         startYmd,
           end_ymd:           endYmd,
+          lang:              currentLang(),
         },
       });
       haptic('ok');
