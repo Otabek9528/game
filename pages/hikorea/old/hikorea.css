@@ -24,6 +24,8 @@ body {
 
 .hk-container {
   flex: 1;
+  position: relative;       /* anchor for absolutely-positioned children
+                                like the pull-to-refresh indicator */
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -635,41 +637,58 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.hk-cal-day-mark {
-  font-size: 0.62rem;
-  font-weight: 700;
-  line-height: 1;
-  opacity: 0.78;
-  font-variant-numeric: tabular-nums;
+/* Tiny fill bar at the bottom of the cell showing approximate fullness */
+.hk-cal-fill {
+  position: absolute;
+  bottom: 5px;
+  left: 12%;
+  right: 12%;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.hk-cal-fill > span {
+  display: block;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 2px;
 }
 
 /* Cell variants */
-.hk-cal-cell.empty       { background: transparent; }     /* leading/trailing pad */
-.hk-cal-cell.past        { background: transparent; color: #d1d5db; }
-.hk-cal-cell.today       { box-shadow: inset 0 0 0 2px #0d9488; }
+.hk-cal-cell.empty  { background: transparent; }
+.hk-cal-cell.past   { background: transparent; color: #d1d5db; }
+.hk-cal-cell.today  { box-shadow: inset 0 0 0 2px #0d9488; }
 
-.hk-cal-cell.has-slots {
-  /* default for has-slots, overridden by .high/.med/.low */
-  background: #f0fdfa;
-  color: #134e4a;
-}
-
-.hk-c-high, .hk-cal-cell.high {
+/* 3 honest tiers + closed.
+   - empty   (no bookings yet)         -> bright green
+   - partial (some bookings, can book) -> amber/teal blend
+   - full    (taken == max for DoW)    -> coral, de-emphasized
+   - closed  (not in HiKorea window)   -> gray  */
+.hk-c-empty, .hk-cal-cell.tier-empty {
   background: linear-gradient(180deg, #6ee7b7 0%, #34d399 100%);
   color: #064e3b;
 }
-.hk-c-med, .hk-cal-cell.med {
+.hk-c-partial, .hk-cal-cell.tier-partial,
+.hk-cal-cell.tier-light, .hk-cal-cell.tier-half {
   background: linear-gradient(180deg, #fde68a 0%, #fbbf24 100%);
   color: #78350f;
 }
-.hk-c-low, .hk-cal-cell.low {
+.hk-c-full, .hk-cal-cell.tier-full {
   background: linear-gradient(180deg, #fca5a5 0%, #f87171 100%);
   color: #7f1d1d;
+  opacity: 0.65;
 }
-.hk-c-none, .hk-cal-cell.full {
+.hk-c-closed, .hk-cal-cell.closed {
   background: #f3f4f6;
   color: #9ca3af;
 }
+
+/* Fill-bar color per tier */
+.hk-cal-cell.tier-partial .hk-cal-fill > span,
+.hk-cal-cell.tier-light   .hk-cal-fill > span,
+.hk-cal-cell.tier-half    .hk-cal-fill > span { background: #b45309; }
+.hk-cal-cell.tier-full    .hk-cal-fill > span { background: #b91c1c; }
 
 /* Helper-message after the calendar when no slots at all */
 .hk-cal-cta-note {
@@ -722,33 +741,40 @@ body {
 
 .hk-quick-label,
 .hk-or-label {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin: 12px 4px 8px;
+  margin: 10px 4px 6px;
 }
 
-.hk-or-label { margin-top: 20px; }
+.hk-or-label { margin-top: 16px; }
 
 .hk-preset-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
 
 .hk-preset {
-  padding: 14px 12px;
+  padding: 11px 6px;
   border: 1.5px solid #e5e7eb;
   background: #fff;
-  border-radius: 12px;
-  font-size: 0.92rem;
+  border-radius: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #374151;
   cursor: pointer;
   transition: all 0.16s ease;
   font-family: inherit;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (max-width: 380px) {
+  .hk-preset-grid { grid-template-columns: repeat(2, 1fr); }
+  .hk-preset      { padding: 12px 6px; }
 }
 
 .hk-preset:hover { border-color: #0d9488; color: #134e4a; }
@@ -999,12 +1025,36 @@ body {
   background: #fff;
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
-  padding: 12px 22px 26px;
+  padding: 12px 0 0;            /* horizontal padding moves into inner sections */
   z-index: 100;
   box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.18);
   animation: hkSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   max-width: 560px;
   margin: 0 auto;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hk-sheet-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 22px;
+}
+
+.hk-sheet-head,
+.hk-sheet-actions {
+  flex-shrink: 0;
+  padding-left: 22px;
+  padding-right: 22px;
+}
+
+.hk-sheet-actions {
+  padding-top: 8px;
+  padding-bottom: 26px;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 @keyframes hkSlideUp {
@@ -1068,12 +1118,114 @@ body {
 .hk-sheet-stat.low   .pill-num { background: #fee2e2; color: #b91c1c; }
 .hk-sheet-stat.full  .pill-num { background: #f3f4f6; color: #6b7280; }
 
+/* Loading / error states for live HiKorea fetch */
+.hk-sheet-stat.loading,
+.hk-sheet-stat.error {
+  background: #f9fafb;
+}
+.hk-sheet-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: #4b5563;
+  font-weight: 600;
+}
+.hk-sheet-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #d1d5db;
+  border-top-color: #0d9488;
+  border-radius: 50%;
+  animation: hkSpin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes hkSpin {
+  to { transform: rotate(360deg); }
+}
+.hk-sheet-stat.error .hk-sheet-loading { color: #b45309; }
+
 .hk-sheet-stat-msg {
   display: block;
   margin-top: 6px;
   font-size: 0.85rem;
   color: #6b7280;
   font-weight: 500;
+}
+
+/* Per-time-slot grid inside the date sheet (live data) */
+.hk-sheet-times {
+  margin-top: 14px;
+  text-align: left;
+}
+.hk-sheet-times-head {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 4px 8px;
+}
+.hk-sheet-times-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+.hk-sheet-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid transparent;
+  transition: transform 0.12s ease;
+}
+.hk-sheet-time-row.high {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+.hk-sheet-time-row.partial {
+  background: #fefce8;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.hk-sheet-time-row.full {
+  background: #f9fafb;
+  border-color: transparent;
+  color: #9ca3af;
+}
+.hk-sheet-time-label { font-weight: 700; font-size: 0.92rem; }
+.hk-sheet-time-stat  { font-weight: 600; }
+
+/* Plain-language availability ("3 left" / "Full") */
+.hk-sheet-time-avail {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+.hk-sheet-time-avail strong {
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.hk-sheet-time-avail-suffix {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.85;
+  text-transform: lowercase;
+}
+.hk-sheet-time-avail.muted {
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
 }
 
 .hk-sheet-actions {
@@ -1282,20 +1434,24 @@ body {
 .night-mode .hk-cal-month-title { color: #5eead4; }
 .night-mode .hk-cal-dow-label { color: #6b7280; }
 .night-mode .hk-cal-cell.past { color: #4b5563; }
-.night-mode .hk-cal-cell.has-slots { background: rgba(94, 234, 212, 0.1); color: #ccfbf1; }
-.night-mode .hk-cal-cell.high {
+.night-mode .hk-cal-cell.tier-empty {
   background: linear-gradient(180deg, #047857 0%, #065f46 100%);
   color: #d1fae5;
 }
-.night-mode .hk-cal-cell.med {
+.night-mode .hk-cal-cell.tier-partial,
+.night-mode .hk-cal-cell.tier-light,
+.night-mode .hk-cal-cell.tier-half {
   background: linear-gradient(180deg, #b45309 0%, #92400e 100%);
   color: #fef3c7;
 }
-.night-mode .hk-cal-cell.low {
-  background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
-  color: #fee2e2;
+.night-mode .hk-cal-cell.tier-full {
+  background: linear-gradient(180deg, #7f1d1d 0%, #6b1818 100%);
+  color: #fecaca;
+  opacity: 0.55;
 }
-.night-mode .hk-cal-cell.full { background: #2a2a2a; color: #6b7280; }
+.night-mode .hk-cal-cell.closed { background: #2a2a2a; color: #6b7280; }
+.night-mode .hk-cal-fill { background: rgba(255, 255, 255, 0.08); }
+.night-mode .hk-cal-fill > span { background: rgba(255, 255, 255, 0.55); }
 
 .night-mode .hk-cal-cta-note {
   background: rgba(251, 191, 36, 0.08);
@@ -1354,6 +1510,10 @@ body {
 .night-mode .hk-empty-sub { color: #6b7280; }
 
 .night-mode .hk-sheet { background: #1e1e1e; }
+.night-mode .hk-sheet-actions {
+  background: #1e1e1e;
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
 .night-mode .hk-sheet-handle { background: #4b5563; }
 .night-mode .hk-sheet-day { color: #9ca3af; }
 .night-mode .hk-sheet-date { color: #5eead4; }
@@ -1365,6 +1525,26 @@ body {
 .night-mode .hk-sheet-stat.low  .pill-num { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
 .night-mode .hk-sheet-stat.full .pill-num { background: rgba(255, 255, 255, 0.05); color: #9ca3af; }
 .night-mode .hk-sheet-stat-msg { color: #9ca3af; }
+
+.night-mode .hk-sheet-loading { color: #d1d5db; }
+.night-mode .hk-sheet-spinner { border-color: #3a3a3a; border-top-color: #5eead4; }
+.night-mode .hk-sheet-stat.error .hk-sheet-loading { color: #fcd34d; }
+
+.night-mode .hk-sheet-times-head { color: #9ca3af; }
+.night-mode .hk-sheet-time-row.high {
+  background: rgba(34, 197, 94, 0.10);
+  border-color: rgba(110, 231, 183, 0.35);
+  color: #6ee7b7;
+}
+.night-mode .hk-sheet-time-row.partial {
+  background: rgba(245, 158, 11, 0.10);
+  border-color: rgba(253, 230, 138, 0.35);
+  color: #fcd34d;
+}
+.night-mode .hk-sheet-time-row.full {
+  background: rgba(255, 255, 255, 0.04);
+  color: #6b7280;
+}
 
 .night-mode .hk-overlay-card { background: #1e1e1e; }
 .night-mode .hk-overlay-title { color: #5eead4; }
@@ -1387,4 +1567,362 @@ body {
   .hk-cal-day-mark { font-size: 0.56rem; }
   .hk-preset-grid { grid-template-columns: 1fr; }
   .hk-range-inputs { grid-template-columns: 1fr; }
+}
+
+/* =====================================================================
+   ADDITIONS for v9 (summary banner, sheet progress, time groups,
+   test-notification button)
+   ===================================================================== */
+
+.hk-cal-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #6ee7b7;
+  border-radius: 14px;
+}
+.hk-cal-summary.muted {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fcd34d;
+}
+.hk-summary-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.hk-summary-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.hk-summary-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hk-summary-headline-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #047857;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.hk-cal-summary.muted .hk-summary-headline-label { color: #92400e; }
+.hk-summary-headline-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #064e3b;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.hk-cal-summary.muted .hk-summary-headline-value { color: #78350f; }
+.hk-summary-sub {
+  font-size: 0.82rem;
+  color: #047857;
+  font-weight: 600;
+}
+.hk-cal-summary.muted .hk-summary-sub { color: #92400e; }
+
+/* Sheet progress bar */
+.hk-sheet-progress { margin-top: 14px; }
+.hk-sheet-progress-bar {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.hk-sheet-progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hk-sheet-progress-fill.high { background: linear-gradient(90deg, #34d399, #10b981); }
+.hk-sheet-progress-fill.med  { background: linear-gradient(90deg, #fbbf24, #d97706); }
+.hk-sheet-progress-fill.low  { background: linear-gradient(90deg, #f87171, #dc2626); }
+.hk-sheet-progress-fill.full { background: #9ca3af; }
+.hk-sheet-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: #6b7280;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sheet morning/afternoon groups */
+.hk-sheet-time-group { margin-top: 14px; }
+.hk-sheet-time-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 4px 8px;
+}
+.hk-sheet-time-group-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #374151;
+}
+.hk-sheet-time-group-count {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #0d9488;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Time-row variants: rename `high` → `open` keep `partial`/`full` */
+.hk-sheet-time-row.open {
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  color: #047857;
+}
+
+/* Test-notification button (success overlay) */
+.hk-btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 18px;
+  margin-top: 10px;
+  border: 1.5px solid #0d9488;
+  border-radius: 12px;
+  background: #fff;
+  color: #0d9488;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  gap: 8px;
+}
+.hk-btn-secondary:hover:not(:disabled) {
+  background: #f0fdfa;
+  transform: translateY(-1px);
+}
+.hk-btn-secondary:disabled { cursor: default; opacity: 0.85; }
+.hk-btn-secondary.sent {
+  background: #ecfdf5;
+  border-color: #34d399;
+  color: #047857;
+}
+.hk-spinner-small {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #d1d5db;
+  border-top-color: #0d9488;
+  border-radius: 50%;
+  animation: hkSpin 0.7s linear infinite;
+}
+.hk-overlay-fineprint {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+
+/* Night-mode for v9 additions */
+.night-mode .hk-cal-summary {
+  background: #1e1e1e;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.night-mode .hk-summary-num { color: #5eead4; }
+.night-mode .hk-summary-label { color: #9ca3af; }
+.night-mode .hk-summary-divider { background: rgba(255, 255, 255, 0.08); }
+.night-mode .hk-sheet-progress-bar { background: rgba(255, 255, 255, 0.06); }
+.night-mode .hk-sheet-progress-meta { color: #9ca3af; }
+.night-mode .hk-sheet-time-group-label { color: #d1d5db; }
+.night-mode .hk-sheet-time-group-count { color: #5eead4; }
+.night-mode .hk-sheet-time-row.open {
+  background: rgba(34, 197, 94, 0.10);
+  border-color: rgba(110, 231, 183, 0.35);
+  color: #6ee7b7;
+}
+.night-mode .hk-btn-secondary {
+  background: #1e1e1e;
+  border-color: #5eead4;
+  color: #5eead4;
+}
+.night-mode .hk-btn-secondary:hover:not(:disabled) {
+  background: rgba(94, 234, 212, 0.08);
+}
+.night-mode .hk-btn-secondary.sent {
+  background: rgba(34, 197, 94, 0.10);
+  border-color: #6ee7b7;
+  color: #6ee7b7;
+}
+.night-mode .hk-overlay-fineprint { color: #6b7280; }
+
+/* =====================================================================
+   v10 additions: night-mode summary, date trigger (i18n date display)
+   ===================================================================== */
+
+.night-mode .hk-cal-summary {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.10) 0%, rgba(16, 185, 129, 0.06) 100%);
+  border-color: rgba(110, 231, 183, 0.35);
+}
+.night-mode .hk-cal-summary.muted {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.10) 0%, rgba(217, 119, 6, 0.06) 100%);
+  border-color: rgba(252, 211, 77, 0.4);
+}
+.night-mode .hk-summary-headline-label { color: #6ee7b7; }
+.night-mode .hk-cal-summary.muted .hk-summary-headline-label { color: #fcd34d; }
+.night-mode .hk-summary-headline-value { color: #d1fae5; }
+.night-mode .hk-cal-summary.muted .hk-summary-headline-value { color: #fde68a; }
+.night-mode .hk-summary-sub { color: #6ee7b7; }
+.night-mode .hk-cal-summary.muted .hk-summary-sub { color: #fcd34d; }
+
+/* Date trigger — friendly i18n date display replacing the OS mm/dd/yyyy.
+   The native <input type="date"> sits invisibly on top so taps still open
+   the platform-native picker. */
+.hk-date-wrap {
+  position: relative;
+}
+.hk-date-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 13px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.hk-date-trigger:hover  { border-color: #0d9488; }
+.hk-date-trigger:focus,
+.hk-date-trigger:active { outline: none; border-color: #0d9488; box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.12); }
+.hk-date-trigger-label { flex: 1; }
+.hk-date-trigger-icon  { font-size: 1rem; opacity: 0.7; flex-shrink: 0; }
+
+/* Native input becomes invisible but still receives showPicker() */
+.hk-date-wrap .hk-date-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;  /* trigger handles taps */
+  border: 0;
+}
+
+.night-mode .hk-date-trigger {
+  background: #1e1e1e;
+  border-color: #3a3a3a;
+  color: #e5e7eb;
+}
+.night-mode .hk-date-trigger:hover  { border-color: #5eead4; }
+.night-mode .hk-date-trigger:focus,
+.night-mode .hk-date-trigger:active { border-color: #5eead4; box-shadow: 0 0 0 4px rgba(94, 234, 212, 0.15); }
+
+/* =====================================================================
+   v11 polish: floating CTA spacing, watch pill translations
+   ===================================================================== */
+
+/* When the calendar's floating CTA is visible, reserve extra bottom space
+   in the scroll container so the last week of the bottom month isn't
+   covered by the pill. */
+#section-calendar { padding-bottom: 90px; }
+
+/* Sheet headline pill: slightly larger, more breathing room */
+.hk-sheet-stat .pill-num {
+  padding: 5px 14px;
+  font-size: 1rem;
+}
+
+/* =====================================================================
+   v12: pull-to-refresh indicator
+   ===================================================================== */
+
+.hk-pull-indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0d9488;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.18);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  white-space: nowrap;
+}
+.hk-pull-indicator.visible { opacity: 1; }
+
+.hk-pull-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #d1d5db;
+  border-top-color: #0d9488;
+  border-radius: 50%;
+}
+.hk-pull-indicator.refreshing .hk-pull-spinner {
+  animation: hkSpin 0.7s linear infinite;
+}
+
+.hk-pull-arrow {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 800;
+  transition: transform 0.18s ease;
+}
+.hk-pull-indicator.armed .hk-pull-arrow {
+  transform: rotate(180deg);
+}
+.hk-pull-indicator.refreshing .hk-pull-arrow,
+.hk-pull-indicator.refreshing .hk-pull-text,
+.hk-pull-indicator.refreshing .hk-pull-text-armed { display: none; }
+.hk-pull-indicator.refreshing .hk-pull-spinner    { display: inline-block; }
+
+.hk-pull-indicator .hk-pull-spinner            { display: none; }
+.hk-pull-indicator .hk-pull-arrow              { display: inline-block; }
+.hk-pull-indicator .hk-pull-text               { display: inline; }
+.hk-pull-indicator .hk-pull-text-armed         { display: none; }
+.hk-pull-indicator .hk-pull-text-loading       { display: none; }
+
+.hk-pull-indicator.armed:not(.refreshing) .hk-pull-text       { display: none; }
+.hk-pull-indicator.armed:not(.refreshing) .hk-pull-text-armed { display: inline; }
+
+.hk-pull-indicator.refreshing .hk-pull-text-loading { display: inline; }
+
+.night-mode .hk-pull-indicator {
+  background: #1e1e1e;
+  border-color: rgba(94, 234, 212, 0.3);
+  color: #5eead4;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.night-mode .hk-pull-spinner {
+  border-color: #3a3a3a;
+  border-top-color: #5eead4;
+}
+
+/* Wider DoW headers to accommodate 3-4 char native labels */
+.hk-cal-dow-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
 }

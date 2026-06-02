@@ -945,7 +945,7 @@ const I18N = {
       uz: "Band",   ru: 'Занято',   en: 'Full',
     },
     'hk.sheet.openOfTotal': {
-      uz: "bo'sh",   ru: 'свободно', en: 'open',
+      uz: "ta bo'sh",   ru: 'свободно', en: 'open',
     },
     'hk.sheet.allFull': {
       uz: "hammasi band",
@@ -1007,7 +1007,7 @@ const I18N = {
     'hk.month.11': { uz: 'Noyabr',   ru: 'Ноябрь',   en: 'November'  },
     'hk.month.12': { uz: 'Dekabr',   ru: 'Декабрь',  en: 'December'  },
     'hk.summary.earliestLabel': {
-      uz: 'Bron qilish uchun eng erta joy bor sana:', ru: 'Ближайший слот', en: 'Earliest opening',
+      uz: 'Bron qilish uchun eng erta joy:', ru: 'Ближайший слот:', en: 'Earliest opening:',
     },
 
     'hk.summary.allFull': {

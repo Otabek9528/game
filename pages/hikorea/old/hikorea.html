@@ -26,6 +26,15 @@
   <!-- ===== MAIN CONTAINER ===== -->
   <div class="hk-container">
 
+    <!-- Pull-to-refresh indicator (calendar only) -->
+    <div class="hk-pull-indicator" id="pullIndicator">
+      <span class="hk-pull-spinner"></span>
+      <span class="hk-pull-arrow">↓</span>
+      <span class="hk-pull-text" data-i18n="hk.cal.pullToRefresh">Pull to refresh</span>
+      <span class="hk-pull-text-armed" data-i18n="hk.cal.releaseToRefresh">Release to refresh</span>
+      <span class="hk-pull-text-loading" data-i18n="hk.cal.refreshing">Refreshing…</span>
+    </div>
+
     <!-- =================================================================
          SECTION: HOME (landing + office search)
          ================================================================= -->
@@ -196,16 +205,19 @@
 
       <div class="hk-meta-row" id="calMeta"></div>
 
-      <!-- Legend -->
+      <!-- At-a-glance summary -->
+      <div class="hk-cal-summary" id="calSummary" hidden></div>
+
+      <!-- Legend: 3 honest tiers -->
       <div class="hk-legend">
-        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-high"></span>
-          <span data-i18n="hk.cal.legHigh">Plenty</span></span>
-        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-med"></span>
-          <span data-i18n="hk.cal.legMed">Few</span></span>
-        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-low"></span>
-          <span data-i18n="hk.cal.legLow">Almost full</span></span>
-        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-none"></span>
-          <span data-i18n="hk.cal.legNone">Full / closed</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-empty"></span>
+          <span data-i18n="hk.cal.legEmpty">Wide open</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-partial"></span>
+          <span data-i18n="hk.cal.legPartial">Some bookings</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-full"></span>
+          <span data-i18n="hk.cal.legFull">Fully booked</span></span>
+        <span class="hk-legend-item"><span class="hk-legend-sw hk-c-closed"></span>
+          <span data-i18n="hk.cal.legClosed">Closed</span></span>
       </div>
 
       <!-- Calendar months are rendered here -->
@@ -257,14 +269,26 @@
       <!-- Or custom -->
       <p class="hk-or-label" data-i18n="hk.watch.orLabel">or pick specific dates</p>
       <div class="hk-range-inputs">
-        <label class="hk-field-label">
+        <div class="hk-field-label">
           <span data-i18n="hk.watch.fromLabel">From</span>
-          <input type="date" class="hk-date-input" id="watchStartDate" />
-        </label>
-        <label class="hk-field-label">
+          <div class="hk-date-wrap">
+            <button type="button" class="hk-date-trigger" data-target="watchStartDate">
+              <span class="hk-date-trigger-label" id="watchStartLabel">—</span>
+              <span class="hk-date-trigger-icon">📅</span>
+            </button>
+            <input type="date" class="hk-date-input" id="watchStartDate" />
+          </div>
+        </div>
+        <div class="hk-field-label">
           <span data-i18n="hk.watch.toLabel">To</span>
-          <input type="date" class="hk-date-input" id="watchEndDate" />
-        </label>
+          <div class="hk-date-wrap">
+            <button type="button" class="hk-date-trigger" data-target="watchEndDate">
+              <span class="hk-date-trigger-label" id="watchEndLabel">—</span>
+              <span class="hk-date-trigger-icon">📅</span>
+            </button>
+            <input type="date" class="hk-date-input" id="watchEndDate" />
+          </div>
+        </div>
       </div>
 
       <!-- Preview -->
@@ -280,28 +304,6 @@
       <button class="hk-btn-primary hk-btn-big" id="submitWatchBtn">
         <span data-i18n="hk.watch.createBtn">Start watching</span>
       </button>
-
-      <!-- "Already available" guardrail -->
-      <div class="hk-warn-card" id="availableWarn" hidden>
-        <div class="hk-warn-head">
-          <span class="hk-warn-icon">⏰</span>
-          <strong data-i18n="hk.watch.warnTitle">
-            Heads up — some dates are open right now
-          </strong>
-        </div>
-        <p class="hk-warn-text" data-i18n="hk.watch.warnText">
-          You might be able to book one of these today instead of waiting:
-        </p>
-        <div class="hk-warn-dates" id="availableWarnDates"></div>
-        <a href="https://www.hikorea.go.kr/" target="_blank" rel="noopener noreferrer"
-           class="hk-btn-primary hk-btn-warm">
-          <span data-i18n="hk.watch.bookNow">Go to HiKorea now →</span>
-        </a>
-        <button class="hk-btn-text" id="forceWatchBtn"
-                data-i18n="hk.watch.watchAnyway">
-          Still want a heads-up? Set the watch anyway
-        </button>
-      </div>
     </section>
 
     <!-- =================================================================
@@ -346,7 +348,9 @@
         <div class="hk-sheet-day" id="sheetDay">—</div>
         <div class="hk-sheet-date" id="sheetDate">—</div>
       </div>
-      <div class="hk-sheet-stat" id="sheetStat"></div>
+      <div class="hk-sheet-body">
+        <div class="hk-sheet-stat" id="sheetStat"></div>
+      </div>
       <div class="hk-sheet-actions">
         <a href="https://www.hikorea.go.kr/" target="_blank" rel="noopener noreferrer"
            class="hk-btn-primary" id="sheetBookBtn">
@@ -372,6 +376,12 @@
         </p>
         <button class="hk-btn-primary" id="successOkBtn"
                 data-i18n="hk.success.ok">See my watches</button>
+        <button class="hk-btn-secondary" id="testNotifBtn">
+          <span data-i18n="hk.success.testBtn">📨 Send me a test notification</span>
+        </button>
+        <p class="hk-overlay-fineprint" data-i18n="hk.success.testHint">
+          See exactly what a real alert will look like in Telegram.
+        </p>
       </div>
     </div>
 

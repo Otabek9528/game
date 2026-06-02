@@ -628,14 +628,42 @@
     }
     meta.innerHTML = chips.join('');
 
+    // Build slot lookup. HiKorea's monthResvDataJSONList only contains
+    // dates with at least one booking — so dates with zero bookings
+    // (wide open) are missing. Fill those in from the schedule data
+    // so the calendar reflects reality.
     const slotMap = {};
     (data.dates || []).forEach((row) => { slotMap[row.visi_ymd] = row; });
 
-    // Per-DoW capacity heuristic for the visible window
-    const maxByDow = computeMaxTakenByDow(data.dates);
+    const sched = data.schedule || null;
+    if (sched && sched.bookable_min_ymd && sched.bookable_max_ymd) {
+      const holidaySet = new Set(sched.holidays_ymd || []);
+      const activeSet  = new Set(sched.active_weekdays || []);
+      // Walk every day in [bookable_min, bookable_max] and mark as
+      // wide-open (taken=0) unless we already have a real entry,
+      // it's a holiday, or it's not an active weekday.
+      const start = ymdToDate(sched.bookable_min_ymd);
+      const end   = ymdToDate(sched.bookable_max_ymd);
+      const cursor = new Date(start);
+      while (cursor <= end) {
+        const ymd = dateToYmd(cursor);
+        if (!slotMap[ymd] && !holidaySet.has(ymd)) {
+          // date.getDay(): 0=Sun..6=Sat. Our schedule uses 0=Mon..6=Sun.
+          const jsDow = cursor.getDay();
+          const schedDow = (jsDow + 6) % 7;
+          if (activeSet.has(schedDow)) {
+            slotMap[ymd] = { visi_ymd: ymd, taken: 0, inferred: true };
+          }
+        }
+        cursor.setDate(cursor.getDate() + 1);
+      }
+    }
 
-    // Summary banner — at-a-glance numbers above the months
-    renderSummaryBanner(data.dates || [], maxByDow);
+    // Per-DoW capacity heuristic for the visible window
+    const maxByDow = computeMaxTakenByDow(Object.values(slotMap));
+
+    // Summary banner
+    renderSummaryBanner(Object.values(slotMap), maxByDow);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -650,7 +678,7 @@
       .map(([y, m]) => renderOneMonth(y, m, slotMap, maxByDow, today))
       .join('');
 
-    if (!(data.dates || []).length) {
+    if (!Object.keys(slotMap).length) {
       const note = document.createElement('div');
       note.className = 'hk-cal-cta-note';
       note.innerHTML = `🌙 ${esc(t('hk.cal.allFullNote', "No dates visible right now. Set a watch and we'll ping you the moment one opens."))}`;
