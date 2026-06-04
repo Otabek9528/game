@@ -131,12 +131,12 @@
       qibla: { icon: '🕋', labelKey: 'feature.qibla', href: 'pages/qibla/qibla.html'}, 
       qna: { icon: '🌐', labelKey: 'feature.qna', href: 'pages/questions/qna.html'},
       barcode: { icon: '🧪', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html', isNew: true},  // ← NEW FEATURE
+      hikorea: {icon: '🛂',labelKey: 'feature.hikorea',href: 'pages/hikorea/hikorea.html',isNew: true},
       jobs: { icon: '💼', labelKey: 'feature.jobs', href: 'pages/job-group/job-group.html'},
       parcel: { icon: '📦', labelKey: 'feature.parcel', href: 'pages/parcel/parcel.html' },
       //vegukinShops: { icon: '🛒', labelKey: 'feature.vegukinShops', href: 'pages/vegukinshops/shops.html', isNew: true },
       links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
-      donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },
-      hikorea: {icon: '🛂',labelKey: 'feature.hikorea',href: 'pages/hikorea/hikorea.html',isNew: true},
+      donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },      
       //news: { icon: '📢', labelKey: 'feature.news', href: 'pages/questions/qna.html' },
       //events: { icon: '📅', labelKey: 'feature.events', href: '#', comingSoon: true },
       //market: { icon: '🛒', labelKey: 'feature.market', href: '#', comingSoon: true },
@@ -203,7 +203,7 @@
       if (!container) return;
       
       const availableFeatures = window.I18N ? I18N.getAvailableFeatures() : 
-        ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'vegukinShops', 'links', 'jobs', 'donation', 'barcode', 'community'];
+        ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'vegukinShops', 'links', 'jobs', 'donation', 'barcode', 'community', 'hikorea'];
       
       container.innerHTML = '';
       

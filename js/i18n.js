@@ -672,12 +672,12 @@ const I18N = {
 
     // HOME
     'hk.home.title': {
-      uz: 'Immigratsiya bilan uchrashuv vaqtini tanlang',
+      uz: 'Immigratsiyada joy bron qilish vaqtini tanlang',
       ru: 'Найдите время записи',
       en: 'Find your appointment slot',
     },
     'hk.home.lede': {
-      uz: 'Bot HiKorea websahifasini 24/7 kuzatib, sizga belgilagan vaqtingiz oralig\'ida joy ochilishi bilan Telegram orqali xabar yuboradi.',
+      uz: 'Bot HiKorea websaytini 24/7 kuzatib, belgilagan vaqtingiz oralig\'ida joy ochilishi bilan sizga Telegram orqali xabar yuboradi.',
       ru: 'Бот круглосуточно отслеживает сайт HiKorea и отправляет вам уведомление через Telegram, когда появляется свободное место в указанный вами период времени.',
       en: "Bot monitors the HiKorea website 24/7 and sends you a message via Telegram when a spot opens up during the time period you specify.",
     },
