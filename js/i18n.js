@@ -673,7 +673,7 @@ const I18N = {
 
     // HOME
     'hk.home.title': {
-      uz: 'Immigratsiyada joy bron qilish vaqtini tanlang',
+      uz: 'Immigratsiyada joy bron qilish',
       ru: 'Найдите время записи',
       en: 'Find your appointment slot',
     },
@@ -712,8 +712,8 @@ const I18N = {
       ru: 'Ничего не найдено. Попробуйте другое слово или нажмите "Найти по адресу" выше.',
       en: "No offices match. Try a different word, or use 'Find by address' above.",
     },
-    'hk.home.oneCounter':   { uz: '1 bo\'lim',  ru: '1 окно',  en: '1 counter'   },
-    'hk.home.manyCounters': { uz: 'bo\'lim',    ru: 'окон',     en: 'counters'   },
+    'hk.home.oneCounter':   { uz: '1 ta bo\'lim',  ru: '1 окно',  en: '1 counter'   },
+    'hk.home.manyCounters': { uz: 'ta bo\'lim',    ru: 'окон',     en: 'counters'   },
 
     // BY-ADDRESS
     'hk.address.title': {
