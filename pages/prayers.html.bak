@@ -405,8 +405,7 @@
         let label, commentText = '';
         if (r.type === 'faststart') {
           label = esc(tr('prayer.suhoor.label', 'Saharlik'));
-          //commentText = '\u00B7 ' + esc(tr('prayer.suhoor.hint', "Ro'za boshlanishi"));
-          commentText = '\u00B7 ';
+          commentText = '\u00B7 ' + esc(tr('prayer.suhoor.hint', "Ro'za boshlanishi"));
         } else {
           label = esc(name(r.key));
           if (r.comment) commentText = '(' + esc(tr(r.comment, '')) + ')';
