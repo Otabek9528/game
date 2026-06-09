@@ -75,6 +75,7 @@ const I18N = {
     
     'prayer.tab.today':    { uz: 'Bugun',  ru: 'Сегодня', en: 'Today' },
     'prayer.tab.tomorrow': { uz: 'Ertaga', ru: 'Завтра',  en: 'Tomorrow' },
+    'prayer.status.tomorrow': { uz: 'Ertaga', ru: 'Завтра', en: 'Tomorrow' },
 
     'prayer.advicePrayers': { 
       uz: 'Namozlar: Vaqt kirganidan <strong>10 daqiqa keyin</strong>',

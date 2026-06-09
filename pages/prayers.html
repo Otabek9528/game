@@ -305,7 +305,7 @@
         const timings = json && json.data && json.data.timings;
         if (timings) {
           tomorrowCache = { key: key, timings: timings };
-          if (activeTab === 'tomorrow') renderTimeline(timings, 'tomorrow');
+          if (activeTab === 'tomorrow') { renderTimeline(timings, 'tomorrow'); updateNaflLive(); }
           return timings;
         }
       } catch (e) { console.error('Tomorrow fetch failed:', e); }
@@ -323,6 +323,7 @@
         t.classList.toggle('active', t.dataset.tab === tab);
       });
       renderActiveTimeline();
+      updateNaflLive();
       if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.selectionChanged(); } catch (e) {} }
     }
 
@@ -530,9 +531,17 @@
       updateNaflLive();
     }
 
+    function activeNaflTimings() {
+      if (activeTab === 'tomorrow') {
+        return (tomorrowCache && tomorrowCache.key === tomorrowKey()) ? tomorrowCache.timings : null;
+      }
+      return latest ? latest.timings : null;
+    }
+
     function updateNaflLive() {
-      if (!latest) return;
-      const times = computeSunnah(latest.timings);
+      const T = activeNaflTimings();
+      const isToday = (activeTab === 'today');
+      const times = T ? computeSunnah(T) : { tahajjud: null, ishraq: null, duha: null };
       NAFL.forEach(function (n) {
         const w = times[n.id];
         const item = document.querySelector('.nafl-item[data-nafl="' + n.id + '"]');
@@ -542,15 +551,23 @@
         if (!item || !rangeEl || !statusEl) return;
 
         if (!w || w.start == null || w.end == null) {
-          rangeEl.textContent = '--:-- \u2014 --:--';
-          statusEl.textContent = '\u2014';
+          rangeEl.textContent = T ? '--:-- \u2014 --:--' : '\u2014';
+          statusEl.textContent = '';
           statusEl.className = 'nafl-status';
           item.classList.remove('active-window');
           return;
         }
         rangeEl.textContent = fmt(w.start) + ' \u2014 ' + fmt(w.end);
-        const st = windowStatus(w.start, w.end);
         statusEl.className = 'nafl-status';
+
+        if (!isToday) {
+          statusEl.textContent = tr('prayer.status.tomorrow', 'Ertaga');
+          statusEl.classList.add('s-upcoming');
+          item.classList.remove('active-window');
+          return;
+        }
+
+        const st = windowStatus(w.start, w.end);
         if (st.status === 'active') {
           statusEl.textContent = tr('prayer.status.activeNow', 'Ayni vaqti');
           statusEl.classList.add('s-active');
