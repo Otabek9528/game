@@ -59,10 +59,10 @@
 
     /* ---- timeline ---- */
     .pb-timeline { margin-top:16px; background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:18px; padding:8px 14px 8px 8px; }
-    .pb-row { display:grid; grid-template-columns:32px 1fr auto; align-items:center; column-gap:12px; min-height:60px; border-radius:14px; padding:0 6px; }
+    .pb-row { display:grid; grid-template-columns:32px 1fr auto; align-items:center; column-gap:12px; min-height:54px; border-radius:14px; padding:0 6px; }
     .pb-row.is-past { opacity:.5; }
-    .pb-row.is-boundary { opacity:.55; min-height:42px; }
-    .pb-row.is-faststart { opacity:.9; min-height:50px; }
+    .pb-row.is-boundary { opacity:.55; min-height:40px; }
+    .pb-row.is-faststart { opacity:.9; min-height:46px; }
     .pb-row.is-next { background:var(--pb-ems); }
     .pb-rail { position:relative; align-self:stretch; }
     .pb-line-top, .pb-line-bot { position:absolute; left:15px; width:2px; height:50%; }
@@ -71,20 +71,19 @@
     .pb-node.n-next { left:8px; width:15px; height:15px; background:var(--pb-em); border-color:var(--pb-em); box-shadow:0 0 0 4px rgba(15,110,86,0.18); }
     .pb-node.n-boundary { left:12px; width:8px; height:8px; background:var(--pb-faint); border:none; }
     .pb-node.n-fast { left:10px; background:var(--pb-band); border:none; }
-    .pb-cell { display:flex; align-items:center; gap:12px; min-width:0; }
-    .pb-emoji { font-size:27px; line-height:1; flex-shrink:0; }
-    .pb-row.is-boundary .pb-emoji { font-size:19px; }
-    .pb-row.is-faststart .pb-emoji { font-size:21px; }
-    .pb-namewrap { min-width:0; }
-    .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); }
+    .pb-cell { display:flex; align-items:center; gap:10px; min-width:0; }
+    .pb-emoji { width:30px; text-align:center; font-size:1.5rem; line-height:1; flex-shrink:0; }
+    .pb-row.is-boundary .pb-emoji { font-size:1.15rem; }
+    .pb-row.is-faststart .pb-emoji { font-size:1.2rem; }
+    .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); white-space:nowrap; flex-shrink:0; }
     .pb-row.is-next .pb-name { color:var(--pb-emd); }
-    .pb-row.is-boundary .pb-name { font-size:13px; font-weight:500; color:var(--pb-sub); }
+    .pb-row.is-boundary .pb-name { font-size:14px; font-weight:500; color:var(--pb-sub); }
     .pb-row.is-faststart .pb-name { font-size:15px; }
-    .pb-sub { display:block; font-size:12px; color:var(--pb-faint); margin-top:2px; }
+    .pb-comment { font-size:12px; color:var(--pb-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex-shrink:1; }
     .pb-time { font-size:21px; font-weight:600; color:var(--pb-ink); font-variant-numeric:tabular-nums; }
     .pb-row.is-next .pb-time { color:var(--pb-emd); }
     .pb-row.is-boundary .pb-time, .pb-row.is-faststart .pb-time { font-size:14px; font-weight:500; color:var(--pb-sub); }
-    .pb-chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; }
+    .pb-chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:0; vertical-align:middle; }
     .pb-chip.c-next { color:#fff; background:var(--pb-em); }
     .pb-chip.c-iftar { color:var(--pb-amb); background:var(--pb-ambs); }
 
@@ -260,7 +259,7 @@
       { key: 'Isha',    type: 'prayer',   comment: 'prayer.comment.isha' }
     ];
     const EMOJI = {
-      Imsak: '\u{1F963}', Fajr: '\u{1F305}', Sunrise: '\u{1F304}',
+      Imsak: '', Fajr: '\u{1F305}', Sunrise: '\u{1F304}',
       Dhuhr: '\u2600\uFE0F', Asr: '\u{1F324}\uFE0F', Maghrib: '\u{1F307}', Isha: '\u{1F319}'
     };
     const BAND = ['Imsak', 'Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib'];
@@ -324,18 +323,18 @@
         else if (r.type === 'faststart') node += ' n-fast';
         else if (isNext) node += ' n-next';
 
-        let label, sub = '';
+        let label, commentHtml = '';
         if (r.type === 'faststart') {
-          label = tr('prayer.suhoor.label', 'Saharlik');
-          sub = '<span class="pb-sub">' + esc(tr('prayer.suhoor.hint', "Ro'za boshlanishi")) + '</span>';
+          label = esc(tr('prayer.suhoor.label', 'Saharlik'));
+          commentHtml = '<span class="pb-comment">\u00B7 ' + esc(tr('prayer.suhoor.hint', "Ro'za boshlanishi")) + '</span>';
         } else {
           label = esc(name(r.key));
-          if (r.comment) sub = '<span class="pb-sub">(' + esc(tr(r.comment, '')) + ')</span>';
+          if (r.comment) commentHtml = '<span class="pb-comment">(' + esc(tr(r.comment, '')) + ')</span>';
         }
 
         let chips = '';
         if (isNext) chips += '<span class="pb-chip c-next" data-i18n="prayer.chip.next">keyingi</span>';
-        if (r.fastEnd) chips += '<span class="pb-chip c-iftar">\u{1F37D}\uFE0F ' + esc(tr('prayer.iftar.label', 'Iftorlik')) + '</span>';
+        if (r.fastEnd) chips += '<span class="pb-chip c-iftar">' + esc(tr('prayer.iftar.label', 'Iftorlik')) + '</span>';
 
         html +=
           '<div class="' + rowCls + '">' +
@@ -345,8 +344,8 @@
               '<div class="' + node + '"></div>' +
             '</div>' +
             '<div class="pb-cell">' +
-              '<span class="pb-emoji">' + (EMOJI[r.key] || '\u{1F54C}') + '</span>' +
-              '<div class="pb-namewrap"><span class="pb-name">' + label + chips + '</span>' + sub + '</div>' +
+              '<span class="pb-emoji">' + (EMOJI[r.key] || '') + '</span>' +
+              '<span class="pb-name">' + label + '</span>' + chips + commentHtml +
             '</div>' +
             '<div class="pb-time">' + esc(timeStr) + '</div>' +
           '</div>';
