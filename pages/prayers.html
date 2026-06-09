@@ -49,9 +49,13 @@
       color:var(--pb-emd); background:var(--pb-ems); padding:4px 11px; border-radius:999px;
       border:none; cursor:pointer; -webkit-tap-highlight-color:transparent;
     }
-    .pb-count-row { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
-    .pb-count { font-size:34px; font-weight:600; color:var(--pb-em); font-variant-numeric:tabular-nums; line-height:1.05; }
-    .pb-count-sub { font-size:14px; color:var(--pb-sub); }
+    .pb-next-line { display:flex; align-items:baseline; gap:7px; margin:6px 0 1px; }
+    .pb-next-name { font-size:21px; font-weight:600; color:var(--pb-emd); }
+    .pb-next-dot { color:var(--pb-faint); font-size:16px; }
+    .pb-next-time { font-size:17px; font-weight:500; color:var(--pb-sub); font-variant-numeric:tabular-nums; }
+    .pb-count-row { display:flex; align-items:baseline; gap:8px; }
+    .pb-count { font-size:36px; font-weight:600; color:var(--pb-em); font-variant-numeric:tabular-nums; line-height:1.05; }
+    .pb-count-label { font-size:13px; color:var(--pb-faint); }
     .pb-prog { height:5px; background:var(--pb-line); border-radius:999px; margin:13px 0 10px; position:relative; }
     .pb-prog-fill { position:absolute; left:0; top:0; height:100%; width:0; background:var(--pb-em); border-radius:999px; transition:width .9s linear; }
     .pb-prog-dot { position:absolute; top:50%; left:0; width:11px; height:11px; border-radius:50%; background:var(--pb-surface); border:2px solid var(--pb-em); transform:translate(-50%,-50%); transition:left .9s linear; }
@@ -59,10 +63,10 @@
 
     /* ---- timeline ---- */
     .pb-timeline { margin-top:16px; background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:18px; padding:8px 14px 8px 8px; }
-    .pb-row { display:grid; grid-template-columns:32px 1fr auto; align-items:center; column-gap:12px; min-height:54px; border-radius:14px; padding:0 6px; }
+    .pb-row { display:grid; grid-template-columns:32px 1fr auto; align-items:center; column-gap:12px; min-height:58px; border-radius:14px; padding:6px 6px; }
     .pb-row.is-past { opacity:.5; }
-    .pb-row.is-boundary { opacity:.55; min-height:40px; }
-    .pb-row.is-faststart { opacity:.9; min-height:46px; }
+    .pb-row.is-boundary { opacity:.55; min-height:50px; }
+    .pb-row.is-faststart { opacity:.9; min-height:52px; }
     .pb-row.is-next { background:var(--pb-ems); }
     .pb-rail { position:relative; align-self:stretch; }
     .pb-line-top, .pb-line-bot { position:absolute; left:15px; width:2px; height:50%; }
@@ -75,11 +79,13 @@
     .pb-emoji { width:30px; text-align:center; font-size:1.5rem; line-height:1; flex-shrink:0; }
     .pb-row.is-boundary .pb-emoji { font-size:1.15rem; }
     .pb-row.is-faststart .pb-emoji { font-size:1.2rem; }
-    .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); white-space:nowrap; flex-shrink:0; }
+    .pb-namewrap { display:flex; flex-direction:column; justify-content:center; gap:1px; min-width:0; }
+    .pb-name-line { display:flex; align-items:center; gap:7px; min-width:0; }
+    .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); white-space:nowrap; }
     .pb-row.is-next .pb-name { color:var(--pb-emd); }
     .pb-row.is-boundary .pb-name { font-size:14px; font-weight:500; color:var(--pb-sub); }
     .pb-row.is-faststart .pb-name { font-size:15px; }
-    .pb-comment { font-size:12px; color:var(--pb-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex-shrink:1; }
+    .pb-comment { display:block; min-height:15px; font-size:12px; line-height:1.25; color:var(--pb-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .pb-time { font-size:21px; font-weight:600; color:var(--pb-ink); font-variant-numeric:tabular-nums; }
     .pb-row.is-next .pb-time { color:var(--pb-emd); }
     .pb-row.is-boundary .pb-time, .pb-row.is-faststart .pb-time { font-size:14px; font-weight:500; color:var(--pb-sub); }
@@ -185,9 +191,14 @@
             <span id="methodSummaryText">MWL</span><span style="opacity:.5">·</span><span id="madhabSummaryText" data-i18n="prayer.schoolHanafi">Hanafiy</span>
           </button>
         </div>
+        <div class="pb-next-line">
+          <span class="pb-next-name" id="nextPrayerName">Yuklanmoqda...</span>
+          <span class="pb-next-dot">·</span>
+          <span class="pb-next-time" id="nextPrayerTime">--:--</span>
+        </div>
         <div class="pb-count-row">
           <span class="pb-count" id="countdown">--:--:--</span>
-          <span class="pb-count-sub"><span id="nextPrayerName">Yuklanmoqda...</span> · <span id="nextPrayerTime">--:--</span></span>
+          <span class="pb-count-label" data-i18n="prayer.remaining">qoldi</span>
         </div>
         <div class="pb-prog">
           <div class="pb-prog-fill" id="pbProgressFill"></div>
@@ -323,13 +334,13 @@
         else if (r.type === 'faststart') node += ' n-fast';
         else if (isNext) node += ' n-next';
 
-        let label, commentHtml = '';
+        let label, commentText = '';
         if (r.type === 'faststart') {
           label = esc(tr('prayer.suhoor.label', 'Saharlik'));
-          commentHtml = '<span class="pb-comment">\u00B7 ' + esc(tr('prayer.suhoor.hint', "Ro'za boshlanishi")) + '</span>';
+          commentText = '\u00B7 ' + esc(tr('prayer.suhoor.hint', "Ro'za boshlanishi"));
         } else {
           label = esc(name(r.key));
-          if (r.comment) commentHtml = '<span class="pb-comment">(' + esc(tr(r.comment, '')) + ')</span>';
+          if (r.comment) commentText = '(' + esc(tr(r.comment, '')) + ')';
         }
 
         let chips = '';
@@ -345,7 +356,10 @@
             '</div>' +
             '<div class="pb-cell">' +
               '<span class="pb-emoji">' + (EMOJI[r.key] || '') + '</span>' +
-              '<span class="pb-name">' + label + '</span>' + chips + commentHtml +
+              '<div class="pb-namewrap">' +
+                '<span class="pb-name-line"><span class="pb-name">' + label + '</span>' + chips + '</span>' +
+                '<span class="pb-comment">' + commentText + '</span>' +
+              '</div>' +
             '</div>' +
             '<div class="pb-time">' + esc(timeStr) + '</div>' +
           '</div>';
