@@ -64,6 +64,12 @@ const I18N = {
       ru: 'Ифтар: через <strong>5 минут после Магриба</strong>',
       en: 'Iftar: <strong>5 minutes after</strong> Maghrib'
     },
+    
+    'prayer.suhoor.label': { uz: 'Saharlik (oxiri)', ru: 'Сухур (конец)', en: 'Suhoor (ends)' },
+    'prayer.suhoor.hint':  { uz: "Ro'za boshlanishi", ru: 'Начало поста', en: 'Fast begins' },
+    'prayer.iftar.label':  { uz: 'Iftorlik', ru: 'Ифтар', en: 'Iftar' },
+    'prayer.iftar.hint':   { uz: "Ro'za ochilishi", ru: 'Разговение', en: 'Break fast' },
+
     'prayer.advicePrayers': { 
       uz: 'Namozlar: Vaqt kirganidan <strong>10 daqiqa keyin</strong>',
       ru: 'Намазы: через <strong>10 минут после</strong> наступления времени',

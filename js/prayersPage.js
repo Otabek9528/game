@@ -515,6 +515,56 @@ function initPrayersPage() {
 // MAIN PRAYER LIST
 // ============================================
 
+function createFastSatellite(type, timeStr) {
+  const div = document.createElement('div');
+  div.className = `fast-satellite fast-satellite--${type}`;
+  const isSuhoor = type === 'suhoor';
+  const emoji = isSuhoor ? '🥣' : '🍽️';
+  const label = isSuhoor ? t('prayer.suhoor.label', 'Saharlik (oxiri)') : t('prayer.iftar.label', 'Iftorlik');
+  const hint  = isSuhoor ? t('prayer.suhoor.hint', "Ro'za boshlanishi") : t('prayer.iftar.hint', "Ro'za ochilishi");
+  div.innerHTML = `
+    <span class="fast-left">
+      <span class="fast-emoji">${emoji}</span>
+      <span class="fast-label">${label}</span>
+      <span class="fast-hint">· ${hint}</span>
+    </span>
+    <span class="fast-time">${(timeStr || '--:--').split(' ')[0]}</span>`;
+  return div;
+}
+
+function buildPrayerItem(prayer, timings, currentPrayerName, prayerEmojis, prayerComments) {
+  const div = document.createElement('div');
+  div.className = 'prayer-item';
+  if (prayer === "Sunrise") div.classList.add('sunrise-marker');
+  if (prayer === currentPrayerName && prayer !== "Sunrise") div.classList.add('current-prayer');
+
+  const nameContainer = document.createElement('div');
+  nameContainer.className = 'prayer-name-container';
+  const emoji = document.createElement('span');
+  emoji.className = 'prayer-emoji';
+  emoji.textContent = prayerEmojis[prayer] || '🕌';
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'prayer-name-text';
+  nameSpan.textContent = window.translatePrayer ? window.translatePrayer(prayer) : prayer;
+  if (prayerComments[prayer]) {
+    const subtitle = document.createElement('span');
+    subtitle.className = 'prayer-subtitle';
+    subtitle.textContent = `(${prayerComments[prayer]})`;
+    nameSpan.appendChild(document.createElement('br'));
+    nameSpan.appendChild(subtitle);
+  }
+  nameContainer.appendChild(emoji);
+  nameContainer.appendChild(nameSpan);
+
+  const timeSpan = document.createElement('span');
+  timeSpan.className = 'prayer-time-text';
+  timeSpan.textContent = (timings[prayer] || '--:--').split(' ')[0];
+
+  div.appendChild(nameContainer);
+  div.appendChild(timeSpan);
+  return div;
+}
+
 function populateDetailedPrayerList(timings, currentPrayerName) {
   const prayerListElem = document.getElementById("prayerList");
   if (!prayerListElem) return;
@@ -536,43 +586,22 @@ function populateDetailedPrayerList(timings, currentPrayerName) {
   prayerListElem.innerHTML = '';
 
   prayerOrder.forEach(prayer => {
-    const div = document.createElement('div');
-    div.className = 'prayer-item';
-    if (prayer === "Sunrise") div.classList.add('sunrise-marker');
-    if (prayer === currentPrayerName && prayer !== "Sunrise") {
-      div.classList.add('current-prayer');
+    const item = buildPrayerItem(prayer, timings, currentPrayerName, prayerEmojis, prayerComments);
+    if (prayer === "Fajr") {
+      const group = document.createElement('div');
+      group.className = 'prayer-group';
+      group.appendChild(createFastSatellite('suhoor', timings.Imsak));
+      group.appendChild(item);
+      prayerListElem.appendChild(group);
+    } else if (prayer === "Maghrib") {
+      const group = document.createElement('div');
+      group.className = 'prayer-group';
+      group.appendChild(item);
+      group.appendChild(createFastSatellite('iftar', timings.Maghrib));
+      prayerListElem.appendChild(group);
+    } else {
+      prayerListElem.appendChild(item);
     }
-
-    const nameContainer = document.createElement('div');
-    nameContainer.className = 'prayer-name-container';
-
-    const emoji = document.createElement('span');
-    emoji.className = 'prayer-emoji';
-    emoji.textContent = prayerEmojis[prayer] || '🕌';
-
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'prayer-name-text';
-    const translatedName = window.translatePrayer ? window.translatePrayer(prayer) : prayer;
-    nameSpan.textContent = translatedName;
-
-    if (prayerComments[prayer]) {
-      const subtitle = document.createElement('span');
-      subtitle.className = 'prayer-subtitle';
-      subtitle.textContent = `(${prayerComments[prayer]})`;
-      nameSpan.appendChild(document.createElement('br'));
-      nameSpan.appendChild(subtitle);
-    }
-
-    nameContainer.appendChild(emoji);
-    nameContainer.appendChild(nameSpan);
-
-    const timeSpan = document.createElement('span');
-    timeSpan.className = 'prayer-time-text';
-    timeSpan.textContent = (timings[prayer] || '--:--').split(' ')[0];
-
-    div.appendChild(nameContainer);
-    div.appendChild(timeSpan);
-    prayerListElem.appendChild(div);
   });
 }
 
