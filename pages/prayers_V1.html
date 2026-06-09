@@ -58,35 +58,35 @@
     .pb-date { font-size:12px; color:var(--pb-faint); }
 
     /* ---- timeline ---- */
-    .pb-timeline { margin-top:16px; background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:18px; padding:8px 14px 8px 8px; }
-    .pb-row { display:grid; grid-template-columns:32px 1fr auto; align-items:center; column-gap:12px; min-height:60px; border-radius:14px; padding:0 6px; }
+    .pb-timeline { margin-top:16px; background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:18px; padding:6px 12px 6px 8px; }
+    .pb-row { display:grid; grid-template-columns:30px 1fr auto; align-items:center; column-gap:10px; min-height:46px; border-radius:12px; padding:0 4px; }
     .pb-row.is-past { opacity:.5; }
-    .pb-row.is-boundary { opacity:.55; min-height:42px; }
-    .pb-row.is-faststart { opacity:.9; min-height:50px; }
+    .pb-row.is-boundary { opacity:.55; min-height:38px; }
+    .pb-row.is-faststart { opacity:.85; min-height:42px; }
     .pb-row.is-next { background:var(--pb-ems); }
     .pb-rail { position:relative; align-self:stretch; }
-    .pb-line-top, .pb-line-bot { position:absolute; left:15px; width:2px; height:50%; }
+    .pb-line-top, .pb-line-bot { position:absolute; left:14px; width:2px; height:50%; }
     .pb-line-top { top:0; } .pb-line-bot { bottom:0; }
-    .pb-node { position:absolute; top:50%; left:10px; transform:translateY(-50%); width:12px; height:12px; border-radius:50%; background:var(--pb-surface); border:2px solid var(--pb-em); }
-    .pb-node.n-next { left:8px; width:15px; height:15px; background:var(--pb-em); border-color:var(--pb-em); box-shadow:0 0 0 4px rgba(15,110,86,0.18); }
-    .pb-node.n-boundary { left:12px; width:8px; height:8px; background:var(--pb-faint); border:none; }
-    .pb-node.n-fast { left:10px; background:var(--pb-band); border:none; }
-    .pb-cell { display:flex; align-items:center; gap:12px; min-width:0; }
-    .pb-emoji { font-size:27px; line-height:1; flex-shrink:0; }
-    .pb-row.is-boundary .pb-emoji { font-size:19px; }
-    .pb-row.is-faststart .pb-emoji { font-size:21px; }
+    .pb-node { position:absolute; top:50%; left:9px; transform:translateY(-50%); width:11px; height:11px; border-radius:50%; background:var(--pb-surface); border:2px solid var(--pb-em); }
+    .pb-node.n-next { left:8px; width:13px; height:13px; background:var(--pb-em); border-color:var(--pb-em); box-shadow:0 0 0 4px rgba(15,110,86,0.18); }
+    .pb-node.n-boundary { left:11px; width:7px; height:7px; background:var(--pb-faint); border:none; }
+    .pb-node.n-fast { left:9px; background:var(--pb-band); border:none; }
+    .pb-cell { display:flex; align-items:center; gap:9px; min-width:0; }
+    .pb-cell > i { font-size:18px; color:var(--pb-em); flex-shrink:0; }
+    .pb-row.is-boundary .pb-cell > i, .pb-row.is-faststart .pb-cell > i { color:var(--pb-amb); }
     .pb-namewrap { min-width:0; }
-    .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); }
+    .pb-name { font-size:15px; font-weight:600; color:var(--pb-ink); }
     .pb-row.is-next .pb-name { color:var(--pb-emd); }
     .pb-row.is-boundary .pb-name { font-size:13px; font-weight:500; color:var(--pb-sub); }
-    .pb-row.is-faststart .pb-name { font-size:15px; }
-    .pb-sub { display:block; font-size:12px; color:var(--pb-faint); margin-top:2px; }
-    .pb-time { font-size:21px; font-weight:600; color:var(--pb-ink); font-variant-numeric:tabular-nums; }
+    .pb-row.is-faststart .pb-name { font-size:14px; }
+    .pb-sub { display:block; font-size:11px; color:var(--pb-faint); margin-top:1px; }
+    .pb-time { font-size:15px; font-weight:600; color:var(--pb-ink); font-variant-numeric:tabular-nums; }
     .pb-row.is-next .pb-time { color:var(--pb-emd); }
-    .pb-row.is-boundary .pb-time, .pb-row.is-faststart .pb-time { font-size:14px; font-weight:500; color:var(--pb-sub); }
-    .pb-chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; }
+    .pb-row.is-boundary .pb-time, .pb-row.is-faststart .pb-time { font-size:13px; font-weight:500; color:var(--pb-sub); }
+    .pb-chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:7px; vertical-align:middle; }
     .pb-chip.c-next { color:#fff; background:var(--pb-em); }
     .pb-chip.c-iftar { color:var(--pb-amb); background:var(--pb-ambs); }
+    .pb-chip i { font-size:12px; }
 
     .pb-legend { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--pb-amb); margin:12px 2px 0; }
     .pb-legend .swatch { display:inline-block; width:16px; height:3px; background:var(--pb-band); border-radius:2px; }
@@ -96,11 +96,11 @@
     .pb-nafl-head { display:flex; align-items:center; gap:7px; font-size:14px; font-weight:600; color:var(--pb-ink); margin-bottom:6px; }
     .pb-nafl-head i { font-size:17px; color:var(--pb-amb); }
     .nafl-item { border-top:1px solid var(--pb-line); }
-    .nafl-row { display:flex; align-items:flex-start; gap:10px; padding:11px 0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    .nafl-emoji { font-size:19px; width:22px; flex-shrink:0; margin-top:1px; text-align:center; }
+    .nafl-row { display:flex; align-items:flex-start; gap:10px; padding:10px 0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .nafl-ic { font-size:17px; color:var(--pb-sub); width:18px; flex-shrink:0; margin-top:1px; }
     .nafl-body { flex:1; min-width:0; }
     .nafl-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .nafl-name { font-size:14px; font-weight:600; color:var(--pb-ink); }
+    .nafl-name { font-size:13px; font-weight:600; color:var(--pb-ink); }
     .nafl-status { font-size:11px; font-weight:600; padding:2px 9px; border-radius:999px; white-space:nowrap; }
     .nafl-status.s-active { color:#fff; background:var(--pb-em); }
     .nafl-status.s-upcoming { color:var(--pb-emd); background:var(--pb-ems); }
@@ -109,10 +109,10 @@
     .nafl-prog { height:4px; background:var(--pb-line); border-radius:999px; margin-top:6px; position:relative; display:none; }
     .nafl-item.active-window .nafl-prog { display:block; }
     .nafl-fill { position:absolute; left:0; top:0; height:100%; width:0; background:var(--pb-em); border-radius:999px; }
-    .nafl-chev { font-size:14px; color:var(--pb-faint); transition:transform .2s ease; flex-shrink:0; margin-top:3px; }
+    .nafl-chev { font-size:14px; color:var(--pb-faint); transition:transform .2s ease; flex-shrink:0; margin-top:2px; }
     .nafl-item.open .nafl-chev { transform:rotate(180deg); }
     .nafl-details { max-height:0; overflow:hidden; transition:max-height .25s ease; font-size:12.5px; line-height:1.65; color:var(--pb-sub); }
-    .nafl-item.open .nafl-details { max-height:520px; padding:2px 0 12px 32px; }
+    .nafl-item.open .nafl-details { max-height:520px; padding:2px 0 12px 28px; }
     .nafl-details .hadith-quote { display:block; margin-top:6px; padding-left:10px; border-left:2px solid var(--pb-band); color:var(--pb-ink); font-style:italic; }
     .nafl-src { display:block; margin-top:8px; font-size:11px; color:var(--pb-faint); }
 
@@ -259,16 +259,16 @@
       { key: 'Maghrib', type: 'prayer',   comment: 'prayer.comment.maghrib', fastEnd: true },
       { key: 'Isha',    type: 'prayer',   comment: 'prayer.comment.isha' }
     ];
-    const EMOJI = {
-      Imsak: '\u{1F963}', Fajr: '\u{1F305}', Sunrise: '\u{1F304}',
-      Dhuhr: '\u2600\uFE0F', Asr: '\u{1F324}\uFE0F', Maghrib: '\u{1F307}', Isha: '\u{1F319}'
+    const ICONS = {
+      Imsak: 'ti-moon', Fajr: 'ti-sunrise', Sunrise: 'ti-sun-high',
+      Dhuhr: 'ti-sun', Asr: 'ti-sun-low', Maghrib: 'ti-sunset-2', Isha: 'ti-moon-stars'
     };
     const BAND = ['Imsak', 'Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib'];
 
     const NAFL = [
-      { id: 'tahajjud', emoji: '\u{1F319}' },
-      { id: 'ishraq',   emoji: '\u{1F304}' },
-      { id: 'duha',     emoji: '\u2600\uFE0F' }
+      { id: 'tahajjud', icon: 'ti-moon' },
+      { id: 'ishraq',   icon: 'ti-sunrise' },
+      { id: 'duha',     icon: 'ti-sun' }
     ];
 
     function tr(key, fb) {
@@ -278,7 +278,7 @@
     function hhmm(s) {
       if (!s) return null;
       const c = String(s).split(' ')[0];
-      const parts = c.split(':'); const h = Number(parts[0]); const m = Number(parts[1]);
+      const [h, m] = c.split(':').map(Number);
       if (isNaN(h) || isNaN(m)) return null;
       return h * 60 + m;
     }
@@ -299,7 +299,7 @@
       const T = latest.timings, now = nowMin(), next = latest.nextPrayer;
       let html = '';
 
-      ROWS.forEach(function (r) {
+      ROWS.forEach(function (r, i) {
         const tmin = hhmm(T[r.key]);
         const timeStr = clean(T[r.key]);
         const inBand = BAND.indexOf(r.key) !== -1;
@@ -335,7 +335,7 @@
 
         let chips = '';
         if (isNext) chips += '<span class="pb-chip c-next" data-i18n="prayer.chip.next">keyingi</span>';
-        if (r.fastEnd) chips += '<span class="pb-chip c-iftar">\u{1F37D}\uFE0F ' + esc(tr('prayer.iftar.label', 'Iftorlik')) + '</span>';
+        if (r.fastEnd) chips += '<span class="pb-chip c-iftar"><i class="ti ti-tools-kitchen-2" aria-hidden="true"></i>' + esc(tr('prayer.iftar.label', 'Iftorlik')) + '</span>';
 
         html +=
           '<div class="' + rowCls + '">' +
@@ -345,7 +345,7 @@
               '<div class="' + node + '"></div>' +
             '</div>' +
             '<div class="pb-cell">' +
-              '<span class="pb-emoji">' + (EMOJI[r.key] || '\u{1F54C}') + '</span>' +
+              '<i class="ti ' + (ICONS[r.key] || 'ti-clock') + '" aria-hidden="true"></i>' +
               '<div class="pb-namewrap"><span class="pb-name">' + label + chips + '</span>' + sub + '</div>' +
             '</div>' +
             '<div class="pb-time">' + esc(timeStr) + '</div>' +
@@ -383,11 +383,7 @@
         out.ishraq = { start: s, end: s + ISHRAQ_WINDOW };
         out.duha = { start: sunrise + DUHA_START_OFFSET, end: dhuhr != null ? dhuhr - DUHA_END_BEFORE_DHUHR : null };
       }
-      // Tahajjud: use Aladhan's own Lastthird field (start) -> Fajr (end), matching the API's night split.
-      const lastThird = hhmm(T.Lastthird);
-      if (lastThird != null && fajr != null) {
-        out.tahajjud = { start: lastThird, end: fajr };
-      } else if (fajr != null && maghrib != null) {
+      if (fajr != null && maghrib != null) {
         const night = (fajr + 1440) - maghrib;
         const start = ((fajr - Math.round(night / 3)) % 1440 + 1440) % 1440;
         out.tahajjud = { start: start, end: fajr };
@@ -421,13 +417,13 @@
         html +=
           '<div class="nafl-item" data-nafl="' + n.id + '">' +
             '<div class="nafl-row">' +
-              '<span class="nafl-emoji">' + n.emoji + '</span>' +
+              '<i class="ti ' + n.icon + ' nafl-ic" aria-hidden="true"></i>' +
               '<div class="nafl-body">' +
                 '<div class="nafl-top">' +
                   '<span class="nafl-name">' + esc(tr('prayer.sunnah.' + n.id + '.name', n.id)) + '</span>' +
-                  '<span class="nafl-status" id="naflStatus-' + n.id + '">\u2014</span>' +
+                  '<span class="nafl-status" id="naflStatus-' + n.id + '">—</span>' +
                 '</div>' +
-                '<div class="nafl-range" id="naflRange-' + n.id + '">--:-- \u2014 --:--</div>' +
+                '<div class="nafl-range" id="naflRange-' + n.id + '">--:-- — --:--</div>' +
                 '<div class="nafl-prog"><div class="nafl-fill" id="naflFill-' + n.id + '"></div></div>' +
               '</div>' +
               '<i class="ti ti-chevron-down nafl-chev" aria-hidden="true"></i>' +
@@ -462,13 +458,13 @@
         if (!item || !rangeEl || !statusEl) return;
 
         if (!w || w.start == null || w.end == null) {
-          rangeEl.textContent = '--:-- \u2014 --:--';
-          statusEl.textContent = '\u2014';
+          rangeEl.textContent = '--:-- — --:--';
+          statusEl.textContent = '—';
           statusEl.className = 'nafl-status';
           item.classList.remove('active-window');
           return;
         }
-        rangeEl.textContent = fmt(w.start) + ' \u2014 ' + fmt(w.end);
+        rangeEl.textContent = fmt(w.start) + ' — ' + fmt(w.end);
         const st = windowStatus(w.start, w.end);
         statusEl.className = 'nafl-status';
         if (st.status === 'active') {
@@ -595,7 +591,7 @@
       let startY = null, curY = 0, dragging = false;
       const start = function (e) { dragging = true; startY = e.touches ? e.touches[0].clientY : e.clientY; curY = startY; sheet.style.transition = 'none'; };
       const move = function (e) { if (!dragging) return; curY = e.touches ? e.touches[0].clientY : e.clientY; sheet.style.transform = 'translateY(' + Math.max(0, curY - startY) + 'px)'; };
-      const end = function () { if (!dragging) return; dragging = false; sheet.style.transition = ''; const dd = curY - startY; sheet.style.transform = ''; if (dd > 80) closeSheet(); };
+      const end = function () { if (!dragging) return; dragging = false; sheet.style.transition = ''; const d = curY - startY; sheet.style.transform = ''; if (d > 80) closeSheet(); };
       handle.addEventListener('touchstart', start, { passive: true });
       handle.addEventListener('touchmove', move, { passive: true });
       handle.addEventListener('touchend', end);
