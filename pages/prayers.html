@@ -62,7 +62,11 @@
     .pb-date { font-size:12px; color:var(--pb-faint); }
 
     /* ---- timeline ---- */
-    .pb-timeline { margin-top:16px; background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:18px; padding:8px 14px 8px 8px; }
+    .pb-tabs { display:flex; gap:3px; background:var(--pb-line); border-radius:13px; padding:3px; margin:16px 0 8px; }
+    .pb-tab { flex:1; text-align:center; padding:8px 0; font-size:14px; font-weight:600; color:var(--pb-sub); border-radius:10px; cursor:pointer; transition:background .18s ease, color .18s ease; -webkit-tap-highlight-color:transparent; }
+    .pb-tab.active { background:var(--pb-surface); color:var(--pb-emd); box-shadow:0 1px 3px rgba(0,0,0,0.10); }
+    .pb-tab:active { transform:scale(0.98); }
+    .pb-timeline { margin-top:0; background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:18px; padding:8px 14px 8px 8px; }
     .pb-row { display:grid; grid-template-columns:32px 1fr auto; align-items:center; column-gap:12px; min-height:58px; border-radius:14px; padding:6px 6px; }
     .pb-row.is-past { opacity:.5; }
     .pb-row.is-boundary { opacity:.55; min-height:50px; }
@@ -207,6 +211,10 @@
         <div class="pb-date" id="todayDate" data-i18n="prayer.dateLoading">Sana yuklanmoqda...</div>
       </div>
 
+      <div class="pb-tabs">
+        <div class="pb-tab active" data-tab="today" data-i18n="prayer.tab.today">Bugun</div>
+        <div class="pb-tab" data-tab="tomorrow" data-i18n="prayer.tab.tomorrow">Ertaga</div>
+      </div>
       <div class="pb-timeline" id="prayerTimeline"></div>
 
       <div class="pb-legend">
@@ -259,6 +267,64 @@
     const DUHA_END_BEFORE_DHUHR = 60;
 
     let latest = null; // { timings, currentPrayer, nextPrayer }
+    let activeTab = 'today';
+    let tomorrowCache = null; // { key, timings }
+
+    function tomorrowKey() {
+      const s = window.getPrayerSettings ? window.getPrayerSettings() : { method: '3', madhab: '1' };
+      const d = new Date(); d.setDate(d.getDate() + 1);
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      return dd + '-' + mm + '-' + d.getFullYear() + '|' + s.method + '|' + s.madhab;
+    }
+
+    function renderActiveTimeline() {
+      if (activeTab === 'today') {
+        renderTimeline(latest ? latest.timings : null, 'today');
+      } else if (tomorrowCache && tomorrowCache.key === tomorrowKey()) {
+        renderTimeline(tomorrowCache.timings, 'tomorrow');
+      } else {
+        renderTimeline(null, 'tomorrow');
+        ensureTomorrow();
+      }
+    }
+
+    async function ensureTomorrow() {
+      const key = tomorrowKey();
+      if (tomorrowCache && tomorrowCache.key === key) return tomorrowCache.timings;
+      try {
+        const loc = window.LocationManager ? window.LocationManager.getCurrentLocation() : null;
+        if (!loc || loc.lat == null) return null;
+        const s = window.getPrayerSettings ? window.getPrayerSettings() : { method: '3', madhab: '1' };
+        const datePart = key.split('|')[0];
+        const url = 'https://api.aladhan.com/v1/timings/' + datePart +
+          '?latitude=' + loc.lat + '&longitude=' + loc.lon +
+          '&method=' + s.method + '&school=' + s.madhab;
+        const res = await fetch(url);
+        const json = await res.json();
+        const timings = json && json.data && json.data.timings;
+        if (timings) {
+          tomorrowCache = { key: key, timings: timings };
+          if (activeTab === 'tomorrow') renderTimeline(timings, 'tomorrow');
+          return timings;
+        }
+      } catch (e) { console.error('Tomorrow fetch failed:', e); }
+      if (activeTab === 'tomorrow') {
+        const el = document.getElementById('prayerTimeline');
+        if (el) el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--pb-faint);font-size:13px;">\u2014</div>';
+      }
+      return null;
+    }
+
+    function switchTab(tab) {
+      if (tab === activeTab) return;
+      activeTab = tab;
+      document.querySelectorAll('.pb-tab').forEach(function (t) {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+      renderActiveTimeline();
+      if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.selectionChanged(); } catch (e) {} }
+    }
 
     const ROWS = [
       { key: 'Imsak',   type: 'faststart' },
@@ -302,11 +368,12 @@
     function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
     // ============ TIMELINE ============
-    function renderTimeline() {
+    function renderTimeline(T, mode) {
       const el = document.getElementById('prayerTimeline');
       if (!el) return;
-      if (!latest) { el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--pb-faint);font-size:13px;">Yuklanmoqda...</div>'; return; }
-      const T = latest.timings, now = nowMin(), next = latest.nextPrayer;
+      if (!T) { el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--pb-faint);font-size:13px;">Yuklanmoqda...</div>'; return; }
+      const now = nowMin();
+      const next = (mode === 'today' && latest) ? latest.nextPrayer : null;
       let html = '';
 
       ROWS.forEach(function (r) {
@@ -320,8 +387,8 @@
         else if (inBand) { top = 'var(--pb-band)'; bot = 'var(--pb-band)'; }
         if (r.key === 'Isha') { bot = 'transparent'; }
 
-        const isNext = (r.key === next);
-        const isPast = (tmin != null && tmin < now && !isNext);
+        const isNext = (mode === 'today') && (r.key === next);
+        const isPast = (mode === 'today') && (tmin != null && tmin < now && !isNext);
 
         let rowCls = 'pb-row';
         if (r.type === 'boundary') rowCls += ' is-boundary';
@@ -358,7 +425,7 @@
               '<span class="pb-emoji">' + (EMOJI[r.key] || '') + '</span>' +
               '<div class="pb-namewrap">' +
                 '<span class="pb-name-line"><span class="pb-name">' + label + '</span>' + chips + '</span>' +
-                '<span class="pb-comment">' + commentText + '</span>' +
+                (commentText ? '<span class="pb-comment">' + commentText + '</span>' : '') +
               '</div>' +
             '</div>' +
             '<div class="pb-time">' + esc(timeStr) + '</div>' +
@@ -621,7 +688,7 @@
     window.addEventListener('prayerDataUpdated', function (e) {
       if (e.detail && e.detail.timings) {
         latest = { timings: e.detail.timings, currentPrayer: e.detail.currentPrayer, nextPrayer: e.detail.nextPrayer };
-        renderTimeline();
+        renderActiveTimeline();
         updateHeroProgress();
         buildNafl();
       }
@@ -629,7 +696,7 @@
 
     window.addEventListener('languageChanged', function () {
       updateStatic(); updatePill();
-      renderTimeline(); buildNafl();
+      renderActiveTimeline(); buildNafl();
     });
 
     window.addEventListener('prayerSettingsChanged', function () { updatePill(); });
@@ -637,7 +704,10 @@
     setInterval(function () { updateHeroProgress(); updateNaflLive(); }, 1000);
 
     document.addEventListener('DOMContentLoaded', function () {
-      updateStatic(); updatePill(); renderTimeline(); wireSheetSwipe();
+      updateStatic(); updatePill(); renderActiveTimeline(); wireSheetSwipe();
+      document.querySelectorAll('.pb-tab').forEach(function (t) {
+        t.addEventListener('click', function () { switchTab(t.dataset.tab); });
+      });
       const gear = document.getElementById('settingsGearBtn');
       const pill = document.getElementById('methodPillBtn');
       const bd = document.getElementById('sheetBackdrop');

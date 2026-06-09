@@ -72,6 +72,9 @@ const I18N = {
     'prayer.chip.next':  { uz: 'keyingi', ru: 'следующий', en: 'next' },
     'prayer.fastWindow': { uz: "Ro'za vaqti · Saharlikdan Iftorlikkacha", ru:     'Время поста · от сухура до ифтара', en: 'Fasting window · suhoor to  iftar' },
     'prayer.remaining': { uz: 'qoldi', ru: 'осталось', en: 'remaining' },
+    
+    'prayer.tab.today':    { uz: 'Bugun',  ru: 'Сегодня', en: 'Today' },
+    'prayer.tab.tomorrow': { uz: 'Ertaga', ru: 'Завтра',  en: 'Tomorrow' },
 
     'prayer.advicePrayers': { 
       uz: 'Namozlar: Vaqt kirganidan <strong>10 daqiqa keyin</strong>',
