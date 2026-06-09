@@ -732,6 +732,17 @@
       if (pill) pill.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); openSheet(); });
       if (bd) bd.addEventListener('click', closeSheet);
       window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+      // Native/Telegram back button: close sheet if open, else go home
+      try {
+        if (tg && tg.BackButton) {
+          tg.BackButton.show();
+          tg.BackButton.onClick(function () {
+            const sheet = document.getElementById('bottomSheet');
+            if (sheet && sheet.classList.contains('visible')) { closeSheet(); return; }
+            window.location.href = '../index.html';
+          });
+        }
+      } catch (e) {}
     });
   })();
   </script>
