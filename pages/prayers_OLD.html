@@ -119,6 +119,42 @@
       color: #6ee7b7;
     }
 
+    /* ============================================
+       FASTING SATELLITES (Suhoor / Iftar)
+       ============================================ */
+    .prayer-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .fast-satellite {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 76%;
+      margin: 0 auto;
+      padding: 7px 16px;
+      background: linear-gradient(135deg, var(--gold-100) 0%, #fffbeb 100%);
+      border: 1.5px solid var(--gold-400);
+      box-sizing: border-box;
+    }
+    .fast-satellite .fast-left { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    .fast-satellite .fast-emoji { font-size: 1.05rem; line-height: 1; }
+    .fast-satellite .fast-label { font-size: 0.82rem; font-weight: 600; color: var(--gold-600); white-space: nowrap; }
+    .fast-satellite .fast-hint { font-size: 0.66rem; color: var(--text-muted); white-space: nowrap; }
+    .fast-satellite .fast-time { font-size: 0.92rem; font-weight: 700; color: var(--gold-600); font-variant-numeric: tabular-nums; }
+    /* Suhoor: sits ABOVE Fajr — round top, melt into card */
+    .fast-satellite--suhoor { border-radius: var(--radius-md) var(--radius-md) 0 0; border-bottom: none; margin-bottom: -2px; }
+    /* Iftar: sits BELOW Maghrib — round bottom */
+    .fast-satellite--iftar { border-radius: 0 0 var(--radius-md) var(--radius-md); border-top: none; margin-top: -2px; }
+    /* Night mode */
+    .night-mode .fast-satellite {
+      background: linear-gradient(135deg, rgba(181,134,10,0.14) 0%, rgba(181,134,10,0.06) 100%);
+      border-color: rgba(234,185,50,0.3);
+    }
+    .night-mode .fast-satellite .fast-label,
+    .night-mode .fast-satellite .fast-time { color: #eab932; }
 
     /* ============================================
        SUNNAH & NAFL SECTION

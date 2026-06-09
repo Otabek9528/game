@@ -69,6 +69,8 @@ const I18N = {
     'prayer.suhoor.hint':  { uz: "Ro'za boshlanishi", ru: 'Начало поста', en: 'Fast begins' },
     'prayer.iftar.label':  { uz: 'Iftorlik', ru: 'Ифтар', en: 'Iftar' },
     'prayer.iftar.hint':   { uz: "Ro'za ochilishi", ru: 'Разговение', en: 'Break fast' },
+    'prayer.chip.next':  { uz: 'keyingi', ru: 'следующий', en: 'next' },
+    'prayer.fastWindow': { uz: "Ro'za vaqti · Saharlikdan Iftorlikkacha", ru:     'Время поста · от сухура до ифтара', en: 'Fasting window · suhoor to  iftar' },
 
     'prayer.advicePrayers': { 
       uz: 'Namozlar: Vaqt kirganidan <strong>10 daqiqa keyin</strong>',
