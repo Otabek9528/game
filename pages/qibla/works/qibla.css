@@ -256,137 +256,121 @@ body {
   background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
 }
 
-/* Phase chips */
-.cal-phases {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+.calibration-visual {
+  position: relative;
+  width: 140px;
+  height: 100px;
+  margin-bottom: 8px;
 }
 
-.cal-phase-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #999;
-  background: rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
+.figure-eight-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
-.cal-phase-chip .chip-num {
-  width: 18px;
-  height: 18px;
+.figure-eight-path {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 60px;
+  border: 3px solid rgba(0, 168, 132, 0.2);
   border-radius: 50%;
-  background: #ccc;
-  color: #fff;
-  font-size: 0.7rem;
+}
+
+.figure-eight-path::before {
+  content: '∞';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  color: rgba(0, 168, 132, 0.15);
+  font-weight: 300;
+}
+
+.phone-demo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: figure-eight-motion 4s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes figure-eight-motion {
+  0% { transform: translate(-50%, -50%) translateX(-40px) translateY(0); }
+  25% { transform: translate(-50%, -50%) translateX(0) translateY(-20px) rotate(-15deg); }
+  50% { transform: translate(-50%, -50%) translateX(40px) translateY(0); }
+  75% { transform: translate(-50%, -50%) translateX(0) translateY(20px) rotate(15deg); }
+  100% { transform: translate(-50%, -50%) translateX(-40px) translateY(0); }
+}
+
+.phone-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.calibration-steps {
   display: flex;
-  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
   justify-content: center;
-  transition: background 0.3s ease;
+  margin: 16px 0;
 }
 
-.cal-phase-arrow {
-  color: #bbb;
-  font-size: 0.9rem;
-}
-
-.phase-move #phaseChipMove,
-.phase-hold #phaseChipHold {
-  color: #007b5e;
-  background: rgba(0, 168, 132, 0.12);
-}
-
-.phase-move #phaseChipMove .chip-num,
-.phase-hold #phaseChipHold .chip-num {
-  background: linear-gradient(135deg, #00a884 0%, #007b5e 100%);
-}
-
-.phase-hold #phaseChipMove .chip-num {
-  background: #00a884;
-}
-
-/* Phase visuals */
-.cal-visual {
-  margin-bottom: 4px;
-}
-
-.fig8-path {
-  stroke: rgba(0, 168, 132, 0.35);
-}
-
-.fig8-phone-body {
-  fill: #00a884;
-}
-
-.fig8-phone-screen {
-  fill: #e1f5ee;
-}
-
-/* Spirit level (phase 2) */
-.ring-track {
-  stroke: rgba(0, 168, 132, 0.15);
-}
-
-.ring-fill {
-  stroke: #00a884;
-  transition: stroke-dashoffset 0.2s linear;
-}
-
-.level-outer,
-.level-tick {
-  stroke: rgba(0, 168, 132, 0.35);
-}
-
-.level-target {
-  stroke: #00a884;
-}
-
-.level-bubble {
-  fill: #e6a23c;
-  transition: fill 0.2s ease;
-}
-
-.level-bubble.centered {
-  fill: #00a884;
-}
-
-/* Movement pips (phase 1) */
-.cal-pips-wrap {
+.cal-step {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  margin: 12px 0 4px;
+  min-width: 80px;
 }
 
-.cal-pips {
-  display: flex;
-  gap: 7px;
-}
-
-.cal-pip {
-  width: 13px;
-  height: 13px;
+.step-num {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #00a884 0%, #007b5e 100%);
+  color: white;
   border-radius: 50%;
-  border: 1.5px solid rgba(0, 168, 132, 0.4);
-  background: transparent;
-  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
-.cal-pip.filled {
-  border-color: #00a884;
-  background: #00a884;
-  transform: scale(1.1);
+.step-text {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
 }
 
-.cal-pips-label {
-  font-size: 0.75rem;
-  color: #999;
+/* Calibration Progress Bar */
+.calibration-progress {
+  width: 100%;
+  max-width: 280px;
+  margin: 16px 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00a884 0%, #4caf50 100%);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(0, 168, 132, 0.4);
 }
 
 .progress-text {
@@ -1243,33 +1227,17 @@ body {
   border-color: rgba(0, 168, 132, 0.2);
   background: linear-gradient(180deg, #1e1e1e 0%, #1a2a22 100%);
 }
-.night-mode .cal-phase-chip {
-  background: rgba(255, 255, 255, 0.06);
-  color: #888;
+.night-mode .figure-eight-path {
+  border-color: rgba(0, 168, 132, 0.15);
 }
-.night-mode .phase-move #phaseChipMove,
-.night-mode .phase-hold #phaseChipHold {
-  color: #4dd0b0;
-  background: rgba(0, 168, 132, 0.18);
+.night-mode .figure-eight-path::before {
+  color: rgba(0, 168, 132, 0.1);
 }
-.night-mode .fig8-path {
-  stroke: rgba(0, 168, 132, 0.25);
+.night-mode .step-text {
+  color: #999;
 }
-.night-mode .fig8-phone-screen {
-  fill: #1a2a22;
-}
-.night-mode .ring-track {
-  stroke: rgba(0, 168, 132, 0.12);
-}
-.night-mode .level-outer,
-.night-mode .level-tick {
-  stroke: rgba(0, 168, 132, 0.3);
-}
-.night-mode .cal-pip {
-  border-color: rgba(0, 168, 132, 0.35);
-}
-.night-mode .cal-pips-label {
-  color: #777;
+.night-mode .progress-bar {
+  background: #333;
 }
 
 /* Compass display */

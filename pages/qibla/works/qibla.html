@@ -86,71 +86,36 @@
         </button>
       </div>
 
-      <!-- Calibration State (two-phase: move → hold still) -->
-      <div class="state-card calibration-state phase-move" id="calibrationState" style="display: none;">
-
-        <!-- Phase chips -->
-        <div class="cal-phases">
-          <span class="cal-phase-chip" id="phaseChipMove">
-            <span class="chip-num">1</span>
-            <span data-i18n="qibla.phaseMove">Harakat</span>
-          </span>
-          <span class="cal-phase-arrow">→</span>
-          <span class="cal-phase-chip" id="phaseChipHold">
-            <span class="chip-num">2</span>
-            <span data-i18n="qibla.phaseHold">Barqarorlik</span>
-          </span>
+      <!-- Calibration State (MANDATORY) -->
+      <div class="state-card calibration-state" id="calibrationState" style="display: none;">
+        <div class="calibration-visual">
+          <div class="figure-eight-container">
+            <div class="figure-eight-path"></div>
+            <div class="phone-demo">
+              <span class="phone-icon">📱</span>
+            </div>
+          </div>
         </div>
-
-        <!-- Phase 1 visual: figure-8 with twisting phone -->
-        <div class="cal-visual" id="calVisualMove">
-          <svg viewBox="0 0 220 110" width="220" height="110" aria-hidden="true">
-            <path id="fig8Path"
-              d="M55,55 C55,25 110,25 110,55 C110,85 165,85 165,55 C165,25 110,25 110,55 C110,85 55,85 55,55 Z"
-              class="fig8-path" fill="none" stroke-width="3" stroke-dasharray="6 5" />
-            <g>
-              <g class="fig8-phone-twist">
-                <rect x="-9" y="-16" width="18" height="32" rx="4" class="fig8-phone-body" />
-                <rect x="-6" y="-12" width="12" height="21" rx="2" class="fig8-phone-screen" />
-                <animateTransform attributeName="transform" type="scale"
-                  values="1,1; 0.35,1; 1,1; 0.35,1; 1,1" keyTimes="0;0.25;0.5;0.75;1"
-                  dur="4s" repeatCount="indefinite" additive="sum" />
-              </g>
-              <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
-                <mpath xlink:href="#fig8Path" href="#fig8Path" />
-              </animateMotion>
-            </g>
-          </svg>
-        </div>
-
-        <!-- Phase 2 visual: spirit level + stability ring -->
-        <div class="cal-visual" id="calVisualHold" style="display: none;">
-          <svg viewBox="0 0 140 140" width="140" height="140" aria-hidden="true">
-            <circle cx="70" cy="70" r="62" class="ring-track" fill="none" stroke-width="6" />
-            <circle cx="70" cy="70" r="62" id="stabilityRing" class="ring-fill" fill="none"
-              stroke-width="6" stroke-linecap="round"
-              stroke-dasharray="389.6" stroke-dashoffset="389.6"
-              transform="rotate(-90 70 70)" />
-            <circle cx="70" cy="70" r="38" class="level-outer" fill="none" stroke-width="1.5" />
-            <line x1="24" y1="70" x2="44" y2="70" class="level-tick" stroke-width="1.5" />
-            <line x1="96" y1="70" x2="116" y2="70" class="level-tick" stroke-width="1.5" />
-            <circle cx="70" cy="70" r="12" class="level-target" fill="none" stroke-width="1.5" stroke-dasharray="3 3" />
-            <circle cx="70" cy="70" r="9" id="levelBubble" class="level-bubble" />
-          </svg>
-        </div>
-
-        <h3 class="state-title" id="calTitle" data-i18n="qibla.calibrateTitle">Kompasni kalibratsiya qiling</h3>
-        <p class="state-description" id="calDescription" data-i18n="qibla.calibrateDescMove">
-          Telefonni bilakni burab <strong>∞</strong> shaklida aylantiring — faqat surmang.
+        <h3 class="state-title" data-i18n="qibla.calibrateTitle">Kompasni kalibratsiya qiling</h3>
+        <p class="state-description" data-i18n="qibla.calibrateDesc">
+          Aniq natija olish uchun telefonni havoda <strong>∞ (cheksizlik)</strong> belgisi shaklida bir necha marta harakatlantiring.
         </p>
-
-        <!-- Movement pips (phase 1) -->
-        <div class="cal-pips-wrap" id="calPipsWrap">
-          <div class="cal-pips" id="calPips"></div>
-          <span class="cal-pips-label"><span id="pipsCount">0</span>/8 <span data-i18n="qibla.movements">harakat</span></span>
+        <div class="calibration-steps">
+          <div class="cal-step">
+            <span class="step-num">1</span>
+            <span class="step-text" data-i18n="qibla.calibrateStep1">Telefonni ∞ shaklida harakatlantiring</span>
+          </div>
+          <div class="cal-step">
+            <span class="step-num">2</span>
+            <span class="step-text" data-i18n="qibla.calibrateStep2">5-6 marta takrorlang</span>
+          </div>
         </div>
-
-        <span class="progress-text" id="progressText" data-i18n="qibla.calibrating">Kalibratsiya qiling...</span>
+        <div class="calibration-progress" id="calibrationProgress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <span class="progress-text" id="progressText" data-i18n="qibla.calibrating">Kalibratsiya qiling...</span>
+        </div>
       </div>
 
     </div>

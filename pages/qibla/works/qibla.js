@@ -50,12 +50,6 @@ const CALIBRATION_MOVEMENTS_REQUIRED = 8; // Number of significant movements nee
 const STABILITY_WINDOW_MS = 1200;         // Hold-steady phase duration
 const STABILITY_MAX_STD_DEG = 2.5;        // Max circular std-dev to pass stability
 const IOS_ACCURACY_GATE = 15;             // webkitCompassAccuracy must be < this (deg)
-const ACCURACY_STUCK_REVERT_MS = 2500;    // Stable but accuracy still bad → back to waving
-
-// Conditional calibration: silent quality check on open. Calibration screen only
-// shows when the sensor actually needs it (recalibrate button still forces it).
-const QUICK_CHECK_TIMEOUT = 2000;         // ms to decide before defaulting to calibration
-const QUICK_CHECK_MIN_SAMPLES = 8;        // sliding window size for jitter test
 
 // Tilt handling
 const TILT_WARN_DEG = 35;                 // Beyond this, warn + degrade quality
@@ -103,12 +97,6 @@ let lastCalibrationHeading = 0;
 let calibrationComplete = false;
 let stabilityBuffer = [];          // {t, h} samples for hold-steady phase
 let inStabilityPhase = false;
-let holdAccuracyFailSince = 0;     // for reverting to movement phase when iOS accuracy stays bad
-
-// Quick quality check state
-let isQuickChecking = false;
-let quickCheckSamples = [];
-let quickCheckEvaluate = null;     // set while a check is running
 
 // ============================================
 // TELEGRAM WEBAPP INITIALIZATION
@@ -165,26 +153,9 @@ const errorMessage = document.getElementById('errorMessage');
 const differenceAngle = document.getElementById('differenceAngle');
 const turnDirection = document.getElementById('turnDirection');
 
-// Calibration elements (two-phase UI)
+// Calibration elements
+const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
-const calVisualMove = document.getElementById('calVisualMove');
-const calVisualHold = document.getElementById('calVisualHold');
-const calDescription = document.getElementById('calDescription');
-const calPips = document.getElementById('calPips');
-const calPipsWrap = document.getElementById('calPipsWrap');
-const pipsCount = document.getElementById('pipsCount');
-const stabilityRing = document.getElementById('stabilityRing');
-const levelBubble = document.getElementById('levelBubble');
-const RING_CIRCUMFERENCE = 389.6; // 2π × r62, matches the SVG
-
-// Build the movement pips once
-if (calPips) {
-  for (let i = 0; i < CALIBRATION_MOVEMENTS_REQUIRED; i++) {
-    const pip = document.createElement('span');
-    pip.className = 'cal-pip';
-    calPips.appendChild(pip);
-  }
-}
 
 // ============================================
 // MATHEMATICAL FUNCTIONS
@@ -361,113 +332,49 @@ function startCalibration() {
   calibrationComplete = false;
   inStabilityPhase = false;
   stabilityBuffer = [];
-  holdAccuracyFailSince = 0;
 
   // Reset smoothing
   headingHistory = [];
   smoothedHeading = 0;
 
-  setCalibrationPhaseUI('move');
-  updatePips();
-  updateStabilityRing(0);
   updateCalibrationProgress();
-}
-
-function setCalibrationPhaseUI(phase) {
-  if (calibrationState) {
-    calibrationState.classList.toggle('phase-move', phase === 'move');
-    calibrationState.classList.toggle('phase-hold', phase === 'hold');
-  }
-  if (calVisualMove) calVisualMove.style.display = phase === 'move' ? 'block' : 'none';
-  if (calVisualHold) calVisualHold.style.display = phase === 'hold' ? 'block' : 'none';
-  if (calPipsWrap) calPipsWrap.style.display = phase === 'move' ? 'flex' : 'none';
-  if (calDescription) {
-    calDescription.innerHTML = phase === 'move'
-      ? t('qibla.calibrateDescMove', 'Telefonni bilakni burab <strong>∞</strong> shaklida aylantiring — faqat surmang.')
-      : t('qibla.calibrateDescHold', 'Pufakchani markazda ushlab, qimirlamay turing.');
-  }
-}
-
-function updatePips() {
-  if (!calPips) return;
-  const pips = calPips.children;
-  for (let i = 0; i < pips.length; i++) {
-    pips[i].classList.toggle('filled', i < calibrationMovements);
-  }
-  if (pipsCount) pipsCount.textContent = Math.min(calibrationMovements, CALIBRATION_MOVEMENTS_REQUIRED);
-}
-
-function updateStabilityRing(p) {
-  if (!stabilityRing) return;
-  stabilityRing.setAttribute('stroke-dashoffset', (RING_CIRCUMFERENCE * (1 - p)).toFixed(1));
-}
-
-// Driven by live beta/gamma from handleOrientation during the hold phase.
-function updateLevelBubble(beta, gamma) {
-  if (!levelBubble) return;
-  const clamp = (v, m) => Math.max(-m, Math.min(m, v));
-  const x = clamp(gamma, 30) / 30 * 26;
-  const y = clamp(beta, 30) / 30 * 26;
-  levelBubble.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
-  levelBubble.classList.toggle('centered', Math.hypot(x, y) <= 8);
-}
-
-function enterStabilityPhase() {
-  inStabilityPhase = true;
-  stabilityBuffer = [];
-  holdAccuracyFailSince = 0;
-  setCalibrationPhaseUI('hold');
-  if (progressText) {
-    progressText.textContent = t('qibla.calibrateHoldStill', 'Endi telefonni tekis ushlab, qimirlatmang...');
-  }
-  console.log('🧘 Entering stability phase');
-}
-
-// iOS edge case: the user held still but the OS still reports bad accuracy —
-// holding still won't fix that, more waving might. Send them back to phase 1
-// with partial credit instead of letting the ring sit frozen.
-function revertToMovementPhase() {
-  inStabilityPhase = false;
-  stabilityBuffer = [];
-  holdAccuracyFailSince = 0;
-  calibrationMovements = Math.max(0, CALIBRATION_MOVEMENTS_REQUIRED - 4);
-  setCalibrationPhaseUI('move');
-  updatePips();
-  updateStabilityRing(0);
-  if (progressText) {
-    progressText.textContent = t('qibla.calibrateMoreMoves', 'Sensor hali tayyor emas — yana ∞ harakat qiling');
-  }
-  console.log('↩️ Accuracy still poor, back to movement phase');
 }
 
 function updateCalibrationProgress() {
   if (!isCalibrating) return;
 
-  if (!inStabilityPhase) {
-    const elapsed = Date.now() - calibrationStartTime;
-    const timeProgress = Math.min(elapsed / CALIBRATION_DURATION, 1);
-    const movementProgress = Math.min(calibrationMovements / CALIBRATION_MOVEMENTS_REQUIRED, 1);
-    const movementPhaseProgress = Math.min(timeProgress * 0.4 + movementProgress * 0.6, 1);
+  const elapsed = Date.now() - calibrationStartTime;
+  const timeProgress = Math.min(elapsed / CALIBRATION_DURATION, 1);
+  const movementProgress = Math.min(calibrationMovements / CALIBRATION_MOVEMENTS_REQUIRED, 1);
 
-    if (movementPhaseProgress >= 1) {
-      enterStabilityPhase();
-    } else if (progressText) {
-      progressText.textContent = movementProgress < 0.5
-        ? t('qibla.calibrateMove', 'Telefonni ∞ shaklida harakatlantiring...')
-        : t('qibla.calibrateGood', 'Yaxshi! Davom eting...');
+  // Movement phase covers 0–85% of the bar; stability phase covers the rest.
+  const movementPhaseProgress = Math.min(timeProgress * 0.4 + movementProgress * 0.6, 1);
+  let totalProgress = movementPhaseProgress * 0.85;
+
+  if (movementPhaseProgress >= 1) {
+    if (!inStabilityPhase) {
+      inStabilityPhase = true;
+      stabilityBuffer = [];
+      console.log('🧘 Entering stability phase');
     }
-    return;
+    totalProgress = 0.85 + 0.15 * stabilityProgress();
   }
 
-  // Stability phase
-  const s = stabilityStatus();
-  updateStabilityRing(s.progress);
+  if (progressFill) {
+    progressFill.style.width = `${totalProgress * 100}%`;
+  }
 
-  if (s.progress >= 1) {
-    if (progressText) {
+  if (progressText) {
+    if (totalProgress < 0.3) {
+      progressText.textContent = t('qibla.calibrateMove', 'Telefonni ∞ shaklida harakatlantiring...');
+    } else if (totalProgress < 0.6) {
+      progressText.textContent = t('qibla.calibrateGood', 'Yaxshi! Davom eting...');
+    } else if (totalProgress < 0.85) {
+      progressText.textContent = t('qibla.calibrateAlmost', 'Deyarli tayyor...');
+    } else if (totalProgress < 1) {
+      progressText.textContent = t('qibla.calibrateHoldStill', 'Endi telefonni tekis ushlab, qimirlatmang...');
+    } else {
       progressText.textContent = t('qibla.calibrateDone', '✓ Kalibratsiya tayyor!');
-    }
-    if (!calibrationComplete) {
       calibrationComplete = true;
       setTimeout(() => {
         if (calibrationComplete && isCalibrating) {
@@ -475,65 +382,29 @@ function updateCalibrationProgress() {
         }
       }, 500);
     }
-    return;
-  }
-
-  // Stuck-accuracy detection (iOS only: stable + flat but OS says uncalibrated)
-  if (s.stable && s.tiltOk && !s.accuracyOk) {
-    if (!holdAccuracyFailSince) holdAccuracyFailSince = Date.now();
-    if (Date.now() - holdAccuracyFailSince > ACCURACY_STUCK_REVERT_MS) {
-      revertToMovementPhase();
-      return;
-    }
-  } else {
-    holdAccuracyFailSince = 0;
-  }
-
-  if (progressText) {
-    if (!s.tiltOk) {
-      progressText.textContent = t('qibla.holdFlatShort', 'Telefonni tekis ushlang');
-    } else if (!s.stable) {
-      progressText.textContent = t('qibla.calibrateHoldStill', 'Endi telefonni tekis ushlab, qimirlatmang...');
-    } else {
-      progressText.textContent = t('qibla.calibrateChecking', 'Barqarorlik tekshirilmoqda...');
-    }
   }
 }
 
-// Stability gate: heading must be steady (low circular std) for the full window,
-// the device roughly flat, and — on iOS — the OS-reported accuracy valid and good.
-function stabilityStatus() {
+// Returns 0..1. Passes only when the heading has been stable for
+// STABILITY_WINDOW_MS AND (on iOS) the reported accuracy is valid and good.
+function stabilityProgress() {
   const now = Date.now();
   stabilityBuffer = stabilityBuffer.filter(s => now - s.t <= STABILITY_WINDOW_MS);
 
-  const accuracyOk =
-    lastWebkitAccuracy === null ||
-    (lastWebkitAccuracy >= 0 && lastWebkitAccuracy < IOS_ACCURACY_GATE);
-  const tiltOk = lastTiltDeg < TILT_WARN_DEG;
-
-  if (stabilityBuffer.length < 5) {
-    return { progress: 0, stable: false, accuracyOk, tiltOk };
-  }
+  if (stabilityBuffer.length < 5) return 0;
 
   const windowSpan = now - stabilityBuffer[0].t;
   const { std } = circularStats(stabilityBuffer.map(s => s.h));
+
   const stable = std <= STABILITY_MAX_STD_DEG;
+  const accuracyOk =
+    lastWebkitAccuracy === null ||                                  // Android: no signal
+    (lastWebkitAccuracy >= 0 && lastWebkitAccuracy < IOS_ACCURACY_GATE);
 
-  // Headroom (150 ms) because windowSpan is measured between discrete samples
-  // and can never quite reach the full window — without it, progress asymptotes
-  // at ~98% and completion never fires.
-  const effectiveWindow = STABILITY_WINDOW_MS - 150;
+  if (!stable) return Math.min(0.4, windowSpan / STABILITY_WINDOW_MS * 0.4);
+  if (!accuracyOk) return 0.5; // stable but sensor still uncalibrated → keep waiting
 
-  let progress;
-  if (!stable || !tiltOk) {
-    progress = Math.min(0.4, windowSpan / effectiveWindow * 0.4);
-  } else if (!accuracyOk) {
-    progress = 0.5;
-  } else {
-    progress = Math.min(windowSpan / effectiveWindow, 1);
-  }
-
-  return { progress, stable, accuracyOk, tiltOk };
+  return Math.min(windowSpan / STABILITY_WINDOW_MS, 1);
 }
 
 function trackCalibrationMovement(heading) {
@@ -546,7 +417,6 @@ function trackCalibrationMovement(heading) {
     if (diff > 30) {
       calibrationMovements++;
       lastCalibrationHeading = heading;
-      updatePips();
       console.log(`📐 Calibration movement ${calibrationMovements}/${CALIBRATION_MOVEMENTS_REQUIRED}`);
     }
   }
@@ -560,73 +430,6 @@ function finishCalibration() {
   calibrationComplete = true;
   headingHistory = [];
   showState('compass');
-}
-
-// ============================================
-// QUICK QUALITY CHECK (conditional calibration)
-// ============================================
-// Runs silently behind the loading state. Passes → straight to compass.
-// Fails or times out → calibration screen. The recalibrate button always
-// forces the full calibration flow regardless.
-
-function runQuickQualityCheck() {
-  return new Promise((resolve) => {
-    console.log('⚡ Running quick sensor quality check...');
-    isQuickChecking = true;
-    quickCheckSamples = [];
-
-    const finish = (ok, reason) => {
-      if (!isQuickChecking) return;
-      isQuickChecking = false;
-      quickCheckEvaluate = null;
-      clearTimeout(timer);
-      console.log(`⚡ Quick check ${ok ? 'PASS' : 'FAIL'} (${reason})`);
-      resolve(ok);
-    };
-
-    const timer = setTimeout(() => finish(false, 'timeout'), QUICK_CHECK_TIMEOUT);
-
-    quickCheckEvaluate = (heading) => {
-      if (sensorInvalid) {
-        return finish(false, 'sensor reports invalid');
-      }
-
-      // iOS: the OS accuracy field is authoritative — trust it either way.
-      if (lastWebkitAccuracy !== null) {
-        if (lastWebkitAccuracy >= 0 && lastWebkitAccuracy < IOS_ACCURACY_GATE) {
-          return finish(true, `webkitCompassAccuracy=${lastWebkitAccuracy}`);
-        }
-        if (quickCheckSamples.length >= QUICK_CHECK_MIN_SAMPLES) {
-          return finish(false, `webkitCompassAccuracy=${lastWebkitAccuracy}`);
-        }
-        quickCheckSamples.push(heading);
-        return;
-      }
-
-      // Android: no accuracy signal — pass if any sliding window of recent
-      // headings is steady (low circular std) while the device is fairly flat.
-      quickCheckSamples.push(heading);
-      if (quickCheckSamples.length < QUICK_CHECK_MIN_SAMPLES) return;
-
-      const windowSamples = quickCheckSamples.slice(-QUICK_CHECK_MIN_SAMPLES);
-      const { std } = circularStats(windowSamples);
-      if (std <= STABILITY_MAX_STD_DEG && lastTiltDeg < TILT_WARN_DEG) {
-        finish(true, `std=${std.toFixed(2)}°`);
-      }
-    };
-  });
-}
-
-// Shared post-init routing for both platforms.
-async function routeAfterCompassInit() {
-  const ok = await runQuickQualityCheck();
-  if (ok) {
-    calibrationComplete = true;
-    headingHistory = [];
-    showState('compass');
-  } else {
-    showState('calibration');
-  }
 }
 
 // ============================================
@@ -790,16 +593,6 @@ function handleOrientation(event) {
   if (event.beta !== null && event.gamma !== null &&
       event.beta !== undefined && event.gamma !== undefined) {
     lastTiltDeg = Math.max(Math.abs(event.beta), Math.abs(event.gamma));
-
-    // Live spirit level during the hold-still phase
-    if (isCalibrating && inStabilityPhase) {
-      updateLevelBubble(event.beta, event.gamma);
-    }
-  }
-
-  // Feed the silent quality check (conditional calibration)
-  if (isQuickChecking && quickCheckEvaluate) {
-    quickCheckEvaluate(heading);
   }
 
   // Track calibration movements
@@ -1110,8 +903,7 @@ if (requestPermissionBtn) {
     if (granted) {
       const compassInit = initializeCompass();
       if (compassInit) {
-        showState('loading');
-        routeAfterCompassInit();
+        showState('calibration');
       }
     }
   });
@@ -1199,9 +991,7 @@ async function initializeApp() {
     const compassInit = initializeCompass();
 
     if (compassInit) {
-      // Conditional calibration: only show the calibration screen if the
-      // silent quality check fails. Recalibrate button still forces it.
-      routeAfterCompassInit();
+      showState('calibration');
     }
   }
 }
