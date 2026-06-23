@@ -103,7 +103,7 @@ function translateMonth(monthIndex) {
 // ============================================
 // HIJRI DATE ADJUSTMENT
 // ============================================
-const HIJRI_ADJUSTMENT = 0;
+const HIJRI_ADJUSTMENT = -1;
 
 const HIJRI_MONTHS = {
   1:  { en: "Muḥarram",        days: 30 },
