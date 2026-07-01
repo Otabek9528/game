@@ -39,6 +39,22 @@ async function jdelete(path){
 const TG = window.Telegram?.WebApp || {ready(){},expand(){},disableVerticalSwipes(){},initDataUnsafe:{},themeParams:{},
   BackButton:{show(){},hide(){},onClick(cb){this._cb=cb}},HapticFeedback:{impactOccurred(){},selectionChanged(){}}};
 TG.ready?.(); TG.expand?.(); TG.disableVerticalSwipes?.();
+
+/* ---------- activity log ----------
+   app.js owns 'cars' logging now (logger.js must NOT be included on this page,
+   or it will double-log and re-log on back-from-sell). Fires on any genuine open
+   — main menu OR channel deep-link — because init() always runs here. */
+const LOG_ENDPOINT = "https://vegukin-api.duckdns.org/api/log-interaction";
+function logOpen(){
+  // Skip when returning from the sell page (sell.js sets this flag on its load).
+  try{ if(sessionStorage.getItem("cars_back")==="1"){ sessionStorage.removeItem("cars_back"); return; } }catch(e){}
+  try{
+    const u = TG.initDataUnsafe && TG.initDataUnsafe.user;
+    if(!u) return;
+    fetch(LOG_ENDPOINT, {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
+      body: JSON.stringify({user_id:u.id, username:u.username||u.first_name||"unknown", action:"cars"})}).catch(()=>{});
+  }catch(e){}
+}
 function haptic(t="light"){try{t==="sel"?TG.HapticFeedback.selectionChanged():TG.HapticFeedback.impactOccurred(t)}catch(e){}}
 
 /* ---------- helpers ---------- */
@@ -176,7 +192,7 @@ function card(c,showModel){
     <div class="price num ${hasPrice?"":"noprice"}">${hasPrice?`${c.status!=="sold"?`<span class="dot" style="background:${dealColor(dc)}"></span>`:""}${won(c.price_krw)}`:"Narxi keltirilmagan"}</div>
     <div class="ygen">${ygen} ${c.negotiable&&c.status!=="sold"?'<span class="neg">Kelishiladi</span>':''}</div>
     ${chips.length?`<div class="specs">${chips.map(x=>`<span>${x}</span>`).join("")}</div>`:""}
-    <div class="foot"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>${esc(when)}</div>
+    <div class="foot"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>${esc(when)}${c.views?`<span class="vcount ${c.views>=25?"hot":""}"><svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>${c.views}</span>`:""}</div>
    </div></div>`;
 }
 async function persistFav(id, want){
@@ -669,6 +685,7 @@ function resolveSlug(sp){
 }
 function firstModel(){if(CATALOG.length&&CATALOG[0].models.length)return{brand:CATALOG[0].brand,model:CATALOG[0].models[0].model};return null;}
 async function init(){
+  logOpen();
   applyTheme();renderSearchChips();renderAlertChips();
   try{CATALOG=await jget("/catalog");}catch(e){CATALOG=[];}
   if(UID){try{const r=await jget("/favorites/ids?"+authQS());(r.ids||[]).forEach(id=>FAV.add(id));updateFavBadge();}catch(e){}}
@@ -678,9 +695,15 @@ async function init(){
     try{const c=await jget("/car?id="+id);byId[id]=c;await setCurrent({brand:c.brand,model:c.model});switchTab("browse");openDetail(id);return;}
     catch(e){/* fall through to normal entry */}
   }
-  const target=resolveSlug(sp)||firstModel();
-  if(target){aModelSel=target;setPickField("aModelIc","aModelTxt","aModelField",target);await setCurrent(target);}
-  else{document.getElementById("hTitle").textContent="Avto Bozor";document.getElementById("hSub").textContent="Ma'lumot yo'q";document.getElementById("msum").innerHTML="";document.getElementById("browseList").innerHTML=errHTML("Katalog bo'sh");}
-  switchTab("browse");
+  const target=resolveSlug(sp);
+  if(target){
+    aModelSel=target;setPickField("aModelIc","aModelTxt","aModelField",target);
+    await setCurrent(target);
+    switchTab("browse");
+  }else{
+    // Opened from the main menu (no model deep-link): show ALL cars, newest first,
+    // zero filters. The user narrows to a specific model from here himself.
+    switchTab("search");
+  }
 }
 init();

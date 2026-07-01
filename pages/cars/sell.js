@@ -3,6 +3,9 @@
    Talks to /api/cars (car_api.py). Admin/approval lives elsewhere.
    ============================================================ */
 const API = (window.CARS_API_BASE || "/api/cars");
+// Mark that we're on the sell page — when the user goes back to cars.html,
+// app.js logOpen() sees this and skips re-logging the 'cars' open.
+try{ sessionStorage.setItem("cars_back", "1"); }catch(e){}
 const API_ORIGIN = new URL(API, location.href).origin;
 const absUrl = u => (u && u[0] === "/") ? API_ORIGIN + u : u;
 const UID   = (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) || new URLSearchParams(location.search).get("uid") || null;
