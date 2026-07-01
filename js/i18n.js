@@ -6,7 +6,7 @@ const I18N = {
   STORAGE_KEY: 'vegukin_language',
 
   availableFeatures: {
-    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'hikorea', 'jobs', 'parcel', 'vegukinShops', 'links', 'donation', 'community', 'news', 'events', 'market'],
+    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'hikorea', 'jobs', 'parcel', 'vegukinShops', 'links', 'donation', 'community', 'news', 'events', 'market', 'cars'],
     ru: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community', 'hikorea'],
     en: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community', 'hikorea']
   },
@@ -29,7 +29,7 @@ const I18N = {
     'feature.links': { uz: 'Foydali linklar', ru: 'Полезные ссылки', en: 'Useful Links' },
     'feature.donation': { uz: 'Qo\'llab-quvvatlash', ru: 'Поддержать', en: 'Support' },
     'feature.barcode': { uz: 'Mahsulot tarkibini tekshirish', ru: 'Проверка состава', en: 'Ingredient Check' },
-    'feature.news': { uz: 'Yangiliklar', ru: 'Новости', en: 'News' },
+    'feature.cars': { uz: 'Vegukin Cars', ru: 'Vegukin Cars', en: 'Vegukin Cars' },
     'feature.events': { uz: 'Tadbirlar', ru: 'Мероприятия', en: 'Events' },
     'feature.market': { uz: 'Halal Bozor', ru: 'Халяль Маркет', en: 'Halal Market' },
     'feature.community': { uz: 'Jamoa', ru: 'Сообщество', en: 'Community' },

@@ -21,7 +21,8 @@
     'pages/barcode/barcode.html': 'barcode',
     'pages/community/community.html': 'community',
     'pages/hikorea/hikorea.html': 'hikorea',
-    'pages/ramadan/ramadan.html': 'ramadan'
+    'pages/ramadan/ramadan.html': 'ramadan',
+    'pages/cars/cars.html': 'cars'
   };
   
   /**
