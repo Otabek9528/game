@@ -46,9 +46,20 @@ TG.ready?.(); TG.expand?.(); TG.disableVerticalSwipes?.();
    — main menu OR channel deep-link — because init() always runs here. */
 const LOG_ENDPOINT = "https://vegukin-api.duckdns.org/api/log-interaction";
 function logOpen(){
-  const w = window.Telegram && window.Telegram.WebApp;
-  const u = w && w.initDataUnsafe && w.initDataUnsafe.user;
-  try{ w.showAlert("logOpen ran\nuser=" + JSON.stringify(u||null) + "\nstart_param=" + ((w&&w.initDataUnsafe&&w.initDataUnsafe.start_param)||"none")); }catch(e){}
+  // Sole logger for 'cars' (index.html no longer logs cars). Skip only when
+  // returning from the sell page (sell.js sets cars_back on its load).
+  try{ if(sessionStorage.getItem("cars_back")==="1"){ sessionStorage.removeItem("cars_back"); return; } }catch(e){}
+  let tries=0;
+  (function attempt(){
+    const w = window.Telegram && window.Telegram.WebApp;      // read live, not the stubbed TG
+    const u = w && w.initDataUnsafe && w.initDataUnsafe.user;
+    if(u){
+      try{ fetch(LOG_ENDPOINT, {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
+        body: JSON.stringify({user_id:u.id, username:u.username||u.first_name||"unknown", action:"cars"})}).catch(()=>{}); }catch(e){}
+      return;
+    }
+    if(tries++ < 10) setTimeout(attempt, 300);                // wait for initData on a cold channel launch
+  })();
 }
 function haptic(t="light"){try{t==="sel"?TG.HapticFeedback.selectionChanged():TG.HapticFeedback.impactOccurred(t)}catch(e){}}
 
