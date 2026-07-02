@@ -128,8 +128,8 @@ textarea.ta{background:var(--surface-2);border-radius:12px;padding:12px 14px;min
 .selectfield{display:flex;align-items:center;gap:11px;background:var(--surface-2);border-radius:12px;padding:11px 13px;transition:transform .12s}
 .selectfield:active{transform:scale(.99)}
 .selectfield.err{box-shadow:inset 0 0 0 1.5px var(--high)}
-.selectfield .sf-logo{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;background:#fff;overflow:hidden;color:#fff;font-weight:800;font-size:13px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
-.selectfield .sf-logo img{width:100%;height:100%;object-fit:contain;padding:4px}
+.selectfield .sf-logo{width:38px;height:38px;flex:none;border-radius:11px;display:none;place-items:center;background:#fff;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);color:#fff;font-weight:800;font-size:16px}
+.selectfield .sf-logo img{width:100%;height:100%;object-fit:contain;padding:5px}
 .selectfield .sf-tx{flex:1;min-width:0;font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .selectfield .sf-tx.ph{color:var(--faint);font-weight:500}
 .selectfield .sf-cv{flex:none;color:var(--faint)}
@@ -208,8 +208,8 @@ textarea.ta{background:var(--surface-2);border-radius:12px;padding:12px 14px;min
 .brandgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .bcard{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 6px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow-sm);transition:transform .12s}
 .bcard:active{transform:scale(.96)}
-.bcard .lg{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#fff;overflow:hidden;color:#fff;font-weight:800;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
-.bcard .lg img{width:100%;height:100%;object-fit:contain;padding:6px}
+.bcard .lg{width:60px;height:60px;border-radius:16px;display:grid;place-items:center;background:#fff;overflow:hidden;color:#fff;font-weight:800;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.bcard .lg img{width:100%;height:100%;object-fit:contain;padding:7px}
 .bcard span{font-size:12px;font-weight:600;color:var(--text);text-align:center;line-height:1.2}
 .optrow{display:flex;align-items:center;gap:12px;padding:14px 13px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow-sm);margin-bottom:8px;transition:transform .12s}
 .optrow:active{transform:scale(.99)}
@@ -237,6 +237,11 @@ textarea.ta{background:var(--surface-2);border-radius:12px;padding:12px 14px;min
 .modal .dupitem .dt{min-width:0}
 .modal .dupitem .dt b{display:block;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .modal .dupitem .dt span{font-size:12px;color:var(--dim)}
+.modal .dupitem .dt{flex:1}
+.modal .dupview{align-self:center;flex:none;font-size:12.5px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
+.modal .dupown{align-self:center;flex:none;font-size:11.5px;color:var(--dim);white-space:nowrap}
+.modal .dupnote{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.5}
+.modal .dupnote a{color:var(--accent);font-weight:600;text-decoration:none}
 .modal .mbtns{display:flex;flex-direction:column;gap:9px;margin-top:16px}
 
 /* ---------- toast & spinner ---------- */

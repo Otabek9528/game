@@ -45,7 +45,7 @@ function uploadMedia(listingId, item, onProgress){
 
 /* ---------- brand assets (mirror marketplace) ---------- */
 const BRAND_COLOR={Hyundai:"#0b2c5e",Kia:"#bb162b",Chevrolet:"#c9971c",Genesis:"#1c1c22",Samsung:"#1428a0",SsangYong:"#c8102e",Renault:"#f5a623",Daewoo:"#0b5fa5",Toyota:"#eb0a1e",BMW:"#16588e",Nissan:"#c3002f"};
-const BRAND_LOGO={Hyundai:"hyundai",Chevrolet:"chevrolet",Kia:"kia",BMW:"bmw",Genesis:"genesis",Audi:"audi",Infiniti:"infiniti",Jaguar:"jaguar",SsangYong:"ssangyong","Samsung/Renault":"samsung",Mercedes:"mercedes-benz",Volvo:"volvo",Honda:"honda",Toyota:"toyota",Volkswagen:"volkswagen",Lexus:"lexus"};
+const BRAND_LOGO={Hyundai:"hyundai",Chevrolet:"chevrolet",Kia:"kia",BMW:"bmw",Genesis:"genesis",Audi:"audi",Infiniti:"infiniti",Jaguar:"jaguar",SsangYong:"ssangyong","Samsung/Renault":"samsung",Mercedes:"mercedes-benz",Volvo:"volvo",Honda:"honda",Toyota:"toyota",Volkswagen:"volkswagen",Lexus:"lexus", Daewoo:"daewoo", Nissan:"nissan"};
 const brandColor=b=>BRAND_COLOR[b]||"#41506a";
 const brandMono =b=>((b||"?").trim()[0]||"?").toUpperCase();
 const logoSrc   =b=>BRAND_LOGO[b]?`logo/${BRAND_LOGO[b]}-logo.png`:null;
@@ -418,12 +418,10 @@ async function doSubmit(){
 
   setBusy(true);
   try{
-    // 1) duplicate check against already-posted listings
-    if(!FORCE){
-      let dup=null;
-      try{ dup=await jpost("/listings/check-duplicate",{brand:v.payload.brand,model:v.payload.model,year:v.payload.year,price_krw:v.payload.price_krw,phone:v.payload.contact_phone}); }catch(_){}
-      if(dup&&dup.matches&&dup.matches.length){ setBusy(false); return showDupModal(dup.matches); }
-    }
+    // 1) duplicate pre-check (nicer UX; /submit enforces the same rule server-side)
+    let dup=null;
+    try{ dup=await jpost("/listings/check-duplicate",{brand:v.payload.brand,model:v.payload.model,year:v.payload.year,fuel:v.payload.fuel,mileage_km:v.payload.mileage_km,price_krw:v.payload.price_krw,phone:v.payload.contact_phone}); }catch(_){}
+    if(dup&&dup.matches&&dup.matches.length){ setBusy(false); return showDupModal(dup.matches); }
     // 2) create draft listing
     if(!DRAFT.id){ const r=await jpost("/listings", v.payload); DRAFT.id=r.id; }
     else { await jpost("/listings/"+DRAFT.id+"/edit", v.payload); }
@@ -435,10 +433,15 @@ async function doSubmit(){
       finally{ m.uploading=false; }
       renderMedia();
     }
-    // 4) finalize → pending review
-    await jpost("/listings/"+DRAFT.id+"/submit",{force:FORCE});
+    // 4) finalize → pending review (server re-checks duplicates, may reject with 409)
+    try{
+      await jpost("/listings/"+DRAFT.id+"/submit",{});
+    }catch(e){
+      if(e.data&&e.data.error==="duplicate"&&e.data.matches&&e.data.matches.length){ setBusy(false); return showDupModal(e.data.matches); }
+      throw e;
+    }
     haptic("ok"); toast("E'lon ko'rib chiqishga yuborildi ✓");
-    DRAFT=null; FORCE=false; await loadList(); showList();
+    DRAFT=null; await loadList(); showList();
   }catch(e){
     toast("Xatolik: "+(e.data?.error||e.message||"qayta urining"));
   }
@@ -448,19 +451,20 @@ $("btnSubmit").onclick=doSubmit;
 
 /* ---------- duplicate modal ---------- */
 function showDupModal(matches){
-  const items=matches.slice(0,3).map(m=>`<div class="dupitem">
+  const items=matches.slice(0,3).map(m=>{
+    const view=(m.viewable&&m.id)?`<a class="dupview" href="cars.html?startapp=car${m.id}">Ko'rish →</a>`:(m.own?`<span class="dupown">Sizning e'loningiz</span>`:"");
+    return `<div class="dupitem">
     ${m.thumb?`<img src="${absUrl(m.thumb)}" alt="">`:""}
-    <div class="dt"><b>${esc(m.brand||"")} ${esc(m.model||"")}${m.year?` · ${m.year}`:""}</b><span>${m.price_krw!=null?won(m.price_krw):""}${m.source_name?` · ${esc(m.source_name)}`:""}</span></div></div>`).join("");
+    <div class="dt"><b>${esc(m.brand||"")} ${esc(m.model||"")}${m.year?` · ${m.year}`:""}</b><span>${m.price_krw!=null?won(m.price_krw):""}${m.source_name?` · ${esc(m.source_name)}`:""}</span></div>
+    ${view}</div>`;
+  }).join("");
   openModal(`<div class="mic warn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg></div>
-    <h3>O'xshash e'lon topildi</h3>
-    <p>Bu mashina allaqachon joylangan bo'lishi mumkin. Takror e'lon bermoqchimisiz?</p>
+    <h3>Bu mashina allaqachon joylangan</h3>
+    <p>Xuddi shu mashina bozorda mavjud, shuning uchun takroriy e'lon qabul qilinmaydi.</p>
     ${items}
-    <div class="mbtns">
-      <button class="btn primary" id="dupGo">Baribir yuborish</button>
-      <button class="btn ghost" id="dupCancel">Bekor qilish</button>
-    </div>`);
-  $("dupGo").onclick=()=>{closeModal();FORCE=true;doSubmit();};
-  $("dupCancel").onclick=closeModal;
+    <p class="dupnote">Agar bu xatolik bo'lsa, admin bilan bog'laning: <a href="https://t.me/otabeksattarov">@otabeksattarov</a></p>
+    <div class="mbtns"><button class="btn primary" id="dupClose">Tushunarli</button></div>`);
+  $("dupClose").onclick=closeModal;
 }
 
 /* ---------- generic modal ---------- */

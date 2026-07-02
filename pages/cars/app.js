@@ -46,6 +46,7 @@ TG.ready?.(); TG.expand?.(); TG.disableVerticalSwipes?.();
    — main menu OR channel deep-link — because init() always runs here. */
 const LOG_ENDPOINT = "https://vegukin-api.duckdns.org/api/log-interaction";
 function logOpen(){
+  
   // Sole logger for 'cars' (index.html no longer logs cars). Skip only when
   // returning from the sell page (sell.js sets cars_back on its load).
   try{ if(sessionStorage.getItem("cars_back")==="1"){ sessionStorage.removeItem("cars_back"); return; } }catch(e){}
@@ -226,7 +227,7 @@ const errHTML=(msg)=>`<div class="empty"><div class="e">⚠️</div><h3>${msg||"
 
 /* ---------- BROWSE ---------- */
 let SORT="new",STATUS="all",ALL_MODE=false;
-const SORTS=[["new","Yangi"],["value","Eng foydali"],["plow","Narx ↑"],["phigh","Narx ↓"],["mlow","Yurgani ↑"],["ynew","Yili ↓"]];
+const SORTS=[["new","Yangi"],["value","Eng arzonlari"],["plow","Narx ↑"],["phigh","Narx ↓"],["mlow","Yurgani ↑"],["ynew","Yili ↓"]];
 const STAT=[["all","Hammasi"],["active","Mavjud"],["sold","Sotilgan"]];
 function sortCars(a){const f={plow:(x,y)=>(x.price_krw??Infinity)-(y.price_krw??Infinity),phigh:(x,y)=>(y.price_krw??-Infinity)-(x.price_krw??-Infinity),mlow:(x,y)=>(x.mileage_km||1e9)-(y.mileage_km||1e9),ynew:(x,y)=>(y.year||0)-(x.year||0),new:()=>0,value:(x,y)=>valueScore(x)-valueScore(y)}[SORT];return[...a].sort(f);}
 function valueScore(c){if(c.price_krw==null)return 1e9;const ageP=(2026-(c.year||2014)),mileP=(c.mileage_km||150000)/10000;return c.price_krw/1e6+ageP*0.15+mileP*0.08;}
@@ -706,7 +707,7 @@ function syncBack(){
     ||document.getElementById("detail").classList.contains("on")||TAB!=="browse";
   try{show?TG.BackButton.show():TG.BackButton.hide();}catch(e){}
 }
-document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;if(b.dataset.tab==="sell"){location.href="sell.html";return;}switchTab(b.dataset.tab);});
+document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;if(b.dataset.tab==="sell"){ try{sessionStorage.setItem("cars_back","1")}catch(e){} location.href="sell.html"; return; }switchTab(b.dataset.tab);});
 
 /* ---------- theme ---------- */
 let dark=(()=>{try{const t=localStorage.getItem("cars_theme");if(t)return t==="dark";}catch(e){}return false;})();
