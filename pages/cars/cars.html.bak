@@ -107,6 +107,6 @@
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>window.CARS_API_BASE = "https://vegukin-api.duckdns.org/api/cars";</script>
-<script src="app.js?v=3"></script>
+<script src="app.js"></script>
 </body>
 </html>
