@@ -226,11 +226,14 @@
             }
           } catch (e) {}
           
-          // Log immediately (fire-and-forget with sendBeacon)
-          if (window.logInteraction) {
-            window.logInteraction(featureKey);
+          // 'cars' logs itself on load in app.js (so channel deep-link opens are
+          // covered too, and there's no double-log). Every other feature logs here.
+          if (featureKey !== 'cars') {
+            if (window.logInteraction) {
+              window.logInteraction(featureKey);
+            }
+            sessionStorage.setItem('logged_' + featureKey, '1');
           }
-          sessionStorage.setItem('logged_' + featureKey, '1');  
           
           // Navigate immediately (no URL parameter)
           window.location.href = feature.href;
