@@ -49,12 +49,11 @@ function logOpen(){
   const w = window.Telegram && window.Telegram.WebApp;
   const u = w && w.initDataUnsafe && w.initDataUnsafe.user;
   const sp = (w && w.initDataUnsafe && w.initDataUnsafe.start_param) || "none";
-  fetch(LOG_ENDPOINT, {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
-    body: JSON.stringify({
-      user_id: u ? u.id : 0,
-      username: "PROBE",
-      action: u ? ("carsdbg_"+sp) : "carsdbg_nouser"
-    })}).catch(()=>{});
+  setTimeout(function(){
+    fetch(LOG_ENDPOINT, {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ user_id: u ? u.id : 0, username: "PROBE2", action: u ? ("carsdbg2_"+sp) : "carsdbg2_nouser" })
+    }).catch(function(){});
+  }, 1500);
 }
 function haptic(t="light"){try{t==="sel"?TG.HapticFeedback.selectionChanged():TG.HapticFeedback.impactOccurred(t)}catch(e){}}
 

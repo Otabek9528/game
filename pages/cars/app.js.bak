@@ -48,7 +48,13 @@ const LOG_ENDPOINT = "https://vegukin-api.duckdns.org/api/log-interaction";
 function logOpen(){
   const w = window.Telegram && window.Telegram.WebApp;
   const u = w && w.initDataUnsafe && w.initDataUnsafe.user;
-  try{ w.showAlert("logOpen ran\nuser=" + JSON.stringify(u||null) + "\nstart_param=" + ((w&&w.initDataUnsafe&&w.initDataUnsafe.start_param)||"none")); }catch(e){}
+  const sp = (w && w.initDataUnsafe && w.initDataUnsafe.start_param) || "none";
+  fetch(LOG_ENDPOINT, {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
+    body: JSON.stringify({
+      user_id: u ? u.id : 0,
+      username: "PROBE",
+      action: u ? ("carsdbg_"+sp) : "carsdbg_nouser"
+    })}).catch(()=>{});
 }
 function haptic(t="light"){try{t==="sel"?TG.HapticFeedback.selectionChanged():TG.HapticFeedback.impactOccurred(t)}catch(e){}}
 
