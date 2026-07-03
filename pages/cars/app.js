@@ -63,6 +63,24 @@ function logOpen(){
   })();
 }
 function haptic(t="light"){try{t==="sel"?TG.HapticFeedback.selectionChanged():TG.HapticFeedback.impactOccurred(t)}catch(e){}}
+function dialPhone(num){
+  // WKWebView (Telegram iOS) blocks location.href='tel:'; a programmatic <a> click within
+  // the user gesture is handled reliably. Strip spaces/dashes — malformed tel: fails on iOS.
+  const tel="tel:"+String(num).replace(/[^\d+]/g,"");
+  try{ const a=document.createElement("a"); a.href=tel; a.style.display="none"; document.body.appendChild(a); a.click(); a.remove(); return; }catch(e){}
+  try{ location.href=tel; }catch(e){}
+}
+function openTgHandle(h){
+  const u="https://t.me/"+String(h).replace(/^@/,"");
+  try{ if(TG.openTelegramLink){ TG.openTelegramLink(u); return; } }catch(e){}
+  try{ if(TG.openLink){ TG.openLink(u); return; } }catch(e){}
+  window.open(u,"_blank");
+}
+function copyText(t){
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(String(t)); return true; } }catch(e){}
+  try{ const i=document.createElement("input"); i.value=String(t); i.style.position="fixed"; i.style.opacity="0"; document.body.appendChild(i); i.select(); document.execCommand("copy"); i.remove(); return true; }catch(e){}
+  return false;
+}
 
 /* ---------- helpers ---------- */
 const NA="Keltirilmagan";
@@ -199,7 +217,7 @@ function card(c,showModel){
     <div class="price num ${hasPrice?"":"noprice"}">${hasPrice?`${c.status!=="sold"?`<span class="dot" style="background:${dealColor(dc)}"></span>`:""}${won(c.price_krw)}`:"Narxi keltirilmagan"}</div>
     <div class="ygen">${ygen} ${c.negotiable&&c.status!=="sold"?'<span class="neg">Kelishiladi</span>':''}</div>
     ${chips.length?`<div class="specs">${chips.map(x=>`<span>${x}</span>`).join("")}</div>`:""}
-    <div class="foot"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>${esc(when)}${c.views?`<span class="vcount ${c.views>=25?"hot":""}"><svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>${c.views}</span>`:""}</div>
+    <div class="foot"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>${esc(when)}</div>
    </div></div>`;
 }
 async function persistFav(id, want){
@@ -249,7 +267,24 @@ function renderBrowse(){
   const emptyMsg=ALL_MODE
     ?`<div class="empty"><div class="e">🚗</div><h3>Hozircha e'lon yo'q</h3><p>Tez orada yangi mashinalar qo'shiladi</p></div>`
     :`<div class="empty"><div class="e">🚗</div><h3>Bu modelda e'lon yo'q</h3><p>Yuqoridagi nomdan boshqa modelni tanlang</p></div>`;
-  document.getElementById("browseList").innerHTML=rows.length?rows.map(c=>card(c,ALL_MODE)).join(""):emptyMsg;
+  const cells=rows.map(c=>card(c,ALL_MODE));
+  let html;
+  if(cells.length){ cells.splice(Math.min(6,cells.length),0,channelCard()); html=cells.join(""); }
+  else { html=emptyMsg+channelCard(); }
+  document.getElementById("browseList").innerHTML=html;
+}
+function channelCard(){
+  return `<button class="chcard" onclick="openChannel()" aria-label="Vegukin Avto kanali">
+    <span class="ch-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.27l-3.3 15.56c-.24 1.1-.9 1.37-1.82.85l-5.03-3.71-2.43 2.34c-.27.27-.5.5-1.02.5l.36-5.18L18.4 6.2c.4-.36-.09-.56-.62-.2L7.24 12.9l-4.87-1.52c-1.06-.33-1.08-1.06.22-1.57l19.06-7.35c.88-.33 1.65.2 1.36 1.93z"/></svg></span>
+    <span class="ch-tw"><span class="ch-t">Vegukin Avto — kanal</span><span class="ch-s">Barcha yangi e'lonlar shu yerda jonli chiqadi</span></span>
+    <span class="ch-cta">Ochish</span>
+  </button>`;
+}
+function openChannel(){
+  const u="https://t.me/vegukin_car"; haptic("light");
+  try{ if(TG.openTelegramLink){ TG.openTelegramLink(u); return; } }catch(e){}
+  try{ if(TG.openLink){ TG.openLink(u); return; } }catch(e){}
+  location.href=u;
 }
 function setHeaderBrand(brand,model){
   document.getElementById("hTitle").textContent=(brand||"")+(model?" "+model:"");
@@ -424,6 +459,7 @@ function renderDetail(c,st,modelCars){
   const legal=c.legal_status==="legal"?"Legal":c.legal_status==="no_oformleniya"?"Oformleniyasiz":NA;
   const sr=(k,v)=>`<div class="r"><span class="k">${k}</span><span class="v">${v}</span></div>`;
   const rawtext=c.raw_text?esc(c.raw_text):"Matn keltirilmagan";
+  const hasPhone=!!c.contact, hasHandle=!!c.contact_handle;
   document.getElementById("dbody").innerHTML=`
    <div class="dhead">
     <div class="t">${[c.year,c.brand,c.model,c.generation].filter(v=>v!=null&&v!=="").join(" ")||"E'lon"}</div>
@@ -443,8 +479,11 @@ function renderDetail(c,st,modelCars){
     ${sr("Karobka",transLabel(c.transmission))}${sr("Yoqilg'i",fuelLabel(c.fuel))}${sr("Holati",legal)}
     ${sr("Nomiga o'tkazish",c.registration_required==null?NA:c.registration_required?"Shart":"Shart emas")}${sr("E'lon",na(c.posted_rel||c.posted_at))}${sr("Manba",na(c.source_name))}
    </div></div>
+   ${(hasPhone||hasHandle)?`<div class="sec"><div class="h">Bog'lanish</div><div class="contactcard">
+    ${hasPhone?`<div class="crow"><span class="cic">📞</span><span class="ctx"><b class="num">${esc(c.contact)}</b><span>Sotuvchi telefoni</span></span><button class="cbtn" id="cCall">Qo'ng'iroq</button><button class="cbtn ghost" id="cCopy">Nusxa</button></div>`:""}
+    ${hasHandle?`<div class="crow"><span class="cic">✈️</span><span class="ctx"><b>@${esc(String(c.contact_handle).replace(/^@/,""))}</b><span>Telegram orqali yozish</span></span><button class="cbtn" id="cTg">Yozish</button></div>`:""}
+   </div></div>`:""}
    <div class="sec"><div class="h">O'xshash mashinalar (narx bo'yicha)</div>${comparables(c,st,modelCars)}</div>`;
-  const hasPhone=!!c.contact, hasHandle=!!c.contact_handle;
   const cLabel=hasPhone?"Bog'lanish":hasHandle?"Telegram orqali":"Raqam e'lon matnida";
   document.getElementById("abar").className="abar";
   document.getElementById("abar").innerHTML=`
@@ -461,10 +500,13 @@ function renderDetail(c,st,modelCars){
   document.getElementById("dFav").onclick=togFav;document.getElementById("dFav2").onclick=togFav;
   document.getElementById("dBack").onclick=closeDetail;
   document.getElementById("callBtn").onclick=()=>{haptic('medium');
-    if(hasPhone){location.href="tel:"+c.contact;}
-    else if(hasHandle){window.open("https://t.me/"+String(c.contact_handle).replace(/^@/,""),"_blank");}
+    if(hasPhone){dialPhone(c.contact);}
+    else if(hasHandle){openTgHandle(c.contact_handle);}
     else{const s=document.getElementById("msgSec");if(s){s.scrollIntoView({behavior:"smooth",block:"start"});const mc=s.querySelector(".msgcard");if(mc){mc.classList.add("flash");setTimeout(()=>mc.classList.remove("flash"),1600);}}}
   };
+  const cCall=document.getElementById("cCall");if(cCall)cCall.onclick=()=>{haptic('medium');dialPhone(c.contact);};
+  const cCopy=document.getElementById("cCopy");if(cCopy)cCopy.onclick=()=>{haptic('light');if(copyText(c.contact)){cCopy.textContent="Nusxalandi ✓";cCopy.classList.add("ok");setTimeout(()=>{cCopy.textContent="Nusxa";cCopy.classList.remove("ok");},1500);}};
+  const cTg=document.getElementById("cTg");if(cTg)cTg.onclick=()=>{haptic('light');openTgHandle(c.contact_handle);};
   document.getElementById("dbody").querySelectorAll("[data-id]").forEach(el=>el.onclick=()=>{document.getElementById("detail").scrollTo(0,0);openDetail(+el.dataset.id);});
 }
 try{TG.BackButton.onClick(()=>{
