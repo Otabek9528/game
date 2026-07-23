@@ -681,33 +681,33 @@ async function renderPlaceCards(places) {
 	const distanceDisplay = (place.distance !== null && place.distance !== undefined) ? place.distance.toFixed(2) : 'N/A';
     const phoneDisplay = place.phone || noInfoText;
     
+    // Photo-forward card. The distance badge sits in .place-card-media and
+    // NOT inside .place-card-image, because loadPlacePhotos() replaces that
+    // element's innerHTML wholesale once the photos arrive.
+    // The full address is deliberately not repeated here: it is not
+    // actionable from a scan list, city already gives the neighbourhood,
+    // and it is one tap away on the detail page.
+    const telHref = place.phone ? String(place.phone).replace(/[^0-9+]/g, '') : '';
+    const hasDistance = place.distance !== null && place.distance !== undefined;
+
     card.innerHTML = `
-      <div class="card-top-badges">
-        <div class="place-rating-badge">
-          ${starRatingHTML}
+      <div class="place-card-media">
+        <div class="place-card-image">
+          ${createSkeletonCard(place.id)}
         </div>
-        <div class="place-distance-badge">
-          <span>📍</span>
-          <span>${distanceDisplay} km</span>
-        </div>
+        ${hasDistance ? `
+          <span class="place-distance-badge"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${distanceDisplay} km</span>
+        ` : ''}
       </div>
-      
-      <div class="place-card-image">
-        ${createSkeletonCard(place.id)}
-      </div>
-      
+
       <div class="place-card-content">
         <h3 class="place-name">${place.name}</h3>
-        <p class="place-name-ko">${place.city || 'Unknown City'}</p>
-        <div class="place-info">
-          <div class="place-info-item">
-            <span class="info-icon">📞</span>
-            <span class="info-text">${phoneDisplay}</span>
-          </div>
-          <div class="place-info-item">
-            <span class="info-icon">📍</span>
-            <span class="info-text">${place.address || noAddressText}</span>
-          </div>
+        <p class="place-name-ko">${place.city || ''}</p>
+        <div class="place-meta">
+          ${starRatingHTML}
+          ${place.phone ? `
+            <a class="meta-phone" href="tel:${telHref}" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>${place.phone}</a>
+          ` : ''}
         </div>
       </div>
     `;
@@ -757,6 +757,8 @@ function showError(message) {
 searchByAddressBtn.addEventListener('click', () => {
   const isOpen = addressInputSection.style.display !== 'none';
   addressInputSection.style.display = isOpen ? 'none' : 'block';
+  searchByAddressBtn.classList.toggle('active', !isOpen);
+  searchNearbyBtn.classList.remove('active');
   if (!isOpen) {
     searchBar.focus();
   }
@@ -764,6 +766,8 @@ searchByAddressBtn.addEventListener('click', () => {
 
 // Button 2: Search Nearby (current location)
 searchNearbyBtn.addEventListener('click', async () => {
+  searchNearbyBtn.classList.add('active');
+  searchByAddressBtn.classList.remove('active');
   // Hide placeholder and address input, show loading
   searchPlaceholder.style.display = 'none';
   addressInputSection.style.display = 'none';
