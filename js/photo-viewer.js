@@ -502,3 +502,62 @@
 
   window.SwipeNav = { attach: attach };
 })();
+
+/* ============================================================
+   CoverflowSlot — slot assignment for the carousels.
+
+   The four slots (.center / .left / .right / .hidden-*) are positioned
+   with `left` in places.css, and every adjacent slot change is a short,
+   interpolable move. A few changes are not adjacent:
+
+     - the two off-stage slots sit on opposite edges
+     - in a 3- or 4-photo loop, one photo has to cross the whole
+       carousel on every step
+
+   Animating those drags a ghost card straight across the centre photo.
+   This suppresses the transition for that one element so it repositions
+   instantly, while every genuine neighbour move still animates.
+
+     CoverflowSlot.apply(photoEl, 'center' | 'left' | 'right'
+                                | 'hidden-left' | 'hidden-right')
+   ============================================================ */
+(function () {
+  'use strict';
+
+  // Horizontal anchor of each slot, in % of carousel width.
+  // Must stay in sync with the `left` values in places.css.
+  var SLOT_X = {
+    'center':          6,
+    'left':          -25,
+    'right':          70,
+    'hidden-left':   -60,
+    'hidden-right':  105
+  };
+
+  // Largest genuine neighbour move is right -> center, 64%.
+  var JUMP = 90;
+
+  var ALL = ['center', 'left', 'right', 'hidden', 'hidden-left', 'hidden-right'];
+
+  function apply(photo, slot) {
+    if (!photo || !(slot in SLOT_X)) return;
+
+    var prev = photo.dataset.slot;
+    var jump = !!prev && prev !== slot &&
+               Math.abs(SLOT_X[slot] - SLOT_X[prev]) > JUMP;
+
+    if (jump) photo.style.transition = 'none';
+
+    photo.dataset.slot = slot;
+    ALL.forEach(function (c) { photo.classList.remove(c); });
+    if (slot.indexOf('hidden') === 0) photo.classList.add('hidden');
+    photo.classList.add(slot);
+
+    if (jump) {
+      void photo.offsetWidth;      // commit the new position untransitioned
+      photo.style.transition = '';
+    }
+  }
+
+  window.CoverflowSlot = { apply: apply, SLOT_X: SLOT_X };
+})();

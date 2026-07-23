@@ -281,19 +281,19 @@ function initDetailCarousel(photoCount) {
     const totalPhotos = photos.length;
     
     photos.forEach((photo, index) => {
-      let relativePos = (index - newIndex + totalPhotos) % totalPhotos;
-      
-      photo.classList.remove('center', 'left', 'right', 'hidden');
-      
-      if (relativePos === 0) {
-        photo.classList.add('center');
-      } else if (relativePos === 1) {
-        photo.classList.add('right');
-      } else if (relativePos === totalPhotos - 1) {
-        photo.classList.add('left');
-      } else {
-        photo.classList.add('hidden');
-      }
+      const relativePos = (index - newIndex + totalPhotos) % totalPhotos;
+
+      // Off-stage photos get a side, so they slide in from the correct edge
+      // instead of emerging from behind the centre photo. `<=` puts the
+      // exactly-opposite photo of an even-length loop ahead rather than
+      // behind, which is the side it will be needed on next.
+      let slot;
+      if (relativePos === 0) slot = 'center';
+      else if (relativePos === 1) slot = 'right';
+      else if (relativePos === totalPhotos - 1) slot = 'left';
+      else slot = relativePos <= totalPhotos / 2 ? 'hidden-right' : 'hidden-left';
+
+      CoverflowSlot.apply(photo, slot);
     });
     
     dots.forEach((dot, index) => {

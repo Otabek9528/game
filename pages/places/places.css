@@ -612,6 +612,20 @@ body {
   height: 100%;
   overflow: hidden;
   border-radius: 16px 16px 0 0;
+  /* pan-y, NOT none: the carousel sits inside a vertically scrolling
+     container, so vertical scroll must still pass through. The browser
+     fires pointercancel when it claims a vertical gesture, which aborts
+     the horizontal swipe cleanly. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-carousel img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .carousel-track {
@@ -678,8 +692,10 @@ body {
 .carousel-photo.right {
   width: 55%;
   height: 72%;
-  left: auto;
-  right: -25%;
+  /* left:70% is exactly equivalent to the old right:-25% at width:55%
+     (100% - (-25%) - 55% = 70%), but unlike `left:auto` it interpolates,
+     so photos now slide into and out of this slot instead of teleporting. */
+  left: 70%;
   top: 14%;
   z-index: 5;
   opacity: 0.5;
@@ -691,12 +707,23 @@ body {
 }
 
 .carousel-photo.hidden {
+  /* Geometry was omitted entirely here, so width/height/left/top all
+     computed to `auto` and every transition through the hidden state
+     jumped. Match the side-slot box so the interpolation is continuous. */
+  width: 55%;
+  height: 72%;
+  top: 14%;
   opacity: 0;
   transform: scale(0.6) translateX(0);
   z-index: 1;
   pointer-events: none;
   filter: blur(2px);
 }
+
+/* Off-stage photos need a side, or a photo entering the .right slot would
+   slide out from behind the centre instead of in from the edge. */
+.carousel-photo.hidden.hidden-left  { left: -60%; }
+.carousel-photo.hidden.hidden-right { left: 105%; }
 
 .carousel-dots {
   position: absolute;
