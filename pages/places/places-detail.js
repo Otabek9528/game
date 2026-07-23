@@ -470,7 +470,16 @@ async function renderPlaceDetail(place) {
   const starRatingHTML = generateStarRating(place.reviews);
   const reviewsHTML = renderReviews(place.reviews);
   const reviewCount = place.reviews ? place.reviews.length : 0;
-  const distanceDisplay = place.distance ? place.distance.toFixed(1) : 'N/A';
+  // Distance comes from the list page via ?d=, because the detail
+  // endpoint does not know the user's location. Falls back to the API
+  // field if it ever starts returning one. Unknown means the stat is
+  // omitted, never rendered as "N/A".
+  const dRaw = new URLSearchParams(window.location.search).get('d');
+  const dNum = dRaw !== null ? Number(dRaw)
+             : (place.distance !== null && place.distance !== undefined
+                ? Number(place.distance) : NaN);
+  const distanceKm = (!isNaN(dNum) && dNum >= 0) ? dNum.toFixed(1) : null;
+  const distanceDisplay = distanceKm;
   
   // Translated texts
   const t = window.I18N ? (key) => I18N.t(key) : (key) => key;
@@ -531,7 +540,7 @@ async function renderPlaceDetail(place) {
       <h1 class="detail-title">${place.name}</h1>
       <p class="detail-subtitle">${place.city || ''}</p>
 
-      <div class="detail-stats">
+      <div class="detail-stats${distanceKm ? '' : ' is-two'}">
         <div class="detail-stat">
           <b class="is-rating">${avgRating || '\u2014'}</b>
           <span>Reyting</span>
@@ -540,10 +549,12 @@ async function renderPlaceDetail(place) {
           <b>${reviewCount}</b>
           <span>Izoh</span>
         </div>
-        <div class="detail-stat">
-          <b>${distanceDisplay}<span class="unit">km</span></b>
-          <span>Masofa</span>
-        </div>
+        ${distanceKm ? `
+          <div class="detail-stat">
+            <b>${distanceKm}<span class="unit">km</span></b>
+            <span>Masofa</span>
+          </div>
+        ` : ''}
       </div>
     </div>
 

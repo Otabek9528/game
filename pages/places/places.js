@@ -720,7 +720,12 @@ async function renderPlaceCards(places) {
       }
       saveSearchState();
       sessionStorage.setItem('comingFromDetail', 'true');
-      window.location.href = `places-detail.html?type=${PLACE_TYPE}&id=${place.id}`;
+      // Distance is computed against the user's location by the list
+      // endpoint; the detail endpoint has no idea where the user is, so
+      // carry the value across rather than showing N/A.
+      const dParam = (place.distance !== null && place.distance !== undefined)
+        ? `&d=${encodeURIComponent(place.distance)}` : '';
+      window.location.href = `places-detail.html?type=${PLACE_TYPE}&id=${place.id}${dParam}`;
     });
     
     placeCardsContainer.appendChild(card);
@@ -757,8 +762,6 @@ function showError(message) {
 searchByAddressBtn.addEventListener('click', () => {
   const isOpen = addressInputSection.style.display !== 'none';
   addressInputSection.style.display = isOpen ? 'none' : 'block';
-  searchByAddressBtn.classList.toggle('active', !isOpen);
-  searchNearbyBtn.classList.remove('active');
   if (!isOpen) {
     searchBar.focus();
   }
@@ -766,8 +769,6 @@ searchByAddressBtn.addEventListener('click', () => {
 
 // Button 2: Search Nearby (current location)
 searchNearbyBtn.addEventListener('click', async () => {
-  searchNearbyBtn.classList.add('active');
-  searchByAddressBtn.classList.remove('active');
   // Hide placeholder and address input, show loading
   searchPlaceholder.style.display = 'none';
   addressInputSection.style.display = 'none';

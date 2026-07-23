@@ -1,247 +1,1179 @@
-/* ============================================================
-   places.css — "Yaqin Joylar" list page + shared coverflow carousel
-   Muslim Vegukin Bot
+/* =========================
+   PLACES PAGE STYLES - GENERIC (for Mosques, Restaurants, Shops)
+   ========================= */
 
-   Consumes the global tokens from css/style.css. Nothing here
-   redefines a global token, so no other feature is affected.
-
-   The thing to know: style.css flips only --bg-base, --bg-elevated,
-   --text-* and --sand-50/200/300 for night mode. Raw --sand-100 and
-   --sand-400..900, the emerald ramp and the gold ramp do NOT flip.
-   So this file never uses those directly — everything maps through a
-   local --pl-* layer that has a real night override below.
-   ============================================================ */
-
-:root {
-  --pl-canvas:      var(--bg-base);
-  --pl-surface:     var(--bg-elevated);
-  --pl-surface-2:   #f6f4f1;
-
-  --pl-ink:         var(--text-primary);
-  --pl-ink-2:       var(--text-secondary);
-  --pl-ink-3:       var(--text-muted);
-
-  --pl-line:        #e7e5e4;
-  --pl-line-soft:   #f0eeeb;
-
-  --pl-accent:      var(--emerald-600);
-  --pl-accent-deep: var(--emerald-800);
-  --pl-accent-tint: var(--emerald-50);
-  --pl-on-accent:   #ffffff;
-
-  --pl-gold:        var(--gold-600);
-  --pl-gold-lit:    var(--gold-500);
-  --pl-gold-tint:   var(--gold-100);
-
-  --pl-shadow:      0 1px 2px rgba(28,25,23,.05), 0 10px 28px -14px rgba(28,25,23,.22);
-  --pl-shadow-lift: 0 2px 4px rgba(28,25,23,.06), 0 18px 40px -18px rgba(28,25,23,.30);
+/* Page Layout */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible !important;
 }
 
-.night-mode {
-  --pl-surface-2:   #232323;
-  --pl-line:        #2c2c2c;
-  --pl-line-soft:   #242424;
-
-  --pl-accent:      var(--emerald-400);
-  --pl-accent-deep: var(--emerald-500);
-  --pl-accent-tint: rgba(16,185,129,.13);
-  --pl-on-accent:   #06251b;
-
-  --pl-gold:        var(--gold-400);
-  --pl-gold-lit:    var(--gold-400);
-  --pl-gold-tint:   rgba(212,162,26,.13);
-
-  --pl-shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
-  --pl-shadow-lift: 0 2px 4px rgba(0,0,0,.5), 0 18px 40px -18px rgba(0,0,0,.8);
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--light-bg, #faf7f0);
 }
 
-/* The app header already draws a gold hairline that fades out at both
-   ends (.app__header::after). Reused as the section rule, so this
-   redesign extends the identity that exists rather than importing one. */
-.gold-rule {
-  height: 1px;
-  border: 0;
-  margin: 18px 0 14px;
-  background: linear-gradient(90deg, transparent,
-    var(--pl-gold-lit) 28%, var(--pl-gold-lit) 72%, transparent);
-  opacity: .42;
+.app__header {
+  flex-shrink: 0;
 }
-
-/* ============================================================
-   SHELL
-   ============================================================ */
 
 .places-container {
   flex: 1;
-  width: 100%;
-  max-width: 640px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 40px 16px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 14px 14px 40px;
+  width: 100%;
   box-sizing: border-box;
 }
 
-/* ============================================================
-   SEARCH MODE
-   Was two stacked full-width buttons eating the top of the screen.
-   It is a two-way mode switch, so it now reads as one control.
-   ============================================================ */
-
+/* ======================================
+   SEARCH BUTTONS SECTION (NEW DESIGN)
+   ====================================== */
 .search-buttons-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  background: var(--pl-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--pl-shadow);
-  padding: 8px;
-  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
 }
 
 .search-mode-btn {
-  -webkit-appearance: none;
-  appearance: none;
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: var(--radius-md);
-  padding: 12px 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 1.05rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(74, 144, 226, 0.3);
+}
+
+.search-mode-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+}
+
+.search-mode-btn:active {
+  transform: translateY(0);
+}
+
+.search-mode-btn.nearby-btn {
+  background: linear-gradient(135deg, #00a884 0%, #007b5e 100%);
+  box-shadow: 0 3px 10px rgba(0, 168, 132, 0.3);
+}
+
+.search-mode-btn.nearby-btn:hover {
+  box-shadow: 0 5px 15px rgba(0, 168, 132, 0.4);
+}
+
+.search-mode-btn.active {
+  transform: scale(0.98);
+  opacity: 0.8;
+}
+
+.mode-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.mode-text {
+  flex: 1;
+  text-align: left;
+}
+
+/* Address Input Section */
+.address-input-section {
+  background: #ffffff;
+  border: 2px solid #4a90e2;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: -8px;
+  box-shadow: 0 3px 10px rgba(74, 144, 226, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================================
+   SEARCH PLACEHOLDER
+   ====================================== */
+.search-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-body);
-  color: var(--pl-ink-2);
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-.search-mode-btn:focus-visible {
-  outline: 2px solid var(--pl-accent);
-  outline-offset: 2px;
-}
-.search-mode-btn .mode-icon { font-size: 1.15rem; line-height: 1; }
-.search-mode-btn .mode-text {
-  font-size: .78rem;
-  font-weight: 600;
-  line-height: 1.25;
+  justify-content: center;
+  padding: 40px 20px;
   text-align: center;
-}
-.search-mode-btn.active {
-  background: var(--pl-accent-tint);
-  border-color: var(--pl-accent);
-  color: var(--pl-accent-deep);
-}
-.night-mode .search-mode-btn.active { color: var(--emerald-400); }
-
-.address-input-section {
-  grid-column: 1 / -1;
-  padding-top: 4px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 20px;
+  border: 2px dashed #ced4da;
+  margin: 20px 0;
 }
 
-.search-bar-container { position: relative; display: flex; align-items: center; }
+.placeholder-arrows {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.placeholder-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #495057;
+  margin: 0 0 8px 0;
+}
+
+.placeholder-subtext {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* ======================================
+   SEARCH BAR STYLES
+   ====================================== */
+.search-bar-container {
+  position: relative;
+  margin-bottom: 12px;
+}
 
 .search-bar {
   width: 100%;
+  padding: 16px 50px 16px 20px;
+  border: 2px solid #d0d0d0;
+  border-radius: 14px;
+  font-size: 1.05rem;
   box-sizing: border-box;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  color: var(--pl-ink);
-  background: var(--pl-surface-2);
-  border: 1px solid var(--pl-line);
-  border-radius: var(--radius-md);
-  padding: 13px 42px 13px 14px;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: all 0.3s ease;
+  background: #f9f9f9;
+  color: #333;
+  line-height: 1.5;
+  font-family: inherit;
 }
-.search-bar::placeholder { color: var(--pl-ink-3); }
+
 .search-bar:focus {
   outline: none;
-  border-color: var(--pl-accent);
-  box-shadow: 0 0 0 3px var(--pl-accent-tint);
+  border-color: #4a90e2;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.search-bar::placeholder {
+  color: #999;
+  font-size: 1rem;
+  opacity: 0.75;
 }
 
 .search-clear-btn {
   position: absolute;
-  right: 6px;
-  width: 30px; height: 30px;
-  border: 0;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #d0d0d0;
+  border: none;
   border-radius: 50%;
-  background: var(--pl-line);
-  color: var(--pl-ink-2);
-  font-size: .8rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  display: grid;
-  place-items: center;
+  transition: all 0.2s ease;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.search-clear-btn:hover {
+  background: #b0b0b0;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.search-clear-btn:active {
+  transform: translateY(-50%) scale(0.95);
 }
 
 .search-hint {
-  font-size: .8rem;
+  font-size: 0.88rem;
+  color: #666;
+  margin: 0 0 14px 0;
+  text-align: left;
   line-height: 1.5;
-  color: var(--pl-ink-3);
-  margin: 9px 2px 12px;
+  padding: 0 4px;
 }
 
 .search-action-btn {
   width: 100%;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: var(--pl-accent);
-  color: var(--pl-on-accent);
-  font-family: var(--font-body);
-  font-size: .95rem;
-  font-weight: 700;
-  padding: 14px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform var(--transition-fast);
-}
-.search-action-btn:active { transform: scale(.985); }
-.search-action-btn:focus-visible {
-  outline: 2px solid var(--pl-accent);
-  outline-offset: 2px;
-}
-
-/* ============================================================
-   PAGE TITLE — set in the display face the design system already
-   declares. The gold rule carries the ornament instead of emoji.
-   ============================================================ */
-
-.places-page-title {
-  font-family: var(--font-display);
+  background: linear-gradient(135deg, #00a884 0%, #007b5e 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 1rem;
   font-weight: 600;
-  font-size: 1.4rem;
-  line-height: 1.25;
-  color: var(--pl-ink);
-  margin: 4px 2px 0;
-  letter-spacing: -.01em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 168, 132, 0.3);
 }
 
-/* ============================================================
-   PLACE CARD — photo forward. Every place has at least one photo,
-   so the card is built around the photo rather than defending
-   against its absence.
-   ============================================================ */
+.search-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 168, 132, 0.4);
+}
 
-.place-cards { display: flex; flex-direction: column; gap: 16px; }
+.search-action-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.btn-text {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ======================================
+   PAGE TITLE
+   ====================================== */
+.places-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c5e2e;
+  margin: 0 0 20px 0;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ======================================
+   LOADING INDICATOR
+   ====================================== */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-indicator .spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #00a884;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-indicator p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ======================================
+   NO RESULTS
+   ====================================== */
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.no-results-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.no-results-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 8px 0;
+}
+
+.no-results-hint {
+  font-size: 0.95rem;
+  color: #999;
+  margin: 0;
+}
+
+/* ======================================
+   PLACE CARDS WITH STAR RATINGS
+   ====================================== */
+.place-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  padding-top: 48px;
+}
 
 .place-card {
-  position: relative;
-  background: var(--pl-surface);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--pl-shadow);
-  overflow: hidden;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: visible;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.place-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 123, 94, 0.15);
+  border-color: rgba(0, 168, 132, 0.3);
+}
+
+.place-card:active {
+  transform: translateY(-1px);
+}
+
+/* Card Top Badges - Positioned ABOVE the card */
+.card-top-badges {
+  position: absolute;
+  top: -38px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.card-top-badges > * {
+  pointer-events: auto;
+}
+
+.place-rating-badge {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  padding: 10px 14px;
+  border-radius: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 1;
+  min-width: 0;
+  border: 2px solid rgba(255, 215, 0, 0.2);
+}
+
+.star-container {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.star {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.star.gold {
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.4);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.star.grey {
+  color: #d0d0d0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.no-rating-text {
+  font-size: 0.82rem;
+  color: #888;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.place-distance-badge {
+  background: linear-gradient(135deg, #00a884 0%, #007b5e 100%);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0, 168, 132, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Place Card Image */
+.place-card-image {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8f5f0 0%, #f0f9f5 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+/* Skeleton Loading Placeholder */
+.place-photo-skeleton {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+  border-radius: 16px 16px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+  text-align: center;
+  padding: 0 16px;
+}
+
+.skeleton-icon {
+  font-size: 2rem;
+  opacity: 0.6;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.skeleton-message {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.skeleton-hint {
+  font-size: 0.8rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Detail Page Photo Skeleton */
+.detail-photo-skeleton {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-photo-skeleton .skeleton-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+.detail-photo-skeleton .skeleton-text {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 20px;
+}
+
+.detail-photo-skeleton .skeleton-icon {
+  font-size: 2.5rem;
+  opacity: 0.6;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.detail-photo-skeleton .skeleton-message {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.detail-photo-skeleton .skeleton-hint {
+  font-size: 0.85rem;
+  color: #999;
+  font-style: italic;
+}
+
+.place-photo-single {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.place-photo-single img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+}
+
+.place-photo-single:hover img {
+  transform: scale(1.05);
+}
+
+/* Photo Carousel */
+.photo-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+}
+
+.carousel-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-photo {
+  position: absolute;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  will-change: transform, opacity, left, right, width, height;
+  cursor: pointer;
+}
+
+.carousel-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.carousel-photo.center img:hover {
+  transform: scale(1.05);
+}
+
+.carousel-photo.center {
+  width: 88%;
+  height: 92%;
+  left: 6%;
+  top: 4%;
+  z-index: 10;
+  opacity: 1;
+  transform: scale(1) translateX(0);
+  border-radius: 16px;
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.25),
+    0 0 0 3px rgba(255, 255, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  filter: brightness(1) blur(0px);
+}
+
+.carousel-photo.left {
+  width: 55%;
+  height: 72%;
+  left: -25%;
+  top: 14%;
+  z-index: 5;
+  opacity: 0.5;
+  transform: scale(0.88) translateX(0);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  filter: brightness(0.85) blur(1px);
+  cursor: default;
+}
+
+.carousel-photo.right {
+  width: 55%;
+  height: 72%;
+  left: auto;
+  right: -25%;
+  top: 14%;
+  z-index: 5;
+  opacity: 0.5;
+  transform: scale(0.88) translateX(0);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  filter: brightness(0.85) blur(1px);
+  cursor: default;
+}
+
+.carousel-photo.hidden {
+  opacity: 0;
+  transform: scale(0.6) translateX(0);
+  z-index: 1;
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 7px;
+  z-index: 15;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px 12px;
+  border-radius: 24px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dot.active {
+  background: white;
+  width: 24px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+/* Place Card Content */
+.place-card-content {
+  padding: 16px;
+}
+
+.place-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a4d2e;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.place-name-ko {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+
+.place-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.place-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.info-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* ======================================
+   IMAGE MODAL
+   ====================================== */
+.image-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-modal.active {
+  display: flex;
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-image {
+  max-width: 95%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.modal-nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-nav-prev {
+  left: 20px;
+}
+
+.modal-nav-next {
+  right: 20px;
+}
+
+.modal-counter {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  z-index: 10;
+}
+
+/* ======================================
+   INFO FOOTER
+   ====================================== */
+.info-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 24px;
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.info-footer-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.info-footer-text {
+  font-size: 0.9rem;
+  color: #1565c0;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.info-footer-text a {
+  color: #0d47a1;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ======================================
+   RESPONSIVE ADJUSTMENTS
+   ====================================== */
+@media (max-width: 400px) {
+  .search-mode-btn {
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+  
+  .mode-icon {
+    font-size: 1.2rem;
+  }
+  
+  .placeholder-text {
+    font-size: 1.1rem;
+  }
+  
+  .placeholder-arrows {
+    font-size: 2rem;
+  }
+}
+
+
+/* ========================================
+   NIGHT MODE
+   ======================================== */
+.night-mode {
+  --light-bg: #121212;
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%);
+}
+
+.night-mode .places-container {
+  background: #121212;
+}
+
+/* Search buttons */
+.night-mode .address-input-section {
+  background: #1e1e1e;
+  border-color: #2a5a9e;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+.night-mode .search-bar {
+  background: #252525;
+  border-color: #444;
+  color: #e0e0e0;
+}
+.night-mode .search-bar:focus {
+  background: #2a2a2a;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+.night-mode .search-bar::placeholder {
+  color: #777;
+}
+
+.night-mode .search-hint {
+  color: #999;
+}
+
+/* Placeholder */
+.night-mode .search-placeholder {
+  background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+  border-color: #444;
+}
+.night-mode .placeholder-text {
+  color: #ccc;
+}
+.night-mode .placeholder-subtext {
+  color: #888;
+}
+
+/* Page title */
+.night-mode .places-page-title {
+  color: #4ade80;
+}
+
+/* Loading */
+.night-mode .loading-indicator .spinner {
+  border-color: #333;
+  border-top-color: #00a884;
+}
+.night-mode .loading-indicator p {
+  color: #999;
+}
+
+/* No results */
+.night-mode .no-results-text {
+  color: #ccc;
+}
+.night-mode .no-results-hint {
+  color: #888;
+}
+
+/* Place cards */
+.night-mode .place-card {
+  background: #1e1e1e;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+.night-mode .place-card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  border-color: rgba(0, 168, 132, 0.3);
+}
+
+.night-mode .place-rating-badge {
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.night-mode .place-name {
+  color: #e0e0e0;
+}
+.night-mode .place-name-ko {
+  color: #999;
+}
+.night-mode .info-text {
+  color: #aaa;
+}
+.night-mode .place-card-content {
+  color: #ccc;
+}
+
+/* Photo skeleton */
+.night-mode .detail-photo-skeleton,
+.night-mode .photo-skeleton {
+  background: linear-gradient(135deg, #252525 0%, #1a1a1a 100%);
+}
+.night-mode .skeleton-message {
+  color: #bbb;
+}
+.night-mode .skeleton-hint {
+  color: #888;
+}
+
+/* Info footer */
+.night-mode .info-footer {
+  background: linear-gradient(135deg, #1a2332 0%, #162030 100%);
+  border-color: rgba(33, 150, 243, 0.15);
+}
+.night-mode .info-footer-text {
+  color: #6db3f2;
+}
+.night-mode .info-footer-text a {
+  color: #90caf9;
+}
+
+/* ==================================================================
+   OVERRIDES — appended, so every rule above stays as it was.
+   Three things only:
+     1. the --pl-* token layer that places-detail.css consumes
+     2. the coverflow animation fixes
+     3. the redesigned place card
+   ================================================================== */
+
+/* ---- 1. token layer ------------------------------------------------
+   style.css flips only --bg-base, --bg-elevated, --text-* and
+   --sand-50/200/300 for night mode. The emerald ramp, the gold ramp and
+   --sand-100/400..900 do NOT flip, so nothing downstream may use them
+   directly. Everything maps through --pl-* instead.
+   ------------------------------------------------------------------ */
+:root {
+  --pl-canvas:      var(--bg-base);
+  --pl-surface:     var(--bg-elevated);
+  --pl-surface-2:   #f6f4f1;
+  --pl-ink:         var(--text-primary);
+  --pl-ink-2:       var(--text-secondary);
+  --pl-ink-3:       var(--text-muted);
+  --pl-line:        #e7e5e4;
+  --pl-line-soft:   #f0eeeb;
+  --pl-accent:      var(--emerald-600);
+  --pl-accent-deep: var(--emerald-800);
+  --pl-accent-tint: var(--emerald-50);
+  --pl-on-accent:   #ffffff;
+  --pl-gold:        var(--gold-600);
+  --pl-gold-lit:    var(--gold-500);
+  --pl-gold-tint:   var(--gold-100);
+  --pl-shadow:      0 1px 2px rgba(28,25,23,.05), 0 10px 28px -14px rgba(28,25,23,.22);
+  --pl-shadow-lift: 0 2px 4px rgba(28,25,23,.06), 0 18px 40px -18px rgba(28,25,23,.30);
+}
+.night-mode {
+  --pl-surface-2:   #232323;
+  --pl-line:        #2c2c2c;
+  --pl-line-soft:   #242424;
+  --pl-accent:      var(--emerald-400);
+  --pl-accent-deep: var(--emerald-500);
+  --pl-accent-tint: rgba(16,185,129,.13);
+  --pl-on-accent:   #06251b;
+  --pl-gold:        var(--gold-400);
+  --pl-gold-lit:    var(--gold-400);
+  --pl-gold-tint:   rgba(212,162,26,.13);
+  --pl-shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  --pl-shadow-lift: 0 2px 4px rgba(0,0,0,.5), 0 18px 40px -18px rgba(0,0,0,.8);
+}
+
+/* ---- 2. coverflow fixes ------------------------------------------- */
+
+.photo-carousel {
+  /* pan-y, NOT none: the carousel sits inside a vertically scrolling
+     container, so vertical scroll must pass through. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.photo-carousel img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.carousel-photo { will-change: transform, opacity, left, width, height; }
+
+.carousel-photo.right {
+  /* left:70% is exactly equivalent to right:-25% at width:55%
+     (100% - (-25%) - 55% = 70%), but unlike `left:auto` it interpolates,
+     so photos slide into and out of this slot instead of teleporting. */
+  left: 70%;
+  right: auto;
+}
+.carousel-photo.hidden {
+  /* geometry was omitted entirely, so width/height/left/top all computed
+     to `auto` and every transition through hidden jumped */
+  width: 55%;
+  height: 72%;
+  top: 14%;
+}
+.carousel-photo.hidden.hidden-left  { left: -60%; right: auto; }
+.carousel-photo.hidden.hidden-right { left: 105%; right: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-photo { transition-duration: .01ms !important; }
+}
+
+/* ---- 3. the card -------------------------------------------------- */
+
+.place-card {
+  background: var(--pl-surface);
+  border: 0;
+  border-radius: var(--radius-xl, 20px);
+  overflow: hidden;
+  box-shadow: var(--pl-shadow);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 .place-card:active { transform: scale(.99); }
 @media (hover: hover) {
-  .place-card:hover { box-shadow: var(--pl-shadow-lift); }
+  .place-card:hover { transform: none; box-shadow: var(--pl-shadow-lift); }
 }
+
+/* wrapper so the distance badge survives loadPlacePhotos(), which
+   replaces .place-card-image innerHTML when the photos arrive */
+.place-card-media { position: relative; }
 
 .place-card-image {
   position: relative;
   width: 100%;
+  height: auto;
   aspect-ratio: 16 / 10;
+  margin: 0;
+  border-radius: 0;
   background: var(--pl-surface-2);
   overflow: hidden;
 }
@@ -249,25 +1181,23 @@
   .place-card-image { height: 208px; }
 }
 
-.place-photo-single {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  cursor: pointer;
-}
+/* the old floating rating+distance strip is gone; distance moves onto
+   the photo because it is the fact that orders the list, and rating
+   moves into the meta row where it reads against the name */
+.card-top-badges { display: contents; }
+.place-rating-badge { display: contents; }
 
-/* Distance sits on the photo because it is the fact that orders the
-   list. Rating moves down into the meta row where it can be read
-   against the name instead of competing with the image. */
 .place-distance-badge {
   position: absolute;
   left: 12px;
   bottom: 12px;
+  top: auto;
+  right: auto;
   z-index: 12;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(12, 32, 25, .62);
+  background: rgba(12,32,25,.62);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   color: #fff;
@@ -275,10 +1205,11 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   padding: 7px 12px;
-  border-radius: var(--radius-full);
+  border-radius: 999px;
+  box-shadow: none;
 }
 .place-distance-badge svg {
-  width: 13px; height: 13px;
+  width: 13px; height: 13px; flex: none;
   fill: none; stroke: currentColor; stroke-width: 2;
   stroke-linecap: round; stroke-linejoin: round;
 }
@@ -294,7 +1225,6 @@
   margin: 0 0 3px;
   letter-spacing: -.005em;
 }
-
 .place-name-ko {
   font-size: .85rem;
   font-weight: 500;
@@ -310,18 +1240,6 @@
   padding-top: 11px;
   border-top: 1px solid var(--pl-line-soft);
 }
-
-.meta-rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: .85rem;
-  font-weight: 700;
-  color: var(--pl-gold);
-  font-variant-numeric: tabular-nums;
-}
-.meta-rating .meta-count { font-weight: 500; color: var(--pl-ink-3); }
-
 .meta-phone {
   margin-left: auto;
   display: inline-flex;
@@ -333,275 +1251,12 @@
   text-decoration: none;
   background: var(--pl-accent-tint);
   padding: 7px 12px;
-  border-radius: var(--radius-full);
+  border-radius: 999px;
   font-variant-numeric: tabular-nums;
 }
 .night-mode .meta-phone { color: var(--emerald-400); }
 .meta-phone svg {
-  width: 14px; height: 14px;
+  width: 14px; height: 14px; flex: none;
   fill: none; stroke: currentColor; stroke-width: 2;
   stroke-linecap: round; stroke-linejoin: round;
 }
-
-/* legacy rows, kept so any older markup still renders sanely */
-.card-top-badges { display: contents; }
-.place-rating-badge { display: contents; }
-.place-info { margin-top: 10px; }
-.place-info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: .85rem;
-  color: var(--pl-ink-2);
-  margin-bottom: 5px;
-}
-.info-icon { flex: none; opacity: .7; }
-.info-text { line-height: 1.45; }
-
-/* ============================================================
-   STARS
-   ============================================================ */
-
-.star-container { display: inline-flex; align-items: center; gap: 2px; }
-.star { font-size: .9rem; line-height: 1; }
-.star.gold { color: var(--pl-gold-lit); }
-.star.grey { color: var(--pl-line); }
-.night-mode .star.grey { color: #3a3a3a; }
-.no-rating-text { font-size: .82rem; color: var(--pl-ink-3); font-weight: 500; }
-
-/* ============================================================
-   SKELETON — photos load after the card renders, so this is a real
-   loading state, not a missing-photo fallback.
-   ============================================================ */
-
-.place-photo-skeleton {
-  position: absolute;
-  inset: 0;
-  background: var(--pl-surface-2);
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  align-content: center;
-}
-.skeleton-shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
-  transform: translateX(-100%);
-  animation: pl-shimmer 1.5s infinite;
-}
-.night-mode .skeleton-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
-}
-@keyframes pl-shimmer { to { transform: translateX(100%); } }
-.skeleton-icon { font-size: 1.6rem; opacity: .35; }
-.skeleton-text, .skeleton-message, .skeleton-hint {
-  font-size: .8rem;
-  color: var(--pl-ink-3);
-  text-align: center;
-  margin: 4px 0 0;
-  padding: 0 16px;
-}
-
-/* ============================================================
-   STATES
-   ============================================================ */
-
-.search-placeholder,
-.no-results {
-  text-align: center;
-  padding: 46px 24px;
-  background: var(--pl-surface);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--pl-shadow);
-}
-.placeholder-arrows { font-size: 1.6rem; margin-bottom: 10px; opacity: .8; }
-.placeholder-text,
-.no-results-text {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--pl-ink);
-  margin: 0 0 6px;
-}
-.placeholder-subtext,
-.no-results-hint {
-  font-size: .88rem;
-  line-height: 1.55;
-  color: var(--pl-ink-3);
-  margin: 0 auto;
-  max-width: 32ch;
-}
-.no-results-icon { font-size: 1.8rem; margin: 0 0 8px; }
-
-.loading-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 56px 20px;
-}
-.loading-indicator p { font-size: .9rem; color: var(--pl-ink-3); margin: 0; }
-.spinner {
-  width: 34px; height: 34px;
-  border: 3px solid var(--pl-line);
-  border-top-color: var(--pl-accent);
-  border-radius: 50%;
-  animation: pl-spin .9s linear infinite;
-}
-@keyframes pl-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) {
-  .spinner { animation-duration: 2.4s; }
-  .skeleton-shimmer { animation: none; }
-  .carousel-photo { transition-duration: .01ms !important; }
-}
-
-.info-footer {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 24px;
-  padding: 14px 16px;
-  background: var(--pl-gold-tint);
-  border-radius: var(--radius-lg);
-}
-.info-footer-icon { flex: none; font-size: 1rem; }
-.info-footer-text {
-  font-size: .84rem;
-  line-height: 1.55;
-  color: var(--pl-ink-2);
-  margin: 0;
-}
-.info-footer-text a {
-  color: var(--pl-accent);
-  font-weight: 700;
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-}
-.night-mode .info-footer-text a { color: var(--emerald-400); }
-
-/* ============================================================
-   COVERFLOW CARROUSEL
-   Geometry carried over unchanged from the animation fix. Every slot
-   is positioned with `left` so all transitions interpolate, and
-   .hidden carries explicit geometry plus a side.
-   Do NOT reintroduce `left:auto` / `right:` here.
-   ============================================================ */
-
-.photo-carousel {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  /* pan-y, NOT none: the carousel sits inside a vertically scrolling
-     container, so vertical scroll must pass through. The browser fires
-     pointercancel when it claims a vertical gesture, which aborts the
-     horizontal swipe cleanly. */
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.photo-carousel img {
-  -webkit-user-drag: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.carousel-track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.carousel-photo {
-  position: absolute;
-  transition: all .5s cubic-bezier(.34, 1.56, .64, 1);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0,0,0,.2);
-  will-change: transform, opacity, left, width, height;
-  cursor: pointer;
-}
-.carousel-photo img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.carousel-photo.center {
-  width: 88%; height: 92%;
-  left: 6%; top: 4%;
-  z-index: 10;
-  opacity: 1;
-  transform: scale(1) translateX(0);
-  border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(0,0,0,.25), 0 0 0 3px rgba(255,255,255,.4);
-  filter: brightness(1) blur(0px);
-}
-.carousel-photo.left {
-  width: 55%; height: 72%;
-  left: -25%; top: 14%;
-  z-index: 5;
-  opacity: .5;
-  transform: scale(.88) translateX(0);
-  border-radius: 12px;
-  filter: brightness(.85) blur(1px);
-  cursor: default;
-}
-.carousel-photo.right {
-  width: 55%; height: 72%;
-  /* left:70% is exactly equivalent to the old right:-25% at width:55%
-     (100% - (-25%) - 55% = 70%), but unlike `left:auto` it interpolates. */
-  left: 70%; top: 14%;
-  z-index: 5;
-  opacity: .5;
-  transform: scale(.88) translateX(0);
-  border-radius: 12px;
-  filter: brightness(.85) blur(1px);
-  cursor: default;
-}
-.carousel-photo.hidden {
-  width: 55%; height: 72%;
-  top: 14%;
-  opacity: 0;
-  transform: scale(.6) translateX(0);
-  z-index: 1;
-  pointer-events: none;
-  filter: blur(2px);
-}
-.carousel-photo.hidden.hidden-left  { left: -60%; }
-.carousel-photo.hidden.hidden-right { left: 105%; }
-
-.carousel-dots {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  display: flex;
-  gap: 6px;
-  z-index: 15;
-  background: rgba(12,32,25,.5);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  padding: 7px 10px;
-  border-radius: var(--radius-full);
-}
-.dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.45);
-  cursor: pointer;
-  transition: width var(--transition-fast), background var(--transition-fast);
-}
-.dot.active {
-  width: 16px;
-  border-radius: var(--radius-full);
-  background: var(--gold-400);
-}
-
-/* Wrapper so the distance badge survives loadPlacePhotos(), which
-   replaces .place-card-image innerHTML when the photos arrive. */
-.place-card-media { position: relative; }
