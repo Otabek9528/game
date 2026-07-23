@@ -1,699 +1,589 @@
-/* ============================================================
-   places-detail.css — place detail page
-   Muslim Vegukin Bot
-
-   Loaded AFTER places.css, which supplies the --pl-* token layer
-   and its night override. Nothing here touches a global token.
-
-   Structure of the page, top to bottom:
-     photo  ->  identity plate  ->  action rail  ->  facts  ->  reviews
-   That order is the user's question order: what is it and how far,
-   then take me there, then what do people say.
-   ============================================================ */
+/* =========================================================
+   PLACE DETAIL PAGE
+   Loads after places.css and reuses its --pl- tokens.
+   ========================================================= */
 
 .detail-container {
   flex: 1;
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0 0 40px;
-  box-sizing: border-box;
+  overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  padding: 16px 16px 24px 16px;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--pl-bg);
 }
 
-/* ============================================================
-   LOADING / ERROR
-   ============================================================ */
-
+/* --- Loading / error --- */
 .detail-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 90px 20px;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 20px;
 }
-.detail-loading p { font-size: .95rem; color: var(--pl-ink-3); margin: 0; }
+
 .detail-spinner {
-  width: 38px; height: 38px;
-  border: 3px solid var(--pl-line);
+  width: 44px;
+  height: 44px;
+  border: 4px solid var(--pl-line);
   border-top-color: var(--pl-accent);
   border-radius: 50%;
-  animation: pl-spin .9s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
-.detail-error { text-align: center; padding: 80px 24px; }
-.detail-error-icon { font-size: 2.2rem; margin: 0 0 14px; }
-.detail-error-text {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--pl-ink);
-  margin: 0 0 8px;
-}
-.detail-error-hint {
-  font-size: .92rem;
-  line-height: 1.55;
-  color: var(--pl-ink-3);
-  margin: 0 auto 22px;
-  max-width: 34ch;
-}
-.retry-button {
-  background: var(--pl-accent);
-  color: var(--pl-on-accent);
-  border: 0;
-  border-radius: var(--radius-md);
-  padding: 13px 26px;
-  font-family: var(--font-body);
-  font-size: .95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform var(--transition-fast);
-}
-.retry-button:active { transform: scale(.98); }
-.retry-button:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
-
-/* ============================================================
-   HERO — 250px, down from 400px. At 400 the photo ate over half a
-   phone viewport before a single word. The identity plate overlaps
-   its lower edge so the fold always carries content.
-   ============================================================ */
-
-.detail-photo-section {
-  position: relative;
-  width: 100%;
-  height: 250px;
-  background: var(--emerald-900);
-  overflow: hidden;
-}
-.detail-photo-section::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 96px;
-  background: linear-gradient(to top, rgba(6,40,30,.5), transparent);
-  pointer-events: none;
-  z-index: 11;
-}
-.detail-photo-single {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  cursor: pointer;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* ============================================================
-   IDENTITY PLATE — the decide block.
-   The eyebrow names the kind of place; the stat strip carries the
-   three facts that answer "should I go", in one row, tabular.
-   ============================================================ */
-
-.detail-plate {
-  position: relative;
-  z-index: 20;
-  margin: -32px 14px 0;
-  background: var(--pl-surface);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--pl-shadow);
-  padding: 18px 18px 0;
-}
-
-.detail-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--pl-gold-tint);
-  color: var(--pl-gold);
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .11em;
-  text-transform: uppercase;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-}
-
-.detail-title {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.55rem;
-  line-height: 1.2;
-  color: var(--pl-ink);
-  margin: 12px 0 5px;
-  letter-spacing: -.015em;
-}
-
-.detail-subtitle {
-  font-size: .9rem;
-  font-weight: 500;
-  line-height: 1.45;
-  color: var(--pl-ink-2);
-  margin: 0 0 16px;
-}
-
-.detail-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--pl-line-soft);
-  margin: 0 -18px;
-}
-.detail-stat { padding: 13px 8px 15px; text-align: center; position: relative; }
-.detail-stat + .detail-stat::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 14px; bottom: 14px;
-  width: 1px;
-  background: var(--pl-line-soft);
-}
-.detail-stat b {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.2rem;
-  line-height: 1;
-  color: var(--pl-ink);
-  font-variant-numeric: tabular-nums;
-  margin-bottom: 5px;
-}
-.detail-stat b.is-rating { color: var(--pl-gold); }
-.detail-stat b .unit {
-  font-family: var(--font-body);
-  font-size: .72rem;
-  font-weight: 500;
-  color: var(--pl-ink-3);
-  margin-left: 2px;
-}
-.detail-stat span {
-  font-size: .66rem;
-  font-weight: 600;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--pl-ink-3);
-}
-
-/* ============================================================
-   ACTION RAIL — the signature.
-   This page has exactly two terminal actions, call and navigate,
-   and the reader is usually mid-journey. The rail re-appears fixed
-   to the bottom once the inline copy scrolls away, so "go" is never
-   more than one thumb-tap from anywhere on the page.
-   ============================================================ */
-
-.action-rail {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 9px;
-  padding: 14px;
-}
-
-.act {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-height: 60px;
-  border: 0;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-size: .8rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: transform var(--transition-fast);
-}
-.act:active { transform: scale(.97); }
-.act:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
-.act svg {
-  width: 19px; height: 19px;
-  fill: none; stroke: currentColor; stroke-width: 2;
-  stroke-linecap: round; stroke-linejoin: round;
-}
-.act-call  { background: var(--pl-accent); color: var(--pl-on-accent); }
-.act-kakao { background: #ffe812; color: #3c1e1e; }
-.act-naver { background: #03c75a; color: #fff; }
-
-/* Sticky duplicate. Hidden until the inline rail leaves the viewport,
-   so it costs nothing at the top of the page. */
-.action-rail.is-sticky {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  max-width: 640px;
-  margin: 0 auto;
-  background: var(--pl-surface);
-  border-top: 1px solid var(--pl-line);
-  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -6px 22px -14px rgba(28,25,23,.5);
-  z-index: 900;
-  transform: translateY(105%);
-  transition: transform var(--transition-base);
-}
-.action-rail.is-sticky.on { transform: translateY(0); }
-.action-rail.is-sticky .act {
-  min-height: 50px;
-  flex-direction: row;
-  gap: 8px;
-}
-.night-mode .action-rail.is-sticky { box-shadow: 0 -6px 22px -14px rgba(0,0,0,.9); }
-
-/* ============================================================
-   SECTIONS — a label eyebrow, then dense rows with hairlines.
-   The old design gave a phone number, a street address and a
-   stranger's comment the same grey box, so weight encoded nothing.
-   ============================================================ */
-
-.detail-body { padding: 4px 14px 0; }
-
-.detail-section { margin-bottom: 4px; }
-
-.detail-section-title {
-  font-family: var(--font-body);
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--pl-ink-3);
-  margin: 18px 4px 9px;
-}
-
-.detail-card {
-  background: var(--pl-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--pl-shadow);
-  overflow: hidden;
-}
-
-.detail-row {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 14px 15px;
-  border-bottom: 1px solid var(--pl-line-soft);
-  text-decoration: none;
-  color: inherit;
-  width: 100%;
-  box-sizing: border-box;
-  background: none;
-  border-left: 0; border-right: 0; border-top: 0;
-  font-family: var(--font-body);
-  text-align: left;
-  cursor: pointer;
-}
-.detail-row:last-child { border-bottom: 0; }
-.detail-row:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: -2px; }
-
-.detail-icon {
-  width: 34px; height: 34px;
-  flex: none;
-  border-radius: 9px;
-  background: var(--pl-accent-tint);
-  display: grid;
-  place-items: center;
-}
-.detail-icon svg {
-  width: 17px; height: 17px;
-  fill: none; stroke: var(--pl-accent); stroke-width: 2;
-  stroke-linecap: round; stroke-linejoin: round;
-}
-.night-mode .detail-icon svg { stroke: var(--emerald-400); }
-
-.detail-text { flex: 1; min-width: 0; }
-.detail-text b {
-  display: block;
-  font-size: .95rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--pl-ink);
-  word-break: break-word;
-}
-.detail-text b.is-num { font-variant-numeric: tabular-nums; letter-spacing: .01em; }
-.detail-text span {
-  display: block;
-  font-size: .78rem;
-  font-weight: 500;
-  line-height: 1.3;
-  color: var(--pl-ink-3);
-  margin-top: 2px;
-}
-
-.detail-row-act {
-  flex: none;
-  font-size: .76rem;
-  font-weight: 700;
-  color: var(--pl-accent);
-  background: var(--pl-accent-tint);
-  border: 0;
-  padding: 8px 11px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: var(--font-body);
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-.night-mode .detail-row-act { color: var(--emerald-400); }
-.detail-row-act.done {
-  background: var(--pl-accent);
-  color: var(--pl-on-accent);
-}
-
-.detail-link { color: var(--pl-accent); text-decoration: none; font-weight: 600; }
-.night-mode .detail-link { color: var(--emerald-400); }
-
-/* legacy container, kept so older markup still renders */
-.detail-info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 13px 15px;
-  border-bottom: 1px solid var(--pl-line-soft);
-}
-
-/* ============================================================
-   REVIEWS — bordered rows, not a card each.
-   ============================================================ */
-
-.review-card { padding: 15px; border-bottom: 1px solid var(--pl-line-soft); }
-.review-card:last-child { border-bottom: 0; }
-.review-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 7px;
-}
-.review-rating { display: inline-flex; align-items: center; gap: 4px; }
-.review-stars { color: var(--pl-gold-lit); font-size: .85rem; letter-spacing: .5px; }
-.review-date {
-  font-size: .74rem;
-  font-weight: 500;
-  color: var(--pl-ink-3);
-  font-variant-numeric: tabular-nums;
-}
-.review-text {
-  font-size: .9rem;
-  line-height: 1.6;
-  color: var(--pl-ink-2);
+.detail-loading p {
+  font-size: 1.05rem;
+  color: var(--pl-text-2);
   margin: 0;
 }
 
-/* Empty states are an invitation, not an apology. */
-.no-reviews { padding: 30px 22px; text-align: center; }
-.no-reviews b {
-  display: block;
-  font-family: var(--font-display);
+.detail-error {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.detail-error-icon {
+  font-size: 3.2rem;
+  margin: 0 0 20px 0;
+}
+
+.detail-error-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #c2453a;
+  margin: 0 0 12px 0;
+}
+
+.night-mode .detail-error-text { color: #e87c73; }
+
+.detail-error-hint {
+  font-size: 0.98rem;
+  color: var(--pl-text-2);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.retry-button {
+  background: linear-gradient(160deg, var(--pl-accent) 0%, var(--pl-accent-deep) 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
   font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 180ms var(--pl-ease), box-shadow 180ms var(--pl-ease);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.retry-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(5, 150, 105, 0.38);
+}
+
+.retry-button:active { transform: translateY(0); }
+
+/* =========================================================
+   CARD
+   ========================================================= */
+.detail-card {
+  background: var(--pl-surface);
+  border: 1px solid var(--pl-line);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--pl-shadow-card);
+}
+
+/* --- Hero (carousel host) --- */
+.detail-photo-section {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  background: linear-gradient(135deg, var(--pl-accent-soft) 0%, var(--pl-surface-2) 100%);
+}
+
+.detail-single-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  display: block;
+}
+
+/* --- Head: title, city, chips --- */
+.detail-head {
+  padding: 20px 22px 4px 22px;
+}
+
+.detail-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--pl-text);
+  margin: 0 0 3px 0;
+  line-height: 1.25;
+}
+
+.detail-subtitle {
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--pl-ink);
-  margin-bottom: 5px;
-}
-.no-reviews p {
-  font-size: .85rem;
-  line-height: 1.55;
-  color: var(--pl-ink-3);
-  margin: 0 auto;
-  max-width: 34ch;
+  color: var(--pl-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px 0;
 }
 
-/* ============================================================
-   REVIEW FORM
-   ============================================================ */
+.detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--pl-line);
+}
 
-.review-section { margin-top: 4px; }
+.detail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1;
+  background: var(--pl-surface-2);
+  color: var(--pl-text);
+}
+
+.detail-chip .pl-icon { width: 0.95rem; height: 0.95rem; }
+
+.detail-chip--rating .pl-icon { color: var(--pl-gold); }
+
+.detail-chip--rating .chip-count {
+  font-weight: 600;
+  color: var(--pl-muted);
+  font-size: 0.8rem;
+}
+
+.detail-chip--distance {
+  background: var(--pl-accent-soft);
+  color: var(--pl-accent-deep);
+}
+
+.detail-chip--muted {
+  font-weight: 600;
+  color: var(--pl-muted);
+}
+
+/* =========================================================
+   BODY SECTIONS — hairline dividers, no grey boxes
+   ========================================================= */
+.detail-content {
+  padding: 4px 22px 22px 22px;
+}
+
+.detail-section {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--pl-line);
+}
+
+.detail-section:last-child { border-bottom: none; }
+
+.detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--pl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 12px 0;
+}
+
+.detail-section-title .pl-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--pl-accent);
+}
+
+.detail-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 2px 0;
+  border-radius: 10px;
+  transition: background 200ms ease;
+}
+
+.detail-icon {
+  flex-shrink: 0;
+  color: var(--pl-muted);
+  line-height: 0;
+  margin-top: 3px;
+}
+
+.detail-icon .pl-icon { width: 1.05rem; height: 1.05rem; }
+
+.detail-text {
+  font-size: 1rem;
+  color: var(--pl-text);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.detail-copy-mark {
+  margin-left: auto;
+  color: var(--pl-muted);
+  line-height: 0;
+  margin-top: 3px;
+}
+
+.detail-copy-mark .pl-icon { width: 1rem; height: 1rem; }
+
+.detail-link {
+  color: var(--pl-accent);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 150ms ease;
+}
+
+.detail-link:hover {
+  color: var(--pl-accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.detail-phone-line {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* =========================================================
+   REVIEWS
+   ========================================================= */
+.review-card {
+  background: var(--pl-surface-2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-left: 3px solid var(--pl-accent);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.review-stars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--pl-gold);
+  line-height: 0;
+}
+
+.review-stars .pl-icon { width: 0.9rem; height: 0.9rem; }
+
+.review-date {
+  font-size: 0.82rem;
+  color: var(--pl-muted);
+}
+
+.review-text {
+  font-size: 0.96rem;
+  color: var(--pl-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 28px 20px;
+  color: var(--pl-muted);
+  font-size: 0.96rem;
+}
+
+/* =========================================================
+   REVIEW FORM (collapsible — structure preserved for JS)
+   ========================================================= */
+.review-submit-wrapper { margin-top: 8px; }
+
+.review-collapsible {
+  background: var(--pl-surface);
+  border: 1.5px solid var(--pl-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
 
 .review-toggle-btn {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
-  line-height: 1.3;
+  justify-content: space-between;
+  gap: 10px;
   background: transparent;
-  border: 1px dashed var(--pl-line);
-  color: var(--pl-accent);
-  border-radius: var(--radius-lg);
-  padding: 15px;
-  font-family: var(--font-body);
-  font-size: .92rem;
+  color: var(--pl-accent-deep);
+  border: none;
+  padding: 15px 18px;
+  font-size: 1rem;
   font-weight: 700;
+  font-family: inherit;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
-}
-.night-mode .review-toggle-btn { color: var(--emerald-400); }
-.review-toggle-btn:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
-.review-toggle-btn.active {
-  border-style: solid;
-  border-color: var(--pl-accent);
-  background: var(--pl-accent-tint);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-.toggle-arrow { transition: transform var(--transition-base); font-size: .7rem; }
-.review-toggle-btn.active .toggle-arrow { transform: rotate(180deg); }
-
-.review-collapsible {
-  background: var(--pl-surface);
-  border: 1px solid var(--pl-accent);
-  border-top: 0;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  padding: 18px;
+  transition: background 180ms ease;
 }
 
-.review-guide {
-  background: var(--pl-accent-tint);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  margin-bottom: 16px;
+.review-toggle-btn:hover { background: var(--pl-accent-soft); }
+
+.review-toggle-btn .toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
-.review-guide b {
-  display: block;
-  font-size: .85rem;
+
+.review-toggle-btn .pl-icon { width: 1rem; height: 1rem; }
+
+.toggle-arrow {
+  font-size: 0.75rem;
+  color: var(--pl-muted);
+  transition: transform 200ms var(--pl-ease);
+}
+
+.review-toggle-btn.active { border-bottom: 1px solid var(--pl-line); }
+
+.review-form-lede { margin: 0; }
+
+.review-form-body { padding: 4px 18px 18px 18px; }
+
+.review-hints {
+  background: var(--pl-accent-soft);
+  border-left: 3px solid var(--pl-accent);
+  padding: 13px 14px;
+  border-radius: 10px;
+  margin: 12px 0 16px 0;
+}
+
+.review-hints-title {
+  margin: 0 0 8px 0;
   font-weight: 700;
   color: var(--pl-accent-deep);
-  margin-bottom: 8px;
-}
-.night-mode .review-guide b { color: var(--emerald-400); }
-.review-guide p {
-  font-size: .82rem;
-  line-height: 1.5;
-  color: var(--pl-ink-2);
-  margin: 4px 0;
+  font-size: 0.92rem;
 }
 
-.review-rate-label {
+.review-hint-line {
+  margin: 4px 0;
+  font-size: 0.86rem;
+  color: var(--pl-text-2);
+  line-height: 1.5;
+}
+
+.rate-label {
   text-align: center;
-  font-size: .85rem;
-  color: var(--pl-ink-3);
-  margin: 0 0 8px;
+  margin: 0 0 6px 0;
+  color: var(--pl-text-2);
+  font-size: 0.94rem;
 }
 
 .star-rating-input {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
-  margin: 12px 0 16px;
+  margin: 10px 0 14px 0;
 }
+
 .star-input {
-  font-size: 1.9rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  filter: grayscale(100%);
-  opacity: .35;
-  transition: opacity var(--transition-fast), filter var(--transition-fast),
-              transform var(--transition-fast);
+  color: var(--pl-line);
+  transition: color 150ms ease, transform 150ms ease;
 }
-.star-input.selected { filter: grayscale(0%); opacity: 1; transform: scale(1.12); }
+
+.star-input .pl-icon { width: 30px; height: 30px; }
+
+.star-input.selected { color: var(--pl-gold); }
+
+.star-input:hover { transform: scale(1.12); }
 
 .review-textarea {
   width: 100%;
-  box-sizing: border-box;
-  min-height: 104px;
-  padding: 13px;
+  min-height: 100px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--pl-line);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--pl-text);
   background: var(--pl-surface-2);
-  border: 1px solid var(--pl-line);
-  border-radius: var(--radius-md);
-  font-family: var(--font-body);
-  font-size: .95rem;
-  line-height: 1.55;
-  color: var(--pl-ink);
   resize: vertical;
+  margin-top: 4px;
+  box-sizing: border-box;
+  transition: border-color 160ms ease, background 160ms ease;
 }
-.review-textarea::placeholder { color: var(--pl-ink-3); }
+
 .review-textarea:focus {
   outline: none;
   border-color: var(--pl-accent);
-  box-shadow: 0 0 0 3px var(--pl-accent-tint);
+  background: var(--pl-surface);
 }
+
+.review-textarea::placeholder { color: var(--pl-muted); }
 
 .review-submit-btn {
   width: 100%;
-  background: var(--pl-accent);
-  color: var(--pl-on-accent);
-  border: 0;
-  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, var(--pl-accent) 0%, var(--pl-accent-deep) 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
   padding: 14px;
-  font-family: var(--font-body);
-  font-size: .95rem;
+  font-size: 1rem;
   font-weight: 700;
+  font-family: inherit;
   cursor: pointer;
   margin-top: 12px;
-  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  transition: transform 180ms var(--pl-ease), box-shadow 180ms var(--pl-ease);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
 }
-.review-submit-btn:active { transform: scale(.985); }
-.review-submit-btn:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
-.review-submit-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-.review-success { text-align: center; padding: 28px 20px; }
-.review-success-icon { font-size: 2.4rem; margin-bottom: 12px; }
+.review-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(5, 150, 105, 0.38);
+}
+
+.review-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.review-success {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.review-success-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 12px auto;
+  border-radius: 50%;
+  background: var(--pl-accent-soft);
+  color: var(--pl-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.review-success-icon .pl-icon { width: 28px; height: 28px; }
+
 .review-success h3 {
-  font-family: var(--font-display);
+  color: var(--pl-accent);
+  margin: 0 0 8px 0;
   font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--pl-accent-deep);
-  margin: 0 0 6px;
 }
-.night-mode .review-success h3 { color: var(--emerald-400); }
-.review-success p { font-size: .88rem; color: var(--pl-ink-3); margin: 0; }
 
-/* Clears the fixed rail so the last element is never trapped under it. */
-.detail-tail { height: 84px; }
-
-/* ============================================================
-   LEGACY — classes the old markup emitted. Neutralised rather than
-   deleted so a stale cached script cannot render an unstyled page.
-   ============================================================ */
-
-.detail-badges, .detail-combined-badge, .badge-stars, .badge-distance {
-  display: none;
+.review-success p {
+  color: var(--pl-text-2);
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
-.detail-content { padding: 0; }
-.nav-buttons { display: flex; gap: 10px; margin-top: 12px; }
-.nav-button {
+
+/* =========================================================
+   NAVIGATION DOCK — sticky, always in thumb reach
+   ========================================================= */
+.nav-dock {
+  position: sticky;
+  bottom: 10px;
+  z-index: 60;
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--pl-surface) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--pl-line);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(28, 25, 23, 0.18);
+}
+
+.night-mode .nav-dock {
+  background: rgba(28, 28, 28, 0.85);
+  background: color-mix(in srgb, var(--pl-surface) 82%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dock-btn {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px;
-  border-radius: var(--radius-md);
+  padding: 15px 12px;
+  border-radius: 12px;
   text-decoration: none;
-  font-weight: 700;
-  font-size: .92rem;
-}
-.kakao-button { background: #ffe812; color: #3c1e1e; }
-.naver-button { background: #03c75a; color: #fff; }
-
-@media (prefers-reduced-motion: reduce) {
-  .action-rail.is-sticky { transition: none; }
-  .detail-spinner { animation-duration: 2.4s; }
+  font-weight: 800;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  transition: transform 160ms var(--pl-ease), filter 160ms ease;
 }
 
+.dock-btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+.dock-btn:active { transform: translateY(0); }
 
-/* ==================================================================
-   FIXES
-   ================================================================== */
+.dock-btn .pl-icon { width: 1.05rem; height: 1.05rem; }
 
-/* Two-column stat strip for places with no known distance. */
-.detail-stats.is-two { grid-template-columns: repeat(2, 1fr); }
-
-/* The pencil in the review toggle had no size rule, so it rendered at
-   the SVG's intrinsic size and swallowed the button. Every inline icon
-   in this file is sized explicitly for exactly this reason. */
-.review-toggle-btn svg {
-  width: 18px;
-  height: 18px;
-  flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.review-toggle-btn > span { display: inline-flex; align-items: center; }
-.review-toggle-btn .toggle-arrow {
-  font-size: .6rem;
-  opacity: .7;
-  margin-left: 2px;
+.dock-btn--kakao {
+  background: #fee500;
+  color: #191600;
 }
 
-/* Safety net: an unsized inline SVG anywhere in the detail body can
-   never blow past a sane icon size again. */
-.detail-body svg,
-.action-rail svg,
-.detail-plate svg { max-width: 22px; max-height: 22px; }
-
-
-/* ==================================================================
-   OPTION B — hero stage, and the rating block.
-   ================================================================== */
-
-.detail-photo-section {
-  background: linear-gradient(165deg, #16342a 0%, #0e241d 100%);
-}
-.detail-photo-section .carousel-photo.center {
-  border-radius: 13px;
-  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, .55);
-}
-.detail-photo-section .carousel-photo.left,
-.detail-photo-section .carousel-photo.right { border-radius: 10px; }
-
-/* ---- rating block ----------------------------------------------
-   Rating and review count are not peers. A 5.0 off a single review is
-   noise, and giving it a cell the same size as distance makes it look
-   like a verdict. Merged into one unit so the number always carries
-   its own confidence, and given the wider column so it reads first.
-   ---------------------------------------------------------------- */
-
-.detail-stats { grid-template-columns: 1.45fr 1fr; }
-.detail-stats.is-two { grid-template-columns: 1fr; }
-
-.detail-rating { padding: 13px 8px 15px; text-align: center; position: relative; }
-.detail-stat + .detail-stat::before,
-.detail-rating + .detail-stat::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 14px; bottom: 14px;
-  width: 1px;
-  background: var(--pl-line-soft);
+.dock-btn--naver {
+  background: #03c75a;
+  color: #ffffff;
 }
 
-.rating-stars { display: flex; justify-content: center; gap: 3px; margin-bottom: 6px; }
-.rating-stars .star-container { gap: 3px; }
-.rating-stars .star-ico { width: 17px; height: 17px; }
-.rating-stars .star-count { display: none; }
-
-.rating-line { display: flex; align-items: baseline; justify-content: center; gap: 6px; }
-.rating-line b {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.3rem;
-  line-height: 1;
-  color: var(--pl-gold);
-  font-variant-numeric: tabular-nums;
-}
-.rating-line span {
-  font-size: .68rem;
-  font-weight: 600;
-  letter-spacing: .04em;
-  color: var(--pl-ink-3);
+/* =========================================================
+   ACCESSIBILITY & MOTION
+   ========================================================= */
+.retry-button:focus-visible,
+.review-toggle-btn:focus-visible,
+.review-submit-btn:focus-visible,
+.review-textarea:focus-visible,
+.star-input:focus-visible,
+.dock-btn:focus-visible,
+.detail-link:focus-visible {
+  outline: 2px solid var(--pl-accent);
+  outline-offset: 2px;
 }
 
-/* Few reviews means low confidence, so the stars are muted rather than
-   full gold. Five bright stars off one review overstates the case. */
-.detail-rating.is-thin .star-ico.on { fill: var(--pl-gold); opacity: .5; }
-.detail-rating.is-thin .rating-line b { opacity: .82; }
-
-.detail-rating.is-none { display: grid; align-content: center; gap: 3px; }
-.detail-rating.is-none b {
-  font-family: var(--font-body);
-  font-size: .86rem;
-  font-weight: 700;
-  color: var(--pl-ink-2);
-}
-.detail-rating.is-none span { font-size: .7rem; color: var(--pl-ink-3); }
-
-/* The unit was uppercase at label size, so it read as part of MASOFA
-   rather than belonging to the number. */
-.detail-stat b .unit {
-  font-family: var(--font-body);
-  font-size: .66rem;
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--pl-ink-3);
-  margin-left: 3px;
+/* =========================================================
+   SMALL SCREENS
+   ========================================================= */
+@media (max-width: 420px) {
+  .detail-photo-section { height: 290px; }
+  .detail-title { font-size: 1.45rem; }
+  .detail-head { padding: 18px 18px 4px 18px; }
+  .detail-content { padding: 4px 18px 18px 18px; }
 }

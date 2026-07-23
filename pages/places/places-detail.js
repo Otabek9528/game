@@ -37,6 +37,21 @@ const PLACE_CONFIGS = {
   }
 };
 
+// ============================================
+// INLINE SVG ICONS (UI chrome — replaces emoji)
+// ============================================
+
+const PL_ICONS = {
+  star: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.83 6.1 6.67.77-4.94 4.56 1.32 6.57L12 17.2l-5.88 3.3 1.32-6.57L2.5 9.37l6.67-.77z"/></svg>',
+  pin: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  phone: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.25a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z"/></svg>',
+  copy: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  chat: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3c-1.3 0-2.6-.3-3.7-.8L3 20l1.1-5.5a8 8 0 0 1-.6-3A8.4 8.4 0 0 1 12 3.2a8.4 8.4 0 0 1 9 8.3Z"/></svg>',
+  nav: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 11.2 21.5 2.8a.5.5 0 0 1 .66.66L13.8 22a.5.5 0 0 1-.93-.03l-2.1-7.3a1 1 0 0 0-.68-.68l-7.3-2.1a.5.5 0 0 1-.03-.93Z"/></svg>',
+  pen: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.4 2.4 0 0 1 3.4 3.4L8 18.8 3 20l1.2-5L17 3Z"/></svg>',
+  check: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>'
+};
+
 async function incrementViewCount(placeId) {
   try {
     await fetch(`${API_CONFIG.BASE_URL}/api/place/${placeId}/view`, {
@@ -228,13 +243,13 @@ async function discoverPhotos(photoPath, maxPhotos = 10) {
 function createDetailPhotoCarousel(photos) {
   if (!photos || photos.length === 0) {
     return `
-      <img src="${CONFIG.defaultPhoto}" alt="" onerror="photoFallback(this)" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="openImageModal(['${CONFIG.defaultPhoto}'], 0)" />
+      <img src="${CONFIG.defaultPhoto}" alt="${CONFIG.name} photo" class="detail-single-photo" onclick="openImageModal(['${CONFIG.defaultPhoto}'], 0)" />
     `;
   }
   
   if (photos.length === 1) {
     return `
-      <img src="${photos[0]}" alt="" onerror="photoFallback(this)" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="openImageModal(['${photos[0]}'], 0)" />
+      <img src="${photos[0]}" alt="${CONFIG.name} photo" class="detail-single-photo" onclick="openImageModal(['${photos[0]}'], 0)" />
     `;
   }
   
@@ -247,7 +262,7 @@ function createDetailPhotoCarousel(photos) {
     
     photosHTML += `
       <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${photo}">
-        <img src="${photo}" alt="" onerror="photoFallback(this)" />
+        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" />
       </div>
     `;
     
@@ -266,33 +281,6 @@ function createDetailPhotoCarousel(photos) {
       </div>
     </div>
   `;
-}
-
-// ============================================
-// STICKY ACTION RAIL
-// ============================================
-// The inline rail is cloned to a fixed copy that reveals itself only once
-// the original scrolls out of view, so it costs no viewport at the top of
-// the page but keeps "call" and "navigate" one thumb-tap away below it.
-
-let stickyRailObserver = null;
-
-function initStickyRail() {
-  const inline = document.getElementById('actionRail');
-  document.querySelectorAll('.action-rail.is-sticky').forEach(n => n.remove());
-  if (stickyRailObserver) { stickyRailObserver.disconnect(); stickyRailObserver = null; }
-  if (!inline || !inline.children.length) return;
-
-  const sticky = inline.cloneNode(true);
-  sticky.id = 'actionRailSticky';
-  sticky.classList.add('is-sticky');
-  document.body.appendChild(sticky);
-
-  if (!('IntersectionObserver' in window)) return;
-  stickyRailObserver = new IntersectionObserver(entries => {
-    sticky.classList.toggle('on', !entries[0].isIntersecting);
-  }, { rootMargin: '0px 0px -48px 0px' });
-  stickyRailObserver.observe(inline);
 }
 
 function initDetailCarousel(photoCount) {
@@ -370,35 +358,14 @@ function generateStarRating(reviews) {
   const noRatingText = window.I18N ? I18N.t('detail.noReviews') : 'Hali izoh yo\'q';
   
   if (!reviews || reviews.length === 0) {
-    return `<span class="no-rating-text">${noRatingText}</span>`;
+    return `<span class="detail-chip--muted">${noRatingText}</span>`;
   }
   
   const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-  const roundedRating = Math.round(avgRating);
-
-  let starsHTML = '';
-  for (let i = 1; i <= 5; i++) starsHTML += starIcon(i <= roundedRating);
-
-  return `<div class="star-container">${starsHTML}</div>`;
+  const rating = (Math.round(avgRating * 10) / 10).toFixed(1);
+  
+  return `${PL_ICONS.star}<span class="chip-num">${rating}</span><span class="chip-count">(${reviews.length})</span>`;
 }
-
-// Gold stars as SVG rather than the ⭐ emoji: emoji render differently on
-// every device, sit on their own baseline next to Playfair, and cannot take
-// the --gold token.
-function starIcon(filled) {
-  return '<svg class="star-ico' + (filled ? ' on' : '') + '" viewBox="0 0 24 24" ' +
-         'aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.4-5.8-3-5.8 3 ' +
-         '1.1-6.4L2.6 9.4l6.5-.9z"/></svg>';
-}
-
-// A photo URL that 404s used to render Android's broken-image glyph plus the
-// alt text. Fall back to the type's default photo, then hide.
-function photoFallback(img) {
-  if (img.dataset.fell) { img.style.visibility = 'hidden'; return; }
-  img.dataset.fell = '1';
-  img.src = CONFIG.defaultPhoto;
-}
-
 
 function formatDate(dateString) {
   try {
@@ -425,7 +392,7 @@ function renderReviews(reviews) {
 
   let reviewsHTML = '';
   reviews.forEach(review => {
-    const stars = '⭐'.repeat(review.rating);
+    const stars = PL_ICONS.star.repeat(review.rating);
     const date = formatDate(review.timestamp);
     
     reviewsHTML += `
@@ -482,16 +449,7 @@ async function renderPlaceDetail(place) {
   const starRatingHTML = generateStarRating(place.reviews);
   const reviewsHTML = renderReviews(place.reviews);
   const reviewCount = place.reviews ? place.reviews.length : 0;
-  // Distance comes from the list page via ?d=, because the detail
-  // endpoint does not know the user's location. Falls back to the API
-  // field if it ever starts returning one. Unknown means the stat is
-  // omitted, never rendered as "N/A".
-  const dRaw = new URLSearchParams(window.location.search).get('d');
-  const dNum = dRaw !== null ? Number(dRaw)
-             : (place.distance !== null && place.distance !== undefined
-                ? Number(place.distance) : NaN);
-  const distanceKm = (!isNaN(dNum) && dNum >= 0) ? dNum.toFixed(1) : null;
-  const distanceDisplay = distanceKm;
+  const distanceDisplay = place.distance ? place.distance.toFixed(1) : 'N/A';
   
   // Translated texts
   const t = window.I18N ? (key) => I18N.t(key) : (key) => key;
@@ -526,148 +484,124 @@ async function renderPlaceDetail(place) {
     }
     
     return phones.map(phone => 
-      `<a href="tel:${phone}" class="detail-link" style="display: block; margin-bottom: 4px;">${phone}</a>`
+      `<a href="tel:${phone}" class="detail-link detail-phone-line">${phone}</a>`
     ).join('');
   }
   
-  // Average rating computed defensively: if the review objects do not carry
-  // a numeric `rating`, the stat falls back to a dash rather than NaN.
-  const ratingNums = (place.reviews || [])
-    .map(r => Number(r && r.rating))
-    .filter(n => !isNaN(n) && n > 0);
-  const avgRating = ratingNums.length
-    ? (ratingNums.reduce((a, b) => a + b, 0) / ratingNums.length).toFixed(1)
-    : null;
-
-  const telHref = place.phone ? String(place.phone).replace(/[^0-9+]/g, '') : '';
-  const safeAddress = (place.address || '').replace(/'/g, "\\'");
-
   detailContent.innerHTML = `
-    <div class="detail-photo-section">
-      ${photoHTML}
-    </div>
-
-    <div class="detail-plate">
-      <span class="detail-eyebrow">${CONFIG.name}</span>
-      <h1 class="detail-title">${place.name}</h1>
-      <p class="detail-subtitle">${place.city || ''}</p>
-
-      <div class="detail-stats${distanceKm ? '' : ' is-two'}">
-        ${avgRating ? `
-          <div class="detail-rating${reviewCount < 3 ? ' is-thin' : ''}">
-            <div class="rating-stars">${starRatingHTML}</div>
-            <div class="rating-line">
-              <b>${avgRating}</b>
-              <span>${reviewCount} ta izoh asosida</span>
+    <div class="detail-card">
+      <div class="detail-photo-section">
+        ${photoHTML}
+      </div>
+      
+      <div class="detail-head">
+        <h1 class="detail-title">${place.name}</h1>
+        <p class="detail-subtitle">${place.city || 'Unknown City'}</p>
+        <div class="detail-chips">
+          <div class="detail-chip detail-chip--rating">
+            ${starRatingHTML}
+          </div>
+          ${place.distance ? `
+            <div class="detail-chip detail-chip--distance">
+              ${PL_ICONS.pin}
+              <span>${distanceDisplay} km</span>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+      
+      <div class="detail-content">
+        <div class="detail-section">
+          <h3 class="detail-section-title">${PL_ICONS.phone} ${contactTitle}</h3>
+          <div class="detail-info-item">
+            <span class="detail-icon">${PL_ICONS.phone}</span>
+            <div style="flex: 1;">
+              ${renderPhoneNumbers(place.phone)}
             </div>
           </div>
-        ` : `
-          <div class="detail-rating is-none">
-            <b>Hali baholanmagan</b>
-            <span>Birinchi izohni siz qoldiring</span>
+        </div>
+        
+        <div class="detail-section">
+          <h3 class="detail-section-title">${PL_ICONS.pin} ${addressTitle}</h3>
+          <div class="detail-info-item" style="cursor: pointer;" onclick="copyAddress('${(place.address || '').replace(/'/g, "\\'")}', event)">
+            <span class="detail-icon">${PL_ICONS.pin}</span>
+            <span class="detail-text">${place.address || noAddressText}</span>
+            <span class="detail-copy-mark">${PL_ICONS.copy}</span>
           </div>
-        `}
-        ${distanceKm ? `
-          <div class="detail-stat">
-            <b>${distanceKm}<span class="unit">km</span></b>
-            <span>Masofa</span>
+        </div>
+        
+        ${reviewCount > 0 ? `
+          <div class="detail-section">
+            <h3 class="detail-section-title">${PL_ICONS.chat} ${reviewsTitle} (${reviewCount})</h3>
+            <div class="reviews-container">
+              ${reviewsHTML}
+            </div>
           </div>
         ` : ''}
-      </div>
-    </div>
-
-    <div class="action-rail" id="actionRail">
-      ${place.phone ? `
-        <a class="act act-call" href="tel:${telHref}">
-          <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>Qo'ng'iroq
-        </a>
-      ` : ''}
-      ${place.kakaoMapUrl ? `
-        <a class="act act-kakao" href="${place.kakaoMapUrl}" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>KakaoMap
-        </a>
-      ` : ''}
-      ${place.naverMapUrl ? `
-        <a class="act act-naver" href="${place.naverMapUrl}" target="_blank" rel="noopener"
-           onclick="event.preventDefault(); window.Telegram.WebApp.openLink('${place.naverMapUrl}', {try_instant_view: false});">
-          <svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>NaverMap
-        </a>
-      ` : ''}
-    </div>
-
-    <div class="detail-body">
-
-      <p class="detail-section-title">${addressTitle}</p>
-      <div class="detail-card">
-        <button type="button" class="detail-row" onclick="copyAddress('${safeAddress}', event)">
-          <span class="detail-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-          <span class="detail-text"><b>${place.address || noAddressText}</b></span>
-          ${place.address ? `<span class="detail-row-act">Nusxa</span>` : ''}
-        </button>
-      </div>
-
-      <p class="detail-section-title">${contactTitle}</p>
-      <div class="detail-card">
-        <div class="detail-row">
-          <span class="detail-icon"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg></span>
-          <span class="detail-text">${renderPhoneNumbers(place.phone)}</span>
-        </div>
-      </div>
-
-      <p class="detail-section-title">${reviewsTitle}${reviewCount ? ' \u00b7 ' + reviewCount : ''}</p>
-      <div class="detail-card">
-        ${reviewCount > 0 ? reviewsHTML : `
-          <div class="no-reviews">
-            <b>Bu yer haqida birinchi bo'lib yozing</b>
-            <p>${CONFIG.reviewPrompt} \u2014 boshqalarga foydali bo'ladigan tafsilotlar eng qadrlisi.</p>
-          </div>
-        `}
-      </div>
-
-      <div class="detail-section review-section">
-        <button class="review-toggle-btn" id="reviewToggleBtn">
-          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg><span>${leaveReviewText}</span>
-          <span class="toggle-arrow" id="reviewToggleArrow">\u25bc</span>
-        </button>
-
-        <div id="reviewCollapsible" style="display: none;">
+        
+        <div class="detail-section review-section">
           <div class="review-collapsible">
-            <div class="review-guide">
-              <b>${reviewHintTitle}</b>
-              <p>${reviewHint1}</p>
-              <p>${reviewHint2}</p>
-              <p>${reviewHint3}</p>
-              <p>${reviewHint4}</p>
-            </div>
-
-            <p class="review-rate-label">${rateText}</p>
-            <div class="star-rating-input" id="starRatingInput">
-              <span class="star-input" data-rating="1">\u2b50</span>
-              <span class="star-input" data-rating="2">\u2b50</span>
-              <span class="star-input" data-rating="3">\u2b50</span>
-              <span class="star-input" data-rating="4">\u2b50</span>
-              <span class="star-input" data-rating="5">\u2b50</span>
-            </div>
-
-            <textarea class="review-textarea" id="reviewText"
-                      placeholder="${reviewPlaceholder}"></textarea>
-            <button class="review-submit-btn" id="submitReviewBtn">${submitText}</button>
-
-            <div id="reviewSuccessMessage" class="review-success" style="display: none;">
-              <div class="review-success-icon">\u2705</div>
-              <h3>${thankYouText}</h3>
-              <p>${reviewReceivedText}</p>
+            <button class="review-toggle-btn" id="reviewToggleBtn">
+              <span class="toggle-label">${PL_ICONS.pen} ${leaveReviewText}</span>
+              <span class="toggle-arrow" id="reviewToggleArrow">▼</span>
+            </button>
+            <div id="reviewCollapsible" style="display: none;">
+              <p class="review-form-lede"></p>
+              
+              <div class="review-form-body">
+                <div class="review-hints">
+                  <p class="review-hints-title">${reviewHintTitle}</p>
+                  <p class="review-hint-line">✅ ${reviewHint1}</p>
+                  <p class="review-hint-line">🕌 ${reviewHint2}</p>
+                  <p class="review-hint-line">📋 ${reviewHint3}</p>
+                  <p class="review-hint-line">🗺️ ${reviewHint4}</p>
+                </div>
+                
+                <p class="rate-label">${rateText}</p>
+                <div class="star-rating-input" id="starRatingInput">
+                  <span class="star-input" data-rating="1">${PL_ICONS.star}</span>
+                  <span class="star-input" data-rating="2">${PL_ICONS.star}</span>
+                  <span class="star-input" data-rating="3">${PL_ICONS.star}</span>
+                  <span class="star-input" data-rating="4">${PL_ICONS.star}</span>
+                  <span class="star-input" data-rating="5">${PL_ICONS.star}</span>
+                </div>
+                <textarea 
+                  class="review-textarea" 
+                  id="reviewText" 
+                  placeholder="${reviewPlaceholder}"></textarea>
+                <button class="review-submit-btn" id="submitReviewBtn">${submitText}</button>
+              </div>
+              
+              <div id="reviewSuccessMessage" class="review-success" style="display: none;">
+                <div class="review-success-icon">${PL_ICONS.check}</div>
+                <h3>${thankYouText}</h3>
+                <p>${reviewReceivedText}</p>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
-
-      <div class="detail-tail"></div>
     </div>
+    
+    ${(place.kakaoMapUrl || place.naverMapUrl) ? `
+      <div class="nav-dock" aria-label="${navigationTitle}">
+        ${place.kakaoMapUrl ? `
+          <a href="${place.kakaoMapUrl}" target="_blank" class="dock-btn dock-btn--kakao">
+            ${PL_ICONS.nav}
+            <span>KakaoMap</span>
+          </a>
+        ` : ''}
+        ${place.naverMapUrl ? `
+          <a href="${place.naverMapUrl}" target="_blank" rel="noopener" class="dock-btn dock-btn--naver" onclick="event.preventDefault(); window.Telegram.WebApp.openLink('${place.naverMapUrl}', {try_instant_view: false});">
+            ${PL_ICONS.nav}
+            <span>NaverMap</span>
+          </a>
+        ` : ''}
+      </div>
+    ` : ''}
   `;
-
-  initStickyRail();
-
+  
   if (photos.length > 1) {
     initDetailCarousel(photos.length);
   }
@@ -745,7 +679,7 @@ function initReviewSubmission(placeId) {
       const result = await response.json();
       
       if (result.success) {
-        document.querySelector('.review-collapsible > div').style.display = 'none';
+        document.querySelector('.review-collapsible .review-form-body').style.display = 'none';
         document.getElementById('starRatingInput').style.display = 'none';
         reviewText.style.display = 'none';
         submitBtn.style.display = 'none';

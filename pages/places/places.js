@@ -43,6 +43,17 @@ const PLACE_CONFIGS = {
   }
 };
 
+// ============================================
+// INLINE SVG ICONS (UI chrome — replaces emoji)
+// ============================================
+
+const PL_ICONS = {
+  star: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.83 6.1 6.67.77-4.94 4.56 1.32 6.57L12 17.2l-5.88 3.3 1.32-6.57L2.5 9.37l6.67-.77z"/></svg>',
+  pin: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  phone: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.25a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z"/></svg>',
+  image: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-4.5-4.5L7 21"/></svg>'
+};
+
 // Get translated config based on current language
 function getTranslatedConfig(placeType) {
   const base = PLACE_CONFIGS[placeType] || PLACE_CONFIGS.mosque;
@@ -363,12 +374,14 @@ function createSkeletonCard(placeId) {
   const loadingText = window.I18N ? I18N.t('places.loadingPhotos') : 'Rasmlar yuklanmoqda...';
   const hintText = window.I18N ? I18N.t('places.loadingHint') : 'Internet tezligingizga bog\'liq';
   
-  // The shimmer already says "loading". Half a card of apology about the
-  // user's connection speed does not need to say it again.
   return `
-    <div class="place-photo-skeleton" data-place-id="${placeId}"
-         role="img" aria-label="${loadingText}">
+    <div class="place-photo-skeleton" data-place-id="${placeId}">
       <div class="skeleton-shimmer"></div>
+      <div class="skeleton-text">
+        <span class="skeleton-icon">${PL_ICONS.image}</span>
+        <span class="skeleton-message">${loadingText}</span>
+        <span class="skeleton-hint">${hintText}</span>
+      </div>
     </div>
   `;
 }
@@ -377,7 +390,7 @@ function createSkeletonCard(placeId) {
 function createSinglePhoto(photo, placeId) {
   return `
     <div class="place-photo-single" data-photos='${JSON.stringify([photo])}' data-place-id="${placeId}">
-      <img src="${photo}" alt="" onerror="photoFallback(this)" loading="lazy" onerror="photoFallback(this)" />
+      <img src="${photo}" alt="${CONFIG.name} photo" loading="lazy" />
     </div>
   `;
 }
@@ -386,7 +399,7 @@ function createPhotoCarousel(placeId, photos) {
   if (!photos || photos.length === 0) {
     return `
       <div class="place-photo-single" data-photos='["${CONFIG.defaultPhoto}"]' data-place-id="${placeId}">
-        <img src="${CONFIG.defaultPhoto}" alt="" loading="lazy" onerror="photoFallback(this)" />
+        <img src="${CONFIG.defaultPhoto}" alt="${CONFIG.name} photo" loading="lazy" />
       </div>
     `;
   }
@@ -394,7 +407,7 @@ function createPhotoCarousel(placeId, photos) {
   if (photos.length === 1) {
     return `
       <div class="place-photo-single" data-photos='${JSON.stringify(photos)}' data-place-id="${placeId}">
-        <img src="${photos[0]}" alt="" loading="lazy" onerror="photoFallback(this)" />
+        <img src="${photos[0]}" alt="${CONFIG.name} photo" loading="lazy" />
       </div>
     `;
   }
@@ -408,7 +421,7 @@ function createPhotoCarousel(placeId, photos) {
     
     photosHTML += `
       <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${photo}">
-        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" onerror="photoFallback(this)" loading="lazy" />
+        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" loading="lazy" />
       </div>
     `;
     
@@ -623,36 +636,13 @@ function generateStarRating(averageRating, reviewCount) {
   const noRatingText = window.I18N ? I18N.t('places.noRating') : 'Izoh qoldirilmagan';
   
   if (!reviewCount || reviewCount === 0) {
-    return `<span class="no-rating-text">${noRatingText}</span>`;
+    return `<span class="chip-muted">${noRatingText}</span>`;
   }
   
-  const roundedRating = Math.round(averageRating);
-
-  let starsHTML = '';
-  for (let i = 1; i <= 5; i++) starsHTML += starIcon(i <= roundedRating);
-
-  // The count qualifies the stars, so it travels with them.
-  return `<div class="star-container">${starsHTML}` +
-         `<span class="star-count">${reviewCount}</span></div>`;
+  const rating = (Math.round(Number(averageRating || 0) * 10) / 10).toFixed(1);
+  
+  return `${PL_ICONS.star}<span class="chip-num">${rating}</span><span class="chip-count">(${reviewCount})</span>`;
 }
-
-// Gold stars as SVG rather than the ⭐ emoji: emoji render differently on
-// every device, sit on their own baseline next to Playfair, and cannot take
-// the --gold token.
-function starIcon(filled) {
-  return '<svg class="star-ico' + (filled ? ' on' : '') + '" viewBox="0 0 24 24" ' +
-         'aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.4-5.8-3-5.8 3 ' +
-         '1.1-6.4L2.6 9.4l6.5-.9z"/></svg>';
-}
-
-// A photo URL that 404s used to render Android's broken-image glyph plus the
-// alt text. Fall back to the type's default photo, then hide.
-function photoFallback(img) {
-  if (img.dataset.fell) { img.style.visibility = 'hidden'; return; }
-  img.dataset.fell = '1';
-  img.src = CONFIG.defaultPhoto;
-}
-
 
 async function renderPlaceCards(places) {
   CONFIG = getTranslatedConfig(PLACE_TYPE);
@@ -693,33 +683,33 @@ async function renderPlaceCards(places) {
 	const distanceDisplay = (place.distance !== null && place.distance !== undefined) ? place.distance.toFixed(2) : 'N/A';
     const phoneDisplay = place.phone || noInfoText;
     
-    // Photo-forward card. The distance badge sits in .place-card-media and
-    // NOT inside .place-card-image, because loadPlacePhotos() replaces that
-    // element's innerHTML wholesale once the photos arrive.
-    // The full address is deliberately not repeated here: it is not
-    // actionable from a scan list, city already gives the neighbourhood,
-    // and it is one tap away on the detail page.
-    const telHref = place.phone ? String(place.phone).replace(/[^0-9+]/g, '') : '';
-    const hasDistance = place.distance !== null && place.distance !== undefined;
-
     card.innerHTML = `
-      <div class="place-card-media">
-        <div class="place-card-image">
-          ${createSkeletonCard(place.id)}
-        </div>
-        ${hasDistance ? `
-          <span class="place-distance-badge"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${distanceDisplay} km</span>
-        ` : ''}
+      <div class="place-card-image">
+        ${createSkeletonCard(place.id)}
       </div>
-
+      
+      <div class="media-chips">
+        <div class="chip chip-rating">
+          ${starRatingHTML}
+        </div>
+        <div class="chip chip-distance">
+          ${PL_ICONS.pin}
+          <span>${distanceDisplay} km</span>
+        </div>
+      </div>
+      
       <div class="place-card-content">
         <h3 class="place-name">${place.name}</h3>
-        <p class="place-name-ko">${place.city || ''}</p>
-        <div class="place-meta">
-          ${starRatingHTML}
-          ${place.phone ? `
-            <a class="meta-phone" href="tel:${telHref}" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>${place.phone}</a>
-          ` : ''}
+        <p class="place-name-ko">${place.city || 'Unknown City'}</p>
+        <div class="place-info">
+          <div class="place-info-item">
+            <span class="info-icon">${PL_ICONS.phone}</span>
+            <span class="info-text">${phoneDisplay}</span>
+          </div>
+          <div class="place-info-item">
+            <span class="info-icon">${PL_ICONS.pin}</span>
+            <span class="info-text">${place.address || noAddressText}</span>
+          </div>
         </div>
       </div>
     `;
@@ -732,12 +722,7 @@ async function renderPlaceCards(places) {
       }
       saveSearchState();
       sessionStorage.setItem('comingFromDetail', 'true');
-      // Distance is computed against the user's location by the list
-      // endpoint; the detail endpoint has no idea where the user is, so
-      // carry the value across rather than showing N/A.
-      const dParam = (place.distance !== null && place.distance !== undefined)
-        ? `&d=${encodeURIComponent(place.distance)}` : '';
-      window.location.href = `places-detail.html?type=${PLACE_TYPE}&id=${place.id}${dParam}`;
+      window.location.href = `places-detail.html?type=${PLACE_TYPE}&id=${place.id}`;
     });
     
     placeCardsContainer.appendChild(card);
