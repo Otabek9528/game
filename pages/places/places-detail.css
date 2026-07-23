@@ -125,6 +125,20 @@
   padding: 20px 22px 4px 22px;
 }
 
+.detail-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pl-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin: 0 0 6px 0;
+}
+
+.detail-eyebrow .pl-icon { width: 0.85rem; height: 0.85rem; }
+
 .detail-title {
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.65rem;
@@ -166,7 +180,12 @@
 
 .detail-chip .pl-icon { width: 0.95rem; height: 0.95rem; }
 
-.detail-chip--rating .pl-icon { color: var(--pl-gold); }
+.detail-chip--rating .stars .pl-icon { width: 0.85rem; height: 0.85rem; }
+
+.detail-chip--rating .chip-num {
+  font-size: 0.9rem;
+  margin-left: 2px;
+}
 
 .detail-chip--rating .chip-count {
   font-weight: 600;
@@ -295,11 +314,10 @@
 .review-stars {
   display: inline-flex;
   gap: 2px;
-  color: var(--pl-gold);
   line-height: 0;
 }
 
-.review-stars .pl-icon { width: 0.9rem; height: 0.9rem; }
+.review-stars .stars .pl-icon { width: 0.9rem; height: 0.9rem; }
 
 .review-date {
   font-size: 0.82rem;
@@ -420,7 +438,10 @@
 
 .star-input .pl-icon { width: 30px; height: 30px; }
 
-.star-input.selected { color: var(--pl-gold); }
+.star-input.selected {
+  color: var(--pl-star);
+  filter: drop-shadow(0 1px 4px rgba(255, 183, 3, 0.55));
+}
 
 .star-input:hover { transform: scale(1.12); }
 

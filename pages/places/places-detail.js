@@ -49,7 +49,8 @@ const PL_ICONS = {
   chat: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3c-1.3 0-2.6-.3-3.7-.8L3 20l1.1-5.5a8 8 0 0 1-.6-3A8.4 8.4 0 0 1 12 3.2a8.4 8.4 0 0 1 9 8.3Z"/></svg>',
   nav: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 11.2 21.5 2.8a.5.5 0 0 1 .66.66L13.8 22a.5.5 0 0 1-.93-.03l-2.1-7.3a1 1 0 0 0-.68-.68l-7.3-2.1a.5.5 0 0 1-.03-.93Z"/></svg>',
   pen: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.4 2.4 0 0 1 3.4 3.4L8 18.8 3 20l1.2-5L17 3Z"/></svg>',
-  check: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>'
+  check: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>',
+  rub: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="6.2" y="6.2" width="11.6" height="11.6"/><rect x="6.2" y="6.2" width="11.6" height="11.6" transform="rotate(45 12 12)"/></svg>'
 };
 
 async function incrementViewCount(placeId) {
@@ -354,6 +355,15 @@ function initDetailCarousel(photoCount) {
 // RATING AND REVIEW FUNCTIONS (with I18N)
 // ============================================
 
+function renderStars(rating) {
+  const rounded = Math.round(Number(rating || 0));
+  let starsHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    starsHTML += `<span class="${i <= rounded ? 'star-on' : 'star-off'}">${PL_ICONS.star}</span>`;
+  }
+  return `<span class="stars">${starsHTML}</span>`;
+}
+
 function generateStarRating(reviews) {
   const noRatingText = window.I18N ? I18N.t('detail.noReviews') : 'Hali izoh yo\'q';
   
@@ -364,7 +374,7 @@ function generateStarRating(reviews) {
   const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   const rating = (Math.round(avgRating * 10) / 10).toFixed(1);
   
-  return `${PL_ICONS.star}<span class="chip-num">${rating}</span><span class="chip-count">(${reviews.length})</span>`;
+  return `${renderStars(avgRating)}<span class="chip-num">${rating}</span><span class="chip-count">(${reviews.length})</span>`;
 }
 
 function formatDate(dateString) {
@@ -392,7 +402,7 @@ function renderReviews(reviews) {
 
   let reviewsHTML = '';
   reviews.forEach(review => {
-    const stars = PL_ICONS.star.repeat(review.rating);
+    const stars = renderStars(review.rating);
     const date = formatDate(review.timestamp);
     
     reviewsHTML += `
@@ -495,6 +505,7 @@ async function renderPlaceDetail(place) {
       </div>
       
       <div class="detail-head">
+        <p class="detail-eyebrow">${PL_ICONS.rub} ${CONFIG.name}</p>
         <h1 class="detail-title">${place.name}</h1>
         <p class="detail-subtitle">${place.city || 'Unknown City'}</p>
         <div class="detail-chips">
@@ -512,7 +523,7 @@ async function renderPlaceDetail(place) {
       
       <div class="detail-content">
         <div class="detail-section">
-          <h3 class="detail-section-title">${PL_ICONS.phone} ${contactTitle}</h3>
+          <h3 class="detail-section-title">${PL_ICONS.rub} ${contactTitle}</h3>
           <div class="detail-info-item">
             <span class="detail-icon">${PL_ICONS.phone}</span>
             <div style="flex: 1;">
@@ -522,7 +533,7 @@ async function renderPlaceDetail(place) {
         </div>
         
         <div class="detail-section">
-          <h3 class="detail-section-title">${PL_ICONS.pin} ${addressTitle}</h3>
+          <h3 class="detail-section-title">${PL_ICONS.rub} ${addressTitle}</h3>
           <div class="detail-info-item" style="cursor: pointer;" onclick="copyAddress('${(place.address || '').replace(/'/g, "\\'")}', event)">
             <span class="detail-icon">${PL_ICONS.pin}</span>
             <span class="detail-text">${place.address || noAddressText}</span>
@@ -532,7 +543,7 @@ async function renderPlaceDetail(place) {
         
         ${reviewCount > 0 ? `
           <div class="detail-section">
-            <h3 class="detail-section-title">${PL_ICONS.chat} ${reviewsTitle} (${reviewCount})</h3>
+            <h3 class="detail-section-title">${PL_ICONS.rub} ${reviewsTitle} (${reviewCount})</h3>
             <div class="reviews-container">
               ${reviewsHTML}
             </div>

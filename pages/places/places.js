@@ -632,6 +632,15 @@ function setupLazyLoading() {
 // RENDERING (Optimized with I18N)
 // ============================================
 
+function renderStars(rating) {
+  const rounded = Math.round(Number(rating || 0));
+  let starsHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    starsHTML += `<span class="${i <= rounded ? 'star-on' : 'star-off'}">${PL_ICONS.star}</span>`;
+  }
+  return `<span class="stars">${starsHTML}</span>`;
+}
+
 function generateStarRating(averageRating, reviewCount) {
   const noRatingText = window.I18N ? I18N.t('places.noRating') : 'Izoh qoldirilmagan';
   
@@ -639,9 +648,7 @@ function generateStarRating(averageRating, reviewCount) {
     return `<span class="chip-muted">${noRatingText}</span>`;
   }
   
-  const rating = (Math.round(Number(averageRating || 0) * 10) / 10).toFixed(1);
-  
-  return `${PL_ICONS.star}<span class="chip-num">${rating}</span><span class="chip-count">(${reviewCount})</span>`;
+  return `${renderStars(averageRating)}<span class="chip-count">(${reviewCount})</span>`;
 }
 
 async function renderPlaceCards(places) {
@@ -755,12 +762,21 @@ function showError(message) {
 // EVENT HANDLERS
 // ============================================
 
+// Reflect the chosen search mode on the segmented switch
+function setActiveMode(mode) {
+  if (searchNearbyBtn) searchNearbyBtn.classList.toggle('is-active', mode === 'location');
+  if (searchByAddressBtn) searchByAddressBtn.classList.toggle('is-active', mode === 'address');
+}
+
 // Button 1: Search by Address - toggle input section
 searchByAddressBtn.addEventListener('click', () => {
   const isOpen = addressInputSection.style.display !== 'none';
   addressInputSection.style.display = isOpen ? 'none' : 'block';
   if (!isOpen) {
+    setActiveMode('address');
     searchBar.focus();
+  } else {
+    setActiveMode(currentMode === 'address' ? 'address' : currentMode === 'location' && currentPlaces.length > 0 ? 'location' : null);
   }
 });
 
@@ -776,6 +792,7 @@ searchNearbyBtn.addEventListener('click', async () => {
   
   currentMode = 'location';
   currentSearchAddress = '';
+  setActiveMode('location');
   updatePageTitle();
   
   const location = LocationManager.getCurrentLocation();
@@ -833,6 +850,7 @@ clearSearchBtn.addEventListener('click', () => {
 async function performAddressSearch(address) {
   currentMode = 'address';
   currentSearchAddress = address;
+  setActiveMode('address');
   
   // Hide placeholder, show loading
   searchPlaceholder.style.display = 'none';
@@ -900,6 +918,7 @@ async function initializePlacesPage() {
     // Restore previous search results
     currentMode = savedState.mode;
     currentSearchAddress = savedState.address;
+    setActiveMode(currentMode);
     updatePageTitle();
     currentPlaces = savedState.places;
     

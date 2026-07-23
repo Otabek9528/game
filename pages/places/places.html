@@ -33,17 +33,19 @@
 
     <!-- Search Buttons Section -->
     <div class="search-buttons-section">
-      <!-- Primary: Search Nearby -->
-      <button class="search-mode-btn nearby-btn" id="searchNearbyBtn">
-        <span class="mode-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
-        <span class="mode-text" data-i18n="places.searchNearby">O'z atrofimdan izlash</span>
-      </button>
+      <div class="mode-switch" role="group" aria-label="Qidiruv turi">
+        <!-- Search Nearby -->
+        <button class="search-mode-btn nearby-btn" id="searchNearbyBtn">
+          <span class="mode-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
+          <span class="mode-text" data-i18n="places.searchNearby">O'z atrofimdan izlash</span>
+        </button>
 
-      <!-- Secondary: Search by Address -->
-      <button class="search-mode-btn" id="searchByAddressBtn">
-        <span class="mode-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></span>
-        <span class="mode-text" data-i18n="places.searchByAddress">Boshqa manzil atrofidan izlash</span>
-      </button>
+        <!-- Search by Address -->
+        <button class="search-mode-btn" id="searchByAddressBtn">
+          <span class="mode-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></span>
+          <span class="mode-text" data-i18n="places.searchByAddress">Boshqa manzil atrofidan izlash</span>
+        </button>
+      </div>
 
       <!-- Address Input (Hidden by default) -->
       <div class="address-input-section" id="addressInputSection" style="display: none;">
