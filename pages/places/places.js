@@ -363,14 +363,12 @@ function createSkeletonCard(placeId) {
   const loadingText = window.I18N ? I18N.t('places.loadingPhotos') : 'Rasmlar yuklanmoqda...';
   const hintText = window.I18N ? I18N.t('places.loadingHint') : 'Internet tezligingizga bog\'liq';
   
+  // The shimmer already says "loading". Half a card of apology about the
+  // user's connection speed does not need to say it again.
   return `
-    <div class="place-photo-skeleton" data-place-id="${placeId}">
+    <div class="place-photo-skeleton" data-place-id="${placeId}"
+         role="img" aria-label="${loadingText}">
       <div class="skeleton-shimmer"></div>
-      <div class="skeleton-text">
-        <span class="skeleton-icon">🖼️</span>
-        <span class="skeleton-message">${loadingText}</span>
-        <span class="skeleton-hint">${hintText}</span>
-      </div>
     </div>
   `;
 }
@@ -379,7 +377,7 @@ function createSkeletonCard(placeId) {
 function createSinglePhoto(photo, placeId) {
   return `
     <div class="place-photo-single" data-photos='${JSON.stringify([photo])}' data-place-id="${placeId}">
-      <img src="${photo}" alt="${CONFIG.name} photo" loading="lazy" />
+      <img src="${photo}" alt="" onerror="photoFallback(this)" loading="lazy" onerror="photoFallback(this)" />
     </div>
   `;
 }
@@ -388,7 +386,7 @@ function createPhotoCarousel(placeId, photos) {
   if (!photos || photos.length === 0) {
     return `
       <div class="place-photo-single" data-photos='["${CONFIG.defaultPhoto}"]' data-place-id="${placeId}">
-        <img src="${CONFIG.defaultPhoto}" alt="${CONFIG.name} photo" loading="lazy" />
+        <img src="${CONFIG.defaultPhoto}" alt="" loading="lazy" onerror="photoFallback(this)" />
       </div>
     `;
   }
@@ -396,7 +394,7 @@ function createPhotoCarousel(placeId, photos) {
   if (photos.length === 1) {
     return `
       <div class="place-photo-single" data-photos='${JSON.stringify(photos)}' data-place-id="${placeId}">
-        <img src="${photos[0]}" alt="${CONFIG.name} photo" loading="lazy" />
+        <img src="${photos[0]}" alt="" loading="lazy" onerror="photoFallback(this)" />
       </div>
     `;
   }
@@ -410,7 +408,7 @@ function createPhotoCarousel(placeId, photos) {
     
     photosHTML += `
       <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${photo}">
-        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" loading="lazy" />
+        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" onerror="photoFallback(this)" loading="lazy" />
       </div>
     `;
     
@@ -629,18 +627,32 @@ function generateStarRating(averageRating, reviewCount) {
   }
   
   const roundedRating = Math.round(averageRating);
-  
+
   let starsHTML = '';
-  for (let i = 1; i <= 5; i++) {
-    if (i <= roundedRating) {
-      starsHTML += `<span class="star gold">⭐</span>`;
-    } else {
-      starsHTML += `<span class="star grey">☆</span>`;
-    }
-  }
-  
-  return `<div class="star-container">${starsHTML}</div>`;
+  for (let i = 1; i <= 5; i++) starsHTML += starIcon(i <= roundedRating);
+
+  // The count qualifies the stars, so it travels with them.
+  return `<div class="star-container">${starsHTML}` +
+         `<span class="star-count">${reviewCount}</span></div>`;
 }
+
+// Gold stars as SVG rather than the ⭐ emoji: emoji render differently on
+// every device, sit on their own baseline next to Playfair, and cannot take
+// the --gold token.
+function starIcon(filled) {
+  return '<svg class="star-ico' + (filled ? ' on' : '') + '" viewBox="0 0 24 24" ' +
+         'aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.4-5.8-3-5.8 3 ' +
+         '1.1-6.4L2.6 9.4l6.5-.9z"/></svg>';
+}
+
+// A photo URL that 404s used to render Android's broken-image glyph plus the
+// alt text. Fall back to the type's default photo, then hide.
+function photoFallback(img) {
+  if (img.dataset.fell) { img.style.visibility = 'hidden'; return; }
+  img.dataset.fell = '1';
+  img.src = CONFIG.defaultPhoto;
+}
+
 
 async function renderPlaceCards(places) {
   CONFIG = getTranslatedConfig(PLACE_TYPE);

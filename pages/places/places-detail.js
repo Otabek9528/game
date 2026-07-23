@@ -228,13 +228,13 @@ async function discoverPhotos(photoPath, maxPhotos = 10) {
 function createDetailPhotoCarousel(photos) {
   if (!photos || photos.length === 0) {
     return `
-      <img src="${CONFIG.defaultPhoto}" alt="${CONFIG.name} photo" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="openImageModal(['${CONFIG.defaultPhoto}'], 0)" />
+      <img src="${CONFIG.defaultPhoto}" alt="" onerror="photoFallback(this)" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="openImageModal(['${CONFIG.defaultPhoto}'], 0)" />
     `;
   }
   
   if (photos.length === 1) {
     return `
-      <img src="${photos[0]}" alt="${CONFIG.name} photo" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="openImageModal(['${photos[0]}'], 0)" />
+      <img src="${photos[0]}" alt="" onerror="photoFallback(this)" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="openImageModal(['${photos[0]}'], 0)" />
     `;
   }
   
@@ -247,7 +247,7 @@ function createDetailPhotoCarousel(photos) {
     
     photosHTML += `
       <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${photo}">
-        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" />
+        <img src="${photo}" alt="" onerror="photoFallback(this)" />
       </div>
     `;
     
@@ -375,18 +375,30 @@ function generateStarRating(reviews) {
   
   const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   const roundedRating = Math.round(avgRating);
-  
+
   let starsHTML = '';
-  for (let i = 1; i <= 5; i++) {
-    if (i <= roundedRating) {
-      starsHTML += `<span class="star gold">⭐</span>`;
-    } else {
-      starsHTML += `<span class="star grey">☆</span>`;
-    }
-  }
-  
+  for (let i = 1; i <= 5; i++) starsHTML += starIcon(i <= roundedRating);
+
   return `<div class="star-container">${starsHTML}</div>`;
 }
+
+// Gold stars as SVG rather than the ⭐ emoji: emoji render differently on
+// every device, sit on their own baseline next to Playfair, and cannot take
+// the --gold token.
+function starIcon(filled) {
+  return '<svg class="star-ico' + (filled ? ' on' : '') + '" viewBox="0 0 24 24" ' +
+         'aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.4-5.8-3-5.8 3 ' +
+         '1.1-6.4L2.6 9.4l6.5-.9z"/></svg>';
+}
+
+// A photo URL that 404s used to render Android's broken-image glyph plus the
+// alt text. Fall back to the type's default photo, then hide.
+function photoFallback(img) {
+  if (img.dataset.fell) { img.style.visibility = 'hidden'; return; }
+  img.dataset.fell = '1';
+  img.src = CONFIG.defaultPhoto;
+}
+
 
 function formatDate(dateString) {
   try {
@@ -541,14 +553,20 @@ async function renderPlaceDetail(place) {
       <p class="detail-subtitle">${place.city || ''}</p>
 
       <div class="detail-stats${distanceKm ? '' : ' is-two'}">
-        <div class="detail-stat">
-          <b class="is-rating">${avgRating || '\u2014'}</b>
-          <span>Reyting</span>
-        </div>
-        <div class="detail-stat">
-          <b>${reviewCount}</b>
-          <span>Izoh</span>
-        </div>
+        ${avgRating ? `
+          <div class="detail-rating${reviewCount < 3 ? ' is-thin' : ''}">
+            <div class="rating-stars">${starRatingHTML}</div>
+            <div class="rating-line">
+              <b>${avgRating}</b>
+              <span>${reviewCount} ta izoh asosida</span>
+            </div>
+          </div>
+        ` : `
+          <div class="detail-rating is-none">
+            <b>Hali baholanmagan</b>
+            <span>Birinchi izohni siz qoldiring</span>
+          </div>
+        `}
         ${distanceKm ? `
           <div class="detail-stat">
             <b>${distanceKm}<span class="unit">km</span></b>

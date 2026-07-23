@@ -615,3 +615,85 @@
 .detail-body svg,
 .action-rail svg,
 .detail-plate svg { max-width: 22px; max-height: 22px; }
+
+
+/* ==================================================================
+   OPTION B — hero stage, and the rating block.
+   ================================================================== */
+
+.detail-photo-section {
+  background: linear-gradient(165deg, #16342a 0%, #0e241d 100%);
+}
+.detail-photo-section .carousel-photo.center {
+  border-radius: 13px;
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, .55);
+}
+.detail-photo-section .carousel-photo.left,
+.detail-photo-section .carousel-photo.right { border-radius: 10px; }
+
+/* ---- rating block ----------------------------------------------
+   Rating and review count are not peers. A 5.0 off a single review is
+   noise, and giving it a cell the same size as distance makes it look
+   like a verdict. Merged into one unit so the number always carries
+   its own confidence, and given the wider column so it reads first.
+   ---------------------------------------------------------------- */
+
+.detail-stats { grid-template-columns: 1.45fr 1fr; }
+.detail-stats.is-two { grid-template-columns: 1fr; }
+
+.detail-rating { padding: 13px 8px 15px; text-align: center; position: relative; }
+.detail-stat + .detail-stat::before,
+.detail-rating + .detail-stat::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 14px; bottom: 14px;
+  width: 1px;
+  background: var(--pl-line-soft);
+}
+
+.rating-stars { display: flex; justify-content: center; gap: 3px; margin-bottom: 6px; }
+.rating-stars .star-container { gap: 3px; }
+.rating-stars .star-ico { width: 17px; height: 17px; }
+.rating-stars .star-count { display: none; }
+
+.rating-line { display: flex; align-items: baseline; justify-content: center; gap: 6px; }
+.rating-line b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--pl-gold);
+  font-variant-numeric: tabular-nums;
+}
+.rating-line span {
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--pl-ink-3);
+}
+
+/* Few reviews means low confidence, so the stars are muted rather than
+   full gold. Five bright stars off one review overstates the case. */
+.detail-rating.is-thin .star-ico.on { fill: var(--pl-gold); opacity: .5; }
+.detail-rating.is-thin .rating-line b { opacity: .82; }
+
+.detail-rating.is-none { display: grid; align-content: center; gap: 3px; }
+.detail-rating.is-none b {
+  font-family: var(--font-body);
+  font-size: .86rem;
+  font-weight: 700;
+  color: var(--pl-ink-2);
+}
+.detail-rating.is-none span { font-size: .7rem; color: var(--pl-ink-3); }
+
+/* The unit was uppercase at label size, so it read as part of MASOFA
+   rather than belonging to the number. */
+.detail-stat b .unit {
+  font-family: var(--font-body);
+  font-size: .66rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--pl-ink-3);
+  margin-left: 3px;
+}
