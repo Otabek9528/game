@@ -450,8 +450,26 @@ function copyAddress(address, event) {
 // RENDER PLACE DETAIL (with I18N)
 // ============================================
 
+// The detail API has no user coordinates, so it may omit distance.
+// The list page already computed it — recover it from the saved search state.
+function getDistanceFromSearchState(placeId) {
+  try {
+    const saved = localStorage.getItem(`${PLACE_TYPE}_search_state`);
+    if (!saved) return null;
+    const state = JSON.parse(saved);
+    const match = (state.places || []).find(p => String(p.id) === String(placeId));
+    return (match && match.distance !== null && match.distance !== undefined) ? match.distance : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function renderPlaceDetail(place) {
   CONFIG = getTranslatedConfig(PLACE_TYPE);
+  
+  if (place.distance === null || place.distance === undefined) {
+    place.distance = getDistanceFromSearchState(place.id);
+  }
   
   const photos = await discoverPhotos(place.photo, 10);
   
@@ -459,7 +477,8 @@ async function renderPlaceDetail(place) {
   const starRatingHTML = generateStarRating(place.reviews);
   const reviewsHTML = renderReviews(place.reviews);
   const reviewCount = place.reviews ? place.reviews.length : 0;
-  const distanceDisplay = place.distance ? place.distance.toFixed(1) : 'N/A';
+  const hasDistance = place.distance !== null && place.distance !== undefined;
+  const distanceDisplay = hasDistance ? Number(place.distance).toFixed(1) : 'N/A';
   
   // Translated texts
   const t = window.I18N ? (key) => I18N.t(key) : (key) => key;
@@ -512,7 +531,7 @@ async function renderPlaceDetail(place) {
           <div class="detail-chip detail-chip--rating">
             ${starRatingHTML}
           </div>
-          ${place.distance ? `
+          ${hasDistance ? `
             <div class="detail-chip detail-chip--distance">
               ${PL_ICONS.pin}
               <span>${distanceDisplay} km</span>
