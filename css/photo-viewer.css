@@ -1,0 +1,163 @@
+/* ============================================================
+   photo-viewer.css — shared fullscreen photo viewer
+   Namespaced .pv-* so it cannot collide with the old .image-modal
+   rules still living in places.css.
+   ============================================================ */
+
+.pv {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: #000;
+  display: none;
+  overflow: hidden;
+  /* the gesture handlers own every touch inside the viewer */
+  touch-action: none;
+  overscroll-behavior: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.pv.pv-on { display: block; }
+
+body.pv-locked { overflow: hidden; }
+
+/* ---------- chrome ---------- */
+
+.pv-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .55), transparent);
+  pointer-events: none;              /* only the button inside is tappable */
+}
+
+.pv-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(255, 255, 255, .16);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  transition: background .18s ease;
+}
+.pv-btn:hover  { background: rgba(255, 255, 255, .28); }
+.pv-btn:active { background: rgba(255, 255, 255, .34); }
+
+.pv-close {
+  width: 40px;
+  height: 40px;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.pv-count {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, .4);
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.pv-nav {
+  position: absolute;
+  top: 50%;
+  margin-top: -24px;
+  width: 48px;
+  height: 48px;
+  font-size: 2rem;
+  line-height: 1;
+  padding-bottom: 4px;
+  z-index: 6;
+}
+.pv-prev { left: 12px; }
+.pv-next { right: 12px; }
+
+/* on phones the swipe is the affordance — arrows just get in the way */
+@media (max-width: 520px) {
+  .pv-nav { display: none !important; }
+}
+
+/* ---------- track & slides ---------- */
+
+.pv-track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+.pv-track.pv-anim {
+  transition: transform .28s cubic-bezier(.2, .8, .2, 1);
+}
+
+.pv-slide {
+  flex: none;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.pv-zoom {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+  /* will-change is applied by JS only while a gesture is running */
+}
+.pv-zoom.pv-anim {
+  transition: transform .26s cubic-bezier(.2, .8, .2, 1);
+}
+
+.pv-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity .22s ease;
+  -webkit-user-drag: none;
+}
+.pv-zoom.pv-ready .pv-img { opacity: 1; }
+
+/* ---------- loading / failure ---------- */
+
+.pv-spin {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 38px; height: 38px;
+  margin: -19px 0 0 -19px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, .22);
+  border-top-color: #fff;
+  animation: pv-spin 1s linear infinite;
+}
+.pv-zoom.pv-ready .pv-spin,
+.pv-zoom.pv-error .pv-spin { display: none; }
+
+@keyframes pv-spin { to { transform: rotate(360deg); } }
+
+.pv-fail {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  color: rgba(255, 255, 255, .7);
+  font-size: 14px;
+  padding: 0 24px;
+  display: none;
+}
+.pv-zoom.pv-error .pv-fail { display: block; }
