@@ -111,7 +111,6 @@ const detailError = document.getElementById('detailError');
 const detailContent = document.getElementById('detailContent');
 const errorMessage = document.getElementById('errorMessage');
 
-let carouselInterval = null;
 
 // ============================================
 // IMAGE VIEWER  (shared module — see photo-viewer.js)
@@ -324,11 +323,16 @@ function initDetailCarousel(photoCount) {
       updateCarousel(index);
     });
   });
-  
-  // Auto-rotate carousel
-  carouselInterval = setInterval(() => {
-    updateCarousel((currentIndex + 1) % photos.length);
-  }, 4000);
+
+  // Manual swipe. No auto-rotation on the detail page: the user is already
+  // committed to this place, and tapping the centre photo opens the
+  // fullscreen viewer, which is the proper way to browse the photos.
+  if (window.SwipeNav) {
+    SwipeNav.attach(carousel, {
+      onNext: () => updateCarousel((currentIndex + 1) % photos.length),
+      onPrev: () => updateCarousel((currentIndex - 1 + photos.length) % photos.length)
+    });
+  }
 }
 
 // ============================================

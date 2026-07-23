@@ -161,3 +161,26 @@ body.pv-locked { overflow: hidden; }
   display: none;
 }
 .pv-zoom.pv-error .pv-fail { display: block; }
+
+/* ============================================================
+   Carousel swipe support.
+   Kept here rather than in places.css so that file needs no redeploy.
+   Both pages load this stylesheet after places.css.
+   ============================================================ */
+
+.photo-carousel {
+  /* pan-y, NOT none: the carousel sits inside a vertically scrolling
+     container, so vertical scroll must still pass through to the page.
+     The browser fires pointercancel when it claims a vertical gesture,
+     which aborts the swipe cleanly. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-carousel img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}

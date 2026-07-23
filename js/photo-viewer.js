@@ -432,3 +432,73 @@
     }
   };
 })();
+
+/* ============================================================
+   SwipeNav — threshold swipe for the coverflow carousels.
+
+   Lives here rather than in its own file so places.html and
+   places-detail.html need no extra <script> tag. It is a gesture
+   utility, same family as the viewer above, but independent of it.
+
+   The carousels sit inside vertically scrolling containers, so this
+   deliberately does NOT set touch-action:none. Set `touch-action: pan-y`
+   on the carousel in CSS: vertical scroll keeps working and the browser
+   fires pointercancel when it takes the gesture over, which aborts
+   the swipe cleanly.
+
+     SwipeNav.attach(el, { onNext, onPrev, threshold })
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var DEFAULT_THRESHOLD = 45;   // px of horizontal travel to commit
+  var CLICK_BLOCK_MS    = 350;  // suppress the click a swipe would otherwise fire
+
+  function attach(el, opts) {
+    if (!el || el.__swipeNav) return;
+    el.__swipeNav = true;
+    opts = opts || {};
+
+    var threshold    = opts.threshold || DEFAULT_THRESHOLD;
+    var start        = null;
+    var suppressUntil = 0;
+
+    // Capture phase: runs before the carousel photo's own click handler,
+    // so a swipe that ends on the centre photo cannot also open the viewer.
+    el.addEventListener('click', function (e) {
+      if (Date.now() < suppressUntil) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
+
+    el.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      // Touch pointers get implicit capture on this element, so the
+      // matching pointerup is delivered here even if the finger drifts off.
+      start = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    });
+
+    el.addEventListener('pointerup', function (e) {
+      if (!start || e.pointerId !== start.id) return;
+      var dx = e.clientX - start.x;
+      var dy = e.clientY - start.y;
+      start = null;
+
+      if (Math.abs(dx) < threshold) return;
+      if (Math.abs(dy) > Math.abs(dx)) return;   // it was a vertical scroll
+
+      suppressUntil = Date.now() + CLICK_BLOCK_MS;
+      if (dx < 0) { if (opts.onNext) opts.onNext(); }
+      else        { if (opts.onPrev) opts.onPrev(); }
+    });
+
+    function abort(e) {
+      if (start && e.pointerId === start.id) start = null;
+    }
+    el.addEventListener('pointercancel', abort);
+    el.addEventListener('lostpointercapture', abort);
+  }
+
+  window.SwipeNav = { attach: attach };
+})();

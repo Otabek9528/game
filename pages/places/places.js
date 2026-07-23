@@ -83,6 +83,7 @@ let currentMode = 'location';
 let currentSearchAddress = '';
 let currentPlaces = [];
 let carouselIntervals = {};
+let carouselResume = {};   // placeId -> restart fn, for pause/resume
 
 // DOM Elements
 const placeCardsContainer = document.getElementById('placeCards');
@@ -204,12 +205,14 @@ function updateUIText() {
 
 PhotoViewer.configure({
   onOpen: function () {
+    pauseAllCarousels();
     if (tg.BackButton) {
       tg.BackButton.offClick(handleMainBackButton);
       tg.BackButton.onClick(handleModalBackButton);
     }
   },
   onClose: function () {
+    resumeAllCarousels();
     if (tg.BackButton) {
       tg.BackButton.offClick(handleModalBackButton);
       tg.BackButton.onClick(handleMainBackButton);
@@ -494,47 +497,78 @@ function initCarousel(placeId, photoCount) {
     currentIndex = newIndex;
   }
   
-  // Click on center photo to open modal
+  // Centre photo opens the viewer; the side peeks navigate.
+  // Anything else is left to bubble so the card link still works.
   photos.forEach((photo) => {
     photo.addEventListener('click', (e) => {
-      e.stopPropagation();
       if (photo.classList.contains('center')) {
-        const photoIndex = parseInt(photo.getAttribute('data-index'));
-        openImageModal(allPhotos, photoIndex);
+        e.stopPropagation();
+        openImageModal(allPhotos, currentIndex);
+      } else if (photo.classList.contains('right')) {
+        e.stopPropagation();
+        nudge(currentIndex + 1);
+      } else if (photo.classList.contains('left')) {
+        e.stopPropagation();
+        nudge(currentIndex - 1 + photos.length);
       }
     });
   });
   
-  // Click on dots to navigate
+  // Any deliberate navigation moves the carousel and restarts the clock,
+  // so the timer never overrides the user mid-look.
+  function nudge(index) {
+    updateCarousel(index % photos.length);
+    stopAutoRotation();
+    startAutoRotation();
+  }
+
   dots.forEach((dot, index) => {
     dot.addEventListener('click', (e) => {
       e.stopPropagation();
-      updateCarousel(index);
-      
-      if (carouselIntervals[placeId]) {
-        clearInterval(carouselIntervals[placeId]);
-      }
-      startAutoRotation();
+      nudge(index);
     });
   });
-  
-  function startAutoRotation() {
-    carouselIntervals[placeId] = setInterval(() => {
-      const nextIndex = (currentIndex + 1) % photos.length;
-      updateCarousel(nextIndex);
-    }, 3000);
+
+  if (window.SwipeNav) {
+    SwipeNav.attach(carousel, {
+      onNext: () => nudge(currentIndex + 1),
+      onPrev: () => nudge(currentIndex - 1 + photos.length)
+    });
   }
-  
-  startAutoRotation();
-  
-  carousel.addEventListener('mouseenter', () => {
+
+  function stopAutoRotation() {
     if (carouselIntervals[placeId]) {
       clearInterval(carouselIntervals[placeId]);
+      delete carouselIntervals[placeId];
     }
+  }
+
+  function startAutoRotation() {
+    stopAutoRotation();   // never stack two timers on one card
+    carouselIntervals[placeId] = setInterval(() => {
+      updateCarousel((currentIndex + 1) % photos.length);
+    }, 3000);
+  }
+
+  carouselResume[placeId] = startAutoRotation;
+  startAutoRotation();
+
+  carousel.addEventListener('mouseenter', stopAutoRotation);
+  carousel.addEventListener('mouseleave', startAutoRotation);
+}
+
+// Cards keep rotating behind the fullscreen viewer otherwise, so you close
+// it and the carousel has drifted somewhere else.
+function pauseAllCarousels() {
+  Object.keys(carouselIntervals).forEach((id) => {
+    clearInterval(carouselIntervals[id]);
+    delete carouselIntervals[id];
   });
-  
-  carousel.addEventListener('mouseleave', () => {
-    startAutoRotation();
+}
+
+function resumeAllCarousels() {
+  Object.keys(carouselResume).forEach((id) => {
+    try { carouselResume[id](); } catch (e) {}
   });
 }
 
@@ -614,6 +648,7 @@ async function renderPlaceCards(places) {
   // Clear previous carousels and observers
   Object.values(carouselIntervals).forEach(interval => clearInterval(interval));
   carouselIntervals = {};
+  carouselResume = {};
   loadedPlaces.clear();
   
   placeCardsContainer.innerHTML = '';
