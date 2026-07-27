@@ -1,0 +1,913 @@
+/* =========================================================
+   HOUSING — Uy-joy e'lonlari
+
+   A quiet listings page. Cards on a soft neutral ground,
+   hairline borders instead of shadows, one type scale,
+   generous vertical rhythm. Emerald carries every action;
+   amber appears only on the distance value and the "new"
+   marker, and nowhere else.
+
+   Feature-local tokens are prefixed --hs- so night mode is a
+   token swap, not a per-selector palette. Mirrors the --pl-
+   pattern in pages/places/places.css.
+   ========================================================= */
+
+:root {
+  --hs-bg:            #f4f5f3;
+  --hs-surface:       #ffffff;
+  --hs-surface-2:     #eff2f0;
+  --hs-text:          #1b211d;
+  --hs-text-2:        #515a55;
+  --hs-muted:         #86908a;
+  --hs-line:          #e4e8e5;
+  --hs-line-strong:   #cfd6d1;
+
+  --hs-accent:        var(--emerald-600, #059669);
+  --hs-accent-deep:   var(--emerald-800, #065f46);
+  --hs-accent-soft:   #e8f4ef;
+  --hs-on-accent:     #ffffff;
+
+  --hs-amber:         var(--gold-500, #c8901a);
+  --hs-amber-deep:    #8a6410;
+  --hs-amber-soft:    #fcf4e2;
+
+  --hs-danger:        #b8483b;
+  --hs-danger-soft:   #fbedeb;
+
+  --hs-scrim:         rgba(20, 26, 22, 0.42);
+
+  --hs-r:             16px;
+  --hs-r-sm:          10px;
+  --hs-r-pill:        999px;
+
+  --hs-font:          'Manrope', 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --hs-ease:          cubic-bezier(0.16, 1, 0.3, 1);
+  --hs-tap:           44px;
+
+  /* Set by housing.js from Telegram.WebApp.viewportStableHeight. */
+  --hs-vh:            100dvh;
+  --hs-safe-b:        env(safe-area-inset-bottom, 0px);
+}
+
+.night-mode {
+  --hs-bg:            #121513;
+  --hs-surface:       #1b1f1d;
+  --hs-surface-2:     #242926;
+  --hs-text:          #e8ece9;
+  --hs-text-2:        #adb6b1;
+  --hs-muted:         #85908a;
+  --hs-line:          #2a302c;
+  --hs-line-strong:   #3a423d;
+
+  --hs-accent:        var(--emerald-500, #10b981);
+  --hs-accent-deep:   var(--emerald-400, #34d399);
+  --hs-accent-soft:   rgba(16, 185, 129, 0.13);
+  --hs-on-accent:     #07130d;
+
+  --hs-amber:         var(--gold-400, #dcae4f);
+  --hs-amber-deep:    #e8c274;
+  --hs-amber-soft:    rgba(220, 174, 79, 0.12);
+
+  --hs-danger:        #dd7f74;
+  --hs-danger-soft:   rgba(221, 127, 116, 0.12);
+
+  --hs-scrim:         rgba(0, 0, 0, 0.62);
+}
+
+
+/* =========================================================
+   PAGE FRAME
+   Layout against viewportStableHeight, never 100vh — the
+   Telegram viewport shrinks when the keyboard opens.
+   ========================================================= */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--hs-vh);
+  background: var(--hs-bg);
+  color: var(--hs-text);
+  font-family: var(--hs-font);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app__header { flex-shrink: 0; }
+
+.hs-shell {
+  flex: 1;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 16px calc(100px + var(--hs-safe-b));
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hs-view { display: block; }
+
+
+/* =========================================================
+   TYPE
+   ========================================================= */
+
+.hs-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--hs-text-2);
+  margin: 0 0 9px;
+}
+
+
+/* =========================================================
+   VIEW SWITCHER
+   ========================================================= */
+
+.hs-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 18px 0 0;
+}
+
+.hs-nav__btn {
+  min-height: var(--hs-tap);
+  padding: 10px 16px;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r-pill);
+  background: var(--hs-surface);
+  color: var(--hs-text-2);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms var(--hs-ease), border-color 160ms var(--hs-ease),
+              color 160ms var(--hs-ease);
+}
+
+.hs-nav__btn--active {
+  background: var(--hs-accent-soft);
+  border-color: var(--hs-accent);
+  color: var(--hs-accent-deep);
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.hs-search { padding: 22px 0 0; }
+
+.hs-search__row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.hs-input {
+  width: 100%;
+  min-height: var(--hs-tap);
+  box-sizing: border-box;
+  padding: 12px 15px;
+  border: 1px solid var(--hs-line-strong);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-surface);
+  color: var(--hs-text);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 150ms var(--hs-ease);
+}
+
+.hs-input::placeholder { color: var(--hs-muted); }
+.hs-input:focus { border-color: var(--hs-accent); }
+
+.hs-search__input { flex: 1; min-width: 0; }
+.hs-search__go { flex-shrink: 0; white-space: nowrap; }
+
+.hs-search__hint {
+  margin: 11px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--hs-muted);
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.hs-mode {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 30px 0 16px;
+}
+
+.hs-mode__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--hs-text);
+  margin: 0;
+}
+
+.hs-mode__count {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Origin readout while distance mode is running */
+.hs-origin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--hs-tap);
+  margin: -6px 0 18px;
+  padding: 11px 15px;
+  border: 1px solid var(--hs-accent);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-accent-soft);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hs-origin__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--hs-accent-deep);
+}
+
+.hs-origin__clear {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--hs-accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* =========================================================
+   CARDS
+
+   The address splits into an administrative eyebrow
+   (시/도 · 구/군) and the specific line below it. Korean
+   addresses read outside-in, so the widest part is the part
+   a reader skims past; demoting it puts the line that
+   actually identifies the place first.
+   ========================================================= */
+
+.hs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hs-card {
+  padding: 18px;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r);
+  background: var(--hs-surface);
+  cursor: pointer;
+  transition: border-color 160ms var(--hs-ease), background 160ms var(--hs-ease);
+}
+
+.hs-card:active {
+  background: var(--hs-surface-2);
+  border-color: var(--hs-line-strong);
+}
+
+.hs-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.hs-card__addr-wrap { flex: 1; min-width: 0; }
+
+.hs-card__region {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+
+.hs-card__addr {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.42;
+  letter-spacing: -0.01em;
+  color: var(--hs-text);
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* --- Distance: the hero value in distance mode --- */
+.hs-dist {
+  display: none;
+  align-items: baseline;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  padding: 5px 11px;
+  border-radius: var(--hs-r-pill);
+  background: var(--hs-amber-soft);
+  color: var(--hs-amber-deep);
+  white-space: nowrap;
+}
+
+.hs-dist__num {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hs-dist__unit { font-size: 0.74rem; font-weight: 700; }
+
+/* Shown only in distance mode; the sheet shows it whenever a distance exists. */
+.hs-card--distance .hs-dist { display: inline-flex; }
+.hs-dist--sheet { display: inline-flex; margin-top: 0; }
+
+/* --- Body preview: three lines, faded; full text in the sheet --- */
+.hs-card__body {
+  position: relative;
+  margin: 13px 0 0;
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--hs-text-2);
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.hs-card__body::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 46%;
+  height: 1.65em;
+  background: linear-gradient(to right, transparent, var(--hs-surface) 70%);
+  pointer-events: none;
+}
+
+.hs-card:active .hs-card__body::after {
+  background: linear-gradient(to right, transparent, var(--hs-surface-2) 70%);
+}
+
+/* --- Footer --- */
+.hs-card__foot {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hs-line);
+}
+
+.hs-card__time {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+}
+
+/* Tells the reader what tapping the card will do. */
+.hs-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--hs-accent-deep);
+  white-space: nowrap;
+}
+
+.hs-card__cta--muted { color: var(--hs-muted); font-weight: 600; }
+
+.hs-card__chev { width: 15px; height: 15px; flex-shrink: 0; }
+.hs-card__cta--muted .hs-card__chev { display: none; }
+
+.hs-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--hs-r-pill);
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: var(--hs-surface-2);
+  color: var(--hs-text-2);
+}
+
+.hs-badge--new  { background: var(--hs-amber-soft);  color: var(--hs-amber-deep); }
+.hs-badge--mine { background: var(--hs-accent-soft); color: var(--hs-accent-deep); }
+
+/* --- My-posts card --- */
+.hs-card--mine { cursor: default; }
+.hs-card--mine:active { background: var(--hs-surface); border-color: var(--hs-line); }
+
+.hs-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   No fixed widths — Uzbek labels run long.
+   ========================================================= */
+
+.hs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--hs-tap);
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--hs-r-sm);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  cursor: pointer;
+  background: none;
+  color: var(--hs-text);
+  transition: background 150ms var(--hs-ease), border-color 150ms var(--hs-ease);
+}
+
+.hs-btn--solid {
+  background: var(--hs-accent);
+  color: var(--hs-on-accent);
+  border-color: var(--hs-accent);
+}
+
+.hs-btn--ghost {
+  background: var(--hs-surface);
+  color: var(--hs-accent-deep);
+  border-color: var(--hs-line-strong);
+}
+
+.hs-btn--danger {
+  background: var(--hs-danger-soft);
+  color: var(--hs-danger);
+  border-color: var(--hs-danger);
+}
+
+.hs-btn--text { background: none; color: var(--hs-muted); border-color: transparent; }
+
+.hs-btn--block { width: 100%; }
+
+.hs-btn--sm { min-height: var(--hs-tap); padding: 9px 14px; font-size: 0.86rem; }
+
+.hs-btn[disabled] { opacity: 0.5; pointer-events: none; }
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.hs-more { margin: 16px 0 0; }
+
+.hs-list-end {
+  margin: 22px 0 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+  text-align: center;
+}
+
+.hs-sentinel { height: 1px; }
+
+
+/* =========================================================
+   ASYNC STATES
+   Every one gets a real treatment. A blank screen during
+   geocoding is what makes these apps feel cheap.
+   ========================================================= */
+
+.hs-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hs-skel-card {
+  padding: 18px;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r);
+  background: var(--hs-surface);
+}
+
+.hs-skel {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--hs-surface-2);
+  animation: hs-pulse 1.6s ease-in-out infinite;
+}
+
+.hs-skel + .hs-skel { margin-top: 10px; }
+
+.hs-skel--eyebrow { width: 32%; height: 9px; }
+.hs-skel--title   { width: 86%; height: 17px; margin-top: 12px; }
+.hs-skel--short   { width: 54%; }
+.hs-skel--line    { width: 100%; }
+.hs-skel--foot    { width: 40%; height: 10px; margin-top: 20px; }
+
+@keyframes hs-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+.hs-state {
+  margin: 0;
+  padding: 26px 20px;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r);
+  background: var(--hs-surface);
+  text-align: left;
+}
+
+.hs-state--warn  { border-color: var(--hs-amber);  background: var(--hs-amber-soft); }
+.hs-state--error { border-color: var(--hs-danger); background: var(--hs-danger-soft); }
+
+.hs-state__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hs-text);
+  margin: 0 0 8px;
+}
+
+.hs-state__text {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--hs-text-2);
+  margin: 0;
+  max-width: 34em;
+}
+
+.hs-state__example {
+  margin: 11px 0 0;
+  padding: 11px 13px;
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-surface);
+  border: 1px solid var(--hs-line);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--hs-text);
+  overflow-wrap: anywhere;
+}
+
+.hs-state .hs-btn { margin-top: 18px; }
+
+
+/* =========================================================
+   COMPOSE FORM
+   ========================================================= */
+
+.hs-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hs-field { display: block; }
+
+.hs-textarea { min-height: 200px; resize: vertical; line-height: 1.65; }
+
+.hs-field__hint,
+.hs-field__lock {
+  margin: 9px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--hs-muted);
+}
+
+.hs-field__lock {
+  padding: 11px 13px;
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-surface-2);
+  color: var(--hs-text-2);
+}
+
+.hs-field__foot { display: flex; justify-content: flex-end; margin-top: 9px; }
+
+.hs-field__count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.hs-field__count--over { color: var(--hs-danger); }
+
+.hs-field__err,
+.hs-form__err {
+  margin: 9px 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--hs-danger);
+}
+
+.hs-form__err {
+  padding: 13px 15px;
+  border: 1px solid var(--hs-danger);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-danger-soft);
+}
+
+.hs-input--invalid { border-color: var(--hs-danger); }
+
+
+/* =========================================================
+   FALLBACK PRIMARY ACTION
+   ========================================================= */
+
+.hs-fab {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  padding: 12px 16px calc(12px + var(--hs-safe-b));
+  background: var(--hs-bg);
+  border-top: 1px solid var(--hs-line);
+}
+
+.hs-fab > .hs-btn { max-width: 648px; margin: 0 auto; }
+
+
+/* =========================================================
+   DETAIL SHEET
+   The one place elevation is used, because it means
+   "this is above the page".
+   ========================================================= */
+
+.hs-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--hs-scrim);
+  animation: hs-fade 200ms var(--hs-ease);
+}
+
+.hs-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 51;
+  box-sizing: border-box;
+  max-height: calc(var(--hs-vh) - 44px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 20px calc(20px + var(--hs-safe-b));
+  border-radius: 20px 20px 0 0;
+  background: var(--hs-surface);
+  box-shadow: 0 -10px 32px rgba(20, 26, 22, 0.15);
+  animation: hs-rise 260ms var(--hs-ease);
+}
+
+.night-mode .hs-sheet { box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.5); }
+
+@media (min-width: 720px) {
+  .hs-sheet { left: 50%; right: auto; width: 680px; transform: translateX(-50%); }
+}
+
+.hs-sheet__handle {
+  width: 38px;
+  height: 4px;
+  margin: 0 auto 18px;
+  border-radius: var(--hs-r-pill);
+  background: var(--hs-line-strong);
+}
+
+.hs-sheet__region {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+  margin: 0 0 5px;
+  overflow-wrap: anywhere;
+}
+
+.hs-sheet__addr {
+  font-size: 1.26rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: var(--hs-text);
+  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.hs-sheet__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 13px 0 0;
+}
+
+.hs-sheet__time { font-size: 0.85rem; font-weight: 600; color: var(--hs-muted); }
+
+.hs-sheet__body {
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--hs-line);
+  font-size: 0.97rem;
+  line-height: 1.72;
+  color: var(--hs-text);
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Contact block — the reason the sheet exists */
+.hs-contact {
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r);
+  background: var(--hs-surface-2);
+}
+
+.hs-contact__label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+  margin-bottom: 9px;
+}
+
+.hs-contact__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hs-contact__phone {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.24rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--hs-accent-deep);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.hs-contact--empty {
+  border-style: dashed;
+  border-color: var(--hs-line-strong);
+  background: none;
+  font-size: 0.9rem;
+  color: var(--hs-muted);
+}
+
+.hs-sheet__owner {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 22px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--hs-line);
+}
+
+.hs-sheet__owner .hs-btn { flex: 1 1 auto; }
+
+.hs-sheet__loading,
+.hs-sheet__error { padding: 4px 0 18px; }
+
+.hs-sheet__content { display: block; }
+
+.hs-sheet #hsSheetClose { margin-top: 14px; }
+
+@keyframes hs-rise {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (min-width: 720px) {
+  @keyframes hs-rise {
+    from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+    to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+  }
+}
+
+@keyframes hs-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.hs-toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(92px + var(--hs-safe-b));
+  z-index: 60;
+  max-width: 648px;
+  margin: 0 auto;
+  padding: 13px 16px;
+  border: 1px solid var(--hs-line-strong);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-surface);
+  color: var(--hs-text);
+  font-size: 0.89rem;
+  font-weight: 600;
+  text-align: left;
+  animation: hs-rise 200ms var(--hs-ease);
+}
+
+.hs-toast--error { border-color: var(--hs-danger); color: var(--hs-danger); }
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+.hs-card:focus-visible,
+.hs-btn:focus-visible,
+.hs-input:focus-visible,
+.hs-origin:focus-visible,
+.hs-nav__btn:focus-visible,
+.hs-contact__phone:focus-visible {
+  outline: 2px solid var(--hs-accent);
+  outline-offset: 2px;
+}
+
+[hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .hs-shell { padding-left: 13px; padding-right: 13px; }
+  .hs-card, .hs-skel-card { padding: 16px; }
+  .hs-card__addr { font-size: 1.04rem; }
+  .hs-dist { padding: 4px 9px; }
+  .hs-dist__num { font-size: 0.98rem; }
+  .hs-search__row { flex-direction: column; }
+  .hs-search__go { width: 100%; }
+}
