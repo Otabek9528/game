@@ -1,0 +1,1826 @@
+[
+  {
+    "office_id": "1270667",
+    "short_code": "SU",
+    "name_en": "Seoul Immigration Office",
+    "name_ko": "서울출입국·외국인청",
+    "jurisdictions_en": {
+      "Gyeonggi": [
+        "Seoungnam-shi Sujung-gu",
+        "Seoungnam-shi Jungwon-gu",
+        "Seoungnam-shi Bundang-gu",
+        "Gwacheun-shi",
+        "Hanam-shi"
+      ],
+      "Seoul": [
+        "Gangdong-gu",
+        "Gwanak-gu",
+        "Gwang-jin-gu",
+        "Dongjak-gu",
+        "Seocho-gu",
+        "Sungdong-gu",
+        "Songpa-gu",
+        "Youngsan-gu",
+        "Gangnam-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경기": [
+        "성남시 중원구",
+        "하남시",
+        "성남시 수정구",
+        "성남시 분당구",
+        "과천시"
+      ],
+      "서울": [
+        "성동구",
+        "관악구",
+        "송파구",
+        "동작구",
+        "서초구",
+        "광진구",
+        "강남구",
+        "강동구",
+        "용산구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 774,
+        "booth": {
+          "en": "Foreigner Residence Control(1F, All countries)(2023.10.14.~)",
+          "uz": "Chet ellik rezidentlar nazorati(1-qavat, Barcha mamlakatlar)(2023.10.14.~)",
+          "ru": "Контроль проживания иностранцев(1 этаж, Все страны)(2023.10.14.~)"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for applications for residence permits such as extension of stay, change of status of residence, and alien registration, as well as domestic residence reporting and various other notifications. (Reservations available for all nationalities)",
+          "uz": "Bu immigratsiya arizalari, jumladan viza muddatini uzaytirish, viza turini o'zgartirish va xorijiy fuqaroni ro'yxatga olish, shuningdek yashash manzilini xabar berish va turli boshqa bildirishnomalar uchun oldindan yozilish bo'limidir. (Barcha millat vakillari uchun)",
+          "ru": "Это стойка предварительной записи для подачи заявлений на разрешение на проживание, таких как продление срока пребывания, изменение статуса проживания и регистрация иностранца, а также для отчётности о внутреннем месте проживания и различных других уведомлений. (Запись доступна для всех национальностей)"
+        }
+      },
+      {
+        "desk_seq": 773,
+        "booth": {
+          "en": "Foreigner Residence Control(1F, All countries)(2023.10.14.~, AFTER 09:36)",
+          "uz": "Chet ellik rezidentlar nazorati(1-qavat, Barcha mamlakatlar)(2023.10.14.~, AFTER 09:36)",
+          "ru": "Контроль проживания иностранцев(1 этаж, Все страны)(2023.10.14.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for applications for residence permits such as extension of stay, change of status of residence, and alien registration, as well as domestic residence reporting and various other notifications. (Reservations available for all nationalities)",
+          "uz": "Bu immigratsiya arizalari, jumladan viza muddatini uzaytirish, viza turini o'zgartirish va xorijiy fuqaroni ro'yxatga olish, shuningdek yashash manzilini xabar berish va turli boshqa bildirishnomalar uchun oldindan yozilish bo'limidir. (Barcha millat vakillari uchun)",
+          "ru": "Это стойка предварительной записи для подачи заявлений на разрешение на проживание, таких как продление срока пребывания, изменение статуса проживания и регистрация иностранца, а также для отчётности о внутреннем месте проживания и различных других уведомлений. (Запись доступна для всех национальностей)"
+        }
+      },
+      {
+        "desk_seq": 756,
+        "booth": {
+          "en": "Foreigner Residence Control(3F, All countries)",
+          "uz": "Chet ellik rezidentlar nazorati(3-qavat, Barcha mamlakatlar)",
+          "ru": "Контроль проживания иностранцев(3 этаж, Все страны)"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for applications for residence permits such as extension of stay, change of status of residence, and alien registration, as well as domestic residence reporting and various other notifications. (Reservations available for all nationalities)",
+          "uz": "Bu immigratsiya arizalari, jumladan viza muddatini uzaytirish, viza turini o'zgartirish va xorijiy fuqaroni ro'yxatga olish, shuningdek yashash manzilini xabar berish va turli boshqa bildirishnomalar uchun oldindan yozilish bo'limidir. (Barcha millat vakillari uchun)",
+          "ru": "Это стойка предварительной записи для подачи заявлений на разрешение на проживание, таких как продление срока пребывания, изменение статуса проживания и регистрация иностранца, а также для отчётности о внутреннем месте проживания и различных других уведомлений. (Запись доступна для всех национальностей)"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1272332",
+    "short_code": "SM",
+    "name_en": "Seoul Southern Immigration Office",
+    "name_ko": "서울남부출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Seoul": [
+        "Seodaemun-gu",
+        "Mapo-gu",
+        "Guro-gu",
+        "Geumchun-gu",
+        "Yangchun-gu",
+        "Youngdeungpo-gu",
+        "Gangseo-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "서울": [
+        "서대문구",
+        "영등포구",
+        "강서구",
+        "마포구",
+        "구로구",
+        "금천구",
+        "양천구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 801,
+        "booth": {
+          "en": "Visit Reservation for Permission to Stay [Location:Magok-dong](2024.06.18.~)",
+          "uz": "Koreyada qolish uchun yozilish [Manzil: Magok-dong](2024.06.18.~)",
+          "ru": "Запись на разрешение на пребывание [Адрес: Magok-dong](2024.06.18.~)"
+        },
+        "details": {
+          "en": "Applicants can reserve a visit here for Foreign Resident Registration, Extension of Stay, Change of Status, Report of Domestic Place of Residence, Various Reporting, etc. (For all countries)",
+          "uz": "Arizachilar bu yerda xorijiy rezidentni ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, yashash manzilini xabar berish, immigratsiyaga tegishli turli bildirishnomalar va h.k. uchun bron qila oladilar. (Barcha mamlakatlar uchun)",
+          "ru": "Заявители могут записаться на визит для регистрации иностранного резидента, продления срока пребывания, изменения статуса, сообщения о внутреннем месте проживания, различных уведомлений и т.д. (Для всех стран)"
+        }
+      },
+      {
+        "desk_seq": 800,
+        "booth": {
+          "en": "Visit Reservation for Permission to Stay [Location:Magok-dong](2024.06.18.~, AFTER 09:36)",
+          "uz": "Koreyada qolish uchun yozilish [Manzil: Magok-dong](2024.06.18.~, AFTER 09:36)",
+          "ru": "Запись на разрешение на пребывание [Адрес: Magok-dong](2024.06.18.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Applicants can reserve a visit here for Foreign Resident Registration, Extension of Stay, Change of Status, Report of Domestic Place of Residence, Various Reporting, etc. (For all countries)",
+          "uz": "Arizachilar bu yerda xorijiy rezidentni ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, yashash manzilini xabar berish, immigratsiyaga tegishli turli bildirishnomalar va h.k. uchun bron qila oladilar. (Barcha mamlakatlar uchun)",
+          "ru": "Заявители могут записаться на визит для регистрации иностранного резидента, продления срока пребывания, изменения статуса, сообщения о внутреннем месте проживания, различных уведомлений и т.д. (Для всех стран)"
+        }
+      },
+      {
+        "desk_seq": 762,
+        "booth": {
+          "en": "[Yeongdeungpo Immigration Service Center]Applying for Permission of Stay (Except D2, D4, D8, E7, F5)[Location: Daerim-dong] * Applying via courier(registered mail) NOT available",
+          "uz": "[Yeongdeungpo Immigratsiya Xizmat Markazi] Koreyada qolish uchun ariza berish (D2, D4, D8, E7, F5 dan tashqari)[Manzil: Daerim-dong] * Kuryer orqali ariza berish (pochta) MAVJUD EMAS",
+          "ru": "[Иммиграционный центр Yeongdeungpo] Подача заявления на разрешение на пребывание (Кроме D2, D4, D8, E7, F5)[Адрес: Daerim-dong] * Подача через курьера (заказное письмо) НЕДОСТУПНА"
+        },
+        "details": {
+          "en": "You can reserve a visit here for Alien Registration (domestic residence report), Extension of Stay, Change of Status, Re-issuance (residenc card, overseas korean resident card, permanent resident card) and others",
+          "uz": "Bu yerda xorijiy fuqaroni ro'yxatga olish (yashash manzilini xabar berish), viza muddatini uzaytirish, vizani o'zgartirish, qayta berish (rezident kartasi, xorijdagi koreya rezidenti kartasi, doimiy rezident kartasi) va boshqalar uchun bron qila olasiz",
+          "ru": "Здесь вы можете записаться на визит для регистрации иностранца (отчёт о внутреннем месте жительства), продления срока пребывания, изменения статуса, повторной выдачи (карточки резидента, карточки зарубежного корейского резидента, карточки постоянного резидента) и прочего"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271020",
+    "short_code": "SB",
+    "name_en": "Sejongno Branch Office",
+    "name_ko": "서울출입국·외국인청 세종로출장소",
+    "jurisdictions_en": {
+      "Seoul": [
+        "Joong-gu",
+        "Joongrang-gu",
+        "Jongro-gu",
+        "Eunpyoung-gu",
+        "Sungbuk-gu",
+        "Dongdaemun-gu",
+        "Dobong-gu",
+        "Nowon-gu",
+        "Gangbuk-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "서울": [
+        "중랑구",
+        "중구",
+        "종로구",
+        "은평구",
+        "성북구",
+        "동대문구",
+        "도봉구",
+        "노원구",
+        "강북구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 772,
+        "booth": {
+          "en": "Foreigner Residence Control (Registration, Visa extension, Change of visa status etc)(2023.10.13.~)",
+          "uz": "Chet ellik rezidentlar nazorati (Ro'yxatga olish, Viza muddatini uzaytirish, Viza holati o'zgartirish va h.k.)(2023.10.13.~)",
+          "ru": "Контроль проживания иностранцев (Регистрация, Продление визы, Изменение статуса визы и пр.)(2023.10.13.~)"
+        },
+        "details": {
+          "en": "The Sejong-ro Branch Office is the reservation counter for residence management (foreigner registration) and domestic residence reporting for foreigners registered in Nowon-gu, Dobong-gu, Gangbuk-gu, Jungnang-gu, Eunpyeong-gu, Jongno-gu, Jung-gu, Dongdaemun-gu, and Seongbuk-gu. ★ However, for nationality-related matters such as naturalization permits, please apply for a reservation at the Seoul Immigration Office.",
+          "uz": "Sejong-ro filiali Nowon-gu, Dobong-gu, Gangbuk-gu, Jungnang-gu, Eunpyeong-gu, Jongno-gu, Jung-gu, Dongdaemun-gu va Seongbuk-gu da ro'yxatdan o'tgan chet elliklar uchun yashash joyini boshqarish (chet elliklar ro'yxati) va yashash manzilini xabar berish uchun yozilish bo'limidir. ★ Biroq, fuqarolikka qabul qilish ruxsati kabi fuqarolik bilan bog'liq masalalar bo'yicha Seoul Immigratsiya Ofisiga yozilish uchun murojaat qiling.",
+          "ru": "Филиал Sejong-ro является стойкой записи для управления проживанием (регистрация иностранцев) и отчётности о внутреннем месте проживания для иностранцев, зарегистрированных в Nowon-gu, Dobong-gu, Gangbuk-gu, Jungnang-gu, Eunpyeong-gu, Jongno-gu, Jung-gu, Dongdaemun-gu и Seongbuk-gu. ★ Однако по вопросам, связанным с гражданством, например разрешению на натурализацию, просьба записываться в Сеульский иммиграционный офис."
+        }
+      },
+      {
+        "desk_seq": 771,
+        "booth": {
+          "en": "Foreigner Residence Control (Registration, Visa extension, Change of visa status etc)(2023.10.13.~, AFTER 09:36)",
+          "uz": "Chet ellik rezidentlar nazorati (Ro'yxatga olish, Viza muddatini uzaytirish, Viza holati o'zgartirish va h.k.)(2023.10.13.~, AFTER 09:36)",
+          "ru": "Контроль проживания иностранцев (Регистрация, Продление визы, Изменение статуса визы и пр.)(2023.10.13.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "The Sejong-ro Branch Office is the reservation counter for residence management (foreigner registration) and domestic residence reporting for foreigners registered in Nowon-gu, Dobong-gu, Gangbuk-gu, Jungnang-gu, Eunpyeong-gu, Jongno-gu, Jung-gu, Dongdaemun-gu, and Seongbuk-gu. ★ However, for nationality-related matters such as naturalization permits, please apply for a reservation at the Seoul Immigration Office.",
+          "uz": "Sejong-ro filiali Nowon-gu, Dobong-gu, Gangbuk-gu, Jungnang-gu, Eunpyeong-gu, Jongno-gu, Jung-gu, Dongdaemun-gu va Seongbuk-gu da ro'yxatdan o'tgan chet elliklar uchun yashash joyini boshqarish (chet elliklar ro'yxati) va yashash manzilini xabar berish uchun yozilish bo'limidir. ★ Biroq, fuqarolikka qabul qilish ruxsati kabi fuqarolik bilan bog'liq masalalar bo'yicha Seoul Immigratsiya Ofisiga yozilish uchun murojaat qiling.",
+          "ru": "Филиал Sejong-ro является стойкой записи для управления проживанием (регистрация иностранцев) и отчётности о внутреннем месте проживания для иностранцев, зарегистрированных в Nowon-gu, Dobong-gu, Gangbuk-gu, Jungnang-gu, Eunpyeong-gu, Jongno-gu, Jung-gu, Dongdaemun-gu и Seongbuk-gu. ★ Однако по вопросам, связанным с гражданством, например разрешению на натурализацию, просьба записываться в Сеульский иммиграционный офис."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1272143",
+    "short_code": "AS",
+    "name_en": "Ansan Immigration Office",
+    "name_ko": "안산출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Gyeonggi": [
+        "Anyang-shi Dongan-gu",
+        "Gwangmyoung-shi",
+        "Gunpo-shi",
+        "Anyang-shi Manan-gu",
+        "Ansan-shi Danwon-gu",
+        "Ansan-shi Sangrok-gu",
+        "Shiheung-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경기": [
+        "시흥시",
+        "안양시 동안구",
+        "안산시 상록구",
+        "안산시 단원구",
+        "광명시",
+        "안양시 만안구",
+        "군포시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 749,
+        "booth": {
+          "en": "Ansan Immigration Office] Residence Control [Location:Gojan Station](2021.05.01 ~ )",
+          "uz": "Ansan Immigratsiya Ofisi] Yashash joyini nazorat qilish [Manzil: Gojan Stansiyasi](2021.05.01 ~ )",
+          "ru": "Иммиграционный офис Ansan] Контроль по месту жительства [Адрес: Станция Gojan](2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      },
+      {
+        "desk_seq": 767,
+        "booth": {
+          "en": "Ansan Center] Residence Control(location: Ansan Foreign Resident's Support Headquarters 1F)(2023.09.19.~, AFTER 09:36)",
+          "uz": "Ansan Markazi] Yashash joyini nazorat qilish (manzil: Ansan Xorijiy Rezidentlarni Qo'llab-quvvatlash Shtab-kvartirasi 1-qavat)(2023.09.19.~, AFTER 09:36)",
+          "ru": "Центр Ansan] Контроль по месту жительства (адрес: Штаб поддержки иностранных резидентов Ansan, 1 этаж)(2023.09.19.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Ansan Center is located in Ansan Multicultural Support Headquarters [1F]",
+          "uz": "Ansan Markazi Ansan Ko'p Madaniyatli Qo'llab-quvvatlash Shtab-kvartirasida joylashgan [1-qavat]",
+          "ru": "Центр Ansan расположен в Штабе поддержки многокультурности Ansan [1 этаж]"
+        }
+      },
+      {
+        "desk_seq": 768,
+        "booth": {
+          "en": "Ansan Center] Residence Control(location: Ansan Foreign Resident's Support Headquarters 1F)(2023.09.19.~)",
+          "uz": "Ansan Markazi] Yashash joyini nazorat qilish (manzil: Ansan Xorijiy Rezidentlarni Qo'llab-quvvatlash Shtab-kvartirasi 1-qavat)(2023.09.19.~)",
+          "ru": "Центр Ansan] Контроль по месту жительства (адрес: Штаб поддержки иностранных резидентов Ansan, 1 этаж)(2023.09.19.~)"
+        },
+        "details": {
+          "en": "Ansan Center is located in Ansan Multicultural Support Headquarters [1F]",
+          "uz": "Ansan Markazi Ansan Ko'p Madaniyatli Qo'llab-quvvatlash Shtab-kvartirasida joylashgan [1-qavat]",
+          "ru": "Центр Ansan расположен в Штабе поддержки многокультурности Ansan [1 этаж]"
+        }
+      },
+      {
+        "desk_seq": 770,
+        "booth": {
+          "en": "Siheung Center] Residence Control(location: Siheung migrant welfare Center 2F)(2023.09.15.~)",
+          "uz": "Siheung Markazi] Yashash joyini nazorat qilish (manzil: Siheung Muhojirlarni Ijtimoiy Himoya Markazi 2-qavat)(2023.09.15.~)",
+          "ru": "Центр Siheung] Контроль по месту жительства (адрес: Центр социального обеспечения мигрантов Siheung, 2 этаж)(2023.09.15.~)"
+        },
+        "details": {
+          "en": "Siheung Center is located in Siheung migrant welfare Center [2F]",
+          "uz": "Siheung Markazi Siheung Muhojirlarni Ijtimoiy Himoya Markazida joylashgan [2-qavat]",
+          "ru": "Центр Siheung расположен в Центре социального обеспечения мигрантов Siheung [2 этаж]"
+        }
+      },
+      {
+        "desk_seq": 769,
+        "booth": {
+          "en": "Siheung Center] Residence Control(location: Siheung migrant welfare Center 2F)(2023.09.15.~, AFTER 09:36)",
+          "uz": "Siheung Markazi] Yashash joyini nazorat qilish (manzil: Siheung Muhojirlarni Ijtimoiy Himoya Markazi 2-qavat)(2023.09.15.~, AFTER 09:36)",
+          "ru": "Центр Siheung] Контроль по месту жительства (адрес: Центр социального обеспечения мигрантов Siheung, 2 этаж)(2023.09.15.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Siheung Center is located in Siheung migrant welfare Center [2F]",
+          "uz": "Siheung Markazi Siheung Muhojirlarni Ijtimoiy Himoya Markazida joylashgan [2-qavat]",
+          "ru": "Центр Siheung расположен в Центре социального обеспечения мигрантов Siheung [2 этаж]"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270686",
+    "short_code": "PS",
+    "name_en": "Busan Immigration Office",
+    "name_ko": "부산출입국·외국인청",
+    "jurisdictions_en": {
+      "Busan": [
+        "Saha-gu",
+        "Joong-gu",
+        "Suyoung-gu",
+        "Yeonjae-gu",
+        "Youngdo-gu",
+        "Haeundae-gu",
+        "Geumjung-gu",
+        "Gijang-gun",
+        "Nam-gu",
+        "Dong-gu",
+        "Buk-gu",
+        "Sasang-gu",
+        "Gangseo-gu",
+        "Dongrae-gu",
+        "Seo-gu",
+        "Busanjun-gu"
+      ],
+      "Gyeongnam": [
+        "Yangsan-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경남": [
+        "양산시"
+      ],
+      "부산": [
+        "중구",
+        "수영구",
+        "연제구",
+        "영도구",
+        "해운대구",
+        "금정구",
+        "기장군",
+        "남구",
+        "동구",
+        "북구",
+        "사상구",
+        "강서구",
+        "동래구",
+        "사하구",
+        "서구",
+        "부산진구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 811,
+        "booth": {
+          "en": "[General Civil Service Center]Others(2026.07.17.~)",
+          "uz": "[Umumiy Fuqarolik Xizmati Markazi]Boshqalar(2026.07.17.~)",
+          "ru": "[Общий центр гражданских услуг]Прочее(2026.07.17.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.\n※ Address of General Civil Service Center: 146, Jungang-daero, Jung-gu, Busan",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.\n※ Umumiy Fuqarolik Xizmati Markazi manzili: 146, Jungang-daero, Jung-gu, Busan",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев.\n※ Адрес Общего центра гражданских услуг: 146, Jungang-daero, Jung-gu, Busan"
+        }
+      },
+      {
+        "desk_seq": 812,
+        "booth": {
+          "en": "[General Civil Service Center]Others(2026.07.17.~, AFTER 09:36)",
+          "uz": "[Umumiy Fuqarolik Xizmati Markazi]Boshqalar(2026.07.17.~, AFTER 09:36)",
+          "ru": "[Общий центр гражданских услуг]Прочее(2026.07.17.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.\n※ Address of General Civil Service Center: 146, Jungang-daero, Jung-gu, Busan",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.\n※ Umumiy Fuqarolik Xizmati Markazi manzili: 146, Jungang-daero, Jung-gu, Busan",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев.\n※ Адрес Общего центра гражданских услуг: 146, Jungang-daero, Jung-gu, Busan"
+        }
+      },
+      {
+        "desk_seq": 810,
+        "booth": {
+          "en": "[General Civil Service Center]Others(~2026.07.16.)",
+          "uz": "[Umumiy Fuqarolik Xizmati Markazi]Boshqalar(~2026.07.16.)",
+          "ru": "[Общий центр гражданских услуг]Прочее(~2026.07.16.)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.\n※ Address of General Civil Service Center: 146, Jungang-daero, Jung-gu, Busan",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.\n※ Umumiy Fuqarolik Xizmati Markazi manzili: 146, Jungang-daero, Jung-gu, Busan",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев.\n※ Адрес Общего центра гражданских услуг: 146, Jungang-daero, Jung-gu, Busan"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270747",
+    "short_code": "MS",
+    "name_en": "Changwon Immigration Office",
+    "name_ko": "창원출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Gyeongnam": [
+        "Gosung-gun",
+        "Haman-gun",
+        "Guhchang-gun",
+        "Cnachun-gun",
+        "Changnyeung-gun",
+        "Jinju-shi",
+        "Changwon-shi",
+        "Hamyang-gun",
+        "Hapchun-gun",
+        "Uiryoung-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경남": [
+        "창원시",
+        "진주시",
+        "함양군",
+        "창녕군",
+        "합천군",
+        "함안군",
+        "고성군",
+        "거창군",
+        "산청군",
+        "의령군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 736,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01~)",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01~)",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01~)"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits, visa issuance certificates (excluding H-2 visas), and residence registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar, viza berish sertifikatlari (H-2 vizalaridan tashqari) va yashash joyini ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание, справки о выдаче визы (кроме виз H-2) и регистрация по месту жительства."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270764",
+    "short_code": "CU",
+    "name_en": "Cheongju Immigration Office",
+    "name_ko": "청주출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Chungbuk": [
+        "Chungju-shi",
+        "외천리",
+        "Chungju-shi Heungduk-gu",
+        "Chungju-shi Sangdang-gu",
+        "Jinchun-gun",
+        "Jeungpyoung-gun",
+        "Jaechun-shi",
+        "Eumsung-gun",
+        "Boeun-gun",
+        "Danyang-gun",
+        "Guesan-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "충북": [
+        "제천시",
+        "청주시 흥덕구",
+        "청주시 상당구",
+        "증평군",
+        "단양군",
+        "괴산군",
+        "음성군",
+        "외천리",
+        "진천군",
+        "충주시",
+        "보은군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 759,
+        "booth": {
+          "en": "(Cheongju Immigration Office) Appointment for Residence Permit Applications (Location: 52, Biharo 12beon-gil, Heungdeok-gu)",
+          "uz": "(Cheongju Immigratsiya Ofisi) Yashash uchun ruxsatnoma bo'yicha ariza qabul qilish (Manzil: 52, Biharo 12beon-gil, Heungdeok-gu)",
+          "ru": "(Иммиграционный офис Cheongju) Запись на подачу заявления на вид на жительство (Адрес: 52, Biharo 12beon-gil, Heungdeok-gu)"
+        },
+        "details": {
+          "en": "You cannot make a visit appointment if any of the following apply: - Application for Visa Issuance Certificate, Application for Nationality, Registration/Residence Affairs, Issuance of Certificates, Fact-finding Inquiry",
+          "uz": "Quyidagilardan biri sizga taalluqli bo'lsa, tashrif uchun yozila olmaysiz: - Viza berish sertifikatiga ariza, Fuqarolikka ariza, Ro'yxatga olish/Yashash joyi masalalari, Sertifikat berish, Ma'lumot so'rash",
+          "ru": "Вы не можете записаться на визит, если к вам относится одно из следующего: - Заявление на справку о выдаче визы, Заявление на гражданство, Вопросы регистрации/места жительства, Выдача справок, Информационный запрос"
+        }
+      },
+      {
+        "desk_seq": 758,
+        "booth": {
+          "en": "[Eumseong Center] General Residence Services (Excluding Permanent Residency) (Location: 71, Geumseok-ro, Eumseong-gun, Chungbuk)",
+          "uz": "[Eumseong Markazi] Umumiy yashash xizmatlari (Doimiy yashashdan tashqari) (Manzil: 71, Geumseok-ro, Eumseong-gun, Chungbuk)",
+          "ru": "[Центр Eumseong] Общие услуги по месту жительства (Кроме постоянного проживания) (Адрес: 71, Geumseok-ro, Eumseong-gun, Chungbuk)"
+        },
+        "details": {
+          "en": "This is the advance reservation counter for residency-related services, such as alien registration, residence reporting, extension of stay, change of status of stay (excluding permanent residency), and various certificates (excluding nationality-related certificates).\nIf you are unable to make a reservation at the Eumseong Center, please make an in-person reservation at the Cheongju Immigration Office located in Cheongju City and visit the Cheongju Immigration Office.",
+          "uz": "Bu xorijiy fuqaroni ro'yxatga olish, yashash joyini bildirish, viza muddatini uzaytirish, turar joy holati o'zgartirish (doimiy yashashdan tashqari) va turli sertifikatlar (fuqarolikka oid sertifikatlardan tashqari) kabi yashash bilan bog'liq xizmatlar uchun oldindan yozilish bo'limidir.\nAgar Eumseong Markazida yozila olmasangiz, Cheongju shahrida joylashgan Cheongju Immigratsiya Ofisiga bevosita kelib yoziling va Cheongju Immigratsiya Ofisiga tashrif buyuring.",
+          "ru": "Это стойка предварительной записи для услуг, связанных с проживанием, таких как регистрация иностранца, отчётность о месте жительства, продление срока пребывания, изменение статуса пребывания (кроме постоянного проживания) и различные справки (кроме справок, связанных с гражданством).\nЕсли вы не можете записаться в центре Eumseong, пожалуйста, запишитесь лично в иммиграционном офисе Cheongju, расположенном в городе Cheongju, и посетите иммиграционный офис Cheongju."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270762",
+    "short_code": "CC",
+    "name_en": "Chuncheon Immigration Office",
+    "name_ko": "춘천출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Gangwon": [
+        "Yanggu-gun",
+        "Hongchun-gun",
+        "Huengsung-gun",
+        "Hwachun-gun",
+        "Youngweul-gun",
+        "Pyoungchang-gun",
+        "Chuncheun-shi",
+        "Injae-gun",
+        "Wonju-shi"
+      ],
+      "Gyeonggi": [
+        "Gapyoung-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "강원": [
+        "횡성군",
+        "화천군",
+        "홍천군",
+        "양구군",
+        "춘천시",
+        "인제군",
+        "원주시",
+        "영월군",
+        "평창군"
+      ],
+      "경기": [
+        "가평군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 717,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits, visa issuance certificates (excluding H-2 visas), and residence registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar, viza berish sertifikatlari (H-2 vizalaridan tashqari) va yashash joyini ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание, справки о выдаче визы (кроме виз H-2) и регистрация по месту жительства."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270718",
+    "short_code": "TG",
+    "name_en": "Daegu Immigration Office",
+    "name_ko": "대구출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Deagu": [
+        "Joong-gu",
+        "Buk-gu",
+        "Seo-gu",
+        "Dalseo-gu",
+        "Susung-gu",
+        "Dong-gu",
+        "Dalsung-gun",
+        "Nam-gu"
+      ],
+      "Gyeongbuk": [
+        "Gyoungsan-shi",
+        "Sungju-gun",
+        "Gunoui-gun",
+        "Uisung-gun",
+        "Goryoung-gun",
+        "Youngyang-gun",
+        "Andong-shi",
+        "Chungsong-gun",
+        "Chungdo-gun",
+        "Yehchun-gun",
+        "Youngchun-shi",
+        "Youngju-shi",
+        "Bonghwa-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경북": [
+        "영주시",
+        "안동시",
+        "봉화군",
+        "예천군",
+        "영천시",
+        "경산시",
+        "영양군",
+        "청도군",
+        "청송군",
+        "군위군",
+        "의성군",
+        "고령군",
+        "성주군"
+      ],
+      "대구": [
+        "수성구",
+        "동구",
+        "달성군",
+        "남구",
+        "달서구",
+        "중구",
+        "서구",
+        "북구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 780,
+        "booth": {
+          "en": "Others(2023.10.13.~)",
+          "uz": "Boshqalar(2023.10.13.~)",
+          "ru": "Прочее(2023.10.13.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, Others for Foreigners, Notification of residency for Overseas Korean.(except : Visa Issuance Certifications)",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat, Boshqalar chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.(bundan mustasno: Viza berish sertifikatlari)",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация, Прочее для иностранцев, Уведомление о месте жительства для зарубежных корейцев.(кроме: Справок о выдаче визы)"
+        }
+      },
+      {
+        "desk_seq": 779,
+        "booth": {
+          "en": "Others(2023.10.13.~, AFTER 09:36)",
+          "uz": "Boshqalar(2023.10.13.~, AFTER 09:36)",
+          "ru": "Прочее(2023.10.13.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, Others for Foreigners, Notification of residency for Overseas Korean.(except : Visa Issuance Certifications)",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat, Boshqalar chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.(bundan mustasno: Viza berish sertifikatlari)",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация, Прочее для иностранцев, Уведомление о месте жительства для зарубежных корейцев.(кроме: Справок о выдаче визы)"
+        }
+      },
+      {
+        "desk_seq": 763,
+        "booth": {
+          "en": "Andong Immigration Center] General Residence Services (Jurisdiction: Andong, Yeongju, Uiseong, Yecheon, Bonghwa, Cheongsong, Yeongyang)",
+          "uz": "Andong Immigratsiya Markazi] Umumiy yashash xizmatlari (Yurisdiksiya: Andong, Yeongju, Uiseong, Yecheon, Bonghwa, Cheongsong, Yeongyang)",
+          "ru": "Иммиграционный центр Andong] Общие услуги по месту жительства (Юрисдикция: Andong, Yeongju, Uiseong, Yecheon, Bonghwa, Cheongsong, Yeongyang)"
+        },
+        "details": {
+          "en": "For general residence services for foreigners residing in Andong Immigration Center’s jurisdiction",
+          "uz": "Andong Immigratsiya Markazi yurisdiksiyasida yashovchi chet elliklar uchun umumiy yashash xizmatlari",
+          "ru": "Для общих услуг по месту жительства для иностранцев, проживающих в юрисдикции иммиграционного центра Andong"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1272279",
+    "short_code": "GM",
+    "name_en": "Daegu Immigration Office Gumi Branch Office",
+    "name_ko": "대구출입국·외국인사무소 구미출장소",
+    "jurisdictions_en": {
+      "Gyeongbuk": [
+        "Gimchun-shi",
+        "Sangju-shi",
+        "Mungyoung-shi",
+        "Gumi-shi",
+        "Chilgok-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경북": [
+        "칠곡군",
+        "김천시",
+        "구미시",
+        "문경시",
+        "상주시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 725,
+        "booth": {
+          "en": "Others(2021.05.01 ~ )",
+          "uz": "Boshqalar(2021.05.01 ~ )",
+          "ru": "Прочее(2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270727",
+    "short_code": "TJ",
+    "name_en": "Daejeon Immigration Office",
+    "name_ko": "대전출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Chungbuk": [
+        "Okchun-gun",
+        "Youngdong-gun"
+      ],
+      "Chungnam": [
+        "Gongju-shi",
+        "Gyeryoung-shi",
+        "Chungyang-gun",
+        "Seochun-gun",
+        "Buyeo-gun",
+        "Boryoung-shi",
+        "Geumsan-gun",
+        "Nonsan-shi",
+        "Yeongi-gun"
+      ],
+      "Daejeon": [
+        "Yusung-gu",
+        "Seo-gu",
+        "Daeduk-gu",
+        "SEJONG CITY",
+        "Joong-gu",
+        "Bugang-myeon (excluding Oecheon-ri)",
+        "Dong-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "대전": [
+        "유성구",
+        "서구",
+        "대덕구",
+        "중구",
+        "세종특별자치시",
+        "부강면(외천리 제외)",
+        "동구"
+      ],
+      "충남": [
+        "연기군",
+        "서천군",
+        "부여군",
+        "보령시",
+        "청양군",
+        "계룡시",
+        "공주시",
+        "금산군",
+        "논산시"
+      ],
+      "충북": [
+        "영동군",
+        "옥천군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 782,
+        "booth": {
+          "en": "Others(2023.08.15.~)",
+          "uz": "Boshqalar(2023.08.15.~)",
+          "ru": "Прочее(2023.08.15.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      },
+      {
+        "desk_seq": 781,
+        "booth": {
+          "en": "Others(2023.08.15.~, AFTER 09:36)",
+          "uz": "Boshqalar(2023.08.15.~, AFTER 09:36)",
+          "ru": "Прочее(2023.08.15.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1272144",
+    "short_code": "TC",
+    "name_en": "Daejeon Immigration Office Cheonan Branch Office",
+    "name_ko": "대전출입국·외국인사무소 천안출장소",
+    "jurisdictions_en": {
+      "Chungnam": [
+        "Asan-sh",
+        "Yeasan-gun",
+        "Chunan-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "충남": [
+        "아산시",
+        "예산군",
+        "천안시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 786,
+        "booth": {
+          "en": "Cheonan branch office] Residence Control(2023.11.18.~)",
+          "uz": "Cheonan filiali] Yashash joyini nazorat qilish(2023.11.18.~)",
+          "ru": "Филиал Cheonan] Контроль по месту жительства(2023.11.18.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      },
+      {
+        "desk_seq": 785,
+        "booth": {
+          "en": "[Cheonan branch office] Residence Control(2023.11.18.~, AFTER 09:36)",
+          "uz": "[Cheonan filiali] Yashash joyini nazorat qilish(2023.11.18.~, AFTER 09:36)",
+          "ru": "[Филиал Cheonan] Контроль по месту жительства(2023.11.18.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      },
+      {
+        "desk_seq": 742,
+        "booth": {
+          "en": "Asan Immigration Center] General sojourn related affairs (Excluding permanent residency affairs)(2021.05.01 ~ ) * Applying via courier(registered mail) NOT available",
+          "uz": "Asan Immigratsiya Markazi] Umumiy turar joy masalalari (doimiy yashash masalalaridan tashqari)(2021.05.01 ~ ) * Kuryer orqali ariza berish (pochta) MAVJUD EMAS",
+          "ru": "Иммиграционный центр Asan] Общие вопросы пребывания (за исключением вопросов постоянного проживания)(2021.05.01 ~ ) * Подача через курьера (заказное письмо) НЕДОСТУПНА"
+        },
+        "details": {
+          "en": "Residence Control(except F-5)",
+          "uz": "Yashash joyini nazorat qilish(F-5 dan tashqari)",
+          "ru": "Контроль по месту жительства(кроме F-5)"
+        }
+      },
+      {
+        "desk_seq": 751,
+        "booth": {
+          "en": "Chunan Immigration Center] Residence Control (except F-5) (Location : 8F, Dongnam-gu health center)(2021.05.01 ~ ) * Applying via courier(registered mail) NOT available",
+          "uz": "Chunan Immigratsiya Markazi] Yashash joyini nazorat qilish (F-5 dan tashqari) (Manzil: 8-qavat, Dongnam-gu sog'liqni saqlash markazi)(2021.05.01 ~ ) * Kuryer orqali ariza berish (pochta) MAVJUD EMAS",
+          "ru": "Иммиграционный центр Chunan] Контроль по месту жительства (кроме F-5) (Адрес: 8 этаж, медицинский центр Dongnam-gu)(2021.05.01 ~ ) * Подача через курьера (заказное письмо) НЕДОСТУПНА"
+        },
+        "details": {
+          "en": "Residence Control(except F-5)",
+          "uz": "Yashash joyini nazorat qilish(F-5 dan tashqari)",
+          "ru": "Контроль по месту жительства(кроме F-5)"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1272379",
+    "short_code": "DJ",
+    "name_en": "Daejeon Immigration Office Dangjin Branch Office",
+    "name_ko": "대전출입국·외국인사무소 당진출장소",
+    "jurisdictions_en": {
+      "Chungnam": [
+        "Dangjin-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "충남": [
+        "당진시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 726,
+        "booth": {
+          "en": "Others(2021.05.01 ~ )",
+          "uz": "Boshqalar(2021.05.01 ~ )",
+          "ru": "Прочее(2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271009",
+    "short_code": "TH",
+    "name_en": "Donghae Branch Office",
+    "name_ko": "춘천출입국·외국인사무소 동해출장소",
+    "jurisdictions_en": {
+      "Gangwon": [
+        "Samchuk-shi",
+        "Ganleung-shi",
+        "Donghae-shi",
+        "Jungsun-gun",
+        "Taebaek-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "강원": [
+        "정선군",
+        "동해시",
+        "태백시",
+        "강릉시",
+        "삼척시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 724,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits and address registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1272405",
+    "short_code": "GH",
+    "name_en": "GIMHAE BRANCH OFFICE",
+    "name_ko": "부산출입국·외국인청 김해출장소",
+    "jurisdictions_en": {
+      "Gyeongnam": [
+        "Milyang-shi",
+        "Gimhae-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경남": [
+        "김해시",
+        "밀양시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 789,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (April 16, 2024~)",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (April 16, 2024~)",
+          "ru": "Запись на подачу заявления на вид на жительство (April 16, 2024~)"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits and address registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271016",
+    "short_code": "KE",
+    "name_en": "Geoje Branch Office",
+    "name_ko": "창원출입국·외국인사무소 거제출장소",
+    "jurisdictions_en": {
+      "Gyeongnam": [
+        "Guhjae-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경남": [
+        "거제시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 732,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits and address registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270742",
+    "short_code": "KJ",
+    "name_en": "Gwangju Immigration Office",
+    "name_ko": "광주출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Gwangju": [
+        "Gwangsan-gu",
+        "Buk-gu",
+        "Dong-gu",
+        "Seo-gu",
+        "Nam-gu"
+      ],
+      "Jeonnam": [
+        "Jangheung-gun",
+        "Hampyoung-gun",
+        "Hwasun-gun",
+        "Jansung-gun",
+        "Younggwang-gun",
+        "Damyang-gun",
+        "Naju-shi",
+        "Gurye-gun",
+        "Goksung-gun",
+        "Goheung-gun",
+        "Gangjin-gun",
+        "Bosung-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "광주": [
+        "남구",
+        "광산구",
+        "서구",
+        "동구",
+        "북구"
+      ],
+      "전남": [
+        "담양군",
+        "나주시",
+        "구례군",
+        "곡성군",
+        "강진군",
+        "고흥군",
+        "화순군",
+        "함평군",
+        "장흥군",
+        "장성군",
+        "영광군",
+        "보성군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 804,
+        "booth": {
+          "en": "Others(2024.06.04.~)",
+          "uz": "Boshqalar(2024.06.04.~)",
+          "ru": "Прочее(2024.06.04.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270743",
+    "short_code": "MP",
+    "name_en": "Gwangju Immigration Office Mokpo Branch Office",
+    "name_ko": "광주출입국·외국인사무소 목포출장소",
+    "jurisdictions_en": {
+      "Jeonnam": [
+        "Mokpo-shi",
+        "Muan-gun",
+        "Shinan-gun",
+        "Youngam-gun",
+        "Jindo-gun",
+        "Wando-gun",
+        "Haenam-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "전남": [
+        "목포시",
+        "해남군",
+        "영암군",
+        "완도군",
+        "신안군",
+        "진도군",
+        "무안군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 720,
+        "booth": {
+          "en": "Others(2021.05.01 ~ )",
+          "uz": "Boshqalar(2021.05.01 ~ )",
+          "ru": "Прочее(2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271013",
+    "short_code": "KY",
+    "name_en": "Gwangyang Branch Office",
+    "name_ko": "여수출입국·외국인사무소 광양출장소",
+    "jurisdictions_en": {
+      "Jeonnam": [
+        "Gwangyang-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "전남": [
+        "광양시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 718,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "[Location: Multicultural Immigrant Center, 3rd Floor, Family Culture Center, 9-7, Donggwang 2-gil, Gwangyang-si, Jeollanam-do]",
+          "uz": "[Manzil: Ko'p Madaniyatli Immigratsiya Markazi, 3-qavat, Oilaviy Madaniyat Markazi, 9-7, Donggwang 2-gil, Gwangyang-si, Jeollanam-do]",
+          "ru": "[Адрес: Многокультурный иммиграционный центр, 3 этаж, Семейный культурный центр, 9-7, Donggwang 2-gil, Gwangyang-si, Jeollanam-do]"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270700",
+    "short_code": "IC",
+    "name_en": "Incheon Immigration Office",
+    "name_ko": "인천출입국·외국인청",
+    "jurisdictions_en": {
+      "Gyeonggi": [
+        "Buchun-shi Ojung-gu",
+        "Buchun-shi Sosa-gu",
+        "Gimpo-shi",
+        "Buchun-shi Wonmi-gu"
+      ],
+      "Incheon": [
+        "Bupyoung-gu",
+        "Seo-gu",
+        "Ongjin-gu",
+        "Joong-gu",
+        "Gyeyang-gu",
+        "Dong-gu",
+        "Namdong-gu",
+        "Michuhol-gu",
+        "Ganghwa-gun",
+        "Yeonsu-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경기": [
+        "김포시",
+        "부천시 소사구",
+        "부천시 오정구",
+        "부천시 원미구"
+      ],
+      "인천": [
+        "서구",
+        "연수구",
+        "옹진군",
+        "중구",
+        "부평구",
+        "동구",
+        "남동구",
+        "강화군",
+        "미추홀구",
+        "계양구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 791,
+        "booth": {
+          "en": "Incheon Immigration Office] Visit Reservation for Permission to Stay (Jurisdiction: Inchoen, Bucheon) (2024.06.20.~)",
+          "uz": "Incheon Immigratsiya Ofisi] Koreyada qolish uchun yozilish (Yurisdiksiya: Incheon, Bucheon) (2024.06.20.~)",
+          "ru": "Иммиграционный офис Incheon] Запись на разрешение на пребывание (Юрисдикция: Incheon, Bucheon) (2024.06.20.~)"
+        },
+        "details": {
+          "en": "\t\nRegistration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "\t\nRo'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "\t\nРегистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      },
+      {
+        "desk_seq": 790,
+        "booth": {
+          "en": "Incheon Immigration Office] Visit Reservation for Permission to Stay (Jurisdiction: Inchoen, Bucheon) (2024.06.20.~, AFTER 09:36)",
+          "uz": "Incheon Immigratsiya Ofisi] Koreyada qolish uchun yozilish (Yurisdiksiya: Incheon, Bucheon) (2024.06.20.~, AFTER 09:36)",
+          "ru": "Иммиграционный офис Incheon] Запись на разрешение на пребывание (Юрисдикция: Incheon, Bucheon) (2024.06.20.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "\t\nRegistration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "\t\nRo'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "\t\nРегистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      },
+      {
+        "desk_seq": 793,
+        "booth": {
+          "en": "Gimpo Multicultural Immigrant Center]Visit Reservation for Permission to Stay(Excluding F-5 Change of Status)(Jurisdiction:Gimpo, Ganghwa County) (Location: 1F, Gimpo Foreign Resident Support Center)(2024.04.20.~)",
+          "uz": "Gimpo Ko'p Madaniyatli Immigratsiya Markazi] Koreyada qolish uchun yozilish (F-5 holati o'zgartirishdan tashqari)(Yurisdiksiya: Gimpo, Ganghwa okrugi) (Manzil: 1-qavat, Gimpo Xorijiy Rezidentlarni Qo'llab-quvvatlash Markazi)(2024.04.20.~)",
+          "ru": "Многокультурный иммиграционный центр Gimpo] Запись на разрешение на пребывание (Кроме изменения статуса F-5)(Юрисдикция: Gimpo, округ Ganghwa) (Адрес: 1 этаж, Центр поддержки иностранных резидентов Gimpo)(2024.04.20.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean. Jurisdiction : Gimpo-shi, Ganghwa-gun",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish. Yurisdiksiya: Gimpo-shi, Ganghwa-gun",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев. Юрисдикция: Gimpo-shi, Ganghwa-gun"
+        }
+      },
+      {
+        "desk_seq": 792,
+        "booth": {
+          "en": "Gimpo Multicultural Immigrant Center]Visit Reservation for Permission to Stay(Excluding F-5 Change of Status)(Jurisdiction:Gimpo, Ganghwa County) (Location: 1F, Gimpo Foreign Resident Support Center)(2024.04.20.~, AFTER 09:36)",
+          "uz": "Gimpo Ko'p Madaniyatli Immigratsiya Markazi] Koreyada qolish uchun yozilish (F-5 holati o'zgartirishdan tashqari)(Yurisdiksiya: Gimpo, Ganghwa okrugi) (Manzil: 1-qavat, Gimpo Xorijiy Rezidentlarni Qo'llab-quvvatlash Markazi)(2024.04.20.~, AFTER 09:36)",
+          "ru": "Многокультурный иммиграционный центр Gimpo] Запись на разрешение на пребывание (Кроме изменения статуса F-5)(Юрисдикция: Gimpo, округ Ganghwa) (Адрес: 1 этаж, Центр поддержки иностранных резидентов Gimpo)(2024.04.20.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean. Jurisdiction : Gimpo-shi, Ganghwa-gun",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish. Yurisdiksiya: Gimpo-shi, Ganghwa-gun",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев. Юрисдикция: Gimpo-shi, Ganghwa-gun"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270715",
+    "short_code": "CJ",
+    "name_en": "Jeju Immigration Office",
+    "name_ko": "제주출입국·외국인청",
+    "jurisdictions_en": {
+      "Jeju": [
+        "Seoguipo-shi",
+        "Jeju-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "제주": [
+        "제주시",
+        "서귀포시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 807,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (July 27, 2024~)",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (July 27, 2024~)",
+          "ru": "Запись на подачу заявления на вид на жительство (July 27, 2024~)"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits, visa issuance certificates (excluding H-2 visas), and residence registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar, viza berish sertifikatlari (H-2 vizalaridan tashqari) va yashash joyini ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание, справки о выдаче визы (кроме виз H-2) и регистрация по месту жительства."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270758",
+    "short_code": "CH",
+    "name_en": "Jeonju Immigration Office",
+    "name_ko": "전주출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Jeonbuk": [
+        "Buan-gun",
+        "Sunchang-gun",
+        "Wanju-gun",
+        "Iksan-shi",
+        "Imsil-gun",
+        "Jangsu-gun",
+        "Jeonju-shi Dukjin-gu",
+        "Jeonju-shi Wansan-gu",
+        "Jungeup-shi",
+        "Jinan-gun",
+        "Namwon-shi",
+        "Muju-gun",
+        "Gochang-gun",
+        "Gimjae-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "전북": [
+        "완주군",
+        "익산시",
+        "임실군",
+        "장수군",
+        "전주시 덕진구",
+        "전주시 완산구",
+        "부안군",
+        "진안군",
+        "남원시",
+        "고창군",
+        "무주군",
+        "김제시",
+        "순창군",
+        "정읍시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 728,
+        "booth": {
+          "en": "[Jeonju Immigration Office] General Services for Stay (2021.05.01 ~ )",
+          "uz": "[Jeonju Immigratsiya Ofisi] Umumiy turar joy xizmatlari (2021.05.01 ~ )",
+          "ru": "[Иммиграционный офис Jeonju] Общие услуги по пребыванию (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits, visa issuance certificates (excluding H-2 visas), and residence registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar, viza berish sertifikatlari (H-2 vizalaridan tashqari) va yashash joyini ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание, справки о выдаче визы (кроме виз H-2) и регистрация по месту жительства."
+        }
+      },
+      {
+        "desk_seq": 729,
+        "booth": {
+          "en": "[Iksan Immigration Center] General Services for Stay (Location: 4th Floor, Iksan Station) (2021.05.01 ~ )",
+          "uz": "[Iksan Immigratsiya Markazi] Umumiy turar joy xizmatlari (Manzil: 4-qavat, Iksan Stansiyasi) (2021.05.01 ~ )",
+          "ru": "[Иммиграционный центр Iksan] Общие услуги по пребыванию (Адрес: 4 этаж, Станция Iksan) (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "\t\nThis is a pre-reservation counter for services such as residence permits, visa issuance certificates (excluding H-2 visas), and residence registration.",
+          "uz": "\t\nBu yashash uchun ruxsatnomalar, viza berish sertifikatlari (H-2 vizalaridan tashqari) va yashash joyini ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "\t\nЭто стойка предварительной записи для таких услуг, как разрешения на проживание, справки о выдаче визы (кроме виз H-2) и регистрация по месту жительства."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271011",
+    "short_code": "PH",
+    "name_en": "Pohang Branch Office",
+    "name_ko": "대구출입국·외국인사무소 포항출장소",
+    "jurisdictions_en": {
+      "Gyeongbuk": [
+        "Youngduk-gun",
+        "Ullung-gun",
+        "Uljin-gun",
+        "Pohang-gun Nam-gu",
+        "Pohang-gun Buk-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경북": [
+        "포항시 북구",
+        "영덕군",
+        "포항시 남구",
+        "울릉군",
+        "울진군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 799,
+        "booth": {
+          "en": "Others(2024.04.13.~)",
+          "uz": "Boshqalar(2024.04.13.~)",
+          "ru": "Прочее(2024.04.13.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      },
+      {
+        "desk_seq": 798,
+        "booth": {
+          "en": "Others(2024.04.13.~, AFTER 09:36)",
+          "uz": "Boshqalar(2024.04.13.~, AFTER 09:36)",
+          "ru": "Прочее(2024.04.13.~, AFTER 09:36)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271010",
+    "short_code": "OS",
+    "name_en": "Pyeongtaek Branch Office",
+    "name_ko": "수원출입국·외국인청 평택출장소",
+    "jurisdictions_en": {
+      "Gyeonggi": [
+        "Ansung-shi",
+        "Osan-shi",
+        "Pyoungtaek-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경기": [
+        "평택시",
+        "오산시",
+        "안성시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 747,
+        "booth": {
+          "en": "Foreigner Residence Control (Resgistration, Visa extension, Change of visa status etc)(2021.05.01 ~ )",
+          "uz": "Chet ellik rezidentlar nazorati (Ro'yxatga olish, Viza muddatini uzaytirish, Viza holati o'zgartirish va h.k.)(2021.05.01 ~ )",
+          "ru": "Контроль проживания иностранцев (Регистрация, Продление визы, Изменение статуса визы и пр.)(2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271015",
+    "short_code": "SC",
+    "name_en": "Sacheon Branch Office",
+    "name_ko": "창원출입국·외국인사무소 사천출장소",
+    "jurisdictions_en": {
+      "Gyeongnam": [
+        "Namhae-gun",
+        "Hadong-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경남": [
+        "남해군",
+        "하동군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 731,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits and address registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271012",
+    "short_code": "TS",
+    "name_en": "Seosan Branch Office",
+    "name_ko": "대전출입국·외국인사무소 서산출장소",
+    "jurisdictions_en": {
+      "Chungnam": [
+        "Hongsung-gun",
+        "Taean-gun",
+        "Seosan-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "충남": [
+        "태안군",
+        "홍성군",
+        "서산시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 733,
+        "booth": {
+          "en": "Others(2021.05.01 ~ )",
+          "uz": "Boshqalar(2021.05.01 ~ )",
+          "ru": "Прочее(2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271023",
+    "short_code": "SO",
+    "name_en": "Sokcho Branch Office",
+    "name_ko": "춘천출입국·외국인사무소 속초출장소",
+    "jurisdictions_en": {
+      "Gangwon": [
+        "Yangyang-gun",
+        "Shokcho-shi",
+        "Gosung-gun"
+      ]
+    },
+    "jurisdictions_ko": {
+      "강원": [
+        "속초시",
+        "고성군",
+        "양양군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 723,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits and address registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270947",
+    "short_code": "HS",
+    "name_en": "Suwon Immigration Office",
+    "name_ko": "수원출입국·외국인청",
+    "jurisdictions_en": {
+      "Gyeonggi": [
+        "Ichun-shi",
+        "Hwasung-shi",
+        "Yongin-shi Cheoin-gu",
+        "Yongin-shi Giheung-gu",
+        "Yeoju-si",
+        "Yangpyoung-gun",
+        "Suwon-shi Paldal-gu",
+        "Suwon-shi Jangan-gu",
+        "Suwon-shi Youngtong-gu",
+        "Suwon-shi Gwonseun-gu",
+        "Gwangju-shi",
+        "Uiwang-shi",
+        "Yongin-shi Suji-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경기": [
+        "의왕시",
+        "광주시",
+        "수원시 영통구",
+        "수원시 장안구",
+        "수원시 팔달구",
+        "수원시 권선구",
+        "화성시",
+        "이천시",
+        "양평군",
+        "여주시",
+        "용인시 기흥구",
+        "용인시 수지구",
+        "용인시 처인구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 805,
+        "booth": {
+          "en": "Foreigner Residence Control(2024.8.30.~)",
+          "uz": "Chet ellik rezidentlar nazorati(2024.8.30.~)",
+          "ru": "Контроль проживания иностранцев(2024.8.30.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271014",
+    "short_code": "TY",
+    "name_en": "Tongyeong Branch Office",
+    "name_ko": "창원출입국·외국인사무소 통영출장소",
+    "jurisdictions_en": {
+      "Gyeongnam": [
+        "Tongyoung-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경남": [
+        "통영시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 719,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits and address registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270698",
+    "short_code": "US",
+    "name_en": "Ulsan  Immigration Office",
+    "name_ko": "울산출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Gyeongbuk": [
+        "Gyoungju-shi"
+      ],
+      "Ulsan": [
+        "Nam-gu",
+        "Joong-gu",
+        "Ulju-gun",
+        "Bukl-gu",
+        "Dong-gu"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경북": [
+        "경주시"
+      ],
+      "울산": [
+        "중구",
+        "북구",
+        "동구",
+        "남구",
+        "울주군"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 806,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (September 10, 2024~)",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (September 10, 2024~)",
+          "ru": "Запись на подачу заявления на вид на жительство (September 10, 2024~)"
+        },
+        "details": {
+          "en": "This is the advance reservation counter for services such as residence permits and address registration. 《Reservations are not required for Non-professional Employment (E-9), Seafarer Employment (E-10), Registration Certificate (Re)issuance, and various reporting services》",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir. 《Mutaxassislik bo'lmagan ish (E-9), Dengizchi ishi (E-10), Ro'yxat sertifikatini (qayta) berish va turli xil hisobot xizmatlari uchun yozilish talab etilmaydi》",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу. 《Запись не требуется для непрофессиональной занятости (E-9), морской занятости (E-10), (повторной) выдачи регистрационного свидетельства и различных услуг отчётности》"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1271325",
+    "short_code": "UJ",
+    "name_en": "Yangju Immigration office",
+    "name_ko": "양주출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Gangwon": [
+        "Cheulwon-gun"
+      ],
+      "Gyeonggi": [
+        "Uijungbu-shi",
+        "Pochun-shi",
+        "Yeonchun-gun",
+        "Yangju-shi",
+        "Dongducheun-shi",
+        "Namyangju-shi",
+        "Guri-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "강원": [
+        "철원군"
+      ],
+      "경기": [
+        "포천시",
+        "남양주시",
+        "구리시",
+        "동두천시",
+        "의정부시",
+        "연천군",
+        "양주시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 809,
+        "booth": {
+          "en": "Foreigner Residence Control(2024.10.05.~)",
+          "uz": "Chet ellik rezidentlar nazorati(2024.10.05.~)",
+          "ru": "Контроль проживания иностранцев(2024.10.05.~)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.(2020.02.21~)",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.(2020.02.21~)",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев.(2020.02.21~)"
+        }
+      },
+      {
+        "desk_seq": 808,
+        "booth": {
+          "en": "Foreigner Residence Control(2024.10.05.~2026.7.31., AFTER 09:36)",
+          "uz": "Chet ellik rezidentlar nazorati(2024.10.05.~2026.7.31., AFTER 09:36)",
+          "ru": "Контроль проживания иностранцев(2024.10.05.~2026.7.31., AFTER 09:36)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.(2020.02.21~)",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.(2020.02.21~)",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев.(2020.02.21~)"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1272278",
+    "short_code": "GY",
+    "name_en": "Yangju Immigration office Goyang Branch Office",
+    "name_ko": "양주출입국·외국인사무소 고양출장소",
+    "jurisdictions_en": {
+      "Gyeonggi": [
+        "Goyang-shi Dukyang-gu",
+        "Goyang-shi Ilsandong-gu",
+        "Goyang-shi Ilsanseo-gu",
+        "Paju-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "경기": [
+        "파주시",
+        "고양시 덕양구",
+        "고양시 일산동구",
+        "고양시 일산서구"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 741,
+        "booth": {
+          "en": "Others(2021.05.01 ~ )",
+          "uz": "Boshqalar(2021.05.01 ~ )",
+          "ru": "Прочее(2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "Excludes Visit Reservation - Person whose period of stay expires on the relevant day, Application for Confirmation of Visa Issuance, and Certificate issuance. - Those who have made payments for Disposition of Notification, Fines, etc. - A1-A3 visa holders",
+          "uz": "Tashrif yozuvidan chiqarib tashlanadi - Tegishli kunda turar joy muddati tugaydigan shaxs, Viza berilishini tasdiqlash uchun ariza va Sertifikat berish. - Bildirishnoma, Jarima va h.k. uchun to'lov qilgan shaxslar. - A1-A3 viza egalari",
+          "ru": "Исключается запись на визит - Лица, у которых срок пребывания истекает в соответствующий день, Заявление на подтверждение выдачи визы и выдача справок. - Лица, оплатившие уведомление, штрафы и т.д. - Обладатели виз A1-A3"
+        }
+      }
+    ]
+  },
+  {
+    "office_id": "1270731",
+    "short_code": "YS",
+    "name_en": "Yeosu Immigration Office",
+    "name_ko": "여수출입국·외국인사무소",
+    "jurisdictions_en": {
+      "Jeonnam": [
+        "Sunchun-shi",
+        "Yeoju-shi"
+      ]
+    },
+    "jurisdictions_ko": {
+      "전남": [
+        "순천시",
+        "여수시"
+      ]
+    },
+    "desks": [
+      {
+        "desk_seq": 716,
+        "booth": {
+          "en": "[Yeosu Immigration Office] Visit Reservation for Permission to Stay(from May 1,2022)(Jurisdiction : Yeosu, Suncheon)",
+          "uz": "[Yeosu Immigratsiya Ofisi] Koreyada qolish uchun yozilish (May 1,2022 dan)(Yurisdiksiya: Yeosu, Suncheon)",
+          "ru": "[Иммиграционный офис Yeosu] Запись на разрешение на пребывание (с May 1,2022)(Юрисдикция: Yeosu, Suncheon)"
+        },
+        "details": {
+          "en": "Registration, Extension of stay, Change of status, Re-entry permition, Visa Issuance Certifications(except H-2 Visa), Notification, Counseling, etc for Foreigners, Notification of residency for Overseas Korean.",
+          "uz": "Ro'yxatga olish, viza muddatini uzaytirish, vizani o'zgartirish, Qaytib kirish ruxsati, Viza berish sertifikatlari(H-2 Vizasidan tashqari), Bildirishnoma, Maslahat va h.k. chet elliklar uchun, Xorijdagi koreyaliklar uchun yashash joyini bildirish.",
+          "ru": "Регистрация, Продление срока пребывания, Изменение статуса, Разрешение на повторный въезд, Справки о выдаче визы(кроме визы H-2), Уведомление, Консультация и пр. для иностранцев, Уведомление о месте жительства для зарубежных корейцев."
+        }
+      }
+    ]
+  },
+  {
+    "office_id": null,
+    "short_code": null,
+    "name_en": "Gunsan Branch Office",
+    "name_ko": null,
+    "jurisdictions_en": null,
+    "jurisdictions_ko": null,
+    "desks": [
+      {
+        "desk_seq": 734,
+        "booth": {
+          "en": "Appointment for Residence Permit Application (2021.05.01 ~ )",
+          "uz": "Yashash uchun ruxsatnoma ariza qabul qilish (2021.05.01 ~ )",
+          "ru": "Запись на подачу заявления на вид на жительство (2021.05.01 ~ )"
+        },
+        "details": {
+          "en": "This is a pre-reservation counter for services such as residence permits and address registration.",
+          "uz": "Bu yashash uchun ruxsatnomalar va manzilni ro'yxatga olish kabi xizmatlar uchun oldindan yozilish bo'limidir.",
+          "ru": "Это стойка предварительной записи для таких услуг, как разрешения на проживание и регистрация по адресу."
+        }
+      }
+    ]
+  }
+]
