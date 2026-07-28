@@ -1050,63 +1050,10 @@ body {
   overflow-wrap: anywhere;
 }
 
-/* Contact block — the reason the sheet exists */
-.hs-contact {
-  margin: 22px 0 0;
-  padding: 16px 18px;
-  border: 1px solid var(--hs-line);
-  border-radius: var(--hs-r);
-  background: var(--hs-surface-2);
-}
-
-.hs-contact__label {
-  display: block;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--hs-muted);
-  margin-bottom: 9px;
-}
-
-.hs-contact__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.hs-contact__phone {
-  flex: 1;
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 1.26rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--hs-accent-deep);
-  text-decoration: none;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
-.hs-contact__glyph {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  fill: var(--hs-accent);
-}
-
-.hs-contact__hint {
-  margin: 10px 0 0;
-  font-size: 0.78rem;
-  color: var(--hs-muted);
-}
-
 /* --- Telegram opt-in inside the compose form --- */
 .hs-tg {
   margin: 12px 0 0;
-  padding: 13px 14px;
+  padding: 5px 13px 11px;
   border: 1px solid var(--hs-line);
   border-radius: var(--hs-r-sm);
   background: var(--hs-surface-2);
@@ -1114,8 +1061,9 @@ body {
 
 .hs-tg__main {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 11px;
+  min-height: var(--hs-tap);
   cursor: pointer;
 }
 
@@ -1123,32 +1071,23 @@ body {
   width: 21px;
   height: 21px;
   flex-shrink: 0;
-  margin: 1px 0 0;
+  margin: 0;
   accent-color: var(--hs-accent);
   cursor: pointer;
 }
 
-.hs-tg__text { flex: 1; min-width: 0; }
-
 .hs-tg__title {
-  display: block;
+  flex: 1;
+  min-width: 0;
   font-size: 0.9rem;
   font-weight: 600;
+  line-height: 1.35;
   color: var(--hs-text);
-  line-height: 1.4;
-}
-
-.hs-tg__note {
-  display: block;
-  margin-top: 3px;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: var(--hs-muted);
 }
 
 .hs-tg__field {
   position: relative;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .hs-tg__at {
@@ -1167,56 +1106,93 @@ body {
   background: var(--hs-surface);
 }
 
-.hs-tg__hint {
-  margin: 9px 0 0;
-  font-size: 0.78rem;
-  line-height: 1.5;
-  color: var(--hs-muted);
+
+/* Contact block — two tight tappable rows, no labels, no hints. The icons
+   say what each row is; the earlier version spent 250px saying it in words. */
+.hs-contact {
+  margin: 20px 0 0;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r);
+  overflow: hidden;
+  background: var(--hs-surface);
 }
 
-.hs-tg__hint span {
-  font-weight: 700;
-  color: var(--hs-accent-deep);
-  word-break: break-all;
-}
-
-/* --- Telegram button in the detail sheet --- */
-.hs-tg-btn {
+.hs-crow {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
+  gap: 10px;
   width: 100%;
-  min-height: var(--hs-tap);
-  margin-top: 13px;
-  padding: 11px 16px;
-  border: 1px solid var(--hs-accent);
-  border-radius: var(--hs-r-sm);
-  background: var(--hs-accent-soft);
-  color: var(--hs-accent-deep);
+  min-height: 56px;
+  padding: 6px 12px 6px 14px;
+  border: 0;
+  background: none;
   font-family: inherit;
-  font-size: 0.92rem;
-  font-weight: 700;
+  text-align: left;
   cursor: pointer;
-  transition: background 150ms var(--hs-ease);
 }
 
-.hs-tg-btn:active { background: var(--hs-surface-2); }
+.hs-crow + .hs-crow { border-top: 1px solid var(--hs-line); }
+.hs-crow--tap:active { background: var(--hs-surface-2); }
 
-.hs-tg-btn__glyph {
+.hs-crow__main {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.hs-crow__glyph {
   width: 19px;
   height: 19px;
   flex-shrink: 0;
-  fill: currentColor;
+  fill: var(--hs-accent);
 }
 
-.hs-contact--tg .hs-tg-btn { margin-top: 9px; }
+.hs-crow__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  color: var(--hs-accent-deep);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hs-crow__side {
+  flex-shrink: 0;
+  min-height: 38px;
+  padding: 7px 13px;
+  border: 1px solid var(--hs-line-strong);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-surface);
+  color: var(--hs-text-2);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hs-crow__side:active { background: var(--hs-surface-2); }
+
+.hs-crow__chev {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--hs-muted);
+}
 
 .hs-contact--empty {
+  padding: 15px 16px;
   border-style: dashed;
   border-color: var(--hs-line-strong);
   background: none;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--hs-muted);
 }
 
@@ -1321,8 +1297,8 @@ body {
 .hs-tab:focus-visible,
 .hs-radius__btn:focus-visible,
 .hs-radius-custom__input:focus-visible,
-.hs-contact__phone:focus-visible,
-.hs-tg-btn:focus-visible,
+.hs-crow__main:focus-visible,
+.hs-crow__side:focus-visible,
 .hs-tg__box:focus-visible {
   outline: 2px solid var(--hs-accent);
   outline-offset: 2px;

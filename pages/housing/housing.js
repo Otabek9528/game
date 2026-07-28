@@ -873,7 +873,9 @@
 
     if (el.sheetTelegram) {
       if (handle) {
-        setText(el.sheetTelegramLabel, '@' + handle + ' ga yozish');
+        // The chevron carries the affordance; the label is just the handle,
+        // which keeps long usernames from ellipsizing.
+        setText(el.sheetTelegramLabel, '@' + handle);
         el.sheetTelegram.dataset.username = handle;
         show(el.sheetTelegram);
       } else {
