@@ -69,7 +69,7 @@
           </button>
         </div>
         <p class="hs-search__hint" id="hsSearchHint">
-          Koreyscha manzil yozsangiz, e'lonlar shu joyga yaqinligi bo'yicha saralanadi.
+          Koreys tilida manzil yozsangiz, e'lonlar shu joyga yaqinligi bo'yicha saralanadi.
         </p>
       </form>
 
@@ -251,7 +251,7 @@
         <span class="hs-pagehead__icon"><svg viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="7.6" r="3.3" /><path d="M4.6 18.2c.7-3.3 3.4-5 6.4-5s5.7 1.7 6.4 5" /></svg></span>
         <div class="hs-pagehead__text">
           <h2 class="hs-pagehead__title">Mening e'lonlarim</h2>
-          <p class="hs-pagehead__sub">Muddati tugashidan oldin shu yerdan uzaytiring</p>
+          <p class="hs-pagehead__sub">E'lonlar 30 kundan keyin bazadan o'chiriladi. Muddatni tugashidan oldin shu yerdan uzaytiring</p>
         </div>
         <span class="hs-pagehead__count" id="hsMineCount"></span>
       </div>
@@ -275,8 +275,7 @@
 
       <div class="hs-state" id="hsMineEmpty" hidden>
         <p class="hs-state__title">Sizda e'lon yo'q</p>
-        <p class="hs-state__text">Joylagan e'lonlaringiz shu yerda turadi — muddati
-          tugashidan oldin ularni shu yerdan uzaytira olasiz.</p>
+        <p class="hs-state__text">Joylagan e'lonlaringiz shu yerda ko'rinadi.</p>
       </div>
 
       <div class="hs-state hs-state--error" id="hsMineError" hidden>
@@ -316,7 +315,7 @@
         </div>
 
         <div class="hs-field">
-          <label class="hs-label" for="hsComposeContact">Telefon raqami</label>
+          <label class="hs-label" for="hsComposeContact">Bog'lanish uchun telefon raqam</label>
           <input type="tel" class="hs-input" id="hsComposeContact" name="contact"
                  placeholder="010-1234-5678" inputmode="tel" />
           <p class="hs-field__err" data-error-for="contact" hidden></p>
@@ -350,7 +349,7 @@
         <span class="hs-pagehead__icon"><svg viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3.4a5 5 0 0 0-5 5c0 4.3-1.6 5.6-1.6 5.6h13.2S16 12.7 16 8.4a5 5 0 0 0-5-5z" /><path d="M9.3 16.8a1.95 1.95 0 0 0 3.4 0" /></svg></span>
         <div class="hs-pagehead__text">
           <h2 class="hs-pagehead__title">Bildirishnomalar</h2>
-          <p class="hs-pagehead__sub">Shu atrofda yangi e'lon chiqsa, bot darhol
+          <p class="hs-pagehead__sub">Manzilni va qidiruv radiusini kiriting. Shu radius ichida yangi e'lon qo'yilsa, bot darhol
             xabar yuboradi</p>
         </div>
         <span class="hs-pagehead__count" id="hsAlertCount"></span>
@@ -365,14 +364,14 @@
         </div>
 
         <div class="hs-field">
-          <span class="hs-label">Qidiruv doirasi</span>
+          <span class="hs-label">Qidiruv radiusi: shu masofadagi barcha e'lonlar</span>
           <div class="hs-radius" id="hsAlertRadius" role="radiogroup" aria-label="Qidiruv doirasi">
-            <button type="button" class="hs-radius__btn" data-radius="3"
-                    role="radio" aria-checked="false">3 km</button>
             <button type="button" class="hs-radius__btn" data-radius="5"
                     role="radio" aria-checked="false">5 km</button>
-            <button type="button" class="hs-radius__btn hs-radius__btn--active" data-radius="10"
-                    role="radio" aria-checked="true">10 km</button>
+            <button type="button" class="hs-radius__btn" data-radius="10"
+                    role="radio" aria-checked="false">10 km</button>
+            <button type="button" class="hs-radius__btn hs-radius__btn--active" data-radius="15"
+                    role="radio" aria-checked="true">15 km</button>
             <button type="button" class="hs-radius__btn" data-radius="20"
                     role="radio" aria-checked="false">20 km</button>
           </div>
@@ -414,8 +413,8 @@
 
       <div class="hs-state" id="hsAlertEmpty" hidden>
         <p class="hs-state__title">Hozircha bildirishnoma yo'q</p>
-        <p class="hs-state__text">Yuqorida manzil yozib, doirani tanlang.
-          Istalgancha manzil qo'shishingiz mumkin.</p>
+        <p class="hs-state__text">Yuqorida manzil yozib, qidiruv radiusini tanlang.
+          Istalgancha bildirishnoma qo'shishingiz mumkin.</p>
       </div>
 
       <div class="hs-state hs-state--error" id="hsAlertsError" hidden>
@@ -463,7 +462,7 @@
             <path d="M9.3 16.8a1.95 1.95 0 0 0 3.4 0" />
           </svg>
         </span>
-        <span class="hs-tab__label">Xabarlar</span>
+        <span class="hs-tab__label">Xabarnoma</span>
       </button>
 
       <button type="button" class="hs-tab hs-tab--action" id="hsNavCompose"
@@ -529,7 +528,7 @@
       </div>
 
       <p class="hs-contact hs-contact--empty" id="hsSheetNoContact" hidden>
-        Aloqa ma'lumoti ko'rsatilmagan.
+        Tel raqam ko'rsatilmagan.
       </p>
 
       <div class="hs-sheet__owner" id="hsSheetOwnerActions" hidden>
