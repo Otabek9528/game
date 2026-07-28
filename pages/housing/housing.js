@@ -43,6 +43,7 @@
 
   var el = {
     shell: $('hsShell'),
+    pull: $('hsPull'),
 
     navBrowse: $('hsNavBrowse'),
     navMine: $('hsNavMine'),
@@ -627,6 +628,10 @@
       }
     } catch (e) {}
 
+    // Swiping down from the top is Telegram's "close the Mini App" gesture.
+    // Without this, pull-to-refresh would dismiss the app instead.
+    try { if (typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes(); } catch (e) {}
+
     applyViewportHeight();
     try { tg.onEvent('viewportChanged', applyViewportHeight); } catch (e) {}
     try { tg.BackButton.onClick(onBack); } catch (e) {}
@@ -722,7 +727,7 @@
 
     var headers = INIT_DATA ? { auth: true } : {};
 
-    api('/posts?' + query.join('&'), headers)
+    return api('/posts?' + query.join('&'), headers)
       .then(function (data) {
         hide(el.skeleton);
         state.loading = false;
@@ -1121,7 +1126,7 @@
     el.mineList.innerHTML = '';
     show(el.mineSkeleton);
 
-    api('/me/posts', { auth: true })
+    return api('/me/posts', { auth: true })
       .then(function (data) {
         hide(el.mineSkeleton);
         var posts = data.posts || [];
@@ -1436,7 +1441,7 @@
     el.alertList.innerHTML = '';
     show(el.alertSkeleton);
 
-    api('/alerts', { auth: true })
+    return api('/alerts', { auth: true })
       .then(function (data) {
         hide(el.alertSkeleton);
         var alerts = data.alerts || [];
@@ -1518,6 +1523,123 @@
           loadAlerts();
         })
         .catch(function (err) { haptic('error'); toast(errorText(err), true); });
+    });
+  }
+
+  // =========================================================
+  // Pull to refresh
+  // =========================================================
+
+  var PULL_TRIGGER = 68;    // px of travel before the gesture arms
+  var PULL_MAX = 96;        // px ceiling, so the sheet cannot be dragged away
+  var PULL_RESIST = 0.45;   // finger travel -> visual travel
+
+  function refreshActiveView() {
+    if (state.view === 'mine') return loadMine();
+    if (state.view === 'alerts') return loadAlerts();
+    return loadPosts(true);
+  }
+
+  function pullRender(distance, armed) {
+    var shown = Math.min(distance, PULL_MAX);
+    var progress = Math.min(1, shown / PULL_TRIGGER);
+    if (el.shell) el.shell.style.transform = 'translateY(' + shown + 'px)';
+    if (!el.pull) return;
+    el.pull.style.opacity = String(progress);
+    el.pull.style.transform = 'translateY(' + (shown - 10) + 'px)';
+    var icon = el.pull.querySelector('.hs-pull__icon');
+    if (icon && !el.pull.classList.contains('hs-pull--busy')) {
+      icon.style.transform = 'rotate(' + Math.round(progress * 270) + 'deg)';
+    }
+    el.pull.classList.toggle('hs-pull--armed', !!armed);
+  }
+
+  function pullReset(animated) {
+    if (el.shell) {
+      el.shell.classList.toggle('hs-shell--settling', !!animated);
+      el.shell.style.transform = '';
+    }
+    if (el.pull) {
+      el.pull.classList.toggle('hs-pull--settling', !!animated);
+      el.pull.classList.remove('hs-pull--busy', 'hs-pull--armed');
+      el.pull.style.opacity = '0';
+      el.pull.style.transform = '';
+      var icon = el.pull.querySelector('.hs-pull__icon');
+      if (icon) icon.style.transform = '';
+    }
+    if (animated) {
+      setTimeout(function () {
+        if (el.shell) el.shell.classList.remove('hs-shell--settling');
+        if (el.pull) el.pull.classList.remove('hs-pull--settling');
+      }, 300);
+    }
+  }
+
+  /* Arms only when the list is already scrolled to the very top and nothing
+     is layered over it. The compose form is excluded — refreshing under a
+     half-filled form would be hostile. */
+  function bindPullToRefresh() {
+    if (!el.shell) return;
+    var startY = 0;
+    var distance = 0;
+    var tracking = false;
+    var busy = false;
+
+    function eligible() {
+      return !busy
+        && !state.sheetPostId
+        && state.view !== 'compose'
+        && el.shell.scrollTop <= 0;
+    }
+
+    el.shell.addEventListener('touchstart', function (ev) {
+      if (ev.touches.length !== 1 || !eligible()) { tracking = false; return; }
+      tracking = true;
+      startY = ev.touches[0].clientY;
+      distance = 0;
+      el.shell.classList.remove('hs-shell--settling');
+      if (el.pull) el.pull.classList.remove('hs-pull--settling');
+    }, { passive: true });
+
+    el.shell.addEventListener('touchmove', function (ev) {
+      if (!tracking) return;
+      // The list scrolled under the finger — hand the gesture back.
+      if (el.shell.scrollTop > 0) { tracking = false; pullReset(false); return; }
+      var raw = ev.touches[0].clientY - startY;
+      if (raw <= 0) { distance = 0; pullRender(0, false); return; }
+      distance = raw * PULL_RESIST;
+      pullRender(distance, distance >= PULL_TRIGGER);
+    }, { passive: true });
+
+    function release() {
+      if (!tracking) return;
+      tracking = false;
+      if (distance < PULL_TRIGGER) { pullReset(true); return; }
+
+      busy = true;
+      haptic('light');
+      if (el.pull) el.pull.classList.add('hs-pull--busy');
+      // Hold the indicator at the trigger point while the request runs.
+      if (el.shell) {
+        el.shell.classList.add('hs-shell--settling');
+        el.shell.style.transform = 'translateY(' + PULL_TRIGGER + 'px)';
+      }
+
+      var started = Date.now();
+      Promise.resolve(refreshActiveView())
+        .catch(function () { /* the view renders its own error state */ })
+        .then(function () {
+          // A refresh that finishes in 40ms reads as "nothing happened".
+          var wait = Math.max(0, 400 - (Date.now() - started));
+          setTimeout(function () { busy = false; pullReset(true); }, wait);
+        });
+    }
+
+    el.shell.addEventListener('touchend', release);
+    el.shell.addEventListener('touchcancel', function () {
+      if (!tracking) return;
+      tracking = false;
+      pullReset(true);
     });
   }
 
@@ -1643,6 +1765,7 @@
     bindPhoneFormatting(el.composeContact);
 
     bindSheetSwipe();
+    bindPullToRefresh();
 
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape' && state.sheetPostId) closeSheet();

@@ -112,10 +112,70 @@ body {
   padding: 10px 16px calc(104px + var(--hs-safe-b));
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 .hs-view { display: block; }
+
+
+/* =========================================================
+   PULL TO REFRESH
+   ========================================================= */
+
+.hs-pull {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.hs-pull--armed .hs-pull__disc { border-color: var(--hs-accent); }
+
+.hs-pull__disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--hs-line-strong);
+  border-radius: 50%;
+  background: var(--hs-surface);
+  box-shadow: 0 2px 10px rgba(20, 26, 22, 0.12);
+}
+
+.night-mode .hs-pull__disc { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45); }
+
+.hs-pull__icon {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: var(--hs-accent-deep);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Released and waiting on the network: spin until the data lands. */
+.hs-pull--busy .hs-pull__icon { animation: hs-spin 0.75s linear infinite; }
+
+.hs-pull--settling,
+.hs-shell--settling { transition: transform 260ms var(--hs-ease), opacity 200ms var(--hs-ease); }
+
+@keyframes hs-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-pull--busy .hs-pull__icon { animation: none; }
+}
 
 
 /* =========================================================

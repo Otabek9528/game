@@ -51,6 +51,17 @@
     </a>
   </header>
 
+  <!-- Pull-to-refresh indicator. Fixed, so it is not affected by the shell's
+       own scroll; driven entirely from housing.js. -->
+  <div class="hs-pull" id="hsPull" aria-hidden="true">
+    <span class="hs-pull__disc">
+      <svg class="hs-pull__icon" viewBox="0 0 24 24" focusable="false">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66" />
+        <path d="M20 4v5h-5" />
+      </svg>
+    </span>
+  </div>
+
   <div class="hs-shell" id="hsShell">
 
     <!-- =========================================================
