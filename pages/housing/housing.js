@@ -93,7 +93,6 @@
     composeBodyCount: $('hsComposeBodyCount'),
     composeError: $('hsComposeError'),
     composeSubmit: $('hsComposeSubmit'),
-    composeCancel: $('hsComposeCancel'),
 
     tabbar: $('hsTabbar'),
     navCompose: $('hsNavCompose'),
@@ -372,7 +371,8 @@
   var NAV = {
     browse: el.navBrowse,
     mine: el.navMine,
-    alerts: el.navAlerts
+    alerts: el.navAlerts,
+    compose: el.navCompose
   };
 
   var ACTIVE_TAB = 'hs-tab--active';
@@ -454,9 +454,9 @@
       if (active) NAV[key].setAttribute('aria-current', 'page');
       else NAV[key].removeAttribute('aria-current');
     });
-    // The tab bar is navigation; it steps aside while a form is open so the
-    // submit action is the only thing at the bottom of the screen.
-    if (el.tabbar) el.tabbar.hidden = (name === 'compose');
+    // With submission living inside the form, the tab bar can stay put on
+    // every screen — tapping another tab doubles as "cancel".
+    if (el.tabbar) el.tabbar.hidden = false;
     if (el.shell) el.shell.scrollTop = 0;
     syncMainButton();
     syncBackButton();
@@ -474,29 +474,17 @@
       && tg.platform && tg.platform !== 'unknown');
   }
 
-  /* Posting is now a tab, so MainButton has exactly one job: submitting the
-     compose form. Everywhere else it stays hidden — two primary actions at the
-     bottom of the same screen is one too many. */
+  /* Submission lives inside the form as a normal button, so Telegram's
+     MainButton is retired entirely — one bottom bar, no competition. */
   function syncMainButton() {
-    var onCompose = (state.view === 'compose' && !state.sheetPostId);
-
-    if (!mainButtonAvailable()) {
-      if (el.composeSubmit) el.composeSubmit.hidden = !onCompose;
-      return;
+    if (mainButtonAvailable()) {
+      try { tg.MainButton.hide(); } catch (e) {}
     }
-    hide(el.composeSubmit);
-
-    var mb = tg.MainButton;
-    if (!onCompose) { mb.hide(); return; }
-
-    var dark = document.documentElement.classList.contains('night-mode');
-    mb.setParams({
-      text: state.composeMode === 'edit' ? 'O\u02bbzgarishlarni saqlash' : 'E\u02bblonni joylash',
-      color: dark ? '#10b981' : '#059669',
-      text_color: dark ? '#07130d' : '#ffffff',
-      is_active: true,
-      is_visible: true
-    });
+    if (el.composeSubmit) {
+      el.composeSubmit.textContent = state.composeMode === 'edit'
+        ? 'O\u02bbzgarishlarni saqlash'
+        : 'E\u02bblonni joylash';
+    }
   }
 
   /* Kept visible even at the board root. On Android, Telegram routes the
@@ -540,12 +528,7 @@
     applyViewportHeight();
     try { tg.onEvent('viewportChanged', applyViewportHeight); } catch (e) {}
     try { tg.BackButton.onClick(onBack); } catch (e) {}
-    try { tg.MainButton.onClick(onMainButton); } catch (e) {}
-  }
-
-  function onMainButton() {
-    if (state.view === 'compose') submitCompose();
-    else openCompose('create');
+    try { tg.MainButton.hide(); } catch (e) {}
   }
 
   // =========================================================
@@ -1088,13 +1071,6 @@
     navigate({ v: 'compose', sheet: null });
   }
 
-  function cancelCompose() {
-    clearFieldErrors();
-    history.back();
-    state.composeMode = 'create';
-    state.composePostId = null;
-  }
-
   function validateCompose() {
     clearFieldErrors();
     var ok = true;
@@ -1122,13 +1098,13 @@
 
   function setSubmitting(on) {
     state.submitting = on;
-    if (mainButtonAvailable()) {
-      try {
-        if (on) tg.MainButton.showProgress(true);
-        else tg.MainButton.hideProgress();
-      } catch (e) {}
+    if (!el.composeSubmit) return;
+    el.composeSubmit.disabled = on;
+    if (on) {
+      el.composeSubmit.textContent = 'Yuborilmoqda\u2026';
+    } else {
+      syncMainButton();
     }
-    if (el.composeSubmit) el.composeSubmit.disabled = on;
   }
 
   function handleSubmitError(err) {
@@ -1282,7 +1258,7 @@
 
     clearAlertErrors();
     var address = (el.alertAddress.value || '').trim();
-    if (address.length < 4 || address.length > 200 || !/[\uac00-\ud7a3]/.test(address)) {
+    if (address.length < 2 || address.length > 200 || !/[\uac00-\ud7a3]/.test(address)) {
       setAlertFieldError(FIELD_MESSAGES.address);
       haptic('error');
       return;
@@ -1432,7 +1408,6 @@
       ev.preventDefault();
       submitCompose();
     });
-    el.composeCancel.addEventListener('click', cancelCompose);
     el.composeBody.addEventListener('input', updateBodyCount);
     bindPhoneFormatting(el.composeContact);
 

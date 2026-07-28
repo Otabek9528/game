@@ -109,7 +109,7 @@ body {
   max-width: 680px;
   margin: 0 auto;
   box-sizing: border-box;
-  padding: 18px 16px calc(104px + var(--hs-safe-b));
+  padding: 10px 16px calc(104px + var(--hs-safe-b));
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -229,7 +229,7 @@ body {
    SEARCH
    ========================================================= */
 
-.hs-search { padding: 4px 0 0; }
+.hs-search { padding: 8px 0 0; }
 
 .hs-search__row {
   display: flex;
@@ -266,6 +266,67 @@ body {
   font-size: 0.85rem;
   line-height: 1.55;
   color: var(--hs-muted);
+}
+
+
+/* =========================================================
+   PAGE HEADER — icon chip + title + one-line purpose
+   ========================================================= */
+
+.hs-pagehead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 10px 0 16px;
+}
+
+.hs-pagehead__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  border-radius: 12px;
+  background: var(--hs-accent-soft);
+  color: var(--hs-accent-deep);
+}
+
+.hs-pagehead__icon svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hs-pagehead__text { flex: 1; min-width: 0; }
+
+.hs-pagehead__title {
+  font-size: 1.16rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--hs-text);
+  margin: 0;
+}
+
+.hs-pagehead__sub {
+  margin: 3px 0 0;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--hs-muted);
+}
+
+.hs-pagehead__count {
+  flex-shrink: 0;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 
@@ -517,14 +578,6 @@ body {
    ALERTS SCREEN
    ========================================================= */
 
-.hs-intro {
-  margin: -6px 0 20px;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: var(--hs-text-2);
-  max-width: 36em;
-}
-
 .hs-form--tight {
   gap: 18px;
   padding: 18px;
@@ -626,6 +679,8 @@ body {
 .hs-btn--block { width: 100%; }
 
 .hs-btn--sm { min-height: var(--hs-tap); padding: 9px 14px; font-size: 0.86rem; }
+
+.hs-btn--lg { min-height: 52px; font-size: 1rem; margin-top: 4px; }
 
 .hs-btn[disabled] { opacity: 0.5; pointer-events: none; }
 
