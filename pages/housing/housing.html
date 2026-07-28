@@ -54,18 +54,6 @@
   <div class="hs-shell" id="hsShell">
 
     <!-- =========================================================
-         VIEW SWITCHER
-         ========================================================= -->
-    <nav class="hs-nav" id="hsNav" aria-label="Bo'limlar">
-      <button type="button" class="hs-nav__btn hs-nav__btn--active" id="hsNavBrowse"
-              data-target="browse" aria-current="page">E'lonlar</button>
-      <button type="button" class="hs-nav__btn" id="hsNavMine"
-              data-target="mine">Mening e'lonlarim</button>
-      <button type="button" class="hs-nav__btn" id="hsNavAlerts"
-              data-target="alerts">Bildirishnomalar</button>
-    </nav>
-
-    <!-- =========================================================
          VIEW: BROWSE
          ========================================================= -->
     <section class="hs-view" id="hsViewBrowse" data-view="browse">
@@ -420,14 +408,56 @@
   </div>
 
   <!-- =========================================================
-       FALLBACK PRIMARY ACTION
-       Only when Telegram.WebApp.MainButton is unavailable.
+       BOTTOM TAB BAR
+       Three destinations plus the primary action. Hidden while
+       composing, where Telegram's MainButton takes over.
        ========================================================= -->
-  <div class="hs-fab" id="hsFallbackAction" hidden>
-    <button type="button" class="hs-btn hs-btn--solid hs-btn--block" id="hsFallbackBtn">
-      E'lon joylash
-    </button>
-  </div>
+  <nav class="hs-tabbar" id="hsTabbar" aria-label="Bo'limlar">
+    <div class="hs-tabbar__inner">
+
+      <button type="button" class="hs-tab hs-tab--active" id="hsNavBrowse"
+              data-target="browse" aria-current="page">
+        <span class="hs-tab__icon">
+          <svg viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+            <path d="M4 6.5h.9M4 11h.9M4 15.5h.9" />
+            <path d="M8.2 6.5H18M8.2 11H18M8.2 15.5h6.4" />
+          </svg>
+        </span>
+        <span class="hs-tab__label">E'lonlar</span>
+      </button>
+
+      <button type="button" class="hs-tab" id="hsNavMine" data-target="mine">
+        <span class="hs-tab__icon">
+          <svg viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+            <circle cx="11" cy="7.6" r="3.3" />
+            <path d="M4.6 18.2c.7-3.3 3.4-5 6.4-5s5.7 1.7 6.4 5" />
+          </svg>
+        </span>
+        <span class="hs-tab__label">E'lonlarim</span>
+      </button>
+
+      <button type="button" class="hs-tab" id="hsNavAlerts" data-target="alerts">
+        <span class="hs-tab__icon">
+          <svg viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+            <path d="M11 3.4a5 5 0 0 0-5 5c0 4.3-1.6 5.6-1.6 5.6h13.2S16 12.7 16 8.4a5 5 0 0 0-5-5z" />
+            <path d="M9.3 16.8a1.95 1.95 0 0 0 3.4 0" />
+          </svg>
+        </span>
+        <span class="hs-tab__label">Xabarlar</span>
+      </button>
+
+      <button type="button" class="hs-tab hs-tab--action" id="hsNavCompose"
+              data-target="compose">
+        <span class="hs-tab__icon hs-tab__icon--filled">
+          <svg viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+            <path d="M11 5.4v11.2M5.4 11h11.2" />
+          </svg>
+        </span>
+        <span class="hs-tab__label">Joylash</span>
+      </button>
+
+    </div>
+  </nav>
 
   <!-- =========================================================
        DETAIL SHEET

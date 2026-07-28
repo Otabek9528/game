@@ -95,8 +95,8 @@
     composeSubmit: $('hsComposeSubmit'),
     composeCancel: $('hsComposeCancel'),
 
-    fab: $('hsFallbackAction'),
-    fabBtn: $('hsFallbackBtn'),
+    tabbar: $('hsTabbar'),
+    navCompose: $('hsNavCompose'),
 
     backdrop: $('hsSheetBackdrop'),
     sheet: $('hsSheet'),
@@ -319,6 +319,8 @@
     alerts: el.navAlerts
   };
 
+  var ACTIVE_TAB = 'hs-tab--active';
+
   /* ---------------------------------------------------------
      Routing
 
@@ -329,11 +331,19 @@
      the page the user arrived from.
      --------------------------------------------------------- */
 
+  function routeDepth() {
+    try {
+      return (history.state && typeof history.state.d === 'number') ? history.state.d : 0;
+    } catch (e) { return 0; }
+  }
+
   function pushRoute(route) {
+    route.d = routeDepth() + 1;
     try { history.pushState(route, ''); } catch (e) {}
   }
 
   function replaceRoute(route) {
+    route.d = routeDepth();
     try { history.replaceState(route, ''); } catch (e) {}
   }
 
@@ -384,14 +394,13 @@
     Object.keys(NAV).forEach(function (key) {
       if (!NAV[key]) return;
       var active = (key === name);
-      NAV[key].classList.toggle('hs-nav__btn--active', active);
+      NAV[key].classList.toggle(ACTIVE_TAB, active);
       if (active) NAV[key].setAttribute('aria-current', 'page');
       else NAV[key].removeAttribute('aria-current');
     });
-    // The nav has no tab for compose; keep browse highlighted there.
-    if (name === 'compose' && el.navBrowse) {
-      el.navBrowse.classList.remove('hs-nav__btn--active');
-    }
+    // The tab bar is navigation; it steps aside while a form is open so the
+    // submit action is the only thing at the bottom of the screen.
+    if (el.tabbar) el.tabbar.hidden = (name === 'compose');
     if (el.shell) el.shell.scrollTop = 0;
     syncMainButton();
     syncBackButton();
@@ -409,43 +418,45 @@
       && tg.platform && tg.platform !== 'unknown');
   }
 
+  /* Posting is now a tab, so MainButton has exactly one job: submitting the
+     compose form. Everywhere else it stays hidden — two primary actions at the
+     bottom of the same screen is one too many. */
   function syncMainButton() {
+    var onCompose = (state.view === 'compose' && !state.sheetPostId);
+
     if (!mainButtonAvailable()) {
-      // Desktop browser or an old client: use the in-page bar instead.
-      if (el.fab) el.fab.hidden = (state.view === 'compose' || state.view === 'alerts');
-      if (el.composeSubmit) el.composeSubmit.hidden = (state.view !== 'compose');
+      if (el.composeSubmit) el.composeSubmit.hidden = !onCompose;
       return;
     }
-    hide(el.fab);
     hide(el.composeSubmit);
 
     var mb = tg.MainButton;
-    if (state.sheetPostId) { mb.hide(); return; }
+    if (!onCompose) { mb.hide(); return; }
 
-    if (state.view === 'compose') {
-      mb.setParams({
-        text: state.composeMode === 'edit' ? 'O\u02bbzgarishlarni saqlash' : 'E\u02bblonni joylash',
-        is_active: true,
-        is_visible: true
-      });
-    } else if (state.view === 'browse' || state.view === 'mine') {
-      mb.setParams({ text: 'E\u02bblon joylash', is_active: true, is_visible: true });
-    } else if (state.view === 'alerts') {
-      // The alerts screen has its own in-page submit; MainButton would compete.
-      mb.hide();
-    } else {
-      mb.hide();
-    }
+    mb.setParams({
+      text: state.composeMode === 'edit' ? 'O\u02bbzgarishlarni saqlash' : 'E\u02bblonni joylash',
+      is_active: true,
+      is_visible: true
+    });
   }
 
+  /* Kept visible even at the board root. On Android, Telegram routes the
+     hardware back gesture to BackButton only while it is shown — hide it and
+     the phone's back closes the whole Mini App instead of returning to the
+     home screen. */
   function syncBackButton() {
     if (!tg || !tg.BackButton) return;
-    if (state.sheetPostId || state.view !== 'browse') tg.BackButton.show();
-    else tg.BackButton.hide();
+    try { tg.BackButton.show(); } catch (e) {}
   }
 
   // Telegram's back arrow and the phone's back gesture both land here.
-  function onBack() { history.back(); }
+  function onBack() {
+    // Depth 0 is the board itself. Going "back" from there means leaving the
+    // feature — done explicitly rather than through history, so it also works
+    // when the Mini App was launched straight into this page.
+    if (routeDepth() > 0) history.back();
+    else window.location.href = '../../index.html';
+  }
 
   function applyViewportHeight() {
     var h = (tg && tg.viewportStableHeight) ? tg.viewportStableHeight : window.innerHeight;
@@ -1249,6 +1260,12 @@
         navigate({ v: 'alerts', sheet: null });
       });
     }
+    if (el.navCompose) {
+      el.navCompose.addEventListener('click', function () {
+        haptic('light');
+        openCompose('create');
+      });
+    }
 
     el.searchForm.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -1308,7 +1325,6 @@
     });
     el.composeCancel.addEventListener('click', cancelCompose);
     el.composeBody.addEventListener('input', updateBodyCount);
-    if (el.fabBtn) el.fabBtn.addEventListener('click', onMainButton);
 
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape' && state.sheetPostId) closeSheet();

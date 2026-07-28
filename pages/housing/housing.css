@@ -109,7 +109,7 @@ body {
   max-width: 680px;
   margin: 0 auto;
   box-sizing: border-box;
-  padding: 0 16px calc(100px + var(--hs-safe-b));
+  padding: 18px 16px calc(104px + var(--hs-safe-b));
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -133,43 +133,103 @@ body {
 
 
 /* =========================================================
-   VIEW SWITCHER
+   BOTTOM TAB BAR
+
+   Four equal columns: three destinations and the primary
+   action. The action is the only filled element in the bar,
+   so it reads as "do" rather than "go" without needing a
+   second accent colour or a floating button on top of it.
    ========================================================= */
 
-.hs-nav {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 18px 0 0;
-}
-
-.hs-nav__btn {
-  min-height: var(--hs-tap);
-  padding: 10px 16px;
-  border: 1px solid var(--hs-line);
-  border-radius: var(--hs-r-pill);
+.hs-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  padding: 6px 8px calc(6px + var(--hs-safe-b));
   background: var(--hs-surface);
-  color: var(--hs-text-2);
-  font-family: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 160ms var(--hs-ease), border-color 160ms var(--hs-ease),
-              color 160ms var(--hs-ease);
+  border-top: 1px solid var(--hs-line);
 }
 
-.hs-nav__btn--active {
-  background: var(--hs-accent-soft);
-  border-color: var(--hs-accent);
-  color: var(--hs-accent-deep);
+.hs-tabbar__inner {
+  display: flex;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
 }
+
+.hs-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 54px;
+  padding: 5px 2px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--hs-muted);
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hs-tab__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 26px;
+  border-radius: var(--hs-r-pill);
+  transition: background 180ms var(--hs-ease), color 180ms var(--hs-ease);
+}
+
+.hs-tab svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hs-tab__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hs-tab--active { color: var(--hs-accent-deep); }
+.hs-tab--active .hs-tab__icon { background: var(--hs-accent-soft); }
+
+.hs-tab--action { color: var(--hs-accent-deep); }
+
+.hs-tab__icon--filled {
+  background: var(--hs-accent);
+  color: var(--hs-on-accent);
+}
+
+.hs-tab--action:active .hs-tab__icon--filled { background: var(--hs-accent-deep); }
+
+/* The action tab never takes the "current page" treatment — it opens a
+   form, it is not a destination you sit on. */
+.hs-tab--action.hs-tab--active .hs-tab__icon { background: var(--hs-accent); }
 
 
 /* =========================================================
    SEARCH
    ========================================================= */
 
-.hs-search { padding: 22px 0 0; }
+.hs-search { padding: 4px 0 0; }
 
 .hs-search__row {
   display: flex;
@@ -729,24 +789,6 @@ body {
 
 
 /* =========================================================
-   FALLBACK PRIMARY ACTION
-   ========================================================= */
-
-.hs-fab {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  padding: 12px 16px calc(12px + var(--hs-safe-b));
-  background: var(--hs-bg);
-  border-top: 1px solid var(--hs-line);
-}
-
-.hs-fab > .hs-btn { max-width: 648px; margin: 0 auto; }
-
-
-/* =========================================================
    DETAIL SHEET
    The one place elevation is used, because it means
    "this is above the page".
@@ -921,7 +963,7 @@ body {
   position: fixed;
   left: 16px;
   right: 16px;
-  bottom: calc(92px + var(--hs-safe-b));
+  bottom: calc(100px + var(--hs-safe-b));
   z-index: 60;
   max-width: 648px;
   margin: 0 auto;
@@ -947,7 +989,7 @@ body {
 .hs-btn:focus-visible,
 .hs-input:focus-visible,
 .hs-origin:focus-visible,
-.hs-nav__btn:focus-visible,
+.hs-tab:focus-visible,
 .hs-radius__btn:focus-visible,
 .hs-contact__phone:focus-visible {
   outline: 2px solid var(--hs-accent);
@@ -971,6 +1013,9 @@ body {
 
 @media (max-width: 380px) {
   .hs-shell { padding-left: 13px; padding-right: 13px; }
+  .hs-tab { font-size: 0.66rem; }
+  .hs-tab__icon { width: 36px; }
+  .hs-tabbar { padding-left: 4px; padding-right: 4px; }
   .hs-card, .hs-skel-card { padding: 16px; }
   .hs-card__addr { font-size: 1.04rem; }
   .hs-dist { padding: 4px 9px; }
