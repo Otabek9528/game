@@ -7,26 +7,33 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="housing.css" />
 
   <script>
     // Repo convention: night mode is a class on documentElement, read before paint.
+    // Phase 4 seeds localStorage from Telegram.WebApp.colorScheme on first visit;
+    // after that localStorage wins.
     if (localStorage.getItem('theme') === 'night') {
       document.documentElement.classList.add('night-mode');
     }
   </script>
 
   <!--
-    First paint shows the skeleton, not demo cards: housing.js calls
-    loadPosts(true) on boot, which keeps the skeleton up until the first
-    page lands and hides it on error. Nothing flashes and disappears.
+    STANDALONE REVIEW NOTES (Phase 3, final)
 
-    To preview the other async states, remove `hidden` from any of:
-      #hsEmpty  #hsGeoError  #hsError
-    ...and add `hidden` to #hsSkeleton.
+    Three sample posts are hardcoded in #hsList and marked data-demo="1";
+    housing.js clears the list before its first render, so they disappear
+    once JS exists.
+
+    To preview the async states, remove `hidden` from any of:
+      #hsSkeleton  #hsEmpty  #hsGeoError  #hsError
+    ...and add `hidden` to #hsList so they aren't stacked.
+
+    Sample 1 shows the distance-mode treatment (.hs-card--distance). In the
+    real app every card in a list shares one mode.
 
     Every value on a card comes straight from the API: address, distance,
     relative time, body preview, has_contact. Nothing is derived or parsed.
@@ -62,50 +69,35 @@
          ========================================================= -->
     <section class="hs-view" id="hsViewBrowse" data-view="browse">
 
-      <!-- Sticky so search is reachable from anywhere in the list, not only
-           from the top of it. -->
-      <div class="hs-searchbar" id="hsSearchBar">
-        <form class="hs-search" id="hsSearchForm" autocomplete="off" novalidate>
-          <label class="hs-sr" for="hsAddressInput">Manzil bo'yicha izlash</label>
-          <div class="hs-search__row">
-            <span class="hs-inputwrap hs-search__field">
-              <svg class="hs-inputwrap__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                <circle cx="9" cy="9" r="5.6" />
-                <path d="M13.2 13.2 17 17" />
-              </svg>
-              <input type="search" class="hs-input hs-input--icon hs-search__input" id="hsAddressInput"
-                     name="address" placeholder="서울특별시 관악구 신림동"
-                     enterkeyhint="search" inputmode="text" />
-            </span>
-            <button type="submit" class="hs-btn hs-btn--soft hs-search__go" id="hsSearchBtn">
-              Izlash
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <p class="hs-search__hint" id="hsSearchHint">
-        Koreys tilida manzil yozsangiz, e'lonlar shu joyga yaqinligi bo'yicha saralanadi.
-      </p>
+      <form class="hs-search" id="hsSearchForm" autocomplete="off" novalidate>
+        <label class="hs-label" for="hsAddressInput">Manzil bo'yicha izlash</label>
+        <div class="hs-search__row">
+          <input type="search" class="hs-input hs-search__input" id="hsAddressInput"
+                 name="address" placeholder="서울특별시 관악구 신림동"
+                 enterkeyhint="search" inputmode="text" />
+          <button type="submit" class="hs-btn hs-btn--solid hs-search__go" id="hsSearchBtn">
+            Izlash
+          </button>
+        </div>
+        <p class="hs-search__hint" id="hsSearchHint">
+          Koreys tilida manzil yozsangiz, e'lonlar shu joyga yaqinligi bo'yicha saralanadi.
+        </p>
+      </form>
 
       <!-- ---- Which sort mode is running ---- -->
       <div class="hs-mode" id="hsModeBar">
         <h2 class="hs-mode__title" id="hsSortLabel">Eng yangi e'lonlar</h2>
-        <span class="hs-mode__count" id="hsBoardCount"></span>
+        <span class="hs-mode__count" id="hsBoardCount">3 ta</span>
       </div>
 
       <button type="button" class="hs-origin" id="hsModeChip" hidden>
-        <svg class="hs-origin__pin" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M8 1.6c-2.4 0-4.3 1.9-4.3 4.3 0 3.2 4.3 8.5 4.3 8.5s4.3-5.3 4.3-8.5c0-2.4-1.9-4.3-4.3-4.3z" />
-          <circle cx="8" cy="5.9" r="1.6" />
-        </svg>
         <span class="hs-origin__text" id="hsModeChipText">서울특별시 관악구 신림동</span>
         <span class="hs-origin__clear" id="hsModeChipClear"
               aria-label="Manzil bo'yicha izlashni bekor qilish">Bekor qilish</span>
       </button>
 
       <!-- ---- Loading skeleton ---- -->
-      <div class="hs-skeleton" id="hsSkeleton" aria-hidden="true">
+      <div class="hs-skeleton" id="hsSkeleton" hidden aria-hidden="true">
         <div class="hs-skel-card">
           <div class="hs-skel hs-skel--eyebrow"></div>
           <div class="hs-skel hs-skel--title"></div>
@@ -131,7 +123,103 @@
       </div>
 
       <!-- ---- Post list ---- -->
-      <div class="hs-list" id="hsList"></div>
+      <div class="hs-list" id="hsList">
+
+        <!-- ===== SAMPLE 1 — long Korean address, distance mode, new ===== -->
+        <article class="hs-card hs-card--distance" data-demo="1" data-post-id="101"
+                 tabindex="0" role="button">
+          <div class="hs-card__head">
+            <div class="hs-card__addr-wrap">
+              <p class="hs-card__region" data-field="region">서울특별시 · 관악구</p>
+              <h3 class="hs-card__addr" data-field="address">신림동 1522-27 그린빌라 302호</h3>
+            </div>
+            <span class="hs-dist" data-field="distance-wrap">
+              <span class="hs-dist__num" data-field="distance">1.4</span>
+              <span class="hs-dist__unit">km</span>
+            </span>
+          </div>
+
+          <p class="hs-card__body" data-field="preview">Bir xonali kvartira, oyiga 500,000 won,
+            depozit 5,000,000 won. Iyul oyining oxiridan boshlab, kamida olti oyga.
+            Kommunal to'lovlar alohida, taxminan 60,000 won. Uy jihozlangan: muzlatgich,
+            kir yuvish mashinasi, konditsioner bor. Metro bekatiga piyoda yetti daqiqa.</p>
+
+          <div class="hs-card__foot">
+            <span class="hs-card__time" data-field="time">2 soat oldin</span>
+            <span class="hs-badge hs-badge--new" data-field="new-badge">Yangi</span>
+            <span class="hs-badge hs-badge--mine" data-field="mine-badge" hidden>Sizniki</span>
+            <span class="hs-card__cta" data-field="cta">
+              Raqamni ko'rish
+              <svg class="hs-card__chev" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor"
+                      stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </article>
+
+        <!-- ===== SAMPLE 2 — long Uzbek body, no distance ===== -->
+        <article class="hs-card" data-demo="1" data-post-id="102" tabindex="0" role="button">
+          <div class="hs-card__head">
+            <div class="hs-card__addr-wrap">
+              <p class="hs-card__region" data-field="region">경기도 · 안산시 단원구</p>
+              <h3 class="hs-card__addr" data-field="address">고잔동 720-3 대우아파트 105동 1104호</h3>
+            </div>
+            <span class="hs-dist" data-field="distance-wrap" hidden>
+              <span class="hs-dist__num" data-field="distance"></span>
+              <span class="hs-dist__unit">km</span>
+            </span>
+          </div>
+
+          <p class="hs-card__body" data-field="preview">Kontraktim yana to'rt oy davom etadi,
+            lekin ishim boshqa shaharga ko'chgani uchun chiqib ketishim kerak bo'lyapti.
+            Uy egasi depozitni faqat yangi ijarachi topilgandan keyin qaytaradi, shuning uchun
+            o'rnimga kirishga tayyor odam qidiryapman. Oyiga 450,000 won, depozit 3,000,000 won.
+            Uch xonali, ikki kishi bemalol sig'adi. Yaqin atrofda o'zbek do'koni va masjid bor,
+            avtobus bekati uydan ikki daqiqalik masofada.</p>
+
+          <div class="hs-card__foot">
+            <span class="hs-card__time" data-field="time">2 kun oldin</span>
+            <span class="hs-badge hs-badge--new" data-field="new-badge" hidden>Yangi</span>
+            <span class="hs-badge hs-badge--mine" data-field="mine-badge" hidden>Sizniki</span>
+            <span class="hs-card__cta" data-field="cta">
+              Raqamni ko'rish
+              <svg class="hs-card__chev" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor"
+                      stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </article>
+
+        <!-- ===== SAMPLE 3 — no contact (defensive: the API requires one) ===== -->
+        <article class="hs-card" data-demo="1" data-post-id="103" data-no-contact="1"
+                 tabindex="0" role="button">
+          <div class="hs-card__head">
+            <div class="hs-card__addr-wrap">
+              <p class="hs-card__region" data-field="region">부산광역시 · 해운대구</p>
+              <h3 class="hs-card__addr" data-field="address">우동 1413</h3>
+            </div>
+            <span class="hs-dist" data-field="distance-wrap" hidden>
+              <span class="hs-dist__num" data-field="distance"></span>
+              <span class="hs-dist__unit">km</span>
+            </span>
+          </div>
+
+          <p class="hs-card__body" data-field="preview">Rent-partner qidiryapman. Oyiga
+            300,000 won, kommunal alohida.</p>
+
+          <div class="hs-card__foot">
+            <span class="hs-card__time" data-field="time">3 hafta oldin</span>
+            <span class="hs-badge hs-badge--new" data-field="new-badge" hidden>Yangi</span>
+            <span class="hs-badge hs-badge--mine" data-field="mine-badge" hidden>Sizniki</span>
+            <span class="hs-card__cta hs-card__cta--muted" data-field="cta">
+              Aloqa ma'lumoti yo'q
+            </span>
+          </div>
+        </article>
+
+      </div>
 
       <!-- ---- Pagination ---- -->
       <div class="hs-more" id="hsMore" hidden>
@@ -144,27 +232,13 @@
 
       <!-- ---- Empty ---- -->
       <div class="hs-state" id="hsEmpty" hidden>
-        <span class="hs-state__icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M3.6 10.4 12 4l8.4 6.4" />
-            <path d="M5.6 12v7.2h12.8V12" />
-            <path d="M10 19.2v-4.4h4v4.4" />
-          </svg>
-        </span>
         <p class="hs-state__title">Hozircha e'lon yo'q</p>
         <p class="hs-state__text">Birinchi bo'lib e'lon joylang — buning uchun pastdagi
           «Joylash» tugmasini bosing.</p>
-        <button type="button" class="hs-btn hs-btn--solid" id="hsEmptyCta">E'lon joylash</button>
       </div>
 
       <!-- ---- Geocoding failed ---- -->
       <div class="hs-state hs-state--warn" id="hsGeoError" hidden>
-        <span class="hs-state__icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 2.6c-3.5 0-6.4 2.9-6.4 6.4 0 4.8 6.4 12.4 6.4 12.4s6.4-7.6 6.4-12.4c0-3.5-2.9-6.4-6.4-6.4z" />
-            <path d="M12 6.4v3.6M12 12.8v.1" />
-          </svg>
-        </span>
         <p class="hs-state__title">Manzil topilmadi</p>
         <p class="hs-state__text">Manzilni koreys tilida, to'liqroq yozib ko'ring:</p>
         <p class="hs-state__example">서울특별시 관악구 신림동 1522-27</p>
@@ -173,14 +247,6 @@
 
       <!-- ---- Request error ---- -->
       <div class="hs-state hs-state--error" id="hsError" hidden>
-        <span class="hs-state__icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M3 8.4a13 13 0 0 1 18 0" />
-            <path d="M6.6 12.2a8 8 0 0 1 10.8 0" />
-            <path d="M10 15.9a3 3 0 0 1 4 0" />
-            <path d="M12 19.4v.1" />
-          </svg>
-        </span>
         <p class="hs-state__title">E'lonlarni yuklab bo'lmadi</p>
         <p class="hs-state__text">Internet aloqasini tekshiring va qayta urinib ko'ring.</p>
         <button type="button" class="hs-btn hs-btn--ghost" id="hsErrorRetry">Qayta urinish</button>
@@ -193,19 +259,12 @@
          ========================================================= -->
     <section class="hs-view" id="hsViewMine" data-view="mine" hidden>
       <div class="hs-pagehead">
-        <span class="hs-pagehead__icon">
-          <svg viewBox="0 0 22 22" aria-hidden="true" focusable="false">
-            <circle cx="11" cy="7.6" r="3.3" />
-            <path d="M4.6 18.2c.7-3.3 3.4-5 6.4-5s5.7 1.7 6.4 5" />
-          </svg>
-        </span>
+        <span class="hs-pagehead__icon"><svg viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="7.6" r="3.3" /><path d="M4.6 18.2c.7-3.3 3.4-5 6.4-5s5.7 1.7 6.4 5" /></svg></span>
         <div class="hs-pagehead__text">
-          <div class="hs-pagehead__row">
-            <h2 class="hs-pagehead__title">Mening e'lonlarim</h2>
-            <span class="hs-pagehead__count" id="hsMineCount"></span>
-          </div>
+          <h2 class="hs-pagehead__title">Mening e'lonlarim</h2>
           <p class="hs-pagehead__sub">E'lonlar 30 kundan keyin bazadan o'chiriladi. Muddatni tugashidan oldin shu yerdan uzaytiring</p>
         </div>
+        <span class="hs-pagehead__count" id="hsMineCount"></span>
       </div>
 
       <div class="hs-skeleton" id="hsMineSkeleton" hidden aria-hidden="true">
@@ -226,27 +285,11 @@
       <div class="hs-list" id="hsMineList"></div>
 
       <div class="hs-state" id="hsMineEmpty" hidden>
-        <span class="hs-state__icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M5.4 4.6h9.2l4 4v10.8H5.4z" />
-            <path d="M14.2 4.6v4.4h4.2" />
-            <path d="M9 13.4h6M9 16.4h4" />
-          </svg>
-        </span>
         <p class="hs-state__title">Sizda e'lon yo'q</p>
         <p class="hs-state__text">Joylagan e'lonlaringiz shu yerda ko'rinadi.</p>
-        <button type="button" class="hs-btn hs-btn--solid" id="hsMineEmptyCta">E'lon joylash</button>
       </div>
 
       <div class="hs-state hs-state--error" id="hsMineError" hidden>
-        <span class="hs-state__icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M3 8.4a13 13 0 0 1 18 0" />
-            <path d="M6.6 12.2a8 8 0 0 1 10.8 0" />
-            <path d="M10 15.9a3 3 0 0 1 4 0" />
-            <path d="M12 19.4v.1" />
-          </svg>
-        </span>
         <p class="hs-state__title">Yuklab bo'lmadi</p>
         <p class="hs-state__text">Qayta urinib ko'ring.</p>
         <button type="button" class="hs-btn hs-btn--ghost" id="hsMineRetry">Qayta urinish</button>
@@ -258,15 +301,9 @@
          ========================================================= -->
     <section class="hs-view" id="hsViewCompose" data-view="compose" hidden>
       <div class="hs-pagehead">
-        <span class="hs-pagehead__icon">
-          <svg viewBox="0 0 22 22" aria-hidden="true" focusable="false">
-            <path d="M11 5.4v11.2M5.4 11h11.2" />
-          </svg>
-        </span>
+        <span class="hs-pagehead__icon"><svg viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 5.4v11.2M5.4 11h11.2" /></svg></span>
         <div class="hs-pagehead__text">
-          <div class="hs-pagehead__row">
-            <h2 class="hs-pagehead__title" id="hsComposeTitle">Yangi e'lon</h2>
-          </div>
+          <h2 class="hs-pagehead__title" id="hsComposeTitle">Yangi e'lon</h2>
           <p class="hs-pagehead__sub">Manzil, telefon raqami va qisqa tavsif kifoya</p>
         </div>
       </div>
@@ -275,86 +312,60 @@
 
         <div class="hs-form__card">
 
-          <div class="hs-field" id="hsComposeAddressRow">
-            <label class="hs-label" for="hsComposeAddress">
-              Manzil <span class="hs-label__req">majburiy</span>
+        <div class="hs-field" id="hsComposeAddressRow">
+          <label class="hs-label" for="hsComposeAddress">Manzil</label>
+          <input type="text" class="hs-input" id="hsComposeAddress" name="address"
+                 placeholder="서울특별시 관악구 신림동 1522-27" />
+          <p class="hs-field__hint" id="hsComposeAddressHint">
+            Koreys tilida yozing. Manzil keyin o'zgartirilmaydi.
+          </p>
+          <p class="hs-field__lock" id="hsComposeAddressLock" hidden>
+            Manzilni o'zgartirib bo'lmaydi. Xato bo'lsa, e'lonni o'chirib, yangisini joylang.
+          </p>
+          <p class="hs-field__err" data-error-for="address" hidden></p>
+        </div>
+
+        <div class="hs-field">
+          <label class="hs-label" for="hsComposeContact">Bog'lanish uchun telefon raqam</label>
+          <input type="tel" class="hs-input" id="hsComposeContact" name="contact"
+                 placeholder="010-1234-5678" inputmode="tel" />
+          <p class="hs-field__hint">Telefon raqami yoki Telegram — kamida bittasi
+            ko'rsatilishi shart.</p>
+          <p class="hs-field__err" data-error-for="contact" hidden></p>
+
+          <div class="hs-tg" id="hsTgRow">
+            <label class="hs-tg__main" for="hsTgCheck">
+              <input type="checkbox" id="hsTgCheck" class="hs-tg__box" />
+              <span class="hs-tg__title">Telegram orqali bog'lanish</span>
             </label>
-            <span class="hs-inputwrap">
-              <svg class="hs-inputwrap__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                <path d="M10 2.2c-2.7 0-4.9 2.2-4.9 4.9 0 3.7 4.9 10.7 4.9 10.7s4.9-7 4.9-10.7c0-2.7-2.2-4.9-4.9-4.9z" />
-                <circle cx="10" cy="7" r="1.8" />
-              </svg>
-              <input type="text" class="hs-input hs-input--icon" id="hsComposeAddress" name="address"
-                     placeholder="서울특별시 관악구 신림동 1522-27" />
-            </span>
-            <p class="hs-field__hint" id="hsComposeAddressHint">
-              Koreys tilida yozing. Manzil keyin o'zgartirilmaydi.
-            </p>
-            <p class="hs-field__lock" id="hsComposeAddressLock" hidden>
-              Manzilni o'zgartirib bo'lmaydi. Xato bo'lsa, e'lonni o'chirib, yangisini joylang.
-            </p>
-            <p class="hs-field__err" data-error-for="address" hidden></p>
-          </div>
 
-          <div class="hs-sep" aria-hidden="true"></div>
-
-          <div class="hs-field">
-            <label class="hs-label" for="hsComposeContact">Bog'lanish uchun telefon raqam</label>
-            <span class="hs-inputwrap">
-              <svg class="hs-inputwrap__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                <path d="M4.4 3.6c-.6.6-.9 1.5-.7 2.3 1 4.5 4.6 8.1 9.1 9.1.8.2 1.7-.1 2.3-.7l1-1c.5-.5.5-1.4-.1-1.9l-1.9-1.4c-.5-.4-1.2-.4-1.7 0l-.7.6a10 10 0 0 1-3.1-3.1l.6-.7c.4-.5.4-1.2 0-1.7L7.8 3.3c-.5-.6-1.4-.6-1.9-.1z" />
-              </svg>
-              <input type="tel" class="hs-input hs-input--icon" id="hsComposeContact" name="contact"
-                     placeholder="010-1234-5678" inputmode="tel" />
-            </span>
-            <p class="hs-field__hint">Telefon raqami yoki Telegram — kamida bittasi
-              ko'rsatilishi shart.</p>
-            <p class="hs-field__err" data-error-for="contact" hidden></p>
-
-            <div class="hs-tg" id="hsTgRow">
-              <label class="hs-tg__main" for="hsTgCheck">
-                <svg class="hs-tg__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <path d="M21.8 4.3 18.9 19c-.2 1-.8 1.2-1.6.8l-4.5-3.3-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.3-7.5c.4-.3-.1-.5-.6-.2L7.4 13 3 11.6c-1-.3-1-1 .2-1.4l17.3-6.7c.8-.3 1.5.2 1.3 1.4z" />
-                </svg>
-                <span class="hs-tg__title">Telegram orqali bog'lanish</span>
-                <input type="checkbox" id="hsTgCheck" class="hs-tg__box" />
-              </label>
-
-              <div class="hs-tg__field" id="hsTgField" hidden>
-                <span class="hs-tg__at">@</span>
-                <input type="text" class="hs-input hs-tg__input" id="hsTgUsername"
-                       placeholder="username" autocapitalize="off" autocorrect="off"
-                       spellcheck="false" inputmode="text" />
-              </div>
-              <p class="hs-tg__hint" id="hsTgHint" hidden>
-                Sizning hisobingiz: <span id="hsTgOwn">—</span>
-              </p>
-              <p class="hs-field__err" data-error-for="contact_username" hidden></p>
+            <div class="hs-tg__field" id="hsTgField" hidden>
+              <span class="hs-tg__at">@</span>
+              <input type="text" class="hs-input hs-tg__input" id="hsTgUsername"
+                     placeholder="username" autocapitalize="off" autocorrect="off"
+                     spellcheck="false" inputmode="text" />
             </div>
+            <p class="hs-field__err" data-error-for="contact_username" hidden></p>
           </div>
+        </div>
 
-          <div class="hs-sep" aria-hidden="true"></div>
-
-          <div class="hs-field">
-            <div class="hs-label-row">
-              <label class="hs-label" for="hsComposeBody">E'lon matni</label>
-              <span class="hs-field__count" id="hsComposeBodyCount">0 / 4000</span>
-            </div>
-            <textarea class="hs-input hs-textarea" id="hsComposeBody" name="body" rows="9"
-                      placeholder="Ijara haqi, depozit, boshlanish sanasi, muddati va boshqa shartlarni yozing. Masalan: oyiga 500,000 won, depozit 5,000,000 won, avgust oyidan boshlab, kamida olti oyga. Kommunal alohida."></textarea>
-            <p class="hs-field__err" data-error-for="body" hidden></p>
+        <div class="hs-field">
+          <label class="hs-label" for="hsComposeBody">E'lon matni</label>
+          <textarea class="hs-input hs-textarea" id="hsComposeBody" name="body" rows="9"
+                    placeholder="Ijara haqi, depozit, boshlanish sanasi, muddati va boshqa shartlarni yozing. Masalan: oyiga 500,000 won, depozit 5,000,000 won, avgust oyidan boshlab, kamida olti oyga. Kommunal alohida."></textarea>
+          <div class="hs-field__foot">
+            <span class="hs-field__count" id="hsComposeBodyCount">0 / 4000</span>
           </div>
+          <p class="hs-field__err" data-error-for="body" hidden></p>
+        </div>
 
         </div>
 
         <p class="hs-form__err" id="hsComposeError" hidden></p>
 
-        <!-- Sticky: a nine-row textarea otherwise pushes the submit off screen. -->
-        <div class="hs-submitbar">
-          <button type="submit" class="hs-btn hs-btn--solid hs-btn--block hs-btn--lg" id="hsComposeSubmit">
-            E'lonni joylash
-          </button>
-        </div>
+        <button type="submit" class="hs-btn hs-btn--solid hs-btn--block hs-btn--lg" id="hsComposeSubmit">
+          E'lonni joylash
+        </button>
       </form>
     </section>
 
@@ -363,33 +374,20 @@
          ========================================================= -->
     <section class="hs-view" id="hsViewAlerts" data-view="alerts" hidden>
       <div class="hs-pagehead">
-        <span class="hs-pagehead__icon">
-          <svg viewBox="0 0 22 22" aria-hidden="true" focusable="false">
-            <path d="M11 3.4a5 5 0 0 0-5 5c0 4.3-1.6 5.6-1.6 5.6h13.2S16 12.7 16 8.4a5 5 0 0 0-5-5z" />
-            <path d="M9.3 16.8a1.95 1.95 0 0 0 3.4 0" />
-          </svg>
-        </span>
+        <span class="hs-pagehead__icon"><svg viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3.4a5 5 0 0 0-5 5c0 4.3-1.6 5.6-1.6 5.6h13.2S16 12.7 16 8.4a5 5 0 0 0-5-5z" /><path d="M9.3 16.8a1.95 1.95 0 0 0 3.4 0" /></svg></span>
         <div class="hs-pagehead__text">
-          <div class="hs-pagehead__row">
-            <h2 class="hs-pagehead__title">Bildirishnomalar</h2>
-            <span class="hs-pagehead__count" id="hsAlertCount"></span>
-          </div>
+          <h2 class="hs-pagehead__title">Bildirishnomalar</h2>
           <p class="hs-pagehead__sub">Manzilni va qidiruv radiusini kiriting. Shu radius ichida yangi e'lon qo'yilsa, bot darhol
             xabar yuboradi</p>
         </div>
+        <span class="hs-pagehead__count" id="hsAlertCount"></span>
       </div>
 
       <form class="hs-form hs-form--tight" id="hsAlertForm" autocomplete="off" novalidate>
         <div class="hs-field">
           <label class="hs-label" for="hsAlertAddress">Manzil</label>
-          <span class="hs-inputwrap">
-            <svg class="hs-inputwrap__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-              <path d="M10 2.2c-2.7 0-4.9 2.2-4.9 4.9 0 3.7 4.9 10.7 4.9 10.7s4.9-7 4.9-10.7c0-2.7-2.2-4.9-4.9-4.9z" />
-              <circle cx="10" cy="7" r="1.8" />
-            </svg>
-            <input type="text" class="hs-input hs-input--icon" id="hsAlertAddress"
-                   placeholder="서울특별시 관악구 신림동" />
-          </span>
+          <input type="text" class="hs-input" id="hsAlertAddress"
+                 placeholder="서울특별시 관악구 신림동" />
           <p class="hs-field__err" data-error-for="alert-address" hidden></p>
         </div>
 
@@ -442,27 +440,12 @@
       <div class="hs-list" id="hsAlertList"></div>
 
       <div class="hs-state" id="hsAlertEmpty" hidden>
-        <span class="hs-state__icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 3.4a5.6 5.6 0 0 0-5.6 5.6c0 4.8-1.8 6.2-1.8 6.2h14.8s-1.8-1.4-1.8-6.2A5.6 5.6 0 0 0 12 3.4z" />
-            <path d="M10.1 18.2a2.2 2.2 0 0 0 3.8 0" />
-          </svg>
-        </span>
         <p class="hs-state__title">Hozircha bildirishnoma yo'q</p>
         <p class="hs-state__text">Yuqorida manzil yozib, qidiruv radiusini tanlang.
           Istalgancha bildirishnoma qo'shishingiz mumkin.</p>
-        <button type="button" class="hs-btn hs-btn--ghost" id="hsAlertEmptyCta">Manzil kiritish</button>
       </div>
 
       <div class="hs-state hs-state--error" id="hsAlertsError" hidden>
-        <span class="hs-state__icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M3 8.4a13 13 0 0 1 18 0" />
-            <path d="M6.6 12.2a8 8 0 0 1 10.8 0" />
-            <path d="M10 15.9a3 3 0 0 1 4 0" />
-            <path d="M12 19.4v.1" />
-          </svg>
-        </span>
         <p class="hs-state__title">Yuklab bo'lmadi</p>
         <p class="hs-state__text">Qayta urinib ko'ring.</p>
         <button type="button" class="hs-btn hs-btn--ghost" id="hsAlertsRetry">Qayta urinish</button>
@@ -473,7 +456,8 @@
 
   <!-- =========================================================
        BOTTOM TAB BAR
-       Three destinations plus the primary action.
+       Three destinations plus the primary action. Hidden while
+       composing, where Telegram's MainButton takes over.
        ========================================================= -->
   <nav class="hs-tabbar" id="hsTabbar" aria-label="Bo'limlar">
     <div class="hs-tabbar__inner">
@@ -529,15 +513,7 @@
 
   <aside class="hs-sheet" id="hsSheet" hidden role="dialog" aria-modal="true"
          aria-labelledby="hsSheetAddress" data-post-id="">
-
-    <div class="hs-sheet__grab">
-      <span class="hs-sheet__handle" id="hsSheetHandle" aria-hidden="true"></span>
-      <button type="button" class="hs-sheet__x" id="hsSheetClose" aria-label="Yopish">
-        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-          <path d="M5.6 5.6 14.4 14.4M14.4 5.6 5.6 14.4" />
-        </svg>
-      </button>
-    </div>
+    <div class="hs-sheet__handle" id="hsSheetHandle" aria-hidden="true"></div>
 
     <div class="hs-sheet__loading" id="hsSheetLoading" hidden>
       <div class="hs-skel hs-skel--eyebrow"></div>
@@ -568,26 +544,19 @@
         Kommunal to'lovlar alohida, taxminan 60,000 won.</p>
 
       <div class="hs-contact" id="hsSheetContactRow">
-        <div class="hs-crow hs-crow--call" id="hsSheetPhoneRow">
+        <div class="hs-crow" id="hsSheetPhoneRow">
           <a class="hs-crow__main" id="hsSheetCall" href="tel:01012345678">
-            <span class="hs-crow__badge">
-              <svg class="hs-crow__glyph" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                <path d="M4.2 3.4c-.6.6-.9 1.5-.7 2.3 1 4.5 4.6 8.1 9.1 9.1.8.2 1.7-.1 2.3-.7l1-1c.5-.5.5-1.4-.1-1.9l-1.9-1.4c-.5-.4-1.2-.4-1.7 0l-.7.6a10 10 0 0 1-3.1-3.1l.6-.7c.4-.5.4-1.2 0-1.7L7.6 3.1c-.5-.6-1.4-.6-1.9-.1z" />
-              </svg>
-            </span>
-            <span class="hs-crow__text" id="hsSheetCallNum">010-1234-5678</span>
-          </a>
+            <svg class="hs-crow__glyph" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <path d="M4.2 3.4c-.6.6-.9 1.5-.7 2.3 1 4.5 4.6 8.1 9.1 9.1.8.2 1.7-.1 2.3-.7l1-1c.5-.5.5-1.4-.1-1.9l-1.9-1.4c-.5-.4-1.2-.4-1.7 0l-.7.6a10 10 0 0 1-3.1-3.1l.6-.7c.4-.5.4-1.2 0-1.7L7.6 3.1c-.5-.6-1.4-.6-1.9-.1z" />
+            </svg><span class="hs-crow__text" id="hsSheetCallNum">010-1234-5678</span></a>
           <button type="button" class="hs-crow__side" id="hsSheetCopy">Nusxalash</button>
         </div>
 
         <button type="button" class="hs-crow hs-crow--tap" id="hsSheetTelegram" hidden>
           <span class="hs-crow__main">
-            <span class="hs-crow__badge hs-crow__badge--tg">
-              <svg class="hs-crow__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M21.8 4.3 18.9 19c-.2 1-.8 1.2-1.6.8l-4.5-3.3-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.3-7.5c.4-.3-.1-.5-.6-.2L7.4 13 3 11.6c-1-.3-1-1 .2-1.4l17.3-6.7c.8-.3 1.5.2 1.3 1.4z" />
-              </svg>
-            </span>
-            <span class="hs-crow__text" id="hsSheetTelegramLabel">@username</span>
+            <svg class="hs-crow__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M21.8 4.3 18.9 19c-.2 1-.8 1.2-1.6.8l-4.5-3.3-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.3-7.5c.4-.3-.1-.5-.6-.2L7.4 13 3 11.6c-1-.3-1-1 .2-1.4l17.3-6.7c.8-.3 1.5.2 1.3 1.4z" />
+            </svg><span class="hs-crow__text" id="hsSheetTelegramLabel">@username</span>
           </span>
           <svg class="hs-crow__chev" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
             <path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor"
@@ -605,6 +574,8 @@
         <button type="button" class="hs-btn hs-btn--danger" id="hsSheetDelete">O'chirish</button>
       </div>
     </div>
+
+    <button type="button" class="hs-btn hs-btn--ghost hs-btn--block" id="hsSheetClose">Yopish</button>
   </aside>
 
   <!-- =========================================================
