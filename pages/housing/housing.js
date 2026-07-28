@@ -254,20 +254,57 @@
     return raw;
   }
 
-  /* Live formatting while typing. Only touches digit-only input, and only
-     moves the caret when it was already at the end — mid-string edits are
-     left exactly where the user put them. */
+  /* Korean numbers group differently by prefix. 010 is always 3-4-4, so it
+     never reflows mid-typing; Seoul 02 and the older 01x/area codes depend on
+     the final length. */
+  function phoneGroups(d) {
+    if (d.slice(0, 2) === '02') return d.length <= 9 ? [2, 3, 4] : [2, 4, 4];
+    if (d.slice(0, 3) === '010') return [3, 4, 4];
+    return d.length <= 10 ? [3, 3, 4] : [3, 4, 4];
+  }
+
+  /* Partial-friendly: formats whatever digits exist so far, so the dash
+     appears the moment you cross a boundary instead of at the end. */
+  function formatPhoneProgressive(raw) {
+    var d = String(raw || '').replace(/\D/g, '');
+    if (!d) return '';
+    // Longer than any Korean number — probably foreign; leave it alone.
+    if (d.length > 11) return raw;
+
+    var groups = phoneGroups(d);
+    var out = [];
+    var i = 0;
+    for (var k = 0; k < groups.length && i < d.length; k++) {
+      out.push(d.slice(i, i + groups[k]));
+      i += groups[k];
+    }
+    if (i < d.length) out.push(d.slice(i));
+    return out.join('-');
+  }
+
+  /* Live formatting while typing. Only touches digit-only input — KakaoTalk
+     IDs and +82 forms pass through — and restores the caret by digit count,
+     so editing in the middle of the number stays where you put it. */
   function bindPhoneFormatting(input) {
     if (!input) return;
     input.addEventListener('input', function () {
       var v = input.value;
       if (!/^[\d\s-]*$/.test(v)) return;
-      var atEnd = input.selectionStart === v.length;
-      var next = formatPhone(v);
-      if (next !== v && atEnd) {
-        input.value = next;
-        try { input.setSelectionRange(next.length, next.length); } catch (e) {}
+
+      var caret = input.selectionStart;
+      var digitsBefore = (v.slice(0, caret).match(/\d/g) || []).length;
+
+      var next = formatPhoneProgressive(v);
+      if (next === v) return;
+      input.value = next;
+
+      var pos = 0;
+      var seen = 0;
+      while (pos < next.length && seen < digitsBefore) {
+        if (/\d/.test(next.charAt(pos))) seen++;
+        pos++;
       }
+      try { input.setSelectionRange(pos, pos); } catch (e) {}
     });
   }
 
