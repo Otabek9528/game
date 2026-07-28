@@ -138,7 +138,7 @@
       //vegukinShops: { icon: '🛒', labelKey: 'feature.vegukinShops', href: 'pages/vegukinshops/shops.html', isNew: true },
       links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
       donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },      
-      housing: { icon: '🏠', labelKey: 'feature.housing', href: 'pages/housing/housing.html'},
+      events: { icon: '📅', labelKey: 'feature.events', href: 'pages/housing/housing.html'},
       //market: { icon: '🛒', labelKey: 'feature.market', href: '#', comingSoon: true },
       community: { icon: '👥', labelKey: 'feature.community', href: 'pages/community/community.html' }
     };

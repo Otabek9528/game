@@ -454,6 +454,72 @@ body {
 
 
 /* =========================================================
+   ALERTS SCREEN
+   ========================================================= */
+
+.hs-intro {
+  margin: -6px 0 20px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--hs-text-2);
+  max-width: 36em;
+}
+
+.hs-form--tight {
+  gap: 18px;
+  padding: 18px;
+  margin-bottom: 22px;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r);
+  background: var(--hs-surface);
+}
+
+.hs-radius {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hs-radius__btn {
+  flex: 1 1 auto;
+  min-width: 68px;
+  min-height: var(--hs-tap);
+  padding: 10px 12px;
+  border: 1px solid var(--hs-line-strong);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-surface);
+  color: var(--hs-text-2);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: background 150ms var(--hs-ease), border-color 150ms var(--hs-ease),
+              color 150ms var(--hs-ease);
+}
+
+.hs-radius__btn--active {
+  background: var(--hs-accent-soft);
+  border-color: var(--hs-accent);
+  color: var(--hs-accent-deep);
+}
+
+.hs-card--alert { cursor: default; }
+.hs-card--alert:active { background: var(--hs-surface); border-color: var(--hs-line); }
+.hs-card--alert .hs-card__foot { margin-top: 14px; }
+.hs-card--alert .hs-btn { margin-left: auto; }
+
+/* The radius badge reuses the distance treatment but is always shown. */
+.hs-dist--radius {
+  display: inline-flex;
+  background: var(--hs-accent-soft);
+  color: var(--hs-accent-deep);
+}
+
+.hs-card--alert.is-disabled { opacity: 0.62; }
+
+
+/* =========================================================
    BUTTONS
    No fixed widths — Uzbek labels run long.
    ========================================================= */
@@ -882,6 +948,7 @@ body {
 .hs-input:focus-visible,
 .hs-origin:focus-visible,
 .hs-nav__btn:focus-visible,
+.hs-radius__btn:focus-visible,
 .hs-contact__phone:focus-visible {
   outline: 2px solid var(--hs-accent);
   outline-offset: 2px;

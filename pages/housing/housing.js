@@ -118,6 +118,19 @@
     sheetDelete: $('hsSheetDelete'),
     sheetClose: $('hsSheetClose'),
 
+    alertCount: $('hsAlertCount'),
+    alertForm: $('hsAlertForm'),
+    alertAddress: $('hsAlertAddress'),
+    alertRadius: $('hsAlertRadius'),
+    alertSubmit: $('hsAlertSubmit'),
+    alertError: $('hsAlertError'),
+    alertSkeleton: $('hsAlertSkeleton'),
+    alertList: $('hsAlertList'),
+    alertEmpty: $('hsAlertEmpty'),
+    alertsError: $('hsAlertsError'),
+    alertsRetry: $('hsAlertsRetry'),
+    alertTemplate: $('hsAlertTemplate'),
+
     toast: $('hsToast'),
 
     cardTemplate: $('hsCardTemplate'),
@@ -142,7 +155,11 @@
     lastDistances: {},     // post_id -> km, so the sheet can show it
     composeMode: 'create',
     composePostId: null,
-    submitting: false
+    submitting: false,
+    alertRadius: 10,
+    alertSubmitting: false,
+    pendingRefresh: false,
+    geocoding: false
   };
 
   // =========================================================
@@ -302,7 +319,64 @@
     alerts: el.navAlerts
   };
 
-  function setView(name) {
+  /* ---------------------------------------------------------
+     Routing
+
+     Every screen change is a History entry, so the phone's own
+     back gesture and Telegram's back arrow walk the same trail.
+     The entry for the board itself is written with replaceState,
+     which means back from the board leaves for index.html —
+     the page the user arrived from.
+     --------------------------------------------------------- */
+
+  function pushRoute(route) {
+    try { history.pushState(route, ''); } catch (e) {}
+  }
+
+  function replaceRoute(route) {
+    try { history.replaceState(route, ''); } catch (e) {}
+  }
+
+  function navigate(route) {
+    pushRoute(route);
+    applyRoute(route);
+  }
+
+  function applyRoute(route, fromPop) {
+    var target = route || { v: 'browse', sheet: null };
+
+    if (target.sheet) {
+      if (state.sheetPostId !== target.sheet) openSheetUI(target.sheet);
+    } else if (state.sheetPostId) {
+      closeSheetUI();
+    }
+
+    if (state.view !== target.v) applyView(target.v);
+    else { syncMainButton(); syncBackButton(); }
+  }
+
+  /* Some actions finish by unwinding one History entry rather than pushing a
+     new one — submitting a form, deleting a post. Popping keeps the trail
+     clean (no duplicate entries, no back press that appears to do nothing),
+     but the data underneath needs refreshing once we land. */
+  function backAndRefresh() {
+    state.pendingRefresh = true;
+    history.back();
+  }
+
+  function onPopState(ev) {
+    var before = state.view;
+    applyRoute(ev.state, true);
+    if (!state.pendingRefresh) return;
+    state.pendingRefresh = false;
+    if (state.sheetPostId) return;               // the sheet refetches itself
+    if (before !== state.view) return;           // applyView already reloaded
+    if (state.view === 'browse') loadPosts(true);
+    else if (state.view === 'mine') loadMine();
+    else if (state.view === 'alerts') loadAlerts();
+  }
+
+  function applyView(name) {
     state.view = name;
     Object.keys(VIEWS).forEach(function (key) {
       if (VIEWS[key]) VIEWS[key].hidden = (key !== name);
@@ -321,6 +395,9 @@
     if (el.shell) el.shell.scrollTop = 0;
     syncMainButton();
     syncBackButton();
+
+    if (name === 'mine') loadMine();
+    if (name === 'alerts') loadAlerts();
   }
 
   // =========================================================
@@ -335,7 +412,7 @@
   function syncMainButton() {
     if (!mainButtonAvailable()) {
       // Desktop browser or an old client: use the in-page bar instead.
-      if (el.fab) el.fab.hidden = (state.view === 'compose');
+      if (el.fab) el.fab.hidden = (state.view === 'compose' || state.view === 'alerts');
       if (el.composeSubmit) el.composeSubmit.hidden = (state.view !== 'compose');
       return;
     }
@@ -353,6 +430,9 @@
       });
     } else if (state.view === 'browse' || state.view === 'mine') {
       mb.setParams({ text: 'E\u02bblon joylash', is_active: true, is_visible: true });
+    } else if (state.view === 'alerts') {
+      // The alerts screen has its own in-page submit; MainButton would compete.
+      mb.hide();
     } else {
       mb.hide();
     }
@@ -364,12 +444,8 @@
     else tg.BackButton.hide();
   }
 
-  function onBack() {
-    if (state.sheetPostId) { closeSheet(); return; }
-    if (state.view === 'compose') { cancelCompose(); return; }
-    if (state.view !== 'browse') { setView('browse'); return; }
-    window.location.href = '../../index.html';
-  }
+  // Telegram's back arrow and the phone's back gesture both land here.
+  function onBack() { history.back(); }
 
   function applyViewportHeight() {
     var h = (tg && tg.viewportStableHeight) ? tg.viewportStableHeight : window.innerHeight;
@@ -525,13 +601,13 @@
       });
   }
 
-  function setRecentMode() {
+  function setRecentMode(skipLoad) {
     state.sort = 'recent';
     state.origin = null;
     setText(el.sortLabel, 'Eng yangi e\u02bblonlar');
     hide(el.modeChip);
     if (el.addressInput) el.addressInput.value = '';
-    loadPosts(true);
+    if (!skipLoad) loadPosts(true);
   }
 
   function setDistanceMode(origin) {
@@ -557,9 +633,17 @@
     show(el.skeleton);
     el.searchBtn.disabled = true;
 
+    // Park pagination while the geocode is in flight. Without this, the
+    // sentinel sits at the top of an emptied list and the observer can fire a
+    // page load that wipes whichever state the search is about to show.
+    state.geocoding = true;
+    state.cursor = null;
+    state.done = true;
+
     api('/geocode', { method: 'POST', auth: true, body: { address: value } })
       .then(function (data) {
         el.searchBtn.disabled = false;
+        state.geocoding = false;
         setDistanceMode({
           lat: data.lat,
           lon: data.lon,
@@ -569,7 +653,10 @@
       })
       .catch(function (err) {
         el.searchBtn.disabled = false;
+        state.geocoding = false;
         hide(el.skeleton);
+        // state.done stays true: nothing should auto-load underneath the
+        // message until the person changes the address or retries.
         if (err.code === 'geocode_failed' || err.code === 'validation_failed') {
           show(el.geoError);
         } else {
@@ -621,6 +708,10 @@
   }
 
   function openSheet(postId) {
+    navigate({ v: state.view, sheet: postId });
+  }
+
+  function openSheetUI(postId) {
     state.sheetPostId = postId;
     el.sheet.dataset.postId = postId;
 
@@ -655,6 +746,11 @@
   }
 
   function closeSheet() {
+    // Unwind through History so the back trail stays consistent.
+    if (state.sheetPostId) history.back();
+  }
+
+  function closeSheetUI() {
     state.sheetPostId = null;
     state.sheetPost = null;
     hide(el.sheet);
@@ -867,13 +963,14 @@
     }
 
     updateBodyCount();
-    if (state.sheetPostId) closeSheet();
-    setView('compose');
+    // Pushed on top of whatever route we came from — including a sheet route,
+    // so cancelling returns to the post the user was reading.
+    navigate({ v: 'compose', sheet: null });
   }
 
   function cancelCompose() {
     clearFieldErrors();
-    setView(state.composeMode === 'edit' ? 'mine' : 'browse');
+    history.back();
     state.composeMode = 'create';
     state.composePostId = null;
   }
@@ -963,13 +1060,159 @@
         toast(wasEdit ? 'O\u02bbzgarishlar saqlandi.' : 'E\u02bblon joylandi.');
         state.composeMode = 'create';
         state.composePostId = null;
-        if (wasEdit) { setView('mine'); loadMine(); }
-        else { setView('browse'); setRecentMode(); }
+        // Pop the compose entry instead of replacing it, so back never
+        // returns to a form that has already been submitted.
+        if (!wasEdit) setRecentMode(true);
+        backAndRefresh();
       })
       .catch(function (err) {
         setSubmitting(false);
         handleSubmitError(err);
       });
+  }
+
+  // =========================================================
+  // Geo-alerts
+  // =========================================================
+
+  function setAlertRadius(value) {
+    state.alertRadius = value;
+    var buttons = el.alertRadius.querySelectorAll('[data-radius]');
+    Array.prototype.forEach.call(buttons, function (btn) {
+      var active = Number(btn.dataset.radius) === value;
+      btn.classList.toggle('hs-radius__btn--active', active);
+      btn.setAttribute('aria-checked', active ? 'true' : 'false');
+    });
+  }
+
+  function clearAlertErrors() {
+    var node = el.alertForm.querySelector('[data-error-for="alert-address"]');
+    if (node) { setText(node, ''); hide(node); }
+    if (el.alertAddress) el.alertAddress.classList.remove('hs-input--invalid');
+    setText(el.alertError, '');
+    hide(el.alertError);
+  }
+
+  function setAlertFieldError(message) {
+    var node = el.alertForm.querySelector('[data-error-for="alert-address"]');
+    if (node) { setText(node, message); show(node); }
+    if (el.alertAddress) el.alertAddress.classList.add('hs-input--invalid');
+  }
+
+  function buildAlertCard(alert) {
+    var node = el.alertTemplate.content.firstElementChild.cloneNode(true);
+    node.dataset.alertId = alert.id;
+
+    var split = splitAddress(alert.address_display);
+    var regionEl = node.querySelector('[data-field="region"]');
+    if (split.region) setText(regionEl, split.region);
+    else hide(regionEl);
+    setText(node.querySelector('[data-field="address"]'), split.rest || alert.address_display);
+    setText(node.querySelector('[data-field="radius"]'), alert.radius_km);
+
+    var statusEl = node.querySelector('[data-field="status"]');
+    if (!alert.is_active) {
+      node.classList.add('is-disabled');
+      setText(statusEl, 'O\u02bbchirilgan — botni bloklagansiz');
+    } else if (alert.match_count) {
+      setText(statusEl, plural(alert.match_count, 'ta') + ' xabar yuborilgan');
+    } else {
+      setText(statusEl, 'Faol');
+    }
+
+    node.querySelector('[data-action="delete"]').addEventListener('click', function () {
+      deleteAlert(alert.id);
+    });
+    return node;
+  }
+
+  function loadAlerts() {
+    if (!INIT_DATA) {
+      hide(el.alertSkeleton);
+      el.alertList.innerHTML = '';
+      show(el.alertEmpty);
+      toast(ERRORS.unauthorized, true);
+      return;
+    }
+    hide(el.alertEmpty);
+    hide(el.alertsError);
+    el.alertList.innerHTML = '';
+    show(el.alertSkeleton);
+
+    api('/alerts', { auth: true })
+      .then(function (data) {
+        hide(el.alertSkeleton);
+        var alerts = data.alerts || [];
+        setText(el.alertCount, alerts.length ? plural(alerts.length, 'ta') : '');
+        if (!alerts.length) { show(el.alertEmpty); return; }
+        var frag = document.createDocumentFragment();
+        alerts.forEach(function (alert) { frag.appendChild(buildAlertCard(alert)); });
+        el.alertList.appendChild(frag);
+      })
+      .catch(function (err) {
+        hide(el.alertSkeleton);
+        show(el.alertsError);
+        toast(errorText(err), true);
+      });
+  }
+
+  function submitAlert() {
+    if (state.alertSubmitting) return;
+    if (!requireAuth()) return;
+
+    clearAlertErrors();
+    var address = (el.alertAddress.value || '').trim();
+    if (address.length < 4 || address.length > 200 || !/[\uac00-\ud7a3]/.test(address)) {
+      setAlertFieldError(FIELD_MESSAGES.address);
+      haptic('error');
+      return;
+    }
+
+    state.alertSubmitting = true;
+    el.alertSubmit.disabled = true;
+
+    api('/alerts', {
+      method: 'POST',
+      auth: true,
+      body: { address: address, radius_km: state.alertRadius }
+    })
+      .then(function () {
+        state.alertSubmitting = false;
+        el.alertSubmit.disabled = false;
+        el.alertAddress.value = '';
+        haptic('success');
+        toast('Bildirishnoma qo\u02bbshildi.');
+        loadAlerts();
+      })
+      .catch(function (err) {
+        state.alertSubmitting = false;
+        el.alertSubmit.disabled = false;
+        haptic('error');
+        if (err.code === 'geocode_failed') {
+          setAlertFieldError('Manzil topilmadi. To\u02bbliqroq yozib ko\u02bbring.');
+          return;
+        }
+        if (err.code === 'validation_failed') {
+          setAlertFieldError(FIELD_MESSAGES.address);
+          return;
+        }
+        setText(el.alertError, errorText(err));
+        show(el.alertError);
+      });
+  }
+
+  function deleteAlert(alertId) {
+    if (!requireAuth()) return;
+    confirmAction('Bu bildirishnoma o\u02bbchirilsinmi?').then(function (ok) {
+      if (!ok) return;
+      api('/alerts/' + alertId, { method: 'DELETE', auth: true })
+        .then(function () {
+          haptic('success');
+          toast('Bildirishnoma o\u02bbchirildi.');
+          loadAlerts();
+        })
+        .catch(function (err) { haptic('error'); toast(errorText(err), true); });
+    });
   }
 
   // =========================================================
@@ -982,6 +1225,7 @@
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         if (state.view !== 'browse') return;
+        if (state.geocoding) return;
         if (state.loading || state.done || !state.cursor) return;
         loadPosts(false);
       });
@@ -994,8 +1238,17 @@
   // =========================================================
 
   function bind() {
-    el.navBrowse.addEventListener('click', function () { setView('browse'); });
-    el.navMine.addEventListener('click', function () { setView('mine'); loadMine(); });
+    el.navBrowse.addEventListener('click', function () {
+      navigate({ v: 'browse', sheet: null });
+    });
+    el.navMine.addEventListener('click', function () {
+      navigate({ v: 'mine', sheet: null });
+    });
+    if (el.navAlerts) {
+      el.navAlerts.addEventListener('click', function () {
+        navigate({ v: 'alerts', sheet: null });
+      });
+    }
 
     el.searchForm.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -1012,15 +1265,30 @@
     el.errorRetry.addEventListener('click', function () { loadPosts(true); });
     el.geoErrorRetry.addEventListener('click', function () {
       hide(el.geoError);
+      setRecentMode();
       if (el.addressInput) el.addressInput.focus();
     });
     el.mineRetry.addEventListener('click', loadMine);
+    el.alertsRetry.addEventListener('click', loadAlerts);
+
+    el.alertForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (el.alertAddress) el.alertAddress.blur();
+      submitAlert();
+    });
+    el.alertRadius.addEventListener('click', function (ev) {
+      var btn = ev.target.closest ? ev.target.closest('[data-radius]') : null;
+      if (!btn) return;
+      setAlertRadius(Number(btn.dataset.radius));
+      haptic('light');
+    });
 
     el.backdrop.addEventListener('click', closeSheet);
     el.sheetClose.addEventListener('click', closeSheet);
     el.sheetCopy.addEventListener('click', copyContact);
     el.sheetErrorRetry.addEventListener('click', function () {
-      if (state.sheetPostId) openSheet(state.sheetPostId);
+      // Already on the sheet route — refetch without pushing another entry.
+      if (state.sheetPostId) openSheetUI(state.sheetPostId);
     });
     el.sheetEdit.addEventListener('click', function () {
       if (state.sheetPost) openCompose('edit', state.sheetPost);
@@ -1029,9 +1297,8 @@
       var id = state.sheetPostId;
       if (!id) return;
       deletePost(id, function () {
-        closeSheet();
-        if (state.view === 'mine') loadMine();
-        else loadPosts(true);
+        // Pop the sheet entry — back must not reopen a deleted post.
+        backAndRefresh();
       });
     });
 
@@ -1048,6 +1315,7 @@
     });
 
     window.addEventListener('resize', applyViewportHeight);
+    window.addEventListener('popstate', onPopState);
   }
 
   // =========================================================
@@ -1058,7 +1326,11 @@
     initTelegram();
     bind();
     initObserver();
-    setView('browse');
+    setAlertRadius(state.alertRadius);
+    // replaceState, not pushState: the entry behind this one is index.html,
+    // so back from the board leaves the feature the way the user came in.
+    replaceRoute({ v: 'browse', sheet: null });
+    applyView('browse');
     setRecentMode();
   }
 

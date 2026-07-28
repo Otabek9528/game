@@ -61,9 +61,8 @@
               data-target="browse" aria-current="page">E'lonlar</button>
       <button type="button" class="hs-nav__btn" id="hsNavMine"
               data-target="mine">Mening e'lonlarim</button>
-      <!-- Phase 6 unhides this. Nothing is wired to it yet. -->
       <button type="button" class="hs-nav__btn" id="hsNavAlerts"
-              data-target="alerts" hidden>Bildirishnomalar</button>
+              data-target="alerts">Bildirishnomalar</button>
     </nav>
 
     <!-- =========================================================
@@ -350,9 +349,73 @@
     </section>
 
     <!-- =========================================================
-         VIEW: ALERTS — Phase 6 fills this in. Structural stub only.
+         VIEW: ALERTS — saved geo-alerts
          ========================================================= -->
-    <section class="hs-view" id="hsViewAlerts" data-view="alerts" hidden></section>
+    <section class="hs-view" id="hsViewAlerts" data-view="alerts" hidden>
+      <div class="hs-mode">
+        <h2 class="hs-mode__title">Bildirishnomalar</h2>
+        <span class="hs-mode__count" id="hsAlertCount"></span>
+      </div>
+
+      <p class="hs-intro">Nuqta belgilang — o'sha atrofda yangi e'lon paydo bo'lganda
+        bot sizga to'g'ridan-to'g'ri xabar yuboradi.</p>
+
+      <form class="hs-form hs-form--tight" id="hsAlertForm" autocomplete="off">
+        <div class="hs-field">
+          <label class="hs-label" for="hsAlertAddress">Manzil</label>
+          <input type="text" class="hs-input" id="hsAlertAddress"
+                 placeholder="서울특별시 관악구 신림동" />
+          <p class="hs-field__err" data-error-for="alert-address" hidden></p>
+        </div>
+
+        <div class="hs-field">
+          <span class="hs-label">Radius</span>
+          <div class="hs-radius" id="hsAlertRadius" role="radiogroup" aria-label="Radius">
+            <button type="button" class="hs-radius__btn" data-radius="3"
+                    role="radio" aria-checked="false">3 km</button>
+            <button type="button" class="hs-radius__btn" data-radius="5"
+                    role="radio" aria-checked="false">5 km</button>
+            <button type="button" class="hs-radius__btn hs-radius__btn--active" data-radius="10"
+                    role="radio" aria-checked="true">10 km</button>
+            <button type="button" class="hs-radius__btn" data-radius="20"
+                    role="radio" aria-checked="false">20 km</button>
+          </div>
+        </div>
+
+        <p class="hs-form__err" id="hsAlertError" hidden></p>
+
+        <button type="submit" class="hs-btn hs-btn--solid hs-btn--block" id="hsAlertSubmit">
+          Qo'shish
+        </button>
+      </form>
+
+      <div class="hs-skeleton" id="hsAlertSkeleton" hidden aria-hidden="true">
+        <div class="hs-skel-card">
+          <div class="hs-skel hs-skel--eyebrow"></div>
+          <div class="hs-skel hs-skel--title"></div>
+          <div class="hs-skel hs-skel--foot"></div>
+        </div>
+        <div class="hs-skel-card">
+          <div class="hs-skel hs-skel--eyebrow"></div>
+          <div class="hs-skel hs-skel--title"></div>
+          <div class="hs-skel hs-skel--foot"></div>
+        </div>
+      </div>
+
+      <div class="hs-list" id="hsAlertList"></div>
+
+      <div class="hs-state" id="hsAlertEmpty" hidden>
+        <p class="hs-state__title">Bildirishnoma yo'q</p>
+        <p class="hs-state__text">Yuqoridagi maydonga manzil yozib, radiusni tanlang.
+          Nechta nuqta qo'shsangiz ham bo'ladi.</p>
+      </div>
+
+      <div class="hs-state hs-state--error" id="hsAlertsError" hidden>
+        <p class="hs-state__title">Yuklab bo'lmadi</p>
+        <p class="hs-state__text">Qayta urinib ko'ring.</p>
+        <button type="button" class="hs-btn hs-btn--ghost" id="hsAlertsRetry">Qayta urinish</button>
+      </div>
+    </section>
 
   </div>
 
@@ -477,6 +540,26 @@
         <button type="button" class="hs-btn hs-btn--ghost hs-btn--sm" data-action="edit">Tahrirlash</button>
         <button type="button" class="hs-btn hs-btn--ghost hs-btn--sm" data-action="extend">Uzaytirish</button>
         <button type="button" class="hs-btn hs-btn--danger hs-btn--sm" data-action="delete">O'chirish</button>
+      </div>
+    </article>
+  </template>
+
+  <template id="hsAlertTemplate">
+    <article class="hs-card hs-card--alert" data-alert-id="">
+      <div class="hs-card__head">
+        <div class="hs-card__addr-wrap">
+          <p class="hs-card__region" data-field="region"></p>
+          <h3 class="hs-card__addr" data-field="address"></h3>
+        </div>
+        <span class="hs-dist hs-dist--radius">
+          <span class="hs-dist__num" data-field="radius"></span>
+          <span class="hs-dist__unit">km</span>
+        </span>
+      </div>
+      <div class="hs-card__foot">
+        <span class="hs-card__time" data-field="status"></span>
+        <button type="button" class="hs-btn hs-btn--danger hs-btn--sm"
+                data-action="delete">O'chirish</button>
       </div>
     </article>
   </template>
