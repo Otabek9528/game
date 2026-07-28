@@ -111,6 +111,7 @@
     sheetBody: $('hsSheetBody'),
     sheetContactRow: $('hsSheetContactRow'),
     sheetCall: $('hsSheetCall'),
+    sheetCallNum: $('hsSheetCallNum'),
     sheetCopy: $('hsSheetCopy'),
     sheetNoContact: $('hsSheetNoContact'),
     sheetOwner: $('hsSheetOwnerActions'),
@@ -184,7 +185,15 @@
   var toastTimer = null;
   function toast(message, isError) {
     if (!el.toast) return;
-    setText(el.toast, message);
+    el.toast.innerHTML = '';
+    var icon = document.createElement('span');
+    icon.className = 'hs-toast__icon' + (isError ? ' hs-toast__icon--error' : '');
+    icon.textContent = isError ? '!' : '\u2713';
+    var text = document.createElement('span');
+    text.className = 'hs-toast__text';
+    text.textContent = message;
+    el.toast.appendChild(icon);
+    el.toast.appendChild(text);
     el.toast.classList.toggle('hs-toast--error', !!isError);
     show(el.toast);
     if (toastTimer) clearTimeout(toastTimer);
@@ -197,6 +206,14 @@
      the whole string when the pattern does not match. */
   var ADMIN_TAIL = /(특별자치시|특별자치도|특별시|광역시|시|도|군|구)$/;
 
+  // Kakao often returns provinces in their short form ("경기", "서울"),
+  // which the suffix rule cannot catch.
+  var SHORT_REGIONS = {
+    '서울': 1, '부산': 1, '대구': 1, '인천': 1, '광주': 1, '대전': 1,
+    '울산': 1, '세종': 1, '경기': 1, '강원': 1, '충북': 1, '충남': 1,
+    '전북': 1, '전남': 1, '경북': 1, '경남': 1, '제주': 1
+  };
+
   function splitAddress(full) {
     var text = String(full || '').trim();
     if (!text) return { region: '', rest: '' };
@@ -205,8 +222,9 @@
 
     var region = [];
     for (var i = 0; i < parts.length - 1 && region.length < 3; i++) {
-      if (ADMIN_TAIL.test(parts[i])) region.push(parts[i]);
-      else break;
+      if (ADMIN_TAIL.test(parts[i]) || (i === 0 && SHORT_REGIONS[parts[i]])) {
+        region.push(parts[i]);
+      } else break;
     }
     if (!region.length) return { region: '', rest: text };
     // "경기도 안산시 단원구" reads better as "경기도 · 안산시 단원구":
@@ -217,6 +235,41 @@
       region: tail ? head + ' · ' + tail : head,
       rest: parts.slice(region.length).join(' ')
     };
+  }
+
+  /* 01012345678 -> 010-1234-5678. Leaves anything that is not a bare
+     Korean number alone: KakaoTalk IDs, +82 forms, already-dashed input. */
+  function formatPhone(value) {
+    var raw = String(value || '').trim();
+    if (!/^[\d\s-]+$/.test(raw)) return raw;
+    var d = raw.replace(/\D/g, '');
+    if (d.length === 11 && d.charAt(0) === '0') {
+      return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+    }
+    if (d.length === 10 && d.slice(0, 2) === '02') {
+      return '02-' + d.slice(2, 6) + '-' + d.slice(6);
+    }
+    if (d.length === 10 && d.charAt(0) === '0') {
+      return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+    }
+    return raw;
+  }
+
+  /* Live formatting while typing. Only touches digit-only input, and only
+     moves the caret when it was already at the end — mid-string edits are
+     left exactly where the user put them. */
+  function bindPhoneFormatting(input) {
+    if (!input) return;
+    input.addEventListener('input', function () {
+      var v = input.value;
+      if (!/^[\d\s-]*$/.test(v)) return;
+      var atEnd = input.selectionStart === v.length;
+      var next = formatPhone(v);
+      if (next !== v && atEnd) {
+        input.value = next;
+        try { input.setSelectionRange(next.length, next.length); } catch (e) {}
+      }
+    });
   }
 
   function formatDistance(km) {
@@ -258,7 +311,7 @@
         : 'Juda ko\u02bbp urinish. Birozdan keyin qayta urining.';
     }
     if (ERRORS[err.code]) return ERRORS[err.code];
-    if (err.offline) return 'Internet aloqasi yo\u02bbq.';
+    if (err.offline) return 'Serverga ulanib bo\u02bblmadi. Qayta urinib ko\u02bbring.';
     return 'Xatolik yuz berdi.';
   }
 
@@ -289,7 +342,10 @@
         }
         return data;
       });
-    }, function () {
+    }, function (cause) {
+      // A CORS block and a dead network look identical here; the console
+      // line is what tells them apart.
+      try { console.error('housing: request failed', path, cause); } catch (e) {}
       var err = new Error('network');
       err.offline = true;
       return Promise.reject(err);
@@ -433,8 +489,11 @@
     var mb = tg.MainButton;
     if (!onCompose) { mb.hide(); return; }
 
+    var dark = document.documentElement.classList.contains('night-mode');
     mb.setParams({
       text: state.composeMode === 'edit' ? 'O\u02bbzgarishlarni saqlash' : 'E\u02bblonni joylash',
+      color: dark ? '#10b981' : '#059669',
+      text_color: dark ? '#07130d' : '#ffffff',
       is_active: true,
       is_visible: true
     });
@@ -703,7 +762,7 @@
     setText(el.sheetBody, post.body || '');
 
     if (post.contact) {
-      setText(el.sheetCall, post.contact);
+      setText(el.sheetCallNum || el.sheetCall, formatPhone(post.contact));
       el.sheetCall.href = 'tel:' + String(post.contact).replace(/[^\d+]/g, '');
       show(el.sheetContactRow);
       hide(el.sheetNoContact);
@@ -771,12 +830,62 @@
     syncBackButton();
   }
 
+  /* Pull the sheet down to close it — the gesture every bottom sheet on the
+     phone already teaches. The drag only arms when the sheet's own scroll is
+     at the top, so scrolling long post text still works normally. */
+  function bindSheetSwipe() {
+    if (!el.sheet) return;
+    var startY = 0, delta = 0, armed = false, width720 = false;
+
+    function baseTransform() {
+      return width720 ? 'translateX(-50%) ' : '';
+    }
+
+    el.sheet.addEventListener('touchstart', function (ev) {
+      if (!state.sheetPostId) return;
+      if (el.sheet.scrollTop > 0) { armed = false; return; }
+      armed = true;
+      width720 = window.innerWidth >= 720;
+      startY = ev.touches[0].clientY;
+      delta = 0;
+      el.sheet.style.transition = 'none';
+    }, { passive: true });
+
+    el.sheet.addEventListener('touchmove', function (ev) {
+      if (!armed) return;
+      delta = ev.touches[0].clientY - startY;
+      if (delta <= 0) {
+        el.sheet.style.transform = '';
+        return;
+      }
+      el.sheet.style.transform = baseTransform() + 'translateY(' + delta + 'px)';
+    }, { passive: true });
+
+    el.sheet.addEventListener('touchend', function () {
+      if (!armed) return;
+      armed = false;
+      el.sheet.style.transition = 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1)';
+      if (delta > 90) {
+        el.sheet.style.transform = baseTransform() + 'translateY(100%)';
+        setTimeout(function () {
+          el.sheet.style.transition = '';
+          el.sheet.style.transform = '';
+          closeSheet();
+        }, 190);
+      } else {
+        el.sheet.style.transform = '';
+        setTimeout(function () { el.sheet.style.transition = ''; }, 210);
+      }
+      delta = 0;
+    });
+  }
+
   function copyContact() {
     var post = state.sheetPost;
     if (!post || !post.contact) return;
     var value = post.contact;
 
-    function done() { toast('Raqam nusxalandi.'); haptic('success'); }
+    function done() { toast('Raqam nusxalab olindi'); haptic('success'); }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(value).then(done, fallbackCopy);
@@ -820,7 +929,7 @@
         api('/posts/' + postId, { method: 'DELETE', auth: true })
           .then(function () {
             haptic('success');
-            toast('E\u02bblon o\u02bbchirildi.');
+            toast('E\u02bblon o\u02bbchirildi');
             if (afterDelete) afterDelete();
           })
           .catch(function (err) { haptic('error'); toast(errorText(err), true); });
@@ -832,7 +941,7 @@
     api('/posts/' + postId + '/extend', { method: 'POST', auth: true })
       .then(function (data) {
         haptic('success');
-        toast('Muddat ' + plural(data.days_left || 30, 'kun') + 'ga uzaytirildi.');
+        toast('Muddat yana ' + plural(data.days_left || 30, 'kun') + 'ga uzaytirildi');
         if (afterExtend) afterExtend();
       })
       .catch(function (err) { haptic('error'); toast(errorText(err), true); });
@@ -1068,7 +1177,7 @@
         setSubmitting(false);
         haptic('success');
         var wasEdit = state.composeMode === 'edit';
-        toast(wasEdit ? 'O\u02bbzgarishlar saqlandi.' : 'E\u02bblon joylandi.');
+        toast(wasEdit ? 'O\u02bbzgarishlar saqlandi' : 'E\u02bbloningiz joylandi');
         state.composeMode = 'create';
         state.composePostId = null;
         // Pop the compose entry instead of replacing it, so back never
@@ -1192,7 +1301,7 @@
         el.alertSubmit.disabled = false;
         el.alertAddress.value = '';
         haptic('success');
-        toast('Bildirishnoma qo\u02bbshildi.');
+        toast('Bildirishnoma qo\u02bbshildi');
         loadAlerts();
       })
       .catch(function (err) {
@@ -1219,7 +1328,7 @@
       api('/alerts/' + alertId, { method: 'DELETE', auth: true })
         .then(function () {
           haptic('success');
-          toast('Bildirishnoma o\u02bbchirildi.');
+          toast('Bildirishnoma o\u02bbchirildi');
           loadAlerts();
         })
         .catch(function (err) { haptic('error'); toast(errorText(err), true); });
@@ -1325,6 +1434,9 @@
     });
     el.composeCancel.addEventListener('click', cancelCompose);
     el.composeBody.addEventListener('input', updateBodyCount);
+    bindPhoneFormatting(el.composeContact);
+
+    bindSheetSwipe();
 
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape' && state.sheetPostId) closeSheet();

@@ -69,8 +69,7 @@
           </button>
         </div>
         <p class="hs-search__hint" id="hsSearchHint">
-          Manzilni koreys tilida yozing — e'lonlar o'sha nuqtadan uzoqligi bo'yicha
-          tartiblanadi.
+          Koreyscha manzil yozsangiz, e'lonlar shu joyga yaqinligi bo'yicha saralanadi.
         </p>
       </form>
 
@@ -217,14 +216,14 @@
           Yana yuklash
         </button>
       </div>
-      <p class="hs-list-end" id="hsListEnd" hidden>Boshqa e'lon yo'q.</p>
+      <p class="hs-list-end" id="hsListEnd" hidden>Barcha e'lonlar ko'rsatildi</p>
       <div class="hs-sentinel" id="hsSentinel" aria-hidden="true"></div>
 
       <!-- ---- Empty ---- -->
       <div class="hs-state" id="hsEmpty" hidden>
         <p class="hs-state__title">Hozircha e'lon yo'q</p>
-        <p class="hs-state__text">Birinchi e'lonni siz joylashingiz mumkin — manzil,
-          telefon raqami va qisqa tavsif kifoya.</p>
+        <p class="hs-state__text">Birinchi bo'lib e'lon joylang — buning uchun pastdagi
+          «Joylash» tugmasini bosing.</p>
       </div>
 
       <!-- ---- Geocoding failed ---- -->
@@ -272,8 +271,8 @@
 
       <div class="hs-state" id="hsMineEmpty" hidden>
         <p class="hs-state__title">Sizda e'lon yo'q</p>
-        <p class="hs-state__text">E'lon joylasangiz, u shu yerda ko'rinadi va muddatini
-          shu yerdan uzaytirasiz.</p>
+        <p class="hs-state__text">Joylagan e'lonlaringiz shu yerda turadi — muddati
+          tugashidan oldin ularni shu yerdan uzaytira olasiz.</p>
       </div>
 
       <div class="hs-state hs-state--error" id="hsMineError" hidden>
@@ -292,6 +291,8 @@
       </div>
 
       <form class="hs-form" id="hsComposeForm" data-mode="create" data-post-id="" autocomplete="off">
+
+        <div class="hs-form__card">
 
         <div class="hs-field" id="hsComposeAddressRow">
           <label class="hs-label" for="hsComposeAddress">Manzil</label>
@@ -323,6 +324,8 @@
           <p class="hs-field__err" data-error-for="body" hidden></p>
         </div>
 
+        </div>
+
         <p class="hs-form__err" id="hsComposeError" hidden></p>
 
         <!-- Shown only when Telegram.WebApp.MainButton is unavailable. -->
@@ -330,7 +333,7 @@
           E'lonni joylash
         </button>
 
-        <button type="button" class="hs-btn hs-btn--text hs-btn--block" id="hsComposeCancel">
+        <button type="button" class="hs-btn hs-btn--ghost hs-btn--block" id="hsComposeCancel">
           Bekor qilish
         </button>
       </form>
@@ -345,8 +348,8 @@
         <span class="hs-mode__count" id="hsAlertCount"></span>
       </div>
 
-      <p class="hs-intro">Nuqta belgilang — o'sha atrofda yangi e'lon paydo bo'lganda
-        bot sizga to'g'ridan-to'g'ri xabar yuboradi.</p>
+      <p class="hs-intro">Manzil kiriting — shu atrofda yangi e'lon chiqsa, bot sizga
+        Telegram orqali darhol xabar yuboradi.</p>
 
       <form class="hs-form hs-form--tight" id="hsAlertForm" autocomplete="off">
         <div class="hs-field">
@@ -357,7 +360,7 @@
         </div>
 
         <div class="hs-field">
-          <span class="hs-label">Radius</span>
+          <span class="hs-label">Qidiruv doirasi</span>
           <div class="hs-radius" id="hsAlertRadius" role="radiogroup" aria-label="Radius">
             <button type="button" class="hs-radius__btn" data-radius="3"
                     role="radio" aria-checked="false">3 km</button>
@@ -393,9 +396,9 @@
       <div class="hs-list" id="hsAlertList"></div>
 
       <div class="hs-state" id="hsAlertEmpty" hidden>
-        <p class="hs-state__title">Bildirishnoma yo'q</p>
-        <p class="hs-state__text">Yuqoridagi maydonga manzil yozib, radiusni tanlang.
-          Nechta nuqta qo'shsangiz ham bo'ladi.</p>
+        <p class="hs-state__title">Hozircha bildirishnoma yo'q</p>
+        <p class="hs-state__text">Yuqorida manzil yozib, doirani tanlang.
+          Istalgancha manzil qo'shishingiz mumkin.</p>
       </div>
 
       <div class="hs-state hs-state--error" id="hsAlertsError" hidden>
@@ -477,7 +480,7 @@
 
     <div class="hs-sheet__error" id="hsSheetError" hidden>
       <p class="hs-state__title">Ochib bo'lmadi</p>
-      <p class="hs-state__text">E'lon o'chirilgan yoki muddati tugagan bo'lishi mumkin.</p>
+      <p class="hs-state__text">Bu e'lon o'chirilgan yoki muddati tugagan bo'lishi mumkin.</p>
       <button type="button" class="hs-btn hs-btn--ghost" id="hsSheetErrorRetry">Qayta urinish</button>
     </div>
 
@@ -499,9 +502,13 @@
       <div class="hs-contact" id="hsSheetContactRow">
         <span class="hs-contact__label">Aloqa uchun</span>
         <div class="hs-contact__row">
-          <a class="hs-contact__phone" id="hsSheetCall" href="tel:01012345678">010-1234-5678</a>
+          <a class="hs-contact__phone" id="hsSheetCall" href="tel:01012345678">
+            <svg class="hs-contact__glyph" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <path d="M4.2 3.4c-.6.6-.9 1.5-.7 2.3 1 4.5 4.6 8.1 9.1 9.1.8.2 1.7-.1 2.3-.7l1-1c.5-.5.5-1.4-.1-1.9l-1.9-1.4c-.5-.4-1.2-.4-1.7 0l-.7.6a10 10 0 0 1-3.1-3.1l.6-.7c.4-.5.4-1.2 0-1.7L7.6 3.1c-.5-.6-1.4-.6-1.9-.1z" />
+            </svg><span id="hsSheetCallNum">010-1234-5678</span></a>
           <button type="button" class="hs-btn hs-btn--ghost hs-btn--sm" id="hsSheetCopy">Nusxalash</button>
         </div>
+        <p class="hs-contact__hint">Raqamni bossangiz, qo'ng'iroq oynasi ochiladi</p>
       </div>
 
       <p class="hs-contact hs-contact--empty" id="hsSheetNoContact" hidden>
@@ -514,7 +521,7 @@
       </div>
     </div>
 
-    <button type="button" class="hs-btn hs-btn--text hs-btn--block" id="hsSheetClose">Yopish</button>
+    <button type="button" class="hs-btn hs-btn--ghost hs-btn--block" id="hsSheetClose">Yopish</button>
   </aside>
 
   <!-- =========================================================
