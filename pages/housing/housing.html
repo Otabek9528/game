@@ -58,7 +58,7 @@
          ========================================================= -->
     <section class="hs-view" id="hsViewBrowse" data-view="browse">
 
-      <form class="hs-search" id="hsSearchForm" autocomplete="off">
+      <form class="hs-search" id="hsSearchForm" autocomplete="off" novalidate>
         <label class="hs-label" for="hsAddressInput">Manzil bo'yicha izlash</label>
         <div class="hs-search__row">
           <input type="search" class="hs-input hs-search__input" id="hsAddressInput"
@@ -298,7 +298,7 @@
         </div>
       </div>
 
-      <form class="hs-form" id="hsComposeForm" data-mode="create" data-post-id="" autocomplete="off">
+      <form class="hs-form" id="hsComposeForm" data-mode="create" data-post-id="" autocomplete="off" novalidate>
 
         <div class="hs-form__card">
 
@@ -356,7 +356,7 @@
         <span class="hs-pagehead__count" id="hsAlertCount"></span>
       </div>
 
-      <form class="hs-form hs-form--tight" id="hsAlertForm" autocomplete="off">
+      <form class="hs-form hs-form--tight" id="hsAlertForm" autocomplete="off" novalidate>
         <div class="hs-field">
           <label class="hs-label" for="hsAlertAddress">Manzil</label>
           <input type="text" class="hs-input" id="hsAlertAddress"
@@ -366,7 +366,7 @@
 
         <div class="hs-field">
           <span class="hs-label">Qidiruv doirasi</span>
-          <div class="hs-radius" id="hsAlertRadius" role="radiogroup" aria-label="Radius">
+          <div class="hs-radius" id="hsAlertRadius" role="radiogroup" aria-label="Qidiruv doirasi">
             <button type="button" class="hs-radius__btn" data-radius="3"
                     role="radio" aria-checked="false">3 km</button>
             <button type="button" class="hs-radius__btn" data-radius="5"
@@ -376,6 +376,18 @@
             <button type="button" class="hs-radius__btn" data-radius="20"
                     role="radio" aria-checked="false">20 km</button>
           </div>
+
+          <div class="hs-radius-custom">
+            <label class="hs-radius-custom__label" for="hsAlertRadiusInput">
+              Yoki o'zingiz kiriting
+            </label>
+            <div class="hs-radius-custom__field">
+              <input type="number" class="hs-input hs-radius-custom__input" id="hsAlertRadiusInput"
+                     inputmode="numeric" min="1" max="500" step="1" placeholder="10" />
+              <span class="hs-radius-custom__unit">km</span>
+            </div>
+          </div>
+          <p class="hs-field__err" data-error-for="alert-radius" hidden></p>
         </div>
 
         <p class="hs-form__err" id="hsAlertError" hidden></p>

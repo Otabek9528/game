@@ -122,6 +122,7 @@
     alertForm: $('hsAlertForm'),
     alertAddress: $('hsAlertAddress'),
     alertRadius: $('hsAlertRadius'),
+    alertRadiusInput: $('hsAlertRadiusInput'),
     alertSubmit: $('hsAlertSubmit'),
     alertError: $('hsAlertError'),
     alertSkeleton: $('hsAlertSkeleton'),
@@ -1208,22 +1209,51 @@
   // Geo-alerts
   // =========================================================
 
-  function setAlertRadius(value) {
+  var RADIUS_MIN = 1;
+  var RADIUS_MAX = 500;
+
+  /* Presets are shortcuts, not the allowed set — any whole number in range is
+     accepted. Typing a custom value clears the preset highlight; picking a
+     preset writes back into the field, so the two never disagree. */
+  function setAlertRadius(value, fromInput) {
     state.alertRadius = value;
+
     var buttons = el.alertRadius.querySelectorAll('[data-radius]');
     Array.prototype.forEach.call(buttons, function (btn) {
       var active = Number(btn.dataset.radius) === value;
       btn.classList.toggle('hs-radius__btn--active', active);
       btn.setAttribute('aria-checked', active ? 'true' : 'false');
     });
+
+    if (!fromInput && el.alertRadiusInput) {
+      el.alertRadiusInput.value = value;
+      el.alertRadiusInput.classList.remove('hs-input--invalid');
+    }
+  }
+
+  function readRadiusInput() {
+    if (!el.alertRadiusInput) return state.alertRadius;
+    var raw = (el.alertRadiusInput.value || '').trim();
+    if (raw === '') return null;
+    var n = parseInt(raw, 10);
+    return isNaN(n) ? NaN : n;
   }
 
   function clearAlertErrors() {
-    var node = el.alertForm.querySelector('[data-error-for="alert-address"]');
-    if (node) { setText(node, ''); hide(node); }
+    ['alert-address', 'alert-radius'].forEach(function (name) {
+      var node = el.alertForm.querySelector('[data-error-for="' + name + '"]');
+      if (node) { setText(node, ''); hide(node); }
+    });
     if (el.alertAddress) el.alertAddress.classList.remove('hs-input--invalid');
+    if (el.alertRadiusInput) el.alertRadiusInput.classList.remove('hs-input--invalid');
     setText(el.alertError, '');
     hide(el.alertError);
+  }
+
+  function setRadiusError(message) {
+    var node = el.alertForm.querySelector('[data-error-for="alert-radius"]');
+    if (node) { setText(node, message); show(node); }
+    if (el.alertRadiusInput) el.alertRadiusInput.classList.add('hs-input--invalid');
   }
 
   function setAlertFieldError(message) {
@@ -1301,13 +1331,22 @@
       return;
     }
 
+    var radius = readRadiusInput();
+    if (radius === null) radius = state.alertRadius;
+    if (isNaN(radius) || radius < RADIUS_MIN || radius > RADIUS_MAX) {
+      setRadiusError('Doira ' + RADIUS_MIN + ' km dan ' + RADIUS_MAX + ' km gacha bo\u02bblsin.');
+      haptic('error');
+      return;
+    }
+    setAlertRadius(radius);
+
     state.alertSubmitting = true;
     el.alertSubmit.disabled = true;
 
     api('/alerts', {
       method: 'POST',
       auth: true,
-      body: { address: address, radius_km: state.alertRadius }
+      body: { address: address, radius_km: radius }
     })
       .then(function () {
         state.alertSubmitting = false;
@@ -1422,6 +1461,20 @@
       haptic('light');
     });
 
+    if (el.alertRadiusInput) {
+      el.alertRadiusInput.addEventListener('input', function () {
+        var n = readRadiusInput();
+        if (n === null || isNaN(n)) return;
+        setAlertRadius(n, true);
+      });
+      el.alertRadiusInput.addEventListener('blur', function () {
+        var n = readRadiusInput();
+        if (n === null) { setAlertRadius(state.alertRadius); return; }
+        if (isNaN(n)) return;
+        setAlertRadius(Math.min(RADIUS_MAX, Math.max(RADIUS_MIN, n)));
+      });
+    }
+
     el.backdrop.addEventListener('click', closeSheet);
     el.sheetClose.addEventListener('click', closeSheet);
     el.sheetCopy.addEventListener('click', copyContact);
@@ -1467,6 +1520,7 @@
     bind();
     initObserver();
     setAlertRadius(state.alertRadius);
+
     // replaceState, not pushState: the entry behind this one is index.html,
     // so back from the board leaves the feature the way the user came in.
     replaceRoute({ v: 'browse', sheet: null });

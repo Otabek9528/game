@@ -611,6 +611,55 @@ body {
               color 150ms var(--hs-ease);
 }
 
+.hs-radius-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hs-line);
+}
+
+.hs-radius-custom__label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--hs-muted);
+}
+
+.hs-radius-custom__field {
+  position: relative;
+  flex-shrink: 0;
+  width: 116px;
+}
+
+.hs-radius-custom__input {
+  padding-right: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  -moz-appearance: textfield;
+}
+
+.hs-radius-custom__input::-webkit-outer-spin-button,
+.hs-radius-custom__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hs-radius-custom__unit {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  transform: translateY(-50%);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--hs-muted);
+  pointer-events: none;
+}
+
 .hs-radius__btn--active {
   background: var(--hs-accent-soft);
   border-color: var(--hs-accent);
@@ -1102,6 +1151,7 @@ body {
 .hs-origin:focus-visible,
 .hs-tab:focus-visible,
 .hs-radius__btn:focus-visible,
+.hs-radius-custom__input:focus-visible,
 .hs-contact__phone:focus-visible {
   outline: 2px solid var(--hs-accent);
   outline-offset: 2px;
