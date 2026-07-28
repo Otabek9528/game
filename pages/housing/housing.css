@@ -493,7 +493,7 @@ body {
   text-align: left;
   display: -webkit-box;
   -webkit-line-clamp: 3;
-  line-clamp: 2;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
@@ -1043,6 +1043,115 @@ body {
   color: var(--hs-muted);
 }
 
+/* --- Telegram opt-in inside the compose form --- */
+.hs-tg {
+  margin: 12px 0 0;
+  padding: 13px 14px;
+  border: 1px solid var(--hs-line);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-surface-2);
+}
+
+.hs-tg__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  cursor: pointer;
+}
+
+.hs-tg__box {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+  margin: 1px 0 0;
+  accent-color: var(--hs-accent);
+  cursor: pointer;
+}
+
+.hs-tg__text { flex: 1; min-width: 0; }
+
+.hs-tg__title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--hs-text);
+  line-height: 1.4;
+}
+
+.hs-tg__note {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--hs-muted);
+}
+
+.hs-tg__field {
+  position: relative;
+  margin-top: 12px;
+}
+
+.hs-tg__at {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--hs-muted);
+  pointer-events: none;
+}
+
+.hs-tg__input {
+  padding-left: 30px;
+  background: var(--hs-surface);
+}
+
+.hs-tg__hint {
+  margin: 9px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--hs-muted);
+}
+
+.hs-tg__hint span {
+  font-weight: 700;
+  color: var(--hs-accent-deep);
+  word-break: break-all;
+}
+
+/* --- Telegram button in the detail sheet --- */
+.hs-tg-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: var(--hs-tap);
+  margin-top: 13px;
+  padding: 11px 16px;
+  border: 1px solid var(--hs-accent);
+  border-radius: var(--hs-r-sm);
+  background: var(--hs-accent-soft);
+  color: var(--hs-accent-deep);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms var(--hs-ease);
+}
+
+.hs-tg-btn:active { background: var(--hs-surface-2); }
+
+.hs-tg-btn__glyph {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  fill: currentColor;
+}
+
+.hs-contact--tg .hs-tg-btn { margin-top: 9px; }
+
 .hs-contact--empty {
   border-style: dashed;
   border-color: var(--hs-line-strong);
@@ -1152,7 +1261,9 @@ body {
 .hs-tab:focus-visible,
 .hs-radius__btn:focus-visible,
 .hs-radius-custom__input:focus-visible,
-.hs-contact__phone:focus-visible {
+.hs-contact__phone:focus-visible,
+.hs-tg-btn:focus-visible,
+.hs-tg__box:focus-visible {
   outline: 2px solid var(--hs-accent);
   outline-offset: 2px;
 }

@@ -93,6 +93,12 @@
     composeBodyCount: $('hsComposeBodyCount'),
     composeError: $('hsComposeError'),
     composeSubmit: $('hsComposeSubmit'),
+    tgRow: $('hsTgRow'),
+    tgCheck: $('hsTgCheck'),
+    tgField: $('hsTgField'),
+    tgUsername: $('hsTgUsername'),
+    tgHint: $('hsTgHint'),
+    tgOwn: $('hsTgOwn'),
 
     tabbar: $('hsTabbar'),
     navCompose: $('hsNavCompose'),
@@ -109,10 +115,14 @@
     sheetDistance: $('hsSheetDistance'),
     sheetBody: $('hsSheetBody'),
     sheetContactRow: $('hsSheetContactRow'),
+    sheetPhoneRow: $('hsSheetPhoneRow'),
+    sheetPhoneHint: $('hsSheetPhoneHint'),
     sheetCall: $('hsSheetCall'),
     sheetCallNum: $('hsSheetCallNum'),
     sheetCopy: $('hsSheetCopy'),
     sheetNoContact: $('hsSheetNoContact'),
+    sheetTelegram: $('hsSheetTelegram'),
+    sheetTelegramLabel: $('hsSheetTelegramLabel'),
     sheetOwner: $('hsSheetOwnerActions'),
     sheetEdit: $('hsSheetEdit'),
     sheetDelete: $('hsSheetDelete'),
@@ -159,6 +169,8 @@
     submitting: false,
     alertRadius: 10,
     alertSubmitting: false,
+    myUsername: null,
+    meLoaded: false,
     pendingRefresh: false,
     geocoding: false
   };
@@ -387,6 +399,58 @@
       err.offline = true;
       return Promise.reject(err);
     });
+  }
+
+  /* The compose form shows the poster their own handle next to the opt-in, so
+     they can see exactly what would be published. Fetched once per session. */
+  function loadMe() {
+    if (state.meLoaded || !INIT_DATA) return Promise.resolve();
+    return api('/me', { auth: true })
+      .then(function (data) {
+        state.meLoaded = true;
+        state.myUsername = data.username || null;
+      })
+      .catch(function () { state.meLoaded = true; });
+  }
+
+  var TG_USERNAME = /^[A-Za-z][A-Za-z0-9_]{4,31}$/;
+
+  /* Accepts '@name', 'name', 't.me/name' and full URLs — people paste all
+     four. Mirrors normalize_username() on the server. */
+  function normalizeUsername(v) {
+    var raw = String(v || '').trim();
+    if (!raw) return '';
+    raw = raw.replace(/^https?:\/\//i, '').replace(/^(www\.)?t\.me\//i, '');
+    return raw.replace(/^@+/, '').trim();
+  }
+
+  /* The typed field is an override, not a replacement: it is prefilled with
+     the poster's own handle, so the common case is still zero effort, while
+     posting on someone's behalf or from a second account stays possible. */
+  function syncTelegramOptIn(checked, override) {
+    var own = state.myUsername || '';
+    if (el.tgOwn) setText(el.tgOwn, own ? '@' + own : '—');
+    if (el.tgHint) el.tgHint.hidden = !own;
+    if (el.tgCheck) el.tgCheck.checked = !!checked;
+    if (el.tgUsername) el.tgUsername.value = override || (checked ? own : '') || '';
+    syncTelegramField();
+  }
+
+  function syncTelegramField() {
+    var on = !!(el.tgCheck && el.tgCheck.checked);
+    if (el.tgField) el.tgField.hidden = !on;
+    if (el.tgHint) el.tgHint.hidden = !on || !state.myUsername;
+    if (on && el.tgUsername && !el.tgUsername.value && state.myUsername) {
+      el.tgUsername.value = state.myUsername;
+    }
+  }
+
+  function telegramPayload() {
+    var on = !!(el.tgCheck && el.tgCheck.checked);
+    return {
+      show_username: on,
+      contact_username: on ? normalizeUsername(el.tgUsername && el.tgUsername.value) : ''
+    };
   }
 
   function requireAuth() {
@@ -782,14 +846,35 @@
 
     setText(el.sheetBody, post.body || '');
 
-    if (post.contact) {
+    /* Phone and Telegram are independent now — a post may carry either, both,
+       or (defensively) neither. */
+    var hasPhone = !!post.contact;
+    var handle = post.telegram_username;
+
+    if (hasPhone) {
       setText(el.sheetCallNum || el.sheetCall, formatPhone(post.contact));
       el.sheetCall.href = 'tel:' + String(post.contact).replace(/[^\d+]/g, '');
+    }
+    if (el.sheetPhoneRow) el.sheetPhoneRow.hidden = !hasPhone;
+    if (el.sheetPhoneHint) el.sheetPhoneHint.hidden = !hasPhone;
+
+    if (hasPhone || handle) {
       show(el.sheetContactRow);
       hide(el.sheetNoContact);
     } else {
       hide(el.sheetContactRow);
       show(el.sheetNoContact);
+    }
+
+    if (el.sheetTelegram) {
+      if (handle) {
+        setText(el.sheetTelegramLabel, '@' + handle + ' ga yozish');
+        el.sheetTelegram.dataset.username = handle;
+        show(el.sheetTelegram);
+      } else {
+        hide(el.sheetTelegram);
+        el.sheetTelegram.dataset.username = '';
+      }
     }
 
     if (post.is_mine) show(el.sheetOwner);
@@ -899,6 +984,19 @@
       }
       delta = 0;
     });
+  }
+
+  /* openTelegramLink keeps the chat inside Telegram. A plain <a href> would
+     bounce out to the browser and trigger the "open this link?" prompt. */
+  function openTelegramChat() {
+    var handle = el.sheetTelegram && el.sheetTelegram.dataset.username;
+    if (!handle) return;
+    var url = 'https://t.me/' + handle;
+    haptic('light');
+    if (tg && typeof tg.openTelegramLink === 'function') {
+      try { tg.openTelegramLink(url); return; } catch (e) {}
+    }
+    window.open(url, '_blank');
   }
 
   function copyContact() {
@@ -1045,7 +1143,7 @@
   // =========================================================
 
   function clearFieldErrors() {
-    ['address', 'contact', 'body'].forEach(function (name) {
+    ['address', 'contact', 'body', 'contact_username'].forEach(function (name) {
       var node = el.composeForm.querySelector('[data-error-for="' + name + '"]');
       if (node) { setText(node, ''); hide(node); }
     });
@@ -1059,11 +1157,14 @@
   function setFieldError(name, message) {
     var node = el.composeForm.querySelector('[data-error-for="' + name + '"]');
     if (node) { setText(node, message); show(node); }
-    var input = { address: el.composeAddress, contact: el.composeContact, body: el.composeBody }[name];
+    var input = { address: el.composeAddress, contact: el.composeContact,
+                  body: el.composeBody, contact_username: el.tgUsername }[name];
     if (input) input.classList.add('hs-input--invalid');
   }
 
   var FIELD_MESSAGES = {
+    contact_username: '5-32 belgi: harflar, raqamlar va pastki chiziq. Harf bilan boshlansin.',
+    contact_required: 'Telefon raqami yoki Telegram \u2014 kamida bittasini ko\u02bbrsating.',
     address: 'Manzilni koreys tilida, to\u02bbliq yozing.',
     contact: 'Telefon raqamini to\u02bbg\u02bbri yozing.',
     body: 'Matn kamida ' + BODY_MIN + ' ta belgidan iborat bo\u02bblsin.'
@@ -1084,6 +1185,12 @@
     el.composeForm.dataset.postId = post ? post.id : '';
 
     clearFieldErrors();
+
+    var editing = (mode === 'edit' && post);
+    loadMe().then(function () {
+      syncTelegramOptIn(editing ? !!post.show_username : false,
+                        editing ? (post.contact_username || '') : '');
+    });
 
     if (mode === 'edit' && post) {
       setText(el.composeTitle, 'E\u02bblonni tahrirlash');
@@ -1123,7 +1230,8 @@
         ok = false;
       }
     }
-    if (contact.length < 5 || contact.length > 40 || (contact.match(/\d/g) || []).length < 5) {
+    if (contact && (contact.length < 5 || contact.length > 40 ||
+                    (contact.match(/\d/g) || []).length < 5)) {
       setFieldError('contact', FIELD_MESSAGES.contact);
       ok = false;
     }
@@ -1131,7 +1239,22 @@
       setFieldError('body', FIELD_MESSAGES.body);
       ok = false;
     }
-    return ok ? { address: address, contact: contact, body: body } : null;
+
+    var tg = telegramPayload();
+    if (!contact && !tg.show_username) {
+      setFieldError('contact', FIELD_MESSAGES.contact_required);
+      ok = false;
+    }
+    if (tg.show_username) {
+      if (!tg.contact_username) {
+        setFieldError('contact_username', 'Username yozing yoki belgini olib tashlang.');
+        ok = false;
+      } else if (!TG_USERNAME.test(tg.contact_username)) {
+        setFieldError('contact_username', FIELD_MESSAGES.contact_username);
+        ok = false;
+      }
+    }
+    return ok ? { address: address, contact: contact, body: body, tg: tg } : null;
   }
 
   function setSubmitting(on) {
@@ -1176,13 +1299,24 @@
       request = api('/posts/' + state.composePostId + '/edit', {
         method: 'POST',
         auth: true,
-        body: { contact: values.contact, body: values.body }
+        body: {
+          contact: values.contact,
+          body: values.body,
+          show_username: values.tg.show_username,
+          contact_username: values.tg.contact_username
+        }
       });
     } else {
       request = api('/posts', {
         method: 'POST',
         auth: true,
-        body: { address: values.address, contact: values.contact, body: values.body }
+        body: {
+          address: values.address,
+          contact: values.contact,
+          body: values.body,
+          show_username: values.tg.show_username,
+          contact_username: values.tg.contact_username
+        }
       });
     }
 
@@ -1499,6 +1633,13 @@
       submitCompose();
     });
     el.composeBody.addEventListener('input', updateBodyCount);
+    if (el.sheetTelegram) el.sheetTelegram.addEventListener('click', openTelegramChat);
+    if (el.tgCheck) el.tgCheck.addEventListener('change', syncTelegramField);
+    if (el.tgUsername) {
+      el.tgUsername.addEventListener('blur', function () {
+        el.tgUsername.value = normalizeUsername(el.tgUsername.value);
+      });
+    }
     bindPhoneFormatting(el.composeContact);
 
     bindSheetSwipe();
@@ -1520,6 +1661,7 @@
     bind();
     initObserver();
     setAlertRadius(state.alertRadius);
+    loadMe();
 
     // replaceState, not pushState: the entry behind this one is index.html,
     // so back from the board leaves the feature the way the user came in.
