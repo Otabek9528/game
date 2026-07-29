@@ -1203,16 +1203,10 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--hs-danger) 16%, transparent);
 }
 
-/* Submit rides above the tab bar instead of sitting below a nine-row
-   textarea the user has to scroll past. */
+/* Submit sits in the normal flow, directly under the form card. */
 .hs-submitbar {
-  position: sticky;
-  bottom: calc(var(--hs-tabbar-h) + var(--hs-safe-b) - 4px);
-  z-index: 10;
-  margin: 4px calc(var(--hs-gutter) * -1) 0;
-  padding: 14px var(--hs-gutter) 12px;
-  background: linear-gradient(to top,
-              var(--hs-bg) 0%, var(--hs-bg) 66%, transparent 100%);
+  display: block;
+  margin: 4px 0 0;
 }
 
 
