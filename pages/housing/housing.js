@@ -677,10 +677,18 @@
     if (post.is_mine) show(node.querySelector('[data-field="mine-badge"]'));
 
     var cta = node.querySelector('[data-field="cta"]');
-    if (cta && post.has_contact === false) {
-      cta.classList.add('hs-card__cta--muted');
-      cta.textContent = 'Aloqa ma\u02bblumoti yo\u02bbq';
-    }
+        if (cta) {
+          // A post carries a phone, a Telegram handle, or both — the muted
+          // fallback belongs only to the case where it somehow has neither.
+          if (post.has_contact) {
+            cta.textContent = 'Raqamni ko\u02bbrish';
+          } else if (post.has_telegram) {
+            cta.textContent = 'Telegram orqali bog\u02bblanish';
+          } else {
+            cta.classList.add('hs-card__cta--muted');
+            cta.textContent = 'Aloqa ma\u02bblumoti yo\u02bbq';
+          }
+        }
 
     node.addEventListener('click', function () { openSheet(post.id); });
     node.addEventListener('keydown', function (ev) {
