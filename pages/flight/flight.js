@@ -348,6 +348,10 @@
     }
 
     const rows = data.fares.map((f) => {
+      const conf = f.confidence === 'stable'
+        ? `<span class="fl-tag fl-tag-hold">${Math.round(f.held_hours)} soatdan beri shu narx</span>`
+        : (f.confidence === 'new'
+            ? '<span class="fl-tag fl-tag-new">yangi paydo bo\'ldi</span>' : '');
       const tags =
         (f.passes_quality ? '<span class="fl-tag fl-tag-good">qulay reys</span>' : '') +
         (f.is_risky_gate ? '<span class="fl-tag fl-tag-warn">self-transfer</span>' : '');
@@ -359,6 +363,7 @@
             <div class="fl-f-line1">${esc(f.airline_name || f.airline || '—')}<span class="fl-fno">${esc(f.airline || '')}${esc(f.flight_number || '')}</span>${tags}</div>
             <div class="fl-f-line2">
               ${esc(stopsUz(f.transfers))} · ${esc(durLong(f.duration))}${ret}<br>
+              ${conf}<br>
               Sotuvchi: ${esc(f.gate || '—')}${f.also_sold_by ? ` <span class="fl-more">+${f.also_sold_by} boshqa sotuvchi</span>` : ''}
             </div>
             <a class="fl-book" href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">
@@ -374,7 +379,9 @@
         <h3 class="fl-rdate">${esc(dateTitle(iso))}</h3>
         <div class="fl-rmeta">${data.count} ta variant</div>
         ${ctx}
-      </div>${rows}`;
+      </div>${rows}
+      <p class="fl-disclaimer">Narxlar Aviasales bazasidan olingan va taxminiy.
+      Aniq va joriy narxni Aviasales sahifasida ko'rasiz.</p>`;
 
     if (!keepScroll) {
       box.scrollIntoView({ behavior: 'smooth', block: 'start' });

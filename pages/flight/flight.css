@@ -459,6 +459,17 @@ body {
 }
 
 .fl-tag-good { background: var(--emerald-50); color: var(--emerald-700); }
+.fl-tag-hold { background: var(--sand-100); color: var(--text-secondary); margin-left: 0; }
+.fl-tag-new  { background: var(--gold-100); color: var(--gold-600); margin-left: 0; }
+
+.fl-disclaimer {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--sand-200);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
 .fl-tag-warn { background: var(--gold-100); color: var(--gold-600); }
 
 .fl-book {
@@ -599,6 +610,9 @@ body {
   background: rgba(6, 78, 59, 0.35);
   color: var(--emerald-400);
 }
+
+.night-mode .fl-tag-hold { background: #2a2a2a; color: #a0a0a0; }
+.night-mode .fl-tag-new { background: rgba(181,134,10,0.18); color: var(--gold-400); }
 
 .night-mode .fl-fno, .night-mode .fl-more { color: #777; }
 
