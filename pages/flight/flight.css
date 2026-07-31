@@ -474,6 +474,22 @@ body {
 
 .fl-empty { color: var(--text-muted); font-size: 0.88rem; margin: 6px 0; }
 
+.fl-fno {
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.fl-more { color: var(--text-muted); font-size: 0.72rem; }
+
+.fl-day.is-nodata .fl-daymeta {
+  font-size: 0.55rem;
+  line-height: 1.15;
+  white-space: normal;
+}
+
 /* ===========================================
    DATA STATUS
    =========================================== */
@@ -583,6 +599,8 @@ body {
   background: rgba(6, 78, 59, 0.35);
   color: var(--emerald-400);
 }
+
+.night-mode .fl-fno, .night-mode .fl-more { color: #777; }
 
 .night-mode .fl-tag-good { background: rgba(6, 78, 59, 0.35); color: var(--emerald-400); }
 .night-mode .fl-tag-warn { background: rgba(181, 134, 10, 0.18); color: var(--gold-400); }

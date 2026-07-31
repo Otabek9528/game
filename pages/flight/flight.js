@@ -156,18 +156,19 @@
     const p = new URLSearchParams({
       trip: state.trip, origin: state.origin, dest: state.dest,
     });
-    if ($('fDirect').checked) p.set('direct', '1');
     if ($('fRisky').checked) p.set('exclude_risky', '1');
     const s = $('fStops').value;
     if (s !== '') p.set('max_stops', s);
+    const dmax = $('fDur').value;
+    if (dmax !== '') p.set('max_duration', dmax);
     return p;
   }
 
   function activeFilterCount() {
     let n = 0;
-    if ($('fDirect').checked) n++;
     if ($('fRisky').checked) n++;
     if ($('fStops').value !== '') n++;
+    if ($('fDur').value !== '') n++;
     return n;
   }
 
@@ -240,8 +241,11 @@
     p.set('month', ym);
 
     let days = [];
+    let filteredOut = new Set();
     try {
-      days = (await api('/calendar', p)).days || [];
+      const cal = await api('/calendar', p);
+      days = cal.days || [];
+      filteredOut = new Set(cal.dates_filtered_out || []);
     } catch (e) {
       logErr('calendar failed', e);
       grid.innerHTML = '<p class="fl-empty" style="grid-column:1/-1">' +
@@ -275,7 +279,9 @@
       const d = byDate[iso];
 
       if (!d || iso < todayIso) {
-        html += `<div class="fl-day is-nodata"><span class="fl-daynum">${dd}</span></div>`;
+        const why = (iso >= todayIso && filteredOut.has(iso))
+          ? '<span class="fl-daymeta">filtrga mos emas</span>' : '';
+        html += `<div class="fl-day is-nodata"><span class="fl-daynum">${dd}</span>${why}</div>`;
         continue;
       }
 
@@ -289,7 +295,7 @@
           <span class="fl-daynum">${dd}</span>
           ${d.min_direct != null ? '<span class="fl-daydot"></span>' : ''}
           <span class="fl-dayprice">${wonShort(d.min_price)}</span>
-          <span class="fl-daymeta">${esc(stopsUz(d.best_stops))} · ${esc(durShort(d.best_duration))}</span>
+          <span class="fl-daymeta">${esc(d.best_airline_name || '')} · ${esc(durShort(d.best_duration))}</span>
           <span class="fl-bar"><i style="width:${pct}%"></i></span>
         </button>`;
     }
@@ -350,13 +356,13 @@
       return `
         <div class="fl-fare">
           <div class="fl-f-main">
-            <div class="fl-f-line1">${esc(f.airline || '—')} ${esc(f.flight_number || '')}${tags}</div>
+            <div class="fl-f-line1">${esc(f.airline_name || f.airline || '—')}<span class="fl-fno">${esc(f.airline || '')}${esc(f.flight_number || '')}</span>${tags}</div>
             <div class="fl-f-line2">
               ${esc(stopsUz(f.transfers))} · ${esc(durLong(f.duration))}${ret}<br>
-              Sotuvchi: ${esc(f.gate || '—')}
+              Sotuvchi: ${esc(f.gate || '—')}${f.also_sold_by ? ` <span class="fl-more">+${f.also_sold_by} boshqa sotuvchi</span>` : ''}
             </div>
             <a class="fl-book" href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">
-              Aviasales'da ochish →
+              Aviasales'da jonli narxni ko'rish →
             </a>
           </div>
           <div class="fl-price">${won(f.price)}</div>
@@ -445,7 +451,7 @@
     $('filterToggle').setAttribute('aria-expanded', String(open));
   });
 
-  ['fDirect', 'fRisky', 'fStops'].forEach((id) => {
+  ['fRisky', 'fStops', 'fDur'].forEach((id) => {
     $(id).addEventListener('change', () => { syncFilterBadge(); loadMonth(); });
   });
 
@@ -454,9 +460,9 @@
   });
 
   $('filterReset').addEventListener('click', () => {
-    $('fDirect').checked = false;
     $('fRisky').checked = false;
     $('fStops').value = '';
+    $('fDur').value = '';
     syncFilterBadge();
     loadMonth();
   });

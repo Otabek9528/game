@@ -50,21 +50,27 @@
     <!-- ===== FILTERS (collapsed by default) ===== -->
     <div class="fl-filters" id="filterPanel" hidden>
       <label class="fl-chk">
-        <input type="checkbox" id="fDirect" />
-        <span>Faqat to'g'ridan-to'g'ri reyslar</span>
-      </label>
-      <label class="fl-chk">
         <input type="checkbox" id="fRisky" />
         <span>Self-transfer chiptalarni yashirish</span>
       </label>
 
       <div class="fl-field">
-        <span class="fl-field-label">Transferlar soni</span>
+        <span class="fl-field-label">Transferlar</span>
         <select id="fStops" class="fl-select">
           <option value="">Farqi yo'q</option>
-          <option value="0">To'g'ridan-to'g'ri</option>
+          <option value="0">Faqat to'g'ridan-to'g'ri</option>
           <option value="1">Ko'pi bilan 1 ta</option>
           <option value="2">Ko'pi bilan 2 ta</option>
+        </select>
+      </div>
+
+      <div class="fl-field">
+        <span class="fl-field-label">Maksimal davomiylik</span>
+        <select id="fDur" class="fl-select">
+          <option value="">Farqi yo'q</option>
+          <option value="600">10 soatgacha</option>
+          <option value="960">16 soatgacha</option>
+          <option value="1440">24 soatgacha</option>
         </select>
       </div>
 
