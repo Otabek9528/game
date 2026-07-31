@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Aviachipta narxlari — Muslim Vegukin Bot</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="flight.css" />
+
+  <script>
+    if (localStorage.getItem('theme') === 'night') {
+      document.documentElement.classList.add('night-mode');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ===== APP HEADER (shared) ===== -->
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <div class="fl-container">
+
+    <!-- ===== LEDE ===== -->
+    <div class="fl-lede">
+      <h1 class="fl-title">Aviachipta narxlari</h1>
+      <p class="fl-sub">Har kun uchun eng arzon chipta — kalendardan ko'ring.</p>
+    </div>
+
+    <!-- ===== CONTROLS ===== -->
+    <div class="fl-controls">
+      <div class="fl-seg" role="group" aria-label="Chipta turi">
+        <button type="button" id="btnOW" aria-pressed="true">Bir tomonga</button>
+        <button type="button" id="btnRT" aria-pressed="false">Borish-kelish</button>
+      </div>
+
+      <select id="routeSel" class="fl-select" aria-label="Yo'nalish"></select>
+
+      <button type="button" class="fl-filter-toggle" id="filterToggle" aria-expanded="false">
+        <span>Filtrlar</span>
+        <span class="fl-filter-count" id="filterCount" hidden>0</span>
+        <span class="fl-caret">▾</span>
+      </button>
+    </div>
+
+    <!-- ===== FILTERS (collapsed by default) ===== -->
+    <div class="fl-filters" id="filterPanel" hidden>
+      <label class="fl-chk">
+        <input type="checkbox" id="fDirect" />
+        <span>Faqat to'g'ridan-to'g'ri reyslar</span>
+      </label>
+      <label class="fl-chk">
+        <input type="checkbox" id="fRisky" />
+        <span>Self-transfer chiptalarni yashirish</span>
+      </label>
+
+      <div class="fl-field">
+        <span class="fl-field-label">Transferlar soni</span>
+        <select id="fStops" class="fl-select">
+          <option value="">Farqi yo'q</option>
+          <option value="0">To'g'ridan-to'g'ri</option>
+          <option value="1">Ko'pi bilan 1 ta</option>
+          <option value="2">Ko'pi bilan 2 ta</option>
+        </select>
+      </div>
+
+      <div class="fl-field">
+        <span class="fl-field-label">Saralash</span>
+        <select id="fSort" class="fl-select">
+          <option value="price">Avval arzoni</option>
+          <option value="duration">Avval tezi</option>
+          <option value="value">Eng maqbuli</option>
+        </select>
+      </div>
+
+      <button type="button" class="fl-reset" id="filterReset">Filtrlarni tozalash</button>
+    </div>
+
+    <!-- ===== MONTH NAV ===== -->
+    <div class="fl-monthbar">
+      <button type="button" class="fl-ghost" id="prevM" aria-label="Oldingi oy">‹</button>
+      <h2 class="fl-month-title" id="monthTitle">—</h2>
+      <button type="button" class="fl-ghost" id="nextM" aria-label="Keyingi oy">›</button>
+    </div>
+
+    <!-- ===== CALENDAR ===== -->
+    <div class="fl-cal">
+      <div class="fl-dows">
+        <div>Du</div><div>Se</div><div>Ch</div><div>Pa</div><div>Ju</div><div>Sh</div><div>Ya</div>
+      </div>
+      <div class="fl-grid" id="grid">
+        <div class="fl-skel" style="grid-column:1/-1"></div>
+      </div>
+
+      <div class="fl-legend">
+        <span><i class="fl-swatch fl-sw-cheap"></i> arzon kunlar</span>
+        <span><i class="fl-swatch fl-sw-mid"></i> o'rtacha</span>
+        <span><i class="fl-swatch fl-sw-high"></i> qimmat</span>
+        <span><i class="fl-dot-legend"></i> to'g'ridan-to'g'ri bor</span>
+      </div>
+    </div>
+
+    <!-- ===== RESULTS ===== -->
+    <div class="fl-results" id="results">
+      <p class="fl-empty">Kalendardan kunni tanlang — o'sha kundagi barcha chiptalar shu yerda ko'rinadi.</p>
+    </div>
+
+    <!-- ===== DATA STATUS ===== -->
+    <div class="fl-status">
+      <h4 class="fl-status-h">Ma'lumot holati</h4>
+      <div class="fl-stats" id="stats">Yuklanmoqda…</div>
+      <div class="fl-prog"><i id="progBar"></i></div>
+      <p class="fl-note" id="progNote"></p>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div class="fl-toast" id="toast" hidden></div>
+
+  <!-- ===== Scripts ===== -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/logger.js"></script>
+  <script src="flight.js"></script>
+</body>
+</html>

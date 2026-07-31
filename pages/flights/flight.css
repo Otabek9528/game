@@ -1,0 +1,611 @@
+/* =====================================================================
+   flight.css — Aviachipta narxlari
+   Built on the shared token system in ../../css/style.css
+   (emerald / sand / gold, --radius-*, --shadow-*, --transition-*).
+   Price level colours: emerald = cheap, sand = mid, gold = expensive.
+   ===================================================================== */
+
+[hidden] { display: none !important; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible !important;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+}
+
+.app__header { flex-shrink: 0; }
+
+.fl-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 96px;
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ===========================================
+   LEDE
+   =========================================== */
+
+.fl-lede { padding: 20px 2px 14px; }
+
+.fl-title {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 6px;
+  color: var(--text-primary);
+}
+
+.fl-sub {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ===========================================
+   CONTROLS
+   =========================================== */
+
+.fl-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.fl-seg {
+  display: inline-flex;
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+}
+
+.fl-seg button {
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-full);
+  padding: 7px 15px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.fl-seg button[aria-pressed="true"] {
+  background: var(--emerald-600);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.fl-select {
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-full);
+  padding: 8px 13px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  max-width: 100%;
+}
+
+.fl-select:focus-visible {
+  outline: 2px solid var(--emerald-500);
+  outline-offset: 1px;
+}
+
+.fl-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-full);
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  margin-left: auto;
+}
+
+.fl-filter-toggle[aria-expanded="true"] {
+  border-color: var(--emerald-500);
+  color: var(--emerald-700);
+}
+
+.fl-filter-count {
+  background: var(--emerald-600);
+  color: #fff;
+  font-size: 0.7rem;
+  min-width: 17px;
+  height: 17px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.fl-caret { font-size: 0.7rem; transition: transform var(--transition-fast); }
+.fl-filter-toggle[aria-expanded="true"] .fl-caret { transform: rotate(180deg); }
+
+/* ===========================================
+   FILTER PANEL
+   =========================================== */
+
+.fl-filters {
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fl-chk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.fl-chk input { width: 17px; height: 17px; accent-color: var(--emerald-600); flex-shrink: 0; }
+
+.fl-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.fl-field-label { font-size: 0.88rem; color: var(--text-secondary); }
+
+.fl-reset {
+  align-self: flex-start;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--emerald-700);
+  background: none;
+  border: 0;
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+/* ===========================================
+   MONTH NAV
+   =========================================== */
+
+.fl-monthbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 4px 0 10px;
+}
+
+.fl-month-title {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin: 0;
+  min-width: 165px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.fl-ghost {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--sand-200);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-full);
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.fl-ghost:active { transform: scale(0.94); }
+.fl-ghost[disabled] { opacity: 0.35; cursor: default; box-shadow: none; }
+
+/* ===========================================
+   CALENDAR
+   =========================================== */
+
+.fl-cal {
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-lg);
+  padding: 12px 12px 14px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.fl-dows {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.fl-dows div {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fl-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.fl-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 66px;
+  padding: 5px 5px 6px;
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.fl-day:active { transform: scale(0.96); }
+.fl-day[aria-selected="true"] {
+  border-color: var(--emerald-600);
+  box-shadow: inset 0 0 0 1px var(--emerald-600);
+}
+
+.fl-day.is-empty { background: transparent; border-color: transparent; cursor: default; }
+.fl-day.is-nodata { opacity: 0.45; cursor: default; }
+
+.fl-daynum { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; }
+
+.fl-dayprice {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.fl-daymeta {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the price ladder: bar length = how cheap this day is within the month */
+.fl-bar {
+  margin-top: auto;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sand-200);
+  position: relative;
+  overflow: hidden;
+}
+
+.fl-bar > i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; display: block; }
+
+.lv-cheap .fl-bar > i { background: var(--emerald-600); }
+.lv-mid   .fl-bar > i { background: var(--sand-400); }
+.lv-high  .fl-bar > i { background: var(--gold-600); }
+
+.lv-cheap .fl-dayprice { color: var(--emerald-700); }
+
+.fl-daydot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--emerald-500);
+}
+
+.fl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 12px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.fl-legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+.fl-swatch { width: 11px; height: 3px; border-radius: 2px; display: inline-block; }
+.fl-sw-cheap { background: var(--emerald-600); }
+.fl-sw-mid   { background: var(--sand-400); }
+.fl-sw-high  { background: var(--gold-600); }
+
+.fl-dot-legend {
+  width: 5px; height: 5px; border-radius: var(--radius-full);
+  background: var(--emerald-500); display: inline-block;
+}
+
+/* skeleton */
+.fl-skel {
+  height: 210px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--sand-100) 25%, var(--sand-200) 50%, var(--sand-100) 75%);
+  background-size: 200% 100%;
+  animation: flShimmer 1.2s infinite;
+}
+
+@keyframes flShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ===========================================
+   RESULTS
+   =========================================== */
+
+.fl-results {
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.fl-rhead { margin-bottom: 10px; }
+
+.fl-rdate {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+  color: var(--text-primary);
+}
+
+.fl-rmeta { font-size: 0.8rem; color: var(--text-secondary); }
+
+.fl-ctx {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--emerald-700);
+  background: var(--emerald-50);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+}
+
+.fl-fare {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 0;
+  border-top: 1px solid var(--sand-200);
+}
+
+.fl-fare:first-of-type { border-top: 0; padding-top: 4px; }
+
+.fl-f-main { min-width: 0; }
+
+.fl-f-line1 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.fl-f-line2 { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+
+.fl-price {
+  font-size: 1.02rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-align: right;
+  letter-spacing: -0.02em;
+}
+
+.fl-tag {
+  display: inline-block;
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  margin-left: 5px;
+  vertical-align: 1px;
+}
+
+.fl-tag-good { background: var(--emerald-50); color: var(--emerald-700); }
+.fl-tag-warn { background: var(--gold-100); color: var(--gold-600); }
+
+.fl-book {
+  display: inline-block;
+  margin-top: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--emerald-700);
+  text-decoration: none;
+}
+
+.fl-book:active { opacity: 0.6; }
+
+.fl-empty { color: var(--text-muted); font-size: 0.88rem; margin: 6px 0; }
+
+/* ===========================================
+   DATA STATUS
+   =========================================== */
+
+.fl-status {
+  margin-top: 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.fl-status-h {
+  margin: 0 0 9px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fl-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.fl-stats b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+.fl-prog {
+  height: 4px;
+  background: var(--sand-200);
+  border-radius: var(--radius-full);
+  margin-top: 11px;
+  overflow: hidden;
+}
+
+.fl-prog > i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--emerald-600);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-slow);
+}
+
+.fl-note { font-size: 0.75rem; color: var(--text-muted); margin: 8px 0 0; line-height: 1.5; }
+
+/* ===========================================
+   TOAST
+   =========================================== */
+
+.fl-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 14px);
+  background: var(--sand-800);
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transition: opacity var(--transition-base), transform var(--transition-base);
+  z-index: 400;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.fl-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ===========================================
+   NIGHT MODE
+   =========================================== */
+
+.night-mode .fl-seg,
+.night-mode .fl-select,
+.night-mode .fl-filter-toggle,
+.night-mode .fl-ghost,
+.night-mode .fl-cal,
+.night-mode .fl-filters,
+.night-mode .fl-results,
+.night-mode .fl-status,
+.night-mode .fl-day {
+  background: var(--bg-elevated);
+  border-color: #333;
+}
+
+.night-mode .fl-day.is-empty { background: transparent; border-color: transparent; }
+
+.night-mode .fl-bar,
+.night-mode .fl-prog { background: #333; }
+
+.night-mode .fl-title,
+.night-mode .fl-month-title,
+.night-mode .fl-rdate { color: var(--emerald-400); }
+
+.night-mode .lv-cheap .fl-dayprice,
+.night-mode .fl-book,
+.night-mode .fl-reset { color: var(--emerald-400); }
+
+.night-mode .fl-ctx {
+  background: rgba(6, 78, 59, 0.35);
+  color: var(--emerald-400);
+}
+
+.night-mode .fl-tag-good { background: rgba(6, 78, 59, 0.35); color: var(--emerald-400); }
+.night-mode .fl-tag-warn { background: rgba(181, 134, 10, 0.18); color: var(--gold-400); }
+
+.night-mode .fl-skel {
+  background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+  background-size: 200% 100%;
+}
+
+.night-mode .fl-toast { background: #2a2a2a; }
+
+/* ===========================================
+   SMALL SCREENS / MOTION
+   =========================================== */
+
+@media (max-width: 380px) {
+  .fl-day { min-height: 60px; padding: 4px; }
+  .fl-dayprice { font-size: 0.66rem; }
+  .fl-daymeta { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+:focus-visible { outline: 2px solid var(--emerald-500); outline-offset: 2px; }
