@@ -139,7 +139,7 @@
       links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
       donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },      
       housing: { icon: '🏠', labelKey: 'feature.housing', href: 'pages/housing/housing.html', isNew: true},
-      market: { icon: '🛒', labelKey: 'feature.market', href: '/pages/flights/flight.html', comingSoon: true },
+      market: { icon: '🛒', labelKey: 'feature.market', href: '/pages/flight/flight.html' },
       community: { icon: '👥', labelKey: 'feature.community', href: 'pages/community/community.html' }
     };
 
