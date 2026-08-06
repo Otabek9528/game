@@ -177,31 +177,21 @@ body {
     color: var(--emerald-400);
   }
 
-.night-mode .progress-line {
-  background: linear-gradient(
-    90deg,
-    var(--emerald-400) 0%,
-    var(--emerald-500) var(--progress),
-    rgba(255, 255, 255, 0.08) var(--progress),
-    rgba(255, 255, 255, 0.08) 100%
-  );
-}
-.night-mode .progress-line .progress-dot {
+/* --- night mode: prayer card --- */
+.night-mode .rail-track { background: rgba(255, 255, 255, 0.11); }
+.night-mode .rail-fill  { background: var(--emerald-400); }
+.night-mode .arch-eyebrow { color: var(--emerald-400); opacity: 0.8; }
+.night-mode .arch-countdown { color: #f2f5f4; }
+.night-mode .prayer-rail .progress-dot {
   background: #1e1e1e;
-  box-shadow: 0 0 0 3px #1e1e1e, 0 0 0 5px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 0 3px #1e1e1e;
 }
- 
-
-
-.night-mode .progress-line::before,
-.night-mode .progress-line::after {
-    box-shadow: 0 0 0 3px #1e1e1e, 0 2px 4px rgba(0,0,0,0.3);
-  }
-
-.night-mode .countdown-badge {
-    background: linear-gradient(135deg, rgba(181, 134, 10, 0.15) 0%, rgba(181, 134, 10, 0.08) 100%);
-    border-color: rgba(234, 185, 50, 0.4);
-  }
+.night-mode .prayer-rail .progress-dot path { fill: var(--emerald-400); }
+.night-mode .timeline-name { color: #8b8e8d; }
+.night-mode .timeline-time { color: #ececec; }
+.night-mode .timeline-end .timeline-time { color: var(--emerald-400); }
+.night-mode .left-side .weekday { color: #b9bbba; }
+.night-mode .left-side .hijri { color: #7c7f7e; }
 
 .night-mode .card {
     background: #1e1e1e;
@@ -386,28 +376,10 @@ body {
   box-sizing: border-box;
 }
 
-/* Decorative top accent */
-.prayer-card-timeline::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--emerald-600), var(--gold-500), var(--emerald-600));
-}
-
-/* Subtle pattern */
-.prayer-card-timeline::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle at top right, var(--emerald-50) 0%, transparent 70%);
-  pointer-events: none;
-}
+/* The card is a plain white plane. The arch is the only coloured element on it —
+   the old gold gradient rule and the corner radial wash both competed with it. */
+.prayer-card-timeline::before { content: none; }
+.prayer-card-timeline::after  { content: none; }
 
 .prayer-card-timeline:hover {
   transform: translateY(-2px);
@@ -423,7 +395,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
+  gap: 10px;
   position: relative;
   z-index: 1;
 }
@@ -432,169 +405,195 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;   /* lets the nowrap date ellipsis instead of shoving the city pill off-card */
+  flex: 1 1 auto;
 }
 
+/* Demoted: the date is context, not the answer. It was the largest type on the
+   card and it is the least actionable thing on it. */
 .left-side .weekday {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text-secondary);
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .left-side .hijri {
-  font-size: 0.95rem;
+  font-size: 0.86rem;
+  font-weight: 500;
   color: var(--text-muted);
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .right-side {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 5px;
+  padding: 5px 10px;
   background: var(--emerald-50);
   border-radius: var(--radius-full);
+  flex-shrink: 0;
 }
 
 .right-side .location-icon {
-  font-size: 1.1rem;
+  font-size: 0.8rem;
   line-height: 1;
+  opacity: 0.75;
 }
 
 .right-side .city-name {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.82rem;
+  font-weight: 600;
   color: var(--emerald-700);
-  line-height: 1;
+  line-height: 1.2;
 }
 
-/* Timeline Prayer */
+/* =========================
+   TIMELINE PRAYER
+   Hierarchy: the countdown is why the card exists, so it is the largest thing on
+   it. Under it, a rail spanning the current prayer window, filling left→right
+   toward the prayer named at its right foot. The marker is a khatam — the eight-
+   pointed star from Central Asian girih work — which is the one ornamental
+   decision on the card; everything else is hairlines and type.
+   ========================= */
 .timeline-prayer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   position: relative;
   z-index: 1;
-  margin-top: 8px;
-}
-
-.timeline-start,
-.timeline-end {
-  flex: 1;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
 }
 
-.timeline-emoji {
-  font-size: 2.75rem;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+.arch-eyebrow {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--emerald-700);
+  opacity: 0.7;
+  line-height: 1;
+  margin-bottom: 7px;
+}
+
+.arch-countdown {
+  font-size: clamp(2.4rem, 13vw, 3.3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--emerald-900);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
   line-height: 1;
 }
 
-.timeline-name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-  line-height: 1.2;
-  /* Reserve 2 lines. "Quyosh chiqishi" (uz) wraps in the narrow timeline column
-     while every other prayer name fits on one — without this the card jumps in
-     height and the two halves lose horizontal alignment when Sunrise is the
-     current or next segment. em-based, so it scales with the media-query size. */
-  min-height: 2.4em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.timeline-time {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--emerald-600);
-  margin: 0;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.2;
-}
-
-/* Timeline Progress */
-.timeline-progress {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 0 8px;
-  min-width: 120px;
-  flex: 0 0 auto;
-}
-
-.progress-line {
+/* --- the rail --- */
+.prayer-rail {
   --progress: 0%;
   position: relative;
   width: 100%;
-  height: 4px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(
-    90deg,
-    var(--emerald-500) 0%,
-    var(--emerald-400) var(--progress),
-    rgba(6, 95, 70, 0.18) var(--progress),
-    rgba(6, 95, 70, 0.18) 100%
-  );
-  transition: background 0.9s linear;
+  max-width: 340px;
+  height: 3px;
+  margin: 22px 0 0;
 }
 
-.progress-line::before,
-.progress-line::after {
-  content: '';
+.rail-track, .rail-fill {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 10px;
-  height: 10px;
+  left: 0;
   border-radius: var(--radius-full);
-  background: var(--emerald-500);
-  box-shadow: 0 0 0 3px var(--bg-elevated), 0 2px 4px rgba(0, 0, 0, 0.12);
-  z-index: 1;
 }
-.progress-line::before { left: -5px; }
-.progress-line::after  { right: -5px; }
-
-.progress-line .progress-dot {
+.rail-track {
+  top: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--sand-200);
+}
+.rail-fill {
+  top: 0;
+  width: var(--progress);
+  height: 3px;
+  background: var(--emerald-600);
+  transition: width 0.9s linear;
+}
+.prayer-rail .progress-dot {
   position: absolute;
-  top: 50%;
   left: var(--progress);
+  top: 1.5px;
   transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
-  background: #fff;
-  border: 2.5px solid var(--emerald-600);
-  box-shadow: 0 0 0 3px var(--bg-elevated), 0 0 0 5px rgba(16, 185, 129, 0.25);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 3px var(--bg-elevated);
   transition: left 0.9s linear;
-  z-index: 2;
+  pointer-events: none;
+}
+.prayer-rail .progress-dot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.prayer-rail .progress-dot path {
+  fill: var(--emerald-600);
+  stroke: none;
+}
+/* the old bar's end-cap dots — the rail's own ends read as the ends now */
+.prayer-rail::before, .prayer-rail::after { content: none; }
+
+/* --- the feet: the two ends of the window --- */
+.timeline-feet {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  margin-top: 17px;
 }
 
-.countdown-badge {
-  background: linear-gradient(135deg, var(--gold-100) 0%, #fff8e7 100%);
-  border: 2px solid var(--gold-400);
-  border-radius: var(--radius-full);
-  padding: 6px 12px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--gold-600);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  letter-spacing: 0.3px;
-  box-shadow: 0 2px 8px rgba(212, 162, 26, 0.25);
-  animation: none;
+.timeline-start, .timeline-end {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
 }
+.timeline-start { align-items: flex-start; text-align: left; }
+.timeline-end   { align-items: flex-end;   text-align: right; }
+
+.timeline-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+
+/* Emoji kept — at caption size they read as a bullet, not a sticker. */
+.timeline-emoji {
+  font-size: 0.78rem;
+  line-height: 1;
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+.timeline-time {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+/* the prayer you are heading toward is the one that matters */
+.timeline-end .timeline-time { color: var(--emerald-700); }
 
 /* =========================
    SCROLLABLE FEATURES
@@ -1053,11 +1052,11 @@ body {
   }
   
   .left-side .weekday {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   
   .left-side .hijri {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
   
   .right-side {
@@ -1068,28 +1067,22 @@ body {
     font-size: 0.85rem;
   }
   
-  .timeline-emoji {
-    font-size: 2rem;
+  .timeline-time {
+    font-size: 1.2rem;
+  }
+  
+  .arch-eyebrow {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
   }
   
   .timeline-name {
-    font-size: 1.05rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.07em;
   }
   
-  .timeline-time {
-    font-size: 1rem;
-  }
-  
-  .progress-line {
-    width: 60px;
-  }
-  
-  .timeline-progress {
-    min-width: 100px;
-  }
-  .countdown-badge {
-    font-size: 0.85rem;
-    padding: 5px 10px;
+  .timeline-feet {
+    margin-top: 8px;
   }
 }
 

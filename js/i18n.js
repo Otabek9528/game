@@ -47,6 +47,7 @@ const I18N = {
     'prayer.pageTitle': { uz: 'Bugungi Namoz Vaqtlari', ru: 'Время намаза сегодня', en: 'Today\'s Prayer Times' },
     'prayer.dateLoading': { uz: 'Sana yuklanmoqda...', ru: 'Загрузка даты...', en: 'Loading date...' },
     'prayer.nextPrayer': { uz: 'Keyingi namoz', ru: 'Следующий намаз', en: 'Next prayer' },
+    'prayer.remaining': { uz: 'Qolgan vaqt', ru: 'Осталось', en: 'Remaining' },
     'prayer.untilFajrEnds': { uz: 'Bomdod tugashiga', ru: 'До конца Фаджра', en: 'Until Fajr ends' },
     'prayer.never': { uz: 'Hech qachon', ru: 'Никогда', en: 'Never' },
     'prayer.infoTitle': { uz: 'Ma\'lumot', ru: 'Информация', en: 'Information' },
