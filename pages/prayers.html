@@ -62,10 +62,35 @@
     .pb-date { font-size:12px; color:var(--pb-faint); }
 
     /* ---- timeline ---- */
-    .pb-tabs { display:flex; gap:3px; background:var(--pb-line); border-radius:13px; padding:3px; margin:16px 0 8px; }
-    .pb-tab { flex:1; text-align:center; padding:8px 0; font-size:14px; font-weight:600; color:var(--pb-sub); border-radius:10px; cursor:pointer; transition:background .18s ease, color .18s ease; -webkit-tap-highlight-color:transparent; }
-    .pb-tab.active { background:var(--pb-surface); color:var(--pb-emd); box-shadow:0 1px 3px rgba(0,0,0,0.10); }
-    .pb-tab:active { transform:scale(0.98); }
+    /* ---- date stepper (replaces today/tomorrow tabs) ---- */
+    .pb-datenav {
+      display:flex; align-items:stretch; gap:3px;
+      background:var(--pb-line); border-radius:13px; padding:3px; margin:16px 0 8px;
+    }
+    .pb-datenav-btn {
+      flex:0 0 46px; display:flex; align-items:center; justify-content:center;
+      background:transparent; border:none; border-radius:10px; cursor:pointer;
+      padding:0; -webkit-tap-highlight-color:transparent; transition:background .15s ease;
+    }
+    .pb-datenav-btn:active { background:rgba(0,0,0,0.06); }
+    .pb-datenav-btn:disabled { opacity:.3; cursor:default; }
+    /* pure-CSS triangles */
+    .pb-tri { display:block; width:0; height:0; border-style:solid; }
+    .pb-tri-left  { border-width:7px 9px 7px 0; border-color:transparent var(--pb-emd) transparent transparent; }
+    .pb-tri-right { border-width:7px 0 7px 9px; border-color:transparent transparent transparent var(--pb-emd); }
+    .pb-datenav-center {
+      flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:1px; padding:7px 4px; background:var(--pb-surface); color:var(--pb-emd);
+      border:none; border-radius:10px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.10);
+      -webkit-tap-highlight-color:transparent;
+    }
+    .pb-datenav-center:active { transform:scale(0.98); }
+    .pb-datenav-main { font-size:14px; font-weight:600; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+    .pb-datenav-sub  { font-size:11px; font-weight:500; color:var(--pb-faint); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+    /* off-today: center button doubles as "return to today" */
+    .pb-datenav.is-away .pb-datenav-center { background:var(--pb-ems); }
+    .pb-datenav.is-away .pb-datenav-sub { color:var(--pb-emd); }
+    .pb-datenav.is-loading .pb-datenav-sub { opacity:.5; }
     .pb-timeline { margin-top:0; background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:18px; padding:8px 14px 8px 8px; }
     .pb-row { display:grid; grid-template-columns:32px 1fr auto; align-items:center; column-gap:12px; min-height:58px; border-radius:14px; padding:6px 6px; }
     .pb-row.is-past { opacity:.5; }
@@ -215,9 +240,17 @@
         <div class="pb-date" id="todayDate" data-i18n="prayer.dateLoading">Sana yuklanmoqda...</div>
       </div>
 
-      <div class="pb-tabs">
-        <div class="pb-tab active" data-tab="today" data-i18n="prayer.tab.today">Bugun</div>
-        <div class="pb-tab" data-tab="tomorrow" data-i18n="prayer.tab.tomorrow">Ertaga</div>
+      <div class="pb-datenav" id="dateNav">
+        <button class="pb-datenav-btn" id="datePrevBtn" type="button" aria-label="Oldingi kun">
+          <span class="pb-tri pb-tri-left" aria-hidden="true"></span>
+        </button>
+        <button class="pb-datenav-center" id="dateCenterBtn" type="button">
+          <span class="pb-datenav-main" id="dateNavMain">Bugun</span>
+          <span class="pb-datenav-sub" id="dateNavSub">--</span>
+        </button>
+        <button class="pb-datenav-btn" id="dateNextBtn" type="button" aria-label="Keyingi kun">
+          <span class="pb-tri pb-tri-right" aria-hidden="true"></span>
+        </button>
       </div>
       <div class="pb-timeline" id="prayerTimeline"></div>
 
@@ -270,64 +303,191 @@
     const DUHA_START_OFFSET   = 20;   // after sunrise (sun a spear's length)
     const DUHA_END_BEFORE_DHUHR = 60;
 
-    let latest = null; // { timings, currentPrayer, nextPrayer }
-    let activeTab = 'today';
-    let tomorrowCache = null; // { key, timings }
+    let latest = null; // today's live data: { timings, currentPrayer, nextPrayer, date }
 
-    function tomorrowKey() {
+    // ============ DATE STEPPER STATE ============
+    // viewDate is the day currently shown in the timeline + nafl sections.
+    // The hero card above stays pinned to TODAY — it's the live countdown widget.
+    let viewDate = startOfDay(new Date());
+    let pinnedToToday = true;     // if the page is left open past midnight, follow the new day
+    const dayCache = new Map();   // cacheKey -> { timings, date } | 'error'
+    let renderToken = 0;          // monotonic: only the newest navigation may render
+    let fetchTimer = null;        // debounce for held/rapid arrow taps
+    const FETCH_DEBOUNCE_MS = 180;
+
+    function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+    function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+    function isoKey(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+             '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function apiDate(d) {
+      return String(d.getDate()).padStart(2, '0') + '-' +
+             String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear();
+    }
+    function dayOffset(d) {
+      return Math.round((startOfDay(d) - startOfDay(new Date())) / 86400000);
+    }
+    function isViewToday() { return dayOffset(viewDate) === 0; }
+
+    // Cache key includes method, madhab AND location — changing city or madhab
+    // must not serve a stale day.
+    function ctxKey() {
       const s = window.getPrayerSettings ? window.getPrayerSettings() : { method: '3', madhab: '1' };
-      const d = new Date(); d.setDate(d.getDate() + 1);
-      const dd = String(d.getDate()).padStart(2, '0');
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      return dd + '-' + mm + '-' + d.getFullYear() + '|' + s.method + '|' + s.madhab;
+      const loc = window.LocationManager ? window.LocationManager.getCurrentLocation() : null;
+      const lat = loc && loc.lat != null ? Number(loc.lat).toFixed(4) : 'x';
+      const lon = loc && loc.lon != null ? Number(loc.lon).toFixed(4) : 'x';
+      return s.method + '|' + s.madhab + '|' + lat + '|' + lon;
     }
+    function cacheKey(d) { return isoKey(d) + '|' + ctxKey(); }
 
-    function renderActiveTimeline() {
-      if (activeTab === 'today') {
-        renderTimeline(latest ? latest.timings : null, 'today');
-      } else if (tomorrowCache && tomorrowCache.key === tomorrowKey()) {
-        renderTimeline(tomorrowCache.timings, 'tomorrow');
-      } else {
-        renderTimeline(null, 'tomorrow');
-        ensureTomorrow();
-      }
-    }
-
-    async function ensureTomorrow() {
-      const key = tomorrowKey();
-      if (tomorrowCache && tomorrowCache.key === key) return tomorrowCache.timings;
+    async function fetchDay(d) {
+      const key = cacheKey(d);
+      const hit = dayCache.get(key);
+      if (hit && hit !== 'error') return hit;
+      const loc = window.LocationManager ? window.LocationManager.getCurrentLocation() : null;
+      if (!loc || loc.lat == null) return null;
+      const s = window.getPrayerSettings ? window.getPrayerSettings() : { method: '3', madhab: '1' };
+      const url = 'https://api.aladhan.com/v1/timings/' + apiDate(d) +
+        '?latitude=' + loc.lat + '&longitude=' + loc.lon +
+        '&method=' + s.method + '&school=' + s.madhab;
       try {
-        const loc = window.LocationManager ? window.LocationManager.getCurrentLocation() : null;
-        if (!loc || loc.lat == null) return null;
-        const s = window.getPrayerSettings ? window.getPrayerSettings() : { method: '3', madhab: '1' };
-        const datePart = key.split('|')[0];
-        const url = 'https://api.aladhan.com/v1/timings/' + datePart +
-          '?latitude=' + loc.lat + '&longitude=' + loc.lon +
-          '&method=' + s.method + '&school=' + s.madhab;
         const res = await fetch(url);
         const json = await res.json();
         const timings = json && json.data && json.data.timings;
-        if (timings) {
-          tomorrowCache = { key: key, timings: timings };
-          if (activeTab === 'tomorrow') { renderTimeline(timings, 'tomorrow'); updateNaflLive(); }
-          return timings;
-        }
-      } catch (e) { console.error('Tomorrow fetch failed:', e); }
-      if (activeTab === 'tomorrow') {
-        const el = document.getElementById('prayerTimeline');
-        if (el) el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--pb-faint);font-size:13px;">\u2014</div>';
+        if (!timings) throw new Error('no timings in response');
+        const entry = { timings: timings, date: json.data.date || null };
+        dayCache.set(key, entry);
+        return entry;
+      } catch (e) {
+        console.error('Day fetch failed for ' + apiDate(d) + ':', e);
+        dayCache.set(key, 'error');
+        return null;
       }
-      return null;
     }
 
-    function switchTab(tab) {
-      if (tab === activeTab) return;
-      activeTab = tab;
-      document.querySelectorAll('.pb-tab').forEach(function (t) {
-        t.classList.toggle('active', t.dataset.tab === tab);
-      });
-      renderActiveTimeline();
+    // Today's data already arrives via prayerTimes.js — seed the cache from it so
+    // stepping away and back is instant and costs no request.
+    function seedTodayCache() {
+      if (!latest || !latest.timings) return;
+      dayCache.set(cacheKey(startOfDay(new Date())), { timings: latest.timings, date: latest.date || null });
+    }
+
+    function invalidateCache() {
+      dayCache.clear();
+      seedTodayCache();
+    }
+
+    // ---- date label ----
+    function relativeLabel(off) {
+      if (off === 0) return tr('prayer.tab.today', 'Bugun');
+      if (off === 1) return tr('prayer.tab.tomorrow', 'Ertaga');
+      if (off === -1) return tr('prayer.date.yesterday', 'Kecha');
+      // Day/month names come from the i18n dictionary, never toLocaleDateString.
+      const en = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][viewDate.getDay()];
+      return window.translateWeekday ? window.translateWeekday(en) : en;
+    }
+
+    function updateDateNav(entry) {
+      const nav = document.getElementById('dateNav');
+      const mainEl = document.getElementById('dateNavMain');
+      const subEl = document.getElementById('dateNavSub');
+      const prevBtn = document.getElementById('datePrevBtn');
+      const nextBtn = document.getElementById('dateNextBtn');
+      const off = dayOffset(viewDate);
+
+      if (mainEl) mainEl.textContent = relativeLabel(off);
+
+      if (subEl) {
+        const monthName = window.translateMonth ? window.translateMonth(viewDate.getMonth()) : '';
+        let sub = viewDate.getDate() + '-' + monthName;
+        const h = entry && entry.date && entry.date.hijri;
+        if (h && h.day && h.month) sub += ' \u00b7 ' + parseInt(h.day, 10) + '-' + (h.month.en || h.month.number);
+        subEl.textContent = sub;
+      }
+
+      if (nav) nav.classList.toggle('is-away', off !== 0);
+      if (prevBtn) prevBtn.setAttribute('aria-label', tr('prayer.date.prev', 'Oldingi kun'));
+      if (nextBtn) nextBtn.setAttribute('aria-label', tr('prayer.date.next', 'Keyingi kun'));
+      const center = document.getElementById('dateCenterBtn');
+      if (center) center.setAttribute('aria-label', off !== 0 ? tr('prayer.date.backToToday', 'Bugunga qaytish') : '');
+    }
+
+    function showTimelineMessage(html) {
+      const el = document.getElementById('prayerTimeline');
+      if (el) el.innerHTML = '<div style="padding:22px 18px;text-align:center;color:var(--pb-faint);font-size:13px;">' + html + '</div>';
+    }
+
+    // Single entry point. Renders synchronously from cache when possible; otherwise
+    // shows a placeholder and fetches. `renderToken` guarantees a slow response for
+    // an abandoned date can never overwrite what's on screen.
+    function renderView() {
+      const token = ++renderToken;
+      const nav = document.getElementById('dateNav');
+      const key = cacheKey(viewDate);
+      const cached = dayCache.get(key);
+
+      if (cached && cached !== 'error') {
+        if (nav) nav.classList.remove('is-loading');
+        updateDateNav(cached);
+        renderTimeline(cached.timings, isViewToday());
+        updateNaflLive();
+        prefetchNeighbours();
+        return;
+      }
+
+      updateDateNav(null);
+      if (nav) nav.classList.add('is-loading');
+      showTimelineMessage(esc(tr('prayer.dateLoading', 'Yuklanmoqda...')));
       updateNaflLive();
+
+      if (fetchTimer) clearTimeout(fetchTimer);
+      fetchTimer = setTimeout(function () {
+        const target = new Date(viewDate);
+        fetchDay(target).then(function (entry) {
+          if (token !== renderToken) return; // user navigated away — discard
+          if (nav) nav.classList.remove('is-loading');
+          if (!entry) {
+            showTimelineMessage(
+              esc(tr('prayer.date.loadFailed', "Yuklab bo'lmadi")) +
+              '<br><button type="button" id="dateRetryBtn" style="margin-top:10px;padding:7px 16px;border-radius:999px;border:1px solid var(--pb-line);background:var(--pb-surface);color:var(--pb-emd);font-size:13px;font-weight:600;cursor:pointer;">' +
+              esc(tr('prayer.date.retry', 'Qayta urinish')) + '</button>'
+            );
+            const rb = document.getElementById('dateRetryBtn');
+            if (rb) rb.addEventListener('click', function () {
+              dayCache.delete(cacheKey(target));
+              renderView();
+            });
+            return;
+          }
+          updateDateNav(entry);
+          renderTimeline(entry.timings, isViewToday());
+          updateNaflLive();
+          prefetchNeighbours();
+        });
+      }, FETCH_DEBOUNCE_MS);
+    }
+
+    // Warm ±1 day so the next tap in either direction is instant.
+    function prefetchNeighbours() {
+      [-1, 1].forEach(function (n) {
+        const d = addDays(viewDate, n);
+        if (!dayCache.has(cacheKey(d))) fetchDay(d);
+      });
+    }
+
+    function stepDate(n) {
+      viewDate = addDays(viewDate, n);
+      pinnedToToday = dayOffset(viewDate) === 0;
+      renderView();
+      if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.selectionChanged(); } catch (e) {} }
+    }
+
+    function goToday() {
+      pinnedToToday = true;
+      if (isViewToday()) return;
+      viewDate = startOfDay(new Date());
+      renderView();
       if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.selectionChanged(); } catch (e) {} }
     }
 
@@ -373,12 +533,12 @@
     function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
     // ============ TIMELINE ============
-    function renderTimeline(T, mode) {
+    function renderTimeline(T, isToday) {
       const el = document.getElementById('prayerTimeline');
       if (!el) return;
-      if (!T) { el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--pb-faint);font-size:13px;">Yuklanmoqda...</div>'; return; }
+      if (!T) { showTimelineMessage(esc(tr('prayer.dateLoading', 'Yuklanmoqda...'))); return; }
       const now = nowMin();
-      const next = (mode === 'today' && latest) ? latest.nextPrayer : null;
+      const next = (isToday && latest) ? latest.nextPrayer : null;
       let html = '';
 
       ROWS.forEach(function (r) {
@@ -392,8 +552,8 @@
         else if (inBand) { top = 'var(--pb-band)'; bot = 'var(--pb-band)'; }
         if (r.key === 'Isha') { bot = 'transparent'; }
 
-        const isNext = (mode === 'today') && (r.key === next);
-        const isPast = (mode === 'today') && (tmin != null && tmin < now && !isNext);
+        const isNext = !!isToday && (r.key === next);
+        const isPast = !!isToday && (tmin != null && tmin < now && !isNext);
 
         let rowCls = 'pb-row';
         if (r.type === 'boundary') rowCls += ' is-boundary';
@@ -549,15 +709,15 @@
     }
 
     function activeNaflTimings() {
-      if (activeTab === 'tomorrow') {
-        return (tomorrowCache && tomorrowCache.key === tomorrowKey()) ? tomorrowCache.timings : null;
-      }
-      return latest ? latest.timings : null;
+      const entry = dayCache.get(cacheKey(viewDate));
+      if (entry && entry !== 'error') return entry.timings;
+      if (isViewToday() && latest) return latest.timings;
+      return null;
     }
 
     function updateNaflLive() {
       const T = activeNaflTimings();
-      const isToday = (activeTab === 'today');
+      const isToday = isViewToday();
       const times = T ? computeSunnah(T) : { tahajjud: null, ishraq: null, duha: null };
       NAFL.forEach(function (n) {
         const w = times[n.id];
@@ -578,8 +738,12 @@
         statusEl.className = 'nafl-status';
 
         if (!isToday) {
-          statusEl.textContent = tr('prayer.status.tomorrow', 'Ertaga');
-          statusEl.classList.add('s-upcoming');
+          const off = dayOffset(viewDate);
+          statusEl.textContent =
+            off === 1 ? tr('prayer.status.tomorrow', 'Ertaga') :
+            off === -1 ? tr('prayer.date.yesterday', 'Kecha') :
+            tr('prayer.status.otherDate', 'Boshqa kun');
+          statusEl.classList.add(off < 0 ? 's-passed' : 's-upcoming');
           item.classList.remove('active-window');
           return;
         }
@@ -721,28 +885,52 @@
     // ============ EVENTS ============
     window.addEventListener('prayerDataUpdated', function (e) {
       if (e.detail && e.detail.timings) {
-        latest = { timings: e.detail.timings, currentPrayer: e.detail.currentPrayer, nextPrayer: e.detail.nextPrayer };
-        renderActiveTimeline();
+        latest = {
+          timings: e.detail.timings,
+          currentPrayer: e.detail.currentPrayer,
+          nextPrayer: e.detail.nextPrayer,
+          date: e.detail.date || null
+        };
+        seedTodayCache();
         updateHeroLabel();
         updateHeroProgress();
         buildNafl();
+        renderView();
       }
     });
 
     window.addEventListener('languageChanged', function () {
       updateStatic(); updatePill(); updateHeroLabel();
-      renderActiveTimeline(); buildNafl();
+      renderView(); buildNafl();
     });
 
-    window.addEventListener('prayerSettingsChanged', function () { updatePill(); });
+    // Method/madhab and city both change what a given date's times are — the whole
+    // day cache is stale, not just today's entry.
+    window.addEventListener('prayerSettingsChanged', function () {
+      updatePill(); invalidateCache(); renderView();
+    });
+    window.addEventListener('locationUpdated', function () {
+      invalidateCache(); renderView();
+    });
 
-    setInterval(function () { updateHeroProgress(); updateNaflLive(); }, 1000);
+    setInterval(function () {
+      // Page left open across midnight: follow the new day if the user hadn't
+      // navigated away, otherwise their chosen date silently becomes "Kecha".
+      if (pinnedToToday && dayOffset(viewDate) !== 0) {
+        viewDate = startOfDay(new Date());
+        renderView();
+      }
+      updateHeroProgress(); updateNaflLive();
+    }, 1000);
 
     document.addEventListener('DOMContentLoaded', function () {
-      updateStatic(); updatePill(); updateHeroLabel(); renderActiveTimeline(); wireSheetSwipe();
-      document.querySelectorAll('.pb-tab').forEach(function (t) {
-        t.addEventListener('click', function () { switchTab(t.dataset.tab); });
-      });
+      updateStatic(); updatePill(); updateHeroLabel(); renderView(); wireSheetSwipe();
+      const prevBtn = document.getElementById('datePrevBtn');
+      const nextBtn = document.getElementById('dateNextBtn');
+      const centerBtn = document.getElementById('dateCenterBtn');
+      if (prevBtn) prevBtn.addEventListener('click', function () { stepDate(-1); });
+      if (nextBtn) nextBtn.addEventListener('click', function () { stepDate(1); });
+      if (centerBtn) centerBtn.addEventListener('click', goToday);
       const gear = document.getElementById('settingsGearBtn');
       const pill = document.getElementById('methodPillBtn');
       const bd = document.getElementById('sheetBackdrop');

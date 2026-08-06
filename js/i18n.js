@@ -77,6 +77,13 @@ const I18N = {
     
     'prayer.tab.today':    { uz: 'Bugun',  ru: 'Сегодня', en: 'Today' },
     'prayer.tab.tomorrow': { uz: 'Ertaga', ru: 'Завтра',  en: 'Tomorrow' },
+    'prayer.date.yesterday': { uz: 'Kecha', ru: 'Вчера', en: 'Yesterday' },
+    'prayer.date.prev':    { uz: 'Oldingi kun', ru: 'Предыдущий день', en: 'Previous day' },
+    'prayer.date.next':    { uz: 'Keyingi kun', ru: 'Следующий день', en: 'Next day' },
+    'prayer.date.backToToday': { uz: 'Bugunga qaytish', ru: 'Вернуться к сегодня', en: 'Back to today' },
+    'prayer.date.loadFailed': { uz: "Yuklab bo'lmadi", ru: 'Не удалось загрузить', en: 'Could not load' },
+    'prayer.date.retry':   { uz: 'Qayta urinish', ru: 'Повторить', en: 'Retry' },
+    'prayer.status.otherDate': { uz: 'Boshqa kun', ru: 'Другой день', en: 'Other day' },
     'prayer.status.tomorrow': { uz: 'Ertaga', ru: 'Завтра', en: 'Tomorrow' },
 
     'prayer.advicePrayers': { 
