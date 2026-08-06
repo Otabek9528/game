@@ -158,39 +158,65 @@ async function getPrayerTimes(lat, lon) {
   return data.data;
 }
 
+// Aladhan may return "05:12" or "05:12 (KST)" — always strip the suffix before parsing.
+function cleanTime(str) {
+  if (!str) return '';
+  return String(str).split(' ')[0];
+}
+
+function toMinutes(str) {
+  const c = cleanTime(str);
+  if (!c) return null;
+  const parts = c.split(':');
+  const h = Number(parts[0]);
+  const m = Number(parts[1]);
+  if (isNaN(h) || isNaN(m)) return null;
+  return h * 60 + m;
+}
+
+// Countdown segment boundaries. Sunrise IS included: the Fajr window ends at
+// sunrise, so between Fajr and sunrise the countdown must target sunrise, and
+// only after sunrise does it target Dhuhr. Sunrise is a boundary, not a prayer —
+// callers that render "next prayer" must special-case it (see isBoundarySegment).
+const SEGMENT_ORDER = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+// Segments that are NOT obligatory prayers — used by UI to relabel.
+const BOUNDARY_SEGMENTS = ["Sunrise"];
+function isBoundarySegment(name) {
+  return BOUNDARY_SEGMENTS.indexOf(name) !== -1;
+}
+
 function getCurrentPrayer(timings) {
   const now = new Date();
   const currentTime = now.getHours() * 60 + now.getMinutes();
-  const prayerOrder = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-  const times = prayerOrder.map((p) => {
-    const [h, m] = timings[p].split(":").map(Number);
-    return { name: p, total: h * 60 + m };
-  });
 
-  let current, next;
-  if (currentTime < times[0].total) {
-    current = times[times.length - 1];
-    next = times[0];
-  } else if (currentTime >= times[times.length - 1].total) {
-    current = times[times.length - 1];
-    next = times[0];
-  } else {
-    for (let i = 0; i < times.length - 1; i++) {
-      if (currentTime >= times[i].total && currentTime < times[i + 1].total) {
-        current = times[i];
-        next = times[i + 1];
-        break;
-      }
-    }
+  // Drop any boundary the API didn't return (defensive: some methods omit Sunrise
+  // at extreme latitudes) — the sequence degrades to the old five-prayer behaviour.
+  const times = SEGMENT_ORDER
+    .map((p) => ({ name: p, total: toMinutes(timings[p]) }))
+    .filter((t) => t.total != null);
+
+  if (!times.length) return { current: null, next: null };
+
+  // times[] is chronologically ascending by construction. Find the last boundary
+  // already passed today; -1 means we're between midnight and Fajr (still Isha).
+  let idx = -1;
+  for (let i = 0; i < times.length; i++) {
+    if (currentTime >= times[i].total) idx = i;
   }
+
+  const current = idx === -1 ? times[times.length - 1] : times[idx];
+  const next = (idx === -1 || idx === times.length - 1) ? times[0] : times[idx + 1];
+
   return { current, next };
 }
 
 function formatCountdown(nextTime) {
   const now = new Date();
-  const [h, m] = nextTime.split(":").map(Number);
+  const targetMin = toMinutes(nextTime);
+  if (targetMin == null) return "--:--:--";
   const next = new Date();
-  next.setHours(h, m, 0, 0);
+  next.setHours(Math.floor(targetMin / 60), targetMin % 60, 0, 0);
   let diff = (next - now) / 1000;
   if (diff < 0) diff += 24 * 3600;
   const hrs = Math.floor(diff / 3600);
@@ -205,15 +231,8 @@ function updateProgressLine(timings, currentName, nextName) {
   const track = document.querySelector('.progress-line');
   if (!track) return;
 
-  const toMin = (str) => {
-    if (!str) return null;
-    const clean = str.split(' ')[0];
-    const [h, m] = clean.split(':').map(Number);
-    return h * 60 + m;
-  };
-
-  const curStart = toMin(timings[currentName]);
-  const nextStart = toMin(timings[nextName]);
+  const curStart = toMinutes(timings[currentName]);
+  const nextStart = toMinutes(timings[nextName]);
   if (curStart == null || nextStart == null) return;
 
   const now = new Date();
@@ -244,9 +263,13 @@ async function updatePrayerData(lat, lon, city) {
 
     const data = await getPrayerTimes(lat, lon);
     const { current, next } = getCurrentPrayer(data.timings);
+    if (!current || !next) {
+      console.error('❌ Could not resolve current/next segment from timings', data.timings);
+      return;
+    }
 
     const prayerEmojis = {
-      "Fajr": "🌅", "Dhuhr": "☀️", "Asr": "🌤️",
+      "Fajr": "🌅", "Sunrise": "🌄", "Dhuhr": "☀️", "Asr": "🌤️",
       "Maghrib": "🌇", "Isha": "🌙"
     };
 
@@ -260,11 +283,11 @@ async function updatePrayerData(lat, lon, city) {
     const nextPrayerTimeElem = document.getElementById("nextPrayerTime");
 
     if (currentPrayerElem) currentPrayerElem.innerText = translatePrayer(current.name);
-    if (prayerTimeElem) prayerTimeElem.innerText = data.timings[current.name];
+    if (prayerTimeElem) prayerTimeElem.innerText = cleanTime(data.timings[current.name]);
     if (currentEmojiElem) currentEmojiElem.innerText = prayerEmojis[current.name] || '🕌';
     if (nextPrayerElem) nextPrayerElem.innerText = translatePrayer(next.name);
     if (nextEmojiElem) nextEmojiElem.innerText = prayerEmojis[next.name] || '🕌';
-    if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = data.timings[next.name];
+    if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = cleanTime(data.timings[next.name]);
 
     // Date / Hijri setup (used inside tick when rollover dispatches event)
     const localDate = new Date();
@@ -299,15 +322,16 @@ async function updatePrayerData(lat, lon, city) {
 
     async function tick() {
       const { current: curNow, next: nextNow } = getCurrentPrayer(data.timings);
+      if (!curNow || !nextNow) return;
 
       // Prayer boundary crossed — update names, emojis, times on both index.html and prayers.html
       if (curNow.name !== _lastPrayerName) {
         if (currentPrayerElem) currentPrayerElem.innerText = translatePrayer(curNow.name);
-        if (prayerTimeElem)   prayerTimeElem.innerText   = data.timings[curNow.name];
+        if (prayerTimeElem)   prayerTimeElem.innerText   = cleanTime(data.timings[curNow.name]);
         if (currentEmojiElem) currentEmojiElem.innerText = prayerEmojis[curNow.name] || '🕌';
         if (nextPrayerElem)   nextPrayerElem.innerText   = translatePrayer(nextNow.name);
         if (nextEmojiElem)    nextEmojiElem.innerText    = prayerEmojis[nextNow.name] || '🕌';
-        if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = data.timings[nextNow.name];
+        if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = cleanTime(data.timings[nextNow.name]);
         if (nextPrayerNameElem) nextPrayerNameElem.innerText = translatePrayer(nextNow.name);
 
         // Re-dispatch so prayers.html list re-renders its "current prayer" highlight
@@ -394,6 +418,8 @@ window.addEventListener('prayerSettingsChanged', () => {
 });
 
 window.updatePrayerData = updatePrayerData;
+window.isBoundarySegment = isBoundarySegment;
+window.SEGMENT_ORDER = SEGMENT_ORDER;
 window.translatePrayer = translatePrayer;
 window.translateWeekday = translateWeekday;
 window.translateMonth = translateMonth;

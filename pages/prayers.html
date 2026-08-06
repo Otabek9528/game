@@ -88,6 +88,10 @@
     .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); white-space:nowrap; }
     .pb-row.is-next .pb-name { color:var(--pb-emd); }
     .pb-row.is-boundary .pb-name { font-size:14px; font-weight:500; color:var(--pb-sub); }
+    /* Sunrise is a boundary row, but it can also be the *next* event — don't fade it then. */
+    .pb-row.is-boundary.is-next { opacity:1; }
+    .pb-row.is-boundary.is-next .pb-name,
+    .pb-row.is-boundary.is-next .pb-time { color:var(--pb-emd); font-weight:600; }
     .pb-row.is-faststart .pb-name { font-size:15px; }
     .pb-comment { display:block; min-height:15px; font-size:12px; line-height:1.25; color:var(--pb-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .pb-time { font-size:21px; font-weight:600; color:var(--pb-ink); font-variant-numeric:tabular-nums; }
@@ -190,7 +194,7 @@
 
       <div class="pb-hero">
         <div class="pb-hero-top">
-          <span class="pb-hero-label" data-i18n="prayer.nextPrayer">Keyingi namoz</span>
+          <span class="pb-hero-label" id="heroNextLabel" data-i18n="prayer.nextPrayer">Keyingi namoz</span>
           <button id="methodPillBtn" class="pb-method-pill" type="button">
             <span id="methodSummaryText">MWL</span><span style="opacity:.5">·</span><span id="madhabSummaryText" data-i18n="prayer.schoolHanafi">Hanafiy</span>
           </button>
@@ -433,6 +437,20 @@
       });
 
       el.innerHTML = html;
+    }
+
+    // The hero says "Keyingi namoz" — but Sunrise is not a namoz, it's the END of
+    // the Fajr window. Relabel while the countdown targets Sunrise.
+    function updateHeroLabel() {
+      const el = document.getElementById('heroNextLabel');
+      if (!el) return;
+      const nextName = latest ? latest.nextPrayer : null;
+      const isBoundary = window.isBoundarySegment
+        ? window.isBoundarySegment(nextName)
+        : nextName === 'Sunrise';
+      el.textContent = isBoundary
+        ? tr('prayer.untilFajrEnds', 'Bomdod tugashiga')
+        : tr('prayer.nextPrayer', 'Keyingi namoz');
     }
 
     function updateHeroProgress() {
@@ -705,13 +723,14 @@
       if (e.detail && e.detail.timings) {
         latest = { timings: e.detail.timings, currentPrayer: e.detail.currentPrayer, nextPrayer: e.detail.nextPrayer };
         renderActiveTimeline();
+        updateHeroLabel();
         updateHeroProgress();
         buildNafl();
       }
     });
 
     window.addEventListener('languageChanged', function () {
-      updateStatic(); updatePill();
+      updateStatic(); updatePill(); updateHeroLabel();
       renderActiveTimeline(); buildNafl();
     });
 
@@ -720,7 +739,7 @@
     setInterval(function () { updateHeroProgress(); updateNaflLive(); }, 1000);
 
     document.addEventListener('DOMContentLoaded', function () {
-      updateStatic(); updatePill(); renderActiveTimeline(); wireSheetSwipe();
+      updateStatic(); updatePill(); updateHeroLabel(); renderActiveTimeline(); wireSheetSwipe();
       document.querySelectorAll('.pb-tab').forEach(function (t) {
         t.addEventListener('click', function () { switchTab(t.dataset.tab); });
       });

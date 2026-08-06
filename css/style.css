@@ -502,6 +502,15 @@ body {
   color: var(--text-primary);
   margin: 0;
   line-height: 1.2;
+  /* Reserve 2 lines. "Quyosh chiqishi" (uz) wraps in the narrow timeline column
+     while every other prayer name fits on one — without this the card jumps in
+     height and the two halves lose horizontal alignment when Sunrise is the
+     current or next segment. em-based, so it scales with the media-query size. */
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .timeline-time {
