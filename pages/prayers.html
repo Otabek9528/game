@@ -111,7 +111,6 @@
     .pb-row.is-past .pb-node { background:var(--pb-line); border-color:var(--pb-line); }
     .pb-row.is-past .pb-node.n-boundary { background:var(--pb-line); }
     .pb-node.n-fast { left:10px; background:var(--pb-band); border:none; }
-    .pb-cell { display:flex; align-items:center; min-width:0; }
     .pb-namewrap { display:flex; flex-direction:column; justify-content:center; gap:1px; min-width:0; }
     .pb-name-line { display:flex; align-items:center; gap:7px; min-width:0; }
     .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); white-space:nowrap; }
@@ -597,10 +596,9 @@
               '<div class="pb-line-bot" style="background:' + bot + '"></div>' +
               '<div class="' + node + '"></div>' +
             '</div>' +
-            '<div class="pb-cell">' +
-              '<div class="pb-namewrap">' +
-                '<span class="pb-name-line"><span class="pb-name">' + label + '</span>' + chips + '</span>' +
-                (commentText ? '<span class="pb-comment">' + commentText + '</span>' : '') +
+            '<div class="pb-namewrap">' +
+              '<span class="pb-name-line"><span class="pb-name">' + label + '</span>' + chips + '</span>' +
+              (commentText ? '<span class="pb-comment">' + commentText + '</span>' : '') +
             '</div>' +
             '<div class="pb-time">' + esc(timeStr) + '</div>' +
           '</div>';
