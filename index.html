@@ -72,6 +72,11 @@
             <div class="ps-cell" data-prayer="Asr"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
             <div class="ps-cell" data-prayer="Maghrib"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
             <div class="ps-cell" data-prayer="Isha"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
+
+            <!-- One rail spanning all six segments. Its notches sit exactly on the
+                 cell boundaries (gutter is 0), so a filled segment always means a
+                 passed prayer and the marker can't appear over the wrong cell. -->
+            <div class="strip-rail"><span class="strip-fill"></span></div>
           </div>
         </div>
       </button>

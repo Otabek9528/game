@@ -101,6 +101,7 @@ const I18N = {
     },
     'prayer.lastUpdate': { uz: 'Oxirgi yangilanish', ru: 'Последнее обновление', en: 'Last update' },
     'prayer.staleWarning': { uz: 'Yangilashni maslahat beramiz', ru: 'Рекомендуем обновить', en: 'Recommend updating' },
+    'prayer.untilTime': { uz: '{t} gacha', ru: 'до {t}', en: 'until {t}' },
     'prayer.comment.fajr': { uz: 'Xufton vaqti tugaydi', ru: 'Время Иша заканчивается', en: 'Isha time ends' },
     'prayer.comment.sunrise': { uz: 'Bomdod vaqti tugaydi', ru: 'Время Фаджр заканчивается', en: 'Fajr time ends' },
     'prayer.comment.asr': { uz: 'Peshin vaqti tugaydi', ru: 'Время Зухр заканчивается', en: 'Dhuhr time ends' },
