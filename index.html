@@ -51,36 +51,27 @@
           </div>
         </div>
 
-        <!-- Timeline: Current → Next -->
+        <!-- Countdown + the whole day -->
         <div class="timeline-prayer">
-          <span class="arch-eyebrow" id="countdownLabel">Qolgan vaqt</span>
+          <span class="arch-eyebrow" id="countdownLabel">Qoldi</span>
           <span class="arch-countdown" id="countdown">--:--:--</span>
 
-          <!-- The rail spans the current prayer window and fills left→right, so it
-               reads in the same direction as the feet beneath it. `progress-line`
-               is kept as a class so prayerTimes.js's existing --progress writes
-               land here with no JS change. -->
-          <div class="prayer-rail progress-line">
-            <span class="rail-track"></span>
-            <span class="rail-fill"></span>
-            <span class="rail-hair"></span>
+          <!-- The whole day. Progress through the current window is drawn INSIDE
+               the cell it describes, so the marker can't be misread as pointing at
+               a neighbouring prayer. `progress-line` is kept as a class so
+               prayerTimes.js's existing --progress writes land here. -->
+          <div class="prayer-strip progress-line" id="prayerStrip">
             <div class="progress-dot">
               <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
                 <path d="M8.00,0.00 L10.34,2.34 L13.66,2.34 L13.66,5.66 L16.00,8.00 L13.66,10.34 L13.66,13.66 L10.34,13.66 L8.00,16.00 L5.66,13.66 L2.34,13.66 L2.34,10.34 L0.00,8.00 L2.34,5.66 L2.34,2.34 L5.66,2.34 Z" />
               </svg>
             </div>
-          </div>
-
-          <!-- Feet: the two ends of the window the rail spans. -->
-          <div class="timeline-feet">
-            <div class="timeline-start">
-              <p class="timeline-name"><span class="timeline-emoji" id="currentEmoji">🌅</span><span id="currentPrayer">--</span></p>
-              <p class="timeline-time" id="prayerTime">--:--</p>
-            </div>
-            <div class="timeline-end">
-              <p class="timeline-name"><span id="nextPrayer">--</span><span class="timeline-emoji" id="nextEmoji">☀️</span></p>
-              <p class="timeline-time" id="nextPrayerTime">--:--</p>
-            </div>
+            <div class="ps-cell" data-prayer="Fajr"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
+            <div class="ps-cell ps-boundary" data-prayer="Sunrise"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
+            <div class="ps-cell" data-prayer="Dhuhr"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
+            <div class="ps-cell" data-prayer="Asr"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
+            <div class="ps-cell" data-prayer="Maghrib"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
+            <div class="ps-cell" data-prayer="Isha"><span class="ps-name">--</span><span class="ps-time">--:--</span></div>
           </div>
         </div>
       </button>

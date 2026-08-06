@@ -251,6 +251,34 @@ function updateProgressLine(timings, currentName, nextName) {
   track.style.setProperty('--progress', (pct * 100).toFixed(2) + '%');
 }
 
+// Fill the home-screen day strip (index.html only). No-ops everywhere else, so
+// pages without #prayerStrip are completely unaffected.
+function updatePrayerStrip(timings, currentName, nextName) {
+  const strip = document.getElementById('prayerStrip');
+  if (!strip) return;
+  strip.querySelectorAll('.ps-cell').forEach(function (cell, i) {
+    const key = cell.getAttribute('data-prayer');
+    if (key === currentName) strip.style.setProperty('--cell-index', i);
+    const nameEl = cell.querySelector('.ps-name');
+    const timeEl = cell.querySelector('.ps-time');
+    // "Quyosh chiqishi" cannot fit a 1/6-width column — use the short form where one exists.
+    if (nameEl) {
+      let label = translatePrayer(key);
+      if (window.I18N) {
+        const shortKey = 'prayer.' + key.toLowerCase() + 'Short';
+        const shortVal = I18N.t(shortKey);
+        if (shortVal && shortVal !== shortKey) label = shortVal;
+      } else if (key === 'Sunrise') {
+        label = 'Quyosh';
+      }
+      nameEl.innerText = label;
+    }
+    if (timeEl) timeEl.innerText = cleanTime(timings[key]) || '--:--';
+    cell.classList.toggle('is-current', key === currentName);
+    cell.classList.toggle('is-next', key === nextName);
+  });
+}
+
 // ============================================
 // UPDATE PRAYER DATA
 // ============================================
@@ -288,6 +316,8 @@ async function updatePrayerData(lat, lon, city) {
     if (nextPrayerElem) nextPrayerElem.innerText = translatePrayer(next.name);
     if (nextEmojiElem) nextEmojiElem.innerText = prayerEmojis[next.name] || '🕌';
     if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = cleanTime(data.timings[next.name]);
+
+    updatePrayerStrip(data.timings, current.name, next.name);
 
     // Date / Hijri setup (used inside tick when rollover dispatches event)
     const localDate = new Date();
@@ -333,6 +363,8 @@ async function updatePrayerData(lat, lon, city) {
         if (nextEmojiElem)    nextEmojiElem.innerText    = prayerEmojis[nextNow.name] || '🕌';
         if (nextPrayerTimeElem) nextPrayerTimeElem.innerText = cleanTime(data.timings[nextNow.name]);
         if (nextPrayerNameElem) nextPrayerNameElem.innerText = translatePrayer(nextNow.name);
+
+        updatePrayerStrip(data.timings, curNow.name, nextNow.name);
 
         // Re-dispatch so prayers.html list re-renders its "current prayer" highlight
         window.dispatchEvent(new CustomEvent('prayerDataUpdated', {
@@ -419,6 +451,7 @@ window.addEventListener('prayerSettingsChanged', () => {
 
 window.updatePrayerData = updatePrayerData;
 window.isBoundarySegment = isBoundarySegment;
+window.updatePrayerStrip = updatePrayerStrip;
 window.SEGMENT_ORDER = SEGMENT_ORDER;
 window.translatePrayer = translatePrayer;
 window.translateWeekday = translateWeekday;
