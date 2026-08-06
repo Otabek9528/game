@@ -504,9 +504,18 @@ body {
   position: relative;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  column-gap: 2px;
+  column-gap: 4px;
   width: 100%;
   margin-top: 16px;
+  background-image:
+    linear-gradient(var(--sand-200), var(--sand-200)),
+    linear-gradient(var(--sand-200), var(--sand-200)),
+    linear-gradient(var(--sand-200), var(--sand-200)),
+    linear-gradient(var(--sand-200), var(--sand-200)),
+    linear-gradient(var(--sand-200), var(--sand-200));
+  background-size: 1px 15px;
+  background-position: 16.6667% 58%, 33.3333% 58%, 50.0000% 58%, 66.6667% 58%, 83.3333% 58%;
+  background-repeat: no-repeat;
 }
 
 .ps-cell {
@@ -545,10 +554,45 @@ body {
   border-radius: 50%;
   background: var(--bg-elevated);
   box-shadow: 0 0 0 2px var(--bg-elevated);
-  transition: left 0.9s linear;
+  transition: left 0.9s linear, opacity 0.3s ease;
   pointer-events: none;
   z-index: 2;
 }
+
+/* Before the first real position lands, the marker is hidden and nothing animates,
+   so it appears in place rather than sliding in from the far left. */
+.prayer-card-timeline.is-loading .progress-dot { opacity: 0; }
+.prayer-card-timeline.is-loading .progress-dot,
+.prayer-card-timeline.is-loading .ps-cell.is-current::after { transition: none; }
+
+/* Skeleton: "--:--" placeholders render as a broken seven-segment display, which
+   looks like a fault rather than a wait. Only ever seen on a first-ever open,
+   since the card paints from cache after that. */
+.prayer-card-timeline.is-loading .arch-eyebrow { opacity: 0.3; }
+.prayer-card-timeline.is-loading .arch-countdown,
+.prayer-card-timeline.is-loading .ps-cell .ps-name,
+.prayer-card-timeline.is-loading .ps-cell .ps-time,
+.prayer-card-timeline.is-loading .left-side .weekday,
+.prayer-card-timeline.is-loading .left-side .hijri,
+.prayer-card-timeline.is-loading .right-side .city-name {
+  color: transparent;
+  background: var(--sand-100);
+  border-radius: 5px;
+}
+.prayer-card-timeline.is-loading .arch-countdown { border-radius: 10px; }
+.prayer-card-timeline.is-loading .ps-cell .ps-name { min-width: 32px; }
+.prayer-card-timeline.is-loading .ps-cell .ps-time { min-width: 38px; }
+.prayer-card-timeline.is-loading .left-side .weekday { min-width: 128px; }
+.prayer-card-timeline.is-loading .left-side .hijri { min-width: 86px; }
+.prayer-card-timeline.is-loading .right-side { background: var(--sand-100); }
+.prayer-card-timeline.is-loading .right-side .location-icon { opacity: 0; }
+.night-mode .prayer-card-timeline.is-loading .arch-countdown,
+.night-mode .prayer-card-timeline.is-loading .ps-cell .ps-name,
+.night-mode .prayer-card-timeline.is-loading .ps-cell .ps-time,
+.night-mode .prayer-card-timeline.is-loading .left-side .weekday,
+.night-mode .prayer-card-timeline.is-loading .left-side .hijri,
+.night-mode .prayer-card-timeline.is-loading .right-side,
+.night-mode .prayer-card-timeline.is-loading .right-side .city-name { background: rgba(255,255,255,0.06); }
 .prayer-strip .progress-dot svg { display: block; width: 100%; height: 100%; }
 .prayer-strip .progress-dot path { fill: var(--emerald-600); stroke: none; }
 

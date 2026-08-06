@@ -149,6 +149,43 @@ function adjustHijriDate(hijriObj) {
 // PRAYER TIME CALCULATIONS
 // ============================================
 
+// Today's timings are stable for the whole day, so there is no reason to show an
+// empty card while the network round-trips. Cache them and paint immediately on
+// open, then refresh from the API in the background.
+const TIMINGS_CACHE_KEY = 'prayerTimingsCache';
+
+function timingsCacheKey(lat, lon) {
+  const s = getPrayerSettings();
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() +
+    '|' + s.method + '|' + s.madhab +
+    '|' + Number(lat).toFixed(3) + '|' + Number(lon).toFixed(3);
+}
+
+function readTimingsCache(lat, lon) {
+  try {
+    const raw = localStorage.getItem(TIMINGS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || parsed.key !== timingsCacheKey(lat, lon)) return null;
+    if (!parsed.data || !parsed.data.timings) return null;
+    return parsed.data;
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeTimingsCache(lat, lon, data) {
+  try {
+    localStorage.setItem(TIMINGS_CACHE_KEY, JSON.stringify({
+      key: timingsCacheKey(lat, lon),
+      data: { timings: data.timings, date: data.date }
+    }));
+  } catch (e) {
+    console.warn('Could not cache prayer timings:', e);
+  }
+}
+
 async function getPrayerTimes(lat, lon) {
   const { method, madhab } = getPrayerSettings();
   const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=${method}&school=${madhab}&adjustment=${HIJRI_ADJUSTMENT}`;
@@ -298,19 +335,33 @@ function updatePrayerStrip(timings, currentName, nextName) {
     cell.classList.toggle('is-current', key === currentName);
     cell.classList.toggle('is-next', key === nextName);
   });
+
+  // The marker starts at --progress:0 / --cell-index:0, i.e. the far left. Letting
+  // it transition to its real position reads as time racing past. Transitions stay
+  // disabled until after the first real position lands.
+  const wrap = strip.closest('.prayer-card-timeline') || strip;
+  if (wrap.classList.contains('is-loading')) {
+    requestAnimationFrame(function () { wrap.classList.remove('is-loading'); });
+  }
 }
 
 // ============================================
 // UPDATE PRAYER DATA
 // ============================================
 
-async function updatePrayerData(lat, lon, city) {
+async function updatePrayerData(lat, lon, city, preloadedData) {
   try {
-    console.log('📿 Fetching prayer times for:', city, '(' + lat + ', ' + lon + ')');
     const cityNameElem = document.getElementById("cityName");
     if (cityNameElem && city) cityNameElem.innerText = city;
 
-    const data = await getPrayerTimes(lat, lon);
+    let data;
+    if (preloadedData) {
+      data = preloadedData;
+    } else {
+      console.log('📿 Fetching prayer times for:', city, '(' + lat + ', ' + lon + ')');
+      data = await getPrayerTimes(lat, lon);
+      writeTimingsCache(lat, lon, data);
+    }
     const { current, next } = getCurrentPrayer(data.timings);
     if (!current || !next) {
       console.error('❌ Could not resolve current/next segment from timings', data.timings);
@@ -470,6 +521,35 @@ window.addEventListener('prayerSettingsChanged', () => {
   }
 });
 
+// Paint from cache as early as possible. LocationManager stores the last known
+// location synchronously in localStorage, so this runs without waiting on GPS,
+// Telegram's LocationManager callback, or the Aladhan request.
+function paintFromCache() {
+  try {
+    const loc = window.LocationManager ? LocationManager.getCurrentLocation() : null;
+    if (!loc || loc.lat == null) return false;
+    const cached = readTimingsCache(loc.lat, loc.lon);
+    if (!cached) return false;
+    console.log('⚡ Painting prayer card from cache');
+    updatePrayerData(loc.lat, loc.lon, loc.city, cached);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (paintFromCache()) return;
+  // First-ever open: at least translate the countdown label instead of leaving
+  // the Uzbek fallback baked into the markup.
+  const labelEl = document.getElementById('countdownLabel');
+  if (labelEl && window.I18N) {
+    const v = I18N.t('prayer.remaining');
+    if (v && v !== 'prayer.remaining') labelEl.innerText = v;
+  }
+});
+
+window.paintFromCache = paintFromCache;
 window.updatePrayerData = updatePrayerData;
 window.isBoundarySegment = isBoundarySegment;
 window.updatePrayerStrip = updatePrayerStrip;
