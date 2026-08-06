@@ -251,9 +251,30 @@ function updateProgressLine(timings, currentName, nextName) {
   track.style.setProperty('--progress', (pct * 100).toFixed(2) + '%');
 }
 
+// The countdown targets the NEXT prayer, but the strip highlights the CURRENT one.
+// Without naming the target, "00:32:59" above a highlighted PESHIN reads as
+// "32 minutes until Peshin". So the label names what is being counted to.
+function formatUntilLabel(nextName) {
+  const t = (k) => {
+    if (!window.I18N) return null;
+    const v = I18N.t(k);
+    return (v && v !== k) ? v : null;
+  };
+  // Sunrise is the end of Fajr's window, not a prayer to be "counted to".
+  if (isBoundarySegment(nextName)) {
+    return t('prayer.untilFajrEnds') || 'Bomdod tugashiga';
+  }
+  const shortName = t('prayer.' + nextName.toLowerCase() + 'Short') || translatePrayer(nextName);
+  const pattern = t('prayer.untilName') || '{name}gacha';
+  return pattern.replace('{name}', shortName);
+}
+
 // Fill the home-screen day strip (index.html only). No-ops everywhere else, so
 // pages without #prayerStrip are completely unaffected.
 function updatePrayerStrip(timings, currentName, nextName) {
+  const labelEl = document.getElementById('countdownLabel');
+  if (labelEl) labelEl.innerText = formatUntilLabel(nextName);
+
   const strip = document.getElementById('prayerStrip');
   if (!strip) return;
   strip.querySelectorAll('.ps-cell').forEach(function (cell, i) {
@@ -452,6 +473,7 @@ window.addEventListener('prayerSettingsChanged', () => {
 window.updatePrayerData = updatePrayerData;
 window.isBoundarySegment = isBoundarySegment;
 window.updatePrayerStrip = updatePrayerStrip;
+window.formatUntilLabel = formatUntilLabel;
 window.SEGMENT_ORDER = SEGMENT_ORDER;
 window.translatePrayer = translatePrayer;
 window.translateWeekday = translateWeekday;

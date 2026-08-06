@@ -311,25 +311,12 @@
     });
 
     // ============================================
-    // PRAYER CARD STATIC LABEL
-    // ============================================
-    // index.html has no data-i18n pass, so the one static string on the card is
-    // set here and re-set whenever the language changes.
-    function updateCardStatic() {
-      const el = document.getElementById('countdownLabel');
-      if (!el) return;
-      const v = window.I18N ? I18N.t('prayer.remaining') : 'prayer.remaining';
-      el.textContent = (v && v !== 'prayer.remaining') ? v : 'Qolgan vaqt';
-    }
-
-    // ============================================
     // LANGUAGE CHANGE LISTENER
     // ============================================
 
     window.addEventListener('languageChanged', () => {
       updateLanguageButtons();
       updateFeatureCards();
-      updateCardStatic();
     });
 
 
@@ -340,7 +327,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       initLanguageSelector();
       updateFeatureCards();
-      updateCardStatic();
       console.log('✅ Main page initialized');
     });
 

@@ -49,6 +49,7 @@ const I18N = {
     'prayer.nextPrayer': { uz: 'Keyingi namoz', ru: 'Следующий намаз', en: 'Next prayer' },
     'prayer.remaining': { uz: 'Qoldi', ru: 'Осталось', en: 'Remaining' },
     'prayer.sunriseShort': { uz: 'Quyosh', ru: 'Восход', en: 'Sunrise' },
+    'prayer.untilName': { uz: '{name}gacha', ru: 'До {name}', en: 'Until {name}' },
     'prayer.untilFajrEnds': { uz: 'Bomdod tugashiga', ru: 'До конца Фаджра', en: 'Until Fajr ends' },
     'prayer.never': { uz: 'Hech qachon', ru: 'Никогда', en: 'Never' },
     'prayer.infoTitle': { uz: 'Ma\'lumot', ru: 'Информация', en: 'Information' },
