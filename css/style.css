@@ -501,21 +501,13 @@ body {
 .prayer-strip {
   --progress: 0%;
   --cell-index: 0;
+  --gutter: 4px;
   position: relative;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  column-gap: 4px;
+  column-gap: var(--gutter);
   width: 100%;
   margin-top: 16px;
-  background-image:
-    linear-gradient(var(--sand-200), var(--sand-200)),
-    linear-gradient(var(--sand-200), var(--sand-200)),
-    linear-gradient(var(--sand-200), var(--sand-200)),
-    linear-gradient(var(--sand-200), var(--sand-200)),
-    linear-gradient(var(--sand-200), var(--sand-200));
-  background-size: 1px 15px;
-  background-position: 16.6667% 58%, 33.3333% 58%, 50.0000% 58%, 66.6667% 58%, 83.3333% 58%;
-  background-repeat: no-repeat;
 }
 
 .ps-cell {
@@ -527,6 +519,21 @@ body {
   padding: 6px 1px 13px;
   border-radius: 9px;
   min-width: 0;
+}
+
+
+/* Dividers anchor to the cell at left:-2px — exactly half the 4px gutter — so they
+   land on the true boundary at any width instead of drifting as a percentage of
+   the strip. Scoped away from .is-current, whose ::after is the progress fill. */
+.ps-cell:not(:first-child):not(.is-current)::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--gutter) / -2);
+  top: 58%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 15px;
+  background: var(--sand-200);
 }
 
 /* track + fill, drawn along the foot of the current cell only */
@@ -1111,6 +1118,15 @@ body {
     letter-spacing: 0.02em;
   }
   
+  /* At 320px the six columns are only 40px wide — the longest prayer name
+     overflows by ~2px. Reclaim it from the gutter, the cell padding and the
+     tracking rather than truncating a name. */
+  @media (max-width: 360px) {
+    .prayer-strip { --gutter: 3px; }
+    .ps-cell { padding-left: 0; padding-right: 0; }
+    .ps-name { font-size: 0.51rem; letter-spacing: 0; }
+  }
+  
   .ps-time {
     font-size: 0.79rem;
   }
@@ -1236,3 +1252,7 @@ body {
   color: #ffd700;
 }
 
+
+/* the cell after the highlight loses its divider too, so the pill sits in
+   symmetric whitespace rather than hugging a rule on one side only */
+.ps-cell.is-current + .ps-cell::after { content: none; }
