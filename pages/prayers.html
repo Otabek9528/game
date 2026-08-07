@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uz"> 
+<html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -100,12 +100,12 @@
     .pb-row.is-past .pb-comment { color:var(--pb-faint); }
     .pb-row.is-boundary { min-height:46px; }
     .pb-row.is-faststart { min-height:46px; }
-    .pb-row.is-next { background:var(--pb-ems); }
+    .pb-row.is-hl { background:var(--pb-ems); }
     .pb-rail { position:relative; align-self:stretch; }
     .pb-line-top, .pb-line-bot { position:absolute; left:15px; width:2px; height:50%; }
     .pb-line-top { top:0; } .pb-line-bot { bottom:0; }
     .pb-node { position:absolute; top:50%; left:10px; transform:translateY(-50%); width:12px; height:12px; border-radius:50%; background:var(--pb-surface); border:2px solid var(--pb-em); }
-    .pb-node.n-next { left:8px; width:15px; height:15px; background:var(--pb-em); border-color:var(--pb-em); box-shadow:0 0 0 4px rgba(15,110,86,0.18); }
+    .pb-node.n-hl { left:8px; width:15px; height:15px; background:var(--pb-em); border-color:var(--pb-em); box-shadow:0 0 0 4px rgba(15,110,86,0.18); }
     .pb-node.n-boundary { left:12px; width:8px; height:8px; background:var(--pb-faint); border:none; }
     /* the rail reads as elapsed: passed nodes solid, upcoming hollow */
     .pb-row.is-past .pb-node { background:var(--pb-line); border-color:var(--pb-line); }
@@ -114,18 +114,23 @@
     .pb-namewrap { display:flex; flex-direction:column; justify-content:center; gap:1px; min-width:0; }
     .pb-name-line { display:flex; align-items:center; gap:7px; min-width:0; }
     .pb-name { font-size:17px; font-weight:600; color:var(--pb-ink); white-space:nowrap; }
+    .pb-row.is-hl .pb-name,
     .pb-row.is-next .pb-name { color:var(--pb-emd); }
     .pb-row.is-boundary .pb-name { font-size:14px; font-weight:500; color:var(--pb-sub); }
     /* Sunrise is a boundary row, but it can also be the *next* event — don't fade it then. */
-        .pb-row.is-boundary.is-next .pb-name,
-    .pb-row.is-boundary.is-next .pb-time { color:var(--pb-emd); font-weight:600; }
+    .pb-row.is-boundary.is-next .pb-name,
+    .pb-row.is-boundary.is-hl .pb-name,
+    .pb-row.is-boundary.is-next .pb-time,
+    .pb-row.is-boundary.is-hl .pb-time { color:var(--pb-emd); font-weight:600; }
     .pb-row.is-faststart .pb-name { font-size:15px; }
     .pb-comment { display:block; min-height:15px; font-size:11.5px; letter-spacing:.01em; font-variant-numeric:tabular-nums; line-height:1.25; color:var(--pb-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .pb-time { font-size:21px; font-weight:600; color:var(--pb-ink); font-variant-numeric:tabular-nums; }
+    .pb-row.is-hl .pb-time,
     .pb-row.is-next .pb-time { color:var(--pb-emd); }
     .pb-row.is-boundary .pb-time, .pb-row.is-faststart .pb-time { font-size:14px; font-weight:500; color:var(--pb-sub); }
     .pb-chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:0; vertical-align:middle; }
-    .pb-chip.c-next { color:#fff; background:var(--pb-em); }
+    .pb-chip.c-now  { color:#fff; background:var(--pb-em); }
+    .pb-chip.c-next { color:var(--pb-emd); background:var(--pb-ems); box-shadow:inset 0 0 0 1px rgba(15,110,86,0.22); }
     .pb-chip.c-iftar { color:var(--pb-amb); background:var(--pb-ambs); }
 
     .pb-legend { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--pb-amb); margin:12px 2px 0; }
@@ -502,12 +507,23 @@
       { key: 'Maghrib', type: 'prayer',   comment: 'prayer.comment.maghrib', fastEnd: true },
       { key: 'Isha',    type: 'prayer',   comment: 'prayer.comment.isha' }
     ];
-    // Each prayer's window closes when the next entry begins. Stating that on the
-    // prayer's OWN row ("until 05:40") reads correctly; the previous version put
-    // it on the following row ("Bomdod — Isha time ends"), which never parses.
+    // Each row states which prayer's window CLOSES at that moment.
+
+    // A prayer stays valid until the next entry begins. Isha wraps past midnight.
     const WINDOW_END = {
       Fajr: 'Sunrise', Dhuhr: 'Asr', Asr: 'Maghrib', Maghrib: 'Isha', Isha: 'Fajr'
     };
+
+    function activePrayerKey(T, now) {
+      let found = null;
+      Object.keys(WINDOW_END).forEach(function (k) {
+        const s = hhmm(T[k]), e = hhmm(T[WINDOW_END[k]]);
+        if (s == null || e == null) return;
+        const inside = (e > s) ? (now >= s && now < e) : (now >= s || now < e);
+        if (inside) found = k;
+      });
+      return found;
+    }
     const BAND = ['Imsak', 'Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib'];
 
     const NAFL = [
@@ -543,6 +559,8 @@
       if (!T) { showTimelineMessage(esc(tr('prayer.dateLoading', 'Yuklanmoqda...'))); return; }
       const now = nowMin();
       const next = (isToday && latest) ? latest.nextPrayer : null;
+      // null between sunrise and Dhuhr — that gap genuinely has no obligatory prayer
+      const activeKey = isToday ? activePrayerKey(T, now) : null;
       let html = '';
 
       ROWS.forEach(function (r) {
@@ -556,36 +574,36 @@
         else if (inBand) { top = 'var(--pb-band)'; bot = 'var(--pb-band)'; }
         if (r.key === 'Isha') { bot = 'transparent'; }
 
+        const isActive = !!isToday && activeKey != null && r.key === activeKey;
         const isNext = !!isToday && (r.key === next);
-        const isPast = !!isToday && (tmin != null && tmin < now && !isNext);
+        const isPast = !!isToday && !isActive && !isNext && (tmin != null && tmin < now);
+        // In the sunrise→Dhuhr gap nothing is active, so the highlight falls to
+        // the upcoming prayer rather than leaving the list with no anchor.
+        const isHl = isActive || (!activeKey && isNext);
 
         let rowCls = 'pb-row';
         if (r.type === 'boundary') rowCls += ' is-boundary';
         if (r.type === 'faststart') rowCls += ' is-faststart';
+        if (isActive) rowCls += ' is-active';
         if (isNext) rowCls += ' is-next';
+        if (isHl) rowCls += ' is-hl';
         else if (isPast) rowCls += ' is-past';
 
         let node = 'pb-node';
         if (r.type === 'boundary') node += ' n-boundary';
         else if (r.type === 'faststart') node += ' n-fast';
-        else if (isNext) node += ' n-next';
+        else if (isHl) node += ' n-hl';
 
         let label, commentText = '';
         if (r.type === 'faststart') {
           label = esc(tr('prayer.suhoor.label', 'Saharlik'));
-          commentText = esc(tr('prayer.suhoor.hint', "Ro'za boshlanishi"));
         } else {
           label = esc(name(r.key));
-          if (r.type === 'prayer' && WINDOW_END[r.key] && T[WINDOW_END[r.key]]) {
-            commentText = esc(
-              tr('prayer.untilTime', '{t} gacha').replace('{t}', clean(T[WINDOW_END[r.key]]))
-            );
-          } else if (r.comment) {
-            commentText = esc(tr(r.comment, ''));
-          }
+          if (r.comment) commentText = '(' + esc(tr(r.comment, '')) + ')';
         }
 
         let chips = '';
+        if (isActive) chips += '<span class="pb-chip c-now">' + esc(tr('prayer.chip.now', 'hozir')) + '</span>';
         if (isNext) chips += '<span class="pb-chip c-next" data-i18n="prayer.chip.next">keyingi</span>';
         if (r.fastEnd) chips += '<span class="pb-chip c-iftar">' + esc(tr('prayer.iftar.label', 'Iftorlik')) + '</span>';
 

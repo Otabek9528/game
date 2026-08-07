@@ -75,6 +75,8 @@ const I18N = {
     'prayer.iftar.label':  { uz: 'Iftorlik', ru: 'Ифтар', en: 'Iftar' },
     'prayer.iftar.hint':   { uz: "Ro'za ochilishi", ru: 'Разговение', en: 'Break fast' },
     'prayer.chip.next':  { uz: 'keyingi', ru: 'следующий', en: 'next' },
+
+    'prayer.chip.now': { uz: 'hozir', ru: 'сейчас', en: 'now' },
     'prayer.fastWindow': { uz: "Ro'za vaqti · Saharlikdan Iftorlikkacha", ru:     'Время поста · от сухура до ифтара', en: 'Fasting window · suhoor to  iftar' },
     'prayer.remaining': { uz: 'qoldi', ru: 'осталось', en: 'remaining' },
     
@@ -101,7 +103,6 @@ const I18N = {
     },
     'prayer.lastUpdate': { uz: 'Oxirgi yangilanish', ru: 'Последнее обновление', en: 'Last update' },
     'prayer.staleWarning': { uz: 'Yangilashni maslahat beramiz', ru: 'Рекомендуем обновить', en: 'Recommend updating' },
-    'prayer.untilTime': { uz: '{t} gacha', ru: 'до {t}', en: 'until {t}' },
     'prayer.comment.fajr': { uz: 'Xufton vaqti tugaydi', ru: 'Время Иша заканчивается', en: 'Isha time ends' },
     'prayer.comment.sunrise': { uz: 'Bomdod vaqti tugaydi', ru: 'Время Фаджр заканчивается', en: 'Fajr time ends' },
     'prayer.comment.asr': { uz: 'Peshin vaqti tugaydi', ru: 'Время Зухр заканчивается', en: 'Dhuhr time ends' },
