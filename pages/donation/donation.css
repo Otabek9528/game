@@ -67,38 +67,30 @@ body {
    ========================= */
 .donation-hero {
   text-align: center;
-  padding: 28px 8px 22px;
+  padding: 18px 8px 16px;
 }
 
 .hero-icon {
   display: grid;
   place-items: center;
-  width: 66px;
-  height: 66px;
-  margin: 0 auto 16px;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
   border-radius: 50%;
   background: var(--d-surface);
   color: var(--d-teal);
   box-shadow: 0 0 0 1px var(--d-hairline), var(--d-shadow);
 }
-.hero-icon svg { width: 32px; height: 32px; }
+.hero-icon svg { width: 27px; height: 27px; }
 
 .hero-title {
-  margin: 0 0 8px;
+  margin: 0;
   font-family: var(--d-display);
-  font-size: 1.48rem;
+  font-size: 1.46rem;
   font-weight: 800;
   line-height: 1.22;
   letter-spacing: -.021em;
   color: var(--d-ink);
-}
-
-.hero-subtitle {
-  margin: 0 auto;
-  max-width: 30ch;
-  font-size: .93rem;
-  line-height: 1.5;
-  color: var(--d-ink-2);
 }
 
 /* =========================
@@ -109,7 +101,7 @@ body {
   background: var(--d-surface);
   border: 1px solid var(--d-hairline);
   border-radius: var(--d-radius);
-  padding: 18px 18px 18px 22px;
+  padding: 16px 16px 16px 20px;
   margin-bottom: 18px;
   box-shadow: var(--d-shadow);
   overflow: hidden;
@@ -129,8 +121,8 @@ body {
 .donation-message-card p {
   margin: 0;
   text-align: left;
-  font-size: .92rem;
-  line-height: 1.62;
+  font-size: .9rem;
+  line-height: 1.5;
   color: var(--d-ink-2);
 }
 
@@ -152,6 +144,7 @@ body {
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
+  border-radius: var(--d-radius) var(--d-radius) 0 0;
   background: linear-gradient(90deg, var(--d-teal-deep), var(--d-teal) 60%, var(--d-brass));
 }
 
@@ -160,8 +153,8 @@ body {
   align-items: center;
   justify-content: flex-start;
   gap: 11px;
-  padding: 4px 0 16px;
-  margin-bottom: 4px;
+  padding: 2px 0 14px;
+  margin-bottom: 2px;
   border-bottom: 1px solid var(--d-hairline);
 }
 
@@ -190,7 +183,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 14px 0;
+  padding: 12px 0;
   border-bottom: none;
 }
 
@@ -231,11 +224,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   background: var(--d-teal-soft);
   border-radius: var(--d-radius-sm);
-  padding: 14px 16px;
-  margin: 6px 0 0;
+  padding: 13px 16px;
+  margin: 4px 0 0;
 }
 
 .account-row .detail-icon { color: var(--d-teal-deep); }
@@ -263,7 +256,7 @@ body {
   gap: 9px;
   width: 100%;
   min-height: 52px;
-  margin-top: 16px;
+  margin-top: 14px;
   padding: 14px 20px;
   border: none;
   border-radius: 14px;
@@ -288,8 +281,23 @@ body {
 .copy-button.copied { background: var(--d-brass); }
 
 .copy-icon {
-  font-size: 1.05rem;
-  line-height: 1;
+  /* The emoji the JS writes is masked out; the glyph below is drawn in currentColor,
+     so it stays crisp and theme-aware on every device. */
+  display: block;
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  font-size: 0;
+  line-height: 0;
+  color: inherit;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='2.5' width='11' height='15' rx='2.5'/%3E%3Cpath d='M15.5 21.5h-8a2.5 2.5 0 0 1-2.5-2.5V7'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='2.5' width='11' height='15' rx='2.5'/%3E%3Cpath d='M15.5 21.5h-8a2.5 2.5 0 0 1-2.5-2.5V7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.copy-button.copied .copy-icon {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.6 9.4 18 20 6.8'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.6 9.4 18 20 6.8'/%3E%3C/svg%3E");
 }
 
 /* =========================
@@ -367,6 +375,7 @@ body {
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
+  border-radius: var(--d-radius) var(--d-radius) 0 0;
   background: var(--d-brass);
 }
 
@@ -403,7 +412,7 @@ body {
    RESPONSIVE
    ========================= */
 @media (max-width: 360px) {
-  .hero-title { font-size: 1.34rem; }
+  .hero-title { font-size: 1.32rem; }
   .bank-name { font-size: .9rem; }
   .account-number { font-size: 1.22rem; }
   .donation-container { padding-left: 14px; padding-right: 14px; }
