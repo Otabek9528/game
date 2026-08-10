@@ -1,0 +1,458 @@
+/* =========================================================
+   DONATION PAGE — visual refresh
+   Same structure, same classes, same JS contract.
+   Palette : warm paper ground, pine ink, jewel teal, brass hairline
+   Type    : Onest (display) / Manrope (body) / IBM Plex Mono (number)
+   ========================================================= */
+
+:root {
+  --d-paper:      #F5F3ED;
+  --d-paper-2:    #ECE8DE;
+  --d-surface:    #FFFFFF;
+  --d-ink:        #16261F;
+  --d-ink-2:      #5E6B64;
+  --d-ink-3:      #8C978F;
+  --d-teal:       #0E7C63;
+  --d-teal-deep:  #0A5644;
+  --d-teal-soft:  #E6F1EC;
+  --d-brass:      #A5772F;
+  --d-brass-soft: #F6EFE1;
+  --d-line:       #E3DFD5;
+  --d-hairline:   #EFEBE1;
+
+  --d-radius:     18px;
+  --d-radius-sm:  12px;
+
+  --d-display: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --d-body:    'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --d-mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --d-shadow:  0 1px 2px rgba(22, 38, 31, .04), 0 10px 28px -14px rgba(22, 38, 31, .22);
+}
+
+/* ---------- shell: one scroll container ---------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--d-paper);
+  color: var(--d-ink);
+  font-family: var(--d-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app__header { flex-shrink: 0; }
+
+.donation-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 4px 18px calc(44px + env(safe-area-inset-bottom));
+}
+
+/* =========================
+   HERO
+   ========================= */
+.donation-hero {
+  text-align: center;
+  padding: 28px 8px 22px;
+}
+
+.hero-icon {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--d-surface);
+  color: var(--d-teal);
+  box-shadow: 0 0 0 1px var(--d-hairline), var(--d-shadow);
+}
+.hero-icon svg { width: 32px; height: 32px; }
+
+.hero-title {
+  margin: 0 0 8px;
+  font-family: var(--d-display);
+  font-size: 1.48rem;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -.021em;
+  color: var(--d-ink);
+}
+
+.hero-subtitle {
+  margin: 0 auto;
+  max-width: 30ch;
+  font-size: .93rem;
+  line-height: 1.5;
+  color: var(--d-ink-2);
+}
+
+/* =========================
+   MESSAGE CARD
+   ========================= */
+.donation-message-card {
+  position: relative;
+  background: var(--d-surface);
+  border: 1px solid var(--d-hairline);
+  border-radius: var(--d-radius);
+  padding: 18px 18px 18px 22px;
+  margin-bottom: 18px;
+  box-shadow: var(--d-shadow);
+  overflow: hidden;
+}
+
+.donation-message-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--d-brass);
+}
+
+.donation-message-card p {
+  margin: 0;
+  text-align: left;
+  font-size: .92rem;
+  line-height: 1.62;
+  color: var(--d-ink-2);
+}
+
+/* =========================
+   BANK DETAILS CARD
+   ========================= */
+.bank-details-card {
+  position: relative;
+  background: var(--d-surface);
+  border-radius: var(--d-radius);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 0 0 1px var(--d-hairline), var(--d-shadow);
+  overflow: hidden;
+}
+
+.bank-details-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--d-teal-deep), var(--d-teal) 60%, var(--d-brass));
+}
+
+.bank-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 11px;
+  padding: 4px 0 16px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--d-hairline);
+}
+
+.bank-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--d-teal-soft);
+  color: var(--d-teal-deep);
+}
+.bank-icon svg { width: 19px; height: 19px; }
+
+.bank-name {
+  font-family: var(--d-display);
+  font-size: .96rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--d-ink);
+}
+
+.bank-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: none;
+}
+
+.detail-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--d-ink-3);
+}
+
+.detail-icon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--d-ink-3);
+}
+.detail-icon svg { width: 17px; height: 17px; }
+
+.detail-value {
+  font-family: var(--d-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .005em;
+  color: var(--d-ink);
+  text-align: right;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* --- the number: stacked so it never wraps mid-block --- */
+.account-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--d-teal-soft);
+  border-radius: var(--d-radius-sm);
+  padding: 14px 16px;
+  margin: 6px 0 0;
+}
+
+.account-row .detail-icon { color: var(--d-teal-deep); }
+.account-row .detail-label { color: var(--d-teal-deep); }
+
+.account-number {
+  font-family: var(--d-mono);
+  font-size: 1.42rem;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  font-variant-numeric: tabular-nums;
+  color: var(--d-teal-deep);
+  text-align: left;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* =========================
+   COPY BUTTON
+   ========================= */
+.copy-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 16px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 14px;
+  background: var(--d-teal-deep);
+  color: #fff;
+  font-family: var(--d-body);
+  font-size: .99rem;
+  font-weight: 600;
+  letter-spacing: .005em;
+  cursor: pointer;
+  transition: background-color .2s ease, transform .1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.copy-button:active { transform: scale(.985); }
+
+.copy-button:focus-visible {
+  outline: 2px solid var(--d-teal);
+  outline-offset: 2px;
+}
+
+.copy-button.copied { background: var(--d-brass); }
+
+.copy-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+/* =========================
+   USAGE CARD
+   ========================= */
+.usage-card {
+  background: var(--d-surface);
+  border-radius: var(--d-radius);
+  padding: 18px 18px 8px;
+  margin-bottom: 18px;
+  box-shadow: 0 0 0 1px var(--d-hairline), var(--d-shadow);
+}
+
+.usage-title {
+  margin: 0 0 6px;
+  text-align: left;
+  font-family: var(--d-display);
+  font-size: .98rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -.01em;
+  color: var(--d-ink);
+}
+
+.usage-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.usage-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  background: none;
+  border-bottom: 1px solid var(--d-hairline);
+}
+
+.usage-list li:last-child { border-bottom: none; }
+
+.usage-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--d-teal-soft);
+  color: var(--d-teal-deep);
+}
+.usage-icon svg { width: 17px; height: 17px; }
+
+.usage-list li span:last-child {
+  font-size: .9rem;
+  line-height: 1.45;
+  color: var(--d-ink-2);
+}
+
+/* =========================
+   THANK YOU
+   ========================= */
+.thank-you-section {
+  position: relative;
+  text-align: center;
+  padding: 26px 20px 24px;
+  border-radius: var(--d-radius);
+  background: var(--d-surface);
+  box-shadow: 0 0 0 1px var(--d-hairline), var(--d-shadow);
+  overflow: hidden;
+}
+
+.thank-you-section::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--d-brass);
+}
+
+.thank-you-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: var(--d-brass-soft);
+  color: var(--d-brass);
+}
+.thank-you-icon svg { width: 26px; height: 26px; }
+
+.thank-you-text {
+  margin: 0 auto 10px;
+  max-width: 30ch;
+  font-size: .93rem;
+  line-height: 1.55;
+  color: var(--d-ink-2);
+}
+
+.thank-you-subtext {
+  margin: 0;
+  font-family: var(--d-display);
+  font-size: 1.24rem;
+  font-weight: 800;
+  letter-spacing: -.015em;
+  color: var(--d-teal-deep);
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 360px) {
+  .hero-title { font-size: 1.34rem; }
+  .bank-name { font-size: .9rem; }
+  .account-number { font-size: 1.22rem; }
+  .donation-container { padding-left: 14px; padding-right: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* =========================
+   NIGHT MODE
+   ========================= */
+.night-mode {
+  --d-paper:      #0F1512;
+  --d-paper-2:    #1B231F;
+  --d-surface:    #171E1A;
+  --d-ink:        #E7EDE9;
+  --d-ink-2:      #A3B0A9;
+  --d-ink-3:      #77857E;
+  --d-teal:       #35C79E;
+  --d-teal-deep:  #23A883;
+  --d-teal-soft:  #16302A;
+  --d-brass:      #D2A44E;
+  --d-brass-soft: #2A2318;
+  --d-line:       #2A342E;
+  --d-hairline:   #26302B;
+  --d-shadow:     0 1px 2px rgba(0, 0, 0, .4), 0 10px 28px -14px rgba(0, 0, 0, .75);
+}
+
+.night-mode,
+.night-mode body {
+  background: var(--d-paper);
+  color: var(--d-ink);
+}
+
+.night-mode .app__header {
+  background: linear-gradient(135deg, #0A2018 0%, #0E2B21 100%);
+}
+
+.night-mode .hero-icon { color: var(--d-teal); }
+
+.night-mode .copy-button {
+  background: var(--d-teal-deep);
+  color: #06120E;
+}
+.night-mode .copy-button.copied {
+  background: var(--d-brass);
+  color: #1A1204;
+}
+
+.night-mode .account-number { color: var(--d-teal); }
+.night-mode .thank-you-subtext { color: var(--d-teal); }

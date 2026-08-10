@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Xayriya - Loyihani Qo'llab-Quvvatlash</title>
+
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="donation.css" />
+
+  <script>
+  if (localStorage.getItem('theme') === 'night') {
+    document.documentElement.classList.add('night-mode');
+  }
+  </script>
+
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <!-- DONATION CONTAINER -->
+  <div class="donation-container">
+
+    <!-- Hero Section -->
+    <div class="donation-hero">
+      <div class="hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 27.5S4.5 20.8 4.5 13.1A6.1 6.1 0 0 1 16 10a6.1 6.1 0 0 1 11.5 3.1c0 7.7-11.5 14.4-11.5 14.4Z" />
+          <path d="M16 10v17.5" opacity=".35" />
+          <path d="M12.4 7.2c1.4-.2 2.7.3 3.6 1.4.9-1.1 2.2-1.6 3.6-1.4" opacity=".55" />
+        </svg>
+      </div>
+      <h2 class="hero-title" data-i18n="donation.heroTitle">Bot faoliyatini qo'llab-quvvatlang</h2>
+      <p class="hero-subtitle" data-i18n="donation.heroSubtitle">Sizning yordamingiz bilan loyiha yanada rivojlanadi</p>
+    </div>
+
+    <!-- Message Card -->
+    <div class="donation-message-card">
+      <p data-i18n="donation.message">Agar ushbu bot sizga foydali bo'layotgan bo'lsa va uning ishlashi hamda rivojlanishiga o'z hissangizni qo'shmoqchi bo'lsangiz, quyidagi hisob raqamga istalgan miqdorda moddiy mablag'laringizni yuborishingiz mumkin.</p>
+    </div>
+
+    <!-- Bank Details Card -->
+    <div class="bank-details-card">
+      <div class="bank-header">
+        <span class="bank-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5 12 4.5l9 5" /><path d="M5.5 10v8" /><path d="M9.8 10v8" /><path d="M14.2 10v8" /><path d="M18.5 10v8" /><path d="M3.5 20.5h17" />
+          </svg>
+        </span>
+        <span class="bank-name">KEB하나은행 (Hana Bank)</span>
+      </div>
+
+      <div class="bank-detail-row">
+        <div class="detail-label">
+          <span class="detail-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.6" /><path d="M4.8 20a7.4 7.4 0 0 1 14.4 0" />
+            </svg>
+          </span>
+          <span data-i18n="donation.name">Ism</span>
+        </div>
+        <div class="detail-value">SATTAROV OTABEK</div>
+      </div>
+
+      <div class="bank-detail-row account-row">
+        <div class="detail-label">
+          <span class="detail-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.8" y="5.5" width="18.4" height="13" rx="2.5" /><path d="M2.8 10h18.4" /><path d="M6.5 14.6h3.2" />
+            </svg>
+          </span>
+          <span data-i18n="donation.accountNumber">Hisob raqam</span>
+        </div>
+        <div class="detail-value account-number" id="accountNumber">559-910261-05007</div>
+      </div>
+
+      <button class="copy-button" id="copyBtn">
+        <span class="copy-icon" id="copyIcon">📋</span>
+        <span class="copy-text" id="copyText" data-i18n="donation.copy">Nusxa olish</span>
+      </button>
+    </div>
+
+    <!-- Usage Info -->
+    <div class="usage-card">
+      <h3 class="usage-title" data-i18n="donation.usageTitle">Yig'ilgan mablag'lar quyidagilar uchun ishlatiladi:</h3>
+      <ul class="usage-list">
+        <li>
+          <span class="usage-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="7" rx="2" /><rect x="3" y="13" width="18" height="7" rx="2" /><path d="M6.8 7.5h.01" /><path d="M6.8 16.5h.01" />
+            </svg>
+          </span>
+          <span data-i18n="donation.usage1">Server va hosting xarajatlari</span>
+        </li>
+        <li>
+          <span class="usage-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.6 3.4a5 5 0 0 0-6.3 6.4l-4.7 4.7a2 2 0 0 0 0 2.8l2.9 2.9a2 2 0 0 0 2.8 0l4.7-4.7a5 5 0 0 0 6.4-6.3l-3.1 3.1-3.1-.6-.6-3.1z" />
+            </svg>
+          </span>
+          <span data-i18n="donation.usage2">Texnik xizmat va muntazam yangilanishlar</span>
+        </li>
+        <li>
+          <span class="usage-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m8.2 8.4-4 3.6 4 3.6" /><path d="m15.8 8.4 4 3.6-4 3.6" /><path d="M13.4 5 10.6 19" />
+            </svg>
+          </span>
+          <span data-i18n="donation.usage3">Dasturchilar mehnati va loyihani rivojlantirish</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Thank You Section -->
+    <div class="thank-you-section">
+      <div class="thank-you-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 6.8 8.4 9.4a2 2 0 0 0 0 2.8l.3.3a2 2 0 0 0 2.8 0l1.2-1.2 3.4 3.4a1.7 1.7 0 0 1-2.4 2.4" />
+          <path d="M13.7 17.1a1.7 1.7 0 0 1-2.4 2.4l-.9-.9" />
+          <path d="M2.8 8.2 6.4 5a2 2 0 0 1 2.5-.1l2.1 1.5" />
+          <path d="M21.2 8.2 17.4 5a2 2 0 0 0-2.5-.1L13 6.3" />
+          <path d="m15.1 14.7 2.6 2.6" opacity=".45" />
+        </svg>
+      </div>
+      <p class="thank-you-text" data-i18n="donation.thankYouText">Sizning har qanday hissangiz biz uchun katta ahamiyatga ega!</p>
+      <p class="thank-you-subtext" data-i18n="donation.thankYou">Rahmat!</p>
+    </div>
+
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/logger.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="donation.js"></script>
+
+</body>
+</html>
