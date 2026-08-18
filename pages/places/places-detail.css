@@ -1177,3 +1177,88 @@
   background: #2a2a2a;
   border: 1px solid var(--pl-line);
 }
+
+/* --- Quiet empty-state prompt (replaces the dashed placeholder tiles) --- */
+.pd-quiet {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--pl-muted);
+}
+
+.pd-quiet-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--pl-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pd-quiet-link:hover { color: var(--pl-accent-deep); }
+
+/* --- "+" tile, shown only when at least one real link exists --- */
+.pd-social-tile--add {
+  border-style: dashed;
+  background: transparent;
+  cursor: pointer;
+  gap: 4px;
+}
+
+.pd-social-tile--add:hover {
+  border-color: var(--pl-accent);
+  background: var(--pl-accent-soft);
+}
+
+.pd-social-tile--add:hover .pd-social-icon { color: var(--pl-accent); }
+.pd-social-tile--add:active { transform: scale(0.97); }
+.pd-social-tile--add .pd-social-name { color: var(--pl-muted); font-weight: 600; }
+
+/* --- Platform picker inside the sheet --- */
+.pd-sheet-picker { display: flex; flex-direction: column; gap: 8px; }
+.pd-sheet-picker[hidden] { display: none; }
+
+.pd-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--pl-line);
+  border-radius: 12px;
+  background: var(--pl-surface);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.pd-picker-row:hover { border-color: var(--pl-accent); background: var(--pl-accent-soft); }
+.pd-picker-row:active { transform: scale(0.99); }
+
+.pd-picker-icon { line-height: 0; color: var(--pl-muted); }
+.pd-picker-icon .pl-icon { width: 22px; height: 22px; }
+.pd-picker-row--telegram  .pd-picker-icon { color: #2aabee; }
+.pd-picker-row--tiktok    .pd-picker-icon { color: #111111; }
+.pd-picker-row--instagram .pd-picker-icon { color: #d62976; }
+
+.pd-picker-name { font-size: 0.95rem; font-weight: 700; color: var(--pl-text); }
+
+.pd-sheet-meta[hidden],
+.pd-sheet-moderation[hidden],
+.pd-sheet-btn[hidden] { display: none; }
+
+.pd-quiet-link:focus-visible,
+.pd-social-tile--add:focus-visible,
+.pd-picker-row:focus-visible {
+  outline: 2px solid var(--pl-accent);
+  outline-offset: 2px;
+}
+
+/* --- Night mode for the above --- */
+.night-mode .pd-social-tile--add { background: transparent; }
+.night-mode .pd-picker-row { background: rgba(255, 255, 255, 0.04); }
+.night-mode .pd-picker-row--tiktok .pd-picker-icon { color: #f1f1ef; }

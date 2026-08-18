@@ -1048,15 +1048,65 @@ console.log('✅ Places Detail JS loaded');
     return add;
   }
 
+  // Compact "+" tile, shown after the real ones when some platforms are still
+  // missing. Opens a picker rather than three permanent empty boxes.
+  function buildAddTile(missing) {
+    var add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'pd-social-tile pd-social-tile--add';
+    add.appendChild(iconSpan('pd-social-icon', PD_ICONS.plus));
+    var label = document.createElement('span');
+    label.className = 'pd-social-name';
+    label.textContent = t('detail.social.add', 'Qo\'shish');
+    add.appendChild(label);
+    add.addEventListener('click', function () { pickField(missing); });
+    return add;
+  }
+
+  // One quiet line + text link, used wherever there is nothing to show yet.
+  // Deliberately not a button: a big "+" reads as "press me" and collects
+  // curiosity taps, while a sentence reads as "if you happen to know this".
+  function quietPrompt(text, linkLabel, onClick) {
+    var wrap = document.createElement('p');
+    wrap.className = 'pd-quiet';
+    wrap.appendChild(document.createTextNode(text + ' '));
+    var link = document.createElement('button');
+    link.type = 'button';
+    link.className = 'pd-quiet-link';
+    link.textContent = linkLabel;
+    link.addEventListener('click', onClick);
+    wrap.appendChild(link);
+    return wrap;
+  }
+
   function renderSocial() {
     var host = $('pdSocialSection');
     if (!host) return;
     host.textContent = '';
     host.appendChild(sectionTitle(t('detail.social.title', 'Ijtimoiy tarmoqlar')));
 
+    var shown = [];
+    var missing = [];
+    PLATFORMS.forEach(function (p) {
+      if ((place && place[p.prop]) || isPending(p.field)) shown.push(p);
+      else missing.push(p);
+    });
+
+    // Nothing registered: no grid at all. Three dashed boxes advertising an
+    // absence made the card look unfinished and invited taps from people with
+    // nothing to add.
+    if (!shown.length) {
+      host.appendChild(quietPrompt(
+        t('detail.social.emptyPrompt', 'Bu joyning ijtimoiy tarmoqlarini bilasizmi?'),
+        t('detail.social.add', 'Qo\'shish'),
+        function () { pickField(missing); }));
+      return;
+    }
+
     var grid = document.createElement('div');
     grid.className = 'pd-social-grid';
-    PLATFORMS.forEach(function (p) { grid.appendChild(buildTile(p)); });
+    shown.forEach(function (p) { grid.appendChild(buildTile(p)); });
+    if (missing.length) grid.appendChild(buildAddTile(missing));
     host.appendChild(grid);
   }
 
@@ -1099,12 +1149,10 @@ console.log('✅ Places Detail JS loaded');
       return;
     }
 
-    var empty = document.createElement('p');
-    empty.className = 'pd-note-empty';
-    empty.textContent = t('detail.note.empty',
-      'Ish vaqti va dam olish kunlari hali qo\'shilmagan.');
-    host.appendChild(empty);
-    host.appendChild(noteAction(t('detail.note.addCta', 'Ma\'lumot qo\'shish'), null));
+    host.appendChild(quietPrompt(
+      t('detail.note.empty', 'Ish vaqti va dam olish kunlari hali qo\'shilmagan.'),
+      t('detail.note.addCta', 'Ma\'lumot qo\'shish'),
+      function () { openSheet('note', null); }));
   }
 
   function pendingChip() {
@@ -1130,6 +1178,36 @@ console.log('✅ Places Detail JS loaded');
   // SUBMISSION SHEET
   // ============================================
 
+  // With one platform left there is nothing to choose, so go straight in.
+  function pickField(missing) {
+    if (!missing || !missing.length) return;
+    if (missing.length === 1) { openSheet(missing[0].field, null); return; }
+    openPicker(missing);
+  }
+
+  function openPicker(missing) {
+    var backdrop = $('pdSheetBackdrop');
+    var picker = $('pdSheetPicker');
+    if (!backdrop || !picker) return;
+
+    sheetCtx = null;
+    picker.textContent = '';
+    missing.forEach(function (p) {
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'pd-picker-row pd-picker-row--' + p.field;
+      row.appendChild(iconSpan('pd-picker-icon', p.icon));
+      var name = document.createElement('span');
+      name.className = 'pd-picker-name';
+      name.textContent = p.label;
+      row.appendChild(name);
+      row.addEventListener('click', function () { openSheet(p.field, null); });
+      picker.appendChild(row);
+    });
+
+    showSheet('pick', t('detail.sheet.pickTitle', 'Nimani qo\'shmoqchisiz?'), PD_ICONS.plus);
+  }
+
   function platformFor(field) {
     for (var i = 0; i < PLATFORMS.length; i++) {
       if (PLATFORMS[i].field === field) return PLATFORMS[i];
@@ -1151,30 +1229,51 @@ console.log('✅ Places Detail JS loaded');
     return tpl.replace('{platform}', name);
   }
 
-  function openSheet(field, current) {
+  // Shared open mechanics for both sheet modes ('pick' and 'input').
+  function showSheet(mode, titleText, iconHTML, iconClass) {
     var backdrop = $('pdSheetBackdrop');
     var sheet = $('pdSheet');
     if (!backdrop || !sheet) return;
 
+    var picking = mode === 'pick';
+
+    $('pdSheetIcon').innerHTML = iconHTML || '';
+    $('pdSheetIcon').className = 'pd-sheet-icon' + (iconClass ? ' ' + iconClass : '');
+    $('pdSheetTitle').textContent = titleText;
+
+    $('pdSheetPicker').hidden = !picking;
+    $('pdSheetMeta').hidden = picking;
+    $('pdSheetModeration').hidden = picking;
+    $('pdSheetSend').hidden = picking;
+    if (picking) {
+      $('pdSheetCurrent').hidden = true;
+      $('pdSheetInput').hidden = true;
+      $('pdSheetTextarea').hidden = true;
+    }
+
+    setError(null);
+
+    if (backdrop.hidden) {
+      backdrop.hidden = false;
+      // Next frame, so the transition has a start state to animate from.
+      requestAnimationFrame(function () {
+        backdrop.classList.add('visible');
+        sheet.classList.add('visible');
+      });
+      haptic('light');
+      if (tg.BackButton) {
+        tg.BackButton.offClick(handleMainBackButton);
+        tg.BackButton.onClick(handleSheetBackButton);
+      }
+    }
+  }
+
+  function openSheet(field, current) {
     sheetCtx = { field: field, isEdit: !!current, current: current || null };
     sending = false;
 
     var isNote = field === 'note';
     var p = platformFor(field);
-
-    $('pdSheetIcon').innerHTML = isNote ? PD_ICONS.info : (p ? p.icon : '');
-    $('pdSheetIcon').className = 'pd-sheet-icon' + (isNote ? '' : ' pd-sheet-icon--' + field);
-    $('pdSheetTitle').textContent = sheetTitleText(field, !!current);
-
-    // Current value, shown when this is a correction so the reviewer's diff
-    // and the submitter's starting point agree.
-    var curWrap = $('pdSheetCurrent');
-    if (current) {
-      $('pdSheetCurrentValue').textContent = isNote ? current : displayHandle(field, current);
-      curWrap.hidden = false;
-    } else {
-      curWrap.hidden = true;
-    }
 
     var input = $('pdSheetInput');
     var area = $('pdSheetTextarea');
@@ -1194,26 +1293,24 @@ console.log('✅ Places Detail JS loaded');
       input.placeholder = p ? p.placeholder : '';
     }
 
+    // Current value, shown when this is a correction so the reviewer's diff
+    // and the submitter's starting point agree.
+    var curWrap = $('pdSheetCurrent');
+    if (current) {
+      $('pdSheetCurrentValue').textContent = isNote ? current : displayHandle(field, current);
+      curWrap.hidden = false;
+    } else {
+      curWrap.hidden = true;
+    }
+
     $('pdSheetHint').textContent = isNote
       ? t('detail.sheet.noteHint', 'Ish vaqti, dam olish kunlari yoki e\'lon.')
       : t(p ? p.hintKey : '', '@username yoki havola');
 
-    setError(null);
     setSending(false);
-
-    backdrop.hidden = false;
-    // Next frame, so the transition has a start state to animate from.
-    requestAnimationFrame(function () {
-      backdrop.classList.add('visible');
-      sheet.classList.add('visible');
-    });
-
-    haptic('light');
-
-    if (tg.BackButton) {
-      tg.BackButton.offClick(handleMainBackButton);
-      tg.BackButton.onClick(handleSheetBackButton);
-    }
+    showSheet('input', sheetTitleText(field, !!current),
+      isNote ? PD_ICONS.info : (p ? p.icon : ''),
+      isNote ? '' : 'pd-sheet-icon--' + field);
 
     setTimeout(function () {
       var el = isNote ? area : input;
