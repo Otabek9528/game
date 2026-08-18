@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Joy Ma'lumotlari</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="places.css" />
+  <link rel="stylesheet" href="places-detail.css" />
+  <link rel="stylesheet" href="../../css/photo-viewer.css" />
+
+  <script>
+    if (localStorage.getItem('theme') === 'night') {
+      document.documentElement.classList.add('night-mode');
+    }
+  </script>
+  
+</head>
+<body>
+
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <div class="detail-container">
+    
+    <div class="detail-loading" id="detailLoading">
+      <div class="detail-spinner"></div>
+      <p data-i18n="common.loading">Yuklanmoqda...</p>
+    </div>
+
+    <div class="detail-error" id="detailError" style="display: none;">
+      <p class="detail-error-icon"><svg class="pl-icon" viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#c2453a" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg></p>
+      <p class="detail-error-text" data-i18n="places.error">Xatolik yuz berdi</p>
+      <p class="detail-error-hint" id="errorMessage">Ma'lumotlarni yuklashda muammo. Iltimos, qaytadan urinib ko'ring.</p>
+      <button class="retry-button" onclick="loadPlaceDetail()" data-i18n="detail.retry">Qaytadan urinish</button>
+    </div>
+
+    <div id="detailContent" style="display: none;"></div>
+
+  </div>
+
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/apiConfig.js"></script>
+  <script src="../../js/photo-viewer.js"></script>
+  <script src="places-detail.js"></script>
+
+</body>
+</html>
