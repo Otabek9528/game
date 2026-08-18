@@ -926,6 +926,34 @@ console.log('✅ Places Detail JS loaded');
     }
   }
 
+  // Opening a profile from inside a Telegram webview.
+  //
+  // A plain target="_blank" is swallowed by the webview — the tap does
+  // nothing, which is why only the t.me tile appeared to work (Telegram
+  // recognises its own links). Telegram exposes two explicit methods:
+  //
+  //   openTelegramLink : opens a t.me link inside Telegram itself — one tap,
+  //                      straight to the channel, no browser in between
+  //   openLink         : hands the URL to the external browser, which is what
+  //                      lets the OS forward instagram.com / tiktok.com into
+  //                      the installed app via universal links
+  //
+  // The href stays on the anchor so long-press-to-copy still works and the
+  // page degrades to an ordinary link when opened outside Telegram.
+  function openProfile(field, url) {
+    try {
+      if (field === 'telegram' && tg && typeof tg.openTelegramLink === 'function') {
+        tg.openTelegramLink(url);
+        return;
+      }
+      if (tg && typeof tg.openLink === 'function') {
+        tg.openLink(url);
+        return;
+      }
+    } catch (e) {}
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   function isPending(field) {
     return pendingFields.indexOf(field) !== -1;
   }
@@ -978,6 +1006,12 @@ console.log('✅ Places Detail JS loaded');
       handle.className = 'pd-social-state';
       handle.textContent = displayHandle(p.field, value);
       link.appendChild(handle);
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        haptic('light');
+        openProfile(p.field, value);
+      });
       tile.appendChild(link);
 
       // Correction path. Kept as a separate control rather than wrapping the
@@ -1392,39 +1426,96 @@ console.log('✅ Places Detail JS loaded');
       if (e.key === 'Escape' && isSheetOpen()) closeSheet();
     });
 
-    // Drag the grab handle down to dismiss, matching the prayer settings
-    // sheet. Bound to the handle only: dragging inside the textarea should
-    // select text, not close the sheet.
-    var grip = $('pdSheetGrip');
-    if (grip) {
-      var startY = 0, curY = 0, dragging = false;
+    bindSheetDrag(sheet);
+  }
 
-      grip.addEventListener('pointerdown', function (e) {
-        dragging = true;
-        startY = curY = e.clientY;
-        sheet.style.transition = 'none';
-        try { grip.setPointerCapture(e.pointerId); } catch (err) {}
-      });
+  // Swipe down to dismiss, from anywhere on the sheet.
+  //
+  // Three things must keep working while this is bound, which is why it is not
+  // simply "any downward drag closes":
+  //   - typing and selecting text in the input/textarea
+  //   - scrolling the body when the content is taller than the sheet
+  //   - horizontal gestures, which belong to the browser
+  // So the gesture only becomes a dismiss once it is clearly vertical, clearly
+  // downward, and the body is already scrolled to the top.
+  function bindSheetDrag(sheet) {
+    var DISMISS_PX = 90;   // past this on release, it closes
+    var SLOP_PX = 8;       // movement before we decide whose gesture this is
 
-      grip.addEventListener('pointermove', function (e) {
-        if (!dragging) return;
-        curY = e.clientY;
-        var dy = Math.max(0, curY - startY);
-        sheet.style.transform = 'translateY(' + dy + 'px)';
-      });
+    var startY = 0, startX = 0, dy = 0;
+    var tracking = false, committed = false, scroller = null;
 
-      var endDrag = function () {
-        if (!dragging) return;
-        dragging = false;
-        sheet.style.transition = '';
-        var dy = curY - startY;
-        sheet.style.transform = '';
-        if (dy > 80) closeSheet();
-      };
-
-      grip.addEventListener('pointerup', endDrag);
-      grip.addEventListener('pointercancel', endDrag);
+    function interactive(el) {
+      return !!(el && el.closest && el.closest('input, textarea, select, button, a'));
     }
+
+    function onStart(e) {
+      if (sending) return;              // never yank the sheet out mid-submit
+      if (interactive(e.target)) return;
+      var t = e.touches ? e.touches[0] : e;
+      startY = t.clientY;
+      startX = t.clientX;
+      dy = 0;
+      tracking = true;
+      committed = false;
+      scroller = $('pdSheetBody');
+    }
+
+    function abandon(sheetEl) {
+      tracking = false;
+      committed = false;
+      sheetEl.style.transition = '';
+    }
+
+    function onMove(e) {
+      if (!tracking) return;
+      var t = e.touches ? e.touches[0] : e;
+      var moveY = t.clientY - startY;
+      var moveX = t.clientX - startX;
+
+      if (!committed) {
+        if (Math.abs(moveY) < SLOP_PX && Math.abs(moveX) < SLOP_PX) return;
+        // Mostly sideways, heading up, or there is content scrolled above:
+        // not a dismiss. Hand the gesture back rather than fighting it.
+        if (Math.abs(moveX) > Math.abs(moveY) || moveY < 0 ||
+            (scroller && scroller.scrollTop > 0)) {
+          abandon(sheet);
+          return;
+        }
+        committed = true;
+        sheet.style.transition = 'none';
+      }
+
+      dy = Math.max(0, moveY);
+      // Without this the page behind scrolls along with the sheet.
+      if (e.cancelable) e.preventDefault();
+      sheet.style.transform = 'translateY(' + dy + 'px)';
+    }
+
+    function onEnd() {
+      if (!tracking) return;
+      var travelled = dy;
+      tracking = false;
+      committed = false;
+      sheet.style.transition = '';
+      if (travelled > DISMISS_PX) {
+        closeSheet();
+      } else {
+        sheet.style.transform = '';
+      }
+      dy = 0;
+    }
+
+    sheet.addEventListener('touchstart', onStart, { passive: true });
+    sheet.addEventListener('touchmove', onMove, { passive: false });
+    sheet.addEventListener('touchend', onEnd);
+    sheet.addEventListener('touchcancel', onEnd);
+
+    // Mouse drags are tracked on the window so the gesture survives the
+    // pointer leaving the sheet mid-drag.
+    sheet.addEventListener('mousedown', onStart);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
   }
 
   function mount(placeData) {
