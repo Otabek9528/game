@@ -944,6 +944,16 @@ console.log('✅ Places Detail JS loaded');
     try {
       if (field === 'telegram' && tg && typeof tg.openTelegramLink === 'function') {
         tg.openTelegramLink(url);
+        // openTelegramLink opens the chat but explicitly does NOT close the
+        // Mini App, so the group ends up behind the web view and looks like
+        // nothing happened. Closing is what actually reveals it.
+        //
+        // Deferred by a frame or two: closing in the same tick can be
+        // processed before the open event, which shuts the app without ever
+        // opening the chat.
+        setTimeout(function () {
+          try { tg.close(); } catch (e) {}
+        }, 150);
         return;
       }
       if (tg && typeof tg.openLink === 'function') {
