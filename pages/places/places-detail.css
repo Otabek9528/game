@@ -776,36 +776,6 @@
 
 .pd-social-tile--pending .pd-social-state { white-space: normal; line-height: 1.25; }
 
-/* --- Correction affordance on a connected tile --- */
-.pd-social-edit {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  z-index: 2;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--pl-surface);
-  color: var(--pl-muted);
-  box-shadow: 0 1px 4px rgba(28, 25, 23, 0.14);
-  cursor: pointer;
-  opacity: 0.75;
-  transition: opacity 160ms ease, color 160ms ease, transform 160ms var(--pl-ease);
-}
-
-.pd-social-edit:hover {
-  opacity: 1;
-  color: var(--pl-accent);
-  transform: scale(1.08);
-}
-
-.pd-social-edit .pl-icon { width: 0.78rem; height: 0.78rem; }
-
 /* =========================================================
    OWNER NOTE
    ========================================================= */
@@ -1141,7 +1111,6 @@
 
 .pd-social-tile--empty:focus-visible,
 .pd-social-link:focus-visible,
-.pd-social-edit:focus-visible,
 .pd-note-cta:focus-visible,
 .pd-sheet-btn:focus-visible,
 .pd-sheet-input:focus-visible,
@@ -1152,7 +1121,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pd-social-tile,
-  .pd-social-edit,
   .pd-sheet,
   .pd-sheet-backdrop,
   .pd-toast {
@@ -1194,11 +1162,6 @@
 .night-mode .pd-social-tile--empty { background: transparent; }
 
 .night-mode .pd-social-tile--pending { background: rgba(234, 185, 50, 0.1); }
-
-.night-mode .pd-social-edit {
-  background: var(--pl-surface-2);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-}
 
 .night-mode .pd-sheet-icon--tiktok { color: #f1f1ef; }
 

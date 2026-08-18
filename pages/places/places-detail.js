@@ -969,7 +969,6 @@ console.log('✅ Places Detail JS loaded');
 
   function buildTile(p) {
     var value = place ? place[p.prop] : null;
-    var locked = isPending(p.field);   // a correction is already queued
 
     var tile = document.createElement('div');
     tile.className = 'pd-social-tile pd-social-tile--on pd-social-tile--' + p.field;
@@ -1001,22 +1000,10 @@ console.log('✅ Places Detail JS loaded');
     });
     tile.appendChild(link);
 
-    // No pencil while a change to this field is already queued — a second
-    // submission would only bounce off the one-pending-per-field rule.
-    if (!locked) {
-      var edit = document.createElement('button');
-      edit.type = 'button';
-      edit.className = 'pd-social-edit';
-      edit.setAttribute('aria-label',
-        t('detail.social.suggestEdit', 'O\'zgartirish taklif qilish') + ' — ' + p.label);
-      edit.innerHTML = PD_ICONS.pen;
-      edit.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openSheet(p.field, value);
-      });
-      tile.appendChild(edit);
-    }
+    // No correction affordance: once a link is set it is fixed, and changes go
+    // through the admin rather than back through the queue. Letting anyone
+    // re-propose a link that already works produced churn to review and a
+    // steady trickle of competing values for the same field.
     return tile;
   }
 
