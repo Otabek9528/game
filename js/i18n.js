@@ -1088,7 +1088,7 @@ const I18N = {
     },
     'detail.note.addCta': { uz: 'Ma\'lumot qo\'shish', ru: 'Добавить информацию', en: 'Add information' },
     'detail.note.pending': { uz: 'Ko\'rib chiqilmoqda', ru: 'На проверке', en: 'Under review' },
-    'detail.note.suggestEdit': { uz: 'O\'zgartirish taklif qilish', ru: 'Предложить изменение', en: 'Suggest a correction' },
+    'detail.note.fromOwner': { uz: 'Muassasa egasidan', ru: 'От владельца заведения', en: 'From the owner' },
 
     // ---------- Place detail: submission sheet ----------
     'detail.sheet.addTitle': {

@@ -209,33 +209,62 @@ function checkImageExists(url) {
 }
 
 async function discoverPhotos(photoPath, maxPhotos = 10) {
-  const photos = [];
   const extensions = ['jpg', 'jpeg', 'png'];
   const basePath = `../../${photoPath}`;
-  
-  for (let i = 1; i <= maxPhotos; i++) {
-    let photoFound = false;
-    
-    for (const ext of extensions) {
-      const photoUrl = `${basePath}/${i}.${ext}`;
-      
-      try {
-        const exists = await checkImageExists(photoUrl);
-        if (exists) {
-          photos.push(photoUrl);
-          photoFound = true;
-          break;
+
+  // Photos are found by probing filenames, so the cost is round trips, not
+  // bytes. Probing one extension at a time and one index at a time meant ~11
+  // sequential requests before the first photo was known — seconds on mobile
+  // data. A batch fires every extension of every index in the batch at once,
+  // so the usual place resolves in a single round trip.
+  const BATCH = 5;
+  const found = [];
+
+  for (let start = 1; start <= maxPhotos; start += BATCH) {
+    const indices = [];
+    for (let i = start; i < start + BATCH && i <= maxPhotos; i++) indices.push(i);
+
+    const hits = await Promise.all(indices.map(async (i) => {
+      const perExt = await Promise.all(extensions.map(async (ext) => {
+        const url = `${basePath}/${i}.${ext}`;
+        try {
+          return (await checkImageExists(url)) ? url : null;
+        } catch (e) {
+          return null;
         }
-      } catch (e) {
-        continue;
-      }
+      }));
+      // Extension order is the preference order, so keep the first hit.
+      return perExt.find(Boolean) || null;
+    }));
+
+    // Numbering has to stay contiguous from 1: stop at the first gap even if
+    // later indices exist, otherwise a stray 7.jpg would appear as photo 2.
+    let gap = false;
+    for (const hit of hits) {
+      if (!hit) { gap = true; break; }
+      found.push(hit);
     }
-    
-    if (!photoFound) break;
+    if (gap) break;
   }
-  
-  return photos;
+
+  return found;
 }
+
+
+// Shown while the probing above runs, so the card is readable immediately
+// instead of waiting on photos. Reuses the skeleton from places.css.
+function detailPhotoSkeleton() {
+  const loading = window.I18N ? I18N.t('places.loadingPhotos') : 'Rasmlar yuklanmoqda...';
+  return `
+    <div class="detail-photo-skeleton">
+      <div class="skeleton-shimmer"></div>
+      <div class="skeleton-text">
+        <span class="skeleton-message">${loading}</span>
+      </div>
+    </div>
+  `;
+}
+
 
 // ============================================
 // CAROUSEL FUNCTIONS
@@ -471,9 +500,9 @@ async function renderPlaceDetail(place) {
     place.distance = getDistanceFromSearchState(place.id);
   }
   
-  const photos = await discoverPhotos(place.photo, 10);
-  
-  const photoHTML = createDetailPhotoCarousel(photos);
+  // Everything below is already in hand from the API response. Photos are the
+  // only slow part, so the card renders now and they drop in when ready.
+  const photoHTML = detailPhotoSkeleton();
   const starRatingHTML = generateStarRating(place.reviews);
   const reviewsHTML = renderReviews(place.reviews);
   const reviewCount = place.reviews ? place.reviews.length : 0;
@@ -637,14 +666,18 @@ async function renderPlaceDetail(place) {
     ` : ''}
   `;
   
-  if (photos.length > 1) {
-    initDetailCarousel(photos.length);
-  }
-
   initReviewSubmission(place.id);
 
   // Social links + owner note. Mounted last so it can read place.pendingFields.
   if (window.PlaceExtras) PlaceExtras.mount(place);
+
+  // Photos arrive after the card is already on screen.
+  discoverPhotos(place.photo, 10).then(function (photos) {
+    const section = document.querySelector('.detail-photo-section');
+    if (!section) return;                     // navigated away mid-probe
+    section.innerHTML = createDetailPhotoCarousel(photos);
+    if (photos.length > 1) initDetailCarousel(photos.length);
+  });
 }
 
 
@@ -839,8 +872,7 @@ console.log('✅ Places Detail JS loaded');
     instagram: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.25" fill="currentColor" stroke="none"/></svg>',
     plus: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
     clock: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
-    info: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>',
-    pen: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.4 2.4 0 0 1 3.4 3.4L8 18.8 3 20l1.2-5L17 3Z"/></svg>'
+    info: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>'
   };
 
   var PLATFORMS = [
@@ -943,17 +975,12 @@ console.log('✅ Places Detail JS loaded');
   function openProfile(field, url) {
     try {
       if (field === 'telegram' && tg && typeof tg.openTelegramLink === 'function') {
+        // Telegram exposes no way to minimise a Mini App from script — only
+        // close(), which tears the session down and loses the user's place.
+        // So the client decides: on versions that support minimising it drops
+        // the app to a bubble when it opens the chat, and elsewhere the chat
+        // waits underneath.
         tg.openTelegramLink(url);
-        // openTelegramLink opens the chat but explicitly does NOT close the
-        // Mini App, so the group ends up behind the web view and looks like
-        // nothing happened. Closing is what actually reveals it.
-        //
-        // Deferred by a frame or two: closing in the same tick can be
-        // processed before the open event, which shuts the app without ever
-        // opening the chat.
-        setTimeout(function () {
-          try { tg.close(); } catch (e) {}
-        }, 150);
         return;
       }
       if (tg && typeof tg.openLink === 'function') {
@@ -1106,8 +1133,23 @@ console.log('✅ Places Detail JS loaded');
     host.appendChild(sectionTitle(t('detail.note.title', 'Qo\'shimcha ma\'lumot')));
 
     if (value) {
+      // Presented as a notice from the venue, not as another opinion in the
+      // review stream: attributed header strip, no rating, no edit affordance.
       var card = document.createElement('div');
       card.className = 'pd-note-card';
+
+      var head = document.createElement('div');
+      head.className = 'pd-note-head';
+      var badge = document.createElement('span');
+      badge.className = 'pd-note-badge';
+      badge.innerHTML = PD_ICONS.info;   // static markup from our own table
+      var label = document.createElement('span');
+      label.className = 'pd-note-label';
+      label.textContent = t('detail.note.fromOwner', 'Muassasa egasidan');
+      head.appendChild(badge);
+      head.appendChild(label);
+      card.appendChild(head);
+
       var text = document.createElement('p');
       text.className = 'pd-note-text';
       // textContent, always. Line breaks survive via white-space: pre-line
@@ -1115,11 +1157,6 @@ console.log('✅ Places Detail JS loaded');
       text.textContent = value;
       card.appendChild(text);
       host.appendChild(card);
-
-      if (!pending) {
-        host.appendChild(noteAction(
-          t('detail.note.suggestEdit', 'O\'zgartirish taklif qilish'), value));
-      }
       return;
     }
 
@@ -1127,16 +1164,6 @@ console.log('✅ Places Detail JS loaded');
       t('detail.note.empty', 'Ish vaqti va dam olish kunlari hali qo\'shilmagan.'),
       t('detail.note.addCta', 'Ma\'lumot qo\'shish'),
       function () { openSheet('note', null); }));
-  }
-
-  function noteAction(label, current) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'pd-note-cta';
-    btn.innerHTML = current ? PD_ICONS.pen : PD_ICONS.plus;
-    btn.appendChild(document.createTextNode(' ' + label));
-    btn.addEventListener('click', function () { openSheet('note', current); });
-    return btn;
   }
 
   // ============================================

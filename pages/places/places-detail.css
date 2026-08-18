@@ -780,15 +780,44 @@
    OWNER NOTE
    ========================================================= */
 
+/* Deliberately unlike .review-card: reviews are left-bordered opinions from
+   visitors, this is a notice from the venue itself — a bordered panel with an
+   attributed header strip and no rating furniture. */
 .pd-note-card {
+  border: 1px solid var(--pl-line);
+  border-radius: 14px;
+  background: var(--pl-surface);
+  overflow: hidden;
+}
+
+.pd-note-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
   background: var(--pl-accent-soft);
-  border-left: 3px solid var(--pl-accent);
-  border-radius: 10px;
-  padding: 13px 15px;
+  border-bottom: 1px solid var(--pl-line);
+}
+
+.pd-note-badge {
+  display: inline-flex;
+  line-height: 0;
+  color: var(--pl-accent-deep);
+}
+
+.pd-note-badge .pl-icon { width: 17px; height: 17px; }
+
+.pd-note-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pl-accent-deep);
 }
 
 .pd-note-text {
   margin: 0;
+  padding: 13px 15px 15px;
   font-size: 0.92rem;
   line-height: 1.65;
   color: var(--pl-text);
@@ -805,31 +834,6 @@
   line-height: 1.55;
   color: var(--pl-muted);
 }
-
-.pd-note-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 12px;
-  padding: 8px 15px;
-  border: 1.5px dashed var(--pl-line);
-  border-radius: var(--pl-radius-sm);
-  background: transparent;
-  color: var(--pl-accent);
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color 160ms ease, background 160ms ease;
-}
-
-.pd-note-cta:hover {
-  border-color: var(--pl-accent);
-  background: var(--pl-accent-soft);
-}
-
-.pd-note-cta:active { transform: scale(0.98); }
-.pd-note-cta .pl-icon { width: 0.85rem; height: 0.85rem; }
 
 .pd-pending-chip {
   display: inline-flex;
@@ -1111,7 +1115,6 @@
 
 .pd-social-tile--empty:focus-visible,
 .pd-social-link:focus-visible,
-.pd-note-cta:focus-visible,
 .pd-sheet-btn:focus-visible,
 .pd-sheet-input:focus-visible,
 .pd-sheet-textarea:focus-visible {
@@ -1177,6 +1180,19 @@
   background: #2a2a2a;
   border: 1px solid var(--pl-line);
 }
+
+.night-mode .pd-note-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--pl-line);
+}
+
+.night-mode .pd-note-head {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: var(--pl-line);
+}
+
+.night-mode .pd-note-badge,
+.night-mode .pd-note-label { color: var(--pl-accent); }
 
 /* A section with nothing to show and nothing to offer removes itself, so no
    heading is left hanging over empty space. */

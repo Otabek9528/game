@@ -6,7 +6,13 @@
   <title>Yaqin Joylar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <!-- Loaded without blocking render: a stylesheet in the head holds up first paint
+       AND the scripts below it, which delays the API call by however long the font
+       server takes. media="print" makes it a non-blocking fetch that is promoted to
+       the real stylesheet once it lands; display=swap already covers the FOUT. -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet" media="print" onload="this.media='all'; this.onload=null" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" /></noscript>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="places.css" />
   <link rel="stylesheet" href="../../css/photo-viewer.css" />
@@ -112,14 +118,14 @@
 
   </div>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="../../js/i18n.js"></script>
-  <script src="../../js/locationManager.js"></script>
-  <script src="../../js/apiConfig.js"></script>
-  <script src="../../js/photo-viewer.js"></script>
-  <script src="places.js"></script>
+  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script defer src="../../js/i18n.js"></script>
+  <script defer src="../../js/locationManager.js"></script>
+  <script defer src="../../js/apiConfig.js"></script>
+  <script defer src="../../js/photo-viewer.js"></script>
+  <script defer src="places.js"></script>
 
-  <script src="../../js/ad-modal.js"></script>
+  <script defer src="../../js/ad-modal.js"></script>
 
 </body>
 </html>
