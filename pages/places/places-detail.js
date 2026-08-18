@@ -560,6 +560,11 @@ async function renderPlaceDetail(place) {
           </div>
         </div>
         
+        <!-- Community-submitted, admin-moderated. Filled by PlaceExtras
+             with DOM APIs so no place-supplied string touches innerHTML. -->
+        <div class="detail-section" id="pdSocialSection"></div>
+        <div class="detail-section" id="pdNoteSection"></div>
+
         ${reviewCount > 0 ? `
           <div class="detail-section">
             <h3 class="detail-section-title">${PL_ICONS.rub} ${reviewsTitle} (${reviewCount})</h3>
@@ -636,7 +641,10 @@ async function renderPlaceDetail(place) {
     initDetailCarousel(photos.length);
   }
 
-  initReviewSubmission(place.id);      
+  initReviewSubmission(place.id);
+
+  // Social links + owner note. Mounted last so it can read place.pendingFields.
+  if (window.PlaceExtras) PlaceExtras.mount(place);
 }
 
 
@@ -795,3 +803,651 @@ async function loadPlaceDetail() {
 document.addEventListener('DOMContentLoaded', loadPlaceDetail);
 
 console.log('✅ Places Detail JS loaded');
+
+/* ============================================================
+   PLACE EXTRAS — social links + owner info note
+
+   Community-submitted, admin-moderated. Everything a visitor can
+   see here is either already approved (it came back on the place
+   payload) or is shown as "waiting for review" — a submission is
+   never rendered as though it were live.
+
+   Mounted by renderPlaceDetail() into the two empty sections it
+   leaves in the card, and re-mounted on languageChanged.
+
+   Sheet markup lives in places-detail.html; this only fills and
+   drives it.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  // Trailing slash trimmed once here — API_CONFIG.BASE_URL carries one, and
+  // the older `${BASE_URL}/api/...` call sites end up with a double slash.
+  var API_BASE = (window.API_CONFIG && API_CONFIG.BASE_URL
+    ? API_CONFIG.BASE_URL
+    : 'https://vegukin-api.duckdns.org/').replace(/\/+$/, '');
+
+  // Keep in step with NOTE_MAX_LENGTH in place_submissions_api.py. The server
+  // is the authority; this only stops the keyboard before the round-trip.
+  var NOTE_MAX = 500;
+
+  var TOAST_MS = 3200;
+
+  var PD_ICONS = {
+    telegram: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-2.01 1.95c-.23.23-.42.42-.81.42z"/></svg>',
+    tiktok: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.2v13.2a2.9 2.9 0 1 1-2.4-2.85V9.1a6.1 6.1 0 1 0 5.6 6.08V8.9a7.3 7.3 0 0 0 4.3 1.38V7.06A4.4 4.4 0 0 1 16.6 2z"/></svg>',
+    instagram: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.25" fill="currentColor" stroke="none"/></svg>',
+    plus: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+    clock: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    info: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>',
+    pen: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.4 2.4 0 0 1 3.4 3.4L8 18.8 3 20l1.2-5L17 3Z"/></svg>'
+  };
+
+  var PLATFORMS = [
+    { field: 'telegram',  prop: 'telegramUrl',  label: 'Telegram',  icon: PD_ICONS.telegram,
+      hintKey: 'detail.sheet.telegramHint',  placeholder: '@username' },
+    { field: 'tiktok',    prop: 'tiktokUrl',    label: 'TikTok',    icon: PD_ICONS.tiktok,
+      hintKey: 'detail.sheet.tiktokHint',    placeholder: '@username' },
+    { field: 'instagram', prop: 'instagramUrl', label: 'Instagram', icon: PD_ICONS.instagram,
+      hintKey: 'detail.sheet.instagramHint', placeholder: '@username' }
+  ];
+
+  var place = null;          // last rendered place payload
+  var pendingFields = [];    // fields already queued, from the API
+  var sheetCtx = null;       // { field, isEdit, current }
+  var sending = false;
+  var toastTimer = null;
+
+  function $(id) { return document.getElementById(id); }
+
+  function t(key, fallback) {
+    if (window.I18N) {
+      var v = I18N.t(key);
+      if (v !== key) return v;
+    }
+    return fallback;
+  }
+
+  function haptic(kind) {
+    try { tg.HapticFeedback.impactOccurred(kind || 'light'); } catch (e) {}
+  }
+
+  function notify(kind) {
+    try { tg.HapticFeedback.notificationOccurred(kind); } catch (e) {}
+  }
+
+  // The page ships data-i18n attributes but nothing ever applied them, so the
+  // loading/error/retry strings were stuck in Uzbek. Applying them here fixes
+  // those too. textContent, not innerHTML — none of these keys carry markup.
+  function applyI18n(root) {
+    var scope = root || document;
+    var nodes = scope.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < nodes.length; i++) {
+      var key = nodes[i].getAttribute('data-i18n');
+      var val = window.I18N ? I18N.t(key) : key;
+      if (val && val !== key) nodes[i].textContent = val;
+    }
+  }
+
+  // Section headings pair a trusted constant SVG with a translated label.
+  // The icon goes in via innerHTML; the label always via a text node, so no
+  // place-supplied string ever reaches innerHTML on this page.
+  function sectionTitle(labelText) {
+    var h = document.createElement('h3');
+    h.className = 'detail-section-title';
+    h.innerHTML = PL_ICONS.rub;
+    h.appendChild(document.createTextNode(' ' + labelText));
+    return h;
+  }
+
+  function iconSpan(className, svg) {
+    var s = document.createElement('span');
+    s.className = className;
+    s.innerHTML = svg;
+    return s;
+  }
+
+  // Show "@handle" rather than the full URL — shorter, and it reads as an
+  // identity instead of a link.
+  function displayHandle(field, url) {
+    try {
+      var u = new URL(url);
+      var segs = u.pathname.split('/').filter(Boolean);
+      if (!segs.length) return url;
+      if (field === 'telegram' && (segs[0].charAt(0) === '+' || segs[0] === 'joinchat')) {
+        return t('detail.social.inviteLink', 'Havola');
+      }
+      if (field === 'tiktok' && (u.hostname === 'vm.tiktok.com' || u.hostname === 'vt.tiktok.com')) {
+        return t('detail.social.inviteLink', 'Havola');
+      }
+      return '@' + segs[0].replace(/^@/, '');
+    } catch (e) {
+      return url;
+    }
+  }
+
+  function isPending(field) {
+    return pendingFields.indexOf(field) !== -1;
+  }
+
+  function markPending(field) {
+    if (!isPending(field)) pendingFields.push(field);
+    if (place) place.pendingFields = pendingFields.slice();
+  }
+
+  // ============================================
+  // SOCIAL ROW
+  // ============================================
+
+  function buildTile(p) {
+    var value = place ? place[p.prop] : null;
+    var pending = isPending(p.field);
+
+    // Pending: neither the old nor the proposed value is offered for editing —
+    // a second submission would only bounce off the one-pending-per-field rule.
+    if (pending) {
+      var wait = document.createElement('div');
+      wait.className = 'pd-social-tile pd-social-tile--pending';
+      wait.appendChild(iconSpan('pd-social-icon', PD_ICONS.clock));
+      var wname = document.createElement('span');
+      wname.className = 'pd-social-name';
+      wname.textContent = p.label;
+      wait.appendChild(wname);
+      var wstate = document.createElement('span');
+      wstate.className = 'pd-social-state';
+      wstate.textContent = t('detail.social.pending', 'Ko\'rib chiqilmoqda');
+      wait.appendChild(wstate);
+      return wait;
+    }
+
+    if (value) {
+      var tile = document.createElement('div');
+      tile.className = 'pd-social-tile pd-social-tile--on pd-social-tile--' + p.field;
+
+      var link = document.createElement('a');
+      link.className = 'pd-social-link';
+      link.href = value;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.appendChild(iconSpan('pd-social-icon', p.icon));
+      var name = document.createElement('span');
+      name.className = 'pd-social-name';
+      name.textContent = p.label;
+      link.appendChild(name);
+      var handle = document.createElement('span');
+      handle.className = 'pd-social-state';
+      handle.textContent = displayHandle(p.field, value);
+      link.appendChild(handle);
+      tile.appendChild(link);
+
+      // Correction path. Kept as a separate control rather than wrapping the
+      // whole tile, so the common action (open the profile) stays one tap.
+      var edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'pd-social-edit';
+      edit.setAttribute('aria-label',
+        t('detail.social.suggestEdit', 'O\'zgartirish taklif qilish') + ' — ' + p.label);
+      edit.innerHTML = PD_ICONS.pen;
+      edit.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openSheet(p.field, value);
+      });
+      tile.appendChild(edit);
+      return tile;
+    }
+
+    var add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'pd-social-tile pd-social-tile--empty';
+    add.appendChild(iconSpan('pd-social-icon', p.icon));
+    var aname = document.createElement('span');
+    aname.className = 'pd-social-name';
+    aname.textContent = p.label;
+    add.appendChild(aname);
+    var astate = document.createElement('span');
+    astate.className = 'pd-social-state pd-social-state--add';
+    astate.innerHTML = PD_ICONS.plus;
+    astate.appendChild(document.createTextNode(' ' + t('detail.social.add', 'Qo\'shish')));
+    add.appendChild(astate);
+    add.addEventListener('click', function () { openSheet(p.field, null); });
+    return add;
+  }
+
+  function renderSocial() {
+    var host = $('pdSocialSection');
+    if (!host) return;
+    host.textContent = '';
+    host.appendChild(sectionTitle(t('detail.social.title', 'Ijtimoiy tarmoqlar')));
+
+    var grid = document.createElement('div');
+    grid.className = 'pd-social-grid';
+    PLATFORMS.forEach(function (p) { grid.appendChild(buildTile(p)); });
+    host.appendChild(grid);
+  }
+
+  // ============================================
+  // INFO NOTE
+  // ============================================
+
+  function renderNote() {
+    var host = $('pdNoteSection');
+    if (!host) return;
+    host.textContent = '';
+    host.appendChild(sectionTitle(t('detail.note.title', 'Qo\'shimcha ma\'lumot')));
+
+    var value = place ? place.ownerNote : null;
+    var pending = isPending('note');
+
+    if (value) {
+      var card = document.createElement('div');
+      card.className = 'pd-note-card';
+
+      var text = document.createElement('p');
+      text.className = 'pd-note-text';
+      // textContent, always. Line breaks survive via white-space: pre-line
+      // in the CSS rather than by turning newlines into <br>.
+      text.textContent = value;
+      card.appendChild(text);
+      host.appendChild(card);
+
+      if (pending) {
+        host.appendChild(pendingChip());
+      } else {
+        host.appendChild(noteAction(
+          t('detail.note.suggestEdit', 'O\'zgartirish taklif qilish'), value));
+      }
+      return;
+    }
+
+    if (pending) {
+      host.appendChild(pendingChip());
+      return;
+    }
+
+    var empty = document.createElement('p');
+    empty.className = 'pd-note-empty';
+    empty.textContent = t('detail.note.empty',
+      'Ish vaqti va dam olish kunlari hali qo\'shilmagan.');
+    host.appendChild(empty);
+    host.appendChild(noteAction(t('detail.note.addCta', 'Ma\'lumot qo\'shish'), null));
+  }
+
+  function pendingChip() {
+    var chip = document.createElement('div');
+    chip.className = 'pd-pending-chip';
+    chip.innerHTML = PD_ICONS.clock;
+    chip.appendChild(document.createTextNode(
+      ' ' + t('detail.note.pending', 'Ko\'rib chiqilmoqda')));
+    return chip;
+  }
+
+  function noteAction(label, current) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pd-note-cta';
+    btn.innerHTML = current ? PD_ICONS.pen : PD_ICONS.plus;
+    btn.appendChild(document.createTextNode(' ' + label));
+    btn.addEventListener('click', function () { openSheet('note', current); });
+    return btn;
+  }
+
+  // ============================================
+  // SUBMISSION SHEET
+  // ============================================
+
+  function platformFor(field) {
+    for (var i = 0; i < PLATFORMS.length; i++) {
+      if (PLATFORMS[i].field === field) return PLATFORMS[i];
+    }
+    return null;
+  }
+
+  function sheetTitleText(field, isEdit) {
+    if (field === 'note') {
+      return isEdit
+        ? t('detail.sheet.noteEditTitle', 'Ma\'lumotni o\'zgartirish')
+        : t('detail.sheet.noteAddTitle', 'Ma\'lumot qo\'shish');
+    }
+    var p = platformFor(field);
+    var name = p ? p.label : field;
+    var tpl = isEdit
+      ? t('detail.sheet.editTitle', '{platform} havolasini o\'zgartirish')
+      : t('detail.sheet.addTitle', '{platform} havolasini qo\'shish');
+    return tpl.replace('{platform}', name);
+  }
+
+  function openSheet(field, current) {
+    var backdrop = $('pdSheetBackdrop');
+    var sheet = $('pdSheet');
+    if (!backdrop || !sheet) return;
+
+    sheetCtx = { field: field, isEdit: !!current, current: current || null };
+    sending = false;
+
+    var isNote = field === 'note';
+    var p = platformFor(field);
+
+    $('pdSheetIcon').innerHTML = isNote ? PD_ICONS.info : (p ? p.icon : '');
+    $('pdSheetIcon').className = 'pd-sheet-icon' + (isNote ? '' : ' pd-sheet-icon--' + field);
+    $('pdSheetTitle').textContent = sheetTitleText(field, !!current);
+
+    // Current value, shown when this is a correction so the reviewer's diff
+    // and the submitter's starting point agree.
+    var curWrap = $('pdSheetCurrent');
+    if (current) {
+      $('pdSheetCurrentValue').textContent = isNote ? current : displayHandle(field, current);
+      curWrap.hidden = false;
+    } else {
+      curWrap.hidden = true;
+    }
+
+    var input = $('pdSheetInput');
+    var area = $('pdSheetTextarea');
+    var counter = $('pdSheetCounter');
+
+    input.hidden = isNote;
+    area.hidden = !isNote;
+    counter.hidden = !isNote;
+
+    if (isNote) {
+      area.value = current || '';
+      area.placeholder = t('detail.sheet.notePlaceholder',
+        'Masalan:\nDu-Ju: 11:00 - 22:00\nShanba: yopiq');
+      updateCounter();
+    } else {
+      input.value = '';
+      input.placeholder = p ? p.placeholder : '';
+    }
+
+    $('pdSheetHint').textContent = isNote
+      ? t('detail.sheet.noteHint', 'Ish vaqti, dam olish kunlari yoki e\'lon.')
+      : t(p ? p.hintKey : '', '@username yoki havola');
+
+    setError(null);
+    setSending(false);
+
+    backdrop.hidden = false;
+    // Next frame, so the transition has a start state to animate from.
+    requestAnimationFrame(function () {
+      backdrop.classList.add('visible');
+      sheet.classList.add('visible');
+    });
+
+    haptic('light');
+
+    if (tg.BackButton) {
+      tg.BackButton.offClick(handleMainBackButton);
+      tg.BackButton.onClick(handleSheetBackButton);
+    }
+
+    setTimeout(function () {
+      var el = isNote ? area : input;
+      try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+    }, 260);
+  }
+
+  function closeSheet() {
+    var backdrop = $('pdSheetBackdrop');
+    var sheet = $('pdSheet');
+    if (!backdrop || !sheet || backdrop.hidden) return;
+
+    backdrop.classList.remove('visible');
+    sheet.classList.remove('visible');
+    sheet.style.transform = '';
+    setTimeout(function () { backdrop.hidden = true; }, 280);
+
+    sheetCtx = null;
+
+    if (tg.BackButton) {
+      tg.BackButton.offClick(handleSheetBackButton);
+      tg.BackButton.onClick(handleMainBackButton);
+    }
+  }
+
+  // Named, so offClick can remove exactly this handler.
+  function handleSheetBackButton() { closeSheet(); }
+
+  function isSheetOpen() {
+    var b = $('pdSheetBackdrop');
+    return !!b && !b.hidden;
+  }
+
+  function setError(message) {
+    var el = $('pdSheetError');
+    if (!el) return;
+    if (!message) {
+      el.hidden = true;
+      el.textContent = '';
+      return;
+    }
+    el.textContent = message;
+    el.hidden = false;
+  }
+
+  function setSending(on) {
+    sending = on;
+    var btn = $('pdSheetSend');
+    if (!btn) return;
+    btn.disabled = on;
+    btn.textContent = on
+      ? t('detail.sheet.sending', 'Yuborilmoqda...')
+      : t('detail.sheet.send', 'Yuborish');
+  }
+
+  function updateCounter() {
+    var area = $('pdSheetTextarea');
+    var counter = $('pdSheetCounter');
+    if (!area || !counter) return;
+    var n = area.value.length;
+    counter.textContent = n + ' / ' + NOTE_MAX;
+    counter.classList.toggle('pd-sheet-counter--near', n > NOTE_MAX - 50);
+  }
+
+  // Server codes -> localised copy. Anything unmapped falls back to the
+  // server's own English text, so a new code still says something useful.
+  function messageForCode(code, serverText) {
+    var key = 'detail.submit.err.' + code;
+    var msg = window.I18N ? I18N.t(key) : key;
+    if (msg && msg !== key) return msg;
+    return serverText || t('detail.submit.err.server_error',
+      'Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+  }
+
+  function submit() {
+    if (sending || !sheetCtx || !place) return;
+
+    var field = sheetCtx.field;
+    var isNote = field === 'note';
+    var value = isNote ? $('pdSheetTextarea').value : $('pdSheetInput').value;
+
+    if (!value || !value.trim()) {
+      setError(t('detail.submit.err.empty', 'Avval to\'ldiring.'));
+      return;
+    }
+
+    setError(null);
+    setSending(true);
+
+    fetch(API_BASE + '/api/place/' + encodeURIComponent(place.id) + '/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Signed initData — the server verifies this and ignores any user id
+        // we might send, so a submission cannot be attributed to someone else.
+        'X-Init-Data': (tg && tg.initData) ? tg.initData : ''
+      },
+      body: JSON.stringify({ field: field, value: value }),
+      signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
+    })
+      .then(function (res) {
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      })
+      .then(function (r) {
+        if (r.ok && r.data && r.data.success) {
+          // The value is deliberately NOT written into the card. It shows as
+          // pending until an admin approves it and the API returns it.
+          markPending(field);
+          closeSheet();
+          renderSocial();
+          renderNote();
+          notify('success');
+          showToast(t('detail.submit.ok',
+            'Rahmat! Taklifingiz ko\'rib chiqilmoqda.'));
+          return;
+        }
+
+        var code = (r.data && r.data.code) || 'server_error';
+        var text = messageForCode(code, r.data && r.data.error);
+
+        // Nothing the submitter can retype will change these, so the sheet
+        // closes and the answer arrives as a toast instead of an inline error
+        // above an input they would keep poking at.
+        if (code === 'already_pending') {
+          markPending(field);
+          closeSheet();
+          renderSocial();
+          renderNote();
+          showToast(text);
+          return;
+        }
+        if (code === 'rate_limited' || code === 'same_as_current' ||
+            code === 'place_not_found') {
+          closeSheet();
+          showToast(text);
+          return;
+        }
+
+        setSending(false);
+        setError(text);
+        notify('error');
+      })
+      .catch(function (err) {
+        setSending(false);
+        setError(err && err.name === 'TimeoutError'
+          ? t('detail.submit.err.timeout',
+              'Server javob bermadi. Qaytadan urinib ko\'ring.')
+          : t('detail.submit.err.network',
+              'Internetga ulanib bo\'lmadi. Qaytadan urinib ko\'ring.'));
+        notify('error');
+      });
+  }
+
+  // ============================================
+  // TOAST
+  // ============================================
+
+  function showToast(message) {
+    var el = $('pdToast');
+    if (!el) return;
+    el.textContent = message;
+    el.hidden = false;
+    requestAnimationFrame(function () { el.classList.add('visible'); });
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      el.classList.remove('visible');
+      setTimeout(function () { el.hidden = true; }, 260);
+    }, TOAST_MS);
+  }
+
+  // ============================================
+  // WIRING
+  // ============================================
+
+  function bindSheetOnce() {
+    if (bindSheetOnce.done) return;
+    bindSheetOnce.done = true;
+
+    var backdrop = $('pdSheetBackdrop');
+    var sheet = $('pdSheet');
+    if (!backdrop || !sheet) return;
+
+    backdrop.addEventListener('click', function (e) {
+      if (e.target === backdrop) closeSheet();
+    });
+
+    var cancel = $('pdSheetCancel');
+    if (cancel) cancel.addEventListener('click', closeSheet);
+
+    var send = $('pdSheetSend');
+    if (send) send.addEventListener('click', submit);
+
+    var input = $('pdSheetInput');
+    if (input) {
+      input.addEventListener('input', function () { setError(null); });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); submit(); }
+      });
+    }
+
+    var area = $('pdSheetTextarea');
+    if (area) {
+      area.addEventListener('input', function () {
+        setError(null);
+        updateCounter();
+      });
+    }
+
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isSheetOpen()) closeSheet();
+    });
+
+    // Drag the grab handle down to dismiss, matching the prayer settings
+    // sheet. Bound to the handle only: dragging inside the textarea should
+    // select text, not close the sheet.
+    var grip = $('pdSheetGrip');
+    if (grip) {
+      var startY = 0, curY = 0, dragging = false;
+
+      grip.addEventListener('pointerdown', function (e) {
+        dragging = true;
+        startY = curY = e.clientY;
+        sheet.style.transition = 'none';
+        try { grip.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+
+      grip.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        curY = e.clientY;
+        var dy = Math.max(0, curY - startY);
+        sheet.style.transform = 'translateY(' + dy + 'px)';
+      });
+
+      var endDrag = function () {
+        if (!dragging) return;
+        dragging = false;
+        sheet.style.transition = '';
+        var dy = curY - startY;
+        sheet.style.transform = '';
+        if (dy > 80) closeSheet();
+      };
+
+      grip.addEventListener('pointerup', endDrag);
+      grip.addEventListener('pointercancel', endDrag);
+    }
+  }
+
+  function mount(placeData) {
+    place = placeData || null;
+    pendingFields = (place && place.pendingFields) ? place.pendingFields.slice() : [];
+    bindSheetOnce();
+    applyI18n(document);
+    renderSocial();
+    renderNote();
+  }
+
+  window.addEventListener('languageChanged', function () {
+    applyI18n(document);
+    if (place) {
+      renderSocial();
+      renderNote();
+    }
+    if (isSheetOpen() && sheetCtx) {
+      $('pdSheetTitle').textContent = sheetTitleText(sheetCtx.field, sheetCtx.isEdit);
+      setSending(sending);
+    }
+  });
+
+  window.PlaceExtras = { mount: mount };
+})();
+

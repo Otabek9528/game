@@ -47,6 +47,57 @@
   </div>
 
 
+  <!-- ==========================================================
+       COMMUNITY SUBMISSION SHEET
+       One sheet serves all four fields; places-detail.js fills it.
+       ========================================================== -->
+  <div class="pd-sheet-backdrop" id="pdSheetBackdrop" hidden>
+    <div class="pd-sheet" id="pdSheet" role="dialog" aria-modal="true" aria-labelledby="pdSheetTitle">
+
+      <div class="pd-sheet-grip" id="pdSheetGrip"><span class="pd-sheet-grip-bar"></span></div>
+
+      <div class="pd-sheet-head">
+        <span class="pd-sheet-icon" id="pdSheetIcon"></span>
+        <h3 class="pd-sheet-title" id="pdSheetTitle"></h3>
+      </div>
+
+      <div class="pd-sheet-body">
+        <div class="pd-sheet-current" id="pdSheetCurrent" hidden>
+          <span class="pd-sheet-current-label" data-i18n="detail.sheet.current">Hozirgi</span>
+          <span class="pd-sheet-current-value" id="pdSheetCurrentValue"></span>
+        </div>
+
+        <input class="pd-sheet-input" id="pdSheetInput" type="text"
+               autocomplete="off" autocapitalize="none" autocorrect="off"
+               spellcheck="false" inputmode="url" hidden />
+
+        <textarea class="pd-sheet-textarea" id="pdSheetTextarea"
+                  rows="5" maxlength="500" hidden></textarea>
+
+        <div class="pd-sheet-meta">
+          <span class="pd-sheet-hint" id="pdSheetHint"></span>
+          <span class="pd-sheet-counter" id="pdSheetCounter" hidden></span>
+        </div>
+
+        <p class="pd-sheet-error" id="pdSheetError" role="alert" hidden></p>
+
+        <p class="pd-sheet-moderation" data-i18n="detail.sheet.moderationNote">
+          Taklifingiz administrator tekshiruvidan so'ng chop etiladi.
+        </p>
+      </div>
+
+      <div class="pd-sheet-actions">
+        <button type="button" class="pd-sheet-btn pd-sheet-btn--ghost"
+                id="pdSheetCancel" data-i18n="detail.sheet.cancel">Bekor qilish</button>
+        <button type="button" class="pd-sheet-btn pd-sheet-btn--primary"
+                id="pdSheetSend" data-i18n="detail.sheet.send">Yuborish</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="pd-toast" id="pdToast" role="status" aria-live="polite" hidden></div>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="../../js/i18n.js"></script>
   <script src="../../js/apiConfig.js"></script>

@@ -1058,6 +1058,160 @@ const I18N = {
     'hk.watch.tapPick': { uz: 'Sanani tanlang', ru: 'Выберите дату', en: 'Tap to pick' },
     'hk.cal.pullToRefresh':    { uz: 'Yangilash',   ru: 'Oбновления', en: 'Refresh' },
     'hk.cal.releaseToRefresh': { uz: 'Yangilash', ru: 'Oбновления', en: 'Refresh'},
+    // ---------- Place detail: social links + owner note ----------
+    'detail.social.title': { uz: 'Ijtimoiy tarmoqlar', ru: 'Соцсети', en: 'Social media' },
+    'detail.social.add': { uz: 'Qo\'shish', ru: 'Добавить', en: 'Add' },
+    'detail.social.pending': { uz: 'Ko\'rib chiqilmoqda', ru: 'На проверке', en: 'Under review' },
+    'detail.social.suggestEdit': { uz: 'O\'zgartirish taklif qilish', ru: 'Предложить изменение', en: 'Suggest a correction' },
+    'detail.social.inviteLink': { uz: 'Havola', ru: 'Ссылка', en: 'Link' },
+
+    'detail.note.title': { uz: 'Qo\'shimcha ma\'lumot', ru: 'Дополнительно', en: 'Good to know' },
+    'detail.note.empty': {
+      uz: 'Ish vaqti va dam olish kunlari hali qo\'shilmagan.',
+      ru: 'Часы работы и выходные пока не указаны.',
+      en: 'Opening hours and days off have not been added yet.'
+    },
+    'detail.note.addCta': { uz: 'Ma\'lumot qo\'shish', ru: 'Добавить информацию', en: 'Add information' },
+    'detail.note.pending': { uz: 'Ko\'rib chiqilmoqda', ru: 'На проверке', en: 'Under review' },
+    'detail.note.suggestEdit': { uz: 'O\'zgartirish taklif qilish', ru: 'Предложить изменение', en: 'Suggest a correction' },
+
+    // ---------- Place detail: submission sheet ----------
+    'detail.sheet.addTitle': {
+      uz: '{platform} havolasini qo\'shish',
+      ru: 'Добавить ссылку {platform}',
+      en: 'Add {platform} link'
+    },
+    'detail.sheet.editTitle': {
+      uz: '{platform} havolasini o\'zgartirish',
+      ru: 'Изменить ссылку {platform}',
+      en: 'Change {platform} link'
+    },
+    'detail.sheet.noteAddTitle': { uz: 'Ma\'lumot qo\'shish', ru: 'Добавить информацию', en: 'Add information' },
+    'detail.sheet.noteEditTitle': { uz: 'Ma\'lumotni o\'zgartirish', ru: 'Изменить информацию', en: 'Change information' },
+    'detail.sheet.current': { uz: 'Hozirgi', ru: 'Сейчас', en: 'Current' },
+    'detail.sheet.telegramHint': { uz: '@username yoki t.me havolasi', ru: '@username или ссылка t.me', en: '@username or a t.me link' },
+    'detail.sheet.tiktokHint': { uz: '@username yoki tiktok.com havolasi', ru: '@username или ссылка tiktok.com', en: '@username or a tiktok.com link' },
+    'detail.sheet.instagramHint': { uz: '@username yoki instagram.com havolasi', ru: '@username или ссылка instagram.com', en: '@username or an instagram.com link' },
+    'detail.sheet.noteHint': {
+      uz: 'Ish vaqti, dam olish kunlari yoki e\'lon.',
+      ru: 'Часы работы, выходные или объявление.',
+      en: 'Opening hours, days off or an announcement.'
+    },
+    'detail.sheet.notePlaceholder': {
+      uz: 'Masalan:\nDu-Ju: 11:00 - 22:00\nShanba: yopiq',
+      ru: 'Например:\nПн-Пт: 11:00 - 22:00\nСуббота: выходной',
+      en: 'For example:\nMon-Fri: 11:00 - 22:00\nSaturday: closed'
+    },
+    'detail.sheet.moderationNote': {
+      uz: 'Taklifingiz administrator tekshiruvidan so\'ng chop etiladi.',
+      ru: 'Ваше предложение появится после проверки администратором.',
+      en: 'Your suggestion will appear after an admin reviews it.'
+    },
+    'detail.sheet.cancel': { uz: 'Bekor qilish', ru: 'Отмена', en: 'Cancel' },
+    'detail.sheet.send': { uz: 'Yuborish', ru: 'Отправить', en: 'Send' },
+    'detail.sheet.sending': { uz: 'Yuborilmoqda...', ru: 'Отправляется...', en: 'Sending...' },
+
+    // ---------- Place detail: submission results ----------
+    // Keys match the `code` field the API returns, so a new server code only
+    // needs a key here — the frontend needs no change.
+    'detail.submit.ok': {
+      uz: 'Rahmat! Taklifingiz ko\'rib chiqilmoqda.',
+      ru: 'Спасибо! Ваше предложение на проверке.',
+      en: 'Thank you! Your suggestion is under review.'
+    },
+    'detail.submit.err.empty': { uz: 'Avval to\'ldiring.', ru: 'Сначала заполните поле.', en: 'Please fill this in first.' },
+    'detail.submit.err.too_short': { uz: 'Juda qisqa.', ru: 'Слишком коротко.', en: 'That is too short.' },
+    'detail.submit.err.too_long': {
+      uz: 'Matn juda uzun — 500 belgidan oshmasin.',
+      ru: 'Текст слишком длинный — не более 500 символов.',
+      en: 'That is too long — please keep it under 500 characters.'
+    },
+    'detail.submit.err.wrong_host': {
+      uz: 'Bu havola boshqa saytga tegishli. Iltimos, to\'g\'ri havolani kiriting.',
+      ru: 'Эта ссылка ведёт на другой сайт. Введите правильную ссылку.',
+      en: 'That link points to a different site. Please enter the right one.'
+    },
+    'detail.submit.err.invalid_handle': {
+      uz: 'Username noto\'g\'ri. Faqat harflar, raqamlar va pastki chiziq.',
+      ru: 'Неверный username. Только буквы, цифры и подчёркивание.',
+      en: 'That username is not valid. Letters, digits and underscores only.'
+    },
+    'detail.submit.err.invalid_url': { uz: 'Bu havolaga o\'xshamaydi.', ru: 'Это не похоже на ссылку.', en: 'That does not look like a link.' },
+    'detail.submit.err.invalid_scheme': {
+      uz: 'Faqat http va https havolalar qabul qilinadi.',
+      ru: 'Принимаются только ссылки http и https.',
+      en: 'Only http and https links are accepted.'
+    },
+    'detail.submit.err.incomplete': { uz: 'Havola to\'liq emas.', ru: 'Ссылка неполная.', en: 'That link is incomplete.' },
+    'detail.submit.err.invalid_invite': { uz: 'Taklif havolasi to\'liq emas.', ru: 'Пригласительная ссылка неполная.', en: 'That invite link is incomplete.' },
+    'detail.submit.err.not_a_profile': {
+      uz: 'Bu post havolasi. Iltimos, profil havolasini yuboring.',
+      ru: 'Это ссылка на публикацию. Отправьте ссылку на профиль.',
+      en: 'That is a link to a post. Please send the profile link.'
+    },
+    'detail.submit.err.already_pending': {
+      uz: 'Bu ma\'lumot bo\'yicha taklif allaqachon ko\'rib chiqilmoqda.',
+      ru: 'Предложение по этому полю уже на проверке.',
+      en: 'A change to this is already waiting for review.'
+    },
+    'detail.submit.err.same_as_current': {
+      uz: 'Bu allaqachon saqlangan ma\'lumot.',
+      ru: 'Это уже сохранено.',
+      en: 'That is already what is saved.'
+    },
+    'detail.submit.err.rate_limited': {
+      uz: 'Bugungi takliflar chegarasiga yetdingiz. Ertaga urinib ko\'ring.',
+      ru: 'Вы исчерпали лимит предложений на сегодня. Попробуйте завтра.',
+      en: 'You have reached today\'s limit. Please try again tomorrow.'
+    },
+    'detail.submit.err.place_not_found': { uz: 'Bu joy topilmadi.', ru: 'Это место не найдено.', en: 'That place was not found.' },
+    'detail.submit.err.invalid_field': { uz: 'Noma\'lum maydon.', ru: 'Неизвестное поле.', en: 'Unknown field.' },
+    'detail.submit.err.no_init_data': {
+      uz: 'Iltimos, bu sahifani Telegram ichida oching.',
+      ru: 'Пожалуйста, откройте эту страницу внутри Telegram.',
+      en: 'Please open this page inside Telegram.'
+    },
+    'detail.submit.err.bad_init_data': {
+      uz: 'Iltimos, sahifani qaytadan oching.',
+      ru: 'Пожалуйста, откройте страницу заново.',
+      en: 'Please reopen the page.'
+    },
+    'detail.submit.err.bad_signature': {
+      uz: 'Telegram hisobingizni tasdiqlab bo\'lmadi.',
+      ru: 'Не удалось подтвердить ваш аккаунт Telegram.',
+      en: 'Could not verify your Telegram account.'
+    },
+    'detail.submit.err.stale_init_data': {
+      uz: 'Sessiya muddati tugadi. Sahifani qaytadan oching.',
+      ru: 'Сессия истекла. Откройте страницу заново.',
+      en: 'Your session expired. Please reopen the page.'
+    },
+    'detail.submit.err.no_user': {
+      uz: 'Telegram hisobingizni o\'qib bo\'lmadi.',
+      ru: 'Не удалось прочитать ваш аккаунт Telegram.',
+      en: 'Could not read your Telegram account.'
+    },
+    'detail.submit.err.server_misconfigured': {
+      uz: 'Takliflar vaqtincha ishlamayapti.',
+      ru: 'Предложения временно недоступны.',
+      en: 'Submissions are temporarily unavailable.'
+    },
+    'detail.submit.err.server_error': {
+      uz: 'Xatolik yuz berdi. Qaytadan urinib ko\'ring.',
+      ru: 'Произошла ошибка. Попробуйте снова.',
+      en: 'Something went wrong. Please try again.'
+    },
+    'detail.submit.err.timeout': {
+      uz: 'Server javob bermadi. Qaytadan urinib ko\'ring.',
+      ru: 'Сервер не ответил. Попробуйте снова.',
+      en: 'The server did not respond. Please try again.'
+    },
+    'detail.submit.err.network': {
+      uz: 'Internetga ulanib bo\'lmadi. Qaytadan urinib ko\'ring.',
+      ru: 'Нет соединения с интернетом. Попробуйте снова.',
+      en: 'Could not reach the internet. Please try again.'
+    },
+
     'hk.cal.refreshing':       { uz: 'Yangilanmoqda…',            ru: 'Обновление…',             en: 'Refreshing…' },
   },
 
