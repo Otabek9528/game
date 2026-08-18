@@ -1060,6 +1060,11 @@ const I18N = {
     'hk.cal.releaseToRefresh': { uz: 'Yangilash', ru: 'Oбновления', en: 'Refresh'},
     // ---------- Place detail: social links + owner note ----------
     'detail.social.title': { uz: 'Ijtimoiy tarmoqlar', ru: 'Соцсети', en: 'Social media' },
+    'detail.social.addMorePrompt': {
+      uz: 'Boshqa tarmoqdagi sahifasini bilasizmi?',
+      ru: 'Знаете страницу в другой соцсети?',
+      en: 'Know a page on another network?'
+    },
     'detail.social.emptyPrompt': {
       uz: 'Bu joyning ijtimoiy tarmoqlarini bilasizmi?',
       ru: 'Знаете соцсети этого места?',

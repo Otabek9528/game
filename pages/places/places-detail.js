@@ -969,53 +969,41 @@ console.log('✅ Places Detail JS loaded');
 
   function buildTile(p) {
     var value = place ? place[p.prop] : null;
-    var pending = isPending(p.field);
+    var locked = isPending(p.field);   // a correction is already queued
 
-    // Pending: neither the old nor the proposed value is offered for editing —
-    // a second submission would only bounce off the one-pending-per-field rule.
-    if (pending) {
-      var wait = document.createElement('div');
-      wait.className = 'pd-social-tile pd-social-tile--pending';
-      wait.appendChild(iconSpan('pd-social-icon', PD_ICONS.clock));
-      var wname = document.createElement('span');
-      wname.className = 'pd-social-name';
-      wname.textContent = p.label;
-      wait.appendChild(wname);
-      var wstate = document.createElement('span');
-      wstate.className = 'pd-social-state';
-      wstate.textContent = t('detail.social.pending', 'Ko\'rib chiqilmoqda');
-      wait.appendChild(wstate);
-      return wait;
-    }
+    var tile = document.createElement('div');
+    tile.className = 'pd-social-tile pd-social-tile--on pd-social-tile--' + p.field;
 
-    if (value) {
-      var tile = document.createElement('div');
-      tile.className = 'pd-social-tile pd-social-tile--on pd-social-tile--' + p.field;
+    var link = document.createElement('a');
+    link.className = 'pd-social-link';
+    link.href = value;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.appendChild(iconSpan('pd-social-icon', p.icon));
 
-      var link = document.createElement('a');
-      link.className = 'pd-social-link';
-      link.href = value;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.appendChild(iconSpan('pd-social-icon', p.icon));
-      var name = document.createElement('span');
-      name.className = 'pd-social-name';
-      name.textContent = p.label;
-      link.appendChild(name);
-      var handle = document.createElement('span');
-      handle.className = 'pd-social-state';
-      handle.textContent = displayHandle(p.field, value);
-      link.appendChild(handle);
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        haptic('light');
-        openProfile(p.field, value);
-      });
-      tile.appendChild(link);
+    var text = document.createElement('span');
+    text.className = 'pd-social-text';
+    var name = document.createElement('span');
+    name.className = 'pd-social-name';
+    name.textContent = p.label;
+    text.appendChild(name);
+    var handle = document.createElement('span');
+    handle.className = 'pd-social-state';
+    handle.textContent = displayHandle(p.field, value);
+    text.appendChild(handle);
+    link.appendChild(text);
 
-      // Correction path. Kept as a separate control rather than wrapping the
-      // whole tile, so the common action (open the profile) stays one tap.
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      haptic('light');
+      openProfile(p.field, value);
+    });
+    tile.appendChild(link);
+
+    // No pencil while a change to this field is already queued — a second
+    // submission would only bounce off the one-pending-per-field rule.
+    if (!locked) {
       var edit = document.createElement('button');
       edit.type = 'button';
       edit.className = 'pd-social-edit';
@@ -1028,39 +1016,8 @@ console.log('✅ Places Detail JS loaded');
         openSheet(p.field, value);
       });
       tile.appendChild(edit);
-      return tile;
     }
-
-    var add = document.createElement('button');
-    add.type = 'button';
-    add.className = 'pd-social-tile pd-social-tile--empty';
-    add.appendChild(iconSpan('pd-social-icon', p.icon));
-    var aname = document.createElement('span');
-    aname.className = 'pd-social-name';
-    aname.textContent = p.label;
-    add.appendChild(aname);
-    var astate = document.createElement('span');
-    astate.className = 'pd-social-state pd-social-state--add';
-    astate.innerHTML = PD_ICONS.plus;
-    astate.appendChild(document.createTextNode(' ' + t('detail.social.add', 'Qo\'shish')));
-    add.appendChild(astate);
-    add.addEventListener('click', function () { openSheet(p.field, null); });
-    return add;
-  }
-
-  // Compact "+" tile, shown after the real ones when some platforms are still
-  // missing. Opens a picker rather than three permanent empty boxes.
-  function buildAddTile(missing) {
-    var add = document.createElement('button');
-    add.type = 'button';
-    add.className = 'pd-social-tile pd-social-tile--add';
-    add.appendChild(iconSpan('pd-social-icon', PD_ICONS.plus));
-    var label = document.createElement('span');
-    label.className = 'pd-social-name';
-    label.textContent = t('detail.social.add', 'Qo\'shish');
-    add.appendChild(label);
-    add.addEventListener('click', function () { pickField(missing); });
-    return add;
+    return tile;
   }
 
   // One quiet line + text link, used wherever there is nothing to show yet.
@@ -1082,32 +1039,53 @@ console.log('✅ Places Detail JS loaded');
   function renderSocial() {
     var host = $('pdSocialSection');
     if (!host) return;
+    host.hidden = false;
     host.textContent = '';
-    host.appendChild(sectionTitle(t('detail.social.title', 'Ijtimoiy tarmoqlar')));
 
+    // A field awaiting review is shown exactly as if nothing were there — no
+    // "under review" badge — but it is not offered for input either, so a
+    // second person cannot queue a competing value and the first cannot
+    // resubmit thinking it failed.
     var shown = [];
-    var missing = [];
+    var offerable = [];
     PLATFORMS.forEach(function (p) {
-      if ((place && place[p.prop]) || isPending(p.field)) shown.push(p);
-      else missing.push(p);
+      if (place && place[p.prop]) shown.push(p);
+      else if (!isPending(p.field)) offerable.push(p);
     });
 
-    // Nothing registered: no grid at all. Three dashed boxes advertising an
-    // absence made the card look unfinished and invited taps from people with
-    // nothing to add.
+    // Nothing to show and nothing to offer: drop the section entirely rather
+    // than leave a heading over empty space.
+    if (!shown.length && !offerable.length) {
+      host.hidden = true;
+      return;
+    }
+
+    host.appendChild(sectionTitle(t('detail.social.title', 'Ijtimoiy tarmoqlar')));
+
     if (!shown.length) {
       host.appendChild(quietPrompt(
         t('detail.social.emptyPrompt', 'Bu joyning ijtimoiy tarmoqlarini bilasizmi?'),
         t('detail.social.add', 'Qo\'shish'),
-        function () { pickField(missing); }));
+        function () { pickField(offerable); }));
       return;
     }
 
+    // Column count follows the number of real links, so a place with only a
+    // Telegram group gets one wide, confident tile instead of a third of a row
+    // next to two blanks.
     var grid = document.createElement('div');
-    grid.className = 'pd-social-grid';
+    grid.className = 'pd-social-grid pd-social-grid--' + shown.length;
     shown.forEach(function (p) { grid.appendChild(buildTile(p)); });
-    if (missing.length) grid.appendChild(buildAddTile(missing));
     host.appendChild(grid);
+
+    // The remaining platforms are an aside, not a call to action: same quiet
+    // text link as the all-empty state, so the real links keep the focus.
+    if (offerable.length) {
+      host.appendChild(quietPrompt(
+        t('detail.social.addMorePrompt', 'Boshqa tarmoqdagi sahifasini bilasizmi?'),
+        t('detail.social.add', 'Qo\'shish'),
+        function () { pickField(offerable); }));
+    }
   }
 
   // ============================================
@@ -1117,16 +1095,22 @@ console.log('✅ Places Detail JS loaded');
   function renderNote() {
     var host = $('pdNoteSection');
     if (!host) return;
+    host.hidden = false;
     host.textContent = '';
-    host.appendChild(sectionTitle(t('detail.note.title', 'Qo\'shimcha ma\'lumot')));
 
     var value = place ? place.ownerNote : null;
     var pending = isPending('note');
 
+    if (!value && pending) {
+      host.hidden = true;      // queued: shown as nothing, offered as nothing
+      return;
+    }
+
+    host.appendChild(sectionTitle(t('detail.note.title', 'Qo\'shimcha ma\'lumot')));
+
     if (value) {
       var card = document.createElement('div');
       card.className = 'pd-note-card';
-
       var text = document.createElement('p');
       text.className = 'pd-note-text';
       // textContent, always. Line breaks survive via white-space: pre-line
@@ -1135,17 +1119,10 @@ console.log('✅ Places Detail JS loaded');
       card.appendChild(text);
       host.appendChild(card);
 
-      if (pending) {
-        host.appendChild(pendingChip());
-      } else {
+      if (!pending) {
         host.appendChild(noteAction(
           t('detail.note.suggestEdit', 'O\'zgartirish taklif qilish'), value));
       }
-      return;
-    }
-
-    if (pending) {
-      host.appendChild(pendingChip());
       return;
     }
 
@@ -1153,15 +1130,6 @@ console.log('✅ Places Detail JS loaded');
       t('detail.note.empty', 'Ish vaqti va dam olish kunlari hali qo\'shilmagan.'),
       t('detail.note.addCta', 'Ma\'lumot qo\'shish'),
       function () { openSheet('note', null); }));
-  }
-
-  function pendingChip() {
-    var chip = document.createElement('div');
-    chip.className = 'pd-pending-chip';
-    chip.innerHTML = PD_ICONS.clock;
-    chip.appendChild(document.createTextNode(
-      ' ' + t('detail.note.pending', 'Ko\'rib chiqilmoqda')));
-    return chip;
   }
 
   function noteAction(label, current) {
@@ -1312,10 +1280,9 @@ console.log('✅ Places Detail JS loaded');
       isNote ? PD_ICONS.info : (p ? p.icon : ''),
       isNote ? '' : 'pd-sheet-icon--' + field);
 
-    setTimeout(function () {
-      var el = isNote ? area : input;
-      try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
-    }, 260);
+    // Deliberately not focused. Auto-focus makes the on-screen keyboard jump
+    // up the moment the sheet opens, covering half of it before the user has
+    // read what is being asked for. They tap the field when ready.
   }
 
   function closeSheet() {

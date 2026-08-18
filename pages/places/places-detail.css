@@ -623,6 +623,43 @@
   gap: 10px;
 }
 
+/* Column count follows the number of real links. One link gets a full-width
+   tile laid out horizontally, which reads as a deliberate single entry rather
+   than a third of a row with two gaps beside it. */
+.pd-social-grid--1 { grid-template-columns: 1fr; }
+.pd-social-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.pd-social-grid--3 { grid-template-columns: repeat(3, 1fr); }
+
+.pd-social-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pd-social-grid--1 .pd-social-tile { min-height: 74px; }
+
+.pd-social-grid--1 .pd-social-link {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.pd-social-grid--1 .pd-social-text { align-items: flex-start; }
+.pd-social-grid--1 .pd-social-icon .pl-icon { width: 30px; height: 30px; }
+.pd-social-grid--1 .pd-social-name { font-size: 0.95rem; }
+.pd-social-grid--1 .pd-social-state { font-size: 0.8rem; }
+
+/* The single tile is a row, so it needs no fixed height — let the link set it. */
+.pd-social-grid--1 .pd-social-tile::after {
+  content: '';
+  display: block;
+  padding-top: 0;
+}
+
 /* One box for all three states, so a filled and an empty tile line up. */
 .pd-social-tile {
   position: relative;
@@ -1178,6 +1215,10 @@
   border: 1px solid var(--pl-line);
 }
 
+/* A section with nothing to show and nothing to offer removes itself, so no
+   heading is left hanging over empty space. */
+.detail-section[hidden] { display: none; }
+
 /* --- Quiet empty-state prompt (replaces the dashed placeholder tiles) --- */
 .pd-quiet {
   margin: 0;
@@ -1200,6 +1241,9 @@
 }
 
 .pd-quiet-link:hover { color: var(--pl-accent-deep); }
+
+/* When it follows the grid it is an aside, not the main event. */
+.pd-social-grid + .pd-quiet { margin-top: 12px; font-size: 0.82rem; }
 
 /* --- "+" tile, shown only when at least one real link exists --- */
 .pd-social-tile--add {
