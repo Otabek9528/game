@@ -1059,14 +1059,14 @@ const I18N = {
     'hk.cal.pullToRefresh':    { uz: 'Yangilash',   ru: 'Oбновления', en: 'Refresh' },
     'hk.cal.releaseToRefresh': { uz: 'Yangilash', ru: 'Oбновления', en: 'Refresh'},
     // ---------- Place detail: social links + owner note ----------
-    'detail.social.title': { uz: 'Ijtimoiy tarmoqlar', ru: 'Соцсети', en: 'Social media' },
+    'detail.social.title': { uz: 'Ijtimoiy tarmoqlarda', ru: 'Соцсети', en: 'Social media' },
     'detail.social.addMorePrompt': {
       uz: 'Boshqa tarmoqdagi sahifasini bilasizmi?',
       ru: 'Знаете страницу в другой соцсети?',
       en: 'Know a page on another network?'
     },
     'detail.social.emptyPrompt': {
-      uz: 'Bu joyning ijtimoiy tarmoqlarini bilasizmi?',
+      uz: 'Bu joy ijtimoiy tarmoqlarda bormi?',
       ru: 'Знаете соцсети этого места?',
       en: 'Do you know this place\'s social media?'
     },
@@ -1117,8 +1117,8 @@ const I18N = {
       en: 'For example:\nMon-Fri: 11:00 - 22:00\nSaturday: closed'
     },
     'detail.sheet.moderationNote': {
-      uz: 'Taklifingiz administrator tekshiruvidan so\'ng chop etiladi.',
-      ru: 'Ваше предложение появится после проверки администратором.',
+      uz: 'Taklifingiz admin tekshiruvidan so\'ng chop etiladi.',
+      ru: 'Ваше предложение появится после проверки админом.',
       en: 'Your suggestion will appear after an admin reviews it.'
     },
     'detail.sheet.cancel': { uz: 'Bekor qilish', ru: 'Отмена', en: 'Cancel' },
@@ -1174,7 +1174,7 @@ const I18N = {
       en: 'That is already what is saved.'
     },
     'detail.submit.err.rate_limited': {
-      uz: 'Bugungi takliflar chegarasiga yetdingiz. Ertaga urinib ko\'ring.',
+      uz: 'Bugungi takliflar limitiga yetdingiz. Ertaga urinib ko\'ring.',
       ru: 'Вы исчерпали лимит предложений на сегодня. Попробуйте завтра.',
       en: 'You have reached today\'s limit. Please try again tomorrow.'
     },
