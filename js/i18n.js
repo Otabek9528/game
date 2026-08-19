@@ -1080,7 +1080,7 @@ const I18N = {
     'detail.social.suggestEdit': { uz: 'O\'zgartirish taklif qilish', ru: 'Предложить изменение', en: 'Suggest a correction' },
     'detail.social.inviteLink': { uz: 'Havola', ru: 'Ссылка', en: 'Link' },
 
-    'detail.note.title': { uz: 'Qo\'shimcha ma\'lumot', ru: 'Дополнительно', en: 'Good to know' },
+    'detail.note.title': { uz: 'Muassasa haqida', ru: 'О заведении', en: 'About the venue' },
     'detail.note.empty': {
       uz: 'Ish vaqti va dam olish kunlari hali qo\'shilmagan.',
       ru: 'Часы работы и выходные пока не указаны.',
@@ -1088,7 +1088,6 @@ const I18N = {
     },
     'detail.note.addCta': { uz: 'Ma\'lumot qo\'shish', ru: 'Добавить информацию', en: 'Add information' },
     'detail.note.pending': { uz: 'Ko\'rib chiqilmoqda', ru: 'На проверке', en: 'Under review' },
-    'detail.note.fromOwner': { uz: 'Muassasa egasidan', ru: 'От владельца заведения', en: 'From the owner' },
 
     // ---------- Place detail: submission sheet ----------
     'detail.sheet.addTitle': {

@@ -1130,25 +1130,14 @@ console.log('✅ Places Detail JS loaded');
       return;
     }
 
-    host.appendChild(sectionTitle(t('detail.note.title', 'Qo\'shimcha ma\'lumot')));
+    host.appendChild(sectionTitle(t('detail.note.title', 'Muassasa haqida')));
 
     if (value) {
-      // Presented as a notice from the venue, not as another opinion in the
-      // review stream: attributed header strip, no rating, no edit affordance.
+      // The section heading already says whose words these are, so the card
+      // carries no header of its own — just a tinted, fully bordered panel,
+      // which is what keeps it from reading like the reviews below it.
       var card = document.createElement('div');
       card.className = 'pd-note-card';
-
-      var head = document.createElement('div');
-      head.className = 'pd-note-head';
-      var badge = document.createElement('span');
-      badge.className = 'pd-note-badge';
-      badge.innerHTML = PD_ICONS.info;   // static markup from our own table
-      var label = document.createElement('span');
-      label.className = 'pd-note-label';
-      label.textContent = t('detail.note.fromOwner', 'Muassasa egasidan');
-      head.appendChild(badge);
-      head.appendChild(label);
-      card.appendChild(head);
 
       var text = document.createElement('p');
       text.className = 'pd-note-text';

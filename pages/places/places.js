@@ -337,32 +337,45 @@ async function getFirstPhoto(photoPath) {
 
 // Discover all photos (called lazily when card becomes visible)
 async function discoverPhotos(photoPath, maxPhotos = 10) {
-  const photos = [];
   const extensions = ['jpg', 'jpeg', 'png'];
   const basePath = `../../${photoPath}`;
-  
-  for (let i = 1; i <= maxPhotos; i++) {
-    let photoFound = false;
-    
-    for (const ext of extensions) {
-      const photoUrl = `${basePath}/${i}.${ext}`;
-      
-      try {
-        const exists = await checkImageExists(photoUrl);
-        if (exists) {
-          photos.push(photoUrl);
-          photoFound = true;
-          break;
+
+  // Finding photos costs round trips, not bytes: every miss is a 404 we wait
+  // on. Asking for one extension of one index at a time meant a card with
+  // three photos spent a dozen serial requests before showing anything. A
+  // batch asks for every extension of every index at once, so the usual card
+  // resolves in a single round trip.
+  const BATCH = 5;
+  const found = [];
+
+  for (let start = 1; start <= maxPhotos; start += BATCH) {
+    const indices = [];
+    for (let i = start; i < start + BATCH && i <= maxPhotos; i++) indices.push(i);
+
+    const hits = await Promise.all(indices.map(async (i) => {
+      const perExt = await Promise.all(extensions.map(async (ext) => {
+        const url = `${basePath}/${i}.${ext}`;
+        try {
+          return (await checkImageExists(url)) ? url : null;
+        } catch (e) {
+          return null;
         }
-      } catch (e) {
-        continue;
-      }
+      }));
+      // Extension order is the preference order, so keep the first hit.
+      return perExt.find(Boolean) || null;
+    }));
+
+    // Numbering has to stay contiguous from 1: stop at the first gap even if
+    // later indices exist, otherwise a stray 7.jpg would appear as photo 2.
+    let gap = false;
+    for (const hit of hits) {
+      if (!hit) { gap = true; break; }
+      found.push(hit);
     }
-    
-    if (!photoFound) break;
+    if (gap) break;
   }
-  
-  return photos;
+
+  return found;
 }
 
 // ============================================
@@ -623,7 +636,9 @@ function setupLazyLoading() {
     });
   }, {
     root: null,
-    rootMargin: '100px', // Start loading 100px before card enters viewport
+    // Probing starts well before the card is on screen, so the photos are
+    // usually there by the time it is — 100px was about a third of a card.
+    rootMargin: '600px',
     threshold: 0.1
   });
 }

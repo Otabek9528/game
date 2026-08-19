@@ -780,44 +780,18 @@
    OWNER NOTE
    ========================================================= */
 
-/* Deliberately unlike .review-card: reviews are left-bordered opinions from
-   visitors, this is a notice from the venue itself — a bordered panel with an
-   attributed header strip and no rating furniture. */
+/* Deliberately unlike .review-card: reviews are grey cards with an accent bar
+   down one side and a rating, this is the venue's own notice — a tinted panel
+   enclosed on all four sides, with nothing else in it. */
 .pd-note-card {
   border: 1px solid var(--pl-line);
   border-radius: 14px;
-  background: var(--pl-surface);
-  overflow: hidden;
-}
-
-.pd-note-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 15px;
   background: var(--pl-accent-soft);
-  border-bottom: 1px solid var(--pl-line);
-}
-
-.pd-note-badge {
-  display: inline-flex;
-  line-height: 0;
-  color: var(--pl-accent-deep);
-}
-
-.pd-note-badge .pl-icon { width: 17px; height: 17px; }
-
-.pd-note-label {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--pl-accent-deep);
+  padding: 14px 16px;
 }
 
 .pd-note-text {
   margin: 0;
-  padding: 13px 15px 15px;
   font-size: 0.92rem;
   line-height: 1.65;
   color: var(--pl-text);
@@ -1182,17 +1156,9 @@
 }
 
 .night-mode .pd-note-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
   border-color: var(--pl-line);
 }
-
-.night-mode .pd-note-head {
-  background: rgba(255, 255, 255, 0.05);
-  border-bottom-color: var(--pl-line);
-}
-
-.night-mode .pd-note-badge,
-.night-mode .pd-note-label { color: var(--pl-accent); }
 
 /* A section with nothing to show and nothing to offer removes itself, so no
    heading is left hanging over empty space. */
