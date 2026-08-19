@@ -1,0 +1,457 @@
+From 758a73a5c7776d3609dc4bf5acbc495410484fc1 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 18 Aug 2026 21:39:25 +0000
+Subject: [PATCH] Present the owner note as a notice, and stop blocking the
+ render on fonts
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The note area is now read-only and attributed. Reviews are opinions from
+visitors and look like it — grey card, accent bar, stars. An owner note is
+different in kind: it is the venue telling people its hours, so it gets a
+bordered panel with an "MUASSASA EGASIDAN" header strip and no rating
+furniture. The suggest-an-edit pencil is gone from it, matching the social
+links: once a value is approved it is fixed, and corrections come to the
+admin rather than through the queue.
+
+Tapping a Telegram link no longer closes the Mini App. close() tears the
+session down and drops the user back at the start, which is not what
+"show me the group" should cost.
+
+Load time: the card was waiting on the Google Fonts stylesheet. A
+stylesheet in the head blocks the scripts below it, so the API call did not
+even start until the font server answered — 13s in a network where that
+host stalls. It is now fetched non-render-blocking (display=swap already
+covered the FOUT) and the page scripts are deferred, so they download in
+parallel with execution order preserved. Photo probing was the other
+serial cost: it now fires a batch of indices and extensions at once, still
+stopping at the first gap, and the card renders behind a skeleton instead
+of waiting for it.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01E9xoHoZswncJmqfxjYdHDW
+---
+ js/i18n.js                      |   2 +-
+ pages/places/places-detail.css  |  74 ++++++++++-------
+ pages/places/places-detail.html |  18 +++--
+ pages/places/places-detail.js   | 137 +++++++++++++++++++-------------
+ pages/places/places.html        |  22 +++--
+ 5 files changed, 154 insertions(+), 99 deletions(-)
+
+diff --git a/js/i18n.js b/js/i18n.js
+index 03572eb..a5c237d 100644
+--- a/js/i18n.js
++++ b/js/i18n.js
+@@ -1088,7 +1088,7 @@ const I18N = {
+     },
+     'detail.note.addCta': { uz: 'Ma\'lumot qo\'shish', ru: 'Добавить информацию', en: 'Add information' },
+     'detail.note.pending': { uz: 'Ko\'rib chiqilmoqda', ru: 'На проверке', en: 'Under review' },
+-    'detail.note.suggestEdit': { uz: 'O\'zgartirish taklif qilish', ru: 'Предложить изменение', en: 'Suggest a correction' },
++    'detail.note.fromOwner': { uz: 'Muassasa egasidan', ru: 'От владельца заведения', en: 'From the owner' },
+ 
+     // ---------- Place detail: submission sheet ----------
+     'detail.sheet.addTitle': {
+diff --git a/pages/places/places-detail.css b/pages/places/places-detail.css
+index 5a6fddb..97517a8 100644
+--- a/pages/places/places-detail.css
++++ b/pages/places/places-detail.css
+@@ -780,15 +780,44 @@
+    OWNER NOTE
+    ========================================================= */
+ 
++/* Deliberately unlike .review-card: reviews are left-bordered opinions from
++   visitors, this is a notice from the venue itself — a bordered panel with an
++   attributed header strip and no rating furniture. */
+ .pd-note-card {
++  border: 1px solid var(--pl-line);
++  border-radius: 14px;
++  background: var(--pl-surface);
++  overflow: hidden;
++}
++
++.pd-note-head {
++  display: flex;
++  align-items: center;
++  gap: 8px;
++  padding: 10px 15px;
+   background: var(--pl-accent-soft);
+-  border-left: 3px solid var(--pl-accent);
+-  border-radius: 10px;
+-  padding: 13px 15px;
++  border-bottom: 1px solid var(--pl-line);
++}
++
++.pd-note-badge {
++  display: inline-flex;
++  line-height: 0;
++  color: var(--pl-accent-deep);
++}
++
++.pd-note-badge .pl-icon { width: 17px; height: 17px; }
++
++.pd-note-label {
++  font-size: 0.74rem;
++  font-weight: 700;
++  letter-spacing: 0.05em;
++  text-transform: uppercase;
++  color: var(--pl-accent-deep);
+ }
+ 
+ .pd-note-text {
+   margin: 0;
++  padding: 13px 15px 15px;
+   font-size: 0.92rem;
+   line-height: 1.65;
+   color: var(--pl-text);
+@@ -806,31 +835,6 @@
+   color: var(--pl-muted);
+ }
+ 
+-.pd-note-cta {
+-  display: inline-flex;
+-  align-items: center;
+-  gap: 6px;
+-  margin-top: 12px;
+-  padding: 8px 15px;
+-  border: 1.5px dashed var(--pl-line);
+-  border-radius: var(--pl-radius-sm);
+-  background: transparent;
+-  color: var(--pl-accent);
+-  font-family: inherit;
+-  font-size: 0.82rem;
+-  font-weight: 600;
+-  cursor: pointer;
+-  transition: border-color 160ms ease, background 160ms ease;
+-}
+-
+-.pd-note-cta:hover {
+-  border-color: var(--pl-accent);
+-  background: var(--pl-accent-soft);
+-}
+-
+-.pd-note-cta:active { transform: scale(0.98); }
+-.pd-note-cta .pl-icon { width: 0.85rem; height: 0.85rem; }
+-
+ .pd-pending-chip {
+   display: inline-flex;
+   align-items: center;
+@@ -1111,7 +1115,6 @@
+ 
+ .pd-social-tile--empty:focus-visible,
+ .pd-social-link:focus-visible,
+-.pd-note-cta:focus-visible,
+ .pd-sheet-btn:focus-visible,
+ .pd-sheet-input:focus-visible,
+ .pd-sheet-textarea:focus-visible {
+@@ -1178,6 +1181,19 @@
+   border: 1px solid var(--pl-line);
+ }
+ 
++.night-mode .pd-note-card {
++  background: rgba(255, 255, 255, 0.03);
++  border-color: var(--pl-line);
++}
++
++.night-mode .pd-note-head {
++  background: rgba(255, 255, 255, 0.05);
++  border-bottom-color: var(--pl-line);
++}
++
++.night-mode .pd-note-badge,
++.night-mode .pd-note-label { color: var(--pl-accent); }
++
+ /* A section with nothing to show and nothing to offer removes itself, so no
+    heading is left hanging over empty space. */
+ .detail-section[hidden] { display: none; }
+diff --git a/pages/places/places-detail.html b/pages/places/places-detail.html
+index e3cad47..839ee07 100644
+--- a/pages/places/places-detail.html
++++ b/pages/places/places-detail.html
+@@ -6,7 +6,13 @@
+   <title>Joy Ma'lumotlari</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com" />
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
++  <!-- Loaded without blocking render: a stylesheet in the head holds up first paint
++       AND the scripts below it, which delays the API call by however long the font
++       server takes. media="print" makes it a non-blocking fetch that is promoted to
++       the real stylesheet once it lands; display=swap already covers the FOUT. -->
++  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap"
++        rel="stylesheet" media="print" onload="this.media='all'; this.onload=null" />
++  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" /></noscript>
+   <link rel="stylesheet" href="../../css/style.css" />
+   <link rel="stylesheet" href="places.css" />
+   <link rel="stylesheet" href="places-detail.css" />
+@@ -100,11 +106,11 @@
+ 
+   <div class="pd-toast" id="pdToast" role="status" aria-live="polite" hidden></div>
+ 
+-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+-  <script src="../../js/i18n.js"></script>
+-  <script src="../../js/apiConfig.js"></script>
+-  <script src="../../js/photo-viewer.js"></script>
+-  <script src="places-detail.js"></script>
++  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
++  <script defer src="../../js/i18n.js"></script>
++  <script defer src="../../js/apiConfig.js"></script>
++  <script defer src="../../js/photo-viewer.js"></script>
++  <script defer src="places-detail.js"></script>
+ 
+ </body>
+ </html>
+diff --git a/pages/places/places-detail.js b/pages/places/places-detail.js
+index c73efd5..1490921 100644
+--- a/pages/places/places-detail.js
++++ b/pages/places/places-detail.js
+@@ -209,34 +209,63 @@ function checkImageExists(url) {
+ }
+ 
+ async function discoverPhotos(photoPath, maxPhotos = 10) {
+-  const photos = [];
+   const extensions = ['jpg', 'jpeg', 'png'];
+   const basePath = `../../${photoPath}`;
+-  
+-  for (let i = 1; i <= maxPhotos; i++) {
+-    let photoFound = false;
+-    
+-    for (const ext of extensions) {
+-      const photoUrl = `${basePath}/${i}.${ext}`;
+-      
+-      try {
+-        const exists = await checkImageExists(photoUrl);
+-        if (exists) {
+-          photos.push(photoUrl);
+-          photoFound = true;
+-          break;
++
++  // Photos are found by probing filenames, so the cost is round trips, not
++  // bytes. Probing one extension at a time and one index at a time meant ~11
++  // sequential requests before the first photo was known — seconds on mobile
++  // data. A batch fires every extension of every index in the batch at once,
++  // so the usual place resolves in a single round trip.
++  const BATCH = 5;
++  const found = [];
++
++  for (let start = 1; start <= maxPhotos; start += BATCH) {
++    const indices = [];
++    for (let i = start; i < start + BATCH && i <= maxPhotos; i++) indices.push(i);
++
++    const hits = await Promise.all(indices.map(async (i) => {
++      const perExt = await Promise.all(extensions.map(async (ext) => {
++        const url = `${basePath}/${i}.${ext}`;
++        try {
++          return (await checkImageExists(url)) ? url : null;
++        } catch (e) {
++          return null;
+         }
+-      } catch (e) {
+-        continue;
+-      }
++      }));
++      // Extension order is the preference order, so keep the first hit.
++      return perExt.find(Boolean) || null;
++    }));
++
++    // Numbering has to stay contiguous from 1: stop at the first gap even if
++    // later indices exist, otherwise a stray 7.jpg would appear as photo 2.
++    let gap = false;
++    for (const hit of hits) {
++      if (!hit) { gap = true; break; }
++      found.push(hit);
+     }
+-    
+-    if (!photoFound) break;
++    if (gap) break;
+   }
+-  
+-  return photos;
++
++  return found;
+ }
+ 
++
++// Shown while the probing above runs, so the card is readable immediately
++// instead of waiting on photos. Reuses the skeleton from places.css.
++function detailPhotoSkeleton() {
++  const loading = window.I18N ? I18N.t('places.loadingPhotos') : 'Rasmlar yuklanmoqda...';
++  return `
++    <div class="detail-photo-skeleton">
++      <div class="skeleton-shimmer"></div>
++      <div class="skeleton-text">
++        <span class="skeleton-message">${loading}</span>
++      </div>
++    </div>
++  `;
++}
++
++
+ // ============================================
+ // CAROUSEL FUNCTIONS
+ // ============================================
+@@ -471,9 +500,9 @@ async function renderPlaceDetail(place) {
+     place.distance = getDistanceFromSearchState(place.id);
+   }
+   
+-  const photos = await discoverPhotos(place.photo, 10);
+-  
+-  const photoHTML = createDetailPhotoCarousel(photos);
++  // Everything below is already in hand from the API response. Photos are the
++  // only slow part, so the card renders now and they drop in when ready.
++  const photoHTML = detailPhotoSkeleton();
+   const starRatingHTML = generateStarRating(place.reviews);
+   const reviewsHTML = renderReviews(place.reviews);
+   const reviewCount = place.reviews ? place.reviews.length : 0;
+@@ -637,14 +666,18 @@ async function renderPlaceDetail(place) {
+     ` : ''}
+   `;
+   
+-  if (photos.length > 1) {
+-    initDetailCarousel(photos.length);
+-  }
+-
+   initReviewSubmission(place.id);
+ 
+   // Social links + owner note. Mounted last so it can read place.pendingFields.
+   if (window.PlaceExtras) PlaceExtras.mount(place);
++
++  // Photos arrive after the card is already on screen.
++  discoverPhotos(place.photo, 10).then(function (photos) {
++    const section = document.querySelector('.detail-photo-section');
++    if (!section) return;                     // navigated away mid-probe
++    section.innerHTML = createDetailPhotoCarousel(photos);
++    if (photos.length > 1) initDetailCarousel(photos.length);
++  });
+ }
+ 
+ 
+@@ -839,8 +872,7 @@ console.log('✅ Places Detail JS loaded');
+     instagram: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.25" fill="currentColor" stroke="none"/></svg>',
+     plus: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+     clock: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+-    info: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>',
+-    pen: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.4 2.4 0 0 1 3.4 3.4L8 18.8 3 20l1.2-5L17 3Z"/></svg>'
++    info: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>'
+   };
+ 
+   var PLATFORMS = [
+@@ -943,17 +975,12 @@ console.log('✅ Places Detail JS loaded');
+   function openProfile(field, url) {
+     try {
+       if (field === 'telegram' && tg && typeof tg.openTelegramLink === 'function') {
++        // Telegram exposes no way to minimise a Mini App from script — only
++        // close(), which tears the session down and loses the user's place.
++        // So the client decides: on versions that support minimising it drops
++        // the app to a bubble when it opens the chat, and elsewhere the chat
++        // waits underneath.
+         tg.openTelegramLink(url);
+-        // openTelegramLink opens the chat but explicitly does NOT close the
+-        // Mini App, so the group ends up behind the web view and looks like
+-        // nothing happened. Closing is what actually reveals it.
+-        //
+-        // Deferred by a frame or two: closing in the same tick can be
+-        // processed before the open event, which shuts the app without ever
+-        // opening the chat.
+-        setTimeout(function () {
+-          try { tg.close(); } catch (e) {}
+-        }, 150);
+         return;
+       }
+       if (tg && typeof tg.openLink === 'function') {
+@@ -1106,8 +1133,23 @@ console.log('✅ Places Detail JS loaded');
+     host.appendChild(sectionTitle(t('detail.note.title', 'Qo\'shimcha ma\'lumot')));
+ 
+     if (value) {
++      // Presented as a notice from the venue, not as another opinion in the
++      // review stream: attributed header strip, no rating, no edit affordance.
+       var card = document.createElement('div');
+       card.className = 'pd-note-card';
++
++      var head = document.createElement('div');
++      head.className = 'pd-note-head';
++      var badge = document.createElement('span');
++      badge.className = 'pd-note-badge';
++      badge.innerHTML = PD_ICONS.info;   // static markup from our own table
++      var label = document.createElement('span');
++      label.className = 'pd-note-label';
++      label.textContent = t('detail.note.fromOwner', 'Muassasa egasidan');
++      head.appendChild(badge);
++      head.appendChild(label);
++      card.appendChild(head);
++
+       var text = document.createElement('p');
+       text.className = 'pd-note-text';
+       // textContent, always. Line breaks survive via white-space: pre-line
+@@ -1115,11 +1157,6 @@ console.log('✅ Places Detail JS loaded');
+       text.textContent = value;
+       card.appendChild(text);
+       host.appendChild(card);
+-
+-      if (!pending) {
+-        host.appendChild(noteAction(
+-          t('detail.note.suggestEdit', 'O\'zgartirish taklif qilish'), value));
+-      }
+       return;
+     }
+ 
+@@ -1129,16 +1166,6 @@ console.log('✅ Places Detail JS loaded');
+       function () { openSheet('note', null); }));
+   }
+ 
+-  function noteAction(label, current) {
+-    var btn = document.createElement('button');
+-    btn.type = 'button';
+-    btn.className = 'pd-note-cta';
+-    btn.innerHTML = current ? PD_ICONS.pen : PD_ICONS.plus;
+-    btn.appendChild(document.createTextNode(' ' + label));
+-    btn.addEventListener('click', function () { openSheet('note', current); });
+-    return btn;
+-  }
+-
+   // ============================================
+   // SUBMISSION SHEET
+   // ============================================
+diff --git a/pages/places/places.html b/pages/places/places.html
+index 61e7724..beec79e 100644
+--- a/pages/places/places.html
++++ b/pages/places/places.html
+@@ -6,7 +6,13 @@
+   <title>Yaqin Joylar</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com" />
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
++  <!-- Loaded without blocking render: a stylesheet in the head holds up first paint
++       AND the scripts below it, which delays the API call by however long the font
++       server takes. media="print" makes it a non-blocking fetch that is promoted to
++       the real stylesheet once it lands; display=swap already covers the FOUT. -->
++  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap"
++        rel="stylesheet" media="print" onload="this.media='all'; this.onload=null" />
++  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" /></noscript>
+   <link rel="stylesheet" href="../../css/style.css" />
+   <link rel="stylesheet" href="places.css" />
+   <link rel="stylesheet" href="../../css/photo-viewer.css" />
+@@ -112,14 +118,14 @@
+ 
+   </div>
+ 
+-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+-  <script src="../../js/i18n.js"></script>
+-  <script src="../../js/locationManager.js"></script>
+-  <script src="../../js/apiConfig.js"></script>
+-  <script src="../../js/photo-viewer.js"></script>
+-  <script src="places.js"></script>
++  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
++  <script defer src="../../js/i18n.js"></script>
++  <script defer src="../../js/locationManager.js"></script>
++  <script defer src="../../js/apiConfig.js"></script>
++  <script defer src="../../js/photo-viewer.js"></script>
++  <script defer src="places.js"></script>
+ 
+-  <script src="../../js/ad-modal.js"></script>
++  <script defer src="../../js/ad-modal.js"></script>
+ 
+ </body>
+ </html>
+-- 
+2.43.0
+

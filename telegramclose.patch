@@ -1,0 +1,43 @@
+From a80703e8983b4338ad10733c322adfead9ebe732 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 18 Aug 2026 14:22:53 +0000
+Subject: [PATCH] Close the Mini App when a Telegram link is tapped
+
+openTelegramLink opens the chat but explicitly does not close the Mini
+App, so the group appeared behind the web view and the tap looked like
+it had done nothing.
+
+The close is deferred ~150ms: issued in the same tick it can be handled
+before the open event, which shuts the app without ever opening the chat.
+
+Only Telegram closes. TikTok and Instagram go out to the external browser
+via openLink, and closing the app there would drop the user out of
+Telegram entirely rather than letting them come back.
+---
+ pages/places/places-detail.js | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/pages/places/places-detail.js b/pages/places/places-detail.js
+index a701629..c73efd5 100644
+--- a/pages/places/places-detail.js
++++ b/pages/places/places-detail.js
+@@ -944,6 +944,16 @@ console.log('✅ Places Detail JS loaded');
+     try {
+       if (field === 'telegram' && tg && typeof tg.openTelegramLink === 'function') {
+         tg.openTelegramLink(url);
++        // openTelegramLink opens the chat but explicitly does NOT close the
++        // Mini App, so the group ends up behind the web view and looks like
++        // nothing happened. Closing is what actually reveals it.
++        //
++        // Deferred by a frame or two: closing in the same tick can be
++        // processed before the open event, which shuts the app without ever
++        // opening the chat.
++        setTimeout(function () {
++          try { tg.close(); } catch (e) {}
++        }, 150);
+         return;
+       }
+       if (tg && typeof tg.openLink === 'function') {
+-- 
+2.43.0
+
