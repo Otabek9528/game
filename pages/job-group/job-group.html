@@ -92,7 +92,7 @@
           <!-- Sub-nav -->
           <div class="post-subnav">
             <button class="subnav-btn active" id="subnavFormBtn">✍️ Yangi e'lon</button>
-            <button class="subnav-btn" id="subnavMyPostsBtn">📋 E'lonlarim <span class="subnav-badge" id="myPostsBadge">3</span></button>
+            <button class="subnav-btn" id="subnavMyPostsBtn">📋 E'lonlarim <span class="subnav-badge" id="myPostsBadge">0</span></button>
           </div>
 
           <!-- SUB-VIEW A: Post Form -->
@@ -108,7 +108,7 @@
                 <div class="hiw-steps">
                   <div class="hiw-step">
                     <span class="hiw-step-num">1</span>
-                    <span class="hiw-step-text">Ish e'loningizni yozing va <strong>yuborish</strong> tugmasini bosing</span>
+                    <span class="hiw-step-text">Ish e'loningizni yozing va <strong>komissiya turini</strong> tanlang</span>
                   </div>
                   <div class="hiw-step">
                     <span class="hiw-step-num">2</span>
@@ -118,18 +118,14 @@
                     <span class="hiw-step-num">3</span>
                     <span class="hiw-step-text">Odam topilgach, e'lonni <strong>"Band"</strong> deb belgilang</span>
                   </div>
-                  <!-- <div class="hiw-step">
-                    <span class="hiw-step-num">4</span>
-                    <span class="hiw-step-text">Ish tugagach, <strong>"Yakunlash"</strong> bosing — <strong>lotereya chiptasi</strong> oling 🎟</span>
-                  </div> -->
                 </div>
                 <div class="hiw-highlight">
                   <div class="hiw-highlight-row">
                     <span class="hiw-highlight-icon">💰</span>
-                    <span class="hiw-highlight-text">Bir martalik komissiya: <strong>10,000 KRW</strong> - ishni olgan har bir kishi sizga to'laydi</span>
+                    <span class="hiw-highlight-text">Komissiya <strong>ixtiyoriy</strong> — o'zingiz tanlaysiz. Tanlasangiz, ishni olgan har bir kishi sizga bir martalik <strong>10,000 KRW</strong> to'laydi</span>
                   </div>
                   <div class="hiw-highlight-row">
-                    <span class="hiw-highlight-icon">🎟</span>
+                    <span class="hiw-highlight-icon">📌</span>
                     <span class="hiw-highlight-text">Sharti: E'lon faqat <strong>bot guruhida</strong> e'lon qilinib, boshqa guruhlarga joylanmasligi kerak</span>
                   </div>
                   <div class="hiw-highlight-row">
@@ -143,7 +139,7 @@
             <div class="action-section" id="postFormState">
               <div class="post-card">
                 <div class="post-field">
-                  <label class="post-label">E'lon matni</label>
+                  <label class="post-label" for="postMessage">E'lon matni</label>
                   <div class="textarea-wrapper">
                     <textarea id="postMessage" class="post-textarea" placeholder="Restoranga oshpaz kerak&#10;📍 Manzil: 강남 서울시&#10;👥 2 kishi&#10;🕐 09:00 – 18:00&#10;💰 Maosh: 3,000,000 won&#10;📋 Tajriba talab qilinadi" rows="5" maxlength="1000"></textarea>
                     <span class="char-count" id="charCount">0 / 1000</span>
@@ -160,6 +156,7 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="post-field" id="contactField">
                   <label class="post-label" id="contactLabel">Bog'lanish uchun</label>
                   <div class="contact-auto" id="contactAuto" style="display:none;">
@@ -171,6 +168,47 @@
                     <button class="contact-toggle-btn" id="contactBackBtn" type="button" style="display:none;"><span>↩️</span><span>Telegram username ishlatish</span></button>
                   </div>
                 </div>
+
+                <!-- Commission choice -->
+                <div class="post-field" id="commissionField">
+                  <label class="post-label">
+                    Komissiya
+                    <span class="label-req">tanlang</span>
+                  </label>
+                  <div class="commission-options" id="commissionOptions" role="radiogroup" aria-label="Komissiya turi">
+
+                    <label class="commission-option" data-value="yes">
+                      <input type="radio" name="commission" value="yes" id="commissionYes" />
+                      <span class="co-radio" aria-hidden="true"></span>
+                      <span class="co-body">
+                        <span class="co-head">
+                          <span class="co-title">💰 Komissiyali</span>
+                          <span class="co-tag">10,000 KRW</span>
+                        </span>
+                        <span class="co-desc">Ishni olgan har bir kishi sizga <strong>bir martalik</strong> 10,000 KRW to'laydi.</span>
+                      </span>
+                    </label>
+
+                    <label class="commission-option" data-value="no">
+                      <input type="radio" name="commission" value="no" id="commissionNo" />
+                      <span class="co-radio" aria-hidden="true"></span>
+                      <span class="co-body">
+                        <span class="co-head">
+                          <span class="co-title">🤝 Komissiyasiz</span>
+                          <span class="co-tag neutral">Bepul</span>
+                        </span>
+                        <span class="co-desc">Hech qanday to'lov talab qilinmaydi — faqat e'lon joylanadi.</span>
+                      </span>
+                    </label>
+
+                  </div>
+
+                  <div class="commission-preview" id="commissionPreview" style="display:none;">
+                    <span class="cp-label">👁 E'lon ostida shunday ko'rinadi:</span>
+                    <div class="cp-body" id="commissionPreviewText"></div>
+                  </div>
+                </div>
+
                 <!-- Agreement Checkbox -->
                 <label class="agreement-check" id="agreementLabel">
                   <input type="checkbox" id="agreementCheckbox" />
@@ -182,6 +220,7 @@
                 <div class="post-guidelines"><span class="guidelines-icon">⚠️</span><span class="guidelines-text">Reklama, shaxsiy xabarlar yoki ish bilan bog'liq bo'lmagan e'lonlar davomiy qo'ygan foydalanuvchi bloklanadi.</span></div>
               </div>
             </div>
+
             <div class="action-section" id="postLoadingState" style="display:none;">
               <div class="loading-card"><div class="loading-spinner"></div><p class="loading-text">E'lon yuborilmoqda...</p></div>
             </div>
@@ -190,6 +229,7 @@
                 <div class="success-icon">✅</div>
                 <h3 class="success-title">E'lon yuborildi!</h3>
                 <p class="success-text">E'loningiz guruhga muvaffaqiyatli joylandi.</p>
+                <div class="success-chip" id="successChip"></div>
                 <button class="post-again-btn" id="postAgainBtn"><span class="btn-icon">✍️</span><span class="btn-text">Yana e'lon joylash</span></button>
                 <button class="view-posts-btn" id="viewPostsBtn"><span class="btn-icon">📋</span><span class="btn-text">E'lonlarim</span></button>
               </div>
@@ -201,18 +241,6 @@
 
           <!-- SUB-VIEW B: My Posts -->
           <div id="myPostsView" style="display:none;">
-            <!-- 
-            <div class="lottery-banner">
-              <div class="lottery-left">
-                <span class="lottery-icon">🎟</span>
-                <div class="lottery-info">
-                  <span class="lottery-title">Oylik lotereya</span>
-                  <span class="lottery-tickets" id="lotteryTickets">Sizda: 1 ta chipta</span>
-                </div>
-              </div>
-              <span class="lottery-prize">3 × $500</span>
-            </div> 
-            -->
             <div id="myPostsList"></div>
             <div class="empty-posts" id="emptyPosts" style="display:none;">
               <div class="empty-icon">📭</div>

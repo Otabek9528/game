@@ -146,6 +146,7 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .post-field { margin-bottom: 20px; }
 .post-label { display: block; font-size: 0.9rem; font-weight: 600; color: #444; margin-bottom: 8px; }
 .optional-tag { font-weight: 400; font-size: 0.8rem; color: #aaa; }
+.label-req { font-weight: 600; font-size: 0.72rem; color: #e65100; background: #fff3e0; border: 1px solid #ffe0b2; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
 
 /* Hints */
 .post-hints { margin-top: 10px; }
@@ -174,6 +175,50 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .post-input { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 14px; font-size: 0.95rem; color: #333; background: #fafafa; box-sizing: border-box; transition: border-color 0.25s ease, box-shadow 0.25s ease; font-family: inherit; }
 .post-input:focus { outline: none; border-color: #00a884; box-shadow: 0 0 0 3px rgba(0,168,132,0.12); background: #fff; }
 .post-input::placeholder { color: #b0b0b0; font-size: 0.9rem; }
+
+
+/* =========================
+   COMMISSION CHOICE
+   ========================= */
+.commission-options { display: flex; flex-direction: column; gap: 10px; }
+.commission-option {
+  display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
+  padding: 14px 16px; background: #fafafa; border: 2px solid #e0e0e0;
+  border-radius: 14px; -webkit-tap-highlight-color: transparent; position: relative;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+.commission-option:active { transform: scale(0.99); }
+.commission-option input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.commission-option.selected { border-color: #00a884; background: #f0f9f6; }
+.co-radio {
+  width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;
+  border: 2px solid #ccc; border-radius: 50%; background: #fff;
+  position: relative; transition: all 0.2s ease;
+}
+.commission-option.selected .co-radio { border-color: #00a884; }
+.commission-option.selected .co-radio::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 10px; height: 10px; border-radius: 50%; background: #00a884;
+}
+.co-body { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.co-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.co-title { font-size: 0.92rem; font-weight: 700; color: #333; }
+.commission-option.selected .co-title { color: #1a4d2e; }
+.co-tag {
+  font-size: 0.72rem; font-weight: 700; color: #e65100; background: #fff3e0;
+  border: 1px solid #ffe0b2; padding: 2px 8px; border-radius: 20px; white-space: nowrap;
+}
+.co-tag.neutral { color: #4a6d8c; background: #f0f7ff; border-color: #d0e3f7; }
+.co-desc { font-size: 0.8rem; color: #777; line-height: 1.45; }
+.co-desc strong { color: #555; }
+
+.commission-preview {
+  margin-top: 10px; padding: 12px 14px; border-radius: 12px;
+  background: #f7f9f8; border: 1px dashed #cfdcd6;
+  animation: fadeIn 0.25s ease-out;
+}
+.cp-label { display: block; font-size: 0.75rem; font-weight: 600; color: #8a9a93; margin-bottom: 6px; }
+.cp-body { font-size: 0.78rem; color: #556; line-height: 1.55; white-space: pre-line; }
 
 /* Agreement Checkbox */
 .agreement-check {
@@ -236,7 +281,7 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .hiw-body {
   overflow: hidden; max-height: 0; transition: max-height 0.35s ease;
 }
-.hiw-body.open { max-height: 600px; }
+.hiw-body.open { max-height: 800px; }
 .hiw-steps { padding-top: 14px; display: flex; flex-direction: column; gap: 12px; }
 .hiw-step {
   display: flex; gap: 10px; align-items: flex-start;
@@ -264,26 +309,17 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .success-card { background: #fff; border-radius: 20px; padding: 32px 24px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.08); border: 2px solid #00a884; }
 .success-icon { font-size: 3.5rem; margin-bottom: 12px; }
 .success-title { font-size: 1.3rem; font-weight: 700; color: #1a4d2e; margin: 0 0 8px 0; }
-.success-text { font-size: 0.95rem; color: #666; margin: 0 0 20px 0; }
+.success-text { font-size: 0.95rem; color: #666; margin: 0 0 14px 0; }
+.success-chip {
+  display: inline-block; font-size: 0.8rem; font-weight: 700; color: #e65100;
+  background: #fff3e0; border: 1px solid #ffe0b2; padding: 6px 14px;
+  border-radius: 20px; margin-bottom: 20px;
+}
+.success-chip.neutral { color: #4a6d8c; background: #f0f7ff; border-color: #d0e3f7; }
 .post-again-btn, .view-posts-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px 24px; color: white; border: none; border-radius: 14px; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-sizing: border-box; }
 .post-again-btn { background: linear-gradient(135deg, #00a884 0%, #007b5e 100%); box-shadow: 0 4px 16px rgba(0,168,132,0.4); margin-bottom: 10px; }
 .view-posts-btn { background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%); box-shadow: 0 4px 16px rgba(92,107,192,0.4); }
 .post-again-btn:hover, .view-posts-btn:hover { transform: translateY(-2px); }
-
-/* =========================
-   MY POSTS — LOTTERY BANNER
-   ========================= */
-.lottery-banner {
-  display: flex; align-items: center; justify-content: space-between;
-  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border: 2px solid #ffc107;
-  border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
-}
-.lottery-left { display: flex; align-items: center; gap: 10px; }
-.lottery-icon { font-size: 1.6rem; }
-.lottery-info { display: flex; flex-direction: column; }
-.lottery-title { font-size: 0.85rem; font-weight: 700; color: #5d4e00; }
-.lottery-tickets { font-size: 0.78rem; color: #8a7600; }
-.lottery-prize { font-size: 1rem; font-weight: 800; color: #e65100; white-space: nowrap; }
 
 /* =========================
    MY POSTS — POST CARDS
@@ -308,6 +344,13 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 
 .my-post-body { font-size: 0.9rem; color: #444; line-height: 1.5; margin-bottom: 14px; white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
+.my-post-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.commission-chip {
+  font-size: 0.72rem; font-weight: 700; color: #e65100; background: #fff3e0;
+  border: 1px solid #ffe0b2; padding: 3px 10px; border-radius: 20px;
+}
+.commission-chip.none { color: #4a6d8c; background: #f0f7ff; border-color: #d0e3f7; }
+
 .my-post-actions { display: flex; flex-direction: column; gap: 8px; }
 .my-post-actions-row { display: flex; gap: 8px; }
 .post-action-btn {
@@ -323,7 +366,7 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .post-action-btn.finish:disabled { background: #f5f5f5; color: #bbb; cursor: not-allowed; }
 
 .finish-hint { font-size: 0.75rem; color: #999; text-align: center; margin-top: 6px; }
-.ticket-earned { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.82rem; color: #8a7600; font-weight: 600; }
+.post-done-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.82rem; color: #6b8f7a; font-weight: 600; padding: 6px 0; }
 
 /* Empty state */
 .empty-posts { text-align: center; padding: 40px 20px; }
@@ -355,6 +398,19 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .confirm-btn.yes:hover { transform: translateY(-1px); }
 
 /* =========================
+   POLISH — TOUCH & FOCUS
+   ========================= */
+.get-link-btn:active, .post-submit-btn:active:not(:disabled),
+.retry-btn:active, .join-btn:active,
+.post-again-btn:active, .view-posts-btn:active { transform: translateY(0) scale(0.985); }
+.subnav-btn:active, .post-action-btn:active, .agreement-check:active { transform: scale(0.985); }
+.subnav-btn, .post-action-btn, .agreement-check { transition: all 0.2s ease; }
+button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visible,
+.commission-option:focus-within, .agreement-check:focus-within {
+  outline: 2px solid #00a884; outline-offset: 2px;
+}
+
+/* =========================
    RESPONSIVE
    ========================= */
 @media (max-width: 380px) {
@@ -365,6 +421,9 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
   .tab-label { font-size: 0.82rem; }
   .hint-chip { font-size: 0.72rem; padding: 4px 8px; }
   .subnav-btn { font-size: 0.82rem; }
+  .co-title { font-size: 0.86rem; }
+  .co-desc { font-size: 0.76rem; }
+  .cp-body { font-size: 0.74rem; }
 }
 
 /* ========================================
@@ -424,6 +483,24 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 /* Submit hint */
 .night-mode .submit-hint { background: #2a2010; border-color: rgba(255,224,178,0.15); color: #ffb74d; }
 
+.night-mode .label-req { color: #ffb74d; background: #2a2010; border-color: rgba(255,224,178,0.15); }
+
+/* Commission choice */
+.night-mode .commission-option { background: #252525; border-color: #3a3a3a; }
+.night-mode .commission-option.selected { border-color: rgba(0,168,132,0.5); background: #1a2a22; }
+.night-mode .co-radio { background: #1e1e1e; border-color: #555; }
+.night-mode .commission-option.selected .co-radio { border-color: #4ade80; }
+.night-mode .commission-option.selected .co-radio::after { background: #4ade80; }
+.night-mode .co-title { color: #ddd; }
+.night-mode .commission-option.selected .co-title { color: #4ade80; }
+.night-mode .co-desc { color: #8d8d8d; }
+.night-mode .co-desc strong { color: #b0b0b0; }
+.night-mode .co-tag { color: #ffb74d; background: #2a2010; border-color: rgba(255,224,178,0.15); }
+.night-mode .co-tag.neutral { color: #7ba3c4; background: #1a2230; border-color: #253040; }
+.night-mode .commission-preview { background: #1a1f1d; border-color: #2f3b36; }
+.night-mode .cp-label { color: #6b7f77; }
+.night-mode .cp-body { color: #9aa8a2; }
+
 /* Agreement checkbox */
 .night-mode .agreement-check { background: #2a2510; border-color: rgba(240,230,204,0.15); }
 .night-mode .agreement-check:has(input:checked) { border-color: rgba(0,168,132,0.4); background: #1a2a22; }
@@ -443,12 +520,8 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .night-mode .success-card { background: #1e1e1e; box-shadow: 0 4px 16px rgba(0,0,0,0.3); border-color: rgba(0,168,132,0.4); }
 .night-mode .success-title { color: #4ade80; }
 .night-mode .success-text { color: #999; }
-
-/* Lottery banner */
-.night-mode .lottery-banner { background: linear-gradient(135deg, #2a2510 0%, #251e08 100%); border-color: rgba(255,193,7,0.3); }
-.night-mode .lottery-title { color: #e0c860; }
-.night-mode .lottery-tickets { color: #a09030; }
-.night-mode .lottery-prize { color: #ffb74d; }
+.night-mode .success-chip { color: #ffb74d; background: #2a2010; border-color: rgba(255,224,178,0.15); }
+.night-mode .success-chip.neutral { color: #7ba3c4; background: #1a2230; border-color: #253040; }
 
 /* My post cards */
 .night-mode .my-post-card { background: #1e1e1e; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
@@ -462,6 +535,9 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
 .night-mode .post-action-btn.finish { background: #1a2230; color: #64b5f6; }
 .night-mode .post-action-btn.finish:disabled { background: #252525; color: #555; }
 .night-mode .finish-hint { color: #666; }
+.night-mode .post-done-note { color: #6dbb96; }
+.night-mode .commission-chip { color: #ffb74d; background: #2a2010; border-color: rgba(255,224,178,0.15); }
+.night-mode .commission-chip.none { color: #7ba3c4; background: #1a2230; border-color: #253040; }
 .night-mode .empty-text { color: #666; }
 
 /* Confirm modal */

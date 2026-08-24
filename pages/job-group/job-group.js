@@ -12,6 +12,12 @@ const API_BASE_URL = 'https://vegukin-api.duckdns.org/';
 const LINK_DURATION = 15;
 const FINISH_DELAY_MS = 3 * 60 * 60 * 1000; // 3 hours
 
+// Mirrors the footnote the backend appends to the group message.
+const FOOTNOTE_PREVIEW = {
+  yes: "👉 Bu e'lon faqat shu guruhga qo'yildi.\n👉 Ishga qatnashgan har bir kishi ish egasiga bir martalik komissiyani: 10,000 KRW ish haqini olish vaqtida to'laydi.\n👉 E'lon egasiga murojaat qilish orqali siz ushbu to'lovga rozilik bildirasiz.",
+  no: "👉 Bu e'lon faqat shu guruhga qo'yildi.\n👉 Bu e'lon uchun hech qanday komissiya olinmaydi.",
+};
+
 // ===========================================
 // DOM — TABS
 // ===========================================
@@ -44,7 +50,6 @@ const myPostsView = document.getElementById('myPostsView');
 const myPostsBadge = document.getElementById('myPostsBadge');
 const myPostsList = document.getElementById('myPostsList');
 const emptyPosts = document.getElementById('emptyPosts');
-const lotteryTickets = document.getElementById('lotteryTickets');
 
 const postFormState = document.getElementById('postFormState');
 const postLoadingState = document.getElementById('postLoadingState');
@@ -58,6 +63,7 @@ const postAgainBtn = document.getElementById('postAgainBtn');
 const viewPostsBtn = document.getElementById('viewPostsBtn');
 const postErrorRetryBtn = document.getElementById('postErrorRetryBtn');
 const postErrorText = document.getElementById('postErrorText');
+const successChip = document.getElementById('successChip');
 
 const contactAuto = document.getElementById('contactAuto');
 const contactManual = document.getElementById('contactManual');
@@ -66,6 +72,11 @@ const contactLabel = document.getElementById('contactLabel');
 const contactToggleBtn = document.getElementById('contactToggleBtn');
 const contactBackBtn = document.getElementById('contactBackBtn');
 const agreementCheckbox = document.getElementById('agreementCheckbox');
+
+const commissionOptions = document.getElementById('commissionOptions');
+const commissionRadios = document.querySelectorAll('input[name="commission"]');
+const commissionPreview = document.getElementById('commissionPreview');
+const commissionPreviewText = document.getElementById('commissionPreviewText');
 
 // ===========================================
 // STATE
@@ -85,6 +96,11 @@ let myPosts = [];
 
 function getUserId() {
   return tg.initDataUnsafe?.user?.id;
+}
+
+function getCommissionChoice() {
+  const checked = document.querySelector('input[name="commission"]:checked');
+  return checked ? checked.value : null;
 }
 
 // ===========================================
@@ -159,11 +175,11 @@ async function fetchMyPosts() {
         text: p.message,
         contact: p.contact,
         status: p.status,
+        commission: p.commission !== false,
         created_at: p.created_at,
         reserved_at: p.reserved_at,
         finished_at: p.finished_at,
       }));
-      lotteryTickets.textContent = `Sizda: ${data.lottery_tickets} ta chipta`;
     }
   } catch (e) {
     console.error('Failed to fetch posts:', e);
@@ -268,7 +284,7 @@ function initContactField() {
     contactBackBtn.style.display = 'none'; useManualContact = false;
   } else {
     contactAuto.style.display = 'none'; contactManual.style.display = 'block';
-    contactLabel.innerHTML = 'Bog\'lanish uchun kontakt: <span class="optional-tag" style="color:#e65100;font-weight:600;">majburiy</span>';
+    contactLabel.innerHTML = 'Bog\'lanish uchun kontakt: <span class="label-req">majburiy</span>';
     postContact.placeholder = 'Tel raqam yoki Telegram username kiriting';
   }
 }
@@ -283,13 +299,36 @@ contactBackBtn.addEventListener('click', () => {
 });
 
 // ===========================================
+// TAB 2 — COMMISSION CHOICE
+// ===========================================
+function updateCommissionUI() {
+  const choice = getCommissionChoice();
+  commissionOptions.querySelectorAll('.commission-option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.value === choice);
+  });
+  if (choice) {
+    commissionPreviewText.textContent = FOOTNOTE_PREVIEW[choice];
+    commissionPreview.style.display = 'block';
+  } else {
+    commissionPreview.style.display = 'none';
+  }
+}
+
+commissionRadios.forEach(radio => radio.addEventListener('change', () => {
+  updateCommissionUI();
+  if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+  validateForm();
+}));
+
+// ===========================================
 // TAB 2 — FORM VALIDATION
 // ===========================================
 function validateForm() {
   const hasMsg = postMessage.value.trim().length >= 10;
   const hasContact = (userHasUsername && !useManualContact) || postContact.value.trim().length >= 3;
+  const hasCommission = !!getCommissionChoice();
   const agreed = agreementCheckbox.checked;
-  postSubmitBtn.disabled = !(hasMsg && hasContact && agreed);
+  postSubmitBtn.disabled = !(hasMsg && hasContact && hasCommission && agreed);
 
   if (!postSubmitBtn.disabled) {
     const hint = document.querySelector('.submit-hint');
@@ -315,6 +354,9 @@ async function submitPost() {
   if (message.length < 10) return;
   let contact = (userHasUsername && !useManualContact) ? '@' + telegramUsername : postContact.value.trim();
   if (!contact || contact.length < 3) return;
+  const choice = getCommissionChoice();
+  if (!choice) return;
+  const commission = choice === 'yes';
   const userId = tg.initDataUnsafe?.user?.id;
   const userName = tg.initDataUnsafe?.user?.first_name || '';
   showPostState('loading');
@@ -322,15 +364,17 @@ async function submitPost() {
     if (!userId) throw new Error('Telegram foydalanuvchi ID topilmadi');
     const response = await fetch(`${API_BASE_URL}/api/group/post`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, user_name: userName, message, contact }),
+      body: JSON.stringify({ user_id: userId, user_name: userName, message, contact, commission }),
       signal: AbortSignal.timeout(15000)
     });
     if (!response.ok) { const d = await response.json().catch(() => ({})); throw new Error(d.message || `Server xatosi: ${response.status}`); }
     const data = await response.json();
     if (data.success) {
-      updateBadge();
+      successChip.textContent = commission ? '💰 Komissiyali e\'lon — 10,000 KRW' : '🤝 Komissiyasiz e\'lon';
+      successChip.classList.toggle('neutral', !commission);
       showPostState('success');
       if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      fetchMyPosts();
     } else throw new Error(data.message || "E'lon yuborishda xatolik");
   } catch (error) {
     postErrorText.textContent = error.message || "E'lon yuborishda xatolik yuz berdi";
@@ -344,6 +388,8 @@ function resetPostForm() {
   charCount.textContent = '0 / 1000'; charCount.classList.remove('near-limit', 'at-limit');
   postSubmitBtn.disabled = true; useManualContact = false;
   agreementCheckbox.checked = false;
+  commissionRadios.forEach(r => { r.checked = false; });
+  updateCommissionUI();
   initContactField();
   showPostState('form');
 }
@@ -384,10 +430,7 @@ function finishTimeLeft(post) {
 }
 
 function updateBadge() {
-  const active = myPosts.filter(p => p.status !== 'finished').length;
   myPostsBadge.textContent = myPosts.length;
-  const tickets = myPosts.filter(p => p.status === 'finished').length;
-  if (lotteryTickets) lotteryTickets.textContent = `Sizda: ${data.lottery_tickets} ta chipta`;
 }
 
 function renderMyPosts() {
@@ -416,8 +459,12 @@ function renderMyPosts() {
         ${hint}
       `;
     } else {
-      actions = `<div class="ticket-earned">🎟 Lotereya chiptasiga qo'shildi</div>`;
+      actions = `<div class="post-done-note">✅ Ish bajarildi</div>`;
     }
+
+    const commissionChip = post.commission
+      ? `<span class="commission-chip">💰 10,000 KRW</span>`
+      : `<span class="commission-chip none">🤝 Komissiyasiz</span>`;
 
     return `
       <div class="my-post-card status-${post.status}">
@@ -426,6 +473,7 @@ function renderMyPosts() {
           <span class="status-badge ${post.status}">${statusLabels[post.status]}</span>
         </div>
         <div class="my-post-body">${escapeHtml(post.text)}</div>
+        <div class="my-post-meta">${commissionChip}</div>
         <div class="my-post-actions">${actions}</div>
       </div>
     `;
@@ -540,11 +588,13 @@ postSubmitBtn.parentElement.addEventListener('click', (e) => {
   if (!postSubmitBtn.disabled) return;
   const hasMsg = postMessage.value.trim().length >= 10;
   const hasContact = (userHasUsername && !useManualContact) || postContact.value.trim().length >= 3;
+  const hasCommission = !!getCommissionChoice();
   const agreed = agreementCheckbox.checked;
 
   let hint = '';
   if (!hasMsg) hint = 'E\'lon matni kamida 10 belgi bo\'lishi kerak';
   else if (!hasContact) hint = 'Bog\'lanish uchun kontakt ma\'lumotini kiriting';
+  else if (!hasCommission) hint = 'Komissiya turini tanlang 💰';
   else if (!agreed) hint = 'Qoidalarga rozilik belgisini qo\'ying ☑️';
 
   if (hint) showSubmitHint(hint);
@@ -552,8 +602,7 @@ postSubmitBtn.parentElement.addEventListener('click', (e) => {
 
 function showSubmitHint(text) {
   const old = document.querySelector('.submit-hint');
-  if (old) old.textContent = text; // Just update text if already showing
-  if (old) return;
+  if (old) { old.textContent = text; return; }
 
   const hint = document.createElement('div');
   hint.className = 'submit-hint';
@@ -574,7 +623,9 @@ function initPage() {
   showState('initial');
   showPostState('form');
   initContactField();
+  updateCommissionUI();
   updateBadge();
+  fetchMyPosts();
   console.log('✅ Job Group page loaded');
 }
 document.addEventListener('DOMContentLoaded', initPage);
