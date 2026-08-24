@@ -1,4 +1,4 @@
-// job-group.js - Job Group: Join + Post + My Posts
+// job-group.js - Job Group: Join (landing) + Post sheet + My Posts
 
 const tg = window.Telegram.WebApp;
 tg.ready();
@@ -19,13 +19,9 @@ const FOOTNOTE_PREVIEW = {
 };
 
 // ===========================================
-// DOM — TABS
+// DOM — LANDING
 // ===========================================
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabSwipeTrack = document.getElementById('tabSwipeTrack');
-const tabSwipeContainer = document.getElementById('tabSwipeContainer');
-
-// DOM — TAB 1
+const joinPage = document.getElementById('joinPage');
 const initialState = document.getElementById('initialState');
 const loadingState = document.getElementById('loadingState');
 const linkState = document.getElementById('linkState');
@@ -42,7 +38,14 @@ const timerProgress = document.getElementById('timerProgress');
 const copyIcon = document.getElementById('copyIcon');
 const errorText = document.getElementById('errorText');
 
-// DOM — TAB 2
+// DOM — SHEET SHELL
+const fabBtn = document.getElementById('fabBtn');
+const postSheet = document.getElementById('postSheet');
+const sheetHead = document.getElementById('sheetHead');
+const sheetScroll = document.getElementById('sheetScroll');
+const sheetBackBtn = document.getElementById('sheetBackBtn');
+
+// DOM — POST / MY POSTS
 const subnavFormBtn = document.getElementById('subnavFormBtn');
 const subnavMyPostsBtn = document.getElementById('subnavMyPostsBtn');
 const postFormView = document.getElementById('postFormView');
@@ -50,20 +53,28 @@ const myPostsView = document.getElementById('myPostsView');
 const myPostsBadge = document.getElementById('myPostsBadge');
 const myPostsList = document.getElementById('myPostsList');
 const emptyPosts = document.getElementById('emptyPosts');
+const emptyCtaBtn = document.getElementById('emptyCtaBtn');
 
 const postFormState = document.getElementById('postFormState');
 const postLoadingState = document.getElementById('postLoadingState');
+const postLoadingText = document.getElementById('postLoadingText');
 const postSuccessState = document.getElementById('postSuccessState');
 const postErrorState = document.getElementById('postErrorState');
 const postMessage = document.getElementById('postMessage');
 const postContact = document.getElementById('postContact');
 const charCount = document.getElementById('charCount');
 const postSubmitBtn = document.getElementById('postSubmitBtn');
+const postSubmitText = document.getElementById('postSubmitText');
 const postAgainBtn = document.getElementById('postAgainBtn');
 const viewPostsBtn = document.getElementById('viewPostsBtn');
 const postErrorRetryBtn = document.getElementById('postErrorRetryBtn');
 const postErrorText = document.getElementById('postErrorText');
+const successTitle = document.getElementById('successTitle');
+const successText = document.getElementById('successText');
 const successChip = document.getElementById('successChip');
+
+const editBanner = document.getElementById('editBanner');
+const editCancelBtn = document.getElementById('editCancelBtn');
 
 const contactAuto = document.getElementById('contactAuto');
 const contactManual = document.getElementById('contactManual');
@@ -71,12 +82,18 @@ const contactUsername = document.getElementById('contactUsername');
 const contactLabel = document.getElementById('contactLabel');
 const contactToggleBtn = document.getElementById('contactToggleBtn');
 const contactBackBtn = document.getElementById('contactBackBtn');
+const agreementLabel = document.getElementById('agreementLabel');
 const agreementCheckbox = document.getElementById('agreementCheckbox');
 
 const commissionOptions = document.getElementById('commissionOptions');
 const commissionRadios = document.querySelectorAll('input[name="commission"]');
 const commissionPreview = document.getElementById('commissionPreview');
 const commissionPreviewText = document.getElementById('commissionPreviewText');
+
+const hiwHeader = document.getElementById('hiwHeader');
+const hiwBody = document.getElementById('hiwBody');
+const hiwToggle = document.getElementById('hiwToggle');
+const howItWorks = document.getElementById('howItWorks');
 
 // ===========================================
 // STATE
@@ -87,11 +104,8 @@ let timeRemaining = LINK_DURATION;
 let userHasUsername = false;
 let telegramUsername = null;
 let useManualContact = false;
-let activeTab = 0;
-
-// ===========================================
-// POSTS DATA (loaded from API)
-// ===========================================
+let sheetOpen = false;
+let editingPostId = null;
 let myPosts = [];
 
 function getUserId() {
@@ -104,49 +118,61 @@ function getCommissionChoice() {
 }
 
 // ===========================================
-// TAB SWITCHING + SWIPE
+// POST SHEET — OPEN / CLOSE
 // ===========================================
-function switchTab(index) {
-  activeTab = index;
-  tabSwipeTrack.style.transform = `translateX(-${index * 50}%)`;
-  tabBtns.forEach((b, i) => b.classList.toggle('active', i === index));
-  if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+function openSheet(view) {
+  sheetOpen = true;
+  postSheet.classList.add('open');
+  postSheet.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('sheet-open');
+  fabBtn.classList.add('hidden');
+  showSubView(view || 'form');
+  sheetScroll.scrollTop = 0;
+  if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 }
 
-tabBtns.forEach((btn, i) => btn.addEventListener('click', () => switchTab(i)));
+function closeSheet() {
+  sheetOpen = false;
+  postSheet.classList.remove('open');
+  postSheet.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('sheet-open');
+  fabBtn.classList.remove('hidden');
+  postSheet.style.transform = '';
+  if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
 
-let swipeStartX = 0, swipeStartY = 0, swiping = false, swipeDeltaX = 0;
-tabSwipeContainer.addEventListener('touchstart', (e) => {
-  swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY;
-  swiping = false; swipeDeltaX = 0;
+fabBtn.addEventListener('click', () => openSheet('form'));
+sheetBackBtn.addEventListener('click', closeSheet);
+
+// Swipe down on the sheet header to close it
+let dragStartY = 0, dragging = false, dragDeltaY = 0;
+sheetHead.addEventListener('touchstart', (e) => {
+  dragStartY = e.touches[0].clientY; dragging = true; dragDeltaY = 0;
+  postSheet.classList.add('no-transition');
 }, { passive: true });
 
-tabSwipeContainer.addEventListener('touchmove', (e) => {
-  const dx = e.touches[0].clientX - swipeStartX;
-  const dy = e.touches[0].clientY - swipeStartY;
-  if (!swiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-    swiping = true; tabSwipeTrack.classList.add('no-transition');
-  }
-  if (swiping) {
-    e.preventDefault(); swipeDeltaX = dx;
-    const pctDelta = (dx / tabSwipeContainer.offsetWidth) * 50;
-    const clamped = Math.max(-50, Math.min(0, -(activeTab * 50) + pctDelta));
-    tabSwipeTrack.style.transform = `translateX(${clamped}%)`;
-  }
-}, { passive: false });
+sheetHead.addEventListener('touchmove', (e) => {
+  if (!dragging) return;
+  dragDeltaY = Math.max(0, e.touches[0].clientY - dragStartY);
+  postSheet.style.transform = `translateY(${dragDeltaY}px)`;
+}, { passive: true });
 
-tabSwipeContainer.addEventListener('touchend', () => {
-  if (!swiping) return;
-  tabSwipeTrack.classList.remove('no-transition');
-  const threshold = tabSwipeContainer.offsetWidth * 0.2;
-  if (swipeDeltaX < -threshold && activeTab === 0) switchTab(1);
-  else if (swipeDeltaX > threshold && activeTab === 1) switchTab(0);
-  else tabSwipeTrack.style.transform = `translateX(-${activeTab * 50}%)`;
-  swiping = false; swipeDeltaX = 0;
+sheetHead.addEventListener('touchend', () => {
+  if (!dragging) return;
+  dragging = false;
+  postSheet.classList.remove('no-transition');
+  postSheet.style.transform = '';
+  if (dragDeltaY > 90) closeSheet();
+  dragDeltaY = 0;
+}, { passive: true });
+
+// Hide the FAB label while the landing page is scrolled down
+joinPage.addEventListener('scroll', () => {
+  fabBtn.classList.toggle('compact', joinPage.scrollTop > 40);
 }, { passive: true });
 
 // ===========================================
-// TAB 2 — SUB-NAV
+// SUB-NAV (inside the sheet)
 // ===========================================
 function showSubView(view) {
   if (view === 'form') {
@@ -161,6 +187,7 @@ function showSubView(view) {
     subnavMyPostsBtn.classList.add('active');
     fetchMyPosts();
   }
+  sheetScroll.scrollTop = 0;
 }
 
 async function fetchMyPosts() {
@@ -187,12 +214,13 @@ async function fetchMyPosts() {
   renderMyPosts();
 }
 
-subnavFormBtn.addEventListener('click', () => showSubView('form'));
+subnavFormBtn.addEventListener('click', () => { if (editingPostId) cancelEdit(); showSubView('form'); });
 subnavMyPostsBtn.addEventListener('click', () => showSubView('myPosts'));
 viewPostsBtn.addEventListener('click', () => showSubView('myPosts'));
+emptyCtaBtn.addEventListener('click', () => showSubView('form'));
 
 // ===========================================
-// TAB 1 — STATE MANAGEMENT
+// LANDING — STATE MANAGEMENT
 // ===========================================
 function showState(name) {
   [initialState, loadingState, linkState, expiredState, errorState].forEach(el => el.style.display = 'none');
@@ -204,6 +232,7 @@ function showPostState(name) {
   [postFormState, postLoadingState, postSuccessState, postErrorState].forEach(el => el.style.display = 'none');
   const map = { form: postFormState, loading: postLoadingState, success: postSuccessState, error: postErrorState };
   if (map[name]) map[name].style.display = 'block';
+  howItWorks.style.display = name === 'form' ? 'block' : 'none';
 }
 
 // ===========================================
@@ -228,7 +257,7 @@ function updateTimerDisplay() {
 function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 
 // ===========================================
-// TAB 1 — API
+// LANDING — API
 // ===========================================
 async function requestInviteLink() {
   showState('loading'); stopTimer();
@@ -273,7 +302,7 @@ async function copyLink() {
 }
 
 // ===========================================
-// TAB 2 — CONTACT FIELD
+// CONTACT FIELD
 // ===========================================
 function initContactField() {
   telegramUsername = tg.initDataUnsafe?.user?.username || null;
@@ -288,9 +317,15 @@ function initContactField() {
     postContact.placeholder = 'Tel raqam yoki Telegram username kiriting';
   }
 }
+function useManualContactField(value) {
+  useManualContact = true;
+  contactAuto.style.display = 'none';
+  contactManual.style.display = 'block';
+  contactBackBtn.style.display = userHasUsername ? 'flex' : 'none';
+  if (value !== undefined) postContact.value = value;
+}
 contactToggleBtn.addEventListener('click', () => {
-  useManualContact = true; contactAuto.style.display = 'none';
-  contactManual.style.display = 'block'; contactBackBtn.style.display = 'flex';
+  useManualContactField('');
   postContact.focus(); validateForm();
 });
 contactBackBtn.addEventListener('click', () => {
@@ -299,7 +334,7 @@ contactBackBtn.addEventListener('click', () => {
 });
 
 // ===========================================
-// TAB 2 — COMMISSION CHOICE
+// COMMISSION CHOICE
 // ===========================================
 function updateCommissionUI() {
   const choice = getCommissionChoice();
@@ -321,13 +356,13 @@ commissionRadios.forEach(radio => radio.addEventListener('change', () => {
 }));
 
 // ===========================================
-// TAB 2 — FORM VALIDATION
+// FORM VALIDATION
 // ===========================================
 function validateForm() {
   const hasMsg = postMessage.value.trim().length >= 10;
   const hasContact = (userHasUsername && !useManualContact) || postContact.value.trim().length >= 3;
   const hasCommission = !!getCommissionChoice();
-  const agreed = agreementCheckbox.checked;
+  const agreed = editingPostId ? true : agreementCheckbox.checked;
   postSubmitBtn.disabled = !(hasMsg && hasContact && hasCommission && agreed);
 
   if (!postSubmitBtn.disabled) {
@@ -347,35 +382,52 @@ postContact.addEventListener('input', validateForm);
 agreementCheckbox.addEventListener('change', validateForm);
 
 // ===========================================
-// TAB 2 — SUBMIT POST
+// SUBMIT — CREATE OR EDIT
 // ===========================================
+function currentContactValue() {
+  return (userHasUsername && !useManualContact) ? '@' + telegramUsername : postContact.value.trim();
+}
+
 async function submitPost() {
   const message = postMessage.value.trim();
   if (message.length < 10) return;
-  let contact = (userHasUsername && !useManualContact) ? '@' + telegramUsername : postContact.value.trim();
+  const contact = currentContactValue();
   if (!contact || contact.length < 3) return;
   const choice = getCommissionChoice();
   if (!choice) return;
   const commission = choice === 'yes';
-  const userId = tg.initDataUnsafe?.user?.id;
+  const userId = getUserId();
   const userName = tg.initDataUnsafe?.user?.first_name || '';
+  const isEdit = !!editingPostId;
+
+  postLoadingText.textContent = isEdit ? "O'zgarishlar saqlanmoqda..." : "E'lon yuborilmoqda...";
   showPostState('loading');
+
   try {
     if (!userId) throw new Error('Telegram foydalanuvchi ID topilmadi');
-    const response = await fetch(`${API_BASE_URL}/api/group/post`, {
+    const url = isEdit ? `${API_BASE_URL}/api/group/post/edit` : `${API_BASE_URL}/api/group/post`;
+    const payload = isEdit
+      ? { post_id: editingPostId, user_id: userId, message, contact, commission }
+      : { user_id: userId, user_name: userName, message, contact, commission };
+
+    const response = await fetch(url, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, user_name: userName, message, contact, commission }),
-      signal: AbortSignal.timeout(15000)
+      body: JSON.stringify(payload), signal: AbortSignal.timeout(15000)
     });
     if (!response.ok) { const d = await response.json().catch(() => ({})); throw new Error(d.message || `Server xatosi: ${response.status}`); }
     const data = await response.json();
-    if (data.success) {
-      successChip.textContent = commission ? '💰 Komissiyali e\'lon — 10,000 KRW' : '🤝 Komissiyasiz e\'lon';
-      successChip.classList.toggle('neutral', !commission);
-      showPostState('success');
-      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-      fetchMyPosts();
-    } else throw new Error(data.message || "E'lon yuborishda xatolik");
+    if (!data.success) throw new Error(data.message || "E'lon yuborishda xatolik");
+
+    successTitle.textContent = isEdit ? "E'lon yangilandi!" : "E'lon yuborildi!";
+    successText.textContent = isEdit
+      ? "O'zgarishlar guruhdagi xabarga ham qo'llanildi."
+      : "E'loningiz guruhga muvaffaqiyatli joylandi.";
+    successChip.textContent = commission ? '💰 Komissiyali e\'lon — 10,000 KRW' : '🤝 Komissiyasiz e\'lon';
+    successChip.classList.toggle('neutral', !commission);
+    exitEditMode();
+    showPostState('success');
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+    fetchMyPosts();
   } catch (error) {
     postErrorText.textContent = error.message || "E'lon yuborishda xatolik yuz berdi";
     showPostState('error');
@@ -384,6 +436,7 @@ async function submitPost() {
 }
 
 function resetPostForm() {
+  exitEditMode();
   postMessage.value = ''; postContact.value = '';
   charCount.textContent = '0 / 1000'; charCount.classList.remove('near-limit', 'at-limit');
   postSubmitBtn.disabled = true; useManualContact = false;
@@ -393,6 +446,45 @@ function resetPostForm() {
   initContactField();
   showPostState('form');
 }
+
+// ===========================================
+// EDIT MODE
+// ===========================================
+function enterEditMode(post) {
+  editingPostId = post.id;
+  editBanner.style.display = 'flex';
+  agreementLabel.style.display = 'none';
+  postSubmitText.textContent = "O'zgarishlarni saqlash";
+
+  postMessage.value = post.text;
+  charCount.textContent = `${post.text.length} / 1000`;
+
+  initContactField();
+  if (!(userHasUsername && post.contact === '@' + telegramUsername)) {
+    useManualContactField(post.contact);
+  }
+
+  const radio = post.commission ? document.getElementById('commissionYes') : document.getElementById('commissionNo');
+  radio.checked = true;
+  updateCommissionUI();
+
+  showSubView('form');
+  showPostState('form');
+  validateForm();
+}
+
+function exitEditMode() {
+  editingPostId = null;
+  editBanner.style.display = 'none';
+  agreementLabel.style.display = 'flex';
+  postSubmitText.textContent = "E'lonni joylash";
+}
+
+function cancelEdit() {
+  resetPostForm();
+}
+
+editCancelBtn.addEventListener('click', () => { cancelEdit(); showSubView('myPosts'); });
 
 // ===========================================
 // MY POSTS — RENDERING
@@ -445,22 +537,26 @@ function renderMyPosts() {
   const statusLabels = { available: '🟢 Faol', reserved: '🟡 Band', finished: '✅ Bajarildi' };
 
   myPostsList.innerHTML = myPosts.map(post => {
-    let actions = '';
+    let primary = '';
+    let hint = '';
+
     if (post.status === 'available') {
-      actions = `<div class="my-post-actions-row"><button class="post-action-btn reserve" onclick="confirmAction('${post.id}','reserve')">🟡 Band qilish</button></div>`;
+      primary = `<button class="post-action-btn reserve" onclick="confirmAction('${post.id}','reserve')">🟡 Band qilish</button>`;
     } else if (post.status === 'reserved') {
       const can = canFinish(post);
-      const hint = can ? '' : `<div class="finish-hint">⏳ Yakunlash uchun: ${finishTimeLeft(post)}</div>`;
-      actions = `
-        <div class="my-post-actions-row">
-          <button class="post-action-btn reopen" onclick="confirmAction('${post.id}','reopen')">↩️ Faol qilish</button>
-          <button class="post-action-btn finish" ${can ? '' : 'disabled'} onclick="confirmAction('${post.id}','finish')">✅ Yakunlash</button>
-        </div>
-        ${hint}
+      if (!can) hint = `<div class="finish-hint">⏳ Yakunlash uchun: ${finishTimeLeft(post)}</div>`;
+      primary = `
+        <button class="post-action-btn reopen" onclick="confirmAction('${post.id}','reopen')">↩️ Faol qilish</button>
+        <button class="post-action-btn finish" ${can ? '' : 'disabled'} onclick="confirmAction('${post.id}','finish')">✅ Yakunlash</button>
       `;
     } else {
-      actions = `<div class="post-done-note">✅ Ish bajarildi</div>`;
+      primary = `<div class="post-done-note">✅ Ish bajarildi</div>`;
     }
+
+    // Editing rewrites the group message, so it is offered only while the post is still open.
+    const editBtn = post.status === 'available'
+      ? `<button class="post-icon-btn" onclick="startEdit('${post.id}')">✏️ Tahrirlash</button>`
+      : '';
 
     const commissionChip = post.commission
       ? `<span class="commission-chip">💰 10,000 KRW</span>`
@@ -474,7 +570,14 @@ function renderMyPosts() {
         </div>
         <div class="my-post-body">${escapeHtml(post.text)}</div>
         <div class="my-post-meta">${commissionChip}</div>
-        <div class="my-post-actions">${actions}</div>
+        <div class="my-post-actions">
+          <div class="my-post-actions-row">${primary}</div>
+          ${hint}
+          <div class="my-post-actions-row secondary">
+            ${editBtn}
+            <button class="post-icon-btn danger" onclick="confirmAction('${post.id}','delete')">🗑 O'chirish</button>
+          </div>
+        </div>
       </div>
     `;
   }).join('');
@@ -486,16 +589,29 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function startEdit(postId) {
+  const post = myPosts.find(p => String(p.id) === String(postId));
+  if (!post) return;
+  if (post.status !== 'available') {
+    alert("Faqat faol e'lonni tahrirlash mumkin");
+    return;
+  }
+  enterEditMode(post);
+  if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+
 // ===========================================
 // CONFIRMATION MODAL
 // ===========================================
 function confirmAction(postId, action) {
   const messages = {
-    reserve: { title: 'Band qilish', text: 'Ishchi topildimi? E\'lonni band sifatida belgilashni xohlaysizmi?' },
-    reopen: { title: 'Qayta faollashtirish', text: 'E\'lonni qayta faol holatga o\'tkazmoqchimisiz?' },
-    finish: { title: 'Yakunlash', text: 'Ish bajarildi deb belgilamoqchimisiz? Bu qaytarib bo\'lmaydi.' },
+    reserve: { title: 'Band qilish', text: 'Ishchi topildimi? E\'lonni band sifatida belgilashni xohlaysizmi?', yes: 'Ha' },
+    reopen: { title: 'Qayta faollashtirish', text: 'E\'lonni qayta faol holatga o\'tkazmoqchimisiz?', yes: 'Ha' },
+    finish: { title: 'Yakunlash', text: 'Ish bajarildi deb belgilamoqchimisiz? Bu qaytarib bo\'lmaydi.', yes: 'Ha' },
+    delete: { title: "E'lonni o'chirish", text: "E'lon guruhdan ham, ro'yxatingizdan ham butunlay o'chiriladi. Davom etasizmi?", yes: "O'chirish", danger: true },
   };
   const msg = messages[action];
+  if (!msg) return;
 
   const overlay = document.createElement('div');
   overlay.className = 'confirm-overlay';
@@ -505,7 +621,7 @@ function confirmAction(postId, action) {
       <p class="confirm-text">${msg.text}</p>
       <div class="confirm-actions">
         <button class="confirm-btn cancel" id="confirmCancel">Bekor qilish</button>
-        <button class="confirm-btn yes" id="confirmYes">Ha</button>
+        <button class="confirm-btn yes ${msg.danger ? 'danger' : ''}" id="confirmYes">${msg.yes}</button>
       </div>
     </div>
   `;
@@ -522,6 +638,8 @@ function confirmAction(postId, action) {
 async function executeAction(postId, action) {
   const userId = getUserId();
   if (!userId) return;
+
+  if (action === 'delete') return deletePost(postId, userId);
 
   const statusMap = { reserve: 'reserved', reopen: 'available', finish: 'finished' };
   const newStatus = statusMap[action];
@@ -550,13 +668,34 @@ async function executeAction(postId, action) {
   }
 }
 
+async function deletePost(postId, userId) {
+  try {
+    const resp = await fetch(`${API_BASE_URL}/api/group/post/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: postId, user_id: userId }),
+      signal: AbortSignal.timeout(10000),
+    });
+    const data = await resp.json();
+
+    if (data.success) {
+      if (editingPostId && String(editingPostId) === String(postId)) resetPostForm();
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      await fetchMyPosts();
+    } else {
+      alert(data.message || "O'chirishda xatolik");
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+    }
+  } catch (e) {
+    console.error('Delete error:', e);
+    alert("Tarmoq xatosi. Qayta urinib ko'ring.");
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+  }
+}
+
 // ===========================================
 // HOW IT WORKS — COLLAPSIBLE
 // ===========================================
-const hiwHeader = document.getElementById('hiwHeader');
-const hiwBody = document.getElementById('hiwBody');
-const hiwToggle = document.getElementById('hiwToggle');
-
 hiwHeader.addEventListener('click', () => {
   const isOpen = hiwBody.classList.toggle('open');
   hiwToggle.classList.toggle('open', isOpen);
@@ -564,14 +703,22 @@ hiwHeader.addEventListener('click', () => {
 });
 
 // ===========================================
-// BACK BUTTON
+// BACK BUTTON — closes the sheet first, then leaves the page
 // ===========================================
 try {
   if (tg.BackButton) {
     tg.BackButton.show();
-    tg.BackButton.onClick(() => { stopTimer(); window.location.href = '../../index.html'; });
+    tg.BackButton.onClick(() => {
+      if (sheetOpen) { closeSheet(); return; }
+      stopTimer();
+      window.location.href = '../../index.html';
+    });
   }
 } catch (e) {}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && sheetOpen) closeSheet();
+});
 
 // ===========================================
 // EVENT LISTENERS
@@ -583,13 +730,13 @@ copyLinkBtn.addEventListener('click', copyLink);
 joinBtn.addEventListener('click', () => {});
 postSubmitBtn.addEventListener('click', submitPost);
 
-// Show hint when tapping disabled submit button
+// Show hint when tapping the disabled submit button
 postSubmitBtn.parentElement.addEventListener('click', (e) => {
   if (!postSubmitBtn.disabled) return;
   const hasMsg = postMessage.value.trim().length >= 10;
   const hasContact = (userHasUsername && !useManualContact) || postContact.value.trim().length >= 3;
   const hasCommission = !!getCommissionChoice();
-  const agreed = agreementCheckbox.checked;
+  const agreed = editingPostId ? true : agreementCheckbox.checked;
 
   let hint = '';
   if (!hasMsg) hint = 'E\'lon matni kamida 10 belgi bo\'lishi kerak';

@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Ish E'lonlari Guruhi</title>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="job-group.css" />
@@ -21,238 +21,237 @@
     </a>
   </header>
 
-  <!-- TAB BAR -->
-  <div class="tab-bar">
-    <button class="tab-btn active" data-tab="join">
-      <span class="tab-icon">🔗</span>
-      <span class="tab-label">Guruhga qo'shilish</span>
-    </button>
-    <button class="tab-btn" data-tab="post">
-      <span class="tab-icon">✍️</span>
-      <span class="tab-label">E'lon joylash</span>
-    </button>
-    <div class="tab-indicator"></div>
-  </div>
-
-  <!-- SWIPE CONTAINER -->
-  <div class="tab-swipe-container" id="tabSwipeContainer">
-    <div class="tab-swipe-track" id="tabSwipeTrack">
-
-      <!-- TAB 1: JOIN GROUP -->
-      <div class="tab-panel" id="tabJoin">
-        <div class="job-group-container">
-          <div class="job-hero">
-            <h2 class="hero-title">Ish E'lonlari Guruhi</h2>
-            <p class="hero-subtitle">Bot foydalanuvchilari uchun maxsus xizmat</p>
-          </div>
-          <div class="info-card">
-            <h3 class="info-title">🤖 Bot tomonidan:</h3>
-            <ul class="info-list">
-              <li><span class="check-icon">✔️</span><span>50 dan ortiq ish e'lon guruhlari sizning o'rningizga <strong>kunda 24 soat</strong> kuzatib boriladi</span></li>
-              <li><span class="check-icon">✔️</span><span>Faqat <strong>ish bilan bog'liq bo'lgan e'lonlar</strong> ajratib olinadi</span></li>
-              <li><span class="check-icon">✔️</span><span>Barcha ajratib olingan e'lonlar shu zahoti <strong>"Ish e'lonlari"</strong> guruhida e'lon qilib boriladi</span></li>
-            </ul>
-          </div>
-          <div class="action-section" id="initialState">
-            <div class="action-card">
-              <p class="action-text">📨 <strong>"Ish e'lonlari"</strong> guruhiga qo'shilish linkini olish uchun quyidagi tugmani bosing</p>
-              <button class="get-link-btn" id="getLinkBtn"><span class="btn-icon">🔗</span><span class="btn-text">Guruh linkini olish</span></button>
-            </div>
-          </div>
-          <div class="action-section" id="loadingState" style="display:none;">
-            <div class="loading-card"><div class="loading-spinner"></div><p class="loading-text">Link yaratilmoqda...</p></div>
-          </div>
-          <div class="action-section" id="linkState" style="display:none;">
-            <div class="link-card">
-              <div class="timer-section">
-                <div class="timer-circle"><svg class="timer-svg" viewBox="0 0 100 100"><circle class="timer-bg" cx="50" cy="50" r="45"></circle><circle class="timer-progress" id="timerProgress" cx="50" cy="50" r="45"></circle></svg><span class="timer-text" id="timerText">10</span></div>
-                <p class="timer-label">soniya qoldi</p>
-              </div>
-              <div class="link-display">
-                <p class="link-label">Sizning havolangiz:</p>
-                <div class="link-box"><span class="link-text" id="linkText">https://t.me/+ABC123xyz</span><button class="copy-link-btn" id="copyLinkBtn"><span id="copyIcon">📋</span></button></div>
-              </div>
-              <a class="join-btn" id="joinBtn" href="#" target="_blank"><span class="join-icon">🚀</span><span class="join-text">Guruhga qo'shilish</span></a>
-              <div class="warning-box"><span class="warning-icon">⚠️</span><span class="warning-text">Diqqat! Havola faqat <strong>15 soniya</strong> davomida amal qiladi. Shoshiling!</span></div>
-            </div>
-          </div>
-          <div class="action-section" id="expiredState" style="display:none;">
-            <div class="expired-card"><div class="expired-icon">⏰</div><h3 class="expired-title">Havola muddati tugadi</h3><p class="expired-text">Yangi havola olish uchun quyidagi tugmani bosing</p><button class="retry-btn" id="retryBtn"><span class="btn-icon">🔄</span><span class="btn-text">Qayta urinish</span></button></div>
-          </div>
-          <div class="action-section" id="errorState" style="display:none;">
-            <div class="error-card"><div class="error-icon">❌</div><h3 class="error-title">Xatolik yuz berdi</h3><p class="error-text" id="errorText">Link yaratishda xatolik.</p><button class="retry-btn" id="errorRetryBtn"><span class="btn-icon">🔄</span><span class="btn-text">Qayta urinish</span></button></div>
-          </div>
+  <!-- ===========================
+       LANDING — JOIN GROUP
+       =========================== -->
+  <main class="page-scroll" id="joinPage">
+    <div class="job-group-container">
+      <div class="job-hero">
+        <h2 class="hero-title">Ish E'lonlari Guruhi</h2>
+        <p class="hero-subtitle">Bot foydalanuvchilari uchun maxsus xizmat</p>
+      </div>
+      <div class="info-card">
+        <h3 class="info-title">🤖 Bot tomonidan:</h3>
+        <ul class="info-list">
+          <li><span class="check-icon">✔️</span><span>50 dan ortiq ish e'lon guruhlari sizning o'rningizga <strong>kunda 24 soat</strong> kuzatib boriladi</span></li>
+          <li><span class="check-icon">✔️</span><span>Faqat <strong>ish bilan bog'liq bo'lgan e'lonlar</strong> ajratib olinadi</span></li>
+          <li><span class="check-icon">✔️</span><span>Barcha ajratib olingan e'lonlar shu zahoti <strong>"Ish e'lonlari"</strong> guruhida e'lon qilib boriladi</span></li>
+        </ul>
+      </div>
+      <div class="action-section" id="initialState">
+        <div class="action-card">
+          <p class="action-text">📨 <strong>"Ish e'lonlari"</strong> guruhiga qo'shilish linkini olish uchun quyidagi tugmani bosing</p>
+          <button class="get-link-btn" id="getLinkBtn"><span class="btn-icon">🔗</span><span class="btn-text">Guruh linkini olish</span></button>
         </div>
       </div>
-
-      <!-- TAB 2: POST JOB -->
-      <div class="tab-panel" id="tabPost">
-        <div class="job-group-container">
-
-          <!-- Sub-nav -->
-          <div class="post-subnav">
-            <button class="subnav-btn active" id="subnavFormBtn">✍️ Yangi e'lon</button>
-            <button class="subnav-btn" id="subnavMyPostsBtn">📋 E'lonlarim <span class="subnav-badge" id="myPostsBadge">0</span></button>
+      <div class="action-section" id="loadingState" style="display:none;">
+        <div class="loading-card"><div class="loading-spinner"></div><p class="loading-text">Link yaratilmoqda...</p></div>
+      </div>
+      <div class="action-section" id="linkState" style="display:none;">
+        <div class="link-card">
+          <div class="timer-section">
+            <div class="timer-circle"><svg class="timer-svg" viewBox="0 0 100 100"><circle class="timer-bg" cx="50" cy="50" r="45"></circle><circle class="timer-progress" id="timerProgress" cx="50" cy="50" r="45"></circle></svg><span class="timer-text" id="timerText">10</span></div>
+            <p class="timer-label">soniya qoldi</p>
           </div>
-
-          <!-- SUB-VIEW A: Post Form -->
-          <div id="postFormView">
-
-            <!-- How It Works (collapsible) -->
-            <div class="how-it-works" id="howItWorks">
-              <div class="hiw-header" id="hiwHeader">
-                <span class="hiw-title">📌 Bu qanday ishlaydi?</span>
-                <span class="hiw-toggle" id="hiwToggle">▼</span>
-              </div>
-              <div class="hiw-body" id="hiwBody">
-                <div class="hiw-steps">
-                  <div class="hiw-step">
-                    <span class="hiw-step-num">1</span>
-                    <span class="hiw-step-text">Ish e'loningizni yozing va <strong>komissiya turini</strong> tanlang</span>
-                  </div>
-                  <div class="hiw-step">
-                    <span class="hiw-step-num">2</span>
-                    <span class="hiw-step-text">E'loningiz faqat <strong>bot guruhiga</strong> joylanadi. Foydalanuvchilar siz bilan tez orada bog'lanishadi</span>
-                  </div>
-                  <div class="hiw-step">
-                    <span class="hiw-step-num">3</span>
-                    <span class="hiw-step-text">Odam topilgach, e'lonni <strong>"Band"</strong> deb belgilang</span>
-                  </div>
-                </div>
-                <div class="hiw-highlight">
-                  <div class="hiw-highlight-row">
-                    <span class="hiw-highlight-icon">💰</span>
-                    <span class="hiw-highlight-text">Komissiya <strong>ixtiyoriy</strong> — o'zingiz tanlaysiz. Tanlasangiz, ishni olgan har bir kishi sizga bir martalik <strong>10,000 KRW</strong> to'laydi</span>
-                  </div>
-                  <div class="hiw-highlight-row">
-                    <span class="hiw-highlight-icon">📌</span>
-                    <span class="hiw-highlight-text">Sharti: E'lon faqat <strong>bot guruhida</strong> e'lon qilinib, boshqa guruhlarga joylanmasligi kerak</span>
-                  </div>
-                  <div class="hiw-highlight-row">
-                    <span class="hiw-highlight-icon">⏳</span>
-                    <span class="hiw-highlight-text">Agar 2-3 soat ichida odam topilmasa, boshqa guruhlarda e'lon qilishingiz mumkin</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="action-section" id="postFormState">
-              <div class="post-card">
-                <div class="post-field">
-                  <label class="post-label" for="postMessage">E'lon matni</label>
-                  <div class="textarea-wrapper">
-                    <textarea id="postMessage" class="post-textarea" placeholder="Restoranga oshpaz kerak&#10;📍 Manzil: 강남 서울시&#10;👥 2 kishi&#10;🕐 09:00 – 18:00&#10;💰 Maosh: 3,000,000 won&#10;📋 Tajriba talab qilinadi" rows="5" maxlength="1000"></textarea>
-                    <span class="char-count" id="charCount">0 / 1000</span>
-                  </div>
-                  <div class="post-hints">
-                    <span class="hints-label">Xabarda qo'shsangiz yaxshi:</span>
-                    <div class="hint-chips">
-                      <span class="hint-chip">📍 Manzil</span>
-                      <span class="hint-chip">👥 Necha kishi</span>
-                      <span class="hint-chip">🕐 Ish vaqti</span>
-                      <span class="hint-chip">💰 Puli</span>
-                      <span class="hint-chip">📋 Talablari</span>
-                      <span class="hint-chip">ℹ️ Qo'shimchalar</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="post-field" id="contactField">
-                  <label class="post-label" id="contactLabel">Bog'lanish uchun</label>
-                  <div class="contact-auto" id="contactAuto" style="display:none;">
-                    <div class="contact-username-box"><span class="contact-prefix">@</span><span class="contact-username" id="contactUsername"></span><span class="contact-badge">Telegram</span></div>
-                    <button class="contact-toggle-btn" id="contactToggleBtn" type="button"><span>🔄</span><span id="contactToggleText">Yoki telefon raqamni kiritish</span></button>
-                  </div>
-                  <div class="contact-manual" id="contactManual" style="display:none;">
-                    <input type="text" id="postContact" class="post-input" placeholder="Tel raqam yoki Telegram username" maxlength="100" />
-                    <button class="contact-toggle-btn" id="contactBackBtn" type="button" style="display:none;"><span>↩️</span><span>Telegram username ishlatish</span></button>
-                  </div>
-                </div>
-
-                <!-- Commission choice -->
-                <div class="post-field" id="commissionField">
-                  <label class="post-label">
-                    Komissiya
-                    <span class="label-req">tanlang</span>
-                  </label>
-                  <div class="commission-options" id="commissionOptions" role="radiogroup" aria-label="Komissiya turi">
-
-                    <label class="commission-option" data-value="yes">
-                      <input type="radio" name="commission" value="yes" id="commissionYes" />
-                      <span class="co-radio" aria-hidden="true"></span>
-                      <span class="co-body">
-                        <span class="co-head">
-                          <span class="co-title">💰 Komissiyali</span>
-                          <span class="co-tag">10,000 KRW</span>
-                        </span>
-                        <span class="co-desc">Ishni olgan har bir kishi sizga <strong>bir martalik</strong> 10,000 KRW to'laydi.</span>
-                      </span>
-                    </label>
-
-                    <label class="commission-option" data-value="no">
-                      <input type="radio" name="commission" value="no" id="commissionNo" />
-                      <span class="co-radio" aria-hidden="true"></span>
-                      <span class="co-body">
-                        <span class="co-head">
-                          <span class="co-title">🤝 Komissiyasiz</span>
-                          <span class="co-tag neutral">Bepul</span>
-                        </span>
-                        <span class="co-desc">Hech qanday to'lov talab qilinmaydi — faqat e'lon joylanadi.</span>
-                      </span>
-                    </label>
-
-                  </div>
-
-                  <div class="commission-preview" id="commissionPreview" style="display:none;">
-                    <span class="cp-label">👁 E'lon ostida shunday ko'rinadi:</span>
-                    <div class="cp-body" id="commissionPreviewText"></div>
-                  </div>
-                </div>
-
-                <!-- Agreement Checkbox -->
-                <label class="agreement-check" id="agreementLabel">
-                  <input type="checkbox" id="agreementCheckbox" />
-                  <span class="agreement-checkmark"></span>
-                  <span class="agreement-text">Ushbu xabar <strong>ish bilan bog'liq</strong> e'lonligini tasdiqlayman va boshqa Telegram guruhlarga 2-3 soat ichida <strong>joylamayman.</strong></span>
-                </label>
-
-                <button class="post-submit-btn" id="postSubmitBtn" disabled><span class="btn-icon">📤</span><span class="btn-text">E'lonni joylash</span></button>
-                <div class="post-guidelines"><span class="guidelines-icon">⚠️</span><span class="guidelines-text">Reklama, shaxsiy xabarlar yoki ish bilan bog'liq bo'lmagan e'lonlar davomiy qo'ygan foydalanuvchi bloklanadi.</span></div>
-              </div>
-            </div>
-
-            <div class="action-section" id="postLoadingState" style="display:none;">
-              <div class="loading-card"><div class="loading-spinner"></div><p class="loading-text">E'lon yuborilmoqda...</p></div>
-            </div>
-            <div class="action-section" id="postSuccessState" style="display:none;">
-              <div class="success-card">
-                <div class="success-icon">✅</div>
-                <h3 class="success-title">E'lon yuborildi!</h3>
-                <p class="success-text">E'loningiz guruhga muvaffaqiyatli joylandi.</p>
-                <div class="success-chip" id="successChip"></div>
-                <button class="post-again-btn" id="postAgainBtn"><span class="btn-icon">✍️</span><span class="btn-text">Yana e'lon joylash</span></button>
-                <button class="view-posts-btn" id="viewPostsBtn"><span class="btn-icon">📋</span><span class="btn-text">E'lonlarim</span></button>
-              </div>
-            </div>
-            <div class="action-section" id="postErrorState" style="display:none;">
-              <div class="error-card"><div class="error-icon">❌</div><h3 class="error-title">Xatolik yuz berdi</h3><p class="error-text" id="postErrorText">E'lon yuborishda xatolik.</p><button class="retry-btn" id="postErrorRetryBtn"><span class="btn-icon">🔄</span><span class="btn-text">Qayta urinish</span></button></div>
-            </div>
+          <div class="link-display">
+            <p class="link-label">Sizning havolangiz:</p>
+            <div class="link-box"><span class="link-text" id="linkText">https://t.me/+ABC123xyz</span><button class="copy-link-btn" id="copyLinkBtn"><span id="copyIcon">📋</span></button></div>
           </div>
-
-          <!-- SUB-VIEW B: My Posts -->
-          <div id="myPostsView" style="display:none;">
-            <div id="myPostsList"></div>
-            <div class="empty-posts" id="emptyPosts" style="display:none;">
-              <div class="empty-icon">📭</div>
-              <p class="empty-text">Hali e'lon joylamadingiz</p>
-            </div>
-          </div>
-
+          <a class="join-btn" id="joinBtn" href="#" target="_blank"><span class="join-icon">🚀</span><span class="join-text">Guruhga qo'shilish</span></a>
+          <div class="warning-box"><span class="warning-icon">⚠️</span><span class="warning-text">Diqqat! Havola faqat <strong>15 soniya</strong> davomida amal qiladi. Shoshiling!</span></div>
         </div>
       </div>
-
+      <div class="action-section" id="expiredState" style="display:none;">
+        <div class="expired-card"><div class="expired-icon">⏰</div><h3 class="expired-title">Havola muddati tugadi</h3><p class="expired-text">Yangi havola olish uchun quyidagi tugmani bosing</p><button class="retry-btn" id="retryBtn"><span class="btn-icon">🔄</span><span class="btn-text">Qayta urinish</span></button></div>
+      </div>
+      <div class="action-section" id="errorState" style="display:none;">
+        <div class="error-card"><div class="error-icon">❌</div><h3 class="error-title">Xatolik yuz berdi</h3><p class="error-text" id="errorText">Link yaratishda xatolik.</p><button class="retry-btn" id="errorRetryBtn"><span class="btn-icon">🔄</span><span class="btn-text">Qayta urinish</span></button></div>
+      </div>
+      <div class="fab-spacer"></div>
     </div>
-  </div>
+  </main>
+
+  <!-- FLOATING ACTION BUTTON -->
+  <button class="fab" id="fabBtn" type="button" aria-label="E'lon joylash" aria-controls="postSheet">
+    <span class="fab-icon">✍️</span>
+    <span class="fab-label">E'lon joylash</span>
+  </button>
+
+  <!-- ===========================
+       POST SHEET
+       =========================== -->
+  <section class="post-sheet" id="postSheet" aria-hidden="true">
+    <div class="sheet-head" id="sheetHead">
+      <span class="sheet-grabber" aria-hidden="true"></span>
+      <div class="sheet-bar">
+        <button class="sheet-back" id="sheetBackBtn" type="button" aria-label="Orqaga">←</button>
+        <span class="sheet-title">E'lon joylash</span>
+        <span class="sheet-spacer"></span>
+      </div>
+    </div>
+
+    <div class="sheet-scroll" id="sheetScroll">
+      <div class="job-group-container">
+
+        <!-- Sub-nav -->
+        <div class="post-subnav">
+          <button class="subnav-btn active" id="subnavFormBtn" type="button">✍️ Yangi e'lon</button>
+          <button class="subnav-btn" id="subnavMyPostsBtn" type="button">📋 E'lonlarim <span class="subnav-badge" id="myPostsBadge">0</span></button>
+        </div>
+
+        <!-- SUB-VIEW A: Post Form -->
+        <div id="postFormView">
+
+          <!-- How It Works (collapsible) -->
+          <div class="how-it-works" id="howItWorks">
+            <div class="hiw-header" id="hiwHeader">
+              <span class="hiw-title">📌 Bu qanday ishlaydi?</span>
+              <span class="hiw-toggle" id="hiwToggle">▼</span>
+            </div>
+            <div class="hiw-body" id="hiwBody">
+              <div class="hiw-steps">
+                <div class="hiw-step">
+                  <span class="hiw-step-num">1</span>
+                  <span class="hiw-step-text">Ish e'loningizni yozing va <strong>komissiya turini</strong> tanlang</span>
+                </div>
+                <div class="hiw-step">
+                  <span class="hiw-step-num">2</span>
+                  <span class="hiw-step-text">E'loningiz faqat <strong>bot guruhiga</strong> joylanadi. Foydalanuvchilar siz bilan tez orada bog'lanishadi</span>
+                </div>
+                <div class="hiw-step">
+                  <span class="hiw-step-num">3</span>
+                  <span class="hiw-step-text">Odam topilgach, e'lonni <strong>"Band"</strong> deb belgilang</span>
+                </div>
+              </div>
+              <div class="hiw-highlight">
+                <div class="hiw-highlight-row">
+                  <span class="hiw-highlight-icon">💰</span>
+                  <span class="hiw-highlight-text">Komissiya <strong>ixtiyoriy</strong> — o'zingiz tanlaysiz. Tanlasangiz, ishni olgan har bir kishi sizga bir martalik <strong>10,000 KRW</strong> to'laydi</span>
+                </div>
+                <div class="hiw-highlight-row">
+                  <span class="hiw-highlight-icon">📌</span>
+                  <span class="hiw-highlight-text">Sharti: E'lon faqat <strong>bot guruhida</strong> e'lon qilinib, boshqa guruhlarga joylanmasligi kerak</span>
+                </div>
+                <div class="hiw-highlight-row">
+                  <span class="hiw-highlight-icon">⏳</span>
+                  <span class="hiw-highlight-text">Agar 2-3 soat ichida odam topilmasa, boshqa guruhlarda e'lon qilishingiz mumkin</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-section" id="postFormState">
+            <div class="post-card">
+
+              <!-- Edit-mode banner -->
+              <div class="edit-banner" id="editBanner" style="display:none;">
+                <span class="edit-banner-text">✏️ E'lonni tahrirlash</span>
+                <button class="edit-cancel-btn" id="editCancelBtn" type="button">Bekor qilish</button>
+              </div>
+
+              <div class="post-field">
+                <label class="post-label" for="postMessage">E'lon matni</label>
+                <div class="textarea-wrapper">
+                  <textarea id="postMessage" class="post-textarea" placeholder="Restoranga oshpaz kerak&#10;📍 Manzil: 강남 서울시&#10;👥 2 kishi&#10;🕐 09:00 – 18:00&#10;💰 Maosh: 3,000,000 won&#10;📋 Tajriba talab qilinadi" rows="6" maxlength="1000"></textarea>
+                  <span class="char-count" id="charCount">0 / 1000</span>
+                </div>
+              </div>
+
+              <div class="post-field" id="contactField">
+                <label class="post-label" id="contactLabel">Bog'lanish uchun</label>
+                <div class="contact-auto" id="contactAuto" style="display:none;">
+                  <div class="contact-username-box"><span class="contact-prefix">@</span><span class="contact-username" id="contactUsername"></span><span class="contact-badge">Telegram</span></div>
+                  <button class="contact-toggle-btn" id="contactToggleBtn" type="button"><span>🔄</span><span id="contactToggleText">Yoki telefon raqamni kiritish</span></button>
+                </div>
+                <div class="contact-manual" id="contactManual" style="display:none;">
+                  <input type="text" id="postContact" class="post-input" placeholder="Tel raqam yoki Telegram username" maxlength="100" />
+                  <button class="contact-toggle-btn" id="contactBackBtn" type="button" style="display:none;"><span>↩️</span><span>Telegram username ishlatish</span></button>
+                </div>
+              </div>
+
+              <!-- Commission choice -->
+              <div class="post-field" id="commissionField">
+                <label class="post-label">
+                  Komissiya
+                  <span class="label-req">tanlang</span>
+                </label>
+                <div class="commission-options" id="commissionOptions" role="radiogroup" aria-label="Komissiya turi">
+
+                  <label class="commission-option" data-value="yes">
+                    <input type="radio" name="commission" value="yes" id="commissionYes" />
+                    <span class="co-radio" aria-hidden="true"></span>
+                    <span class="co-body">
+                      <span class="co-head">
+                        <span class="co-title">💰 Komissiyali</span>
+                        <span class="co-tag">10,000 KRW</span>
+                      </span>
+                      <span class="co-desc">Ishni olgan har bir kishi sizga <strong>bir martalik</strong> 10,000 KRW to'laydi.</span>
+                    </span>
+                  </label>
+
+                  <label class="commission-option" data-value="no">
+                    <input type="radio" name="commission" value="no" id="commissionNo" />
+                    <span class="co-radio" aria-hidden="true"></span>
+                    <span class="co-body">
+                      <span class="co-head">
+                        <span class="co-title">🤝 Komissiyasiz</span>
+                        <span class="co-tag neutral">Bepul</span>
+                      </span>
+                      <span class="co-desc">Hech qanday to'lov talab qilinmaydi — faqat e'lon joylanadi.</span>
+                    </span>
+                  </label>
+
+                </div>
+
+                <div class="commission-preview" id="commissionPreview" style="display:none;">
+                  <span class="cp-label">👁 E'lon ostida shunday ko'rinadi:</span>
+                  <div class="cp-body" id="commissionPreviewText"></div>
+                </div>
+              </div>
+
+              <!-- Agreement Checkbox -->
+              <label class="agreement-check" id="agreementLabel">
+                <input type="checkbox" id="agreementCheckbox" />
+                <span class="agreement-checkmark"></span>
+                <span class="agreement-text">Ushbu xabar <strong>ish bilan bog'liq</strong> e'lonligini tasdiqlayman va boshqa Telegram guruhlarga 2-3 soat ichida <strong>joylamayman.</strong></span>
+              </label>
+
+              <button class="post-submit-btn" id="postSubmitBtn" type="button" disabled><span class="btn-icon">📤</span><span class="btn-text" id="postSubmitText">E'lonni joylash</span></button>
+              <div class="post-guidelines"><span class="guidelines-icon">⚠️</span><span class="guidelines-text">Reklama, shaxsiy xabarlar yoki ish bilan bog'liq bo'lmagan e'lonlar davomiy qo'ygan foydalanuvchi bloklanadi.</span></div>
+            </div>
+          </div>
+
+          <div class="action-section" id="postLoadingState" style="display:none;">
+            <div class="loading-card"><div class="loading-spinner"></div><p class="loading-text" id="postLoadingText">E'lon yuborilmoqda...</p></div>
+          </div>
+          <div class="action-section" id="postSuccessState" style="display:none;">
+            <div class="success-card">
+              <div class="success-icon">✅</div>
+              <h3 class="success-title" id="successTitle">E'lon yuborildi!</h3>
+              <p class="success-text" id="successText">E'loningiz guruhga muvaffaqiyatli joylandi.</p>
+              <div class="success-chip" id="successChip"></div>
+              <button class="post-again-btn" id="postAgainBtn" type="button"><span class="btn-icon">✍️</span><span class="btn-text">Yana e'lon joylash</span></button>
+              <button class="view-posts-btn" id="viewPostsBtn" type="button"><span class="btn-icon">📋</span><span class="btn-text">E'lonlarim</span></button>
+            </div>
+          </div>
+          <div class="action-section" id="postErrorState" style="display:none;">
+            <div class="error-card"><div class="error-icon">❌</div><h3 class="error-title">Xatolik yuz berdi</h3><p class="error-text" id="postErrorText">E'lon yuborishda xatolik.</p><button class="retry-btn" id="postErrorRetryBtn" type="button"><span class="btn-icon">🔄</span><span class="btn-text">Qayta urinish</span></button></div>
+          </div>
+        </div>
+
+        <!-- SUB-VIEW B: My Posts -->
+        <div id="myPostsView" style="display:none;">
+          <div id="myPostsList"></div>
+          <div class="empty-posts" id="emptyPosts" style="display:none;">
+            <div class="empty-icon">📭</div>
+            <p class="empty-text">Hali e'lon joylamadingiz</p>
+            <button class="empty-cta" id="emptyCtaBtn" type="button">✍️ Birinchi e'lonni joylash</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="../../js/logger.js"></script>
