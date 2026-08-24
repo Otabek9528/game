@@ -67,15 +67,22 @@
       <div class="action-section" id="errorState" style="display:none;">
         <div class="error-card"><div class="error-icon">❌</div><h3 class="error-title">Xatolik yuz berdi</h3><p class="error-text" id="errorText">Link yaratishda xatolik.</p><button class="retry-btn" id="errorRetryBtn"><span class="btn-icon">🔄</span><span class="btn-text">Qayta urinish</span></button></div>
       </div>
-      <div class="fab-spacer"></div>
     </div>
   </main>
 
-  <!-- FLOATING ACTION BUTTON -->
-  <button class="fab" id="fabBtn" type="button" aria-label="E'lon joylash" aria-controls="postSheet">
-    <span class="fab-icon">✍️</span>
-    <span class="fab-label">E'lon joylash</span>
-  </button>
+  <!-- DOCKED ACTION BAR -->
+  <div class="action-dock" id="actionDock">
+    <div class="dock-inner">
+      <button class="dock-primary" id="dockPostBtn" type="button" aria-controls="postSheet">
+        <span class="dock-icon">✍️</span>
+        <span class="dock-label">E'lon joylash</span>
+      </button>
+      <button class="dock-secondary" id="dockMyPostsBtn" type="button" aria-label="E'lonlarim" style="display:none;">
+        <span class="dock-secondary-icon">📋</span>
+        <span class="dock-secondary-count" id="dockMyPostsCount">0</span>
+      </button>
+    </div>
+  </div>
 
   <!-- ===========================
        POST SHEET

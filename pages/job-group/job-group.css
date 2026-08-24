@@ -16,35 +16,49 @@ body.sheet-open .page-scroll { overflow: hidden; }
 .job-group-container {
   flex: 1; padding: 0 16px 40px 16px; max-width: 500px; margin: 0 auto; width: 100%; box-sizing: border-box;
 }
-.fab-spacer { height: 76px; }
+/* keeps the docked bar from covering the last card */
+.page-scroll .job-group-container { padding-bottom: 104px; }
 
 /* =========================
-   FLOATING ACTION BUTTON
+   DOCKED ACTION BAR
    ========================= */
-.fab {
-  position: fixed; z-index: 50;
-  left: max(16px, env(safe-area-inset-left));
-  bottom: calc(20px + env(safe-area-inset-bottom));
-  display: flex; align-items: center; gap: 10px;
-  height: 58px; padding: 0 22px 0 18px; border: none; border-radius: 30px;
+.action-dock {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  background: rgba(255,255,255,0.94);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 1px solid #ece7dd;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  transition: transform 0.3s cubic-bezier(0.32,0.72,0,1), opacity 0.25s ease;
+}
+.action-dock.hidden { transform: translateY(120%); opacity: 0; pointer-events: none; }
+.dock-inner { display: flex; gap: 10px; max-width: 500px; margin: 0 auto; width: 100%; }
+
+.dock-primary {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px;
+  height: 54px; border: none; border-radius: 16px; font-family: inherit;
   background: linear-gradient(135deg, #00a884 0%, #007b5e 100%); color: #fff;
-  font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0,168,132,0.45), 0 2px 6px rgba(0,0,0,0.12);
+  font-size: 1.02rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,168,132,0.32);
   -webkit-tap-highlight-color: transparent;
-  transition: padding 0.28s cubic-bezier(0.4,0,0.2,1), transform 0.22s ease,
-              box-shadow 0.22s ease, opacity 0.22s ease;
-  animation: fabIn 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  transition: transform 0.16s ease, box-shadow 0.2s ease;
 }
-@keyframes fabIn { from { opacity: 0; transform: translateY(20px) scale(0.85); } to { opacity: 1; transform: none; } }
-.fab-icon { font-size: 1.35rem; line-height: 1; }
-.fab-label {
-  max-width: 160px; overflow: hidden; white-space: nowrap;
-  transition: max-width 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, margin 0.28s ease;
+.dock-primary:active { transform: scale(0.975); box-shadow: 0 3px 10px rgba(0,168,132,0.3); }
+.dock-icon { font-size: 1.2rem; line-height: 1; }
+
+.dock-secondary {
+  position: relative; flex-shrink: 0; width: 54px; height: 54px;
+  border: 1px solid #e0dbd1; border-radius: 16px; background: #f7f5f0;
+  font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.16s ease, background 0.2s ease, border-color 0.2s ease;
 }
-.fab.compact { padding: 0; width: 58px; justify-content: center; }
-.fab.compact .fab-label { max-width: 0; opacity: 0; margin-left: -10px; }
-.fab:active { transform: scale(0.94); box-shadow: 0 4px 14px rgba(0,168,132,0.4); }
-.fab.hidden { opacity: 0; transform: translateY(20px) scale(0.85); pointer-events: none; }
+.dock-secondary:active { transform: scale(0.95); background: #efece4; }
+.dock-secondary-icon { font-size: 1.25rem; line-height: 1; }
+.dock-secondary-count {
+  position: absolute; top: 6px; right: 6px; min-width: 18px; height: 18px;
+  padding: 0 5px; border-radius: 9px; background: #00a884; color: #fff;
+  font-size: 0.68rem; font-weight: 700; line-height: 18px; text-align: center;
+  box-shadow: 0 0 0 2px #f7f5f0;
+}
 
 /* =========================
    POST SHEET
@@ -487,8 +501,8 @@ button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visib
   .timer-circle { width: 80px; height: 80px; }
   .timer-text { font-size: 1.8rem; }
   .link-text { font-size: 0.8rem; }
-  .fab { height: 54px; }
-  .fab.compact { width: 54px; }
+  .dock-primary { height: 50px; font-size: 0.95rem; }
+  .dock-secondary { width: 50px; height: 50px; }
   .subnav-btn { font-size: 0.82rem; }
   .co-title { font-size: 0.86rem; }
   .co-desc { font-size: 0.76rem; }
@@ -501,7 +515,11 @@ button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visib
 .night-mode, .night-mode body { background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%); }
 .night-mode .app__header { background: linear-gradient(135deg, #0a2e22 0%, #0d3d2e 100%); }
 
-/* Sheet + FAB */
+/* Dock + sheet */
+.night-mode .action-dock { background: rgba(18,18,18,0.94); border-top-color: #262626; }
+.night-mode .dock-secondary { background: #1e1e1e; border-color: #333; }
+.night-mode .dock-secondary:active { background: #262626; }
+.night-mode .dock-secondary-count { box-shadow: 0 0 0 2px #1e1e1e; }
 .night-mode .post-sheet { background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%); }
 .night-mode .sheet-head { background: #1a1a1a; border-bottom-color: #262626; }
 .night-mode .sheet-grabber { background: #3a3a3a; }

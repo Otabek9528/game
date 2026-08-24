@@ -21,7 +21,6 @@ const FOOTNOTE_PREVIEW = {
 // ===========================================
 // DOM — LANDING
 // ===========================================
-const joinPage = document.getElementById('joinPage');
 const initialState = document.getElementById('initialState');
 const loadingState = document.getElementById('loadingState');
 const linkState = document.getElementById('linkState');
@@ -38,8 +37,11 @@ const timerProgress = document.getElementById('timerProgress');
 const copyIcon = document.getElementById('copyIcon');
 const errorText = document.getElementById('errorText');
 
-// DOM — SHEET SHELL
-const fabBtn = document.getElementById('fabBtn');
+// DOM — DOCK + SHEET SHELL
+const actionDock = document.getElementById('actionDock');
+const dockPostBtn = document.getElementById('dockPostBtn');
+const dockMyPostsBtn = document.getElementById('dockMyPostsBtn');
+const dockMyPostsCount = document.getElementById('dockMyPostsCount');
 const postSheet = document.getElementById('postSheet');
 const sheetHead = document.getElementById('sheetHead');
 const sheetScroll = document.getElementById('sheetScroll');
@@ -125,7 +127,7 @@ function openSheet(view) {
   postSheet.classList.add('open');
   postSheet.setAttribute('aria-hidden', 'false');
   document.body.classList.add('sheet-open');
-  fabBtn.classList.add('hidden');
+  actionDock.classList.add('hidden');
   showSubView(view || 'form');
   sheetScroll.scrollTop = 0;
   if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
@@ -136,12 +138,13 @@ function closeSheet() {
   postSheet.classList.remove('open');
   postSheet.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('sheet-open');
-  fabBtn.classList.remove('hidden');
+  actionDock.classList.remove('hidden');
   postSheet.style.transform = '';
   if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 }
 
-fabBtn.addEventListener('click', () => openSheet('form'));
+dockPostBtn.addEventListener('click', () => openSheet('form'));
+dockMyPostsBtn.addEventListener('click', () => openSheet('myPosts'));
 sheetBackBtn.addEventListener('click', closeSheet);
 
 // Swipe down on the sheet header to close it
@@ -164,11 +167,6 @@ sheetHead.addEventListener('touchend', () => {
   postSheet.style.transform = '';
   if (dragDeltaY > 90) closeSheet();
   dragDeltaY = 0;
-}, { passive: true });
-
-// Hide the FAB label while the landing page is scrolled down
-joinPage.addEventListener('scroll', () => {
-  fabBtn.classList.toggle('compact', joinPage.scrollTop > 40);
 }, { passive: true });
 
 // ===========================================
@@ -523,6 +521,9 @@ function finishTimeLeft(post) {
 
 function updateBadge() {
   myPostsBadge.textContent = myPosts.length;
+  dockMyPostsCount.textContent = myPosts.length;
+  // The shortcut only earns its place once the user actually has posts.
+  dockMyPostsBtn.style.display = myPosts.length ? 'block' : 'none';
 }
 
 function renderMyPosts() {
