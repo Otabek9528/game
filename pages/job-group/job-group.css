@@ -12,11 +12,13 @@ body { display: flex; flex-direction: column; background: linear-gradient(180deg
   flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
   display: flex; flex-direction: column;
 }
-/* The landing page spreads its blocks over whatever height is left, so a tall
-   screen never pools empty space above the dock and a short one just packs. */
+/* The landing content sits as one block, centred in whatever height is left.
+   Auto margins collapse to zero when the content is taller, so it never clips. */
 .page-scroll .job-group-container {
-  flex: 1 0 auto; display: flex; flex-direction: column; justify-content: space-between;
+  flex: 1 0 auto; display: flex; flex-direction: column;
 }
+.page-scroll .job-hero { margin-top: auto; }
+.page-scroll .action-section { margin-bottom: auto; }
 body.sheet-open .page-scroll { overflow: hidden; }
 
 .job-group-container {
@@ -42,13 +44,13 @@ body.sheet-open .page-scroll { overflow: hidden; }
 .dock-primary {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px;
   height: 54px; border: none; border-radius: 16px; font-family: inherit;
-  background: linear-gradient(135deg, #00a884 0%, #007b5e 100%); color: #fff;
+  background: linear-gradient(135deg, #0f6b52 0%, #084a39 100%); color: #fff;
   font-size: 1.02rem; font-weight: 700; cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,168,132,0.32);
+  box-shadow: 0 6px 18px rgba(10,74,57,0.28);
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.16s ease, box-shadow 0.2s ease;
 }
-.dock-primary:active { transform: scale(0.975); box-shadow: 0 3px 10px rgba(0,168,132,0.3); }
+.dock-primary:active { transform: scale(0.975); box-shadow: 0 3px 10px rgba(10,74,57,0.26); }
 .dock-icon { font-size: 1.2rem; line-height: 1; }
 
 .dock-secondary {
@@ -107,17 +109,17 @@ body.sheet-open .page-scroll { overflow: hidden; }
 /* =========================
    HERO
    ========================= */
-.job-hero { text-align: center; padding: 16px 20px 12px; }
-.hero-title { font-size: 1.45rem; font-weight: 700; color: #1a4d2e; margin: 0 0 5px 0; }
-.hero-subtitle { font-size: 0.92rem; color: #666; margin: 0; }
+.job-hero { text-align: center; padding: clamp(5px, 2.75vh, 20px) 20px clamp(5px, 2.2vh, 16px); }
+.hero-title { font-size: clamp(1.06rem, 3.5vh, 1.6rem); font-weight: 700; color: #1a4d2e; margin: 0 0 clamp(2px, 0.7vh, 5px) 0; }
+.hero-subtitle { font-size: clamp(0.76rem, 2.15vh, 0.98rem); color: #666; margin: 0; }
 
 /* =========================
    INFO CARD
    ========================= */
-.info-card { background: #fff; border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-left: 4px solid #00a884; }
-.info-title { font-size: 1.05rem; font-weight: 600; color: #333; margin: 0 0 13px 0; }
-.info-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-.info-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; color: #444; line-height: 1.48; }
+.info-card { background: #fff; border-radius: 18px; padding: clamp(11px, 3vh, 22px) clamp(12px, 3vh, 22px); margin-bottom: clamp(9px, 2.8vh, 20px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-left: 4px solid #00a884; }
+.info-title { font-size: clamp(0.88rem, 2.4vh, 1.12rem); font-weight: 600; color: #333; margin: 0 0 clamp(6px, 2.2vh, 16px) 0; }
+.info-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: clamp(6px, 2.05vh, 15px); }
+.info-list li { display: flex; align-items: flex-start; gap: 10px; font-size: clamp(0.8rem, 2.1vh, 0.97rem); color: #444; line-height: 1.5; }
 .check-icon { font-size: 0.92rem; flex-shrink: 0; margin-top: 1px; }
 .info-list li strong { color: #1a4d2e; }
 
@@ -130,12 +132,12 @@ body.sheet-open .page-scroll { overflow: hidden; }
 /* =========================
    GET LINK (TAB 1)
    ========================= */
-.action-card { background: linear-gradient(135deg, #e8f5f0 0%, #d4edda 100%); border: 2px solid #00a884; border-radius: 20px; padding: 20px; text-align: center; }
-.action-text { font-size: 0.97rem; color: #1a4d2e; line-height: 1.55; margin: 0 0 16px 0; }
-.get-link-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 16px 22px; background: linear-gradient(135deg, #00a884 0%, #007b5e 100%); color: white; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(0,168,132,0.4); }
+.action-card { background: none; border: none; padding: 0; text-align: center; }
+.action-note { font-size: clamp(0.7rem, 1.78vh, 0.82rem); color: #8d8578; line-height: 1.45; margin: clamp(7px, 1.4vh, 11px) 4px 0; }
+.get-link-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: clamp(11px, 2.45vh, 18px) 24px; background: linear-gradient(135deg, #00a884 0%, #007b5e 100%); color: white; border: none; border-radius: 14px; font-size: clamp(0.95rem, 2.4vh, 1.12rem); font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(0,168,132,0.4); }
 .get-link-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,168,132,0.5); }
 .get-link-btn:active { transform: translateY(-1px); }
-.btn-icon { font-size: 1.35rem; }
+.btn-icon { font-size: clamp(1.1rem, 2.7vh, 1.35rem); }
 
 /* Loading */
 .loading-card { background: #fff; border-radius: 20px; padding: 40px 24px; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
@@ -502,52 +504,16 @@ button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visib
 /* =========================
    RESPONSIVE
    ========================= */
-/* Phone heights: tighten the landing page so it needs no scrolling at all */
-@media (max-height: 740px) {
-  .job-hero { padding: 10px 20px 8px; }
-  .hero-title { font-size: 1.32rem; margin-bottom: 3px; }
-  .hero-subtitle { font-size: 0.86rem; }
-  .info-card { padding: 15px 16px; margin-bottom: 12px; }
-  .info-title { font-size: 1rem; margin-bottom: 10px; }
-  .info-list { gap: 9px; }
-  .info-list li { font-size: 0.88rem; line-height: 1.42; }
-  .check-icon { font-size: 0.92rem; margin-top: 1px; }
-  .action-card { padding: 17px 18px; border-radius: 18px; }
-  .action-text { font-size: 0.92rem; line-height: 1.5; margin-bottom: 13px; }
-  .get-link-btn { padding: 14px 20px; font-size: 1.05rem; }
-  .btn-icon { font-size: 1.25rem; }
-}
-
-/* Short phones: squeeze further rather than let anything scroll */
-@media (max-height: 620px) {
-  .job-hero { padding: 6px 16px 6px; }
-  .hero-title { font-size: 1.18rem; }
-  .hero-subtitle { font-size: 0.8rem; }
-  .info-card { padding: 12px 14px; margin-bottom: 10px; }
-  .info-title { font-size: 0.94rem; margin-bottom: 8px; }
-  .info-list { gap: 7px; }
-  .info-list li { font-size: 0.83rem; line-height: 1.38; }
-  .action-card { padding: 13px 14px; }
-  .action-text { font-size: 0.86rem; margin-bottom: 10px; }
-  .get-link-btn { padding: 12px 18px; font-size: 0.98rem; }
+/* The dock is the one fixed-height piece, so it steps down on short screens */
+@media (max-height: 640px) {
   .action-dock { padding: 8px 14px calc(8px + env(safe-area-inset-bottom)); }
   .dock-primary, .dock-secondary { height: 48px; }
   .dock-secondary { width: 48px; }
   .page-scroll .job-group-container { padding-bottom: 76px; }
 }
 
-/* Very short webviews (small phones with the keyboard bar or a tall Telegram header) */
-@media (max-height: 570px) {
-  .job-hero { padding: 4px 14px 4px; }
-  .hero-title { font-size: 1.08rem; margin-bottom: 2px; }
-  .hero-subtitle { font-size: 0.75rem; }
-  .info-card { padding: 10px 12px; margin-bottom: 8px; }
-  .info-title { font-size: 0.88rem; margin-bottom: 6px; }
-  .info-list { gap: 6px; }
-  .info-list li { font-size: 0.79rem; line-height: 1.34; }
-  .action-card { padding: 11px 12px; }
-  .action-text { font-size: 0.82rem; line-height: 1.45; margin-bottom: 8px; }
-  .get-link-btn { padding: 11px 16px; font-size: 0.94rem; }
+@media (max-height: 560px) {
+  .action-note { display: none; }
   .dock-primary, .dock-secondary { height: 46px; }
   .dock-secondary { width: 46px; }
   .page-scroll .job-group-container { padding-bottom: 70px; }
@@ -583,7 +549,7 @@ button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visib
 
 /* Action card */
 .night-mode .action-card { background: linear-gradient(135deg, #1a2a22 0%, #162520 100%); border-color: rgba(0,168,132,0.4); }
-.night-mode .action-text { color: #ccc; }
+.night-mode .action-note { color: #7d7568; }
 
 /* Loading / Link / Expired / Error cards */
 .night-mode .loading-card, .night-mode .link-card { background: #1e1e1e; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
