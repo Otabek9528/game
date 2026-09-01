@@ -1,0 +1,677 @@
+/* =========================================================
+   BIZNES KATALOGI
+   Gold is reserved for paid position and appears nowhere else
+   on the page. That restraint is what makes it mean something.
+   ========================================================= */
+
+/* Several blocks below set display on a class, which outranks the UA's
+   [hidden] { display: none } and leaves "hidden" elements laid out. The
+   backdrop is the dangerous one: invisible, fixed, inset 0, and swallowing
+   every tap on the page. One guard covers all of them. */
+[hidden] { display: none !important; }
+
+.bz-container {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-md) var(--space-md) 96px;
+}
+
+.bz-view { max-width: 560px; margin: 0 auto; }
+
+/* ---------- lede ---------- */
+.bz-lede { padding: var(--space-sm) 2px var(--space-lg); }
+
+.bz-title {
+  font-family: var(--font-display);
+  font-size: 1.72rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+  color: var(--text-primary);
+}
+
+.bz-sub {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+}
+
+/* ---------- category grid ---------- */
+.bz-cat-grid,
+.bz-skeleton {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.bz-cat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-height: 108px;
+  padding: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.bz-cat:active { transform: scale(0.975); box-shadow: none; }
+.bz-cat.is-empty { opacity: 0.62; }
+
+.bz-cat-icon { font-size: 1.6rem; line-height: 1.2; margin-bottom: 4px; }
+
+.bz-cat-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.28;
+  color: var(--text-primary);
+}
+
+.bz-cat-count {
+  margin-top: auto;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ---------- skeleton ---------- */
+.bz-sk-tile {
+  height: 108px;
+  border-radius: var(--radius-lg);
+  background: var(--sand-100);
+  animation: bzPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes bzPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+/* ---------- owner note ---------- */
+.bz-owner-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: var(--space-lg);
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-lg);
+}
+
+.bz-owner-icon { width: 22px; height: 22px; flex: none; color: var(--accent); }
+.bz-owner-icon svg { width: 100%; height: 100%; display: block; }
+.bz-owner-note > div { flex: 1; min-width: 0; }
+.bz-owner-title { margin: 0; font-size: 0.9rem; font-weight: 600; }
+.bz-owner-text { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-secondary); }
+
+.bz-owner-cta {
+  flex: none;
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ---------- list header ---------- */
+.bz-list-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-sm) 0 var(--space-lg);
+}
+
+.bz-back {
+  width: 34px; height: 34px;
+  flex: none;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--sand-200);
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+}
+.bz-back svg { width: 17px; height: 17px; }
+.bz-back:active { transform: scale(0.94); }
+
+.bz-list-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--text-primary);
+}
+
+/* ---------- podium ---------- */
+.bz-zone-label {
+  margin: 0 0 9px 2px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--gold-600);
+}
+
+.bz-card {
+  display: grid;
+  grid-template-columns: 30px 52px 1fr;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  margin-bottom: 9px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: transform var(--transition-fast);
+}
+.bz-card:active { transform: scale(0.985); }
+
+/* Gold intensity descends with rank, so the position reads from the card's
+   weight before the numeral is read at all. */
+.bz-card--r1 { border: 2px solid var(--gold-500); background: var(--gold-100); }
+.bz-card--r2 { border: 1.5px solid var(--gold-400); }
+.bz-card--r3 { border: 1px solid var(--gold-300); }
+
+.bz-rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.bz-card--r1 .bz-rank { font-size: 2rem; color: var(--gold-600); }
+.bz-card--r2 .bz-rank { font-size: 1.75rem; color: var(--gold-500); }
+.bz-card--r3 .bz-rank { font-size: 1.55rem; color: var(--gold-400); }
+
+.bz-card-body { min-width: 0; }
+
+.bz-name {
+  font-size: 0.94rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.bz-desc {
+  margin-top: 2px;
+  font-size: 0.79rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- empty position ---------- */
+.bz-slot-empty {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 14px;
+  margin-bottom: 9px;
+  border: 1px dashed var(--gold-300);
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+}
+.bz-slot-empty:active { transform: scale(0.985); }
+.bz-slot-empty .bz-rank { font-size: 1.55rem; color: var(--gold-300); }
+.bz-slot-text { font-size: 0.86rem; color: var(--text-secondary); }
+
+.bz-slot-price {
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--gold-600);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- divider ---------- */
+.bz-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 2px 12px;
+}
+.bz-divider::before, .bz-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--sand-300);
+}
+.bz-divider span {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---------- regular rows ---------- */
+/* Deliberately uniform and entirely gold-free. The flatness down here is
+   what gives the podium above its lift. */
+.bz-row {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--sand-200);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: transform var(--transition-fast);
+}
+.bz-row:active { transform: scale(0.985); }
+.bz-row-body { min-width: 0; }
+
+/* ---------- logo ---------- */
+.bz-logo {
+  width: 42px; height: 42px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--sand-100);
+  border: 1px solid var(--sand-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.bz-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bz-logo--lg { width: 52px; height: 52px; border-radius: 12px; font-size: 0.86rem; }
+.bz-logo--xl { width: 62px; height: 62px; border-radius: 14px; font-size: 1rem; }
+
+/* ---------- stats ---------- */
+.bz-stats {
+  display: flex;
+  gap: 14px;
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.bz-stat { display: inline-flex; align-items: center; gap: 4px; }
+.bz-stat-icon { width: 12px; height: 12px; display: block; }
+.bz-stat-icon svg { width: 100%; height: 100%; display: block; }
+.bz-stat-icon--heart { color: #d05a4a; }
+
+/* ---------- promote strip ---------- */
+.bz-promote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 13px 15px;
+  border-top: 1px solid var(--sand-200);
+}
+.bz-promote-text { font-size: 0.85rem; color: var(--text-secondary); }
+
+.bz-promote-btn {
+  padding: 8px 15px;
+  border: 1px solid var(--gold-400);
+  border-radius: var(--radius-full);
+  background: var(--gold-100);
+  color: var(--gold-600);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bz-promote-btn:active { transform: scale(0.96); }
+
+/* ---------- states ---------- */
+.bz-loading, .bz-empty, .bz-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 52px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+.bz-loading p { margin: 0; font-size: 0.88rem; }
+
+.bz-spinner {
+  width: 30px; height: 30px;
+  border: 2.5px solid var(--sand-200);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: bzSpin 0.85s linear infinite;
+  margin: 0 auto;
+}
+@keyframes bzSpin { to { transform: rotate(360deg); } }
+
+.bz-empty-icon { width: 42px; height: 42px; color: var(--sand-400); }
+.bz-empty-icon svg { width: 100%; height: 100%; }
+.bz-empty-text { margin: 0; font-size: 0.98rem; font-weight: 600; color: var(--text-primary); }
+.bz-empty-hint, .bz-error-text { margin: 0; font-size: 0.85rem; }
+
+.bz-retry {
+  margin-top: 6px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bz-inline-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 28px 8px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+/* ---------- bottom sheet ---------- */
+.bz-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(28, 25, 23, 0);
+  transition: background var(--transition-base);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.bz-sheet-backdrop.visible { background: rgba(28, 25, 23, 0.46); }
+
+.bz-sheet {
+  width: 100%;
+  max-width: 560px;
+  /* Above the middle, but never the whole screen: the list stays visible
+     behind it so the sheet reads as a layer, not a new page. */
+  height: 66vh;
+  max-height: 82vh;
+  background: var(--bg-elevated);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 34px rgba(28, 25, 23, 0.2);
+  transform: translateY(100%);
+  transition: transform var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.bz-sheet.visible { transform: translateY(0); }
+
+.bz-sheet-grip { padding: 10px 0 4px; display: flex; justify-content: center; flex: none; }
+.bz-sheet-grip-bar {
+  width: 38px; height: 4px;
+  border-radius: 2px;
+  background: var(--sand-300);
+}
+
+.bz-sheet-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 20px 30px;
+}
+
+.bz-sheet-head { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.bz-sheet-eyebrow {
+  margin: 0 0 3px;
+  font-size: 0.71rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.bz-sheet-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.18;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.bz-sheet-desc {
+  margin: 0 0 18px;
+  font-size: 0.91rem;
+  line-height: 1.58;
+  color: var(--text-secondary);
+  /* Owner line breaks survive here rather than becoming <br> markup. */
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- typed links ---------- */
+.bz-link-grid { display: grid; gap: 8px; }
+
+.bz-link {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--sand-50);
+  border: 1px solid var(--sand-200);
+  border-radius: 11px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+.bz-link:active { transform: scale(0.985); }
+.bz-link-icon { width: 20px; height: 20px; color: var(--text-secondary); }
+.bz-link-icon svg { width: 100%; height: 100%; display: block; }
+.bz-link-body { min-width: 0; display: flex; flex-direction: column; }
+.bz-link-label { font-size: 0.71rem; color: var(--text-muted); }
+.bz-link-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bz-link-tail { width: 16px; height: 16px; color: var(--sand-400); }
+.bz-link-tail svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- bidding info sheet ---------- */
+.bz-sheet-body { padding-top: 4px; }
+.bz-sheet-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.24rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.bz-sheet-lede {
+  margin: 0 0 18px;
+  font-size: 0.89rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.bz-price-table {
+  border: 1px solid var(--gold-300);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.bz-price-row {
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--sand-200);
+}
+.bz-price-row:last-child { border-bottom: none; }
+.bz-price-row.is-target { background: var(--gold-100); }
+.bz-price-pos {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-600);
+}
+.bz-price-val {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.bz-price-note { font-size: 0.72rem; color: var(--text-muted); }
+
+.bz-note-list {
+  margin: 0 0 20px;
+  padding-left: 18px;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.bz-note-list li { margin-bottom: 6px; }
+
+.bz-sheet-cta {
+  display: block;
+  padding: 13px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* ---------- toast ---------- */
+.bz-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 1000;
+  transform: translate(-50%, 14px);
+  max-width: 84vw;
+  padding: 11px 18px;
+  border-radius: var(--radius-full);
+  background: var(--sand-900);
+  color: #fff;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: opacity var(--transition-base), transform var(--transition-base);
+  pointer-events: none;
+}
+.bz-toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- focus ---------- */
+.bz-cat:focus-visible,
+.bz-card:focus-visible,
+.bz-row:focus-visible,
+.bz-link:focus-visible,
+.bz-back:focus-visible,
+.bz-retry:focus-visible,
+.bz-promote-btn:focus-visible,
+.bz-slot-empty:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   NIGHT MODE
+   ========================================================= */
+
+.night-mode .bz-cat,
+.night-mode .bz-row,
+.night-mode .bz-card,
+.night-mode .bz-owner-note,
+.night-mode .bz-back {
+  background: #1e1e1e;
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.night-mode .bz-title,
+.night-mode .bz-list-title,
+.night-mode .bz-name,
+.night-mode .bz-sheet-name,
+.night-mode .bz-sheet-title,
+.night-mode .bz-empty-text,
+.night-mode .bz-owner-title,
+.night-mode .bz-price-val { color: #f0ede9; }
+
+.night-mode .bz-sub,
+.night-mode .bz-desc,
+.night-mode .bz-sheet-desc,
+.night-mode .bz-sheet-lede,
+.night-mode .bz-note-list,
+.night-mode .bz-slot-text,
+.night-mode .bz-owner-text,
+.night-mode .bz-promote-text { color: #a8a29e; }
+
+.night-mode .bz-cat-count,
+.night-mode .bz-stats,
+.night-mode .bz-divider span,
+.night-mode .bz-link-label,
+.night-mode .bz-price-note { color: #7c7f7e; }
+
+.night-mode .bz-card--r1 { background: rgba(234, 185, 50, 0.09); border-color: #eab932; }
+.night-mode .bz-card--r2 { border-color: #c09a45; }
+.night-mode .bz-card--r3 { border-color: #8e7a4e; }
+.night-mode .bz-card--r1 .bz-rank { color: #eab932; }
+.night-mode .bz-card--r2 .bz-rank { color: #c09a45; }
+.night-mode .bz-card--r3 .bz-rank { color: #8e7a4e; }
+
+.night-mode .bz-zone-label,
+.night-mode .bz-slot-price,
+.night-mode .bz-price-pos { color: #eab932; }
+
+.night-mode .bz-slot-empty { border-color: #6b5c37; }
+.night-mode .bz-slot-empty .bz-rank { color: #6b5c37; }
+
+.night-mode .bz-promote-btn {
+  background: rgba(234, 185, 50, 0.11);
+  border-color: #8e7a4e;
+  color: #eab932;
+}
+.night-mode .bz-price-table { border-color: #6b5c37; }
+.night-mode .bz-price-row { border-bottom-color: rgba(255, 255, 255, 0.07); }
+.night-mode .bz-price-row.is-target { background: rgba(234, 185, 50, 0.09); }
+
+.night-mode .bz-sheet { background: #1a1a1a; }
+.night-mode .bz-link { background: #232323; border-color: rgba(255, 255, 255, 0.08); color: #f0ede9; }
+.night-mode .bz-logo { background: #2a2a2a; border-color: rgba(255, 255, 255, 0.08); }
+.night-mode .bz-divider::before,
+.night-mode .bz-divider::after { background: rgba(255, 255, 255, 0.11); }
+.night-mode .bz-sk-tile { background: rgba(255, 255, 255, 0.06); }
+.night-mode .bz-sheet-grip-bar { background: rgba(255, 255, 255, 0.22); }
+.night-mode .bz-promote { border-top-color: rgba(255, 255, 255, 0.09); }
+.night-mode .bz-toast { background: #f0ede9; color: #1c1917; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bz-sheet, .bz-sheet-backdrop, .bz-toast,
+  .bz-cat, .bz-card, .bz-row { transition: none; }
+  .bz-sk-tile, .bz-spinner { animation: none; }
+}

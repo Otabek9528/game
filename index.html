@@ -84,6 +84,24 @@
 
     <!-- SCROLLABLE FEATURES SECTION -->
     <div class="scrollable-features">
+      <!-- BUSINESS DIRECTORY BAND -->
+      <!-- Full width and gold, so it reads as a section rather than a
+           fourteenth sibling in the grid below. -->
+      <button class="biz-band" id="bizBand" type="button" hidden>
+        <span class="biz-band-glow" aria-hidden="true"></span>
+        <span class="biz-band-main">
+          <span class="biz-band-icon" aria-hidden="true">🏬</span>
+          <span class="biz-band-text">
+            <span class="biz-band-title">Biznes Katalogi</span>
+            <span class="biz-band-sub" id="bizBandSub">Koreyadagi o'zbek bizneslari</span>
+          </span>
+        </span>
+        <span class="biz-band-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </span>
+        <span class="new-badge biz-band-badge">NEW</span>
+      </button>
+
       <main class="main" id="featureCards">
         <!-- Feature cards will be dynamically generated -->
       </main>
@@ -145,7 +163,9 @@
       donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },      
       housing: { icon: '🏠', labelKey: 'feature.housing', href: 'pages/housing/housing.html', isNew: true},
       //market: { icon: '🛒', labelKey: 'feature.market', href: 'pages/flight/flight.html' },
-      community: { icon: '👥', labelKey: 'feature.community', href: 'pages/community/community.html' }
+      community: { icon: '👥', labelKey: 'feature.community', href: 'pages/community/community.html' },
+      // Rendered as the gold band above the grid, not as a card in it.
+      business: { icon: '🏬', labelKey: 'feature.business', href: 'pages/business/business.html', isBand: true }
     };
 
     // ============================================
@@ -215,6 +235,7 @@
       availableFeatures.forEach(featureKey => {
         const feature = FEATURE_CARDS[featureKey];
         if (!feature) return;
+        if (feature.isBand) return;   // rendered separately, above the grid
         
         const card = document.createElement('button');
         
@@ -257,6 +278,45 @@
       });
       
       console.log('✅ Feature cards updated');
+    }
+
+    // ============================================
+    // BUSINESS DIRECTORY BAND
+    // ============================================
+    // Shown only for the languages that list it, same gate as the cards.
+    // The live count comes from the API; the band renders without it.
+
+    function updateBusinessBand() {
+      const band = document.getElementById('bizBand');
+      if (!band) return;
+
+      const available = window.I18N ? I18N.getAvailableFeatures() : [];
+      band.hidden = available.indexOf('business') === -1;
+      if (band.hidden) return;
+
+      fetch('https://vegukin-api.duckdns.org/api/business/categories')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (!data || !data.success) return;
+          const cats = data.categories || [];
+          const total = cats.reduce((n, c) => n + (c.count || 0), 0);
+          if (!total) return;
+          const sub = document.getElementById('bizBandSub');
+          if (sub) sub.textContent = total + ' ta biznes \u00b7 ' + cats.length + ' yo\'nalish';
+        })
+        .catch(() => {});
+    }
+
+    const bizBand = document.getElementById('bizBand');
+    if (bizBand) {
+      bizBand.addEventListener('click', () => {
+        try {
+          if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        } catch (e) {}
+        if (window.logInteraction) window.logInteraction('business');
+        sessionStorage.setItem('logged_business', '1');
+        window.location.href = 'pages/business/business.html';
+      });
     }
 
     // ============================================
@@ -322,6 +382,7 @@
     window.addEventListener('languageChanged', () => {
       updateLanguageButtons();
       updateFeatureCards();
+      updateBusinessBand();
     });
 
 
@@ -332,6 +393,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       initLanguageSelector();
       updateFeatureCards();
+      updateBusinessBand();
       console.log('✅ Main page initialized');
     });
 

@@ -1289,3 +1289,127 @@ body {
 /* the cell after the highlight loses its divider too, so the pill sits in
    symmetric whitespace rather than hugging a rule on one side only */
 .ps-cell.is-current + .ps-cell::after { content: none; }
+
+/* =========================================================
+   BUSINESS DIRECTORY BAND (home screen)
+   Full width, gold, above the grid. The card grid is entirely
+   emerald, so gold alone separates this from everything else.
+   ========================================================= */
+
+.biz-band {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 15px 16px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, var(--gold-100) 0%, #fdf8e8 100%);
+  border: 1.5px solid var(--gold-400);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  overflow: hidden;
+  font-family: inherit;
+  text-align: left;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.biz-band:active { transform: scale(0.985); box-shadow: none; }
+
+/* display:flex above outranks the UA [hidden] rule, so the band would stay
+   on screen for ru/en users. */
+.biz-band[hidden] { display: none !important; }
+
+/* A slow sweep across the band. It is the only motion on this screen,
+   which is what makes it read as new rather than decorative. */
+.biz-band-glow {
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: bizSweep 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes bizSweep {
+  0%, 62% { left: -60%; }
+  100%    { left: 115%; }
+}
+
+.biz-band-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.biz-band-icon {
+  font-size: 1.55rem;
+  line-height: 1;
+  flex: none;
+}
+
+.biz-band-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.biz-band-title {
+  font-family: var(--font-display);
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--gold-600);
+}
+
+.biz-band-sub {
+  font-size: 0.77rem;
+  color: var(--sand-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.biz-band-arrow {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--gold-500);
+  position: relative;
+}
+.biz-band-arrow svg { width: 100%; height: 100%; display: block; }
+
+.biz-band-badge {
+  position: absolute;
+  top: 7px;
+  right: 34px;
+}
+
+.biz-band:focus-visible {
+  outline: 2px solid var(--gold-600);
+  outline-offset: 2px;
+}
+
+/* --- Night mode --- */
+.night-mode .biz-band {
+  background: linear-gradient(135deg, rgba(234, 185, 50, 0.13) 0%, rgba(234, 185, 50, 0.05) 100%);
+  border-color: #8e7a4e;
+}
+.night-mode .biz-band-title { color: #eab932; }
+.night-mode .biz-band-sub { color: #a8a29e; }
+.night-mode .biz-band-arrow { color: #c09a45; }
+.night-mode .biz-band-glow {
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.11), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .biz-band-glow { animation: none; opacity: 0; }
+  .biz-band { transition: none; }
+}

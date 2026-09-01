@@ -6,7 +6,7 @@ const I18N = {
   STORAGE_KEY: 'vegukin_language',
 
   availableFeatures: {
-    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'housing', 'cars', 'hikorea', 'jobs', 'parcel', 'vegukinShops', 'links', 'donation', 'community', 'news', 'events', 'market'],
+    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'business', 'housing', 'cars', 'hikorea', 'jobs', 'parcel', 'vegukinShops', 'links', 'donation', 'community', 'news', 'events', 'market'],
     ru: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community', 'hikorea'],
     en: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community', 'hikorea']
   },
@@ -34,6 +34,7 @@ const I18N = {
     'feature.events': { uz: 'Tadbirlar', ru: 'Мероприятия', en: 'Events' },
     'feature.market': { uz: 'Halal Bozor', ru: 'Халяль Маркет', en: 'Halal Market' },
     'feature.community': { uz: 'Jamoa', ru: 'Сообщество', en: 'Community' },
+    'feature.business': { uz: 'Biznes Katalogi', ru: 'Biznes Katalogi', en: 'Biznes Katalogi' },
 
     // Prayer names
     'prayer.fajr': { uz: 'Bomdod', ru: 'Фаджр', en: 'Fajr' },

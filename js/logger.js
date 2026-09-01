@@ -22,7 +22,8 @@
     'pages/community/community.html': 'community',
     'pages/hikorea/hikorea.html': 'hikorea',
     'pages/ramadan/ramadan.html': 'ramadan',
-    'pages/cars/cars.html': 'cars'
+    'pages/cars/cars.html': 'cars',
+    'pages/business/business.html': 'business'
   };
   
   /**
