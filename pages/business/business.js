@@ -328,20 +328,27 @@
     var groups = data.groups || [];
     $('bzCount').textContent = data.total ? data.total + ' ta biznes' : '';
 
-    if (!groups.length) {
-      $('bzEmptyTitle').textContent = state.query
-        ? 'Hech narsa topilmadi'
-        : 'Katalog hozircha bo‘sh';
-      $('bzEmptyHint').textContent = state.query
-        ? 'Boshqa so‘z bilan qidirib ko‘ring'
-        : 'Tez orada birinchi bizneslar qo‘shiladi';
-      setView('empty');
-      return;
-    }
-
     setView('ready');
     var host = $('bzBody');
     host.textContent = '';
+
+    // An empty catalogue is the moment an owner is most useful to us, so the
+    // invitation goes here rather than a dead end. A fruitless search is a
+    // different thing and gets no pitch.
+    if (!groups.length) {
+      if (state.query) {
+        host.appendChild(emptyBlock(
+          'Hech narsa topilmadi',
+          '"' + state.query + '" bo‘yicha biznes yo‘q. Boshqa so‘z bilan qidirib ko‘ring.'));
+        return;
+      }
+      host.appendChild(emptyBlock(
+        'Katalog hozircha bo‘sh',
+        'Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi. ' +
+        'Birinchi bo‘lib qo‘shilsangiz, yo‘nalishingizda uzoq vaqt yolg‘iz turasiz.'));
+      host.appendChild(ownerCard());
+      return;
+    }
 
     groups.forEach(function (group) {
       var section = el('section', 'bz-section');
@@ -419,16 +426,21 @@
 
     $('bzCount').textContent = data.total ? data.total + ' ta biznes' : '';
 
-    if (!podium.length && !rest.length) {
-      $('bzEmptyTitle').textContent = 'Bu yo‘nalishda hali biznes yo‘q';
-      $('bzEmptyHint').textContent = 'Birinchi bo‘lib qo‘shilishni xohlaysizmi?';
-      setView('empty');
-      return;
-    }
-
     setView('ready');
     var host = $('bzBody');
     host.textContent = '';
+
+    // An empty category is a real destination now, reachable from the picker,
+    // so it explains itself and offers the one action that makes sense here.
+    if (!podium.length && !rest.length) {
+      host.appendChild(emptyBlock(
+        state.categoryName + ' bo‘yicha hali biznes yo‘q',
+        'Bu yo‘nalish ochiq. Birinchi qo‘shilgan biznes uzoq vaqt yagona ' +
+        'bo‘lib turadi va yuqori o‘rin uchun hech kim bilan tanlashmaydi.',
+        state.categoryIcon));
+      host.appendChild(ownerCard());
+      return;
+    }
 
     // The podium only appears where positions are actually contested.
     if (pricing.showBidding) {
@@ -490,6 +502,14 @@
   // The only route to the money. Someone looking for a bakery never sees a
   // price; an owner gets a standing invitation at the end of every list and
   // the whole mechanism one tap behind it.
+
+  function emptyBlock(title, body, icon) {
+    var box = el('div', 'bz-blank');
+    box.appendChild(glyphNode(icon || '\u25C6', 'bz-glyph bz-blank-glyph'));
+    box.appendChild(el('h3', 'bz-blank-title', title));
+    box.appendChild(el('p', 'bz-blank-body', body));
+    return box;
+  }
 
   function ownerCard() {
     var card = el('button', 'bz-owner');
@@ -885,7 +905,7 @@
     state.categories.forEach(function (cat) {
       var row = el('button', 'bz-pick');
       row.type = 'button';
-      if (!cat.count) row.classList.add('is-empty');
+      if (!cat.count) row.classList.add('is-quiet');
       if (state.mode === 'category' && state.categoryId === cat.id) {
         row.classList.add('is-on');
       }
@@ -901,13 +921,13 @@
         row.disabled = false;
         row.classList.remove('is-on');
         row.addEventListener('click', function () { onChoose(cat); });
-      } else if (cat.count) {
+      } else {
+        // Every category opens, empty or not. Landing on an empty one is how
+        // an owner finds out their trade has a free field in it.
         row.addEventListener('click', function () {
           closeSheet();
           openCategory(cat.id, cat.name, cat.icon);
         });
-      } else {
-        row.disabled = true;
       }
       list.appendChild(row);
     });
@@ -1175,14 +1195,112 @@
 
   function closeSheet() {
     var backdrop = $('sheetBackdrop');
+    var sheet = $('sheet');
     if (backdrop.hidden) return;
+
+    // A drag leaves an inline transform behind; clearing it lets the class
+    // transition run the sheet out instead of it vanishing from where it sat.
+    sheet.style.transition = '';
+    sheet.style.transform = '';
+
     backdrop.classList.remove('visible');
-    $('sheet').classList.remove('visible');
+    sheet.classList.remove('visible');
     setTimeout(function () {
       backdrop.hidden = true;
       $('sheetScroll').textContent = '';
     }, 260);
     setBack(currentBack());
+  }
+
+  // ============================================
+  // SWIPE TO DISMISS
+  // ============================================
+  // A sheet that only closes with the system back button reads as a page.
+  // Dragging starts from the grip, or from the body when it is already
+  // scrolled to the top, so the gesture never fights the sheet's own scroll.
+
+  var DISMISS_PX = 96;          // far enough to be deliberate
+  var DISMISS_VELOCITY = 0.6;   // px per ms, so a quick flick also closes
+
+  function initSheetDrag() {
+    var sheet = $('sheet');
+    var scroll = $('sheetScroll');
+    var startY = 0, startT = 0, dy = 0;
+    var armed = false, active = false, fromGrip = false, pointer = null;
+
+    var SLOP = 6;   // below this it is a tap, not a drag
+
+    function stop(close) {
+      if (!armed) return;
+      if (active) {
+        try { sheet.releasePointerCapture(pointer); } catch (err) {}
+      }
+      armed = false;
+      active = false;
+      pointer = null;
+      sheet.style.transition = '';
+      if (close) {
+        closeSheet();
+      } else {
+        sheet.style.transform = '';
+      }
+      dy = 0;
+    }
+
+    sheet.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      fromGrip = !!(e.target.closest && e.target.closest('.bz-sheet-grip'));
+      // From the body, only when there is nothing left to scroll up into,
+      // so the gesture never fights the sheet's own scrolling.
+      if (!fromGrip && scroll.scrollTop > 0) return;
+
+      armed = true;
+      active = false;
+      pointer = e.pointerId;
+      startY = e.clientY;
+      startT = e.timeStamp;
+      dy = 0;
+    });
+
+    sheet.addEventListener('pointermove', function (e) {
+      if (!armed || e.pointerId !== pointer) return;
+
+      dy = e.clientY - startY;
+
+      if (dy <= 0) {
+        if (active) sheet.style.transform = '';
+        dy = 0;
+        return;
+      }
+      if (!fromGrip && scroll.scrollTop > 0) {
+        stop(false);
+        return;
+      }
+
+      // Capture is taken only once this is unmistakably a drag. Taking it on
+      // pointerdown would retarget the click that follows an ordinary tap to
+      // the sheet, and nothing inside it would be pressable.
+      if (!active) {
+        if (dy < SLOP) return;
+        active = true;
+        sheet.style.transition = 'none';
+        try { sheet.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+
+      if (e.cancelable) e.preventDefault();
+      sheet.style.transform = 'translateY(' + dy + 'px)';
+    }, { passive: false });
+
+    sheet.addEventListener('pointerup', function (e) {
+      if (!armed || e.pointerId !== pointer) return;
+      if (!active) { stop(false); return; }        // a tap; leave it alone
+      var elapsed = Math.max(1, e.timeStamp - startT);
+      var far = dy > DISMISS_PX;
+      var flick = dy > 28 && (dy / elapsed) > DISMISS_VELOCITY;
+      stop(far || flick);
+    });
+
+    sheet.addEventListener('pointercancel', function () { stop(false); });
   }
 
   // ============================================
@@ -1247,6 +1365,7 @@
       if (e.key === 'Escape') closeSheet();
     });
 
+    initSheetDrag();
     loadFeed();
   }
 

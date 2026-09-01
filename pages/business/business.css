@@ -247,8 +247,9 @@
 .bz-pick:last-child { border-bottom: none; }
 .bz-pick.is-on { background: var(--accent-light); font-weight: 700; }
 .bz-pick.is-on .bz-glyph { border-color: rgba(4, 120, 87, 0.25); background: var(--bg-elevated); }
-.bz-pick.is-empty { color: var(--text-muted); cursor: default; }
-.bz-pick.is-empty .bz-glyph { opacity: 0.42; }
+/* An empty category still opens, so it reads as quiet rather than disabled. */
+.bz-pick.is-quiet .bz-pick-name { color: var(--text-secondary); }
+.bz-pick.is-quiet .bz-glyph { opacity: 0.55; }
 
 .bz-pick-name { flex: 1; min-width: 0; }
 
@@ -370,8 +371,12 @@
   font-size: 0.7rem;
 }
 
+/* The three grounds are one warm family fading a step at a time, so the block
+   reads as a podium and the drop from first to third is visible before any
+   badge is. Three unrelated tints made it look patchy instead of ordered. */
+
 /* --- gold --- */
-.bz-row--r1 { background: #fdf6e0; border-color: #e3c15f; }
+.bz-row--r1 { background: #fbeecb; border-color: #e3c15f; }
 .bz-row--r1 .bz-badge {
   width: 40px; height: 40px; font-size: 0.79rem;
   background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%);
@@ -382,7 +387,7 @@
 }
 
 /* --- silver --- */
-.bz-row--r2 { background: #f7f8f9; border-color: #c8ced6; }
+.bz-row--r2 { background: #fdf5e2; border-color: #ddc98e; }
 .bz-row--r2 .bz-badge {
   width: 36px; height: 36px; font-size: 0.74rem;
   background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%);
@@ -393,7 +398,7 @@
 }
 
 /* --- bronze --- */
-.bz-row--r3 { background: #fdf2ea; border-color: #ddab82; }
+.bz-row--r3 { background: #fefaf1; border-color: #e6d4b4; }
 .bz-row--r3 .bz-badge {
   width: 33px; height: 33px; font-size: 0.71rem;
   background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%);
@@ -621,6 +626,42 @@
   padding: 13px;
 }
 
+/* ---------- empty states ---------- */
+
+.bz-blank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 44px 12px 8px;
+}
+
+.bz-blank-glyph {
+  width: 46px;
+  height: 46px;
+  font-size: 1.4rem;
+  border-radius: 13px;
+  margin-bottom: 14px;
+}
+
+.bz-blank-title {
+  margin: 0 0 7px;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.008em;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.bz-blank-body {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
 /* ---------- owner entry ---------- */
 /* The only route to the money. Someone browsing for a bakery never meets a
    price; an owner gets a standing invitation at the end of every list. */
@@ -730,8 +771,18 @@
 }
 .bz-sheet.visible { transform: translateY(0); }
 
-.bz-sheet-grip { padding: 9px 0 3px; display: flex; justify-content: center; flex: none; }
-.bz-sheet-grip-bar { width: 34px; height: 4px; border-radius: 2px; background: var(--sand-300); }
+.bz-sheet-grip {
+  padding: 11px 0 7px;
+  display: flex;
+  justify-content: center;
+  flex: none;
+  cursor: grab;
+  /* The grip owns the vertical gesture; without this the browser scrolls
+     instead of letting the sheet be dragged down. */
+  touch-action: none;
+}
+.bz-sheet-grip:active { cursor: grabbing; }
+.bz-sheet-grip-bar { width: 40px; height: 4px; border-radius: 2px; background: var(--sand-300); }
 
 .bz-sheet-scroll {
   flex: 1;
@@ -1161,9 +1212,9 @@
 /* The metals keep their own colour on the dark ground; only the card tint
    drops to a whisper, so the badges stay the brightest thing in the row. */
 .night-mode .bz-row--paid { border-color: rgba(255,255,255,0.1); }
-.night-mode .bz-row--r1 { background: rgba(232,188,60,0.1); border-color: rgba(232,188,60,0.36); }
-.night-mode .bz-row--r2 { background: rgba(203,209,217,0.07); border-color: rgba(203,209,217,0.26); }
-.night-mode .bz-row--r3 { background: rgba(200,131,74,0.09); border-color: rgba(200,131,74,0.32); }
+.night-mode .bz-row--r1 { background: rgba(232,188,60,0.13); border-color: rgba(232,188,60,0.4); }
+.night-mode .bz-row--r2 { background: rgba(232,188,60,0.08); border-color: rgba(232,188,60,0.26); }
+.night-mode .bz-row--r3 { background: rgba(232,188,60,0.045); border-color: rgba(232,188,60,0.16); }
 .night-mode .bz-badge--ghost { background: none; border-color: rgba(255,255,255,0.18); color: #7d766f; }
 .night-mode .bz-topline::before { background: rgba(255,255,255,0.09); }
 .night-mode .bz-topline-tag { background: #141210; border-color: rgba(255,255,255,0.11); color: #c9a04a; }
@@ -1189,7 +1240,9 @@
 .night-mode .bz-done-icon { background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.5); color: #6ee7b7; }
 .night-mode .bz-minelist { border-color: rgba(255,255,255,0.09); }
 .night-mode .bz-mine { background: #1e1b18; border-bottom-color: rgba(255,255,255,0.07); }
-.night-mode .bz-mine-name { color: #f0ede9; }
+.night-mode .bz-mine-name,
+.night-mode .bz-blank-title { color: #f0ede9; }
+.night-mode .bz-blank-body { color: #a09a93; }
 .night-mode .bz-status--pending, .night-mode .bz-status--unpaid { background: rgba(234,185,50,0.14); color: #eab932; }
 .night-mode .bz-status--active { background: rgba(52,211,153,0.13); color: #6ee7b7; }
 .night-mode .bz-status--off { background: rgba(232,112,92,0.13); color: #f0917f; }
