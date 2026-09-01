@@ -58,6 +58,27 @@
     });
   }
 
+  function postJSON(path, body) {
+    return fetch(API + path, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Init-Data': (tg && tg.initData) ? tg.initData : ''
+      },
+      body: JSON.stringify(body || {}),
+      signal: AbortSignal.timeout(TIMEOUT)
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (!r.ok || !data.success) {
+          var err = new Error(data.error || 'http_' + r.status);
+          err.code = data.error;
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
+
   // ============================================
   // ICONS
   // ============================================
@@ -77,6 +98,11 @@
     appstore: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.7c0-2.2 1.8-3.3 1.9-3.3-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.5 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.4 1.1 8.5.7 1 1.5 2.2 2.6 2.1 1.1 0 1.5-.7 2.8-.7s1.6.7 2.8.7c1.2 0 1.9-1 2.6-2.1.8-1.2 1.2-2.3 1.2-2.4-.1 0-2.2-.9-2.2-3.2zM14.2 5.9c.6-.7 1-1.7.9-2.7-.9 0-2 .6-2.6 1.3-.6.6-1.1 1.6-.9 2.6 1 .1 2-.5 2.6-1.2z"/></svg>',
     playstore: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.4a1 1 0 0 0-.4.8v17.6a1 1 0 0 0 .4.8l9.3-9.6zM14.3 10.3 5.6 1.7l10.9 6.2zM14.3 13.7l2.2 2.4-10.9 6.2zM17.9 9l3 1.7a1.3 1.3 0 0 1 0 2.6l-3 1.7-2.5-3z"/></svg>',
     kakao: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.9 3 2.8 6.3 2.8 10.3c0 2.6 1.7 4.9 4.3 6.2l-1.1 4c-.1.3.3.6.6.4l4.7-3.1c.2 0 .5.1.7.1 5.1 0 9.2-3.3 9.2-7.6S17.1 3 12 3z"/></svg>',
+    thumbUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 22V10l5-8a2.4 2.4 0 0 1 2.3 3.1L13.4 9H19a2.2 2.2 0 0 1 2.1 2.8l-2 8A2.2 2.2 0 0 1 17 22Z"/><path d="M7 10H4.5A1.5 1.5 0 0 0 3 11.5v9A1.5 1.5 0 0 0 4.5 22H7"/></svg>',
+    thumbDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2v12l-5 8a2.4 2.4 0 0 1-2.3-3.1L10.6 15H5a2.2 2.2 0 0 1-2.1-2.8l2-8A2.2 2.2 0 0 1 7 2Z"/><path d="M17 14h2.5A1.5 1.5 0 0 0 21 12.5v-9A1.5 1.5 0 0 0 19.5 2H17"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5.5 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.9"/></svg>'
   };
 
@@ -534,13 +560,287 @@
       wrap.appendChild(pick);
     }
 
+    var submit = el('button', 'bz-btn bz-btn--block');
+    submit.type = 'button';
+    submit.textContent = 'Biznesimni qo‘shish';
+    submit.addEventListener('click', function () { openSubmitForm(); });
+    wrap.appendChild(submit);
+
+    var mineBtn = el('button', 'bz-btn bz-btn--ghost bz-btn--last');
+    mineBtn.type = 'button';
+    mineBtn.textContent = 'Mening bizneslarim';
+    mineBtn.addEventListener('click', openMine);
+    wrap.appendChild(mineBtn);
+
+    mountSheet(wrap);
+  }
+
+  // ============================================
+  // SUBMISSION
+  // ============================================
+
+  var LINK_FIELDS = [
+    { kind: 'phone',     label: 'Telefon',   placeholder: '010-1234-5678', mode: 'tel' },
+    { kind: 'telegram',  label: 'Telegram',  placeholder: '@username' },
+    { kind: 'instagram', label: 'Instagram', placeholder: '@username' },
+    { kind: 'website',   label: 'Veb-sayt',  placeholder: 'example.uz', mode: 'url' }
+  ];
+
+  var SUBMIT_ERRORS = {
+    bad_name: 'Nomni tekshiring (2–80 harf).',
+    bad_category: 'Yo‘nalishni tanlang.',
+    description_too_long: 'Tavsif juda uzun.',
+    no_contact: 'Kamida bitta bog‘lanish usulini kiriting.',
+    invalid_phone: 'Telefon raqami noto‘g‘ri.',
+    invalid_handle: 'Username noto‘g‘ri. Faqat harf, raqam, nuqta va pastki chiziq.',
+    invalid_url: 'Havola noto‘g‘ri.',
+    wrong_host: 'Havola boshqa saytga tegishli.',
+    link_too_long: 'Havola juda uzun.',
+    duplicate: 'Bu nomdagi biznesingiz allaqachon yuborilgan.',
+    rate_limited: 'Bugungi limitga yetdingiz. Ertaga urinib ko‘ring.',
+    no_init_data: 'Iltimos, sahifani Telegram ichida oching.',
+    bad_signature: 'Telegram hisobingizni tasdiqlab bo‘lmadi.'
+  };
+
+  // Draft survives a trip to the category picker and back, so choosing a
+  // category never costs the owner what they already typed.
+  var draft = { name: '', description: '', links: {}, category: null };
+
+  function openSubmitForm() {
+    if (!draft.category && state.mode === 'category') {
+      draft.category = {
+        id: state.categoryId, name: state.categoryName, icon: state.categoryIcon
+      };
+    }
+
+    var wrap = el('div', 'bz-sheet-body');
+    wrap.appendChild(el('p', 'bz-sheet-eyebrow', 'Yangi biznes'));
+    wrap.appendChild(el('h2', 'bz-sheet-name', 'Katalogga qo‘shish'));
+
+    var form = el('div', 'bz-form');
+
+    var nameField = field('Biznes nomi', 'majburiy');
+    var nameInput = el('input', 'bz-input');
+    nameInput.type = 'text';
+    nameInput.maxLength = 80;
+    nameInput.placeholder = 'Samarqand Non';
+    nameInput.value = draft.name;
+    nameInput.addEventListener('input', function () { draft.name = nameInput.value; });
+    nameField.appendChild(nameInput);
+    form.appendChild(nameField);
+
+    var catField = field('Yo‘nalish', 'majburiy');
+    var catBtn = el('button', 'bz-select');
+    catBtn.type = 'button';
+    var catGlyph = glyphNode(draft.category ? draft.category.icon : '◆',
+                             'bz-glyph bz-glyph--pick');
+    var catLabel = el('span', 'bz-select-label',
+                      draft.category ? draft.category.name : 'Tanlang');
+    if (!draft.category) catLabel.classList.add('is-placeholder');
+    catBtn.appendChild(catGlyph);
+    catBtn.appendChild(catLabel);
+    catBtn.appendChild(iconSpan('bz-select-caret', ICONS.arrow));
+    catBtn.addEventListener('click', function () {
+      openPicker(function (cat) {
+        draft.category = cat;
+        openSubmitForm();
+      });
+    });
+    catField.appendChild(catBtn);
+    form.appendChild(catField);
+
+    var descField = field('Tavsif', 'ixtiyoriy');
+    var descInput = el('textarea', 'bz-input bz-textarea');
+    descInput.rows = 4;
+    descInput.maxLength = 500;
+    descInput.placeholder = 'Nima taklif qilasiz, ish vaqti, yetkazib berish…';
+    descInput.value = draft.description;
+    var counter = el('span', 'bz-counter', draft.description.length + ' / 500');
+    descInput.addEventListener('input', function () {
+      draft.description = descInput.value;
+      counter.textContent = descInput.value.length + ' / 500';
+    });
+    descField.appendChild(descInput);
+    descField.appendChild(counter);
+    form.appendChild(descField);
+
+    var linkField = field('Bog‘lanish', 'kamida bittasi');
+    var inputs = {};
+    LINK_FIELDS.forEach(function (spec) {
+      var row = el('div', 'bz-linkrow');
+      row.appendChild(iconSpan('bz-linkrow-icon', LINK_META[spec.kind].icon));
+      var input = el('input', 'bz-input bz-input--flat');
+      input.type = 'text';
+      input.maxLength = 200;
+      input.placeholder = spec.placeholder;
+      input.autocapitalize = 'none';
+      input.spellcheck = false;
+      if (spec.mode) input.inputMode = spec.mode;
+      input.value = draft.links[spec.kind] || '';
+      input.addEventListener('input', function () {
+        draft.links[spec.kind] = input.value;
+      });
+      inputs[spec.kind] = input;
+      row.appendChild(input);
+      linkField.appendChild(row);
+    });
+    form.appendChild(linkField);
+
+    wrap.appendChild(form);
+
+    wrap.appendChild(el('p', 'bz-sheet-fine',
+      'Yuborilgandan keyin admin ko‘rib chiqadi. Ro‘yxatga kirish to‘lovi ' +
+      formatKRW((state.pricing || {}).listingFee || 5000) +
+      ' — admin bilan qo‘lda hal qilinadi.'));
+
+    var error = el('p', 'bz-formerror');
+    error.hidden = true;
+    wrap.appendChild(error);
+
+    var send = el('button', 'bz-btn bz-btn--block');
+    send.type = 'button';
+    send.textContent = 'Yuborish';
+    wrap.appendChild(send);
+
+    function readLinks() {
+      return LINK_FIELDS.map(function (spec) {
+        return { kind: spec.kind, value: inputs[spec.kind].value.trim() };
+      }).filter(function (l) { return l.value; });
+    }
+
+    function fail(code) {
+      error.textContent = SUBMIT_ERRORS[code] ||
+        'Xatolik yuz berdi. Qaytadan urinib ko‘ring.';
+      error.hidden = false;
+      try { tg.HapticFeedback.notificationOccurred('error'); } catch (e) {}
+    }
+
+    var sending = false;
+    send.addEventListener('click', function () {
+      if (sending) return;
+      error.hidden = true;
+
+      var links = readLinks();
+      if (nameInput.value.trim().length < 2) return fail('bad_name');
+      if (!draft.category) return fail('bad_category');
+      if (!links.length) return fail('no_contact');
+
+      sending = true;
+      send.disabled = true;
+      send.textContent = 'Yuborilmoqda…';
+
+      postJSON('/api/business/submit', {
+        name: nameInput.value.trim(),
+        category_id: draft.category.id,
+        description: descInput.value.trim(),
+        links: links
+      })
+        .then(function () {
+          try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
+          draft = { name: '', description: '', links: {}, category: null };
+          showSubmitted();
+        })
+        .catch(function (err) {
+          sending = false;
+          send.disabled = false;
+          send.textContent = 'Yuborish';
+          fail(err.code);
+        });
+    });
+
+    mountSheet(wrap);
+  }
+
+  function field(label, hint) {
+    var box = el('div', 'bz-field');
+    var head = el('div', 'bz-fieldhead');
+    head.appendChild(el('span', 'bz-fieldlabel', label));
+    if (hint) head.appendChild(el('span', 'bz-fieldhint', hint));
+    box.appendChild(head);
+    return box;
+  }
+
+  function showSubmitted() {
+    var wrap = el('div', 'bz-sheet-body bz-done');
+    wrap.appendChild(iconSpan('bz-done-icon', ICONS.check));
+    wrap.appendChild(el('h2', 'bz-sheet-name', 'Yuborildi'));
+    wrap.appendChild(el('p', 'bz-sheet-desc',
+      'Admin ko‘rib chiqadi va tasdiqlangach biznesingiz katalogda ko‘rinadi. ' +
+      'To‘lov bo‘yicha admin siz bilan bog‘lanadi.'));
+
     var cta = el('button', 'bz-btn bz-btn--block');
     cta.type = 'button';
     cta.textContent = 'Admin bilan bog‘lanish';
-    cta.addEventListener('click', function () { openAdmin(); });
+    cta.addEventListener('click', openAdmin);
     wrap.appendChild(cta);
-
     mountSheet(wrap);
+  }
+
+  // ============================================
+  // MY BUSINESSES
+  // ============================================
+
+  var STATUS_TEXT = {
+    pending_review: ['Ko‘rib chiqilmoqda', 'pending'],
+    unpaid: ['To‘lov kutilmoqda', 'unpaid'],
+    active: ['Katalogda', 'active'],
+    rejected: ['Qabul qilinmadi', 'off'],
+    suspended: ['To‘xtatilgan', 'off']
+  };
+
+  function openMine() {
+    var wrap = el('div', 'bz-sheet-body');
+    wrap.appendChild(el('h2', 'bz-sheet-name', 'Mening bizneslarim'));
+    var slot = el('div');
+    slot.appendChild(el('div', 'bz-spinner'));
+    wrap.appendChild(slot);
+    mountSheet(wrap);
+
+    fetch(API + '/api/business/mine', {
+      headers: { 'X-Init-Data': (tg && tg.initData) ? tg.initData : '' },
+      signal: AbortSignal.timeout(TIMEOUT)
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        slot.textContent = '';
+        var items = (data && data.businesses) || [];
+        if (!items.length) {
+          slot.appendChild(el('p', 'bz-sheet-desc', 'Hali biznes qo‘shmagansiz.'));
+        } else {
+          var list = el('div', 'bz-minelist');
+          items.forEach(function (b) { list.appendChild(mineRow(b)); });
+          slot.appendChild(list);
+        }
+        var add = el('button', 'bz-btn bz-btn--block');
+        add.type = 'button';
+        add.textContent = 'Yangi biznes qo‘shish';
+        add.addEventListener('click', function () { openSubmitForm(); });
+        slot.appendChild(add);
+      })
+      .catch(function () {
+        slot.textContent = '';
+        slot.appendChild(el('p', 'bz-sheet-desc', 'Yuklab bo‘lmadi.'));
+      });
+  }
+
+  function mineRow(business) {
+    var row = el('div', 'bz-mine');
+    row.appendChild(glyphNode(business.categoryIcon, 'bz-glyph bz-glyph--pick'));
+
+    var body = el('div', 'bz-mine-body');
+    body.appendChild(el('span', 'bz-mine-name', business.name));
+
+    var meta = el('span', 'bz-mine-meta');
+    var st = STATUS_TEXT[business.status] || [business.status, 'off'];
+    meta.appendChild(el('span', 'bz-status bz-status--' + st[1], st[0]));
+    if (business.status === 'active') {
+      if (business.position) meta.appendChild(el('span', null, '#' + business.position));
+      meta.appendChild(el('span', null, '♡ ' + business.likes));
+      meta.appendChild(el('span', null, business.taps + ' ochilgan'));
+    }
+    body.appendChild(meta);
+    row.appendChild(body);
+    return row;
   }
 
   function stepRow(n, title, body) {
@@ -562,11 +862,12 @@
   // Alphabetical asserts no precedence and, unlike ordering by size, does not
   // reshuffle when a business is added somewhere else.
 
-  function openPicker() {
+  function openPicker(onChoose) {
     haptic('light');
 
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('h2', 'bz-sheet-name', 'Yo‘nalishlar'));
+    wrap.appendChild(el('h2', 'bz-sheet-name',
+      onChoose ? 'Yo‘nalishni tanlang' : 'Yo‘nalishlar'));
 
     var list = el('div', 'bz-picker');
 
@@ -579,7 +880,7 @@
       closeSheet();
       if (state.mode !== 'feed') backToFeed();
     });
-    list.appendChild(all);
+    if (!onChoose) list.appendChild(all);
 
     state.categories.forEach(function (cat) {
       var row = el('button', 'bz-pick');
@@ -594,7 +895,13 @@
 
       // An empty category is shown so the set stays complete and an owner can
       // see their trade is listed, but there is nothing behind it to open.
-      if (cat.count) {
+      // Choosing for the form is a different job from filtering the list, and
+      // an empty category is a perfectly good thing to be the first business in.
+      if (onChoose) {
+        row.disabled = false;
+        row.classList.remove('is-on');
+        row.addEventListener('click', function () { onChoose(cat); });
+      } else if (cat.count) {
         row.addEventListener('click', function () {
           closeSheet();
           openCategory(cat.id, cat.name, cat.icon);
@@ -676,7 +983,63 @@
       if (grid.childNodes.length) wrap.appendChild(grid);
     }
 
+    wrap.appendChild(reactionBar(business));
     return wrap;
+  }
+
+  // Tapping the side you already hold clears it, so one control both sets and
+  // unsets. Counts come back from the server rather than being adjusted here,
+  // so a second device never drifts out of step.
+  function reactionBar(business) {
+    var bar = el('div', 'bz-react');
+    var mine = business.myReaction || 0;
+
+    var up = reactionBtn(ICONS.thumbUp, business.likes, mine === 1);
+    var down = reactionBtn(ICONS.thumbDown, business.dislikes, mine === -1);
+    var busy = false;
+
+    function send(value) {
+      if (busy) return;
+      busy = true;
+      haptic('light');
+      postJSON('/api/business/' + business.id + '/reaction',
+               { value: mine === value ? 0 : value })
+        .then(function (data) {
+          mine = data.myReaction;
+          business.myReaction = data.myReaction;
+          business.likes = data.likes;
+          business.dislikes = data.dislikes;
+          paint(up, data.likes, mine === 1);
+          paint(down, data.dislikes, mine === -1);
+        })
+        .catch(function (err) {
+          showToast(err.code === 'no_init_data' || err.code === 'bad_signature'
+            ? 'Iltimos, sahifani Telegram ichida oching'
+            : 'Saqlab bo‘lmadi');
+        })
+        .then(function () { busy = false; });
+    }
+
+    up.addEventListener('click', function () { send(1); });
+    down.addEventListener('click', function () { send(-1); });
+
+    bar.appendChild(up);
+    bar.appendChild(down);
+    return bar;
+  }
+
+  function reactionBtn(icon, count, on) {
+    var btn = el('button', 'bz-reactbtn');
+    btn.type = 'button';
+    btn.appendChild(iconSpan('bz-reactbtn-icon', icon));
+    btn.appendChild(el('span', 'bz-reactbtn-n', String(count || 0)));
+    if (on) btn.classList.add('is-on');
+    return btn;
+  }
+
+  function paint(btn, count, on) {
+    btn.querySelector('.bz-reactbtn-n').textContent = String(count || 0);
+    btn.classList.toggle('is-on', on);
   }
 
   function linkNode(link) {
@@ -864,7 +1227,9 @@
       $('bzSearch').focus();
     });
 
-    $('bzFilter').addEventListener('click', openPicker);
+    // Passing openPicker directly would hand it the MouseEvent as its
+    // onChoose callback, putting the filter into chooser mode.
+    $('bzFilter').addEventListener('click', function () { openPicker(); });
     $('bzFilterClear').addEventListener('click', function () {
       haptic('light');
       backToFeed();
