@@ -1153,7 +1153,7 @@
 
 .bz-mine-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 
-.bz-mine-edit {
+.bz-mine-act {
   flex: none;
   padding: 6px 12px;
   border: 1px solid var(--sand-300);
@@ -1190,6 +1190,82 @@
 .bz-status--active  { background: var(--accent-light); color: var(--emerald-700); }
 .bz-status--off     { background: #fbeeeb; color: #9c332a; }
 
+/* ---------- bidding ---------- */
+
+.bz-bidnow {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 16px;
+}
+
+.bz-bidstat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px 13px;
+  border: 1px solid var(--sand-200);
+  border-radius: 11px;
+  background: var(--bg-elevated);
+}
+
+.bz-bidstat-k {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.bz-bidstat-v {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.bz-bidopts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+.bz-bidopt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 13px;
+  border: 1.5px solid var(--sand-200);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.bz-bidopt:active { transform: scale(0.99); }
+.bz-bidopt.is-on { border-color: var(--gold-500); background: var(--gold-100); }
+
+/* A figure the owner already meets is shown, not hidden — it is how they see
+   what they are holding relative to what is on offer. */
+.bz-bidopt.is-held { opacity: 0.45; cursor: default; }
+
+.bz-bidopt-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.bz-bidopt-amount {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.bz-bidopt-due {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bz-mine-acts { display: flex; flex-direction: column; gap: 5px; flex: none; }
+.bz-mine-act--bid { color: var(--gold-600); border-color: var(--gold-300); }
+
 /* ---------- toast ---------- */
 
 .bz-toast {
@@ -1217,7 +1293,8 @@
 .bz-input:focus-visible,
 .bz-select:focus-visible,
 .bz-logobtn:focus-visible,
-.bz-mine-edit:focus-visible,
+.bz-mine-act:focus-visible,
+.bz-bidopt:focus-visible,
 .bz-owner:focus-visible,
 .bz-filter:focus-visible,
 .bz-filter-clear:focus-visible,
@@ -1336,8 +1413,16 @@
 }
 .night-mode .bz-logohint { color: #7d766f; }
 .night-mode .bz-logobtn,
-.night-mode .bz-mine-edit { background: #262220; border-color: rgba(255,255,255,0.12); color: #f0ede9; }
-.night-mode .bz-mine-edit { color: var(--emerald-400); }
+.night-mode .bz-mine-act { background: #262220; border-color: rgba(255,255,255,0.12); color: #f0ede9; }
+.night-mode .bz-mine-act { color: var(--emerald-400); }
+.night-mode .bz-mine-act--bid { color: #eab932; border-color: rgba(234,185,50,0.35); }
+.night-mode .bz-bidstat,
+.night-mode .bz-bidopt { background: #1e1b18; border-color: rgba(255,255,255,0.09); }
+.night-mode .bz-bidstat-v,
+.night-mode .bz-bidopt-amount { color: #f0ede9; }
+.night-mode .bz-bidstat-k,
+.night-mode .bz-bidopt-due { color: #7d766f; }
+.night-mode .bz-bidopt.is-on { border-color: #eab932; background: rgba(234,185,50,0.11); }
 .night-mode .bz-status--pending, .night-mode .bz-status--unpaid { background: rgba(234,185,50,0.14); color: #eab932; }
 .night-mode .bz-status--active { background: rgba(52,211,153,0.13); color: #6ee7b7; }
 .night-mode .bz-status--off { background: rgba(232,112,92,0.13); color: #f0917f; }

@@ -1088,6 +1088,153 @@
       });
   }
 
+  // ============================================
+  // BIDDING
+  // ============================================
+
+  var BID_ERRORS = {
+    too_low: 'Taklif juda past.',
+    not_higher: 'Taklif hozirgi summangizdan yuqori bo‘lishi kerak.',
+    already_pending: 'Sizda ko‘rib chiqilayotgan taklif bor.',
+    bidding_closed: 'Bu yo‘nalishda hali tanlov boshlanmagan.',
+    not_active: 'Biznes hali katalogda emas.',
+    bad_amount: 'Summani tekshiring.'
+  };
+
+  function openBidForm(business) {
+    var pricing = business.pricing || {};
+    var prices = pricing.prices || {};
+    var held = business.bidAmount || 0;
+
+    var wrap = el('div', 'bz-sheet-body');
+    wrap.appendChild(el('p', 'bz-sheet-eyebrow', business.categoryName || ''));
+    wrap.appendChild(el('h2', 'bz-sheet-name', 'Yuqori o‘rin'));
+
+    var now = el('div', 'bz-bidnow');
+    now.appendChild(bidStat('Hozirgi o‘rin',
+      business.position ? '#' + business.position : '—'));
+    now.appendChild(bidStat('Sizda', held ? formatKRW(held) : '—'));
+    wrap.appendChild(now);
+
+    wrap.appendChild(el('p', 'bz-sheet-desc',
+      'Quyidagi summani taklif qiling. Sizda allaqachon summa bo‘lsa, ' +
+      'faqat farqini to‘laysiz.'));
+
+    var chosen = null;
+    var options = el('div', 'bz-bidopts');
+    [1, 2, 3].forEach(function (pos) {
+      var price = prices[String(pos)];
+      if (!price) return;
+
+      var opt = el('button', 'bz-bidopt');
+      opt.type = 'button';
+      opt.appendChild(el('span', 'bz-badge bz-badge--sm', '#' + pos));
+
+      var body = el('span', 'bz-bidopt-body');
+      body.appendChild(el('span', 'bz-bidopt-amount', formatKRW(price)));
+      var due = Math.max(0, price - held);
+      body.appendChild(el('span', 'bz-bidopt-due',
+        held ? 'to‘lanadi ' + formatKRW(due) : 'yoki undan yuqori'));
+      opt.appendChild(body);
+
+      // Already at or above this figure: there is nothing to buy here.
+      if (price <= held) {
+        opt.disabled = true;
+        opt.classList.add('is-held');
+      } else {
+        opt.addEventListener('click', function () {
+          chosen = price;
+          var all = options.querySelectorAll('.bz-bidopt');
+          for (var i = 0; i < all.length; i++) all[i].classList.remove('is-on');
+          opt.classList.add('is-on');
+          error.hidden = true;
+          send.disabled = false;
+          send.textContent = 'Taklif qilish — ' + formatKRW(Math.max(0, price - held));
+        });
+      }
+      options.appendChild(opt);
+    });
+    wrap.appendChild(options);
+
+    var error = el('p', 'bz-formerror');
+    error.hidden = true;
+    wrap.appendChild(error);
+
+    var send = el('button', 'bz-btn bz-btn--block');
+    send.type = 'button';
+    send.disabled = true;
+    send.textContent = 'O‘rinni tanlang';
+    wrap.appendChild(send);
+
+    wrap.appendChild(el('p', 'bz-sheet-fine',
+      'Taklif admin to‘lovni tasdiqlagandan keyin kuchga kiradi. Shu orada ' +
+      'boshqa biznes yuqoriroq taklif qilsa, o‘rningiz o‘zgarishi mumkin. ' +
+      'To‘lov qaytarilmaydi.'));
+
+    var sending = false;
+    send.addEventListener('click', function () {
+      if (sending || !chosen) return;
+      sending = true;
+      send.disabled = true;
+      send.textContent = 'Yuborilmoqda…';
+
+      postJSON('/api/business/' + business.id + '/bid', { amount: chosen })
+        .then(function () {
+          try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
+          showBidSent();
+        })
+        .catch(function (err) {
+          sending = false;
+          send.disabled = false;
+          send.textContent = 'Taklif qilish';
+          error.textContent = BID_ERRORS[err.code] ||
+            'Xatolik yuz berdi. Qaytadan urinib ko‘ring.';
+          error.hidden = false;
+          try { tg.HapticFeedback.notificationOccurred('error'); } catch (e) {}
+        });
+    });
+
+    mountSheet(wrap);
+  }
+
+  function bidStat(label, value) {
+    var box = el('div', 'bz-bidstat');
+    box.appendChild(el('span', 'bz-bidstat-k', label));
+    box.appendChild(el('span', 'bz-bidstat-v', value));
+    return box;
+  }
+
+  function showBidSent() {
+    var wrap = el('div', 'bz-sheet-body bz-done');
+    wrap.appendChild(iconSpan('bz-done-icon', ICONS.clock));
+    wrap.appendChild(el('h2', 'bz-sheet-name', 'Taklif yuborildi'));
+    wrap.appendChild(el('p', 'bz-sheet-desc',
+      'Admin to‘lov bo‘yicha siz bilan bog‘lanadi. To‘lov tasdiqlangach ' +
+      'o‘rningiz o‘zgaradi.'));
+
+    var cta = el('button', 'bz-btn bz-btn--block');
+    cta.type = 'button';
+    cta.textContent = 'Admin bilan bog‘lanish';
+    cta.addEventListener('click', openAdmin);
+    wrap.appendChild(cta);
+
+    var back = el('button', 'bz-btn bz-btn--ghost bz-btn--last');
+    back.type = 'button';
+    back.textContent = 'Mening bizneslarim';
+    back.addEventListener('click', openMine);
+    wrap.appendChild(back);
+    mountSheet(wrap);
+  }
+
+  function cancelBid(business) {
+    fetch(API + '/api/business/' + business.id + '/bid', {
+      method: 'DELETE',
+      headers: { 'X-Init-Data': (tg && tg.initData) ? tg.initData : '' }
+    })
+      .then(function () { showToast('Taklif bekor qilindi'); openMine(); })
+      .catch(function () { showToast('Bekor qilib bo‘lmadi'); });
+  }
+
   function mineRow(business) {
     var row = el('div', 'bz-mine');
     row.appendChild(glyphNode(business.categoryIcon, 'bz-glyph bz-glyph--pick'));
@@ -1103,19 +1250,41 @@
       meta.appendChild(el('span', null, '♡ ' + business.likes));
       meta.appendChild(el('span', null, business.taps + ' ochilgan'));
     }
+    if (business.pendingBid) {
+      meta.appendChild(el('span', 'bz-status bz-status--pending',
+        formatKRW(business.pendingBid.amount) + ' kutilmoqda'));
+    }
     body.appendChild(meta);
     row.appendChild(body);
 
     // Rejected listings are not the owner's to fix; everything else is.
     if (business.status !== 'rejected') {
-      var edit = el('button', 'bz-mine-edit');
+      var actions = el('div', 'bz-mine-acts');
+
+      var edit = el('button', 'bz-mine-act bz-mine-act--edit');
       edit.type = 'button';
       edit.textContent = 'Tahrirlash';
       edit.addEventListener('click', function () {
         haptic('light');
         openSubmitForm(business);
       });
-      row.appendChild(edit);
+      actions.appendChild(edit);
+
+      // Only where a position is actually contested, and only once the
+      // listing is live — there is nothing to bid on before that.
+      var pricing = business.pricing || {};
+      if (business.status === 'active' && pricing.showBidding) {
+        var bid = el('button', 'bz-mine-act bz-mine-act--bid');
+        bid.type = 'button';
+        bid.textContent = business.pendingBid ? 'Taklifni bekor qilish' : 'Yuqori o‘rin';
+        bid.addEventListener('click', function () {
+          haptic('light');
+          if (business.pendingBid) cancelBid(business);
+          else openBidForm(business);
+        });
+        actions.appendChild(bid);
+      }
+      row.appendChild(actions);
     }
     return row;
   }
