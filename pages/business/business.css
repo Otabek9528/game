@@ -1,214 +1,474 @@
 /* =========================================================
    BIZNES KATALOGI
-   Gold is reserved for paid position and appears nowhere else
-   on the page. That restraint is what makes it mean something.
+
+   Denser and quieter than the rest of the app: hairline borders
+   instead of shadows, mono for anything numeric, and no emoji at
+   all. Categories are set in type, which is what keeps a directory
+   reading as a directory.
+
+   Gold marks a paid position and nothing else. It appears as a rail
+   and a small chip, never as a fill — a whole card washed yellow
+   reads as a prize ribbon rather than a rank.
    ========================================================= */
 
 /* Several blocks below set display on a class, which outranks the UA's
-   [hidden] { display: none } and leaves "hidden" elements laid out. The
-   backdrop is the dangerous one: invisible, fixed, inset 0, and swallowing
-   every tap on the page. One guard covers all of them. */
+   [hidden] { display: none }. Without this the sheet backdrop stays laid
+   out while invisible — fixed, inset 0, swallowing every tap on the page. */
 [hidden] { display: none !important; }
 
-.bz-container {
+.bz-scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: var(--space-md) var(--space-md) 96px;
+  padding-bottom: 72px;
+  font-feature-settings: "tnum" 0;
 }
 
-.bz-view { max-width: 560px; margin: 0 auto; }
+/* ---------- sticky header ---------- */
 
-/* ---------- lede ---------- */
-.bz-lede { padding: var(--space-sm) 2px var(--space-lg); }
+.bz-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg-base);
+  padding: 14px 16px 0;
+  border-bottom: 1px solid var(--sand-200);
+}
+
+.bz-titlebar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
 
 .bz-title {
-  font-family: var(--font-display);
-  font-size: 1.72rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin: 0 0 6px;
-  color: var(--text-primary);
-}
-
-.bz-sub {
   margin: 0;
-  font-size: 0.94rem;
-  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 1.34rem;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+  line-height: 1.15;
 }
 
-/* ---------- category grid ---------- */
-.bz-cat-grid,
-.bz-skeleton {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+.bz-count {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-.bz-cat {
+/* ---------- search ---------- */
+
+.bz-searchwrap {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-  min-height: 108px;
-  padding: 14px;
+  align-items: center;
+  gap: 9px;
+  height: 38px;
+  padding: 0 11px;
   background: var(--bg-elevated);
   border: 1px solid var(--sand-200);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border-radius: 10px;
+  margin-bottom: 11px;
 }
 
-.bz-cat:active { transform: scale(0.975); box-shadow: none; }
-.bz-cat.is-empty { opacity: 0.62; }
-
-.bz-cat-icon { font-size: 1.6rem; line-height: 1.2; margin-bottom: 4px; }
-
-.bz-cat-name {
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.28;
-  color: var(--text-primary);
+.bz-searchwrap:focus-within {
+  border-color: var(--sand-400);
 }
 
-.bz-cat-count {
-  margin-top: auto;
-  font-size: 0.78rem;
+.bz-search-icon {
+  width: 15px;
+  height: 15px;
+  flex: none;
   color: var(--text-muted);
 }
+.bz-search-icon svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- skeleton ---------- */
-.bz-sk-tile {
-  height: 108px;
-  border-radius: var(--radius-lg);
+.bz-search {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  padding: 0;
+}
+.bz-search::placeholder { color: var(--text-muted); }
+.bz-search::-webkit-search-cancel-button { display: none; }
+
+.bz-search-clear {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.bz-search-clear svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- category glyphs ---------- */
+/* One glyph per category, from the database. It appears only where a
+   category is being named, so it reads as that category's mark rather than
+   as decoration. Business rows stay clean. */
+
+.bz-glyph {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border-radius: 9px;
   background: var(--sand-100);
-  animation: bzPulse 1.4s ease-in-out infinite;
+  border: 1px solid var(--sand-200);
 }
 
-@keyframes bzPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.bz-glyph--filter { width: 34px; height: 34px; font-size: 1.05rem; border-radius: 10px; }
+.bz-glyph--sec    { width: 32px; height: 32px; font-size: 1rem; }
+.bz-glyph--pick   { width: 30px; height: 30px; font-size: 0.95rem; border-radius: 8px; }
 
-/* ---------- owner note ---------- */
-.bz-owner-note {
+/* ---------- filter bar ---------- */
+/* The way into every category, so it carries real weight: the accent tint,
+   a standing label, and the glyph of whatever is currently selected. A
+   horizontal rail would hide its own tail and imply a precedence among
+   categories that does not exist. */
+
+.bz-filterbar {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding-bottom: 13px;
+}
+
+.bz-filter {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: var(--space-lg);
-  padding: 14px 16px;
+  gap: 11px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--emerald-600);
+  border-radius: 13px;
+  background: var(--accent-light);
+  color: var(--emerald-800);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--transition-fast);
+}
+.bz-filter:active { transform: scale(0.99); }
+
+.bz-filter .bz-glyph {
   background: var(--bg-elevated);
-  border: 1px solid var(--sand-200);
-  border-radius: var(--radius-lg);
+  border-color: rgba(4, 120, 87, 0.22);
 }
 
-.bz-owner-icon { width: 22px; height: 22px; flex: none; color: var(--accent); }
-.bz-owner-icon svg { width: 100%; height: 100%; display: block; }
-.bz-owner-note > div { flex: 1; min-width: 0; }
-.bz-owner-title { margin: 0; font-size: 0.9rem; font-weight: 600; }
-.bz-owner-text { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-secondary); }
+.bz-filter-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
 
-.bz-owner-cta {
+.bz-filter-kicker {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--emerald-600);
+  opacity: 0.85;
+}
+
+.bz-filter-label {
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bz-filter-caret { width: 16px; height: 16px; flex: none; color: var(--emerald-600); }
+.bz-filter-caret svg { width: 100%; height: 100%; display: block; }
+
+.bz-filter-clear {
+  width: 52px;
   flex: none;
-  padding: 7px 14px;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.83rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-/* ---------- list header ---------- */
-.bz-list-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: var(--space-sm) 0 var(--space-lg);
-}
-
-.bz-back {
-  width: 34px; height: 34px;
-  flex: none;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--sand-200);
-  border-radius: var(--radius-full);
+  justify-content: center;
+  padding: 16px;
+  border: 1.5px solid var(--sand-300);
+  border-radius: 13px;
   background: var(--bg-elevated);
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 0;
 }
-.bz-back svg { width: 17px; height: 17px; }
-.bz-back:active { transform: scale(0.94); }
+.bz-filter-clear svg { width: 100%; height: 100%; display: block; }
 
-.bz-list-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.28rem;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  color: var(--text-primary);
-}
+/* ---------- category picker ---------- */
+/* Identical rows, alphabetical, the whole set visible in one scroll. Nothing
+   about the layout says one category matters more than another. */
 
-/* ---------- podium ---------- */
-.bz-zone-label {
-  margin: 0 0 9px 2px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--gold-600);
+.bz-picker {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  border: 1px solid var(--sand-200);
+  border-radius: 14px;
+  overflow: hidden;
 }
 
-.bz-card {
-  display: grid;
-  grid-template-columns: 30px 52px 1fr;
+.bz-pick {
+  display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 13px 14px;
-  margin-bottom: 9px;
+  padding: 11px 13px;
+  border: none;
+  border-bottom: 1px solid var(--sand-200);
+  background: var(--bg-elevated);
+  font-family: inherit;
+  font-size: 0.91rem;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+.bz-pick:last-child { border-bottom: none; }
+.bz-pick.is-on { background: var(--accent-light); font-weight: 700; }
+.bz-pick.is-on .bz-glyph { border-color: rgba(4, 120, 87, 0.25); background: var(--bg-elevated); }
+.bz-pick.is-empty { color: var(--text-muted); cursor: default; }
+.bz-pick.is-empty .bz-glyph { opacity: 0.42; }
+
+.bz-pick-name { flex: 1; min-width: 0; }
+
+.bz-pick-n {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+/* ---------- sections ---------- */
+
+.bz-body { padding: 0 16px; }
+
+.bz-section { padding-top: 24px; }
+
+/* A named heading with the category's glyph, not a caption over a hairline.
+   The rule sits under the whole head so each section starts on a clear
+   edge instead of a line threaded through the words. */
+.bz-sechead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--sand-200);
+}
+
+.bz-sectext {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.bz-sectitle {
+  font-family: var(--font-display);
+  font-size: 1.04rem;
+  font-weight: 700;
+  letter-spacing: -0.008em;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.bz-seccount {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bz-secmore {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border: 1px solid var(--sand-200);
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.bz-secmore-icon { width: 13px; height: 13px; }
+.bz-secmore-icon svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- rows ---------- */
+
+.bz-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 13px;
+  margin-bottom: 6px;
   background: var(--bg-elevated);
   border: 1px solid var(--sand-200);
-  border-radius: 14px;
+  border-radius: 12px;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: transform var(--transition-fast);
+  overflow: hidden;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
 }
-.bz-card:active { transform: scale(0.985); }
+.bz-row:active { transform: scale(0.99); }
 
-/* Gold intensity descends with rank, so the position reads from the card's
-   weight before the numeral is read at all. */
-.bz-card--r1 { border: 2px solid var(--gold-500); background: var(--gold-100); }
-.bz-card--r2 { border: 1.5px solid var(--gold-400); }
-.bz-card--r3 { border: 1px solid var(--gold-300); }
+/* A held position leads with its medal. Gold, silver and bronze carry the
+   order on their own, before the numeral is read — and the badge shrinks a
+   step at a time, so size says the same thing the metal does. Each is a
+   three-stop gradient with a light inset along the top edge, which is what
+   reads as a struck disc rather than a flat circle. */
+.bz-row--paid {
+  grid-template-columns: 44px 42px 1fr;
+  border-color: var(--sand-200);
+}
 
-.bz-rank {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1;
-  text-align: center;
+.bz-badge {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+  width: 32px;
+  height: 32px;
+  font-size: 0.7rem;
 }
-.bz-card--r1 .bz-rank { font-size: 2rem; color: var(--gold-600); }
-.bz-card--r2 .bz-rank { font-size: 1.75rem; color: var(--gold-500); }
-.bz-card--r3 .bz-rank { font-size: 1.55rem; color: var(--gold-400); }
 
-.bz-card-body { min-width: 0; }
+/* --- gold --- */
+.bz-row--r1 { background: #fdf6e0; border-color: #e3c15f; }
+.bz-row--r1 .bz-badge {
+  width: 40px; height: 40px; font-size: 0.79rem;
+  background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%);
+  color: #4a3400;
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.75),
+              inset 0 -1.5px 2px rgba(120, 84, 0, 0.32),
+              0 1px 3px rgba(150, 110, 10, 0.3);
+}
 
-.bz-name {
-  font-size: 0.94rem;
+/* --- silver --- */
+.bz-row--r2 { background: #f7f8f9; border-color: #c8ced6; }
+.bz-row--r2 .bz-badge {
+  width: 36px; height: 36px; font-size: 0.74rem;
+  background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%);
+  color: #39404a;
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.9),
+              inset 0 -1.5px 2px rgba(90, 100, 112, 0.3),
+              0 1px 3px rgba(90, 100, 112, 0.22);
+}
+
+/* --- bronze --- */
+.bz-row--r3 { background: #fdf2ea; border-color: #ddab82; }
+.bz-row--r3 .bz-badge {
+  width: 33px; height: 33px; font-size: 0.71rem;
+  background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%);
+  color: #fff;
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
+              inset 0 -1.5px 2px rgba(90, 52, 20, 0.34),
+              0 1px 3px rgba(120, 76, 38, 0.26);
+}
+
+.bz-badge--ghost {
+  width: 33px; height: 33px;
+  background: none;
+  border: 1px dashed var(--sand-300);
+  color: var(--text-muted);
+  box-shadow: none;
+}
+.bz-badge--sm { width: 28px; height: 28px; font-size: 0.68rem; }
+.bz-prices-row:nth-child(1) .bz-badge--sm {
+  background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%);
+  color: #4a3400;
+}
+.bz-prices-row:nth-child(2) .bz-badge--sm {
+  background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%);
+  color: #39404a;
+}
+.bz-prices-row:nth-child(3) .bz-badge--sm {
+  background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%);
+  color: #fff;
+}
+
+/* The marker closing the contested three. "Barcha bizneslar" read as every
+   business in the directory, which is the opposite of what it labelled. */
+.bz-topline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 14px 0 12px;
+  position: relative;
+}
+.bz-topline::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: var(--sand-200);
+}
+.bz-topline-tag {
+  position: relative;
+  padding: 4px 14px;
+  border: 1px solid var(--sand-200);
+  border-radius: 999px;
+  background: var(--bg-base);
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--gold-600);
+}
+
+.bz-section--tight { padding-top: 0; }
+
+.bz-row-body { min-width: 0; }
+
+.bz-rowname {
+  font-size: 0.93rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.24;
   color: var(--text-primary);
   overflow-wrap: anywhere;
 }
 
-.bz-desc {
-  margin-top: 2px;
+.bz-rowdesc {
+  margin-top: 3px;
   font-size: 0.79rem;
-  line-height: 1.35;
+  line-height: 1.4;
   color: var(--text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -216,77 +476,40 @@
   overflow: hidden;
 }
 
-/* ---------- empty position ---------- */
-.bz-slot-empty {
-  display: grid;
-  grid-template-columns: 30px 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 15px 14px;
-  margin-bottom: 9px;
-  border: 1px dashed var(--gold-300);
-  border-radius: 14px;
-  background: transparent;
-  cursor: pointer;
-}
-.bz-slot-empty:active { transform: scale(0.985); }
-.bz-slot-empty .bz-rank { font-size: 1.55rem; color: var(--gold-300); }
-.bz-slot-text { font-size: 0.86rem; color: var(--text-secondary); }
+/* ---------- meta line ---------- */
 
-.bz-slot-price {
-  font-size: 0.79rem;
-  font-weight: 600;
-  color: var(--gold-600);
-  white-space: nowrap;
+.bz-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.63rem;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- divider ---------- */
-.bz-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 20px 2px 12px;
-}
-.bz-divider::before, .bz-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--sand-300);
-}
-.bz-divider span {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
+.bz-stat { display: inline-flex; align-items: center; gap: 4px; }
+.bz-stat-icon { width: 11px; height: 11px; opacity: 0.75; }
+.bz-stat-icon svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- regular rows ---------- */
-/* Deliberately uniform and entirely gold-free. The flatness down here is
-   what gives the podium above its lift. */
-.bz-row {
-  display: grid;
-  grid-template-columns: 42px 1fr;
+.bz-catchip {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 10px 14px;
-  margin-bottom: 8px;
-  background: var(--bg-elevated);
+  height: 16px;
+  padding: 0 7px;
   border: 1px solid var(--sand-200);
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  transition: transform var(--transition-fast);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.6rem;
 }
-.bz-row:active { transform: scale(0.985); }
-.bz-row-body { min-width: 0; }
 
 /* ---------- logo ---------- */
+
 .bz-logo {
-  width: 42px; height: 42px;
+  width: 42px;
+  height: 42px;
   flex: none;
   border-radius: 10px;
   overflow: hidden;
@@ -295,106 +518,188 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
   color: var(--text-muted);
-  letter-spacing: 0.02em;
 }
 .bz-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.bz-logo--lg { width: 52px; height: 52px; border-radius: 12px; font-size: 0.86rem; }
-.bz-logo--xl { width: 62px; height: 62px; border-radius: 14px; font-size: 1rem; }
 
-/* ---------- stats ---------- */
-.bz-stats {
-  display: flex;
-  gap: 14px;
-  margin-top: 5px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
+/* No logo yet: a monogram on a colour derived from the name, so the feed has
+   some life in it without falling back on emoji. */
+.bz-logo--mono {
+  background: hsl(var(--h, 30) 30% 92%);
+  border-color: hsl(var(--h, 30) 26% 85%);
+  color: hsl(var(--h, 30) 42% 34%);
 }
-.bz-stat { display: inline-flex; align-items: center; gap: 4px; }
-.bz-stat-icon { width: 12px; height: 12px; display: block; }
-.bz-stat-icon svg { width: 100%; height: 100%; display: block; }
-.bz-stat-icon--heart { color: #d05a4a; }
 
-/* ---------- promote strip ---------- */
-.bz-promote {
+.bz-logo--xl {
+  width: 58px;
+  height: 58px;
+  border-radius: 13px;
+  font-size: 1.02rem;
+}
+
+/* ---------- empty position ---------- */
+
+.bz-slot {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 18px;
-  padding: 13px 15px;
-  border-top: 1px solid var(--sand-200);
-}
-.bz-promote-text { font-size: 0.85rem; color: var(--text-secondary); }
-
-.bz-promote-btn {
-  padding: 8px 15px;
-  border: 1px solid var(--gold-400);
-  border-radius: var(--radius-full);
-  background: var(--gold-100);
-  color: var(--gold-600);
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
+  gap: 10px;
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 6px;
+  border: 1px dashed var(--sand-300);
+  border-radius: 12px;
+  background: none;
   cursor: pointer;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+  font-family: inherit;
+  text-align: left;
 }
-.bz-promote-btn:active { transform: scale(0.96); }
+.bz-slot:active { transform: scale(0.99); }
+
+.bz-slot-text {
+  flex: 1;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+}
+
+.bz-slot-arrow { width: 15px; height: 15px; flex: none; color: var(--gold-600); }
+.bz-slot-arrow svg { width: 100%; height: 100%; display: block; }
 
 /* ---------- states ---------- */
-.bz-loading, .bz-empty, .bz-error {
+
+.bz-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 52px 20px;
+  gap: 8px;
+  padding: 64px 24px;
   text-align: center;
+}
+
+.bz-state-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.bz-state-hint {
+  margin: 0;
+  font-size: 0.84rem;
   color: var(--text-secondary);
 }
-.bz-loading p { margin: 0; font-size: 0.88rem; }
 
 .bz-spinner {
-  width: 30px; height: 30px;
-  border: 2.5px solid var(--sand-200);
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--sand-200);
   border-top-color: var(--accent);
   border-radius: 50%;
-  animation: bzSpin 0.85s linear infinite;
+  animation: bzSpin 0.8s linear infinite;
   margin: 0 auto;
 }
 @keyframes bzSpin { to { transform: rotate(360deg); } }
 
-.bz-empty-icon { width: 42px; height: 42px; color: var(--sand-400); }
-.bz-empty-icon svg { width: 100%; height: 100%; }
-.bz-empty-text { margin: 0; font-size: 0.98rem; font-weight: 600; color: var(--text-primary); }
-.bz-empty-hint, .bz-error-text { margin: 0; font-size: 0.85rem; }
-
-.bz-retry {
-  margin-top: 6px;
-  padding: 9px 20px;
-  border: none;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: #fff;
+.bz-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--sand-300);
+  border-radius: 9px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
   font-family: inherit;
-  font-size: 0.86rem;
+  font-size: 0.87rem;
   font-weight: 600;
   cursor: pointer;
 }
+.bz-btn--block {
+  display: block;
+  width: 100%;
+  background: var(--sand-800);
+  border-color: var(--sand-800);
+  color: var(--bg-base);
+  padding: 13px;
+}
 
-.bz-inline-error {
-  grid-column: 1 / -1;
-  margin: 0;
-  padding: 28px 8px;
-  text-align: center;
-  font-size: 0.88rem;
-  color: var(--text-secondary);
+/* ---------- owner entry ---------- */
+/* The only route to the money. Someone browsing for a bakery never meets a
+   price; an owner gets a standing invitation at the end of every list. */
+
+.bz-owner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 26px 0 8px;
+  padding: 15px 16px;
+  border: 1.5px solid var(--emerald-600);
+  border-radius: 14px;
+  background: var(--accent-light);
+  color: var(--emerald-800);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bz-owner:active { transform: scale(0.99); }
+
+.bz-owner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.bz-owner-title { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.005em; }
+.bz-owner-sub { font-size: 0.78rem; line-height: 1.4; opacity: 0.82; }
+.bz-owner-arrow { width: 17px; height: 17px; flex: none; color: var(--emerald-600); }
+.bz-owner-arrow svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- owner sheet ---------- */
+
+.bz-steps { display: flex; flex-direction: column; gap: 15px; margin: 4px 0 20px; }
+.bz-step { display: flex; gap: 12px; align-items: flex-start; }
+
+.bz-step-n {
+  flex: none;
+  width: 24px; height: 24px;
+  border-radius: 999px;
+  background: var(--accent-light);
+  border: 1px solid var(--emerald-600);
+  color: var(--emerald-800);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.bz-step-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bz-step-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.bz-step-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary); }
+
+.bz-sheet-sublabel {
+  margin: 0 0 8px;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.bz-sheet-fine {
+  margin: 10px 0 20px;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.bz-btn--ghost {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  background: var(--bg-elevated);
+  border-color: var(--sand-300);
+  color: var(--text-primary);
+  padding: 12px;
 }
 
 /* ---------- bottom sheet ---------- */
+
 .bz-sheet-backdrop {
   position: fixed;
   inset: 0;
@@ -405,18 +710,18 @@
   align-items: flex-end;
   justify-content: center;
 }
-.bz-sheet-backdrop.visible { background: rgba(28, 25, 23, 0.46); }
+.bz-sheet-backdrop.visible { background: rgba(28, 25, 23, 0.5); }
 
 .bz-sheet {
   width: 100%;
   max-width: 560px;
-  /* Above the middle, but never the whole screen: the list stays visible
-     behind it so the sheet reads as a layer, not a new page. */
+  /* Above the middle but never the whole screen: the feed stays visible
+     behind it, so the sheet reads as a layer rather than a new page. */
   height: 66vh;
   max-height: 82vh;
   background: var(--bg-elevated);
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -8px 34px rgba(28, 25, 23, 0.2);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -6px 30px rgba(28, 25, 23, 0.18);
   transform: translateY(100%);
   transition: transform var(--transition-base);
   display: flex;
@@ -425,162 +730,147 @@
 }
 .bz-sheet.visible { transform: translateY(0); }
 
-.bz-sheet-grip { padding: 10px 0 4px; display: flex; justify-content: center; flex: none; }
-.bz-sheet-grip-bar {
-  width: 38px; height: 4px;
-  border-radius: 2px;
-  background: var(--sand-300);
-}
+.bz-sheet-grip { padding: 9px 0 3px; display: flex; justify-content: center; flex: none; }
+.bz-sheet-grip-bar { width: 34px; height: 4px; border-radius: 2px; background: var(--sand-300); }
 
 .bz-sheet-scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 6px 20px 30px;
+  padding: 8px 20px 30px;
 }
 
-.bz-sheet-head { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.bz-sheet-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.bz-sheet-headtext { min-width: 0; }
+
 .bz-sheet-eyebrow {
-  margin: 0 0 3px;
-  font-size: 0.71rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  margin: 0 0 4px;
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.63rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent);
 }
+
 .bz-sheet-name {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: 1.26rem;
   font-weight: 700;
-  line-height: 1.18;
+  line-height: 1.16;
+  letter-spacing: -0.008em;
   color: var(--text-primary);
   overflow-wrap: anywhere;
 }
 
 .bz-sheet-desc {
   margin: 0 0 18px;
-  font-size: 0.91rem;
-  line-height: 1.58;
+  font-size: 0.9rem;
+  line-height: 1.6;
   color: var(--text-secondary);
-  /* Owner line breaks survive here rather than becoming <br> markup. */
+  /* Owner line breaks survive here instead of becoming <br> markup. */
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
 
 /* ---------- typed links ---------- */
-.bz-link-grid { display: grid; gap: 8px; }
+
+.bz-links { display: grid; gap: 7px; }
 
 .bz-link {
   display: grid;
-  grid-template-columns: 20px 1fr auto;
+  grid-template-columns: 18px 1fr 14px;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 14px;
+  padding: 11px 13px;
   background: var(--sand-50);
   border: 1px solid var(--sand-200);
-  border-radius: 11px;
+  border-radius: 10px;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
   color: var(--text-primary);
 }
-.bz-link:active { transform: scale(0.985); }
-.bz-link-icon { width: 20px; height: 20px; color: var(--text-secondary); }
+.bz-link:active { transform: scale(0.99); }
+
+.bz-link-icon { width: 18px; height: 18px; color: var(--text-secondary); }
 .bz-link-icon svg { width: 100%; height: 100%; display: block; }
-.bz-link-body { min-width: 0; display: flex; flex-direction: column; }
-.bz-link-label { font-size: 0.71rem; color: var(--text-muted); }
+.bz-link-body { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.bz-link-label {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 .bz-link-value {
-  font-size: 0.88rem;
+  font-size: 0.87rem;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bz-link-tail { width: 16px; height: 16px; color: var(--sand-400); }
+.bz-link-tail { width: 14px; height: 14px; color: var(--sand-400); }
 .bz-link-tail svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- bidding info sheet ---------- */
-.bz-sheet-body { padding-top: 4px; }
-.bz-sheet-title {
-  margin: 0 0 8px;
-  font-family: var(--font-display);
-  font-size: 1.24rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-.bz-sheet-lede {
-  margin: 0 0 18px;
-  font-size: 0.89rem;
-  line-height: 1.55;
-  color: var(--text-secondary);
-}
+/* ---------- prices ---------- */
 
-.bz-price-table {
-  border: 1px solid var(--gold-300);
-  border-radius: 12px;
+.bz-prices {
+  border: 1px solid var(--sand-200);
+  border-radius: 10px;
   overflow: hidden;
   margin-bottom: 18px;
 }
-.bz-price-row {
+.bz-prices-row {
   display: grid;
-  grid-template-columns: 38px 1fr auto;
-  align-items: baseline;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
   gap: 10px;
-  padding: 11px 14px;
+  padding: 11px 13px;
   border-bottom: 1px solid var(--sand-200);
 }
-.bz-price-row:last-child { border-bottom: none; }
-.bz-price-row.is-target { background: var(--gold-100); }
-.bz-price-pos {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--gold-600);
-}
-.bz-price-val {
-  font-size: 0.92rem;
-  font-weight: 600;
+.bz-prices-row:last-child { border-bottom: none; }
+.bz-prices-row.is-target { background: var(--gold-100); }
+
+.bz-prices-val {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.87rem;
+  font-weight: 500;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
-.bz-price-note { font-size: 0.72rem; color: var(--text-muted); }
+.bz-prices-note { font-size: 0.68rem; color: var(--text-muted); }
 
-.bz-note-list {
+.bz-notes {
   margin: 0 0 20px;
-  padding-left: 18px;
-  font-size: 0.83rem;
+  padding-left: 17px;
+  font-size: 0.81rem;
   line-height: 1.5;
   color: var(--text-secondary);
 }
-.bz-note-list li { margin-bottom: 6px; }
-
-.bz-sheet-cta {
-  display: block;
-  padding: 13px;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.92rem;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-}
+.bz-notes li { margin-bottom: 5px; }
 
 /* ---------- toast ---------- */
+
 .bz-toast {
   position: fixed;
   left: 50%;
-  bottom: 28px;
+  bottom: 26px;
   z-index: 1000;
-  transform: translate(-50%, 14px);
+  transform: translate(-50%, 12px);
   max-width: 84vw;
-  padding: 11px 18px;
-  border-radius: var(--radius-full);
+  padding: 10px 17px;
+  border-radius: 999px;
   background: var(--sand-900);
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   opacity: 0;
   transition: opacity var(--transition-base), transform var(--transition-base);
   pointer-events: none;
@@ -588,90 +878,121 @@
 .bz-toast.visible { opacity: 1; transform: translate(-50%, 0); }
 
 /* ---------- focus ---------- */
-.bz-cat:focus-visible,
-.bz-card:focus-visible,
+
 .bz-row:focus-visible,
+.bz-owner:focus-visible,
+.bz-filter:focus-visible,
+.bz-filter-clear:focus-visible,
+.bz-pick:focus-visible,
 .bz-link:focus-visible,
-.bz-back:focus-visible,
-.bz-retry:focus-visible,
-.bz-promote-btn:focus-visible,
-.bz-slot-empty:focus-visible {
+.bz-slot:focus-visible,
+.bz-btn:focus-visible,
+.bz-secmore:focus-visible,
+.bz-linkbtn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
 /* =========================================================
    NIGHT MODE
+   Warm near-black rather than grey — the gold and the monogram
+   hues both sit better on it.
    ========================================================= */
 
-.night-mode .bz-cat,
+.night-mode .bz-sticky { background: #141210; border-bottom-color: rgba(255,255,255,0.08); }
+.night-mode .bz-searchwrap,
 .night-mode .bz-row,
-.night-mode .bz-card,
-.night-mode .bz-owner-note,
-.night-mode .bz-back {
-  background: #1e1e1e;
+.night-mode .bz-filter-clear,
+.night-mode .bz-pick,
+.night-mode .bz-btn,
+.night-mode .bz-link {
+  background: #1e1b18;
   border-color: rgba(255, 255, 255, 0.09);
 }
+.night-mode .bz-searchwrap:focus-within { border-color: rgba(255,255,255,0.2); }
 
 .night-mode .bz-title,
-.night-mode .bz-list-title,
-.night-mode .bz-name,
+.night-mode .bz-rowname,
 .night-mode .bz-sheet-name,
-.night-mode .bz-sheet-title,
-.night-mode .bz-empty-text,
-.night-mode .bz-owner-title,
-.night-mode .bz-price-val { color: #f0ede9; }
+.night-mode .bz-state-title,
+.night-mode .bz-prices-val,
+.night-mode .bz-search,
+.night-mode .bz-link { color: #f0ede9; }
 
-.night-mode .bz-sub,
-.night-mode .bz-desc,
+.night-mode .bz-rowdesc,
 .night-mode .bz-sheet-desc,
-.night-mode .bz-sheet-lede,
-.night-mode .bz-note-list,
+.night-mode .bz-notes,
 .night-mode .bz-slot-text,
-.night-mode .bz-owner-text,
-.night-mode .bz-promote-text { color: #a8a29e; }
+.night-mode .bz-state-hint,
+.night-mode .bz-sectitle { color: #f0ede9; }
 
-.night-mode .bz-cat-count,
-.night-mode .bz-stats,
-.night-mode .bz-divider span,
+.night-mode .bz-count,
+.night-mode .bz-meta,
+.night-mode .bz-seccount,
 .night-mode .bz-link-label,
-.night-mode .bz-price-note { color: #7c7f7e; }
+.night-mode .bz-prices-note,
+.night-mode .bz-chip-n,
+.night-mode .bz-search-icon,
+.night-mode .bz-search-clear { color: #7d766f; }
 
-.night-mode .bz-card--r1 { background: rgba(234, 185, 50, 0.09); border-color: #eab932; }
-.night-mode .bz-card--r2 { border-color: #c09a45; }
-.night-mode .bz-card--r3 { border-color: #8e7a4e; }
-.night-mode .bz-card--r1 .bz-rank { color: #eab932; }
-.night-mode .bz-card--r2 .bz-rank { color: #c09a45; }
-.night-mode .bz-card--r3 .bz-rank { color: #8e7a4e; }
-
-.night-mode .bz-zone-label,
-.night-mode .bz-slot-price,
-.night-mode .bz-price-pos { color: #eab932; }
-
-.night-mode .bz-slot-empty { border-color: #6b5c37; }
-.night-mode .bz-slot-empty .bz-rank { color: #6b5c37; }
-
-.night-mode .bz-promote-btn {
-  background: rgba(234, 185, 50, 0.11);
-  border-color: #8e7a4e;
-  color: #eab932;
+.night-mode .bz-filter {
+  background: rgba(52, 211, 153, 0.09);
+  border-color: rgba(52, 211, 153, 0.42);
+  color: #d6f5e7;
 }
-.night-mode .bz-price-table { border-color: #6b5c37; }
-.night-mode .bz-price-row { border-bottom-color: rgba(255, 255, 255, 0.07); }
-.night-mode .bz-price-row.is-target { background: rgba(234, 185, 50, 0.09); }
+.night-mode .bz-filter-kicker,
+.night-mode .bz-filter-caret { color: var(--emerald-400); }
+.night-mode .bz-filter .bz-glyph { background: #1e1b18; border-color: rgba(52, 211, 153, 0.24); }
+.night-mode .bz-glyph { background: #262220; border-color: rgba(255,255,255,0.09); }
+.night-mode .bz-secmore { background: #1e1b18; border-color: rgba(255,255,255,0.1); color: var(--emerald-400); }
+.night-mode .bz-sechead { border-bottom-color: rgba(255,255,255,0.09); }
+.night-mode .bz-picker { border-color: rgba(255,255,255,0.09); }
+.night-mode .bz-pick { border-bottom-color: rgba(255,255,255,0.07); color: #f0ede9; }
+.night-mode .bz-pick.is-on { background: rgba(52, 211, 153, 0.1); }
+.night-mode .bz-pick.is-on .bz-glyph { background: #1e1b18; border-color: rgba(52,211,153,0.24); }
+.night-mode .bz-pick.is-empty { color: #6b655f; }
 
-.night-mode .bz-sheet { background: #1a1a1a; }
-.night-mode .bz-link { background: #232323; border-color: rgba(255, 255, 255, 0.08); color: #f0ede9; }
-.night-mode .bz-logo { background: #2a2a2a; border-color: rgba(255, 255, 255, 0.08); }
-.night-mode .bz-divider::before,
-.night-mode .bz-divider::after { background: rgba(255, 255, 255, 0.11); }
-.night-mode .bz-sk-tile { background: rgba(255, 255, 255, 0.06); }
-.night-mode .bz-sheet-grip-bar { background: rgba(255, 255, 255, 0.22); }
-.night-mode .bz-promote { border-top-color: rgba(255, 255, 255, 0.09); }
+
+.night-mode .bz-catchip { border-color: rgba(255,255,255,0.11); color: #7d766f; }
+
+/* The metals keep their own colour on the dark ground; only the card tint
+   drops to a whisper, so the badges stay the brightest thing in the row. */
+.night-mode .bz-row--paid { border-color: rgba(255,255,255,0.1); }
+.night-mode .bz-row--r1 { background: rgba(232,188,60,0.1); border-color: rgba(232,188,60,0.36); }
+.night-mode .bz-row--r2 { background: rgba(203,209,217,0.07); border-color: rgba(203,209,217,0.26); }
+.night-mode .bz-row--r3 { background: rgba(200,131,74,0.09); border-color: rgba(200,131,74,0.32); }
+.night-mode .bz-badge--ghost { background: none; border-color: rgba(255,255,255,0.18); color: #7d766f; }
+.night-mode .bz-topline::before { background: rgba(255,255,255,0.09); }
+.night-mode .bz-topline-tag { background: #141210; border-color: rgba(255,255,255,0.11); color: #c9a04a; }
+.night-mode .bz-owner { background: rgba(52,211,153,0.09); border-color: rgba(52,211,153,0.42); color: #d6f5e7; }
+.night-mode .bz-owner-arrow { color: var(--emerald-400); }
+.night-mode .bz-step-n { background: rgba(52,211,153,0.11); border-color: rgba(52,211,153,0.4); color: var(--emerald-400); }
+.night-mode .bz-step-title { color: #f0ede9; }
+.night-mode .bz-step-body,
+.night-mode .bz-sheet-fine { color: #a09a93; }
+.night-mode .bz-btn--ghost { background: #1e1b18; border-color: rgba(255,255,255,0.12); color: #f0ede9; }
+
+.night-mode .bz-slot { border-color: rgba(255,255,255,0.13); }
+.night-mode .bz-slot-arrow { color: #eab932; }
+
+.night-mode .bz-logo { background: #262220; border-color: rgba(255,255,255,0.08); }
+.night-mode .bz-logo--mono {
+  background: hsl(var(--h, 30) 20% 20%);
+  border-color: hsl(var(--h, 30) 18% 27%);
+  color: hsl(var(--h, 30) 48% 70%);
+}
+
+.night-mode .bz-sheet { background: #1a1715; }
+.night-mode .bz-link { background: #221f1c; }
+.night-mode .bz-prices { border-color: rgba(255,255,255,0.09); }
+.night-mode .bz-prices-row { border-bottom-color: rgba(255,255,255,0.07); }
+.night-mode .bz-prices-row.is-target { background: rgba(234, 185, 50, 0.1); }
+.night-mode .bz-sheet-grip-bar { background: rgba(255,255,255,0.2); }
+.night-mode .bz-btn--block { background: #f0ede9; border-color: #f0ede9; color: #1c1917; }
 .night-mode .bz-toast { background: #f0ede9; color: #1c1917; }
+.night-mode .bz-spinner { border-color: rgba(255,255,255,0.12); border-top-color: var(--emerald-400); }
 
 @media (prefers-reduced-motion: reduce) {
-  .bz-sheet, .bz-sheet-backdrop, .bz-toast,
-  .bz-cat, .bz-card, .bz-row { transition: none; }
-  .bz-sk-tile, .bz-spinner { animation: none; }
+  .bz-sheet, .bz-sheet-backdrop, .bz-toast, .bz-row { transition: none; }
+  .bz-spinner { animation: none; }
 }

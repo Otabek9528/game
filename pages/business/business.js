@@ -1,12 +1,18 @@
-// business.js - Biznes Katalogi (Phase 1: browse, detail, taps)
+// business.js - Biznes Katalogi
 //
-// Two views in one page: a category grid and a business list. Tapping a
-// business opens a bottom sheet. Uzbek only, by design.
+// One screen. The feed is the landing: businesses are on screen the moment the
+// page opens, and the category picker narrows to one in place. Nothing
+// navigates except the sheets, so a business is always one tap away.
 //
-// Nothing owner-supplied ever reaches innerHTML. Names and descriptions go in
-// through textContent; links are typed (kind, value) rows rendered as buttons
-// we build ourselves, so a business can never inject markup into a page that
-// carries the visitor's Telegram session.
+// Ranking is strictly per category. The feed groups by category and orders
+// inside each group; there is no cross-category ordering anywhere, because a
+// bid in Sug'urta and a bid in Pishiriqlar are not competing for the same
+// thing.
+//
+// Nothing owner-supplied reaches innerHTML. Names and descriptions go in as
+// text nodes; links are typed (kind, value) pairs rendered as buttons we
+// build, so a listing can never inject markup into a page carrying the
+// visitor's Telegram session.
 
 (function () {
   'use strict';
@@ -19,17 +25,26 @@
   var API = (window.API_CONFIG ? window.API_CONFIG.BASE_URL : 'https://vegukin-api.duckdns.org/')
               .replace(/\/+$/, '');
   var TIMEOUT = 30000;
+  var ADMIN = 'https://t.me/otabeksattarov';
 
-  var state = { view: 'categories', category: null, pricing: null, business: null };
+  // How many of a category's businesses the feed shows before deferring to
+  // the category view. Enough to be useful, few enough to keep scrolling.
+  var FEED_PER_CATEGORY = 4;
+
+  var state = {
+    mode: 'feed',        // 'feed' | 'category'
+    categoryId: null,
+    categoryName: '',
+    categoryIcon: '',
+    query: '',
+    categories: [],
+    pricing: null
+  };
 
   function $(id) { return document.getElementById(id); }
 
   function haptic(kind) {
     try { tg.HapticFeedback.impactOccurred(kind || 'light'); } catch (e) {}
-  }
-
-  function initDataHeader() {
-    return { 'X-Init-Data': (tg && tg.initData) ? tg.initData : '' };
   }
 
   function getJSON(path) {
@@ -46,19 +61,23 @@
   // ============================================
   // ICONS
   // ============================================
+  // One stroke weight throughout. No emoji anywhere on this page: the
+  // categories are set in type, which is what keeps the feed looking like a
+  // directory rather than a sticker sheet.
 
   var ICONS = {
-    heart: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.7 3.9 12.6a5.1 5.1 0 0 1 7.2-7.2l.9.9.9-.9a5.1 5.1 0 1 1 7.2 7.2Z"/></svg>',
-    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>',
-    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
-    phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.25a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.3 4.3 12.6a4.9 4.9 0 0 1 6.9-6.9l.8.8.8-.8a4.9 4.9 0 1 1 6.9 6.9Z"/></svg>',
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-6.4 10-6.4S22 12 22 12s-3.6 6.4-10 6.4S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
+    phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.25a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z"/></svg>',
     telegram: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-2.01 1.95c-.23.23-.42.42-.81.42z"/></svg>',
-    instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.25" fill="currentColor" stroke="none"/></svg>',
+    instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor" stroke="none"/></svg>',
     tiktok: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.2v13.2a2.9 2.9 0 1 1-2.4-2.85V9.1a6.1 6.1 0 1 0 5.6 6.08V8.9a7.3 7.3 0 0 0 4.3 1.38V7.06A4.4 4.4 0 0 1 16.6 2z"/></svg>',
     appstore: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.7c0-2.2 1.8-3.3 1.9-3.3-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.5 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.4 1.1 8.5.7 1 1.5 2.2 2.6 2.1 1.1 0 1.5-.7 2.8-.7s1.6.7 2.8.7c1.2 0 1.9-1 2.6-2.1.8-1.2 1.2-2.3 1.2-2.4-.1 0-2.2-.9-2.2-3.2zM14.2 5.9c.6-.7 1-1.7.9-2.7-.9 0-2 .6-2.6 1.3-.6.6-1.1 1.6-.9 2.6 1 .1 2-.5 2.6-1.2z"/></svg>',
     playstore: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.4a1 1 0 0 0-.4.8v17.6a1 1 0 0 0 .4.8l9.3-9.6zM14.3 10.3 5.6 1.7l10.9 6.2zM14.3 13.7l2.2 2.4-10.9 6.2zM17.9 9l3 1.7a1.3 1.3 0 0 1 0 2.6l-3 1.7-2.5-3z"/></svg>',
     kakao: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.9 3 2.8 6.3 2.8 10.3c0 2.6 1.7 4.9 4.3 6.2l-1.1 4c-.1.3.3.6.6.4l4.7-3.1c.2 0 .5.1.7.1 5.1 0 9.2-3.3 9.2-7.6S17.1 3 12 3z"/></svg>',
-    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5.5 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.9"/></svg>'
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5.5 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.9"/></svg>'
   };
 
   var LINK_META = {
@@ -73,7 +92,7 @@
   };
 
   // ============================================
-  // SMALL DOM HELPERS
+  // DOM HELPERS
   // ============================================
 
   function el(tag, className, text) {
@@ -85,7 +104,7 @@
 
   function iconSpan(className, svg) {
     var s = el('span', className);
-    s.innerHTML = svg;          // trusted constant, never business-supplied
+    s.innerHTML = svg;          // trusted constant, never listing-supplied
     return s;
   }
 
@@ -96,6 +115,27 @@
       .join('');
   }
 
+  // A business without a logo still gets a colour of its own, derived from
+  // the name so it never changes between loads. Keeps the feed from looking
+  // like a column of grey squares without resorting to emoji.
+  function hueOf(name) {
+    var h = 0;
+    for (var i = 0; i < (name || '').length; i++) {
+      h = (h * 31 + name.charCodeAt(i)) % 360;
+    }
+    return h;
+  }
+
+  // A glyph per category, from the database. Used only where a category is
+  // being named — the section heads, the picker, the filter control — so it
+  // reads as that category's mark rather than as scattered decoration. The
+  // business rows below stay clean.
+  function glyphNode(icon, className) {
+    var box = el('span', className || 'bz-glyph');
+    box.textContent = icon || '\u2022';
+    return box;
+  }
+
   function formatKRW(n) {
     return Number(n || 0).toLocaleString('en-US') + ' KRW';
   }
@@ -103,7 +143,6 @@
   var toastTimer = null;
   function showToast(message) {
     var t = $('bzToast');
-    if (!t) return;
     t.textContent = message;
     t.hidden = false;
     requestAnimationFrame(function () { t.classList.add('visible'); });
@@ -115,9 +154,9 @@
   }
 
   // ============================================
-  // TELEGRAM BACK BUTTON
+  // BACK BUTTON
   // ============================================
-  // One handler at a time, swapped as depth changes: sheet -> list -> home.
+  // One handler at a time, swapped as depth changes: sheet, category, home.
 
   var backHandler = null;
 
@@ -125,328 +164,483 @@
     if (!tg.BackButton) return;
     if (backHandler) tg.BackButton.offClick(backHandler);
     backHandler = fn;
-    if (fn) {
-      tg.BackButton.onClick(fn);
-      tg.BackButton.show();
-    } else {
-      tg.BackButton.hide();
-    }
+    if (fn) { tg.BackButton.onClick(fn); tg.BackButton.show(); }
+    else { tg.BackButton.hide(); }
   }
 
   function goHome() { window.location.href = '../../index.html'; }
 
+  function currentBack() {
+    return state.mode === 'category' ? backToFeed : goHome;
+  }
+
   // ============================================
-  // LOGO
+  // SHARED PIECES
   // ============================================
 
-  function logoNode(business, className) {
-    var box = el('div', className || 'bz-logo');
+  function logoNode(business, size) {
+    var box = el('div', 'bz-logo' + (size ? ' bz-logo--' + size : ''));
     if (business.logo) {
       var img = document.createElement('img');
       img.src = API + '/' + String(business.logo).replace(/^\/+/, '');
       img.alt = '';
       img.loading = 'lazy';
-      img.addEventListener('error', function () {
-        box.textContent = initials(business.name);
-        box.classList.add('bz-logo--fallback');
-      });
+      img.addEventListener('error', function () { monogram(box, business.name); });
       box.appendChild(img);
     } else {
-      box.textContent = initials(business.name);
-      box.classList.add('bz-logo--fallback');
+      monogram(box, business.name);
     }
     return box;
   }
 
-  function statsNode(business) {
-    var wrap = el('div', 'bz-stats');
+  function monogram(box, name) {
+    box.textContent = initials(name);
+    box.classList.add('bz-logo--mono');
+    box.style.setProperty('--h', hueOf(name));
+  }
+
+  function metaNode(business, categoryName) {
+    var meta = el('div', 'bz-meta');
+
+    if (categoryName) {
+      meta.appendChild(el('span', 'bz-catchip', categoryName));
+    }
+
     var likes = el('span', 'bz-stat');
-    likes.appendChild(iconSpan('bz-stat-icon bz-stat-icon--heart', ICONS.heart));
+    likes.appendChild(iconSpan('bz-stat-icon', ICONS.heart));
     likes.appendChild(el('span', null, String(business.likes)));
-    wrap.appendChild(likes);
+    meta.appendChild(likes);
 
     var taps = el('span', 'bz-stat');
     taps.appendChild(iconSpan('bz-stat-icon', ICONS.eye));
     taps.appendChild(el('span', null, String(business.taps)));
-    wrap.appendChild(taps);
-    return wrap;
+    meta.appendChild(taps);
+
+    return meta;
+  }
+
+  // rank is passed only for businesses actually holding a paid position, so
+  // the gold rail always means paid and never means popular.
+  function businessRow(business, opts) {
+    opts = opts || {};
+    var row = el('button', 'bz-row');
+    row.type = 'button';
+
+    // A held position gets a standing badge at the head of the row rather
+    // than a chip buried in the meta line. Rank is the first thing to read
+    // on these rows, so it goes where the eye lands first.
+    if (opts.rank) {
+      row.classList.add('bz-row--paid', 'bz-row--r' + opts.rank);
+      row.appendChild(el('span', 'bz-badge', '#' + opts.rank));
+    }
+
+    row.appendChild(logoNode(business));
+
+    var body = el('div', 'bz-row-body');
+    body.appendChild(el('div', 'bz-rowname', business.name));
+    if (opts.showDescription && business.description) {
+      body.appendChild(el('div', 'bz-rowdesc', business.description));
+    }
+    body.appendChild(metaNode(business, opts.categoryName));
+    row.appendChild(body);
+
+    row.addEventListener('click', function () { openSheet(business.id); });
+    return row;
+  }
+
+  function sectionHeader(title, count, onMore, icon) {
+    var head = el('div', 'bz-sechead');
+    head.appendChild(glyphNode(icon, 'bz-glyph bz-glyph--sec'));
+
+    var text = el('span', 'bz-sectext');
+    text.appendChild(el('span', 'bz-sectitle', title));
+    if (count != null) text.appendChild(el('span', 'bz-seccount', count + ' ta'));
+    head.appendChild(text);
+
+    if (onMore) {
+      var more = el('button', 'bz-secmore');
+      more.type = 'button';
+      more.appendChild(el('span', null, 'Barchasi'));
+      more.appendChild(iconSpan('bz-secmore-icon', ICONS.arrow));
+      more.addEventListener('click', function (e) { e.stopPropagation(); onMore(); });
+      head.appendChild(more);
+    }
+    return head;
   }
 
   // ============================================
-  // VIEW A - CATEGORIES
+  // VIEW STATE
   // ============================================
 
-  function loadCategories() {
-    $('catSkeleton').hidden = false;
-    getJSON('/api/business/categories')
+  function setView(which) {
+    $('bzLoading').hidden = which !== 'loading';
+    $('bzEmpty').hidden = which !== 'empty';
+    $('bzError').hidden = which !== 'error';
+    if (which !== 'ready') $('bzBody').textContent = '';
+  }
+
+  // ============================================
+  // FEED
+  // ============================================
+
+  function loadFeed() {
+    setView('loading');
+    var path = '/api/business/feed' +
+      (state.query ? '?q=' + encodeURIComponent(state.query) : '');
+
+    getJSON(path)
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
-        renderCategories(data.categories || []);
+        if (data.categories) state.categories = data.categories;
+        syncFilter();
+        renderFeed(data);
       })
-      .catch(function () {
-        $('catSkeleton').hidden = true;
-        var grid = $('catGrid');
-        grid.textContent = '';
-        var err = el('p', 'bz-inline-error', "Yo'nalishlarni yuklab bo'lmadi. Qaytadan urinib ko'ring.");
-        grid.appendChild(err);
-      });
+      .catch(function () { setView('error'); });
   }
 
-  function renderCategories(categories) {
-    $('catSkeleton').hidden = true;
-    var grid = $('catGrid');
-    grid.textContent = '';
+  function renderFeed(data) {
+    var groups = data.groups || [];
+    $('bzCount').textContent = data.total ? data.total + ' ta biznes' : '';
 
-    categories.forEach(function (cat) {
-      var tile = el('button', 'bz-cat');
-      tile.type = 'button';
-
-      tile.appendChild(el('span', 'bz-cat-icon', cat.icon));
-      tile.appendChild(el('span', 'bz-cat-name', cat.name));
-      tile.appendChild(el('span', 'bz-cat-count',
-        cat.count === 0 ? "hali bo'sh" : cat.count + ' ta'));
-
-      if (cat.count === 0) tile.classList.add('is-empty');
-
-      tile.addEventListener('click', function () {
-        haptic('light');
-        openCategory(cat);
-      });
-      grid.appendChild(tile);
-    });
-  }
-
-  // ============================================
-  // VIEW B - BUSINESS LIST
-  // ============================================
-
-  function openCategory(cat) {
-    state.view = 'list';
-    state.category = cat;
-
-    $('viewCategories').hidden = true;
-    $('viewList').hidden = false;
-    $('listTitle').textContent = (cat.icon ? cat.icon + '  ' : '') + cat.name;
-    window.scrollTo(0, 0);
-
-    setBack(backToCategories);
-    loadList(cat.id);
-  }
-
-  function backToCategories() {
-    state.view = 'categories';
-    state.category = null;
-    $('viewList').hidden = true;
-    $('viewCategories').hidden = false;
-    window.scrollTo(0, 0);
-    setBack(goHome);
-  }
-
-  function setListState(which) {
-    $('listLoading').hidden = which !== 'loading';
-    $('listError').hidden = which !== 'error';
-    $('listEmpty').hidden = which !== 'empty';
-    if (which !== 'ready') {
-      $('podium').hidden = true;
-      $('listDivider').hidden = true;
-      $('promoteStrip').hidden = true;
-      $('listRows').textContent = '';
+    if (!groups.length) {
+      $('bzEmptyTitle').textContent = state.query
+        ? 'Hech narsa topilmadi'
+        : 'Katalog hozircha bo‘sh';
+      $('bzEmptyHint').textContent = state.query
+        ? 'Boshqa so‘z bilan qidirib ko‘ring'
+        : 'Tez orada birinchi bizneslar qo‘shiladi';
+      setView('empty');
+      return;
     }
+
+    setView('ready');
+    var host = $('bzBody');
+    host.textContent = '';
+
+    groups.forEach(function (group) {
+      var section = el('section', 'bz-section');
+      var cat = group.category;
+      var shown = 0;
+
+      var podium = group.podium || [];
+      var rest = group.businesses || [];
+      var all = podium.concat(rest);
+      var visible = all.slice(0, FEED_PER_CATEGORY);
+
+      section.appendChild(sectionHeader(
+        cat.name,
+        group.total,
+        group.total > visible.length
+          ? function () { openCategory(cat.id, cat.name, cat.icon); } : null,
+        cat.icon
+      ));
+
+      visible.forEach(function (business, i) {
+        var rank = i < podium.length ? i + 1 : null;
+        section.appendChild(businessRow(business, { rank: rank }));
+        shown++;
+      });
+
+      host.appendChild(section);
+    });
+
+    host.appendChild(ownerCard());
   }
 
-  function loadList(categoryId) {
-    setListState('loading');
-    getJSON('/api/business/list?category_id=' + encodeURIComponent(categoryId))
+  // ============================================
+  // CATEGORY VIEW
+  // ============================================
+
+  function openCategory(categoryId, categoryName, categoryIcon) {
+    haptic('light');
+    state.mode = 'category';
+    state.categoryId = categoryId;
+    state.categoryName = categoryName;
+    state.categoryIcon = categoryIcon || '';
+    syncFilter();
+    setBack(backToFeed);
+    $('bzScroll').scrollTop = 0;
+    loadCategory();
+  }
+
+  function backToFeed() {
+    state.mode = 'feed';
+    state.categoryId = null;
+    state.categoryName = '';
+    state.categoryIcon = '';
+    state.pricing = null;
+    syncFilter();
+    setBack(goHome);
+    $('bzScroll').scrollTop = 0;
+    loadFeed();
+  }
+
+  function loadCategory() {
+    setView('loading');
+    getJSON('/api/business/list?category_id=' + encodeURIComponent(state.categoryId))
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
         state.pricing = data.pricing;
-        renderList(data);
+        renderCategory(data);
       })
-      .catch(function () { setListState('error'); });
+      .catch(function () { setView('error'); });
   }
 
-  function renderList(data) {
+  function renderCategory(data) {
     var podium = data.podium || [];
     var rest = data.businesses || [];
     var pricing = data.pricing || {};
 
+    $('bzCount').textContent = data.total ? data.total + ' ta biznes' : '';
+
     if (!podium.length && !rest.length) {
-      setListState('empty');
+      $('bzEmptyTitle').textContent = 'Bu yo‘nalishda hali biznes yo‘q';
+      $('bzEmptyHint').textContent = 'Birinchi bo‘lib qo‘shilishni xohlaysizmi?';
+      setView('empty');
       return;
     }
-    setListState('ready');
 
-    renderPodium(podium, pricing);
-    renderRows(rest);
-
-    // The divider only earns its space when there is something on both sides.
-    var podiumVisible = !$('podium').hidden;
-    $('listDivider').hidden = !(podiumVisible && rest.length);
-
-    renderPromote(pricing);
-  }
-
-  function renderPodium(podium, pricing) {
-    var host = $('podiumSlots');
+    setView('ready');
+    var host = $('bzBody');
     host.textContent = '';
 
-    // Below the threshold there is nothing worth competing for, so the whole
-    // zone disappears and every business uses the plain row treatment.
-    if (!pricing.showBidding) {
-      $('podium').hidden = true;
-      return;
+    // The podium only appears where positions are actually contested.
+    if (pricing.showBidding) {
+      var top = el('section', 'bz-section');
+      top.appendChild(sectionHeader('Top o‘rinlar', null, null, '\u2605'));
+
+      podium.forEach(function (business, i) {
+        top.appendChild(businessRow(business, { rank: i + 1, showDescription: true }));
+      });
+
+      var size = pricing.podiumSize || 3;
+      for (var pos = podium.length + 1; pos <= size; pos++) {
+        top.appendChild(emptySlot(pos));
+      }
+      host.appendChild(top);
     }
-    $('podium').hidden = false;
 
-    var size = pricing.podiumSize || 3;
+    if (rest.length) {
+      var all = el('section', 'bz-section' + (pricing.showBidding ? ' bz-section--tight' : ''));
 
-    podium.forEach(function (business, i) {
-      host.appendChild(podiumCard(business, i + 1));
-    });
+      // "Barcha bizneslar" read as every business in the directory, which is
+      // the opposite of what it labelled. A marker closing the contested
+      // three says the same thing without naming the group at all, and
+      // closes the gap the second heading opened.
+      if (pricing.showBidding) {
+        var line = el('div', 'bz-topline');
+        line.appendChild(el('span', 'bz-topline-tag', 'TOP 3'));
+        all.appendChild(line);
+      }
 
-    // Empty positions are advertised, not hidden: a category with one bidder
-    // still shows #2 and #3 going spare. This is the conversion surface.
-    for (var pos = podium.length + 1; pos <= size; pos++) {
-      host.appendChild(emptySlot(pos, pricing.prices ? pricing.prices[String(pos)] : null));
+      rest.forEach(function (business) {
+        all.appendChild(businessRow(business, { showDescription: !pricing.showBidding }));
+      });
+      host.appendChild(all);
     }
+
+    host.appendChild(ownerCard());
   }
 
-  function podiumCard(business, position) {
-    var card = el('button', 'bz-card bz-card--r' + position);
-    card.type = 'button';
-
-    card.appendChild(el('div', 'bz-rank', String(position)));
-    card.appendChild(logoNode(business, 'bz-logo bz-logo--lg'));
-
-    var body = el('div', 'bz-card-body');
-    body.appendChild(el('div', 'bz-name', business.name));
-    if (business.description) {
-      body.appendChild(el('div', 'bz-desc', business.description));
-    }
-    body.appendChild(statsNode(business));
-    card.appendChild(body);
-
-    card.addEventListener('click', function () { openSheet(business.id); });
-    return card;
-  }
-
-  function emptySlot(position, price) {
-    var slot = el('div', 'bz-slot-empty');
-    slot.appendChild(el('div', 'bz-rank', String(position)));
-    slot.appendChild(el('div', 'bz-slot-text', "Bu o'rin bo'sh"));
-    if (price) {
-      var tag = el('div', 'bz-slot-price', formatKRW(price) + '  →');
-      slot.appendChild(tag);
-    }
+  // Deliberately carries no number. What a position costs is an owner's
+  // business, not something to put in front of someone browsing for a bakery;
+  // the figures live behind this tap, in the owner sheet.
+  function emptySlot(position) {
+    var slot = el('button', 'bz-slot');
+    slot.type = 'button';
+    slot.appendChild(el('span', 'bz-badge bz-badge--ghost', '#' + position));
+    slot.appendChild(el('span', 'bz-slot-text', 'Bu o‘rin bo‘sh'));
+    slot.appendChild(iconSpan('bz-slot-arrow', ICONS.arrow));
     slot.addEventListener('click', function () {
       haptic('light');
-      openBiddingInfo(position, price);
+      openOwnerSheet(position);
     });
     return slot;
   }
 
-  function renderRows(businesses) {
-    var host = $('listRows');
-    host.textContent = '';
+  // ============================================
+  // OWNER ENTRY
+  // ============================================
+  // The only route to the money. Someone looking for a bakery never sees a
+  // price; an owner gets a standing invitation at the end of every list and
+  // the whole mechanism one tap behind it.
 
-    businesses.forEach(function (business) {
-      var row = el('button', 'bz-row');
-      row.type = 'button';
-      row.appendChild(logoNode(business, 'bz-logo'));
+  function ownerCard() {
+    var card = el('button', 'bz-owner');
+    card.type = 'button';
 
-      var body = el('div', 'bz-row-body');
-      body.appendChild(el('div', 'bz-name', business.name));
-      body.appendChild(statsNode(business));
-      row.appendChild(body);
+    var text = el('span', 'bz-owner-text');
+    text.appendChild(el('span', 'bz-owner-title', 'Biznesingiz bormi?'));
+    text.appendChild(el('span', 'bz-owner-sub',
+      'Katalogga qo‘shiling va yo‘nalishingizda yuqori o‘rinni egallang'));
+    card.appendChild(text);
+    card.appendChild(iconSpan('bz-owner-arrow', ICONS.arrow));
 
-      row.addEventListener('click', function () { openSheet(business.id); });
-      host.appendChild(row);
+    card.addEventListener('click', function () {
+      haptic('light');
+      openOwnerSheet(null);
     });
+    return card;
   }
 
-  function renderPromote(pricing) {
-    var strip = $('promoteStrip');
-    if (!pricing.showBidding || !pricing.prices) {
-      strip.hidden = true;
-      return;
-    }
-    strip.hidden = false;
-    $('promotePrice').textContent = '#1 — ' + formatKRW(pricing.prices['1']);
-  }
-
-  // ============================================
-  // BIDDING INFO
-  // ============================================
-  // Phase 1 explains the mechanism and hands off to the admin, since payment
-  // is manual anyway. Phase 4 replaces this with the real bid submission.
-
-  function openBiddingInfo(position, price) {
+  // Prices need a category to be about, so from the unfiltered feed this
+  // explains the mechanism and hands off to the picker; inside a category it
+  // shows that category's ladder.
+  function openOwnerSheet(targetPosition) {
     var pricing = state.pricing || {};
     var prices = pricing.prices || {};
+    var inCategory = state.mode === 'category';
 
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('h2', 'bz-sheet-title', 'Yuqori o‘rin uchun'));
-    wrap.appendChild(el('p', 'bz-sheet-lede',
+    wrap.appendChild(el('p', 'bz-sheet-eyebrow',
+      inCategory ? state.categoryName : 'Biznes egalari uchun'));
+    wrap.appendChild(el('h2', 'bz-sheet-name', 'Katalogga qo‘shilish'));
+
+    var steps = el('div', 'bz-steps');
+    steps.appendChild(stepRow('1', 'Ro‘yxatdan o‘tish',
+      'Bir martalik ' + formatKRW(pricing.listingFee || 5000) +
+      '. Biznesingiz katalogda doimiy qoladi.'));
+    steps.appendChild(stepRow('2', 'Yuqori o‘rin — ixtiyoriy',
       'Har bir yo‘nalishda birinchi uchta o‘rin ochiq tanlovda. ' +
-      'Yuqoriroq turish uchun hozirgi egasidan kamida ' +
-      formatKRW(pricing.bidStep || 5000) + ' ko‘proq taklif qilinadi.'));
+      'Bu ro‘yxatga kirish to‘lovidan alohida.'));
+    steps.appendChild(stepRow('3', 'O‘rinni egallash',
+      'Hozirgi egasidan kamida ' + formatKRW(pricing.bidStep || 5000) +
+      ' ko‘proq taklif qiling. Oldin taklif qilgan bo‘lsangiz, faqat farqini to‘laysiz.'));
+    wrap.appendChild(steps);
 
-    var table = el('div', 'bz-price-table');
-    [1, 2, 3].forEach(function (pos) {
-      if (!prices[String(pos)]) return;
-      var row = el('div', 'bz-price-row' + (pos === position ? ' is-target' : ''));
-      row.appendChild(el('span', 'bz-price-pos', '#' + pos));
-      row.appendChild(el('span', 'bz-price-val', formatKRW(prices[String(pos)])));
-      row.appendChild(el('span', 'bz-price-note', 'yoki undan yuqori'));
-      table.appendChild(row);
-    });
-    wrap.appendChild(table);
+    if (inCategory && pricing.showBidding && prices['1']) {
+      wrap.appendChild(el('p', 'bz-sheet-sublabel',
+        state.categoryName + ' — hozirgi narxlar'));
 
-    var notes = el('ul', 'bz-note-list');
-    [
-      'Ro‘yxatga kirish to‘lovi ' + formatKRW(pricing.listingFee || 5000) +
-        ' — bu o‘rin uchun to‘lovdan alohida.',
-      'To‘lov admin bilan qo‘lda amalga oshiriladi.',
-      'To‘lov tasdiqlangandan keyin o‘rin o‘zgaradi.',
-      'Oldin taklif qilgan bo‘lsangiz, faqat farqini to‘laysiz.',
-      'To‘lov qaytarilmaydi.'
-    ].forEach(function (text) { notes.appendChild(el('li', null, text)); });
-    wrap.appendChild(notes);
+      var table = el('div', 'bz-prices');
+      [1, 2, 3].forEach(function (pos) {
+        if (!prices[String(pos)]) return;
+        var row = el('div', 'bz-prices-row' + (pos === targetPosition ? ' is-target' : ''));
+        row.appendChild(el('span', 'bz-badge bz-badge--sm', '#' + pos));
+        row.appendChild(el('span', 'bz-prices-val', formatKRW(prices[String(pos)])));
+        row.appendChild(el('span', 'bz-prices-note', 'dan'));
+        table.appendChild(row);
+      });
+      wrap.appendChild(table);
+      wrap.appendChild(el('p', 'bz-sheet-fine',
+        'Ko‘rsatilgan summa yoki undan yuqorisi shu o‘rinni yoki undan ' +
+        'balandrog‘ini beradi. To‘lov admin bilan qo‘lda amalga oshiriladi ' +
+        'va tasdiqlangandan keyin o‘rin o‘zgaradi. To‘lov qaytarilmaydi.'));
+    } else if (!inCategory) {
+      var pick = el('button', 'bz-btn bz-btn--ghost');
+      pick.type = 'button';
+      pick.textContent = 'Yo‘nalish narxlarini ko‘rish';
+      pick.addEventListener('click', function () { openPicker(); });
+      wrap.appendChild(pick);
+    }
 
-    var cta = el('a', 'bz-sheet-cta', 'Admin bilan bog‘lanish');
-    cta.href = 'https://t.me/otabeksattarov';
-    cta.addEventListener('click', function (e) {
-      e.preventDefault();
-      try { tg.openTelegramLink('https://t.me/otabeksattarov'); }
-      catch (err) { window.open('https://t.me/otabeksattarov', '_blank'); }
-    });
+    var cta = el('button', 'bz-btn bz-btn--block');
+    cta.type = 'button';
+    cta.textContent = 'Admin bilan bog‘lanish';
+    cta.addEventListener('click', function () { openAdmin(); });
     wrap.appendChild(cta);
 
     mountSheet(wrap);
   }
 
+  function stepRow(n, title, body) {
+    var row = el('div', 'bz-step');
+    row.appendChild(el('span', 'bz-step-n', n));
+    var text = el('span', 'bz-step-text');
+    text.appendChild(el('span', 'bz-step-title', title));
+    text.appendChild(el('span', 'bz-step-body', body));
+    row.appendChild(text);
+    return row;
+  }
+
   // ============================================
-  // DETAIL BOTTOM SHEET
+  // CATEGORY PICKER
+  // ============================================
+  // Every category in one list, alphabetical, identical rows. A horizontal
+  // rail hid whatever did not fit and made the first chip look like the most
+  // important one; there was never a defensible basis for that order.
+  // Alphabetical asserts no precedence and, unlike ordering by size, does not
+  // reshuffle when a business is added somewhere else.
+
+  function openPicker() {
+    haptic('light');
+
+    var wrap = el('div', 'bz-sheet-body');
+    wrap.appendChild(el('h2', 'bz-sheet-name', 'Yo‘nalishlar'));
+
+    var list = el('div', 'bz-picker');
+
+    var all = el('button', 'bz-pick' + (state.mode === 'feed' ? ' is-on' : ''));
+    all.type = 'button';
+    all.appendChild(glyphNode('\u25C6', 'bz-glyph bz-glyph--pick'));
+    all.appendChild(el('span', 'bz-pick-name', 'Barcha yo‘nalishlar'));
+    all.appendChild(el('span', 'bz-pick-n', String(totalCount())));
+    all.addEventListener('click', function () {
+      closeSheet();
+      if (state.mode !== 'feed') backToFeed();
+    });
+    list.appendChild(all);
+
+    state.categories.forEach(function (cat) {
+      var row = el('button', 'bz-pick');
+      row.type = 'button';
+      if (!cat.count) row.classList.add('is-empty');
+      if (state.mode === 'category' && state.categoryId === cat.id) {
+        row.classList.add('is-on');
+      }
+      row.appendChild(glyphNode(cat.icon, 'bz-glyph bz-glyph--pick'));
+      row.appendChild(el('span', 'bz-pick-name', cat.name));
+      row.appendChild(el('span', 'bz-pick-n', cat.count ? String(cat.count) : '—'));
+
+      // An empty category is shown so the set stays complete and an owner can
+      // see their trade is listed, but there is nothing behind it to open.
+      if (cat.count) {
+        row.addEventListener('click', function () {
+          closeSheet();
+          openCategory(cat.id, cat.name, cat.icon);
+        });
+      } else {
+        row.disabled = true;
+      }
+      list.appendChild(row);
+    });
+
+    wrap.appendChild(list);
+    mountSheet(wrap);
+  }
+
+  function totalCount() {
+    return state.categories.reduce(function (n, c) { return n + c.count; }, 0);
+  }
+
+  function syncFilter() {
+    var filtered = state.mode === 'category';
+    $('bzFilterLabel').textContent = filtered ? state.categoryName : 'Barcha yo‘nalishlar';
+    $('bzFilterGlyph').textContent = filtered ? (state.categoryIcon || '\u25C6') : '\u25C6';
+    $('bzFilter').classList.toggle('is-on', filtered);
+    $('bzFilterClear').hidden = !filtered;
+  }
+
+  // ============================================
+  // DETAIL SHEET
   // ============================================
 
   function openSheet(businessId) {
     haptic('light');
 
     var loading = el('div', 'bz-sheet-body');
-    var spinner = el('div', 'bz-spinner');
-    loading.appendChild(spinner);
+    loading.appendChild(el('div', 'bz-spinner'));
     mountSheet(loading);
 
     getJSON('/api/business/' + encodeURIComponent(businessId))
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
-        state.business = data.business;
         mountSheet(detailBody(data.business));
         countTap(businessId);
       })
       .catch(function () {
         var err = el('div', 'bz-sheet-body');
-        err.appendChild(el('p', 'bz-inline-error', "Ma'lumotni yuklab bo'lmadi."));
+        err.appendChild(el('p', 'bz-state-hint', 'Ma’lumotni yuklab bo‘lmadi.'));
         mountSheet(err);
       });
   }
@@ -455,26 +649,26 @@
     var wrap = el('div', 'bz-sheet-body');
 
     var head = el('div', 'bz-sheet-head');
-    head.appendChild(logoNode(business, 'bz-logo bz-logo--xl'));
+    head.appendChild(logoNode(business, 'xl'));
 
-    var headText = el('div');
-    headText.appendChild(el('p', 'bz-sheet-eyebrow', business.categoryName || ''));
+    var text = el('div', 'bz-sheet-headtext');
+    text.appendChild(el('p', 'bz-sheet-eyebrow', business.categoryName || ''));
     var h = el('h2', 'bz-sheet-name', business.name);
     h.id = 'sheetName';
-    headText.appendChild(h);
-    headText.appendChild(statsNode(business));
-    head.appendChild(headText);
+    text.appendChild(h);
+    text.appendChild(metaNode(business));
+    head.appendChild(text);
     wrap.appendChild(head);
 
     if (business.description) {
-      // Newlines survive through white-space: pre-line in the CSS rather than
-      // by turning them into <br>, so the text never becomes markup.
+      // Line breaks survive via white-space: pre-line rather than by turning
+      // newlines into <br>, so owner text never becomes markup.
       wrap.appendChild(el('p', 'bz-sheet-desc', business.description));
     }
 
     var links = business.links || [];
     if (links.length) {
-      var grid = el('div', 'bz-link-grid');
+      var grid = el('div', 'bz-links');
       links.forEach(function (link) {
         var node = linkNode(link);
         if (node) grid.appendChild(node);
@@ -502,6 +696,7 @@
       node.appendChild(iconSpan('bz-link-tail', ICONS.copy));
       node.addEventListener('click', function () { handlePhone(link.value); });
     } else {
+      node.appendChild(iconSpan('bz-link-tail', ICONS.arrow));
       node.addEventListener('click', function () { openExternal(link); });
     }
     return node;
@@ -511,10 +706,9 @@
     if (link.kind === 'phone') return link.value;
     try {
       var u = new URL(link.value);
-      var segs = u.pathname.split('/').filter(Boolean);
       if (link.kind === 'website') return u.hostname.replace(/^www\./, '');
-      if (segs.length) return '@' + segs[0].replace(/^@/, '');
-      return u.hostname;
+      var segs = u.pathname.split('/').filter(Boolean);
+      return segs.length ? '@' + segs[0].replace(/^@/, '') : u.hostname;
     } catch (e) {
       return link.value;
     }
@@ -523,8 +717,7 @@
   // Android opens the dialer. On iOS a tel: link inside the Mini App webview
   // has caused trouble before, so there the number is copied instead.
   function handlePhone(number) {
-    var platform = (tg.platform || '').toLowerCase();
-    if (platform === 'android') {
+    if ((tg.platform || '').toLowerCase() === 'android') {
       haptic('light');
       window.location.href = 'tel:' + number;
       return;
@@ -541,7 +734,8 @@
 
   function copyText(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).then(function () { return true; })
+      return navigator.clipboard.writeText(text)
+        .then(function () { return true; })
         .catch(function () { return legacyCopy(text); });
     }
     return Promise.resolve(legacyCopy(text));
@@ -565,22 +759,30 @@
   }
 
   function openExternal(link) {
-    var url = link.value;
-    if (!/^https?:\/\//i.test(url)) return;   // never hand a non-http scheme on
+    if (!/^https?:\/\//i.test(link.value)) return;   // never pass on another scheme
     haptic('light');
     try {
-      if (link.kind === 'telegram') tg.openTelegramLink(url);
-      else tg.openLink(url, { try_instant_view: false });
+      if (link.kind === 'telegram') tg.openTelegramLink(link.value);
+      else tg.openLink(link.value, { try_instant_view: false });
     } catch (e) {
-      window.open(url, '_blank', 'noopener');
+      window.open(link.value, '_blank', 'noopener');
     }
   }
 
-  // Fire and forget: a failed tap log must never block the sheet.
+  function openAdmin() {
+    haptic('light');
+    try { tg.openTelegramLink(ADMIN); }
+    catch (e) { window.open(ADMIN, '_blank', 'noopener'); }
+  }
+
+  // Fire and forget: a failed tap log must never hold up the sheet.
   function countTap(businessId) {
     fetch(API + '/api/business/' + encodeURIComponent(businessId) + '/tap', {
       method: 'POST',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, initDataHeader()),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Init-Data': (tg && tg.initData) ? tg.initData : ''
+      },
       keepalive: true
     }).catch(function () {});
   }
@@ -593,36 +795,58 @@
     var scroll = $('sheetScroll');
     scroll.textContent = '';
     scroll.appendChild(content);
+    scroll.scrollTop = 0;
     showSheet();
   }
 
   function showSheet() {
     var backdrop = $('sheetBackdrop');
-    var sheet = $('sheet');
     if (!backdrop.hidden) return;
-
     backdrop.hidden = false;
     requestAnimationFrame(function () {
       backdrop.classList.add('visible');
-      sheet.classList.add('visible');
+      $('sheet').classList.add('visible');
     });
     setBack(closeSheet);
   }
 
   function closeSheet() {
     var backdrop = $('sheetBackdrop');
-    var sheet = $('sheet');
     if (backdrop.hidden) return;
-
     backdrop.classList.remove('visible');
-    sheet.classList.remove('visible');
+    $('sheet').classList.remove('visible');
     setTimeout(function () {
       backdrop.hidden = true;
       $('sheetScroll').textContent = '';
     }, 260);
+    setBack(currentBack());
+  }
 
-    state.business = null;
-    setBack(state.view === 'list' ? backToCategories : goHome);
+  // ============================================
+  // SEARCH
+  // ============================================
+
+  var searchTimer = null;
+
+  function onSearchInput() {
+    var value = $('bzSearch').value.trim();
+    $('bzSearchClear').hidden = !value;
+
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () {
+      if (value === state.query) return;
+      state.query = value;
+
+      // Searching always looks across everything: a name you half remember is
+      // no use if it only matches inside the category you happen to be in.
+      if (state.mode === 'category') {
+        state.mode = 'feed';
+        state.categoryId = null;
+            syncFilter();
+        setBack(goHome);
+      }
+      loadFeed();
+    }, 280);
   }
 
   // ============================================
@@ -632,32 +856,33 @@
   function init() {
     setBack(goHome);
 
+    $('bzSearch').addEventListener('input', onSearchInput);
+    $('bzSearchClear').addEventListener('click', function () {
+      $('bzSearch').value = '';
+      $('bzSearchClear').hidden = true;
+      if (state.query) { state.query = ''; loadFeed(); }
+      $('bzSearch').focus();
+    });
+
+    $('bzFilter').addEventListener('click', openPicker);
+    $('bzFilterClear').addEventListener('click', function () {
+      haptic('light');
+      backToFeed();
+    });
+
+    $('bzRetry').addEventListener('click', function () {
+      state.mode === 'category' ? loadCategory() : loadFeed();
+    });
+
     $('sheetBackdrop').addEventListener('click', function (e) {
       if (e.target === $('sheetBackdrop')) closeSheet();
     });
     $('sheet').addEventListener('click', function (e) { e.stopPropagation(); });
-    $('listBackBtn').addEventListener('click', function () {
-      haptic('light');
-      backToCategories();
-    });
-    $('listRetryBtn').addEventListener('click', function () {
-      if (state.category) loadList(state.category.id);
-    });
-    $('promoteBtn').addEventListener('click', function () {
-      var prices = (state.pricing || {}).prices || {};
-      openBiddingInfo(1, prices['1']);
-    });
-    $('ownerContactBtn').addEventListener('click', function (e) {
-      e.preventDefault();
-      try { tg.openTelegramLink('https://t.me/otabeksattarov'); }
-      catch (err) { window.open('https://t.me/otabeksattarov', '_blank'); }
-    });
-
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeSheet();
     });
 
-    loadCategories();
+    loadFeed();
   }
 
   if (document.readyState === 'loading') {

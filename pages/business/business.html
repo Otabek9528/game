@@ -6,9 +6,9 @@
   <title>Biznes Katalogi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet" media="print" onload="this.media='all'; this.onload=null" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" /></noscript>
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" /></noscript>
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="business.css" />
 
@@ -27,84 +27,66 @@
     </a>
   </header>
 
-  <div class="bz-container">
+  <div class="bz-scroll" id="bzScroll">
 
-    <!-- ===== VIEW A: CATEGORY GRID ===== -->
-    <section class="bz-view" id="viewCategories">
-      <div class="bz-lede">
-        <h2 class="bz-title">Biznes Katalogi</h2>
-        <p class="bz-sub">Koreyadagi o'zbek bizneslari &mdash; yo'nalish bo'yicha</p>
+    <!-- Title + search + chips stay put while the feed moves under them. -->
+    <div class="bz-sticky">
+      <div class="bz-titlebar">
+        <h2 class="bz-title" id="bzTitle">Biznes Katalogi</h2>
+        <span class="bz-count" id="bzCount"></span>
       </div>
 
-      <div class="bz-cat-grid" id="catGrid"></div>
-
-      <div class="bz-skeleton" id="catSkeleton">
-        <div class="bz-sk-tile"></div><div class="bz-sk-tile"></div>
-        <div class="bz-sk-tile"></div><div class="bz-sk-tile"></div>
-        <div class="bz-sk-tile"></div><div class="bz-sk-tile"></div>
-      </div>
-
-      <div class="bz-owner-note">
-        <span class="bz-owner-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg>
+      <div class="bz-searchwrap">
+        <span class="bz-search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
-        <div>
-          <p class="bz-owner-title">Biznesingiz bormi?</p>
-          <p class="bz-owner-text">Ro'yxatga qo'shilish uchun admin bilan bog'laning.</p>
-        </div>
-        <a class="bz-owner-cta" id="ownerContactBtn" href="https://t.me/otabeksattarov">Yozish</a>
-      </div>
-    </section>
-
-    <!-- ===== VIEW B: BUSINESS LIST ===== -->
-    <section class="bz-view" id="viewList" hidden>
-      <div class="bz-list-head">
-        <button class="bz-back" id="listBackBtn" type="button" aria-label="Orqaga">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
-        <h2 class="bz-list-title" id="listTitle">&nbsp;</h2>
-      </div>
-
-      <div class="bz-loading" id="listLoading">
-        <div class="bz-spinner"></div>
-        <p>Yuklanmoqda...</p>
-      </div>
-
-      <!-- Paid positions -->
-      <div class="bz-podium" id="podium" hidden>
-        <p class="bz-zone-label">&#9670; Top o'rinlar</p>
-        <div id="podiumSlots"></div>
-      </div>
-
-      <div class="bz-divider" id="listDivider" hidden><span>Barcha bizneslar</span></div>
-
-      <div class="bz-rows" id="listRows"></div>
-
-      <div class="bz-empty" id="listEmpty" hidden>
-        <div class="bz-empty-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </div>
-        <p class="bz-empty-text">Bu yo'nalishda hali biznes yo'q</p>
-        <p class="bz-empty-hint">Birinchi bo'lib qo'shilishni xohlaysizmi?</p>
-      </div>
-
-      <div class="bz-error" id="listError" hidden>
-        <p class="bz-error-text">Ma'lumotlarni yuklab bo'lmadi</p>
-        <button class="bz-retry" id="listRetryBtn" type="button">Qayta urinish</button>
-      </div>
-
-      <!-- Visible to everyone: any browsing user might run a business -->
-      <div class="bz-promote" id="promoteStrip" hidden>
-        <span class="bz-promote-text">Yuqoriga chiqmoqchimisiz?</span>
-        <button class="bz-promote-btn" id="promoteBtn" type="button">
-          <span id="promotePrice">#1</span>
+        <input type="search" class="bz-search" id="bzSearch"
+               placeholder="Biznes qidirish" autocomplete="off"
+               autocapitalize="none" spellcheck="false" />
+        <button class="bz-search-clear" id="bzSearchClear" type="button" aria-label="Tozalash" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
-    </section>
+
+      <!-- One control, showing current state. A horizontal rail would hide
+           its own tail offscreen and imply a precedence among categories
+           that does not exist. -->
+      <div class="bz-filterbar">
+        <button class="bz-filter" id="bzFilter" type="button" aria-haspopup="dialog">
+          <span class="bz-glyph bz-glyph--filter" id="bzFilterGlyph" aria-hidden="true">&#9670;</span>
+          <span class="bz-filter-text">
+            <span class="bz-filter-kicker">Yo'nalish</span>
+            <span class="bz-filter-label" id="bzFilterLabel">Barcha yo'nalishlar</span>
+          </span>
+          <span class="bz-filter-caret" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </span>
+        </button>
+        <button class="bz-filter-clear" id="bzFilterClear" type="button" aria-label="Filtrni olib tashlash" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="bz-body" id="bzBody"></div>
+
+    <div class="bz-state" id="bzLoading">
+      <div class="bz-spinner"></div>
+    </div>
+
+    <div class="bz-state" id="bzEmpty" hidden>
+      <p class="bz-state-title" id="bzEmptyTitle">Hech narsa topilmadi</p>
+      <p class="bz-state-hint" id="bzEmptyHint">Boshqa so'z bilan qidirib ko'ring</p>
+    </div>
+
+    <div class="bz-state" id="bzError" hidden>
+      <p class="bz-state-title">Yuklab bo'lmadi</p>
+      <button class="bz-btn" id="bzRetry" type="button">Qayta urinish</button>
+    </div>
 
   </div>
 
-  <!-- ===== DETAIL BOTTOM SHEET ===== -->
+  <!-- DETAIL SHEET -->
   <div class="bz-sheet-backdrop" id="sheetBackdrop" hidden>
     <div class="bz-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetName">
       <div class="bz-sheet-grip"><span class="bz-sheet-grip-bar"></span></div>
