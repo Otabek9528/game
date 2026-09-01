@@ -771,17 +771,25 @@
 }
 .bz-sheet.visible { transform: translateY(0); }
 
+/* A generous drag zone, not just the bar. The bar is the signal; the whole
+   strip above the content is the target. */
 .bz-sheet-grip {
-  padding: 11px 0 7px;
+  padding: 14px 0 10px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 30px;
   flex: none;
   cursor: grab;
-  /* The grip owns the vertical gesture; without this the browser scrolls
-     instead of letting the sheet be dragged down. */
+  /* The grip owns the vertical gesture; without this the browser takes it
+     and scrolls instead of letting the sheet be dragged down. */
   touch-action: none;
 }
 .bz-sheet-grip:active { cursor: grabbing; }
+/* Dragging the grip must never select the text it passes over. */
+.bz-sheet-grip { -webkit-user-select: none; user-select: none; }
+.bz-sheet.is-dragging,
+.bz-sheet.is-dragging * { -webkit-user-select: none; user-select: none; }
 .bz-sheet-grip-bar { width: 40px; height: 4px; border-radius: 2px; background: var(--sand-300); }
 
 .bz-sheet-scroll {
@@ -789,6 +797,10 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 8px 20px 30px;
+  /* Without this the browser treats a downward drag at the top as overscroll,
+     takes the gesture, and fires pointercancel — which reads to the user as
+     the swipe simply not working. */
+  overscroll-behavior-y: contain;
 }
 
 .bz-sheet-head {

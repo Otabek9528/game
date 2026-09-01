@@ -624,7 +624,14 @@
 
   // Draft survives a trip to the category picker and back, so choosing a
   // category never costs the owner what they already typed.
-  var draft = { name: '', description: '', links: {}, category: null };
+  var draft = { name: '', description: '', links: {}, category: null,
+                logoBlob: null, logoUrl: null };
+
+  function clearDraft() {
+    setDraftLogo(null);
+    draft = { name: '', description: '', links: {}, category: null,
+              logoBlob: null, logoUrl: null };
+  }
 
   // One form for both jobs. In edit mode it opens on what is already stored
   // and sends only what the owner actually changed.
@@ -644,9 +651,7 @@
         draft.links[l.kind] = displayValue(l);
       });
     }
-    if (!editing && draft.id) {
-      draft = { name: '', description: '', links: {}, category: null };
-    }
+    if (!editing && draft.id) clearDraft();
     if (!draft.category && state.mode === 'category') {
       draft.category = {
         id: state.categoryId, name: state.categoryName, icon: state.categoryIcon
@@ -659,7 +664,9 @@
     wrap.appendChild(el('h2', 'bz-sheet-name',
       editing ? 'Tahrirlash' : 'Katalogga qo‘shish'));
 
-    if (editing) wrap.appendChild(logoPicker(existing));
+    wrap.appendChild(logoPicker(editing
+      ? existing
+      : { name: draft.name || 'Yangi biznes', logo: null }));
 
     var form = el('div', 'bz-form');
 
@@ -773,6 +780,7 @@
       sending = true;
       send.disabled = true;
       send.textContent = editing ? 'Saqlanmoqda…' : 'Yuborilmoqda…';
+      nameInput.blur();
 
       var body = {
         name: nameInput.value.trim(),
@@ -785,16 +793,31 @@
         : '/api/business/submit';
 
       postJSON(path, body)
-        .then(function () {
+        .then(function (data) {
           try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
-          draft = { name: '', description: '', links: {}, category: null };
           if (editing) {
+            clearDraft();
             showToast('Saqlandi');
             openMine();
             refreshCurrentView();
-          } else {
-            showSubmitted();
+            return;
           }
+          // The listing is in either way. A logo that fails to follow it is
+          // worth a word, not a failed submission.
+          var held = draft.logoBlob;
+          if (!held) {
+            clearDraft();
+            showSubmitted();
+            return;
+          }
+          send.textContent = 'Logo yuborilmoqda…';
+          return uploadLogo(data.id, held)
+            .then(function () { clearDraft(); showSubmitted(); })
+            .catch(function () {
+              clearDraft();
+              showSubmitted('Biznes yuborildi, lekin logoni yuklab bo‘lmadi. ' +
+                            'Uni keyinroq "Mening bizneslarim" bo‘limida qo‘shishingiz mumkin.');
+            });
         })
         .catch(function (err) {
           sending = false;
@@ -816,7 +839,12 @@
 
   var LOGO_EDGE = 512;
 
+  // Two modes. With a business id the file goes straight up. Without one —
+  // during submission — it is held on the draft and sent the moment the
+  // listing has an id, so an owner picks their logo where they expect to
+  // rather than being sent back for it afterwards.
   function logoPicker(business) {
+    var deferred = !business.id;
     var box = el('div', 'bz-logopick');
 
     var preview = el('div', 'bz-logopreview');
@@ -825,12 +853,13 @@
 
     var side = el('div', 'bz-logoside');
     side.appendChild(el('span', 'bz-fieldlabel', 'Logo'));
-    var hint = el('span', 'bz-logohint', 'PNG yoki JPG, kvadrat eng yaxshi');
+    var hint = el('span', 'bz-logohint',
+      deferred ? 'Ixtiyoriy. PNG yoki JPG' : 'PNG yoki JPG, kvadrat eng yaxshi');
     side.appendChild(hint);
 
     var pick = el('button', 'bz-logobtn');
     pick.type = 'button';
-    pick.textContent = business.logo ? 'Almashtirish' : 'Yuklash';
+    pick.textContent = (business.logo || draft.logoBlob) ? 'Almashtirish' : 'Yuklash';
     side.appendChild(pick);
     box.appendChild(side);
 
@@ -847,18 +876,29 @@
       input.value = '';
       if (!file) return;
 
-      hint.textContent = 'Yuklanmoqda…';
+      hint.textContent = deferred ? 'Tayyorlanmoqda…' : 'Yuklanmoqda…';
       pick.disabled = true;
 
       shrink(file)
-        .then(function (blob) { return uploadLogo(business.id, blob); })
-        .then(function (data) {
-          business.logo = data.logo;
-          paintPreview(preview, business, data.version);
-          hint.textContent = 'Saqlandi';
-          pick.textContent = 'Almashtirish';
-          try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
-          refreshCurrentView();
+        .then(function (blob) {
+          if (deferred) {
+            // Held until the listing exists. Nothing has been sent yet, so
+            // the preview is of the local file.
+            setDraftLogo(blob);
+            showLocalPreview(preview, blob);
+            hint.textContent = 'Tanlandi';
+            pick.textContent = 'Almashtirish';
+            try { tg.HapticFeedback.impactOccurred('light'); } catch (e) {}
+            return null;
+          }
+          return uploadLogo(business.id, blob).then(function (data) {
+            business.logo = data.logo;
+            paintPreview(preview, business, data.version);
+            hint.textContent = 'Saqlandi';
+            pick.textContent = 'Almashtirish';
+            try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
+            refreshCurrentView();
+          });
         })
         .catch(function (err) {
           hint.textContent = LOGO_ERRORS[err && err.code] ||
@@ -879,6 +919,24 @@
     server_misconfigured: 'Rasm yuklash vaqtincha ishlamayapti.'
   };
 
+  // One object URL at a time; the previous is released so a few retries do
+  // not leak the files behind them.
+  function setDraftLogo(blob) {
+    if (draft.logoUrl) { try { URL.revokeObjectURL(draft.logoUrl); } catch (e) {} }
+    draft.logoBlob = blob;
+    draft.logoUrl = blob ? URL.createObjectURL(blob) : null;
+  }
+
+  function showLocalPreview(node, blob) {
+    node.textContent = '';
+    node.className = 'bz-logopreview';
+    node.style.removeProperty('--h');
+    var img = document.createElement('img');
+    img.src = draft.logoUrl || URL.createObjectURL(blob);
+    img.alt = '';
+    node.appendChild(img);
+  }
+
   function paintPreview(node, business, version) {
     node.textContent = '';
     node.className = 'bz-logopreview';
@@ -889,6 +947,11 @@
                 (version ? '?v=' + version : '');
       img.alt = '';
       node.appendChild(img);
+    } else if (draft.logoUrl && !business.id) {
+      var held = document.createElement('img');
+      held.src = draft.logoUrl;
+      held.alt = '';
+      node.appendChild(held);
     } else {
       node.textContent = initials(business.name);
       node.classList.add('bz-logopreview--mono');
@@ -961,13 +1024,14 @@
     return box;
   }
 
-  function showSubmitted() {
+  function showSubmitted(caveat) {
     var wrap = el('div', 'bz-sheet-body bz-done');
     wrap.appendChild(iconSpan('bz-done-icon', ICONS.check));
     wrap.appendChild(el('h2', 'bz-sheet-name', 'Yuborildi'));
     wrap.appendChild(el('p', 'bz-sheet-desc',
       'Admin ko‘rib chiqadi va tasdiqlangach biznesingiz katalogda ko‘rinadi. ' +
       'To‘lov bo‘yicha admin siz bilan bog‘lanadi.'));
+    if (caveat) wrap.appendChild(el('p', 'bz-formerror', caveat));
 
     var cta = el('button', 'bz-btn bz-btn--block');
     cta.type = 'button';
@@ -1423,14 +1487,47 @@
 
     var SLOP = 6;   // below this it is a tap, not a drag
 
+    // The gesture is tracked on the window rather than through pointer
+    // capture. Capture retargets the click that follows an ordinary tap, so
+    // nothing inside the sheet would be pressable; and once a capture has
+    // been taken and released, the next pointerdown on a freshly opened sheet
+    // arrives already cancelled. Window listeners survive both, and survive
+    // the sheet sliding out from under the cursor.
+    function bind() {
+      window.addEventListener('pointermove', onMove, { passive: false });
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onCancel);
+      document.addEventListener('selectstart', noSelect);
+    }
+
+    function unbind() {
+      window.removeEventListener('pointermove', onMove, { passive: false });
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onCancel);
+      document.removeEventListener('selectstart', noSelect);
+    }
+
+    // A drag across text selects it, and the next press over that selection
+    // starts a native drag-and-drop — which the browser announces by
+    // cancelling our gesture before it has moved. Suppressing the selection
+    // is what keeps the second swipe working.
+    function noSelect(e) { e.preventDefault(); }
+
+    function clearSelection() {
+      try {
+        var sel = window.getSelection();
+        if (sel && !sel.isCollapsed) sel.removeAllRanges();
+      } catch (e) {}
+    }
+
     function stop(close) {
       if (!armed) return;
-      if (active) {
-        try { sheet.releasePointerCapture(pointer); } catch (err) {}
-      }
+      unbind();
+      if (active) clearSelection();
       armed = false;
       active = false;
       pointer = null;
+      sheet.classList.remove('is-dragging');
       sheet.style.transition = '';
       if (close) {
         closeSheet();
@@ -1440,11 +1537,57 @@
       dy = 0;
     }
 
+    function onMove(e) {
+      if (!armed || e.pointerId !== pointer) return;
+
+      dy = e.clientY - startY;
+
+      // Pulling up is the scroll's job.
+      if (dy <= 0) {
+        if (active) sheet.style.transform = '';
+        dy = 0;
+        return;
+      }
+      // The body may have scrolled out from under a slow drag.
+      if (!fromGrip && scroll.scrollTop > 0) {
+        stop(false);
+        return;
+      }
+
+      if (!active) {
+        if (dy < SLOP) return;
+        active = true;
+        sheet.classList.add('is-dragging');
+        sheet.style.transition = 'none';
+      }
+
+      if (e.cancelable) e.preventDefault();
+      sheet.style.transform = 'translateY(' + dy + 'px)';
+    }
+
+    function onUp(e) {
+      if (!armed || e.pointerId !== pointer) return;
+      if (!active) { stop(false); return; }   // a tap; leave it alone
+      var elapsed = Math.max(1, e.timeStamp - startT);
+      var far = dy > DISMISS_PX;
+      var flick = dy > 28 && (dy / elapsed) > DISMISS_VELOCITY;
+      stop(far || flick);
+    }
+
+    // A platform can take a gesture back mid-drag. Honour where it got to
+    // rather than snapping back, which reads as the swipe not working.
+    function onCancel(e) {
+      if (!armed || e.pointerId !== pointer) return;
+      stop(active && dy > DISMISS_PX);
+    }
+
     sheet.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (armed) stop(false);
+
       fromGrip = !!(e.target.closest && e.target.closest('.bz-sheet-grip'));
-      // From the body, only when there is nothing left to scroll up into,
-      // so the gesture never fights the sheet's own scrolling.
+      // From the body, only when there is nothing left to scroll up into, so
+      // the gesture never fights the sheet's own scrolling.
       if (!fromGrip && scroll.scrollTop > 0) return;
 
       armed = true;
@@ -1453,47 +1596,8 @@
       startY = e.clientY;
       startT = e.timeStamp;
       dy = 0;
+      bind();
     });
-
-    sheet.addEventListener('pointermove', function (e) {
-      if (!armed || e.pointerId !== pointer) return;
-
-      dy = e.clientY - startY;
-
-      if (dy <= 0) {
-        if (active) sheet.style.transform = '';
-        dy = 0;
-        return;
-      }
-      if (!fromGrip && scroll.scrollTop > 0) {
-        stop(false);
-        return;
-      }
-
-      // Capture is taken only once this is unmistakably a drag. Taking it on
-      // pointerdown would retarget the click that follows an ordinary tap to
-      // the sheet, and nothing inside it would be pressable.
-      if (!active) {
-        if (dy < SLOP) return;
-        active = true;
-        sheet.style.transition = 'none';
-        try { sheet.setPointerCapture(e.pointerId); } catch (err) {}
-      }
-
-      if (e.cancelable) e.preventDefault();
-      sheet.style.transform = 'translateY(' + dy + 'px)';
-    }, { passive: false });
-
-    sheet.addEventListener('pointerup', function (e) {
-      if (!armed || e.pointerId !== pointer) return;
-      if (!active) { stop(false); return; }        // a tap; leave it alone
-      var elapsed = Math.max(1, e.timeStamp - startT);
-      var far = dy > DISMISS_PX;
-      var flick = dy > 28 && (dy / elapsed) > DISMISS_VELOCITY;
-      stop(far || flick);
-    });
-
-    sheet.addEventListener('pointercancel', function () { stop(false); });
   }
 
   // ============================================
