@@ -626,7 +626,27 @@
   // category never costs the owner what they already typed.
   var draft = { name: '', description: '', links: {}, category: null };
 
-  function openSubmitForm() {
+  // One form for both jobs. In edit mode it opens on what is already stored
+  // and sends only what the owner actually changed.
+  function openSubmitForm(existing) {
+    var editing = !!existing;
+    if (editing && draft.id !== existing.id) {
+      draft = {
+        id: existing.id,
+        name: existing.name,
+        description: existing.description || '',
+        links: {},
+        category: { id: existing.categoryId, name: existing.categoryName,
+                    icon: existing.categoryIcon },
+        logo: existing.logo || null
+      };
+      (existing.links || []).forEach(function (l) {
+        draft.links[l.kind] = displayValue(l);
+      });
+    }
+    if (!editing && draft.id) {
+      draft = { name: '', description: '', links: {}, category: null };
+    }
     if (!draft.category && state.mode === 'category') {
       draft.category = {
         id: state.categoryId, name: state.categoryName, icon: state.categoryIcon
@@ -634,8 +654,12 @@
     }
 
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('p', 'bz-sheet-eyebrow', 'Yangi biznes'));
-    wrap.appendChild(el('h2', 'bz-sheet-name', 'Katalogga qo‘shish'));
+    wrap.appendChild(el('p', 'bz-sheet-eyebrow',
+      editing ? draft.category.name : 'Yangi biznes'));
+    wrap.appendChild(el('h2', 'bz-sheet-name',
+      editing ? 'Tahrirlash' : 'Katalogga qo‘shish'));
+
+    if (editing) wrap.appendChild(logoPicker(existing));
 
     var form = el('div', 'bz-form');
 
@@ -663,7 +687,7 @@
     catBtn.addEventListener('click', function () {
       openPicker(function (cat) {
         draft.category = cat;
-        openSubmitForm();
+        openSubmitForm(existing);
       });
     });
     catField.appendChild(catBtn);
@@ -708,10 +732,11 @@
 
     wrap.appendChild(form);
 
-    wrap.appendChild(el('p', 'bz-sheet-fine',
-      'Yuborilgandan keyin admin ko‘rib chiqadi. Ro‘yxatga kirish to‘lovi ' +
-      formatKRW((state.pricing || {}).listingFee || 5000) +
-      ' — admin bilan qo‘lda hal qilinadi.'));
+    wrap.appendChild(el('p', 'bz-sheet-fine', editing
+      ? 'O‘zgarishlar darhol saqlanadi. Admin xabardor qilinadi.'
+      : 'Yuborilgandan keyin admin ko‘rib chiqadi. Ro‘yxatga kirish to‘lovi ' +
+        formatKRW((state.pricing || {}).listingFee || 5000) +
+        ' — admin bilan qo‘lda hal qilinadi.'));
 
     var error = el('p', 'bz-formerror');
     error.hidden = true;
@@ -719,7 +744,7 @@
 
     var send = el('button', 'bz-btn bz-btn--block');
     send.type = 'button';
-    send.textContent = 'Yuborish';
+    send.textContent = editing ? 'Saqlash' : 'Yuborish';
     wrap.appendChild(send);
 
     function readLinks() {
@@ -747,28 +772,184 @@
 
       sending = true;
       send.disabled = true;
-      send.textContent = 'Yuborilmoqda…';
+      send.textContent = editing ? 'Saqlanmoqda…' : 'Yuborilmoqda…';
 
-      postJSON('/api/business/submit', {
+      var body = {
         name: nameInput.value.trim(),
         category_id: draft.category.id,
         description: descInput.value.trim(),
         links: links
-      })
+      };
+      var path = editing
+        ? '/api/business/' + existing.id + '/edit'
+        : '/api/business/submit';
+
+      postJSON(path, body)
         .then(function () {
           try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
           draft = { name: '', description: '', links: {}, category: null };
-          showSubmitted();
+          if (editing) {
+            showToast('Saqlandi');
+            openMine();
+            refreshCurrentView();
+          } else {
+            showSubmitted();
+          }
         })
         .catch(function (err) {
           sending = false;
           send.disabled = false;
-          send.textContent = 'Yuborish';
+          send.textContent = editing ? 'Saqlash' : 'Yuborish';
           fail(err.code);
         });
     });
 
     mountSheet(wrap);
+  }
+
+  // ============================================
+  // LOGO
+  // ============================================
+  // Downscaled in the page before it goes anywhere, so a 4MB phone photo does
+  // not have to cross a Korean mobile connection at full size. The server
+  // re-encodes regardless — this is for speed, not for safety.
+
+  var LOGO_EDGE = 512;
+
+  function logoPicker(business) {
+    var box = el('div', 'bz-logopick');
+
+    var preview = el('div', 'bz-logopreview');
+    paintPreview(preview, business);
+    box.appendChild(preview);
+
+    var side = el('div', 'bz-logoside');
+    side.appendChild(el('span', 'bz-fieldlabel', 'Logo'));
+    var hint = el('span', 'bz-logohint', 'PNG yoki JPG, kvadrat eng yaxshi');
+    side.appendChild(hint);
+
+    var pick = el('button', 'bz-logobtn');
+    pick.type = 'button';
+    pick.textContent = business.logo ? 'Almashtirish' : 'Yuklash';
+    side.appendChild(pick);
+    box.appendChild(side);
+
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png,image/jpeg,image/webp';
+    input.hidden = true;
+    box.appendChild(input);
+
+    pick.addEventListener('click', function () { input.click(); });
+
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0];
+      input.value = '';
+      if (!file) return;
+
+      hint.textContent = 'Yuklanmoqda…';
+      pick.disabled = true;
+
+      shrink(file)
+        .then(function (blob) { return uploadLogo(business.id, blob); })
+        .then(function (data) {
+          business.logo = data.logo;
+          paintPreview(preview, business, data.version);
+          hint.textContent = 'Saqlandi';
+          pick.textContent = 'Almashtirish';
+          try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
+          refreshCurrentView();
+        })
+        .catch(function (err) {
+          hint.textContent = LOGO_ERRORS[err && err.code] ||
+            'Yuklab bo‘lmadi. Boshqa rasm sinab ko‘ring.';
+          try { tg.HapticFeedback.notificationOccurred('error'); } catch (e) {}
+        })
+        .then(function () { pick.disabled = false; });
+    });
+
+    return box;
+  }
+
+  var LOGO_ERRORS = {
+    too_large: 'Rasm juda katta (6 MB gacha).',
+    not_an_image: 'Bu rasm emas.',
+    bad_format: 'Bu format qo‘llab-quvvatlanmaydi.',
+    no_file: 'Rasm tanlanmadi.',
+    server_misconfigured: 'Rasm yuklash vaqtincha ishlamayapti.'
+  };
+
+  function paintPreview(node, business, version) {
+    node.textContent = '';
+    node.className = 'bz-logopreview';
+    node.style.removeProperty('--h');
+    if (business.logo) {
+      var img = document.createElement('img');
+      img.src = API + '/' + String(business.logo).replace(/^\/+/, '') +
+                (version ? '?v=' + version : '');
+      img.alt = '';
+      node.appendChild(img);
+    } else {
+      node.textContent = initials(business.name);
+      node.classList.add('bz-logopreview--mono');
+      node.style.setProperty('--h', hueOf(business.name));
+    }
+  }
+
+  function shrink(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var scale = Math.min(1, LOGO_EDGE / Math.max(img.width, img.height));
+        var w = Math.max(1, Math.round(img.width * scale));
+        var h = Math.max(1, Math.round(img.height * scale));
+
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(function (blob) {
+          // If the canvas refuses, send the original and let the server deal
+          // with it rather than failing in the page.
+          resolve(blob || file);
+        }, 'image/webp', 0.9);
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        var e = new Error('not_an_image');
+        e.code = 'not_an_image';
+        reject(e);
+      };
+      img.src = url;
+    });
+  }
+
+  function uploadLogo(businessId, blob) {
+    var form = new FormData();
+    form.append('file', blob, 'logo.webp');
+    return fetch(API + '/api/business/' + businessId + '/logo', {
+      method: 'POST',
+      headers: { 'X-Init-Data': (tg && tg.initData) ? tg.initData : '' },
+      body: form,
+      signal: AbortSignal.timeout(TIMEOUT)
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (!r.ok || !data.success) {
+          var e = new Error(data.error || 'http_' + r.status);
+          e.code = data.error;
+          throw e;
+        }
+        return data;
+      });
+    });
+  }
+
+  // A change made in a sheet should be true of the list behind it too.
+  function refreshCurrentView() {
+    if (state.mode === 'category') loadCategory();
+    else loadFeed();
   }
 
   function field(label, hint) {
@@ -860,6 +1041,18 @@
     }
     body.appendChild(meta);
     row.appendChild(body);
+
+    // Rejected listings are not the owner's to fix; everything else is.
+    if (business.status !== 'rejected') {
+      var edit = el('button', 'bz-mine-edit');
+      edit.type = 'button';
+      edit.textContent = 'Tahrirlash';
+      edit.addEventListener('click', function () {
+        haptic('light');
+        openSubmitForm(business);
+      });
+      row.appendChild(edit);
+    }
     return row;
   }
 

@@ -958,6 +958,63 @@
   color: #9c332a;
 }
 
+/* ---------- logo picker ---------- */
+
+.bz-logopick {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px;
+  margin: 4px 0 16px;
+  border: 1px solid var(--sand-200);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+}
+
+.bz-logopreview {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--sand-100);
+  border: 1px solid var(--sand-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.bz-logopreview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bz-logopreview--mono {
+  background: hsl(var(--h, 30) 30% 92%);
+  border-color: hsl(var(--h, 30) 26% 85%);
+  color: hsl(var(--h, 30) 42% 34%);
+}
+
+.bz-logoside { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+
+.bz-logohint {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.bz-logobtn {
+  margin-top: 3px;
+  padding: 6px 13px;
+  border: 1px solid var(--sand-300);
+  border-radius: 8px;
+  background: var(--bg-base);
+  font-family: inherit;
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.bz-logobtn:disabled { opacity: 0.5; cursor: default; }
+
 /* ---------- form ---------- */
 
 .bz-form { display: flex; flex-direction: column; gap: 17px; margin: 4px 0 16px; }
@@ -1083,6 +1140,19 @@
 .bz-mine:last-child { border-bottom: none; }
 
 .bz-mine-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+
+.bz-mine-edit {
+  flex: none;
+  padding: 6px 12px;
+  border: 1px solid var(--sand-300);
+  border-radius: 999px;
+  background: var(--bg-base);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
 .bz-mine-name { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
 
 .bz-mine-meta {
@@ -1134,6 +1204,8 @@
 .bz-reactbtn:focus-visible,
 .bz-input:focus-visible,
 .bz-select:focus-visible,
+.bz-logobtn:focus-visible,
+.bz-mine-edit:focus-visible,
 .bz-owner:focus-visible,
 .bz-filter:focus-visible,
 .bz-filter-clear:focus-visible,
@@ -1243,6 +1315,17 @@
 .night-mode .bz-mine-name,
 .night-mode .bz-blank-title { color: #f0ede9; }
 .night-mode .bz-blank-body { color: #a09a93; }
+.night-mode .bz-logopick { background: #1e1b18; border-color: rgba(255,255,255,0.09); }
+.night-mode .bz-logopreview { background: #262220; border-color: rgba(255,255,255,0.08); }
+.night-mode .bz-logopreview--mono {
+  background: hsl(var(--h, 30) 20% 20%);
+  border-color: hsl(var(--h, 30) 18% 27%);
+  color: hsl(var(--h, 30) 48% 70%);
+}
+.night-mode .bz-logohint { color: #7d766f; }
+.night-mode .bz-logobtn,
+.night-mode .bz-mine-edit { background: #262220; border-color: rgba(255,255,255,0.12); color: #f0ede9; }
+.night-mode .bz-mine-edit { color: var(--emerald-400); }
 .night-mode .bz-status--pending, .night-mode .bz-status--unpaid { background: rgba(234,185,50,0.14); color: #eab932; }
 .night-mode .bz-status--active { background: rgba(52,211,153,0.13); color: #6ee7b7; }
 .night-mode .bz-status--off { background: rgba(232,112,92,0.13); color: #f0917f; }
