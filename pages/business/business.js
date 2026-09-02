@@ -232,14 +232,19 @@
       meta.appendChild(el('span', 'bz-catchip', categoryName));
     }
 
+    // A bare heart and a bare eye are icons a reader has to guess at. The
+    // glyphs stay — the line is too narrow for words — but each carries the
+    // name of what it counts for anyone not reading by sight.
     var likes = el('span', 'bz-stat');
     likes.appendChild(iconSpan('bz-stat-icon', ICONS.heart));
     likes.appendChild(el('span', null, String(business.likes)));
+    likes.setAttribute('aria-label', business.likes + ' kishiga yoqdi');
     meta.appendChild(likes);
 
     var taps = el('span', 'bz-stat');
     taps.appendChild(iconSpan('bz-stat-icon', ICONS.eye));
     taps.appendChild(el('span', null, String(business.taps)));
+    taps.setAttribute('aria-label', business.taps + ' marta ochilgan');
     meta.appendChild(taps);
 
     return meta;
@@ -264,8 +269,12 @@
 
     var body = el('div', 'bz-row-body');
     body.appendChild(el('div', 'bz-rowname', business.name));
-    if (opts.showDescription && business.description) {
-      body.appendChild(el('div', 'bz-rowdesc', business.description));
+    // What the business does, not just what it is called. A row carrying only
+    // a name and two counters gives a reader nothing to choose on, and the
+    // text is already in the feed payload.
+    if (opts.showDescription !== false && business.description) {
+      body.appendChild(el('div', 'bz-rowdesc' +
+        (opts.descLines === 1 ? ' bz-rowdesc--one' : ''), business.description));
     }
     body.appendChild(metaNode(business, opts.categoryName));
     row.appendChild(body);
@@ -299,10 +308,46 @@
   // ============================================
 
   function setView(which) {
-    $('bzLoading').hidden = which !== 'loading';
-    $('bzEmpty').hidden = which !== 'empty';
+    // Loading is drawn in the body as a skeleton, not as a spinner in an
+    // otherwise empty page: tearing the list down on every search keystroke
+    // and every filter change is what made the page feel like it was
+    // restarting rather than responding.
+    $('bzLoading').hidden = true;
     $('bzError').hidden = which !== 'error';
-    if (which !== 'ready') $('bzBody').textContent = '';
+    if (which === 'loading') renderSkeleton();
+    else if (which !== 'ready') $('bzBody').textContent = '';
+  }
+
+  // Shaped like the answer that is coming, so nothing jumps when it lands.
+  function renderSkeleton() {
+    var host = $('bzBody');
+    host.textContent = '';
+
+    var groups = state.mode === 'category' ? 1 : 3;
+    var rows = state.mode === 'category' ? 5 : 3;
+
+    for (var g = 0; g < groups; g++) {
+      var section = el('div', 'bz-skel-sec');
+      section.setAttribute('aria-hidden', 'true');
+
+      var head = el('div', 'bz-skel-head');
+      head.appendChild(el('span', 'bz-skel bz-skel--glyph'));
+      head.appendChild(el('span', 'bz-skel bz-skel--title'));
+      section.appendChild(head);
+
+      for (var r = 0; r < rows; r++) {
+        var row = el('div', 'bz-skel-row');
+        row.appendChild(el('span', 'bz-skel bz-skel--logo'));
+        var lines = el('div', 'bz-skel-lines');
+        lines.appendChild(el('span', 'bz-skel bz-skel--name'));
+        lines.appendChild(el('span', 'bz-skel bz-skel--desc'));
+        lines.appendChild(el('span', 'bz-skel bz-skel--meta'));
+        row.appendChild(lines);
+        section.appendChild(row);
+      }
+      host.appendChild(section);
+    }
+    host.setAttribute('aria-busy', 'true');
   }
 
   // ============================================
@@ -331,6 +376,7 @@
     setView('ready');
     var host = $('bzBody');
     host.textContent = '';
+    host.removeAttribute('aria-busy');
 
     // An empty catalogue is the moment an owner is most useful to us, so the
     // invitation goes here rather than a dead end. A fruitless search is a
@@ -370,7 +416,13 @@
 
       visible.forEach(function (business, i) {
         var rank = i < podium.length ? i + 1 : null;
-        section.appendChild(businessRow(business, { rank: rank }));
+        // No TOP marker here, unlike the category view: the feed shows only
+        // the held positions, never the empty ones, so a "TOP 3" rule would
+        // sit under two medals and claim a third that is not there. The
+        // metals carry the distinction on their own.
+        section.appendChild(businessRow(business, {
+          rank: rank, showDescription: true, descLines: 2
+        }));
         shown++;
       });
 
@@ -429,6 +481,7 @@
     setView('ready');
     var host = $('bzBody');
     host.textContent = '';
+    host.removeAttribute('aria-busy');
 
     // An empty category is a real destination now, reachable from the picker,
     // so it explains itself and offers the one action that makes sense here.
@@ -465,19 +518,24 @@
       // the opposite of what it labelled. A marker closing the contested
       // three says the same thing without naming the group at all, and
       // closes the gap the second heading opened.
-      if (pricing.showBidding) {
-        var line = el('div', 'bz-topline');
-        line.appendChild(el('span', 'bz-topline-tag', 'TOP 3'));
-        all.appendChild(line);
-      }
+      if (pricing.showBidding) all.appendChild(topMarker());
 
       rest.forEach(function (business) {
-        all.appendChild(businessRow(business, { showDescription: !pricing.showBidding }));
+        all.appendChild(businessRow(business, { showDescription: true, descLines: 2 }));
       });
       host.appendChild(all);
     }
 
     host.appendChild(ownerCard());
+  }
+
+  // Closes the contested three. "Barcha bizneslar" read as every business in
+  // the directory, which is the opposite of what it labelled; a marker says
+  // the same thing without naming the group at all.
+  function topMarker() {
+    var line = el('div', 'bz-topline');
+    line.appendChild(el('span', 'bz-topline-tag', 'TOP 3'));
+    return line;
   }
 
   // Deliberately carries no number. What a position costs is an owner's
@@ -1419,6 +1477,8 @@
       wrap.appendChild(el('p', 'bz-sheet-desc', business.description));
     }
 
+    // Reaching the business is what this sheet is for, so the contact block
+    // is named and sits above everything optional.
     var links = business.links || [];
     if (links.length) {
       var grid = el('div', 'bz-links');
@@ -1426,7 +1486,12 @@
         var node = linkNode(link);
         if (node) grid.appendChild(node);
       });
-      if (grid.childNodes.length) wrap.appendChild(grid);
+      if (grid.childNodes.length) {
+        var section = el('div', 'bz-linksec');
+        section.appendChild(el('p', 'bz-seclabel', 'Bog\u2018lanish'));
+        section.appendChild(grid);
+        wrap.appendChild(section);
+      }
     }
 
     wrap.appendChild(reactionBar(business));
@@ -1438,6 +1503,7 @@
   // so a second device never drifts out of step.
   function reactionBar(business) {
     var bar = el('div', 'bz-react');
+    bar.appendChild(el('span', 'bz-react-label', 'Bu biznes sizga yoqdimi?'));
     var mine = business.myReaction || 0;
 
     var up = reactionBtn(ICONS.thumbUp, business.likes, mine === 1);
@@ -1796,6 +1862,32 @@
     }, 280);
   }
 
+  // The header carries a rule and a soft edge only once there is content
+  // underneath it. Drawn at rest it divides a page that has no second part
+  // yet, and it never acknowledged that the list had moved at all.
+  function initStickyState() {
+    var scroll = $('bzScroll');
+    var sticky = $('bzSticky');
+    if (!scroll || !sticky) return;
+
+    var stuck = false;
+    var queued = false;
+
+    function measure() {
+      queued = false;
+      var next = scroll.scrollTop > 4;
+      if (next === stuck) return;
+      stuck = next;
+      sticky.classList.toggle('is-stuck', stuck);
+    }
+
+    scroll.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(measure);
+    }, { passive: true });
+  }
+
   // ============================================
   // INIT
   // ============================================
@@ -1832,6 +1924,7 @@
     });
 
     initSheetDrag();
+    initStickyState();
     loadFeed();
   }
 

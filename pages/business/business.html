@@ -30,7 +30,7 @@
   <div class="bz-scroll" id="bzScroll">
 
     <!-- Title + search + chips stay put while the feed moves under them. -->
-    <div class="bz-sticky">
+    <div class="bz-sticky" id="bzSticky">
       <div class="bz-titlebar">
         <h2 class="bz-title" id="bzTitle">Biznes Katalogi</h2>
         <span class="bz-count" id="bzCount"></span>
@@ -70,17 +70,17 @@
 
     <div class="bz-body" id="bzBody"></div>
 
-    <div class="bz-state" id="bzLoading">
+    <!-- Loading is drawn as a skeleton inside .bz-body; this stays only as
+         the fallback the sheets reuse. The former #bzEmpty block was never
+         reachable — empties are composed into the body by emptyBlock(). -->
+    <div class="bz-state" id="bzLoading" hidden>
       <div class="bz-spinner"></div>
     </div>
 
-    <div class="bz-state" id="bzEmpty" hidden>
-      <p class="bz-state-title" id="bzEmptyTitle">Hech narsa topilmadi</p>
-      <p class="bz-state-hint" id="bzEmptyHint">Boshqa so'z bilan qidirib ko'ring</p>
-    </div>
-
     <div class="bz-state" id="bzError" hidden>
-      <p class="bz-state-title">Yuklab bo'lmadi</p>
+      <span class="bz-glyph bz-blank-glyph" aria-hidden="true">&#9888;</span>
+      <p class="bz-state-title">Yuklab bo&#8216;lmadi</p>
+      <p class="bz-state-hint">Internet aloqasini tekshiring va qayta urinib ko&#8216;ring.</p>
       <button class="bz-btn" id="bzRetry" type="button">Qayta urinish</button>
     </div>
 
