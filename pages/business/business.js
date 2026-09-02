@@ -1513,45 +1513,180 @@
   // the top and bottom off a square mark. The gutters that leaves are filled
   // by a blurred copy of the picture itself, so the band is never a pair of
   // grey bars.
-  function heroNode(business) {
-    var src = API + '/' + String(business.logo).replace(/^\/+/, '');
+  // ============================================
+  // IMAGE ANALYSIS
+  // ============================================
+  // What makes a logo look pasted in is the seam where its own background
+  // meets the container we put it in. So we read the picture's edge pixels
+  // and let the picture decide its own treatment, rather than forcing one
+  // frame on a transparent PNG, a solid-ground logo and a product photo
+  // alike.
+  //
+  // Sampling needs a CORS-clean read, so it runs on a *separate* probe image
+  // with crossOrigin set. The image actually on screen never carries that
+  // attribute — if the host does not send the header, the probe fails alone
+  // and the visible logo still loads.
 
-    var hero = el('button', 'bz-hero');
-    hero.type = 'button';
-    hero.setAttribute('aria-label', business.name + ' \u2014 rasmni ochish');
+  var EDGE_UNIFORM = 20;      // per-channel spread below which an edge is flat
+  var ALPHA_CLEAR = 32;       // below this a pixel counts as transparent
 
-    var back = document.createElement('img');
-    back.className = 'bz-hero-back';
-    back.src = src;
-    back.alt = '';
-    back.setAttribute('aria-hidden', 'true');
-    hero.appendChild(back);
+  var imageFacts = {};        // src -> facts, so reopening a sheet is instant
 
-    var img = document.createElement('img');
-    img.className = 'bz-hero-img';
-    img.src = src;
-    img.alt = business.name;
-    hero.appendChild(img);
+  function analyseImage(src, done) {
+    // Deferred even when cached. detailBody() runs while it is still an
+    // argument to mountSheet(), so a synchronous answer here would land
+    // before the sheet exists to receive it.
+    if (imageFacts[src] !== undefined) {
+      var cached = imageFacts[src];
+      setTimeout(function () { done(cached); }, 0);
+      return;
+    }
 
-    hero.appendChild(iconSpan('bz-hero-zoom', ICONS.expand));
+    var probe = new Image();
+    probe.crossOrigin = 'anonymous';
 
-    // A picture that failed to load is not something to offer full screen.
-    img.addEventListener('error', function () { hero.remove(); });
+    probe.onload = function () {
+      var facts = null;
+      try {
+        var n = 32;
+        var canvas = document.createElement('canvas');
+        canvas.width = n;
+        canvas.height = n;
+        var ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(probe, 0, 0, n, n);
+        facts = readPixels(ctx.getImageData(0, 0, n, n).data, n);
+      } catch (e) {
+        facts = null;           // tainted canvas: no header on the image host
+      }
+      imageFacts[src] = facts;
+      done(facts);
+    };
 
-    hero.addEventListener('click', function () {
-      haptic('light');
-      openViewer(src, business.name);
-    });
-    return hero;
+    probe.onerror = function () { imageFacts[src] = null; done(null); };
+    probe.src = src;
   }
 
-  // Category, name, counts. Given its own block so the name is the one thing
-  // the eye lands on: the counts used to sit hard under it competing for the
-  // same line of attention.
-  function identityBlock(business, withMark) {
-    var block = el('div', 'bz-ident' + (withMark ? ' bz-ident--mark' : ''));
+  // The border ring says what the picture sits on; every opaque pixel says
+  // what colour the picture is overall.
+  function readPixels(data, n) {
+    var edge = [], clear = 0, edgeCount = 0;
+    var sumR = 0, sumG = 0, sumB = 0, opaque = 0;
 
-    if (withMark) block.appendChild(logoNode(business, 'xl'));
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        var i = (y * n + x) * 4;
+        var a = data[i + 3];
+        var onEdge = x < 2 || y < 2 || x >= n - 2 || y >= n - 2;
+
+        if (onEdge) {
+          edgeCount++;
+          if (a < ALPHA_CLEAR) clear++;
+          else edge.push([data[i], data[i + 1], data[i + 2]]);
+        }
+        if (a >= ALPHA_CLEAR) {
+          sumR += data[i]; sumG += data[i + 1]; sumB += data[i + 2];
+          opaque++;
+        }
+      }
+    }
+
+    if (!opaque) return null;
+
+    var tint = [Math.round(sumR / opaque), Math.round(sumG / opaque),
+                Math.round(sumB / opaque)];
+
+    // Mostly see-through at the border: a cut-out mark. It wants no plate at
+    // all — anything behind it becomes a box it did not ask for.
+    if (clear / edgeCount > 0.45) return { kind: 'plain', tint: softenTint(tint) };
+
+    var mean = [0, 0, 0], k;
+    for (k = 0; k < edge.length; k++) {
+      mean[0] += edge[k][0]; mean[1] += edge[k][1]; mean[2] += edge[k][2];
+    }
+    mean = mean.map(function (v) { return v / edge.length; });
+
+    var spread = [0, 0, 0];
+    for (k = 0; k < edge.length; k++) {
+      spread[0] += Math.pow(edge[k][0] - mean[0], 2);
+      spread[1] += Math.pow(edge[k][1] - mean[1], 2);
+      spread[2] += Math.pow(edge[k][2] - mean[2], 2);
+    }
+    spread = spread.map(function (v) { return Math.sqrt(v / edge.length); });
+
+    // A flat border is the logo's own background. Painting the plate that
+    // exact colour is what dissolves the seam — the logo stops being an
+    // image in a box and becomes a shape on a surface.
+    if (Math.max(spread[0], spread[1], spread[2]) < EDGE_UNIFORM) {
+      return {
+        kind: 'plate',
+        plate: mean.map(Math.round),
+        tint: mean.map(Math.round)
+      };
+    }
+
+    // Busy to the edge: a photograph. A photograph should look like one.
+    return { kind: 'photo', tint: softenTint(tint) };
+  }
+
+  function rgbStr(c) { return c[0] + ', ' + c[1] + ', ' + c[2]; }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var l = (max + min) / 2, h = 0, s = 0;
+    if (max !== min) {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return [h, s, l];
+  }
+
+  function hslToRgb(h, s, l) {
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    function ch(t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+    return (s === 0 ? [l, l, l] : [ch(h + 1 / 3), ch(h), ch(h - 1 / 3)])
+      .map(function (v) { return Math.round(v * 255); });
+  }
+
+  // A wash mixed from an average colour has to be calmed before it is used,
+  // or a saturated mark paints the whole top of the sheet in its own brand
+  // colour. Hue is kept — it is what makes the field feel like the
+  // business's — while saturation is capped and lightness pulled towards the
+  // middle so a near-black or near-white logo still yields a usable field.
+  //
+  // Deliberately NOT applied to a plate colour: there the wash and the plate
+  // have to stay the same colour, and shifting one of them re-opens the seam
+  // the plate treatment exists to close.
+  function softenTint(rgb) {
+    var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+    return hslToRgb(hsl[0], Math.min(hsl[1], 0.40),
+                    Math.max(0.45, Math.min(0.74, hsl[2])));
+  }
+
+  // ============================================
+  // IDENTITY BLOCK
+  // ============================================
+  // Picture, category, name, counts, on one ground. The wash is mixed from
+  // the picture's own colour and fades out before the text ends, so there is
+  // no edge anywhere between the logo and the page — which is the whole
+  // reason the old banner read as a separate panel bolted on top.
+
+  function identityBlock(business) {
+    var block = el('div', 'bz-ident');
+    var mark = markNode(business);
+    if (mark) block.appendChild(mark);
 
     var text = el('div', 'bz-ident-text');
     text.appendChild(el('p', 'bz-sheet-eyebrow', business.categoryName || ''));
@@ -1560,23 +1695,102 @@
     text.appendChild(h);
     text.appendChild(metaNode(business));
     block.appendChild(text);
+
+    // The wash needs a colour before the picture has been read. Starting
+    // from the name's own hue means the block is never momentarily grey and
+    // never jumps size — only the colour settles.
+    if (business.logo) {
+      // No opening tint. A colour guessed from the name has no relationship
+      // to the picture and can land a pink logo on a mint field; where the
+      // picture cannot be read, no wash at all is the safe answer. When it
+      // can be read the wash fades in behind it, which is also a nicer
+      // arrival than a colour that swaps.
+      var src = API + '/' + String(business.logo).replace(/^\/+/, '');
+      analyseImage(src, function (facts) {
+        if (!facts) return;                    // sampling blocked: stay neutral
+        tintSheet(rgbStr(facts.tint));
+        mark.classList.remove('bz-mark--auto');
+        mark.classList.add('bz-mark--' + facts.kind);
+        if (facts.kind === 'plate') {
+          mark.style.setProperty('--plate', 'rgb(' + rgbStr(facts.plate) + ')');
+        }
+      });
+    } else {
+      // No picture to read, and the monogram already carries this hue, so
+      // the two agree by construction rather than by luck.
+      // Read back by mountSheet: setting it here would be undone a moment
+      // later, since this runs as an argument to mountSheet.
+      block.dataset.tint = hueTintOf(business.name);
+    }
     return block;
+  }
+
+  // The wash belongs to the sheet rather than to the block, so it can start
+  // above the grip. Every other sheet clears it on mount — otherwise one
+  // business's colour would still be sitting behind the submission form.
+  function tintSheet(rgb) {
+    var sheet = $('sheet');
+    if (!sheet) return;
+    if (rgb) {
+      sheet.style.setProperty('--tint-rgb', rgb);
+      sheet.classList.add('has-tint');
+    } else {
+      sheet.classList.remove('has-tint');
+      sheet.style.removeProperty('--tint-rgb');
+    }
+  }
+
+  // The existing name-derived hue, resolved to rgb so the wash and the
+  // monogram agree on a colour for a business that has no picture at all.
+  function hueTintOf(name) {
+    return rgbStr(hslToRgb(hueOf(name) / 360, 0.38, 0.58));
+  }
+
+  // Square, and small enough that the name still leads. Until the picture
+  // has been read it wears the neutral plate, which contains rather than
+  // crops — letterboxing a photograph is a smaller mistake than cutting the
+  // edges off a logo.
+  function markNode(business) {
+    if (!business.logo) {
+      var mono = el('div', 'bz-mark bz-mark--mono');
+      mono.textContent = initials(business.name);
+      mono.style.setProperty('--h', hueOf(business.name));
+      return mono;
+    }
+
+    var src = API + '/' + String(business.logo).replace(/^\/+/, '');
+    var mark = el('button', 'bz-mark bz-mark--auto');
+    mark.type = 'button';
+    mark.setAttribute('aria-label', business.name + ' — rasmni ochish');
+
+    var img = document.createElement('img');
+    img.className = 'bz-mark-img';
+    img.src = src;
+    img.alt = business.name;
+    mark.appendChild(img);
+    mark.appendChild(iconSpan('bz-mark-zoom', ICONS.expand));
+
+    // A picture that never arrives should not offer a full-screen view of
+    // itself; fall back to the monogram the rest of the app uses.
+    img.addEventListener('error', function () {
+      mark.replaceWith(markNode({ name: business.name, logo: null }));
+    });
+
+    mark.addEventListener('click', function () {
+      haptic('light');
+      openViewer(src, business.name);
+    });
+    return mark;
   }
 
   function detailBody(business) {
     var wrap = el('div', 'bz-sheet-body bz-detail');
 
-    // Composition follows the content rather than forcing one layout on
-    // both cases. A business that uploaded a picture leads with it, full
-    // width; one that has not gets a clean identity row instead, because a
-    // 200px band of flat colour holding two letters is worse than the small
-    // mark it replaced, not better.
-    if (business.logo) {
-      wrap.appendChild(heroNode(business));
-      wrap.appendChild(identityBlock(business, false));
-    } else {
-      wrap.appendChild(identityBlock(business, true));
-    }
+    // One composition for every listing now. The picture is part of the
+    // identity block rather than a banner above it, so a business with a
+    // logo and one without differ in what the block contains, not in how
+    // the sheet is built.
+    wrap.appendChild(identityBlock(business));
 
     if (business.description) {
       // Line breaks survive via white-space: pre-line rather than by turning
@@ -2053,6 +2267,11 @@
     var scroll = $('sheetScroll');
     scroll.textContent = '';
     scroll.appendChild(content);
+
+    // Cleared for every sheet, then restored from the content itself, so a
+    // business's colour can never be left sitting behind the submission form.
+    var tinted = content.querySelector && content.querySelector('[data-tint]');
+    tintSheet(tinted ? tinted.dataset.tint : null);
     scroll.scrollTop = 0;
     showSheet();
   }

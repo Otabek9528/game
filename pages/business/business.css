@@ -1038,87 +1038,145 @@
 
 /* ---------- detail sheet ---------- */
 /* The screen where a reader decides whether to trust a business, so the
-   business itself leads: picture, then name, then everything it takes to
-   act on it. Previously the sheet opened on a 58px thumbnail sharing a line
-   with the name and the counters, and none of the three won. */
+   business itself leads: picture, then name, then what it takes to act.
 
-/* The hero bleeds to the sheet's edges and its rounded top corners, so the
-   picture reads as part of the sheet rather than a card floating inside it.
-   -20px matches .bz-sheet-scroll's horizontal padding. */
-.bz-hero {
+   The picture is inside the identity block, not a banner above it. A banner
+   ends in a hard horizontal edge against the sheet, and that edge is what
+   makes it read as a separate panel however well the image is presented.
+   Here one wash — mixed from the picture's own colours by readPixels() —
+   runs under the mark and the name together and fades out before the text
+   does, so there is no line anywhere to notice. */
+
+.bz-ident {
   position: relative;
-  display: block;
-  width: calc(100% + 40px);
-  margin: -8px -20px 18px;
-  padding: 0;
-  border: none;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  background: var(--surface-sunken);
-  cursor: zoom-in;
-  font-family: inherit;
-  -webkit-tap-highlight-color: transparent;
+  margin: -4px 0 26px;
 }
 
-/* Contained, never cropped: these are as often a label or a logo as a photo,
-   and cover would cut the top and bottom off a square mark. */
-.bz-hero-img {
+/* The wash is painted on the sheet, not on the block, so it starts above the
+   grip and runs behind it. Painted on the block it began a few pixels down
+   and drew exactly the horizontal edge the whole change exists to remove —
+   the banner problem, moved rather than solved. It fades out to nothing by
+   the time the description begins, so there is no lower edge either. */
+.bz-sheet::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 300px;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--tint-rgb, 120, 113, 108), 0.30) 0%,
+    rgba(var(--tint-rgb, 120, 113, 108), 0.13) 48%,
+    rgba(var(--tint-rgb, 120, 113, 108), 0) 100%);
+}
+.bz-sheet.has-tint::before { opacity: 1; }
+
+/* Above the wash. Neither carries a background of its own, so the tint
+   shows through both and the sheet reads as one surface. */
+.bz-sheet-grip,
+.bz-sheet-scroll { position: relative; z-index: 1; }
+
+/* ---------- the mark ---------- */
+/* Square and modest. It used to be a 16:10 band eating a third of the
+   screen and pushing the name, the description and the phone number below
+   the fold. */
+
+.bz-mark {
   position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  font-family: inherit;
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-fast);
+}
+.bz-mark:active { transform: scale(0.96); }
+
+.bz-mark-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
 }
 
-/* The picture's own colours, blurred, filling whatever contain leaves over.
-   Cheaper than a chosen accent and always in key with the image. */
-.bz-hero-back {
-  position: absolute;
-  inset: -12%;
-  width: 124%;
-  height: 124%;
-  object-fit: cover;
-  filter: blur(26px) saturate(1.25);
-  opacity: 0.55;
-  transform: translateZ(0);
+/* Before the picture has been read, and whenever reading it is blocked:
+   contained on a neutral plate. Containing letterboxes a photograph;
+   covering would cut the edges off a logo, which is the worse failure. */
+.bz-mark--auto {
+  background: var(--surface-card);
+  box-shadow: inset 0 0 0 1px var(--hairline);
 }
 
-.bz-hero-zoom {
+/* Cut-out mark: no plate at all. Anything behind it is a box it did not
+   ask for, so it sits directly on the wash and the transparency does the
+   blending for us. */
+.bz-mark--plain { background: none; box-shadow: none; }
+.bz-mark--plain .bz-mark-img { padding: 2px; }
+
+/* The logo carries its own solid background, so the plate is painted that
+   exact colour. The logo's rectangular edge then has nothing to meet and
+   simply disappears — this is the whole trick, and it is why the mark needs
+   no border, no shadow and no inner padding here. */
+.bz-mark--plate { background: var(--plate); box-shadow: none; }
+
+/* Busy to its own edges: a photograph. It gets a real frame and fills it,
+   because a photograph in a rounded plate reads as a photograph, while a
+   photograph floating with no edge reads as a mistake. */
+.bz-mark--photo {
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.bz-mark--photo .bz-mark-img { object-fit: cover; }
+
+.bz-mark--mono {
+  background: hsl(var(--h, 30) 34% 90%);
+  box-shadow: inset 0 0 0 1px hsl(var(--h, 30) 28% 82%);
+  color: hsl(var(--h, 30) 44% 32%);
+  cursor: default;
+}
+
+/* Small enough not to sit on the artwork, present enough to say the mark
+   opens. Only rendered for a mark that actually has a picture behind it. */
+.bz-mark-zoom {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 30px;
-  height: 30px;
+  right: 4px;
+  bottom: 4px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 9px;
-  background: rgba(20, 16, 12, 0.5);
-  color: #fff;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: background var(--transition-fast);
+  border-radius: 7px;
+  background: rgba(20, 16, 12, 0.3);
+  color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
-.bz-hero-zoom svg { width: 15px; height: 15px; display: block; }
-.bz-hero:active .bz-hero-zoom { background: rgba(20, 16, 12, 0.72); }
-.bz-hero:active .bz-hero-img { transform: scale(0.99); }
-.bz-hero-img { transition: transform var(--transition-fast); }
+.bz-mark-zoom svg { width: 10px; height: 10px; display: block; }
 
-/* Identity. Its own block rather than a row shared with the mark, so the
-   name has a full measure to itself. */
-.bz-ident { margin-bottom: 18px; }
-.bz-ident--mark { display: flex; align-items: center; gap: 15px; }
-.bz-ident--mark .bz-logo--xl {
-  width: 68px;
-  height: 68px;
-  border-radius: 18px;
-  font-size: 1.2rem;
-}
-.bz-ident-text { min-width: 0; flex: 1; }
+/* ---------- identity text ---------- */
+
+.bz-ident-text { min-width: 0; }
 
 .bz-sheet-name--lead {
-  font-size: 1.55rem;
-  line-height: 1.12;
+  font-size: 1.5rem;
+  line-height: 1.14;
   letter-spacing: -0.018em;
   margin-bottom: 9px;
 }
@@ -1912,7 +1970,22 @@
 }
 
 .night-mode .bz-sheet { background: #1a1715; }
-.night-mode .bz-hero { background: #262220; }
+.night-mode .bz-mark--auto { background: #262220; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.09); }
+.night-mode .bz-mark--photo { background: #262220; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
+.night-mode .bz-mark--mono {
+  background: hsl(var(--h, 30) 20% 20%);
+  box-shadow: inset 0 0 0 1px hsl(var(--h, 30) 18% 27%);
+  color: hsl(var(--h, 30) 48% 70%);
+}
+/* The same wash, held back: a colour lifted from a picture reads far
+   stronger against a near-black ground than against parchment. */
+.night-mode .bz-sheet::before {
+  background: linear-gradient(
+    180deg,
+    rgba(var(--tint-rgb, 120, 113, 108), 0.18) 0%,
+    rgba(var(--tint-rgb, 120, 113, 108), 0.07) 48%,
+    rgba(var(--tint-rgb, 120, 113, 108), 0) 100%);
+}
 .night-mode .bz-prices-row { border-bottom-color: rgba(255, 255, 255, 0.07); }
 .night-mode .bz-prices-row.is-target { background: rgba(234, 185, 50, 0.1); }
 .night-mode .bz-sheet-grip-bar { background: rgba(255, 255, 255, 0.2); }
@@ -1926,7 +1999,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bz-sheet, .bz-sheet-backdrop, .bz-toast, .bz-row, .bz-sticky,
-  .bz-viewer, .bz-hero-img { transition: none; }
+  .bz-viewer, .bz-mark { transition: none; }
   .bz-spinner { animation: none; }
   /* The skeleton still has to be distinguishable from real content, so it
      keeps its tint and loses only the sweep. */
