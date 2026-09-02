@@ -1197,16 +1197,75 @@
   color: var(--text-secondary);
 }
 
-/* ---------- typed links ---------- */
-/* Reaching the business is the whole point of the detail sheet, so the
-   contact list is titled and given real height. Previously it sat on the
-   quietest ground in the sheet while the reaction buttons underneath were
-   the boldest thing on screen — exactly backwards for a visitor. */
+/* ---------- description ---------- */
+/* The body of the screen. Opens clamped so a long one cannot push the phone
+   number below the fold, and expands in place rather than sending anyone to
+   another view. */
 
-.bz-linksec { margin-bottom: 4px; }
+.bz-descbox { margin-bottom: 20px; }
+
+.bz-detail .bz-sheet-desc {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.62;
+  color: var(--text-secondary);
+}
+
+.bz-sheet-desc.is-clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* A soft edge on the last visible line says the text continues, before the
+   button below is even read. */
+.bz-descbox:not(.is-open) .bz-sheet-desc.is-clamped {
+  -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+}
+
+.bz-more {
+  margin-top: 6px;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+.bz-more:active { opacity: 0.6; }
+
+/* A URL inside the description. Sits in the line of text as a compact
+   button rather than a 90-character string wrapping across three lines. */
+.bz-inlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 1px;
+  padding: 1px 7px 2px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 7px;
+  background: var(--surface-sunken);
+  font-family: inherit;
+  font-size: 0.86em;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--accent);
+  cursor: pointer;
+  vertical-align: baseline;
+  -webkit-tap-highlight-color: transparent;
+}
+.bz-inlink:active { background: var(--accent-light); border-color: var(--emerald-600); }
+.bz-inlink-icon { width: 10px; height: 10px; opacity: 0.75; }
+.bz-inlink-icon svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- contact ---------- */
 
 .bz-seclabel {
-  margin: 0 0 8px;
+  margin: 0 0 9px;
   font-family: var(--font-mono);
   font-size: 0.6rem;
   font-weight: 500;
@@ -1215,50 +1274,106 @@
   color: var(--text-muted);
 }
 
-.bz-links { display: grid; gap: 8px; }
+/* Two tiers. The two ways you would actually reach this business get a tile
+   each, carrying the value, because a phone number is something you read and
+   copy. Everywhere else the business exists gets a chip, because nobody
+   needs to read a Play Store URL — only to know it is there.
 
-.bz-link {
+   The old form gave all eight the same full-width card with a caption naming
+   what its own icon already showed, at about 60px each. */
+
+.bz-contact { margin-bottom: 4px; }
+
+.bz-actions {
   display: grid;
-  grid-template-columns: 20px 1fr 14px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.bz-actions--solo { grid-template-columns: 1fr; }
+
+.bz-action {
+  display: flex;
   align-items: center;
-  gap: 13px;
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--surface-card);
+  gap: 10px;
+  min-width: 0;
+  padding: 11px 12px;
   border: 1px solid var(--hairline-strong);
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: left;
+  border-radius: 13px;
+  background: var(--surface-card);
   font-family: inherit;
-  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast),
               transform var(--transition-fast);
 }
-.bz-link:active {
+.bz-action:active {
   transform: scale(0.985);
   background: var(--accent-light);
   border-color: var(--emerald-600);
 }
 
-.bz-link-icon { width: 20px; height: 20px; color: var(--accent); }
-.bz-link-icon svg { width: 100%; height: 100%; display: block; }
-.bz-link-body { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.bz-link-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.bz-link-value {
-  font-size: var(--fs-body);
+.bz-action-icon { width: 19px; height: 19px; flex: none; color: var(--accent); }
+.bz-action-icon svg { width: 100%; height: 100%; display: block; }
+
+.bz-action-text { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+
+/* What the tap does, not what the channel is called. */
+.bz-action-verb {
+  font-size: var(--fs-xs);
   font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bz-action-val {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bz-link-tail { width: 14px; height: 14px; color: var(--sand-400); }
-.bz-link-tail svg { width: 100%; height: 100%; display: block; }
+
+/* Everything else, on one or two wrapped lines instead of six stacked cards. */
+.bz-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.bz-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+.bz-chip:active {
+  transform: scale(0.96);
+  background: var(--accent-light);
+  border-color: var(--emerald-600);
+}
+
+.bz-chip-icon { width: 14px; height: 14px; flex: none; color: var(--text-secondary); }
+.bz-chip-icon svg { width: 100%; height: 100%; display: block; }
+.bz-chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The mark that says this leaves the app. */
+.bz-chip-tail { width: 10px; height: 10px; flex: none; color: var(--sand-400); margin-left: -1px; }
+.bz-chip-tail svg { width: 100%; height: 100%; display: block; }
 
 /* ---------- prices ---------- */
 
@@ -1708,7 +1823,10 @@
 .bz-filter:focus-visible,
 .bz-filter-clear:focus-visible,
 .bz-pick:focus-visible,
-.bz-link:focus-visible,
+.bz-action:focus-visible,
+.bz-chip:focus-visible,
+.bz-inlink:focus-visible,
+.bz-more:focus-visible,
 .bz-slot:focus-visible,
 .bz-btn:focus-visible,
 .bz-secmore:focus-visible,
@@ -1813,13 +1931,27 @@
 .night-mode .bz-mine,
 .night-mode .bz-prices,
 .night-mode .bz-skel-row,
-.night-mode .bz-link {
+.night-mode .bz-action {
   background: #201d1a;
   border-color: rgba(255, 255, 255, 0.09);
 }
-.night-mode .bz-link { border-color: rgba(255, 255, 255, 0.14); }
-.night-mode .bz-link-icon { color: var(--emerald-400); }
-.night-mode .bz-link:active { background: rgba(52, 211, 153, 0.12); border-color: var(--emerald-400); }
+.night-mode .bz-action { border-color: rgba(255, 255, 255, 0.14); }
+.night-mode .bz-action-icon { color: var(--emerald-400); }
+.night-mode .bz-action:active,
+.night-mode .bz-chip:active,
+.night-mode .bz-inlink:active {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: var(--emerald-400);
+}
+.night-mode .bz-chip,
+.night-mode .bz-inlink { background: #262220; border-color: rgba(255, 255, 255, 0.1); }
+.night-mode .bz-chip { color: #e6e1db; }
+.night-mode .bz-inlink { color: var(--emerald-400); }
+.night-mode .bz-chip-icon { color: #a49d95; }
+.night-mode .bz-chip-tail { color: #6b655f; }
+.night-mode .bz-more { color: var(--emerald-400); }
+.night-mode .bz-action-verb { color: #e6e1db; }
+.night-mode .bz-action-val { color: #7d766e; }
 
 /* Control surfaces */
 .night-mode .bz-searchwrap,
@@ -1851,8 +1983,7 @@
 .night-mode .bz-prices-val,
 .night-mode .bz-search,
 .night-mode .bz-sectitle,
-.night-mode .bz-link,
-.night-mode .bz-link-value { color: #e6e1db; }
+.night-mode .bz-action { color: #e6e1db; }
 
 /* Secondary text. These were all set to the primary value, which collapsed
    the two levels into one: a description read exactly as loud as the name
@@ -1871,7 +2002,6 @@
 .night-mode .bz-meta,
 .night-mode .bz-seccount,
 .night-mode .bz-seclabel,
-.night-mode .bz-link-label,
 .night-mode .bz-prices-note,
 .night-mode .bz-react-label,
 .night-mode .bz-filter-kicker,

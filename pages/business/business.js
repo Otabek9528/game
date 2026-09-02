@@ -146,6 +146,7 @@
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5"/></svg>',
     clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 5h6v6M19 5l-8 8M18 14v4.5A1.5 1.5 0 0 1 16.5 20h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg>',
     expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
     copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5.5 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.9"/></svg>'
   };
@@ -1792,28 +1793,10 @@
     // the sheet is built.
     wrap.appendChild(identityBlock(business));
 
-    if (business.description) {
-      // Line breaks survive via white-space: pre-line rather than by turning
-      // newlines into <br>, so owner text never becomes markup.
-      wrap.appendChild(el('p', 'bz-sheet-desc', business.description));
-    }
+    if (business.description) wrap.appendChild(descriptionNode(business.description));
 
-    // Reaching the business is what this sheet is for, so the contact block
-    // is named and sits above everything optional.
-    var links = business.links || [];
-    if (links.length) {
-      var grid = el('div', 'bz-links');
-      links.forEach(function (link) {
-        var node = linkNode(link);
-        if (node) grid.appendChild(node);
-      });
-      if (grid.childNodes.length) {
-        var section = el('div', 'bz-linksec');
-        section.appendChild(el('p', 'bz-seclabel', 'Bog\u2018lanish'));
-        section.appendChild(grid);
-        wrap.appendChild(section);
-      }
-    }
+    var contact = contactNode(business.links || []);
+    if (contact) wrap.appendChild(contact);
 
     wrap.appendChild(reactionBar(business));
     return wrap;
@@ -1875,26 +1858,211 @@
     btn.classList.toggle('is-on', on);
   }
 
-  function linkNode(link) {
-    var meta = LINK_META[link.kind];
-    if (!meta || !link.value) return null;
+  // ============================================
+  // DESCRIPTION
+  // ============================================
+  // The business's own words are the body of this screen, so they get room —
+  // but a long one cannot be allowed to push the phone number off the
+  // bottom, so it opens clamped and says so.
+  //
+  // A URL typed into a description used to sit there as dead text. Owners do
+  // paste store links, so they are turned into real buttons. Built as
+  // elements around text nodes, never innerHTML: nothing owner-supplied is
+  // parsed as markup on a page carrying the visitor's Telegram session.
 
-    var node = el('button', 'bz-link');
-    node.type = 'button';
-    node.appendChild(iconSpan('bz-link-icon', meta.icon));
+  var DESC_CLAMP_LINES = 5;
+  var URL_RE = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+  var TRAILING = /[.,;:!?)\]]+$/;
 
-    var body = el('span', 'bz-link-body');
-    body.appendChild(el('span', 'bz-link-label', meta.label));
-    body.appendChild(el('span', 'bz-link-value', displayValue(link)));
-    node.appendChild(body);
+  function descriptionNode(text) {
+    var box = el('div', 'bz-descbox');
+    var body = el('p', 'bz-sheet-desc is-clamped');
 
-    if (link.kind === 'phone') {
-      node.appendChild(iconSpan('bz-link-tail', ICONS.copy));
-      node.addEventListener('click', function () { handlePhone(link.value); });
-    } else {
-      node.appendChild(iconSpan('bz-link-tail', ICONS.arrow));
-      node.addEventListener('click', function () { openExternal(link); });
+    var last = 0, m;
+    URL_RE.lastIndex = 0;
+    while ((m = URL_RE.exec(text)) !== null) {
+      var raw = m[0];
+      // A sentence-ending full stop is not part of the address.
+      var trail = (raw.match(TRAILING) || [''])[0];
+      if (trail) raw = raw.slice(0, raw.length - trail.length);
+      if (!raw) continue;
+
+      if (m.index > last) {
+        body.appendChild(document.createTextNode(text.slice(last, m.index)));
+      }
+      body.appendChild(inlineLinkNode(raw));
+      if (trail) body.appendChild(document.createTextNode(trail));
+      last = m.index + m[0].length;
     }
+    if (last < text.length) {
+      body.appendChild(document.createTextNode(text.slice(last)));
+    }
+    box.appendChild(body);
+
+    // Whether it actually overflows is only knowable once it is laid out,
+    // and this node is still an argument to mountSheet at this point.
+    requestAnimationFrame(function () {
+      if (body.scrollHeight - body.clientHeight < 4) {
+        body.classList.remove('is-clamped');
+        return;
+      }
+      var toggle = el('button', 'bz-more');
+      toggle.type = 'button';
+      toggle.textContent = 'Ko‘proq';
+      toggle.addEventListener('click', function () {
+        var open = body.classList.toggle('is-clamped');
+        toggle.textContent = open ? 'Ko‘proq' : 'Kamroq';
+        box.classList.toggle('is-open', !open);
+        haptic('light');
+      });
+      box.appendChild(toggle);
+    });
+
+    return box;
+  }
+
+  // Reads as a link, behaves as one, and never shows a raw 90-character URL
+  // in the middle of a paragraph.
+  function inlineLinkNode(raw) {
+    var href = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+    var node = el('button', 'bz-inlink');
+    node.type = 'button';
+    node.appendChild(el('span', null, prettyUrl(href)));
+    node.appendChild(iconSpan('bz-inlink-icon', ICONS.external));
+    node.addEventListener('click', function () {
+      openExternal({ kind: hostKind(href), value: href });
+    });
+    return node;
+  }
+
+  var HOST_LABEL = [
+    [/(^|\.)play\.google\.com$/, 'Google Play', 'playstore'],
+    [/(^|\.)apps\.apple\.com$/, 'App Store', 'appstore'],
+    [/(^|\.)itunes\.apple\.com$/, 'App Store', 'appstore'],
+    [/(^|\.)instagram\.com$/, 'Instagram', 'instagram'],
+    [/(^|\.)tiktok\.com$/, 'TikTok', 'tiktok'],
+    [/(^|\.)(t|telegram)\.me$/, 'Telegram', 'telegram'],
+    [/(^|\.)kakao\.com$/, 'KakaoTalk', 'kakao'],
+    [/(^|\.)youtube\.com$/, 'YouTube', 'website'],
+    [/(^|\.)youtu\.be$/, 'YouTube', 'website']
+  ];
+
+  function hostOf(url) {
+    try { return new URL(url).hostname.toLowerCase().replace(/^www\./, ''); }
+    catch (e) { return ''; }
+  }
+
+  function prettyUrl(url) {
+    var host = hostOf(url);
+    for (var i = 0; i < HOST_LABEL.length; i++) {
+      if (HOST_LABEL[i][0].test(host)) return HOST_LABEL[i][1];
+    }
+    return host || url;
+  }
+
+  // Telegram links have to open through the client rather than the browser,
+  // so a t.me address pasted into a description is routed like a typed one.
+  function hostKind(url) {
+    var host = hostOf(url);
+    for (var i = 0; i < HOST_LABEL.length; i++) {
+      if (HOST_LABEL[i][0].test(host)) return HOST_LABEL[i][2];
+    }
+    return 'website';
+  }
+
+  // ============================================
+  // CONTACT
+  // ============================================
+  // Eight full-width cards, each captioned with the name of the thing its
+  // own icon already showed, ran to about 60px apiece — most of the sheet
+  // spent on repeating itself. Two tiers instead:
+  //
+  //   the two ways you would actually reach this business  -> paired tiles
+  //   everywhere else it exists                            -> wrap-around chips
+  //
+  // A tile carries the value because a phone number is something you read
+  // and copy. A chip carries only the destination, because nobody needs to
+  // read a Play Store URL — they need to know it is there.
+
+  var CONTACT_RANK = {
+    phone: 1, telegram: 2, kakao: 3, website: 4,
+    instagram: 5, tiktok: 6, playstore: 7, appstore: 8
+  };
+
+  var PRIMARY_SLOTS = 2;
+
+  // What the tap does, said in a word. The old caption named the channel,
+  // which the icon had already said; this names the outcome.
+  function actionVerb(kind) {
+    if (kind === 'phone') {
+      return (tg.platform || '').toLowerCase() === 'android'
+        ? 'Qo‘ng‘iroq' : 'Nusxalash';
+    }
+    if (kind === 'telegram' || kind === 'kakao') return 'Yozish';
+    if (kind === 'website') return 'Saytga o‘tish';
+    return LINK_META[kind] ? LINK_META[kind].label : 'Ochish';
+  }
+
+  function contactNode(links) {
+    var usable = links.filter(function (l) {
+      return LINK_META[l.kind] && l.value;
+    }).sort(function (a, b) {
+      return (CONTACT_RANK[a.kind] || 99) - (CONTACT_RANK[b.kind] || 99);
+    });
+    if (!usable.length) return null;
+
+    var section = el('div', 'bz-contact');
+    section.appendChild(el('p', 'bz-seclabel', 'Bog‘lanish'));
+
+    var primary = usable.slice(0, PRIMARY_SLOTS);
+    var rest = usable.slice(PRIMARY_SLOTS);
+
+    var tiles = el('div', 'bz-actions' +
+      (primary.length === 1 ? ' bz-actions--solo' : ''));
+    primary.forEach(function (link) { tiles.appendChild(actionTile(link)); });
+    section.appendChild(tiles);
+
+    if (rest.length) {
+      var chips = el('div', 'bz-chips');
+      rest.forEach(function (link) { chips.appendChild(chipNode(link)); });
+      section.appendChild(chips);
+    }
+    return section;
+  }
+
+  function actionTile(link) {
+    var meta = LINK_META[link.kind];
+    var node = el('button', 'bz-action');
+    node.type = 'button';
+    node.appendChild(iconSpan('bz-action-icon', meta.icon));
+
+    var text = el('span', 'bz-action-text');
+    text.appendChild(el('span', 'bz-action-verb', actionVerb(link.kind)));
+    text.appendChild(el('span', 'bz-action-val', displayValue(link)));
+    node.appendChild(text);
+
+    node.addEventListener('click', function () {
+      if (link.kind === 'phone') handlePhone(link.value);
+      else openExternal(link);
+    });
+    return node;
+  }
+
+  function chipNode(link) {
+    var meta = LINK_META[link.kind];
+    var node = el('button', 'bz-chip');
+    node.type = 'button';
+    node.appendChild(iconSpan('bz-chip-icon', meta.icon));
+    // The hostname is the useful part of a website; for everything else the
+    // platform's name is, since its handle is already one tap away.
+    node.appendChild(el('span', 'bz-chip-text',
+      link.kind === 'website' ? displayValue(link) : meta.label));
+    node.appendChild(iconSpan('bz-chip-tail', ICONS.external));
+
+    node.addEventListener('click', function () {
+      if (link.kind === 'phone') handlePhone(link.value);
+      else openExternal(link);
+    });
     return node;
   }
 
