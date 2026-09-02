@@ -94,6 +94,19 @@
     </div>
   </div>
 
+  <!-- FULL-SCREEN IMAGE VIEWER
+       Kept outside #sheet on purpose: the sheet's dismiss gesture listens on
+       pointerdown at #sheet, and a viewer nested inside it would hand every
+       pinch to that handler. -->
+  <div class="bz-viewer" id="bzViewer" role="dialog" aria-modal="true" aria-label="Rasm" hidden>
+    <div class="bz-viewer-stage" id="bzViewerStage">
+      <img class="bz-viewer-img" id="bzViewerImg" alt="" draggable="false" />
+    </div>
+    <button class="bz-viewer-close" id="bzViewerClose" type="button" aria-label="Yopish">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
   <div class="bz-toast" id="bzToast" role="status" aria-live="polite" hidden></div>
 
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>

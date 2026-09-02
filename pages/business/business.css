@@ -1036,6 +1036,109 @@
   overflow-wrap: anywhere;
 }
 
+/* ---------- detail sheet ---------- */
+/* The screen where a reader decides whether to trust a business, so the
+   business itself leads: picture, then name, then everything it takes to
+   act on it. Previously the sheet opened on a 58px thumbnail sharing a line
+   with the name and the counters, and none of the three won. */
+
+/* The hero bleeds to the sheet's edges and its rounded top corners, so the
+   picture reads as part of the sheet rather than a card floating inside it.
+   -20px matches .bz-sheet-scroll's horizontal padding. */
+.bz-hero {
+  position: relative;
+  display: block;
+  width: calc(100% + 40px);
+  margin: -8px -20px 18px;
+  padding: 0;
+  border: none;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--surface-sunken);
+  cursor: zoom-in;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Contained, never cropped: these are as often a label or a logo as a photo,
+   and cover would cut the top and bottom off a square mark. */
+.bz-hero-img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* The picture's own colours, blurred, filling whatever contain leaves over.
+   Cheaper than a chosen accent and always in key with the image. */
+.bz-hero-back {
+  position: absolute;
+  inset: -12%;
+  width: 124%;
+  height: 124%;
+  object-fit: cover;
+  filter: blur(26px) saturate(1.25);
+  opacity: 0.55;
+  transform: translateZ(0);
+}
+
+.bz-hero-zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(20, 16, 12, 0.5);
+  color: #fff;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background var(--transition-fast);
+}
+.bz-hero-zoom svg { width: 15px; height: 15px; display: block; }
+.bz-hero:active .bz-hero-zoom { background: rgba(20, 16, 12, 0.72); }
+.bz-hero:active .bz-hero-img { transform: scale(0.99); }
+.bz-hero-img { transition: transform var(--transition-fast); }
+
+/* Identity. Its own block rather than a row shared with the mark, so the
+   name has a full measure to itself. */
+.bz-ident { margin-bottom: 18px; }
+.bz-ident--mark { display: flex; align-items: center; gap: 15px; }
+.bz-ident--mark .bz-logo--xl {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  font-size: 1.2rem;
+}
+.bz-ident-text { min-width: 0; flex: 1; }
+
+.bz-sheet-name--lead {
+  font-size: 1.55rem;
+  line-height: 1.12;
+  letter-spacing: -0.018em;
+  margin-bottom: 9px;
+}
+
+/* The counts support the name; they used to sit hard against it and read as
+   part of the title. */
+.bz-detail .bz-meta {
+  margin-top: 0;
+  gap: 5px 14px;
+  font-size: var(--fs-xs);
+}
+.bz-detail .bz-stat-icon { width: 13px; height: 13px; }
+
+.bz-detail .bz-sheet-desc {
+  margin-bottom: 24px;
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
 /* ---------- typed links ---------- */
 /* Reaching the business is the whole point of the detail sheet, so the
    contact list is titled and given real height. Previously it sat on the
@@ -1556,6 +1659,71 @@
   outline-offset: 2px;
 }
 
+/* ---------- full-screen image viewer ---------- */
+/* One transform on the stage carries both zoom and pan, so they cannot fight
+   and one transition animates the way back to rest. The image is sized only
+   by max-width/max-height, which leaves its aspect ratio to the browser and
+   guarantees nothing is ever cropped at any zoom. */
+
+.bz-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 8, 6, calc(0.94 * var(--fade, 1)));
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out), background 120ms linear;
+  /* The viewer owns every touch inside it; without this the browser claims
+     the pinch as a page zoom and the gesture never reaches the handler. */
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.bz-viewer.visible { opacity: 1; }
+
+.bz-viewer-stage {
+  will-change: transform;
+  transform-origin: 50% 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bz-viewer-img {
+  max-width: 100vw;
+  max-height: 100vh;
+  width: auto;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.bz-viewer-close {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+.bz-viewer-close:active { background: rgba(255, 255, 255, 0.26); }
+.bz-viewer-close svg { width: 100%; height: 100%; display: block; }
+
 /* =========================================================
    NIGHT MODE
    Warm near-black rather than grey — the gold and the monogram
@@ -1744,6 +1912,7 @@
 }
 
 .night-mode .bz-sheet { background: #1a1715; }
+.night-mode .bz-hero { background: #262220; }
 .night-mode .bz-prices-row { border-bottom-color: rgba(255, 255, 255, 0.07); }
 .night-mode .bz-prices-row.is-target { background: rgba(234, 185, 50, 0.1); }
 .night-mode .bz-sheet-grip-bar { background: rgba(255, 255, 255, 0.2); }
@@ -1756,7 +1925,8 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .bz-sheet, .bz-sheet-backdrop, .bz-toast, .bz-row, .bz-sticky { transition: none; }
+  .bz-sheet, .bz-sheet-backdrop, .bz-toast, .bz-row, .bz-sticky,
+  .bz-viewer, .bz-hero-img { transition: none; }
   .bz-spinner { animation: none; }
   /* The skeleton still has to be distinguishable from real content, so it
      keeps its tint and loses only the sweep. */

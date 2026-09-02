@@ -31,6 +31,49 @@
   // the category view. Enough to be useful, few enough to keep scrolling.
   var FEED_PER_CATEGORY = 4;
 
+  // ============================================
+  // CATEGORY ORDER
+  // ============================================
+  // A fixed editorial ranking, keyed by slug so renaming a category cannot
+  // move it. Read top to bottom it goes: what a family needs weekly, then
+  // what the paperwork of living here demands, then what is needed once or
+  // twice a year, then what is discretionary.
+  //
+  // Server-side order stays alphabetical and is deliberately left alone —
+  // this is a display decision, and the ordering rule that governs
+  // businesses *inside* a category is untouched by it.
+  var CATEGORY_RANK = {
+    'halal-market': 1,   // halal groceries — the weekly shop
+    'pishiriqlar':  2,   // bread and bakery — daily
+    'tarjima':      3,   // translation and apostille — visas, residency, work
+    'pochta':       4,   // parcels home — constant for a diaspora
+    'aviakassa':    5,   // flights — expensive, recurring
+    'sim-telefon':  6,   // SIM and phones — on arrival, then rarely
+    'sugurta':      7,   // insurance — required, but annual
+    'consulting':   8,   // study consulting — a large but one-time audience
+    'repetitor':    9,   // tutoring — narrower
+    'kosmetika':   10    // cosmetics — discretionary
+  };
+
+  // Anything the server adds later that is not ranked here sorts after
+  // everything known, alphabetically among itself, rather than silently
+  // landing at the top.
+  function rankOf(category) {
+    return CATEGORY_RANK[category.slug] || 99;
+  }
+
+  // Whether a category currently holds anything is a coarse two-bucket
+  // split, not a sort key. Ordering by the count itself would reshuffle the
+  // list every time a business was approved anywhere; this way a category
+  // moves once, when it crosses from empty to non-empty, and never again.
+  function byCategoryOrder(a, b) {
+    var aEmpty = !a.count, bEmpty = !b.count;
+    if (aEmpty !== bEmpty) return aEmpty ? 1 : -1;
+    var ra = rankOf(a), rb = rankOf(b);
+    if (ra !== rb) return ra - rb;
+    return (a.name || '').localeCompare(b.name || '', 'uz');
+  }
+
   var state = {
     mode: 'feed',        // 'feed' | 'category'
     categoryId: null,
@@ -103,6 +146,7 @@
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5"/></svg>',
     clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
     copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5.5 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.9"/></svg>'
   };
 
@@ -362,7 +406,7 @@
     getJSON(path)
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
-        if (data.categories) state.categories = data.categories;
+        if (data.categories) state.categories = data.categories.slice().sort(byCategoryOrder);
         syncFilter();
         renderFeed(data);
       })
@@ -370,7 +414,15 @@
   }
 
   function renderFeed(data) {
-    var groups = data.groups || [];
+    // The same ranking the picker uses. If the sections stayed alphabetical
+    // while the picker was ranked, the two would contradict each other about
+    // which category matters. Every group here has members by definition, so
+    // the empty-bucket half of the comparison never applies.
+    var groups = (data.groups || []).slice().sort(function (a, b) {
+      return byCategoryOrder(
+        { slug: a.category.slug, name: a.category.name, count: a.total },
+        { slug: b.category.slug, name: b.category.name, count: b.total });
+    });
     $('bzCount').textContent = data.total ? data.total + ' ta biznes' : '';
 
     setView('ready');
@@ -1456,20 +1508,75 @@
       });
   }
 
-  function detailBody(business) {
-    var wrap = el('div', 'bz-sheet-body');
+  // The picture, at the width of the sheet. Contained rather than cropped —
+  // these are as often a logo or a label as a photograph, and cover would cut
+  // the top and bottom off a square mark. The gutters that leaves are filled
+  // by a blurred copy of the picture itself, so the band is never a pair of
+  // grey bars.
+  function heroNode(business) {
+    var src = API + '/' + String(business.logo).replace(/^\/+/, '');
 
-    var head = el('div', 'bz-sheet-head');
-    head.appendChild(logoNode(business, 'xl'));
+    var hero = el('button', 'bz-hero');
+    hero.type = 'button';
+    hero.setAttribute('aria-label', business.name + ' \u2014 rasmni ochish');
 
-    var text = el('div', 'bz-sheet-headtext');
+    var back = document.createElement('img');
+    back.className = 'bz-hero-back';
+    back.src = src;
+    back.alt = '';
+    back.setAttribute('aria-hidden', 'true');
+    hero.appendChild(back);
+
+    var img = document.createElement('img');
+    img.className = 'bz-hero-img';
+    img.src = src;
+    img.alt = business.name;
+    hero.appendChild(img);
+
+    hero.appendChild(iconSpan('bz-hero-zoom', ICONS.expand));
+
+    // A picture that failed to load is not something to offer full screen.
+    img.addEventListener('error', function () { hero.remove(); });
+
+    hero.addEventListener('click', function () {
+      haptic('light');
+      openViewer(src, business.name);
+    });
+    return hero;
+  }
+
+  // Category, name, counts. Given its own block so the name is the one thing
+  // the eye lands on: the counts used to sit hard under it competing for the
+  // same line of attention.
+  function identityBlock(business, withMark) {
+    var block = el('div', 'bz-ident' + (withMark ? ' bz-ident--mark' : ''));
+
+    if (withMark) block.appendChild(logoNode(business, 'xl'));
+
+    var text = el('div', 'bz-ident-text');
     text.appendChild(el('p', 'bz-sheet-eyebrow', business.categoryName || ''));
-    var h = el('h2', 'bz-sheet-name', business.name);
+    var h = el('h2', 'bz-sheet-name bz-sheet-name--lead', business.name);
     h.id = 'sheetName';
     text.appendChild(h);
     text.appendChild(metaNode(business));
-    head.appendChild(text);
-    wrap.appendChild(head);
+    block.appendChild(text);
+    return block;
+  }
+
+  function detailBody(business) {
+    var wrap = el('div', 'bz-sheet-body bz-detail');
+
+    // Composition follows the content rather than forcing one layout on
+    // both cases. A business that uploaded a picture leads with it, full
+    // width; one that has not gets a clean identity row instead, because a
+    // 200px band of flat colour holding two letters is worse than the small
+    // mark it replaced, not better.
+    if (business.logo) {
+      wrap.appendChild(heroNode(business));
+      wrap.appendChild(identityBlock(business, false));
+    } else {
+      wrap.appendChild(identityBlock(business, true));
+    }
 
     if (business.description) {
       // Line breaks survive via white-space: pre-line rather than by turning
@@ -1660,6 +1767,282 @@
       },
       keepalive: true
     }).catch(function () {});
+  }
+
+  // ============================================
+  // FULL-SCREEN IMAGE VIEWER
+  // ============================================
+  // Pinch, double-tap, pan, and a pull-down to dismiss, on a plain <img>.
+  //
+  // Everything is one transform on the stage — translate then scale — which
+  // keeps zoom and pan from fighting each other and lets a single transition
+  // animate the way back to rest. The image itself is only ever laid out by
+  // max-width/max-height, so its aspect ratio is the browser's business and
+  // nothing is ever cropped.
+  //
+  // Same rule the sheet gesture learned the hard way: no pointer capture.
+  // Capture retargets the click that follows a tap and arrives cancelled on
+  // the next press, so the pointers are tracked in a Map off window listeners.
+
+  var MAX_SCALE = 5;
+  var DOUBLE_TAP_SCALE = 2.5;
+  var TAP_SLOP = 24;        // px between two taps for them to be one gesture
+  var TAP_GAP = 300;        // ms
+  var VIEWER_DISMISS = 110; // px pulled down at rest before it closes
+
+  var viewer = {
+    open: false, scale: 1, tx: 0, ty: 0,
+    pointers: null, start: null, lastTap: 0, lastTapX: 0, lastTapY: 0,
+    backAfter: null
+  };
+
+  function openViewer(src, label) {
+    var node = $('bzViewer');
+    var img = $('bzViewerImg');
+    if (!node || !img) return;
+
+    img.src = src;
+    img.alt = label || '';
+    viewer.open = true;
+    viewer.scale = 1; viewer.tx = 0; viewer.ty = 0;
+    applyViewer(false);
+
+    node.hidden = false;
+    requestAnimationFrame(function () { node.classList.add('visible'); });
+
+    // The viewer is the deepest thing on screen, so it owns Back until it
+    // closes; the sheet underneath gets it straight back afterwards.
+    viewer.backAfter = backHandler;
+    setBack(closeViewer);
+  }
+
+  function closeViewer() {
+    if (!viewer.open) return;
+    var node = $('bzViewer');
+    viewer.open = false;
+    node.classList.remove('visible');
+    node.style.removeProperty('--fade');
+    setTimeout(function () {
+      node.hidden = true;
+      $('bzViewerImg').removeAttribute('src');
+    }, 220);
+    setBack(viewer.backAfter || currentBack());
+    viewer.backAfter = null;
+  }
+
+  function applyViewer(animate) {
+    var stage = $('bzViewerStage');
+    stage.style.transition = animate ? 'transform 260ms var(--ease-out, ease-out)' : 'none';
+    stage.style.transform =
+      'translate(' + viewer.tx + 'px,' + viewer.ty + 'px) scale(' + viewer.scale + ')';
+  }
+
+  // How far the image may be pushed before its edge leaves the middle of the
+  // screen. Without this a zoomed image can be flicked into the void.
+  function viewerBounds() {
+    var img = $('bzViewerImg');
+    var w = img.clientWidth * viewer.scale;
+    var h = img.clientHeight * viewer.scale;
+    return {
+      x: Math.max(0, (w - window.innerWidth) / 2),
+      y: Math.max(0, (h - window.innerHeight) / 2)
+    };
+  }
+
+  function clampViewer() {
+    var b = viewerBounds();
+    viewer.tx = Math.max(-b.x, Math.min(b.x, viewer.tx));
+    viewer.ty = Math.max(-b.y, Math.min(b.y, viewer.ty));
+  }
+
+  // Zoom about a point rather than the centre, so the thing under the fingers
+  // stays under the fingers.
+  function zoomAbout(next, cx, cy) {
+    next = Math.max(1, Math.min(MAX_SCALE, next));
+    var k = next / viewer.scale;
+    var ox = cx - window.innerWidth / 2;
+    var oy = cy - window.innerHeight / 2;
+    viewer.tx = ox - (ox - viewer.tx) * k;
+    viewer.ty = oy - (oy - viewer.ty) * k;
+    viewer.scale = next;
+  }
+
+  function initViewer() {
+    var node = $('bzViewer');
+    if (!node) return;
+    var stage = $('bzViewerStage');
+    viewer.pointers = new Map();
+
+    $('bzViewerClose').addEventListener('click', function () {
+      haptic('light');
+      closeViewer();
+    });
+
+    function centreOf() {
+      var pts = Array.from(viewer.pointers.values());
+      var sx = 0, sy = 0;
+      pts.forEach(function (p) { sx += p.x; sy += p.y; });
+      return { x: sx / pts.length, y: sy / pts.length };
+    }
+
+    function spanOf() {
+      var pts = Array.from(viewer.pointers.values());
+      return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    }
+
+    function begin() {
+      var c = centreOf();
+      viewer.start = {
+        x: c.x, y: c.y, tx: viewer.tx, ty: viewer.ty,
+        scale: viewer.scale,
+        span: viewer.pointers.size > 1 ? spanOf() : 0,
+        n: viewer.pointers.size,
+        moved: false, t: Date.now()
+      };
+    }
+
+    node.addEventListener('pointerdown', function (e) {
+      if (!viewer.open) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      viewer.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      begin();
+      if (viewer.pointers.size === 1) {
+        window.addEventListener('pointermove', onMove, { passive: false });
+        window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
+      }
+    });
+
+    function onMove(e) {
+      if (!viewer.pointers.has(e.pointerId) || !viewer.start) return;
+      viewer.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (e.cancelable) e.preventDefault();
+
+      var c = centreOf();
+      var dx = c.x - viewer.start.x;
+      var dy = c.y - viewer.start.y;
+      if (Math.hypot(dx, dy) > 4) viewer.start.moved = true;
+
+      if (viewer.pointers.size > 1 && viewer.start.span > 0) {
+        // Pinch. The content point that was under the starting midpoint has
+        // to stay under the current one. Solved from the gesture's start
+        // state on every frame rather than accumulated frame to frame — an
+        // incremental correction applied on top of an absolute translation
+        // drifts, and on a slow pinch the image walks out from under the
+        // fingers.
+        var ratio = spanOf() / viewer.start.span;
+        var s1 = Math.max(0.6, Math.min(MAX_SCALE, viewer.start.scale * ratio));
+        var ox = window.innerWidth / 2;
+        var oy = window.innerHeight / 2;
+        var k = s1 / viewer.start.scale;
+        viewer.scale = s1;
+        viewer.tx = c.x - ox - k * (viewer.start.x - ox - viewer.start.tx);
+        viewer.ty = c.y - oy - k * (viewer.start.y - oy - viewer.start.ty);
+        if (viewer.scale >= 1) clampViewer();
+        applyViewer(false);
+        return;
+      }
+
+      if (viewer.scale > 1) {
+        viewer.tx = viewer.start.tx + dx;
+        viewer.ty = viewer.start.ty + dy;
+        clampViewer();
+        applyViewer(false);
+        return;
+      }
+
+      // At rest a drag is a dismissal, and the backdrop thins out with it so
+      // the gesture shows its own outcome before it completes.
+      viewer.tx = viewer.start.tx + dx * 0.4;
+      viewer.ty = viewer.start.ty + dy;
+      applyViewer(false);
+      node.style.setProperty('--fade',
+        String(Math.max(0.25, 1 - Math.abs(dy) / (window.innerHeight * 0.7))));
+    }
+
+    function onUp(e) {
+      if (!viewer.start) return;
+      viewer.pointers.delete(e.pointerId);
+
+      if (viewer.pointers.size > 0) { begin(); return; }
+
+      window.removeEventListener('pointermove', onMove, { passive: false });
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+
+      var wasSingle = viewer.start.n === 1;
+      var moved = viewer.start.moved;
+      var dy = viewer.ty - (viewer.start.ty || 0);
+      viewer.start = null;
+
+      // Pinched below rest: spring back rather than staying small.
+      if (viewer.scale < 1) {
+        viewer.scale = 1; viewer.tx = 0; viewer.ty = 0;
+        node.style.removeProperty('--fade');
+        applyViewer(true);
+        return;
+      }
+
+      if (!moved && wasSingle) {
+        var now = Date.now();
+        var isDouble = (now - viewer.lastTap) < TAP_GAP &&
+                       Math.hypot(e.clientX - viewer.lastTapX,
+                                  e.clientY - viewer.lastTapY) < TAP_SLOP;
+        if (isDouble) {
+          viewer.lastTap = 0;
+          haptic('light');
+          if (viewer.scale > 1.01) {
+            viewer.scale = 1; viewer.tx = 0; viewer.ty = 0;
+          } else {
+            zoomAbout(DOUBLE_TAP_SCALE, e.clientX, e.clientY);
+            clampViewer();
+          }
+          applyViewer(true);
+          return;
+        }
+        viewer.lastTap = now;
+        viewer.lastTapX = e.clientX;
+        viewer.lastTapY = e.clientY;
+        // A single tap on the backdrop closes, but only at rest — while
+        // zoomed the same tap is how you stop a pan, not how you leave.
+        if (viewer.scale <= 1.01) {
+          setTimeout(function () {
+            if (viewer.open && viewer.lastTap === now) closeViewer();
+          }, TAP_GAP);
+        }
+        return;
+      }
+
+      if (viewer.scale <= 1.01 && Math.abs(dy) > VIEWER_DISMISS) {
+        closeViewer();
+        return;
+      }
+
+      node.style.removeProperty('--fade');
+      if (viewer.scale <= 1.01) { viewer.tx = 0; viewer.ty = 0; }
+      else clampViewer();
+      applyViewer(true);
+    }
+
+    // Trackpad and mouse wheel, for desktop Telegram.
+    node.addEventListener('wheel', function (e) {
+      if (!viewer.open) return;
+      e.preventDefault();
+      zoomAbout(viewer.scale * (e.deltaY < 0 ? 1.12 : 1 / 1.12), e.clientX, e.clientY);
+      if (viewer.scale <= 1.01) { viewer.scale = 1; viewer.tx = 0; viewer.ty = 0; }
+      else clampViewer();
+      applyViewer(false);
+    }, { passive: false });
+
+    // A rotated phone changes what "contained" means, so rest is recomputed.
+    window.addEventListener('resize', function () {
+      if (!viewer.open) return;
+      if (viewer.scale <= 1.01) { viewer.tx = 0; viewer.ty = 0; }
+      else clampViewer();
+      applyViewer(false);
+    });
+
+    stage.addEventListener('dragstart', function (e) { e.preventDefault(); });
   }
 
   // ============================================
@@ -1920,10 +2303,15 @@
     });
     $('sheet').addEventListener('click', function (e) { e.stopPropagation(); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeSheet();
+      if (e.key !== 'Escape') return;
+      // Deepest layer first, or Escape would close the sheet out from under
+      // an open viewer.
+      if (viewer.open) closeViewer();
+      else closeSheet();
     });
 
     initSheetDrag();
+    initViewer();
     initStickyState();
     loadFeed();
   }
