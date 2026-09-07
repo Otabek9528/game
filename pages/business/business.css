@@ -162,104 +162,136 @@
 .bz-glyph--sec    { width: 26px; height: 26px; font-size: 0.85rem; border-radius: 8px; }
 .bz-glyph--pick   { width: 30px; height: 30px; font-size: 0.95rem; border-radius: 8px; }
 
-/* ---------- filter bar ---------- */
-/* The way into every category. It used to be a filled emerald block, which
-   put the loudest colour on the page on a *control* and left the content
-   below it with none — and it competed head-on with the owner call to
-   action, which is also emerald and is the one thing on this page we
-   actually want pressed. So the filter now reads as a instrument: neutral
-   surface, emerald reserved for the parts that indicate state.
-   Still one control, never a horizontal rail: a rail hides its own tail
-   offscreen and implies a precedence among categories that does not exist. */
+/* ---------- category rail ---------- */
+/* The switcher inside a category. It WRAPS: every category is on screen at
+   once, on as many lines as that takes. A rail that scrolls sideways hides
+   its own tail and makes whatever happens to be first look like the most
+   important one — which is why one was turned down before. Wrapping costs a
+   little height and removes both problems.
 
-.bz-filterbar {
+   It replaces the old single "Yo'nalish" dropdown rather than joining it, so
+   the header carries no more weight than it did. */
+
+.bz-rail {
   display: flex;
-  align-items: stretch;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
   padding-bottom: 12px;
 }
 
-.bz-filter {
-  flex: 1;
-  min-width: 0;
-  display: flex;
+.bz-railchip {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 11px;
+  gap: 5px;
+  max-width: 100%;
+  padding: 6px 11px;
   border: 1px solid var(--hairline);
-  border-radius: 12px;
-  background: var(--surface-card);
-  box-shadow: var(--shadow-card);
-  color: var(--text-primary);
-  font-family: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition: transform var(--transition-fast), border-color var(--transition-fast),
-              background var(--transition-fast);
-}
-.bz-filter:active { transform: scale(0.985); background: var(--surface-sunken); }
-
-/* Filtered is a state, and state is what colour is for here. */
-.bz-filter.is-on { border-color: var(--emerald-600); }
-.bz-filter.is-on .bz-filter-label { color: var(--emerald-800); }
-
-.bz-filter .bz-glyph {
+  border-radius: 999px;
   background: var(--surface-sunken);
-  border-color: var(--hairline);
-}
-.bz-filter.is-on .bz-glyph {
-  background: var(--accent-light);
-  border-color: rgba(4, 120, 87, 0.24);
-}
-
-.bz-filter-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.bz-filter-kicker {
-  font-family: var(--font-mono);
-  font-size: 0.56rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.bz-filter.is-on .bz-filter-kicker { color: var(--emerald-600); }
-
-.bz-filter-label {
-  font-size: var(--fs-sm);
+  font-family: inherit;
+  font-size: var(--fs-xs);
   font-weight: 600;
-  letter-spacing: -0.005em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bz-filter-caret { width: 16px; height: 16px; flex: none; color: var(--text-muted); }
-.bz-filter.is-on .bz-filter-caret { color: var(--emerald-600); }
-.bz-filter-caret svg { width: 100%; height: 100%; display: block; }
-
-.bz-filter-clear {
-  width: 46px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  background: var(--surface-card);
-  box-shadow: var(--shadow-card);
+  line-height: 1.2;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              color var(--transition-fast), transform var(--transition-fast);
 }
-.bz-filter-clear:active { background: var(--surface-sunken); }
-.bz-filter-clear svg { width: 100%; height: 100%; display: block; }
+.bz-railchip:active { transform: scale(0.96); }
+
+/* Where you are. The one filled chip on the page, so the rail answers
+   "which category am I in" before the heading above it is read. */
+.bz-railchip.is-on {
+  padding-left: 8px;
+  background: var(--accent-light);
+  border-color: var(--emerald-600);
+  color: var(--emerald-800);
+  cursor: default;
+}
+
+/* A category with nothing in it still switches to — landing on one is how an
+   owner discovers a free field — so it reads as quiet, not disabled. */
+.bz-railchip.is-quiet { opacity: 0.55; }
+.bz-railchip.is-quiet.is-on { opacity: 1; }
+
+.bz-railchip-glyph {
+  flex: none;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+.bz-railchip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- category directory ---------- */
+/* The landing. One card per business type, saying what it covers and how
+   much is in it — the question a reader arriving cold actually has, and the
+   one a flat list of businesses never answered. */
+
+.bz-cats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+.bz-cat {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast),
+              background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.bz-cat:active {
+  transform: scale(0.985);
+  background: var(--surface-sunken);
+  border-color: var(--hairline-strong);
+  box-shadow: none;
+}
+@media (hover: hover) {
+  .bz-cat:hover { border-color: var(--hairline-strong); box-shadow: var(--shadow-lift); }
+}
+.bz-cat.is-quiet .bz-cat-name { color: var(--text-secondary); }
+.bz-cat.is-quiet .bz-glyph { opacity: 0.55; }
+
+.bz-glyph--cat { width: 44px; height: 44px; font-size: 1.35rem; border-radius: 13px; }
+
+.bz-cat-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+
+.bz-cat-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.008em;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.bz-cat-about {
+  font-size: var(--fs-sm);
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.bz-cat-tail { display: flex; align-items: center; gap: 8px; flex: none; }
+
+.bz-cat-n {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bz-cat-arrow { width: 15px; height: 15px; color: var(--sand-400); }
+.bz-cat-arrow svg { width: 100%; height: 100%; display: block; }
 
 /* ---------- category picker ---------- */
 /* Identical rows, alphabetical, the whole set visible in one scroll. Nothing
@@ -1820,8 +1852,8 @@
 .bz-mine-act:focus-visible,
 .bz-bidopt:focus-visible,
 .bz-owner:focus-visible,
-.bz-filter:focus-visible,
-.bz-filter-clear:focus-visible,
+.bz-cat:focus-visible,
+.bz-railchip:focus-visible,
 .bz-pick:focus-visible,
 .bz-action:focus-visible,
 .bz-chip:focus-visible,
@@ -1920,8 +1952,7 @@
 
 /* Content surfaces */
 .night-mode .bz-row,
-.night-mode .bz-filter,
-.night-mode .bz-filter-clear,
+.night-mode .bz-cat,
 .night-mode .bz-pick,
 .night-mode .bz-state,
 .night-mode .bz-blank,
@@ -1958,6 +1989,7 @@
 .night-mode .bz-input,
 .night-mode .bz-select,
 .night-mode .bz-glyph,
+.night-mode .bz-railchip,
 .night-mode .bz-reactbtn,
 .night-mode .bz-btn,
 .night-mode .bz-btn--ghost,
@@ -1970,9 +2002,8 @@
 .night-mode .bz-searchwrap:focus-within,
 .night-mode .bz-input:focus { background: #201d1a; border-color: var(--emerald-400); }
 .night-mode .bz-row:active,
+.night-mode .bz-cat:active,
 .night-mode .bz-pick:active,
-.night-mode .bz-filter:active,
-.night-mode .bz-filter-clear:active,
 .night-mode .bz-btn:active { background: #2b2724; }
 
 /* Primary text */
@@ -1995,7 +2026,7 @@
 .night-mode .bz-state-hint,
 .night-mode .bz-blank-body,
 .night-mode .bz-catchip,
-.night-mode .bz-filter-label { color: #a49d95; }
+.night-mode .bz-cat-about { color: #a49d95; }
 
 /* Muted text */
 .night-mode .bz-count,
@@ -2004,15 +2035,16 @@
 .night-mode .bz-seclabel,
 .night-mode .bz-prices-note,
 .night-mode .bz-react-label,
-.night-mode .bz-filter-kicker,
+.night-mode .bz-cat-n,
 .night-mode .bz-search-icon,
 .night-mode .bz-search-clear { color: #7d766e; }
 
-.night-mode .bz-filter.is-on { border-color: var(--emerald-400); }
-.night-mode .bz-filter.is-on .bz-filter-label { color: #d6f5e7; }
-.night-mode .bz-filter.is-on .bz-filter-kicker,
-.night-mode .bz-filter.is-on .bz-filter-caret { color: var(--emerald-400); }
-.night-mode .bz-filter.is-on .bz-glyph { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.3); }
+.night-mode .bz-railchip { color: #a49d95; }
+.night-mode .bz-railchip.is-on {
+  background: rgba(52, 211, 153, 0.13);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #d6f5e7;
+}
 .night-mode .bz-secmore { color: var(--emerald-400); }
 .night-mode .bz-picker { border-color: rgba(255, 255, 255, 0.09); }
 .night-mode .bz-pick { border-bottom-color: rgba(255, 255, 255, 0.07); color: #e6e1db; }
@@ -2066,6 +2098,7 @@
 .night-mode .bz-minelist { border-color: rgba(255, 255, 255, 0.09); }
 .night-mode .bz-mine { border-bottom-color: rgba(255, 255, 255, 0.07); }
 .night-mode .bz-mine-name,
+.night-mode .bz-cat-name,
 .night-mode .bz-blank-title { color: #e6e1db; }
 .night-mode .bz-logopreview { background: #262220; border-color: rgba(255, 255, 255, 0.08); }
 .night-mode .bz-logopreview--mono {

@@ -36,7 +36,7 @@
         <span class="bz-count" id="bzCount"></span>
       </div>
 
-      <div class="bz-searchwrap">
+      <div class="bz-searchwrap" id="bzSearchWrap">
         <span class="bz-search-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
@@ -48,24 +48,13 @@
         </button>
       </div>
 
-      <!-- One control, showing current state. A horizontal rail would hide
-           its own tail offscreen and imply a precedence among categories
-           that does not exist. -->
-      <div class="bz-filterbar">
-        <button class="bz-filter" id="bzFilter" type="button" aria-haspopup="dialog">
-          <span class="bz-glyph bz-glyph--filter" id="bzFilterGlyph" aria-hidden="true">&#9670;</span>
-          <span class="bz-filter-text">
-            <span class="bz-filter-kicker">Yo'nalish</span>
-            <span class="bz-filter-label" id="bzFilterLabel">Barcha yo'nalishlar</span>
-          </span>
-          <span class="bz-filter-caret" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-        <button class="bz-filter-clear" id="bzFilterClear" type="button" aria-label="Filtrni olib tashlash" hidden>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
+      <!-- The category switcher, present only inside a category. It wraps
+           rather than scrolling sideways: a horizontal rail hides its own
+           tail offscreen, which is exactly why one was rejected before. It
+           also replaces the old single "Yo'nalish" dropdown rather than
+           joining it — two controls for one job. -->
+      <nav class="bz-rail" id="bzRail" aria-label="Yo'nalishlar" hidden></nav>
+
     </div>
 
     <div class="bz-body" id="bzBody"></div>

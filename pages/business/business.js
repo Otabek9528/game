@@ -55,6 +55,34 @@
     'kosmetika':   10    // cosmetics — discretionary
   };
 
+  // What each category is for, in one line. The directory is the landing
+  // again, so a reader who does not already know what "Tarjima va apostil"
+  // covers should not have to open it to find out.
+  var CATEGORY_ABOUT = {
+    'halal-market': 'Halol go‘sht, ziravorlar va oziq-ovqat',
+    'pishiriqlar':  'Non, patir, somsa va shirinliklar',
+    'tarjima':      'Hujjat tarjimasi va apostil',
+    'pochta':       'O‘zbekistonga posilka va yuk',
+    'aviakassa':    'Aviabilet va yo‘l hujjatlari',
+    'sim-telefon':  'SIM karta, telefon va aksessuarlar',
+    'sugurta':      'Sug‘urta va moliyaviy xizmatlar',
+    'consulting':   'Universitet va viza bo‘yicha maslahat',
+    'repetitor':    'Til va fan o‘qituvchilari',
+    'kosmetika':    'Koreys kosmetikasi va parvarish'
+  };
+
+  // The rail has to fit ten categories on screen at once without scrolling
+  // sideways, so it uses a short form of each name. Everywhere a category is
+  // named on its own — heading, card, sheet — keeps the full one.
+  var RAIL_NAME = {
+    'halal-market': 'Halal market',
+    'tarjima':      'Tarjima',
+    'pochta':       'Pochta',
+    'sim-telefon':  'SIM va telefon',
+    'consulting':   'Consulting',
+    'repetitor':    'Repetitor'
+  };
+
   // Anything the server adds later that is not ranked here sorts after
   // everything known, alphabetically among itself, rather than silently
   // landing at the top.
@@ -75,7 +103,10 @@
   }
 
   var state = {
-    mode: 'feed',        // 'feed' | 'category'
+    // 'categories' is the landing: the directory of business types, back by
+    // request after a spell where the landing listed businesses directly.
+    // 'search' is a flat cross-category result set.
+    mode: 'categories',  // 'categories' | 'category' | 'search'
     categoryId: null,
     categoryName: '',
     categoryIcon: '',
@@ -242,7 +273,7 @@
   function goHome() { window.location.href = '../../index.html'; }
 
   function currentBack() {
-    return state.mode === 'category' ? backToFeed : goHome;
+    return state.mode === 'categories' ? goHome : backToCategories;
   }
 
   // ============================================
@@ -368,6 +399,25 @@
     var host = $('bzBody');
     host.textContent = '';
 
+    // The directory is a flat list of like-sized cards, so its skeleton is
+    // one too — a grouped skeleton would promise sections that never arrive.
+    if (state.mode === 'categories') {
+      var cats = el('div', 'bz-skel-sec');
+      cats.setAttribute('aria-hidden', 'true');
+      for (var c = 0; c < 6; c++) {
+        var cat = el('div', 'bz-skel-row');
+        cat.appendChild(el('span', 'bz-skel bz-skel--logo'));
+        var pair = el('div', 'bz-skel-lines');
+        pair.appendChild(el('span', 'bz-skel bz-skel--name'));
+        pair.appendChild(el('span', 'bz-skel bz-skel--desc'));
+        cat.appendChild(pair);
+        cats.appendChild(cat);
+      }
+      host.appendChild(cats);
+      host.setAttribute('aria-busy', 'true');
+      return;
+    }
+
     var groups = state.mode === 'category' ? 1 : 3;
     var rows = state.mode === 'category' ? 5 : 3;
 
@@ -399,90 +449,136 @@
   // FEED
   // ============================================
 
-  function loadFeed() {
-    setView('loading');
-    var path = '/api/business/feed' +
-      (state.query ? '?q=' + encodeURIComponent(state.query) : '');
+  // ============================================
+  // CATEGORIES — the landing
+  // ============================================
+  // The directory of business types, restored as the first screen. Costs one
+  // tap before any business is visible; buys a reader who arrives not knowing
+  // what is here an answer to that question, which the flat feed never gave.
+  //
+  // It is also the cheaper request: /categories returns ten rows, where the
+  // old landing pulled every active business in the catalogue to show four
+  // of each.
 
-    getJSON(path)
+  function loadCategories() {
+    setView('loading');
+    getJSON('/api/business/categories')
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
-        if (data.categories) state.categories = data.categories.slice().sort(byCategoryOrder);
-        syncFilter();
-        renderFeed(data);
+        state.categories = (data.categories || []).slice().sort(byCategoryOrder);
+        syncChrome();
+        renderCategories();
       })
       .catch(function () { setView('error'); });
   }
 
-  function renderFeed(data) {
-    // The same ranking the picker uses. If the sections stayed alphabetical
-    // while the picker was ranked, the two would contradict each other about
-    // which category matters. Every group here has members by definition, so
-    // the empty-bucket half of the comparison never applies.
-    var groups = (data.groups || []).slice().sort(function (a, b) {
-      return byCategoryOrder(
-        { slug: a.category.slug, name: a.category.name, count: a.total },
-        { slug: b.category.slug, name: b.category.name, count: b.total });
-    });
-    $('bzCount').textContent = data.total ? data.total + ' ta biznes' : '';
+  function renderCategories() {
+    var total = totalCount();
+    $('bzCount').textContent = total ? total + ' ta biznes' : '';
 
     setView('ready');
     var host = $('bzBody');
     host.textContent = '';
     host.removeAttribute('aria-busy');
 
-    // An empty catalogue is the moment an owner is most useful to us, so the
-    // invitation goes here rather than a dead end. A fruitless search is a
-    // different thing and gets no pitch.
-    if (!groups.length) {
-      if (state.query) {
-        host.appendChild(emptyBlock(
-          'Hech narsa topilmadi',
-          '"' + state.query + '" bo‘yicha biznes yo‘q. Boshqa so‘z bilan qidirib ko‘ring.'));
-        return;
-      }
-      host.appendChild(emptyBlock(
-        'Katalog hozircha bo‘sh',
-        'Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi. ' +
-        'Birinchi bo‘lib qo‘shilsangiz, yo‘nalishingizda uzoq vaqt yolg‘iz turasiz.'));
+    if (!state.categories.length) {
+      host.appendChild(emptyBlock('Katalog hozircha bo‘sh',
+        'Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi.'));
       host.appendChild(ownerCard());
+      return;
+    }
+
+    var list = el('div', 'bz-cats');
+    state.categories.forEach(function (cat) {
+      list.appendChild(categoryCard(cat));
+    });
+    host.appendChild(list);
+    host.appendChild(ownerCard());
+  }
+
+  function categoryCard(cat) {
+    var card = el('button', 'bz-cat' + (cat.count ? '' : ' is-quiet'));
+    card.type = 'button';
+    card.appendChild(glyphNode(cat.icon, 'bz-glyph bz-glyph--cat'));
+
+    var text = el('div', 'bz-cat-text');
+    text.appendChild(el('span', 'bz-cat-name', cat.name));
+    var about = CATEGORY_ABOUT[cat.slug];
+    if (about) text.appendChild(el('span', 'bz-cat-about', about));
+    card.appendChild(text);
+
+    // An empty category still opens — landing on one is how an owner finds
+    // out their trade has a free field in it — so it reads as quiet rather
+    // than disabled.
+    var tail = el('span', 'bz-cat-tail');
+    tail.appendChild(el('span', 'bz-cat-n', cat.count ? String(cat.count) : '—'));
+    tail.appendChild(iconSpan('bz-cat-arrow', ICONS.arrow));
+    card.appendChild(tail);
+
+    card.addEventListener('click', function () {
+      openCategory(cat.id, cat.name, cat.icon);
+    });
+    return card;
+  }
+
+  // ============================================
+  // SEARCH RESULTS
+  // ============================================
+  // Grouped by category, because knowing a match is a bakery rather than an
+  // insurance broker is most of what makes a result useful.
+
+  function loadSearch() {
+    setView('loading');
+    getJSON('/api/business/feed?q=' + encodeURIComponent(state.query))
+      .then(function (data) {
+        if (!data.success) throw new Error('bad_response');
+        if (data.categories) {
+          state.categories = data.categories.slice().sort(byCategoryOrder);
+        }
+        syncChrome();
+        renderResults(data);
+      })
+      .catch(function () { setView('error'); });
+  }
+
+  function renderResults(data) {
+    // Ranked the same way the rail and the directory are, so the three never
+    // disagree about which category leads.
+    var groups = (data.groups || []).slice().sort(function (a, b) {
+      return byCategoryOrder(
+        { slug: a.category.slug, name: a.category.name, count: a.total },
+        { slug: b.category.slug, name: b.category.name, count: b.total });
+    });
+
+    $('bzCount').textContent = data.total ? data.total + ' ta topildi' : '';
+
+    setView('ready');
+    var host = $('bzBody');
+    host.textContent = '';
+    host.removeAttribute('aria-busy');
+
+    if (!groups.length) {
+      host.appendChild(emptyBlock('Hech narsa topilmadi',
+        '“' + state.query + '” bo‘yicha biznes yo‘q. Boshqa so‘z bilan qidirib ko‘ring.'));
       return;
     }
 
     groups.forEach(function (group) {
       var section = el('section', 'bz-section');
       var cat = group.category;
-      var shown = 0;
+      var all = (group.podium || []).concat(group.businesses || []);
+      var podiumLen = (group.podium || []).length;
 
-      var podium = group.podium || [];
-      var rest = group.businesses || [];
-      var all = podium.concat(rest);
-      var visible = all.slice(0, FEED_PER_CATEGORY);
+      section.appendChild(sectionHeader(cat.name, group.total,
+        function () { openCategory(cat.id, cat.name, cat.icon); }, cat.icon));
 
-      section.appendChild(sectionHeader(
-        cat.name,
-        group.total,
-        group.total > visible.length
-          ? function () { openCategory(cat.id, cat.name, cat.icon); } : null,
-        cat.icon
-      ));
-
-      visible.forEach(function (business, i) {
-        var rank = i < podium.length ? i + 1 : null;
-        // No TOP marker here, unlike the category view: the feed shows only
-        // the held positions, never the empty ones, so a "TOP 3" rule would
-        // sit under two medals and claim a third that is not there. The
-        // metals carry the distinction on their own.
+      all.forEach(function (business, i) {
         section.appendChild(businessRow(business, {
-          rank: rank, showDescription: true, descLines: 2
+          rank: i < podiumLen ? i + 1 : null, showDescription: true, descLines: 2
         }));
-        shown++;
       });
-
       host.appendChild(section);
     });
-
-    host.appendChild(ownerCard());
   }
 
   // ============================================
@@ -495,22 +591,25 @@
     state.categoryId = categoryId;
     state.categoryName = categoryName;
     state.categoryIcon = categoryIcon || '';
-    syncFilter();
-    setBack(backToFeed);
+    syncChrome();
+    setBack(backToCategories);
     $('bzScroll').scrollTop = 0;
     loadCategory();
   }
 
-  function backToFeed() {
-    state.mode = 'feed';
+  function backToCategories() {
+    state.mode = 'categories';
     state.categoryId = null;
     state.categoryName = '';
     state.categoryIcon = '';
     state.pricing = null;
-    syncFilter();
+    state.query = '';
+    $('bzSearch').value = '';
+    $('bzSearchClear').hidden = true;
+    syncChrome();
     setBack(goHome);
     $('bzScroll').scrollTop = 0;
-    loadFeed();
+    loadCategories();
   }
 
   function loadCategory() {
@@ -1123,7 +1222,8 @@
   // A change made in a sheet should be true of the list behind it too.
   function refreshCurrentView() {
     if (state.mode === 'category') loadCategory();
-    else loadFeed();
+    else if (state.mode === 'search') loadSearch();
+    else loadCategories();
   }
 
   function field(label, hint) {
@@ -1428,14 +1528,14 @@
 
     var list = el('div', 'bz-picker');
 
-    var all = el('button', 'bz-pick' + (state.mode === 'feed' ? ' is-on' : ''));
+    var all = el('button', 'bz-pick' + (state.mode === 'categories' ? ' is-on' : ''));
     all.type = 'button';
     all.appendChild(glyphNode('\u25C6', 'bz-glyph bz-glyph--pick'));
     all.appendChild(el('span', 'bz-pick-name', 'Barcha yo‘nalishlar'));
     all.appendChild(el('span', 'bz-pick-n', String(totalCount())));
     all.addEventListener('click', function () {
       closeSheet();
-      if (state.mode !== 'feed') backToFeed();
+      if (state.mode !== 'categories') backToCategories();
     });
     if (!onChoose) list.appendChild(all);
 
@@ -1477,12 +1577,50 @@
     return state.categories.reduce(function (n, c) { return n + c.count; }, 0);
   }
 
-  function syncFilter() {
-    var filtered = state.mode === 'category';
-    $('bzFilterLabel').textContent = filtered ? state.categoryName : 'Barcha yo‘nalishlar';
-    $('bzFilterGlyph').textContent = filtered ? (state.categoryIcon || '\u25C6') : '\u25C6';
-    $('bzFilter').classList.toggle('is-on', filtered);
-    $('bzFilterClear').hidden = !filtered;
+  // Title, count and the rail, kept in step with whichever view is showing.
+  function syncChrome() {
+    var inCategory = state.mode === 'category';
+    $('bzTitle').textContent = inCategory ? state.categoryName
+      : (state.mode === 'search' ? 'Qidiruv natijalari' : 'Biznes Katalogi');
+
+    // The search field and the rail swap rather than stack, so the header
+    // stays the height it has always been. They also do not belong on the
+    // same screen: search is global, so inside a category the field is a
+    // trapdoor — typing in it silently leaves the category you are reading.
+    // It sits one Back tap away on the directory instead.
+    $('bzSearchWrap').hidden = inCategory;
+    renderRail(inCategory);
+  }
+
+  // Every category, on screen at once, wrapping onto as many lines as it
+  // needs. A rail that scrolls sideways hides its own tail and makes whatever
+  // happens to be first look like the most important one; wrapping costs a
+  // little height and removes both problems. It stands in for the old
+  // "Yo'nalish" dropdown rather than sitting next to it.
+  function renderRail(show) {
+    var rail = $('bzRail');
+    rail.hidden = !show;
+    if (!show) { rail.textContent = ''; return; }
+
+    rail.textContent = '';
+    state.categories.forEach(function (cat) {
+      var on = cat.id === state.categoryId;
+      var chip = el('button', 'bz-railchip' + (on ? ' is-on' : '') +
+                              (cat.count ? '' : ' is-quiet'));
+      chip.type = 'button';
+      if (on) chip.setAttribute('aria-current', 'page');
+      // Only the selected chip carries its glyph. On all ten it cost a row
+      // of height and said nothing the name did not; on one it marks where
+      // you are with something other than colour alone.
+      if (on) chip.appendChild(el('span', 'bz-railchip-glyph', cat.icon || '\u2022'));
+      chip.appendChild(el('span', 'bz-railchip-text',
+        RAIL_NAME[cat.slug] || cat.name));
+      chip.addEventListener('click', function () {
+        if (on) return;
+        openCategory(cat.id, cat.name, cat.icon);
+      });
+      rail.appendChild(chip);
+    });
   }
 
   // ============================================
@@ -2622,13 +2760,19 @@
 
       // Searching always looks across everything: a name you half remember is
       // no use if it only matches inside the category you happen to be in.
-      if (state.mode === 'category') {
-        state.mode = 'feed';
+      if (!value) {
+        state.mode = 'categories';
         state.categoryId = null;
-            syncFilter();
+        syncChrome();
         setBack(goHome);
+        loadCategories();
+        return;
       }
-      loadFeed();
+      state.mode = 'search';
+      state.categoryId = null;
+      syncChrome();
+      setBack(backToCategories);
+      loadSearch();
     }, 280);
   }
 
@@ -2669,21 +2813,11 @@
     $('bzSearchClear').addEventListener('click', function () {
       $('bzSearch').value = '';
       $('bzSearchClear').hidden = true;
-      if (state.query) { state.query = ''; loadFeed(); }
+      if (state.query) { state.query = ''; backToCategories(); }
       $('bzSearch').focus();
     });
 
-    // Passing openPicker directly would hand it the MouseEvent as its
-    // onChoose callback, putting the filter into chooser mode.
-    $('bzFilter').addEventListener('click', function () { openPicker(); });
-    $('bzFilterClear').addEventListener('click', function () {
-      haptic('light');
-      backToFeed();
-    });
-
-    $('bzRetry').addEventListener('click', function () {
-      state.mode === 'category' ? loadCategory() : loadFeed();
-    });
+    $('bzRetry').addEventListener('click', refreshCurrentView);
 
     $('sheetBackdrop').addEventListener('click', function (e) {
       if (e.target === $('sheetBackdrop')) closeSheet();
@@ -2700,7 +2834,8 @@
     initSheetDrag();
     initViewer();
     initStickyState();
-    loadFeed();
+    syncChrome();
+    loadCategories();
   }
 
   if (document.readyState === 'loading') {
