@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Biznes Katalogi</title>
+  <title>Biznes katalogi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -27,69 +27,63 @@
     </a>
   </header>
 
-  <div class="bz-scroll" id="bzScroll">
+  <main class="bz-scroll" id="bzScroll">
 
-    <!-- Title + search + chips stay put while the feed moves under them. -->
+    <!-- Title + search stay put while the list moves under them. -->
     <div class="bz-sticky" id="bzSticky">
       <div class="bz-titlebar">
-        <h2 class="bz-title" id="bzTitle">Biznes Katalogi</h2>
-        <span class="bz-count" id="bzCount"></span>
+        <button class="bz-back" id="bzBack" type="button" aria-label="Orqaga" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="bz-titlewrap">
+          <h2 class="bz-title" id="bzTitle">Biznes katalogi</h2>
+          <span class="bz-count" id="bzCount" aria-live="polite"></span>
+        </div>
       </div>
 
       <div class="bz-searchwrap" id="bzSearchWrap">
         <span class="bz-search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
         <input type="search" class="bz-search" id="bzSearch"
-               placeholder="Biznes yoki xizmat qidiring" autocomplete="off"
-               autocapitalize="none" spellcheck="false" />
-        <button class="bz-search-clear" id="bzSearchClear" type="button" aria-label="Tozalash" hidden>
+               placeholder="Biznes yoki xizmatni qidiring" autocomplete="off"
+               autocapitalize="none" spellcheck="false" aria-label="Qidirish" />
+        <button class="bz-search-clear" id="bzSearchClear" type="button" aria-label="Qidiruvni tozalash" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
-
-      <!-- The category switcher, present only inside a category. It wraps
-           rather than scrolling sideways: a horizontal rail hides its own
-           tail offscreen, which is exactly why one was rejected before. It
-           also replaces the old single "Yo'nalish" dropdown rather than
-           joining it — two controls for one job. -->
-      <nav class="bz-rail" id="bzRail" aria-label="Yo'nalishlar" hidden></nav>
-
     </div>
 
     <div class="bz-body" id="bzBody"></div>
 
-    <!-- Loading is drawn as a skeleton inside .bz-body; this stays only as
-         the fallback the sheets reuse. The former #bzEmpty block was never
-         reachable — empties are composed into the body by emptyBlock(). -->
-    <div class="bz-state" id="bzLoading" hidden>
-      <div class="bz-spinner"></div>
-    </div>
-
     <div class="bz-state" id="bzError" hidden>
-      <span class="bz-glyph bz-blank-glyph" aria-hidden="true">&#9888;</span>
+      <span class="bz-state-glyph" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      </span>
       <p class="bz-state-title">Yuklab bo&#8216;lmadi</p>
-      <p class="bz-state-hint">Internet aloqasini tekshiring va qayta urinib ko&#8216;ring.</p>
+      <p class="bz-state-hint">Internet aloqasini tekshirib, qayta urinib ko&#8216;ring.</p>
       <button class="bz-btn" id="bzRetry" type="button">Qayta urinish</button>
     </div>
 
-  </div>
+  </main>
 
-  <!-- DETAIL SHEET -->
-  <div class="bz-sheet-backdrop" id="sheetBackdrop" hidden>
-    <div class="bz-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetName">
-      <div class="bz-sheet-grip"><span class="bz-sheet-grip-bar"></span></div>
-      <button class="bz-sheet-close" id="sheetClose" type="button" aria-label="Yopish">
+  <!-- DIALOG
+       One overlay for everything. A business opens as a centred card — the
+       main object of the page, given the room to be read as one. Tasks
+       (forms, lists, prices) open as a bottom sheet. On wide screens both
+       are centred. -->
+  <div class="bz-backdrop" id="sheetBackdrop" hidden>
+    <div class="bz-dialog" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="bz-dialog-grip" aria-hidden="true"><span class="bz-dialog-grip-bar"></span></div>
+      <button class="bz-dialog-close" id="sheetClose" type="button" aria-label="Yopish">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
-      <div class="bz-sheet-scroll" id="sheetScroll"></div>
+      <div class="bz-dialog-scroll" id="sheetScroll"></div>
     </div>
   </div>
 
-  <!-- FULL-SCREEN IMAGE VIEWER
-       Kept outside #sheet on purpose: the sheet's dismiss gesture listens on
-       pointerdown at #sheet, and a viewer nested inside it would hand every
-       pinch to that handler. -->
+  <!-- FULL-SCREEN IMAGE VIEWER. Kept outside the dialog: the dialog's dismiss
+       gesture listens on pointerdown there and would swallow the pinch. -->
   <div class="bz-viewer" id="bzViewer" role="dialog" aria-modal="true" aria-label="Rasm" hidden>
     <div class="bz-viewer-stage" id="bzViewerStage">
       <img class="bz-viewer-img" id="bzViewerImg" alt="" draggable="false" />

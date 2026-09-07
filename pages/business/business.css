@@ -1,119 +1,189 @@
 /* =========================================================
    BIZNES KATALOGI
 
-   Denser and quieter than the rest of the app: mono for anything
-   numeric, and no emoji at all. Categories are set in type, which
-   is what keeps a directory reading as a directory.
+   Built for the person looking for a business. Three levels:
 
-   Three surface roles do the structural work (tokens in style.css):
-   content sits on a lifted card, controls sit in a sunken well, and
-   sheets float above both. Everything used to be white-on-hairline,
-   which meant a business, a search box and a link button were the
-   same object and none of them could be emphasised.
+     directory  — every trade on one screen, as tiles
+     category   — a list of businesses, one line each
+     business   — a centred card: who they are, how to reach them
 
-   Gold marks a paid position and nothing else.
+   Owner material (listing, positions, prices) is a bottom sheet
+   one tap behind a quiet card at the end of each list, so it is
+   never in the way of reading and never hard to find.
+
+   Surface roles carry the structure (tokens in style.css):
+   content sits on a lifted card, controls sit in a sunken well,
+   overlays float above both. Gold marks a paid position only.
    ========================================================= */
 
 /* Several blocks below set display on a class, which outranks the UA's
-   [hidden] { display: none }. Without this the sheet backdrop stays laid
-   out while invisible — fixed, inset 0, swallowing every tap on the page. */
+   [hidden] { display: none }. Without this the backdrop stays laid out while
+   invisible — fixed, inset 0, swallowing every tap on the page. */
 [hidden] { display: none !important; }
 
 .bz-scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 72px;
-  font-feature-settings: "tnum" 0;
-  /* The feature owns its ground rather than inheriting the app's, so the
-     page and its cards can never drift apart in tone. */
+  padding-bottom: calc(48px + env(safe-area-inset-bottom));
   background: var(--bg-base);
 }
 
-/* ---------- sticky header ---------- */
+/* ---------------------------------------------------------
+   STICKY HEADER
+   --------------------------------------------------------- */
 
 .bz-sticky {
   position: sticky;
   top: 0;
   z-index: 20;
-  /* The emerald app header used to butt straight onto the page on a hard
-     edge, which is most of what made the top of the screen read as two
-     unrelated products stacked. The wash carries the header's colour a
-     little way down and lets go; the flat base underneath keeps the bar
-     opaque so content still scrolls out of sight behind it. */
+  /* The emerald app header used to butt onto the page on a hard edge, which
+     made the top of the screen read as two unrelated products stacked. This
+     wash carries the header's colour a little way down and lets go. */
   background:
     linear-gradient(180deg, rgba(6, 95, 70, 0.07) 0%, rgba(6, 95, 70, 0) 72%),
     var(--bg-base);
-  padding: 16px 16px 0;
-  /* The rule is drawn as an inset shadow, not a border: a transparent border
-     lets the wash above bleed through as a one-pixel green hairline at the
-     bottom edge, which is visible on a retina screen. It also only appears
-     once something has scrolled under it — drawn at rest it divides a page
-     that has no second half yet. */
+  padding: 14px 16px 12px;
+  /* Drawn as an inset shadow rather than a border: a transparent border lets
+     the wash bleed through as a green hairline. It appears only once content
+     has scrolled under it. */
   box-shadow: none;
   transition: box-shadow var(--transition-base);
 }
-
 .bz-sticky.is-stuck {
   box-shadow: inset 0 -1px 0 var(--hairline), 0 6px 16px -12px rgba(68, 52, 30, 0.5);
 }
 
 .bz-titlebar {
   display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  margin-bottom: 11px;
+}
+
+/* An on-page back control, not only the Telegram one. The same page opens in
+   a desktop browser and in clients that draw no system back button, and
+   depth with no visible way out is the fastest way to strand someone. */
+.bz-back {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin-left: -6px;
+  padding: 7px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.bz-back:active { background: var(--surface-sunken); }
+.bz-back svg { width: 100%; height: 100%; display: block; }
+
+.bz-titlewrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
 }
 
 .bz-title {
+  /* It has to claim the free space, not just its content width: as a plain
+     shrink-to-fit item the row's space-between pushed the count to the far
+     edge and ellipsised the category name against a gap of empty bar. */
+  flex: 1 1 auto;
   margin: 0;
+  min-width: 0;
   font-family: var(--font-display);
   font-size: var(--fs-display);
   font-weight: 700;
   letter-spacing: -0.016em;
+  line-height: 1.14;
   color: var(--text-primary);
-  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+/* Inside a category the title is the switcher, so it stops behaving like a
+   heading and starts behaving like a control. */
+.bz-title--switch { overflow: visible; }
 
 .bz-count {
+  flex: none;
   font-family: var(--font-mono);
   font-size: var(--fs-2xs);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- search ---------- */
+/* The category switcher. One control where there used to be a wrapping rail
+   of ten chips: the rail cost three rows of header height on every category
+   screen and put nine irrelevant destinations in front of a reader who had
+   just chosen the tenth. Tapping the name opens the full list. */
+.bz-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 11px;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.bz-switch:active { background: var(--surface-sunken); }
 
+.bz-switch-name {
+  min-width: 0;
+  font-family: var(--font-display);
+  /* A step down from the front page's title. At display size the name shared
+     the bar with a glyph, a caret and a count, and "Halol market" truncated
+     on a 390px screen — the one word a reader needs there. */
+  font-size: 1.26rem;
+  font-weight: 700;
+  letter-spacing: -0.016em;
+  line-height: 1.14;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bz-switch-caret { flex: none; width: 16px; height: 16px; color: var(--text-muted); }
+.bz-switch-caret svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- search ---------- */
 /* A field is something you press into, so it sits in the page rather than on
-   it. Same reason it carries no shadow: only content is lifted. */
+   it, and carries no shadow: only content is lifted. It stays on every view,
+   including inside a category — search is global, and hiding the field there
+   meant a reader who half-remembered a name had to go back first. */
+
 .bz-searchwrap {
   position: relative;
   display: flex;
   align-items: center;
   gap: 9px;
-  height: 42px;
-  padding: 0 12px;
+  height: 44px;
+  padding: 0 13px;
   background: var(--surface-sunken);
   border: 1px solid transparent;
-  border-radius: 11px;
-  margin-bottom: 9px;
+  border-radius: 12px;
   transition: border-color var(--transition-fast), background var(--transition-fast);
 }
-
 .bz-searchwrap:focus-within {
   background: var(--surface-card);
   border-color: var(--emerald-600);
 }
 
-.bz-search-icon {
-  width: 15px;
-  height: 15px;
-  flex: none;
-  color: var(--text-muted);
-}
+.bz-search-icon { width: 16px; height: 16px; flex: none; color: var(--text-muted); }
 .bz-search-icon svg { width: 100%; height: 100%; display: block; }
 
 .bz-search {
@@ -131,21 +201,26 @@
 .bz-search::-webkit-search-cancel-button { display: none; }
 
 .bz-search-clear {
-  width: 18px;
-  height: 18px;
+  width: 26px;
+  height: 26px;
   flex: none;
-  padding: 0;
+  margin-right: -6px;
+  padding: 5px;
   border: none;
+  border-radius: 999px;
   background: none;
   color: var(--text-muted);
   cursor: pointer;
 }
+.bz-search-clear:active { background: var(--hairline); }
 .bz-search-clear svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- category glyphs ---------- */
-/* One glyph per category, from the database. It appears only where a
+/* ---------------------------------------------------------
+   CATEGORY GLYPHS
+   One glyph per category, from the database. It appears only where a
    category is being named, so it reads as that category's mark rather than
-   as decoration. Business rows stay clean. */
+   as decoration; business rows stay clean.
+   --------------------------------------------------------- */
 
 .bz-glyph {
   flex: none;
@@ -153,95 +228,43 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--surface-sunken);
   border: 1px solid var(--hairline);
 }
-
-.bz-glyph--filter { width: 30px; height: 30px; font-size: 0.95rem; border-radius: 9px; }
-.bz-glyph--sec    { width: 26px; height: 26px; font-size: 0.85rem; border-radius: 8px; }
-.bz-glyph--pick   { width: 30px; height: 30px; font-size: 0.95rem; border-radius: 8px; }
-
-/* ---------- category rail ---------- */
-/* The switcher inside a category. It WRAPS: every category is on screen at
-   once, on as many lines as that takes. A rail that scrolls sideways hides
-   its own tail and makes whatever happens to be first look like the most
-   important one — which is why one was turned down before. Wrapping costs a
-   little height and removes both problems.
-
-   It replaces the old single "Yo'nalish" dropdown rather than joining it, so
-   the header carries no more weight than it did. */
-
-.bz-rail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-bottom: 12px;
+.bz-glyph--sec   { width: 26px; height: 26px; font-size: 0.85rem; border-radius: 8px; }
+.bz-glyph--pick  { width: 32px; height: 32px; font-size: 1rem;    border-radius: 9px; }
+.bz-glyph--tile  { width: 42px; height: 42px; font-size: 1.3rem;  border-radius: 13px; }
+.bz-glyph--title {
+  width: 30px; height: 30px; font-size: 0.95rem; border-radius: 9px;
+  background: var(--surface-card);
 }
 
-.bz-railchip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  max-width: 100%;
-  padding: 6px 11px;
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  background: var(--surface-sunken);
-  font-family: inherit;
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-              color var(--transition-fast), transform var(--transition-fast);
-}
-.bz-railchip:active { transform: scale(0.96); }
+/* ---------------------------------------------------------
+   DIRECTORY — the landing
+   A grid, not a list. Ten categories as full-width rows ran past two
+   screens; as tiles the whole catalogue is visible at once, which is the
+   question a reader arriving cold actually has.
+   --------------------------------------------------------- */
 
-/* Where you are. The one filled chip on the page, so the rail answers
-   "which category am I in" before the heading above it is read. */
-.bz-railchip.is-on {
-  padding-left: 8px;
-  background: var(--accent-light);
-  border-color: var(--emerald-600);
-  color: var(--emerald-800);
-  cursor: default;
+.bz-body { padding: 0 16px; }
+
+.bz-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  padding-top: 14px;
 }
 
-/* A category with nothing in it still switches to — landing on one is how an
-   owner discovers a free field — so it reads as quiet, not disabled. */
-.bz-railchip.is-quiet { opacity: 0.55; }
-.bz-railchip.is-quiet.is-on { opacity: 1; }
-
-.bz-railchip-glyph {
-  flex: none;
-  font-size: 0.85rem;
-  line-height: 1;
-}
-.bz-railchip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ---------- category directory ---------- */
-/* The landing. One card per business type, saying what it covers and how
-   much is in it — the question a reader arriving cold actually has, and the
-   one a flat list of businesses never answered. */
-
-.bz-cats {
+.bz-tile {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 16px;
-}
-
-.bz-cat {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  align-items: center;
-  gap: 13px;
-  width: 100%;
+  align-items: flex-start;
+  gap: 4px;
+  min-height: 132px;
   padding: 13px;
   border: 1px solid var(--hairline);
-  border-radius: 14px;
+  border-radius: 15px;
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
   font-family: inherit;
@@ -250,23 +273,23 @@
   transition: transform var(--transition-fast), border-color var(--transition-fast),
               background var(--transition-fast), box-shadow var(--transition-fast);
 }
-.bz-cat:active {
-  transform: scale(0.985);
+.bz-tile:active {
+  transform: scale(0.98);
   background: var(--surface-sunken);
   border-color: var(--hairline-strong);
   box-shadow: none;
 }
 @media (hover: hover) {
-  .bz-cat:hover { border-color: var(--hairline-strong); box-shadow: var(--shadow-lift); }
+  .bz-tile:hover { border-color: var(--hairline-strong); box-shadow: var(--shadow-lift); }
 }
-.bz-cat.is-quiet .bz-cat-name { color: var(--text-secondary); }
-.bz-cat.is-quiet .bz-glyph { opacity: 0.55; }
+/* An empty category still opens — landing on one is how an owner finds out
+   their trade has a free field — so it reads as quiet, not disabled. */
+.bz-tile.is-quiet .bz-glyph { opacity: 0.5; }
+.bz-tile.is-quiet .bz-tile-name { color: var(--text-secondary); }
 
-.bz-glyph--cat { width: 44px; height: 44px; font-size: 1.35rem; border-radius: 13px; }
+.bz-tile .bz-glyph--tile { margin-bottom: 5px; }
 
-.bz-cat-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-
-.bz-cat-name {
+.bz-tile-name {
   font-family: var(--font-display);
   font-size: var(--fs-heading);
   font-weight: 700;
@@ -275,96 +298,32 @@
   color: var(--text-primary);
 }
 
-.bz-cat-about {
-  font-size: var(--fs-sm);
-  line-height: 1.35;
+.bz-tile-about {
+  font-size: var(--fs-xs);
+  line-height: 1.4;
   color: var(--text-secondary);
 }
 
-.bz-cat-tail { display: flex; align-items: center; gap: 8px; flex: none; }
-
-.bz-cat-n {
+.bz-tile-n {
+  margin-top: auto;
+  padding-top: 7px;
   font-family: var(--font-mono);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-2xs);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-.bz-cat-arrow { width: 15px; height: 15px; color: var(--sand-400); }
-.bz-cat-arrow svg { width: 100%; height: 100%; display: block; }
+/* ---------------------------------------------------------
+   SECTIONS
+   --------------------------------------------------------- */
 
-/* ---------- category picker ---------- */
-/* Identical rows, alphabetical, the whole set visible in one scroll. Nothing
-   about the layout says one category matters more than another. */
-
-.bz-picker {
-  display: flex;
-  flex-direction: column;
-  margin-top: 4px;
-  border: 1px solid var(--hairline);
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
-
-.bz-pick {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 13px;
-  border: none;
-  border-bottom: 1px solid var(--hairline);
-  background: var(--surface-card);
-  font-family: inherit;
-  font-size: var(--fs-body);
-  color: var(--text-primary);
-  text-align: left;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-.bz-pick:last-child { border-bottom: none; }
-.bz-pick:active { background: var(--surface-sunken); }
-/* The selected row is marked by a standing emerald edge as well as a tint —
-   a tint alone is easy to miss in a list of eleven near-identical rows. */
-.bz-pick.is-on {
-  background: var(--accent-light);
-  font-weight: 700;
-  box-shadow: inset 3px 0 0 var(--emerald-600);
-}
-.bz-pick.is-on .bz-glyph { border-color: rgba(4, 120, 87, 0.25); background: var(--surface-card); }
-/* An empty category still opens, so it reads as quiet rather than disabled. */
-.bz-pick.is-quiet .bz-pick-name { color: var(--text-secondary); }
-.bz-pick.is-quiet .bz-glyph { opacity: 0.55; }
-
-.bz-pick-name { flex: 1; min-width: 0; }
-
-.bz-pick-n {
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: var(--fs-xs);
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  flex: none;
-}
-
-/* ---------- sections ---------- */
-
-.bz-body { padding: 0 16px; }
-
-.bz-section { padding-top: 22px; }
+.bz-section { padding-top: 20px; }
 .bz-section:first-child { padding-top: 14px; }
 
-/* A named heading with the category's glyph, on one line.
-   It used to stack the name over a "N ta" count and sit above a full-width
-   rule — about 74px of chrome for a category that in this catalogue often
-   holds a single business. Across ten alphabetical sections that is most of
-   the first two screens spent on headings. One line, no rule: the cards
-   below carry their own edges now, so the heading does not need to draw the
-   boundary for them. */
 .bz-sechead {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   margin-bottom: 9px;
 }
 
@@ -377,12 +336,12 @@
 }
 
 .bz-sectitle {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading);
+  margin: 0;
+  font-size: var(--fs-sm);
   font-weight: 700;
-  letter-spacing: -0.008em;
+  letter-spacing: 0.01em;
   line-height: 1.2;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -392,14 +351,28 @@
   flex: none;
   font-family: var(--font-mono);
   font-size: var(--fs-2xs);
-  letter-spacing: 0.04em;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-/* A quiet text affordance, not a pill. As a bordered pill it carried the
-   same visual weight as a business card and pulled the eye off the content
-   it was meant to be subordinate to. */
+/* Paid placement is named where it happens rather than explained in a
+   footnote nobody reads. The mark is quiet; the answer is one tap. */
+.bz-secinfo {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 3px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.bz-secinfo:active { background: var(--surface-sunken); }
+.bz-secinfo svg { width: 100%; height: 100%; display: block; }
+
+/* A quiet text affordance, not a pill: as a bordered pill it carried the
+   weight of a business card and pulled the eye off the content. */
 .bz-secmore {
   flex: none;
   display: inline-flex;
@@ -419,34 +392,34 @@
 .bz-secmore-icon { width: 13px; height: 13px; }
 .bz-secmore-icon svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- rows ---------- */
+/* ---------------------------------------------------------
+   BUSINESS ROWS
+   The content object of the category and search views. One line of what the
+   business does under the name: a row carrying only a name and a counter
+   gives a reader nothing to choose on.
+   --------------------------------------------------------- */
 
-/* The content object. Aligned to the top rather than centred, because a row
-   now carries a description of variable height and centring made a two-line
-   row and a one-line row look like different components. */
 .bz-row {
   position: relative;
   display: grid;
-  grid-template-columns: 46px 1fr;
-  align-items: start;
+  grid-template-columns: 46px 1fr 16px;
+  align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 13px;
+  padding: 11px 12px;
   margin-bottom: 7px;
   background: var(--surface-card);
   border: 1px solid var(--hairline);
-  border-radius: 13px;
+  border-radius: 14px;
   box-shadow: var(--shadow-card);
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  overflow: hidden;
   transition: transform var(--transition-fast), border-color var(--transition-fast),
               box-shadow var(--transition-fast), background var(--transition-fast);
 }
-/* A 1% scale is not a press state — on a phone it is invisible, so a tap
-   that is still waiting on the network reads as a tap that did nothing.
-   The surface has to actually move. */
+/* The surface has to actually move: a 1% scale is invisible on a phone, so a
+   tap still waiting on the network reads as a tap that did nothing. */
 .bz-row:active {
   transform: scale(0.985);
   background: var(--surface-sunken);
@@ -457,173 +430,53 @@
   .bz-row:hover { border-color: var(--hairline-strong); box-shadow: var(--shadow-lift); }
 }
 
-/* A held position leads with its medal. Gold, silver and bronze carry the
-   order on their own, before the numeral is read — and the badge shrinks a
-   step at a time, so size says the same thing the metal does. Each is a
-   three-stop gradient with a light inset along the top edge, which is what
-   reads as a struck disc rather than a flat circle. */
-.bz-row--paid {
-  grid-template-columns: 44px 46px 1fr;
-  border-color: var(--hairline);
-}
-/* The medal and the logo are both identity marks, so they are centred
-   against each other on the row rather than pinned to the top of the text. */
-.bz-row--paid > .bz-badge,
-.bz-row--paid > .bz-logo { align-self: center; }
+.bz-row-lead { position: relative; display: block; width: 46px; height: 46px; }
 
-.bz-badge {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  width: 32px;
-  height: 32px;
-  font-size: 0.7rem;
-}
+.bz-row-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 
-/* The three grounds are one warm family fading a step at a time, so the block
-   reads as a podium and the drop from first to third is visible before any
-   badge is. Three unrelated tints made it look patchy instead of ordered. */
-
-/* --- gold --- */
-.bz-row--r1 { background: #fbeecb; border-color: #e3c15f; }
-.bz-row--r1 .bz-badge {
-  width: 40px; height: 40px; font-size: 0.79rem;
-  background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%);
-  color: #4a3400;
-  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.75),
-              inset 0 -1.5px 2px rgba(120, 84, 0, 0.32),
-              0 1px 3px rgba(150, 110, 10, 0.3);
-}
-
-/* --- silver --- */
-.bz-row--r2 { background: #fdf5e2; border-color: #ddc98e; }
-.bz-row--r2 .bz-badge {
-  width: 36px; height: 36px; font-size: 0.74rem;
-  background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%);
-  color: #39404a;
-  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.9),
-              inset 0 -1.5px 2px rgba(90, 100, 112, 0.3),
-              0 1px 3px rgba(90, 100, 112, 0.22);
-}
-
-/* --- bronze --- */
-.bz-row--r3 { background: #fefaf1; border-color: #e6d4b4; }
-.bz-row--r3 .bz-badge {
-  width: 33px; height: 33px; font-size: 0.71rem;
-  background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%);
-  color: #fff;
-  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
-              inset 0 -1.5px 2px rgba(90, 52, 20, 0.34),
-              0 1px 3px rgba(120, 76, 38, 0.26);
-}
-
-.bz-badge--ghost {
-  width: 33px; height: 33px;
-  background: none;
-  border: 1px dashed var(--sand-300);
-  color: var(--text-muted);
-  box-shadow: none;
-}
-.bz-badge--sm { width: 28px; height: 28px; font-size: 0.68rem; }
-.bz-prices-row:nth-child(1) .bz-badge--sm {
-  background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%);
-  color: #4a3400;
-}
-.bz-prices-row:nth-child(2) .bz-badge--sm {
-  background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%);
-  color: #39404a;
-}
-.bz-prices-row:nth-child(3) .bz-badge--sm {
-  background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%);
-  color: #fff;
-}
-
-/* The marker closing the contested three. "Barcha bizneslar" read as every
-   business in the directory, which is the opposite of what it labelled. */
-.bz-topline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 14px 0 12px;
-  position: relative;
-}
-.bz-topline::before {
-  content: "";
-  position: absolute;
-  left: 0; right: 0; top: 50%;
-  height: 1px;
-  background: var(--sand-200);
-}
-.bz-topline-tag {
-  position: relative;
-  padding: 4px 14px;
-  border: 1px solid var(--sand-200);
-  border-radius: 999px;
-  background: var(--bg-base);
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  color: var(--gold-600);
-}
-
-.bz-section--tight { padding-top: 0; }
-
-.bz-row-body { min-width: 0; }
-
-/* The business name is the content; it should be the largest thing in its
-   own row. It used to run smaller than the category heading above it, so
-   the chrome outranked the thing the chrome was labelling. */
-.bz-rowname {
+.bz-row-name {
   font-size: var(--fs-body);
   font-weight: 600;
-  line-height: 1.28;
+  line-height: 1.3;
   letter-spacing: -0.006em;
   color: var(--text-primary);
   overflow-wrap: anywhere;
 }
 
-/* What the business actually does. A directory row that carries only a name
-   and two counters tells a reader nothing they can act on — this is the
-   single biggest comprehension gap on the feed, and the text was already in
-   the payload, just never rendered outside the category podium. */
-.bz-rowdesc {
-  margin-top: 3px;
+.bz-row-desc {
   font-size: var(--fs-sm);
-  line-height: 1.42;
+  line-height: 1.4;
   color: var(--text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.bz-rowdesc--one { -webkit-line-clamp: 1; }
 
-/* ---------- meta line ---------- */
+.bz-row-chev { width: 16px; height: 16px; color: var(--sand-400); }
+.bz-row-chev svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- the meta line ---------- */
+/* Only what a visitor can act on. Open counts are the owner's metric and
+   live in "Mening bizneslarim"; a zero like-count says nothing, so the line
+   disappears rather than printing one. */
 
 .bz-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 5px 10px;
-  margin-top: 7px;
+  gap: 4px 9px;
+  margin-top: 3px;
   font-family: var(--font-mono);
   font-size: var(--fs-2xs);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+.bz-meta-likes { display: inline-flex; align-items: center; gap: 4px; }
+.bz-meta-icon { width: 11px; height: 11px; opacity: 0.75; }
+.bz-meta-icon svg { width: 100%; height: 100%; display: block; }
 
-.bz-stat { display: inline-flex; align-items: center; gap: 4px; }
-.bz-stat-icon { width: 12px; height: 12px; opacity: 0.7; }
-.bz-stat-icon svg { width: 100%; height: 100%; display: block; }
-
-.bz-catchip {
+.bz-meta-cat {
   display: inline-flex;
   align-items: center;
   height: 17px;
@@ -641,7 +494,7 @@
   width: 46px;
   height: 46px;
   flex: none;
-  border-radius: 12px;
+  border-radius: 13px;
   overflow: hidden;
   background: var(--surface-sunken);
   border: 1px solid var(--hairline);
@@ -650,12 +503,11 @@
   justify-content: center;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
   color: var(--text-muted);
 }
 .bz-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* No logo yet: a monogram on a colour derived from the name, so the feed has
+/* No logo yet: a monogram on a colour derived from the name, so the list has
    some life in it without falling back on emoji. */
 .bz-logo--mono {
   background: hsl(var(--h, 30) 30% 92%);
@@ -663,62 +515,72 @@
   color: hsl(var(--h, 30) 42% 34%);
 }
 
-.bz-logo--xl {
-  width: 58px;
-  height: 58px;
-  border-radius: 13px;
-  font-size: 1.02rem;
-}
+/* ---------- rank badge ---------- */
+/* A held position is marked, not staged. The old treatment gave the top three
+   a gold-tinted card, a coloured border and a 40px medal at the head of the
+   row — an auction leaderboard sitting where a customer was trying to pick a
+   bakery. A small numbered disc on the logo's corner says the same thing and
+   leaves every row the same object. */
 
-/* ---------- empty position ---------- */
-
-.bz-slot {
+.bz-rank {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 13px;
-  margin-bottom: 7px;
-  border: 1px dashed var(--hairline-strong);
-  border-radius: 13px;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  text-align: left;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  justify-content: center;
+  border-radius: 999px;
+  border: 2px solid var(--surface-card);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
-.bz-slot:active { background: var(--surface-sunken); border-color: var(--gold-400); }
+.bz-rank--1 { background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%); color: #4a3400; }
+.bz-rank--2 { background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%); color: #39404a; }
+.bz-rank--3 { background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%); color: #fff; }
 
-.bz-slot-text {
-  flex: 1;
-  font-size: var(--fs-xs);
-  color: var(--text-muted);
+/* In the price table it is a standalone chip, not an overlay. */
+.bz-prices-row .bz-rank,
+.bz-bidopt .bz-rank {
+  position: static;
+  width: 26px;
+  height: 26px;
+  border-width: 0;
+  font-size: 0.7rem;
 }
 
-.bz-slot-arrow { width: 15px; height: 15px; flex: none; color: var(--gold-600); }
-.bz-slot-arrow svg { width: 100%; height: 100%; display: block; }
+/* ---------------------------------------------------------
+   STATES
+   --------------------------------------------------------- */
 
-/* ---------- states ---------- */
-
-/* A failure is a composed state, not a title marooned in whitespace. Same
-   card the empty states use, so the page never looks like it stopped
-   rendering halfway. */
 .bz-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   margin: 18px 16px 0;
-  padding: 34px 20px 30px;
+  padding: 32px 20px 28px;
   border: 1px solid var(--hairline);
-  border-radius: 16px;
+  border-radius: 17px;
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
   text-align: center;
 }
-/* The bare spinner keeps its old plain treatment — it is shown inside sheets,
-   which already have a surface of their own. */
-#bzLoading { border: none; background: none; box-shadow: none; padding: 64px 24px; }
+
+.bz-state-glyph {
+  width: 46px;
+  height: 46px;
+  padding: 11px;
+  margin-bottom: 4px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+}
+.bz-state-glyph svg { width: 100%; height: 100%; display: block; }
 
 .bz-state-title {
   margin: 0;
@@ -743,117 +605,31 @@
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: bzSpin 0.8s linear infinite;
-  margin: 0 auto;
+  margin: 22px auto;
 }
 @keyframes bzSpin { to { transform: rotate(360deg); } }
 
-/* ---------- skeletons ---------- */
-/* Every load used to blank the body and drop a spinner into the middle of
-   it, so changing a filter or typing a letter tore the page down and rebuilt
-   it. That is most of what reads as the interface being disconnected from
-   what you just did. A skeleton in the shape of the answer keeps the layout
-   still and tells the reader what is coming. */
-
-.bz-skel-sec { padding-top: 22px; }
-.bz-skel-sec:first-child { padding-top: 14px; }
-
-.bz-skel-head {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 9px;
-}
-
-.bz-skel-row {
-  display: grid;
-  grid-template-columns: 46px 1fr;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 13px;
-  margin-bottom: 7px;
-  border: 1px solid var(--hairline);
-  border-radius: 13px;
-  background: var(--surface-card);
-}
-.bz-skel-lines { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-
-.bz-skel {
-  border-radius: 6px;
-  background: linear-gradient(90deg,
-              var(--surface-sunken) 0%,
-              var(--hairline) 42%,
-              var(--surface-sunken) 84%);
-  background-size: 280% 100%;
-  animation: bzShimmer 1.5s ease-in-out infinite;
-}
-.bz-skel--glyph { width: 26px; height: 26px; border-radius: 8px; flex: none; }
-.bz-skel--title { width: 38%; height: 13px; }
-.bz-skel--logo  { width: 46px; height: 46px; border-radius: 12px; }
-.bz-skel--name  { width: 58%; height: 12px; }
-.bz-skel--desc  { width: 88%; height: 9px; }
-.bz-skel--meta  { width: 34%; height: 9px; }
-
-@keyframes bzShimmer {
-  0%   { background-position: 120% 0; }
-  100% { background-position: -60% 0; }
-}
-
-.bz-btn {
-  padding: 11px 20px;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 10px;
-  background: var(--surface-card);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--transition-fast), transform var(--transition-fast);
-}
-.bz-btn:active { transform: scale(0.985); background: var(--surface-sunken); }
-
-/* The one filled action in a sheet. Emerald rather than near-black: this is
-   the app's action colour everywhere else, and a black slab in a warm
-   parchment page is the single coldest element on the screen. */
-.bz-btn--block {
-  display: block;
-  width: 100%;
-  background: linear-gradient(145deg, var(--emerald-700) 0%, var(--emerald-800) 100%);
-  border-color: var(--emerald-800);
-  color: #ffffff;
-  padding: 14px;
-  font-size: var(--fs-body);
-  box-shadow: var(--shadow-card);
-}
-.bz-btn--block:active { background: var(--emerald-800); box-shadow: none; }
-.bz-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
-
-/* ---------- empty states ---------- */
-
-/* An empty result is a moment, not a void. It gets a surface of its own so
-   the page still looks composed rather than looking like it failed to
-   render. */
+/* An empty result is a moment, not a void: it gets a surface of its own so
+   the page still looks composed rather than half-rendered. */
 .bz-blank {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 34px 20px 30px;
-  margin-top: 18px;
+  padding: 32px 20px 28px;
+  margin-top: 16px;
   border: 1px solid var(--hairline);
-  border-radius: 16px;
+  border-radius: 17px;
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
 }
-
 .bz-blank-glyph {
   width: 50px;
   height: 50px;
   font-size: 1.5rem;
-  border-radius: 15px;
-  margin-bottom: 15px;
+  border-radius: 16px;
+  margin-bottom: 14px;
 }
-
 .bz-blank-title {
   margin: 0 0 8px;
   font-family: var(--font-display);
@@ -863,7 +639,6 @@
   color: var(--text-primary);
   text-wrap: balance;
 }
-
 .bz-blank-body {
   margin: 0;
   max-width: 34ch;
@@ -872,26 +647,57 @@
   color: var(--text-secondary);
 }
 
-/* ---------- owner entry ---------- */
-/* The only route to the money. Someone browsing for a bakery never meets a
-   price; an owner gets a standing invitation at the end of every list. */
+/* ---------- skeletons ---------- */
+/* Shaped like the answer that is coming, so nothing jumps when it lands and
+   the page never blanks between a tap and its result. */
 
-/* The only filled colour block in the content column, and the only call to
-   action on the page. It used to share both its tint and its weight with the
-   category filter at the top, so the page opened with two equally loud
-   emerald blocks doing unrelated jobs and neither read as the action. */
-/* Most readers are customers, not owners, so this is a quiet footer entry
-   rather than the loudest block on the page. Owners find it; nobody else has
-   to read past it. */
+.bz-skel {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+              var(--surface-sunken) 0%, var(--hairline) 42%, var(--surface-sunken) 84%);
+  background-size: 280% 100%;
+  animation: bzShimmer 1.5s ease-in-out infinite;
+}
+@keyframes bzShimmer {
+  0%   { background-position: 120% 0; }
+  100% { background-position: -60% 0; }
+}
+.bz-skel--glyph   { width: 42px; height: 42px; border-radius: 13px; }
+.bz-skel--title   { width: 38%;  height: 13px; }
+.bz-skel--logo    { width: 46px; height: 46px; border-radius: 13px; }
+.bz-skel--name    { width: 62%;  height: 12px; }
+.bz-skel--desc    { width: 88%;  height: 9px; }
+.bz-skel--mark    { width: 92px; height: 92px; border-radius: 26px; margin: 0 auto 14px; }
+.bz-skel--eyebrow { width: 90px; height: 9px;  margin: 0 auto 10px; }
+.bz-skel--lead    { width: 62%;  height: 20px; margin: 0 auto 20px; }
+.bz-skel--cta     { height: 56px; border-radius: 14px; }
+.bz-skel--line    { height: 11px; margin-bottom: 10px; }
+.bz-skel--line.is-short { width: 55%; }
+
+.bz-tile--skel { gap: 9px; cursor: default; }
+.bz-tile--skel .bz-skel--name { width: 70%; }
+
+.bz-row--skel { cursor: default; grid-template-columns: 46px 1fr; }
+.bz-skel-lines { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+
+/* ---------------------------------------------------------
+   OWNER ENTRY
+   The only route into the money, and the only owner-facing element in the
+   public views. Most readers are customers, so it is a quiet footer entry
+   rather than the loudest block on the page — owners find it, nobody else
+   has to read past it.
+   --------------------------------------------------------- */
+
 .bz-owner {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
   width: 100%;
-  margin: 28px 0 10px;
-  padding: 14px 16px;
+  margin: 26px 0 8px;
+  padding: 13px 14px;
   border: 1px dashed var(--hairline-strong);
-  border-radius: 14px;
+  border-radius: 15px;
   background: none;
   color: var(--text-primary);
   font-family: inherit;
@@ -901,296 +707,215 @@
 }
 .bz-owner:active { background: var(--surface-sunken); border-color: var(--emerald-600); }
 
+.bz-owner-icon { flex: none; width: 22px; height: 22px; color: var(--text-muted); }
+.bz-owner-icon svg { width: 100%; height: 100%; display: block; }
 .bz-owner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .bz-owner-title { font-size: var(--fs-sm); font-weight: 700; color: var(--text-primary); }
 .bz-owner-sub { font-size: var(--fs-xs); line-height: 1.45; color: var(--text-secondary); }
-.bz-owner-arrow { width: 16px; height: 16px; flex: none; color: var(--accent); }
+.bz-owner-arrow { flex: none; width: 15px; height: 15px; color: var(--accent); }
 .bz-owner-arrow svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- owner sheet ---------- */
+/* ---------------------------------------------------------
+   OVERLAY
+   One backdrop, two shapes. A business is the object of the page, so it
+   opens as a centred card with room to be read as one thing. Tasks — forms,
+   lists, prices — open as a bottom sheet, which is where a keyboard expects
+   them and where a swipe-down dismissal belongs.
+   --------------------------------------------------------- */
 
-.bz-steps { display: flex; flex-direction: column; gap: 15px; margin: 4px 0 20px; }
-.bz-step { display: flex; gap: 12px; align-items: flex-start; }
-
-.bz-step-n {
-  flex: none;
-  width: 24px; height: 24px;
-  border-radius: 999px;
-  background: var(--accent-light);
-  border: 1px solid var(--emerald-600);
-  color: var(--emerald-800);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: 0.68rem;
-  font-weight: 500;
-  margin-top: 1px;
-}
-
-.bz-step-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.bz-step-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
-.bz-step-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary); }
-
-.bz-sheet-sublabel {
-  margin: 0 0 8px;
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.bz-sheet-fine {
-  margin: 10px 0 20px;
-  font-size: 0.76rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-}
-
-.bz-btn--ghost {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-  background: var(--surface-sunken);
-  border-color: var(--hairline-strong);
-  color: var(--text-primary);
-  padding: 13px;
-  box-shadow: none;
-}
-
-/* ---------- bottom sheet ---------- */
-
-.bz-sheet-backdrop {
+.bz-backdrop {
   position: fixed;
   inset: 0;
   z-index: 900;
-  background: rgba(28, 25, 23, 0);
-  transition: background var(--transition-base);
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  padding: 0;
+  background: rgba(28, 25, 23, 0);
+  transition: background var(--transition-base);
 }
-.bz-sheet-backdrop.visible { background: rgba(28, 25, 23, 0.5); }
+.bz-backdrop.visible { background: rgba(28, 25, 23, 0.52); }
 
-.bz-sheet {
+.bz-dialog {
   position: relative;
-  width: 100%;
-  max-width: 560px;
-  /* Never the whole screen: the feed stays visible behind it, so the sheet
-     reads as a layer rather than a new page. Sized to its content between
-     those bounds — a fixed 66vh left a short sheet (a confirmation, a
-     three-line error) with a third of a screen of dead white under it,
-     which is what made the sheets feel unfinished. */
-  height: auto;
-  min-height: 38vh;
-  max-height: 86vh;
-  background: var(--surface-raised);
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -2px 8px rgba(68, 52, 30, 0.06), 0 -12px 40px rgba(68, 52, 30, 0.22);
-  transform: translateY(100%);
-  transition: transform var(--transition-base);
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface-raised);
   overflow: hidden;
+  box-shadow: 0 -2px 8px rgba(68, 52, 30, 0.06), 0 -12px 40px rgba(68, 52, 30, 0.22);
 }
-.bz-sheet.visible { transform: translateY(0); }
-/* The business is the primary surface, so it opens as one: full height, the
-   list reduced to a strip above it. At half height it read as a preview of a
-   page that never came. */
-.bz-sheet--detail { height: 94vh; max-height: 94vh; min-height: 0; }
 
-/* The scroll area is a column so the reaction row can sit at the bottom
-   edge of a tall sheet instead of floating wherever the content ran out. */
-.bz-sheet-scroll { display: flex; flex-direction: column; }
-.bz-sheet-scroll > * { flex: none; }
-.bz-detail { flex: 1 0 auto; display: flex; flex-direction: column; }
-.bz-detail .bz-react { margin-top: auto; padding-top: 18px; }
+/* Task sheet: anchored to the floor, sized to its content. A fixed height
+   left a three-line confirmation with a third of a screen of dead space
+   under it. */
+.bz-dialog--sheet {
+  height: auto;
+  min-height: 30vh;
+  max-height: 88vh;
+  border-radius: 22px 22px 0 0;
+  transform: translateY(100%);
+  transition: transform var(--transition-base);
+}
+.bz-dialog--sheet.visible { transform: translateY(0); }
 
-/* Identity, centred: the profile-page reading, where the mark and the name
-   are the point and everything else hangs from them. */
-.bz-detail .bz-ident { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 4px 0 20px; }
-.bz-detail .bz-mark { width: 96px; height: 96px; border-radius: 26px; margin-bottom: 14px; font-size: 1.5rem; }
-.bz-detail .bz-mark-zoom { right: 6px; bottom: 6px; }
-.bz-detail .bz-ident-text { width: 100%; }
-.bz-detail .bz-sheet-eyebrow { margin-bottom: 6px; }
-.bz-detail .bz-sheet-name--lead { font-size: 1.62rem; margin-bottom: 8px; }
-.bz-detail .bz-meta { justify-content: center; }
+/* Business card: centred, inset from the edges, rounded on all four corners.
+   A bottom sheet says "a detail of the list behind me"; this is the thing
+   the reader came for, so it is presented as its own object. */
+.bz-dialog--card {
+  margin: auto;
+  width: calc(100% - 24px);
+  max-width: 460px;
+  max-height: calc(100vh - 88px);
+  max-height: calc(100dvh - 88px);
+  border-radius: 26px;
+  box-shadow: 0 20px 60px rgba(28, 25, 23, 0.34), 0 4px 14px rgba(28, 25, 23, 0.16);
+  transform: translateY(14px) scale(0.97);
+  opacity: 0;
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+.bz-dialog--card.visible { transform: none; opacity: 1; }
+.bz-dialog--card .bz-dialog-grip { display: none; }
+.bz-dialog--card .bz-dialog-scroll { padding-top: 26px; }
 
-.bz-detail .bz-contact { margin-bottom: 22px; }
-.bz-about { margin-bottom: 8px; }
-.bz-about .bz-descbox { margin-bottom: 0; }
+/* A generous drag zone, not just the bar: the bar is the signal, the strip
+   above the content is the target. */
+.bz-dialog-grip {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 30px;
+  padding: 13px 0 9px;
+  cursor: grab;
+  /* The grip owns the vertical gesture; without this the browser takes it
+     and scrolls instead of letting the sheet be dragged down. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.bz-dialog-grip:active { cursor: grabbing; }
+.bz-dialog-grip-bar { width: 40px; height: 4px; border-radius: 2px; background: var(--sand-300); }
 
-.bz-sheet-close {
+.bz-dialog.is-dragging,
+.bz-dialog.is-dragging * { -webkit-user-select: none; user-select: none; }
+
+.bz-dialog-close {
   position: absolute;
-  top: 10px;
+  top: 12px;
   right: 12px;
-  z-index: 2;
-  width: 32px;
-  height: 32px;
-  padding: 8px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  padding: 9px;
   border: none;
   border-radius: 999px;
   background: var(--surface-sunken);
   color: var(--text-secondary);
   cursor: pointer;
+  transition: background var(--transition-fast);
 }
-.bz-sheet-close:active { background: var(--hairline-strong); }
-.bz-sheet-close svg { width: 100%; height: 100%; display: block; }
+.bz-dialog-close:active { background: var(--hairline-strong); }
+.bz-dialog-close svg { width: 100%; height: 100%; display: block; }
 
-/* Wide screens (desktop Telegram): a bottom sheet pinned to the floor of a
-   1200px window is a strip; the same surface centred reads as a dialog. */
-@media (min-width: 640px) {
-  .bz-sheet-backdrop { align-items: center; padding: 24px; }
-  .bz-sheet, .bz-sheet--detail {
-    height: auto;
-    max-height: 88vh;
-    min-height: 0;
-    border-radius: 20px;
-    transform: translateY(24px) scale(0.98);
-    opacity: 0;
-    transition: transform var(--transition-base), opacity var(--transition-base);
-  }
-  .bz-sheet.visible { transform: none; opacity: 1; }
-  .bz-sheet .bz-sheet-grip { display: none; }
-  .bz-sheet .bz-sheet-scroll { padding-top: 22px; }
-  .bz-sticky > *, .bz-body { max-width: 640px; margin-left: auto; margin-right: auto; }
-}
-
-/* A generous drag zone, not just the bar. The bar is the signal; the whole
-   strip above the content is the target. */
-.bz-sheet-grip {
-  padding: 14px 0 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 30px;
-  flex: none;
-  cursor: grab;
-  /* The grip owns the vertical gesture; without this the browser takes it
-     and scrolls instead of letting the sheet be dragged down. */
-  touch-action: none;
-}
-.bz-sheet-grip:active { cursor: grabbing; }
-/* Dragging the grip must never select the text it passes over. */
-.bz-sheet-grip { -webkit-user-select: none; user-select: none; }
-.bz-sheet.is-dragging,
-.bz-sheet.is-dragging * { -webkit-user-select: none; user-select: none; }
-.bz-sheet-grip-bar { width: 40px; height: 4px; border-radius: 2px; background: var(--sand-300); }
-
-.bz-sheet-scroll {
+.bz-dialog-scroll {
+  position: relative;
+  z-index: 1;
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 8px 20px 30px;
+  padding: 6px 20px calc(24px + env(safe-area-inset-bottom));
   /* Without this the browser treats a downward drag at the top as overscroll,
-     takes the gesture, and fires pointercancel — which reads to the user as
-     the swipe simply not working. */
+     takes the gesture, and fires pointercancel — which reads as the swipe
+     simply not working. */
   overscroll-behavior-y: contain;
 }
+.bz-dialog-scroll > * { flex: none; }
 
-.bz-sheet-head {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.bz-sheet-headtext { min-width: 0; }
-
-.bz-sheet-eyebrow {
-  margin: 0 0 4px;
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: 0.63rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.bz-sheet-name {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.32rem;
-  font-weight: 700;
-  line-height: 1.16;
-  letter-spacing: -0.01em;
-  color: var(--text-primary);
-  overflow-wrap: anywhere;
-}
-
-.bz-sheet-desc {
-  margin: 0 0 18px;
-  font-size: var(--fs-body);
-  line-height: 1.6;
-  color: var(--text-secondary);
-  /* Owner line breaks survive here instead of becoming <br> markup. */
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-/* ---------- detail sheet ---------- */
-/* The screen where a reader decides whether to trust a business, so the
-   business itself leads: picture, then name, then what it takes to act.
-
-   The picture is inside the identity block, not a banner above it. A banner
-   ends in a hard horizontal edge against the sheet, and that edge is what
-   makes it read as a separate panel however well the image is presented.
-   Here one wash — mixed from the picture's own colours by readPixels() —
-   runs under the mark and the name together and fades out before the text
-   does, so there is no line anywhere to notice. */
-
-.bz-ident {
-  position: relative;
-  margin: -4px 0 26px;
-}
-
-/* The wash is painted on the sheet, not on the block, so it starts above the
-   grip and runs behind it. Painted on the block it began a few pixels down
-   and drew exactly the horizontal edge the whole change exists to remove —
-   the banner problem, moved rather than solved. It fades out to nothing by
-   the time the description begins, so there is no lower edge either. */
-.bz-sheet::before {
+/* The wash behind a business is painted on the dialog rather than on the
+   identity block, so it starts above the grip and has no upper edge to
+   notice. It fades out before the text ends, so it has no lower edge either. */
+.bz-dialog::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
-  height: 300px;
+  height: 290px;
   opacity: 0;
   transition: opacity var(--transition-base);
   pointer-events: none;
   background: linear-gradient(
     180deg,
     rgba(var(--tint-rgb, 120, 113, 108), 0.30) 0%,
-    rgba(var(--tint-rgb, 120, 113, 108), 0.13) 48%,
+    rgba(var(--tint-rgb, 120, 113, 108), 0.12) 48%,
     rgba(var(--tint-rgb, 120, 113, 108), 0) 100%);
 }
-.bz-sheet.has-tint::before { opacity: 1; }
+.bz-dialog.has-tint::before { opacity: 1; }
 
-/* Above the wash. Neither carries a background of its own, so the tint
-   shows through both and the sheet reads as one surface. */
-.bz-sheet-grip,
-.bz-sheet-scroll { position: relative; z-index: 1; }
+/* Wide screens (desktop Telegram, tablets): both shapes centre, and the feed
+   itself stops running to the full width of a 1200px window. */
+@media (min-width: 640px) {
+  .bz-backdrop { align-items: center; padding: 24px; }
+  .bz-dialog--sheet {
+    margin: auto;
+    height: auto;
+    min-height: 0;
+    max-height: 86vh;
+    border-radius: 22px;
+    transform: translateY(20px) scale(0.98);
+    opacity: 0;
+    transition: transform var(--transition-base), opacity var(--transition-base);
+  }
+  .bz-dialog--sheet.visible { transform: none; opacity: 1; }
+  .bz-dialog--sheet .bz-dialog-grip { display: none; }
+  .bz-dialog--sheet .bz-dialog-scroll { padding-top: 26px; }
+  .bz-dialog--card { max-height: 86vh; }
+  .bz-sticky > *, .bz-body { max-width: 660px; margin-left: auto; margin-right: auto; }
+  .bz-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) {
+  .bz-sticky > *, .bz-body { max-width: 760px; }
+  .bz-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 
-/* ---------- the mark ---------- */
-/* Square and modest. It used to be a 16:10 band eating a third of the
-   screen and pushing the name, the description and the phone number below
-   the fold. */
+/* ---------------------------------------------------------
+   BUSINESS CARD
+   --------------------------------------------------------- */
+
+.bz-detail { display: flex; flex-direction: column; flex: 1 0 auto; }
+.bz-detail-fill { display: flex; flex-direction: column; }
+
+/* ---------- identity ---------- */
+/* Mark, category, name, on one ground. Centred: this is the profile reading,
+   where the mark and the name are the point and everything hangs from them. */
+
+.bz-ident {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 0 0 22px;
+}
 
 .bz-mark {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 92px;
+  height: 92px;
   margin-bottom: 14px;
   padding: 0;
   border: none;
-  border-radius: 22px;
+  border-radius: 26px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   background: none;
   font-family: inherit;
-  font-size: 1.32rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-muted);
   cursor: zoom-in;
@@ -1198,41 +923,23 @@
   transition: transform var(--transition-fast);
 }
 .bz-mark:active { transform: scale(0.96); }
-
-.bz-mark-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
+.bz-mark-img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
 /* Before the picture has been read, and whenever reading it is blocked:
    contained on a neutral plate. Containing letterboxes a photograph;
    covering would cut the edges off a logo, which is the worse failure. */
-.bz-mark--auto {
-  background: var(--surface-card);
-  box-shadow: inset 0 0 0 1px var(--hairline);
-}
+.bz-mark--auto { background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--hairline); }
 
-/* Cut-out mark: no plate at all. Anything behind it is a box it did not
-   ask for, so it sits directly on the wash and the transparency does the
-   blending for us. */
+/* Cut-out mark: no plate at all, so the transparency does the blending. */
 .bz-mark--plain { background: none; box-shadow: none; }
 .bz-mark--plain .bz-mark-img { padding: 2px; }
 
 /* The logo carries its own solid background, so the plate is painted that
-   exact colour. The logo's rectangular edge then has nothing to meet and
-   simply disappears — this is the whole trick, and it is why the mark needs
-   no border, no shadow and no inner padding here. */
+   exact colour and the logo's rectangular edge has nothing to meet. */
 .bz-mark--plate { background: var(--plate); box-shadow: none; }
 
-/* Busy to its own edges: a photograph. It gets a real frame and fills it,
-   because a photograph in a rounded plate reads as a photograph, while a
-   photograph floating with no edge reads as a mistake. */
-.bz-mark--photo {
-  background: var(--surface-sunken);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
-}
+/* Busy to its own edges: a photograph, which gets a real frame and fills it. */
+.bz-mark--photo { background: var(--surface-sunken); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); }
 .bz-mark--photo .bz-mark-img { object-fit: cover; }
 
 .bz-mark--mono {
@@ -1242,78 +949,291 @@
   cursor: default;
 }
 
-/* Small enough not to sit on the artwork, present enough to say the mark
-   opens. Only rendered for a mark that actually has a picture behind it. */
 .bz-mark-zoom {
   position: absolute;
-  right: 4px;
-  bottom: 4px;
-  width: 18px;
-  height: 18px;
+  right: 5px;
+  bottom: 5px;
+  width: 19px;
+  height: 19px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 7px;
-  background: rgba(20, 16, 12, 0.3);
-  color: rgba(255, 255, 255, 0.92);
+  background: rgba(20, 16, 12, 0.32);
+  color: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
 .bz-mark-zoom svg { width: 10px; height: 10px; display: block; }
 
-/* ---------- identity text ---------- */
+.bz-ident-cat {
+  margin: 0 0 5px;
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
 
-.bz-ident-text { min-width: 0; }
-
-.bz-sheet-name--lead {
-  font-size: 1.5rem;
-  line-height: 1.14;
+.bz-ident-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.15;
   letter-spacing: -0.018em;
-  margin-bottom: 9px;
+  color: var(--text-primary);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
-/* The counts support the name; they used to sit hard against it and read as
-   part of the title. */
-.bz-detail .bz-meta {
-  margin-top: 0;
-  gap: 5px 14px;
+/* The one public signal, in words rather than a bare glyph a reader has to
+   guess at. Absent entirely at zero. */
+.bz-ident-proof {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 8px 0 0;
   font-size: var(--fs-xs);
+  color: var(--text-muted);
 }
-.bz-detail .bz-stat-icon { width: 13px; height: 13px; }
+.bz-ident-proof-icon { width: 13px; height: 13px; opacity: 0.8; }
+.bz-ident-proof-icon svg { width: 100%; height: 100%; display: block; }
 
-.bz-detail .bz-sheet-desc {
-  margin-bottom: 24px;
-  font-size: var(--fs-body);
-  line-height: 1.65;
-  color: var(--text-secondary);
+/* ---------- the actions ---------- */
+/* Most people open a listing for the number, so reaching the business is the
+   first thing under the name and the largest thing on the card. */
+
+.bz-cta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.bz-cta--solo { grid-template-columns: 1fr; }
+.bz-cta-none { grid-column: 1 / -1; }
+
+.bz-cta-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 54px;
+  padding: 10px 13px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 14px;
+  background: var(--surface-card);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+.bz-cta-btn:active {
+  transform: scale(0.985);
+  background: var(--accent-light);
+  border-color: var(--emerald-600);
 }
 
-/* ---------- description ---------- */
-/* The body of the screen. Opens clamped so a long one cannot push the phone
-   number below the fold, and expands in place rather than sending anyone to
-   another view. */
+/* The first way to reach them is the filled action. Every contact card
+   having the same weight is what made the old sheet read as a wall of
+   equally unimportant buttons. */
+.bz-cta-btn.is-primary {
+  background: linear-gradient(145deg, var(--emerald-700) 0%, var(--emerald-800) 100%);
+  border-color: var(--emerald-800);
+  box-shadow: var(--shadow-card);
+}
+.bz-cta-btn.is-primary .bz-cta-icon { color: rgba(255, 255, 255, 0.92); }
+.bz-cta-btn.is-primary .bz-cta-verb { color: #fff; }
+.bz-cta-btn.is-primary .bz-cta-val { color: rgba(255, 255, 255, 0.72); }
+.bz-cta-btn.is-primary:active { background: var(--emerald-800); box-shadow: none; }
 
-.bz-descbox { margin-bottom: 20px; }
+.bz-cta-icon { flex: none; width: 20px; height: 20px; color: var(--accent); }
+.bz-cta-icon svg { width: 100%; height: 100%; display: block; }
 
-.bz-detail .bz-sheet-desc {
+.bz-cta-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+/* What the tap does, not what the channel is called: the icon has already
+   said the channel. On iOS this is where the reader learns the number will
+   be copied rather than dialled, before they press it. */
+.bz-cta-verb {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+.bz-cta-val {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* On the narrowest phones two tiles side by side cut the phone number to
+   "010-2345-…", which is the one string on the card that has to be readable
+   in full. Below that width they stack. */
+@media (max-width: 359px) {
+  .bz-cta { grid-template-columns: 1fr; }
+}
+
+/* A listing with no contact route at all is a dead end unless it offers one. */
+.bz-cta-none {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 14px;
+}
+.bz-cta-none-text { flex: 1; min-width: 140px; font-size: var(--fs-sm); color: var(--text-secondary); }
+
+.bz-linkbtn {
+  flex: none;
+  padding: 7px 13px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+.bz-linkbtn:active { background: var(--accent-light); }
+
+/* ---------- secondary links ---------- */
+/* Everywhere else the business exists, as chips: nobody needs to read a Play
+   Store URL, only to know it is there. */
+
+.bz-links { margin-bottom: 20px; }
+.bz-links:last-of-type { margin-bottom: 8px; }
+
+.bz-seclabel {
+  margin: 0 0 9px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.bz-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.bz-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 8px 11px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+.bz-chip:active { transform: scale(0.96); background: var(--accent-light); border-color: var(--emerald-600); }
+.bz-chip-icon { width: 14px; height: 14px; flex: none; color: var(--text-secondary); }
+.bz-chip-icon svg { width: 100%; height: 100%; display: block; }
+.bz-chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bz-chip-tail { width: 10px; height: 10px; flex: none; color: var(--sand-400); }
+.bz-chip-tail svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- facts ---------- */
+/* Owners write free text and most of what a visitor wants from it is
+   structured — an address, hours, a price. Any "Label: value" line is lifted
+   out of the paragraph into a row the eye can scan, and the ones worth
+   acting on carry their own action. */
+
+.bz-facts { margin-bottom: 20px; }
+
+.bz-factlist {
+  margin: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+}
+
+.bz-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 13px;
+  border-bottom: 1px solid var(--hairline);
+}
+.bz-fact:last-child { border-bottom: none; }
+
+.bz-fact-icon { flex: none; width: 17px; height: 17px; margin-top: 2px; color: var(--text-muted); }
+.bz-fact-icon svg { width: 100%; height: 100%; display: block; }
+
+.bz-fact-text { flex: 1; min-width: 0; }
+
+.bz-fact-k {
+  margin: 0 0 2px;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+.bz-fact-v {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.bz-fact-act {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin: -3px -4px 0 0;
+  padding: 8px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface-sunken);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.bz-fact-act:active { background: var(--accent-light); border-color: var(--emerald-600); }
+.bz-fact-act svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- about ---------- */
+/* The owner's own words, clamped so a long one cannot push everything else
+   below the fold, expanding in place. */
+
+.bz-about { margin-bottom: 20px; }
+
+.bz-about-text {
   margin: 0;
   font-size: var(--fs-body);
   line-height: 1.62;
   color: var(--text-secondary);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
-
-.bz-sheet-desc.is-clamped {
+.bz-about-text.is-clamped {
   display: -webkit-box;
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-/* A soft edge on the last visible line says the text continues, before the
-   button below is even read. */
-.bz-descbox:not(.is-open) .bz-sheet-desc.is-clamped {
-  -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+  /* A soft edge on the last visible line says the text continues, before the
+     button below it is even read. */
+  -webkit-mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
 }
 
 .bz-more {
@@ -1329,8 +1249,8 @@
 }
 .bz-more:active { opacity: 0.6; }
 
-/* A URL inside the description. Sits in the line of text as a compact
-   button rather than a 90-character string wrapping across three lines. */
+/* A URL inside owner text: a compact button in the line, not a 90-character
+   string wrapping across three lines. */
 .bz-inlink {
   display: inline-flex;
   align-items: center;
@@ -1353,183 +1273,47 @@
 .bz-inlink-icon { width: 10px; height: 10px; opacity: 0.75; }
 .bz-inlink-icon svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- contact ---------- */
-
-.bz-seclabel {
-  margin: 0 0 9px;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* Two tiers. The two ways you would actually reach this business get a tile
-   each, carrying the value, because a phone number is something you read and
-   copy. Everywhere else the business exists gets a chip, because nobody
-   needs to read a Play Store URL — only to know it is there.
-
-   The old form gave all eight the same full-width card with a caption naming
-   what its own icon already showed, at about 60px each. */
-
-.bz-contact { margin-bottom: 4px; }
-
-.bz-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.bz-actions--solo { grid-template-columns: 1fr; }
-
-.bz-action {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  padding: 11px 12px;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 13px;
-  background: var(--surface-card);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-              transform var(--transition-fast);
-}
-.bz-action:active {
-  transform: scale(0.985);
-  background: var(--accent-light);
-  border-color: var(--emerald-600);
-}
-
-.bz-action-icon { width: 19px; height: 19px; flex: none; color: var(--accent); }
-.bz-action-icon svg { width: 100%; height: 100%; display: block; }
-
-.bz-action-text { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-
-/* What the tap does, not what the channel is called. */
-.bz-action-verb {
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bz-action-val {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Everything else, on one or two wrapped lines instead of six stacked cards. */
-.bz-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.bz-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 100%;
-  padding: 7px 10px;
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  background: var(--surface-sunken);
-  font-family: inherit;
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-              transform var(--transition-fast);
-}
-.bz-chip:active {
-  transform: scale(0.96);
-  background: var(--accent-light);
-  border-color: var(--emerald-600);
-}
-
-.bz-chip-icon { width: 14px; height: 14px; flex: none; color: var(--text-secondary); }
-.bz-chip-icon svg { width: 100%; height: 100%; display: block; }
-.bz-chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* The mark that says this leaves the app. */
-.bz-chip-tail { width: 10px; height: 10px; flex: none; color: var(--sand-400); margin-left: -1px; }
-.bz-chip-tail svg { width: 100%; height: 100%; display: block; }
-
-/* ---------- prices ---------- */
-
-.bz-prices {
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 18px;
-  background: var(--surface-card);
-}
-.bz-prices-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 13px;
-  border-bottom: 1px solid var(--sand-200);
-}
-.bz-prices-row:last-child { border-bottom: none; }
-.bz-prices-row { border-bottom-color: var(--hairline); }
-.bz-prices-row.is-target { background: var(--gold-100); }
-
-.bz-prices-val {
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: 0.87rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-.bz-prices-note { font-size: 0.68rem; color: var(--text-muted); }
-
-.bz-notes {
+.bz-detail-none {
   margin: 0 0 20px;
-  padding-left: 17px;
-  font-size: 0.81rem;
-  line-height: 1.5;
+  padding: 16px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 14px;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
   color: var(--text-secondary);
+  text-align: center;
 }
-.bz-notes li { margin-bottom: 5px; }
 
-/* ---------- reactions ---------- */
-/* Tapping the side already held clears it, so the pair is one control with
-   three states rather than two independent buttons. */
-
-/* Secondary to contacting the business, so it sits below the fold of
-   attention: a labelled footer strip of two compact controls rather than two
-   full-width buttons that outweighed the phone number above them. */
-.bz-react {
+.bz-detail-error {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 20px;
-  padding-top: 15px;
+  gap: 12px;
+  padding: 20px 0 8px;
+  text-align: center;
+}
+
+.bz-detail-skel { padding-top: 4px; }
+
+/* ---------- card footer ---------- */
+/* Everything below the line is secondary to reaching the business, so it
+   sits at the bottom of the card however tall the content above it is. */
+
+.bz-detail-foot {
+  margin-top: auto;
+  padding-top: 16px;
   border-top: 1px solid var(--hairline);
 }
 
-.bz-react-label {
-  flex: 1;
-  min-width: 0;
-  font-size: var(--fs-xs);
-  color: var(--text-muted);
+.bz-react {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+.bz-react-label { flex: 1; min-width: 0; font-size: var(--fs-xs); color: var(--text-muted); }
+.bz-react-pair { flex: none; display: flex; gap: 7px; }
 
 .bz-reactbtn {
-  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1553,17 +1337,343 @@
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
-
 .bz-reactbtn.is-on {
   background: var(--accent-light);
   border-color: var(--emerald-600);
   color: var(--emerald-800);
   font-weight: 600;
 }
-.bz-reactbtn:last-child.is-on {
+.bz-reactbtn:last-child.is-on { background: #fbeeeb; border-color: #c2453a; color: #9c332a; }
+
+/* A wrong number or a closed shop is the visitor's problem first, so they
+   get somewhere to say so without hunting for the admin. */
+.bz-report {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px 0 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--fs-2xs);
+  color: var(--text-muted);
+  text-align: left;
+  cursor: pointer;
+}
+.bz-report:active { color: var(--accent); }
+.bz-report-icon { flex: none; width: 13px; height: 13px; }
+.bz-report-icon svg { width: 100%; height: 100%; display: block; }
+
+/* ---------------------------------------------------------
+   SHEET CONTENT — owner flows, picker, forms
+   --------------------------------------------------------- */
+
+.bz-sheet-body { display: flex; flex-direction: column; }
+
+.bz-eyebrow {
+  margin: 0 0 5px;
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.bz-sheet-title {
+  margin: 0 0 16px;
+  padding-right: 40px;      /* clears the close control */
+  font-family: var(--font-display);
+  font-size: 1.34rem;
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.bz-sheet-text {
+  margin: 0 0 16px;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.bz-fine {
+  margin: 10px 0 18px;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* ---------- steps ---------- */
+
+.bz-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 0 0 20px;
+  padding: 0;
+}
+.bz-step { display: flex; gap: 12px; align-items: flex-start; }
+
+.bz-step-n {
+  flex: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 999px;
+  background: var(--accent-light);
+  border: 1px solid var(--emerald-600);
+  color: var(--emerald-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  margin-top: 1px;
+}
+.bz-step-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.bz-step-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.bz-step-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary); }
+
+/* ---------- prices ---------- */
+
+.bz-prices {
+  border: 1px solid var(--hairline);
+  border-radius: 13px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: var(--surface-card);
+}
+.bz-prices-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--hairline);
+}
+.bz-prices-row:last-child { border-bottom: none; }
+.bz-prices-row.is-target { background: var(--gold-100); }
+
+.bz-prices-val {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.bz-prices-note { font-size: 0.68rem; color: var(--text-muted); }
+
+/* ---------- buttons ---------- */
+
+.bz-btn {
+  padding: 11px 20px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 11px;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.bz-btn:active { transform: scale(0.985); background: var(--surface-sunken); }
+.bz-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+
+/* The one filled action in a sheet: emerald, because that is the app's
+   action colour everywhere else. */
+.bz-btn--block {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  font-size: var(--fs-body);
+  background: linear-gradient(145deg, var(--emerald-700) 0%, var(--emerald-800) 100%);
+  border-color: var(--emerald-800);
+  color: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+.bz-btn--block:active { background: var(--emerald-800); box-shadow: none; }
+
+.bz-btn--ghost {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 13px;
+  background: var(--surface-sunken);
+  border-color: var(--hairline-strong);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+/* A way back out, not a third choice of equal standing: as a filled control
+   it made every sheet end in three same-weight slabs and the actual decision
+   stopped being obvious. */
+.bz-btn--text {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--accent);
+  font-size: var(--fs-sm);
+}
+.bz-btn--text:active { background: var(--surface-sunken); }
+
+/* ---------- category picker ---------- */
+/* Identical rows, the whole set in one scroll, each carrying the line that
+   says what the trade covers. Nothing in the layout claims one category
+   matters more than another. */
+
+.bz-picker {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.bz-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 13px;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--surface-card);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.bz-pick:last-child { border-bottom: none; }
+.bz-pick:active { background: var(--surface-sunken); }
+
+/* Where you are, marked by a standing edge as well as a tint: a tint alone
+   is easy to miss in a list of eleven near-identical rows. */
+.bz-pick.is-on {
+  background: var(--accent-light);
+  box-shadow: inset 3px 0 0 var(--emerald-600);
+}
+.bz-pick.is-on .bz-pick-name { font-weight: 700; }
+.bz-pick.is-on .bz-glyph { border-color: rgba(4, 120, 87, 0.25); background: var(--surface-card); }
+.bz-pick.is-quiet .bz-pick-name { color: var(--text-secondary); }
+.bz-pick.is-quiet .bz-glyph { opacity: 0.5; }
+
+.bz-pick-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.bz-pick-name { font-size: var(--fs-body); line-height: 1.3; }
+.bz-pick-about {
+  font-size: var(--fs-2xs);
+  line-height: 1.35;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bz-pick-n {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- form ---------- */
+
+.bz-form { display: flex; flex-direction: column; gap: 17px; margin: 4px 0 14px; }
+.bz-field { display: flex; flex-direction: column; gap: 7px; }
+.bz-fieldhead { display: flex; align-items: baseline; gap: 8px; }
+
+.bz-fieldlabel { font-size: 0.84rem; font-weight: 600; color: var(--text-primary); }
+
+.bz-fieldhint {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Guidance where the typing happens, not in a paragraph above the form. */
+.bz-fieldnote {
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.bz-input {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  outline: none;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.bz-input:focus { background: var(--surface-card); border-color: var(--emerald-600); }
+.bz-input::placeholder { color: var(--sand-400); }
+
+.bz-textarea { resize: vertical; min-height: 108px; line-height: 1.55; }
+
+.bz-counter {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bz-select {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--surface-sunken);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.bz-select:active { border-color: var(--hairline-strong); }
+.bz-select-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bz-select-label.is-placeholder { color: var(--sand-400); }
+.bz-select-caret { width: 16px; height: 16px; flex: none; color: var(--text-muted); }
+.bz-select-caret svg { width: 100%; height: 100%; display: block; }
+
+.bz-linkrow { display: flex; align-items: center; gap: 10px; }
+.bz-linkrow + .bz-linkrow { margin-top: 7px; }
+.bz-linkrow-icon { width: 17px; height: 17px; flex: none; color: var(--text-muted); }
+.bz-linkrow-icon svg { width: 100%; height: 100%; display: block; }
+.bz-input--flat { flex: 1; min-width: 0; }
+
+.bz-formerror {
+  margin: 0 0 12px;
+  padding: 11px 13px;
+  border-radius: 10px;
   background: #fbeeeb;
-  border-color: #c2453a;
   color: #9c332a;
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 /* ---------- logo picker ---------- */
@@ -1573,9 +1683,9 @@
   align-items: center;
   gap: 14px;
   padding: 14px;
-  margin: 4px 0 16px;
+  margin: 2px 0 16px;
   border: 1px solid var(--hairline);
-  border-radius: 14px;
+  border-radius: 15px;
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
 }
@@ -1584,7 +1694,7 @@
   width: 64px;
   height: 64px;
   flex: none;
-  border-radius: 14px;
+  border-radius: 15px;
   overflow: hidden;
   background: var(--sand-100);
   border: 1px solid var(--sand-200);
@@ -1603,18 +1713,13 @@
 }
 
 .bz-logoside { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
-
-.bz-logohint {
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: var(--text-muted);
-}
+.bz-logohint { font-size: 0.75rem; line-height: 1.4; color: var(--text-muted); }
 
 .bz-logobtn {
   margin-top: 3px;
-  padding: 6px 13px;
+  padding: 7px 14px;
   border: 1px solid var(--hairline-strong);
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--surface-sunken);
   font-family: inherit;
   font-size: var(--fs-xs);
@@ -1624,116 +1729,22 @@
 }
 .bz-logobtn:disabled { opacity: 0.5; cursor: default; }
 
-/* ---------- form ---------- */
-
-.bz-form { display: flex; flex-direction: column; gap: 17px; margin: 4px 0 16px; }
-
-.bz-field { display: flex; flex-direction: column; gap: 7px; }
-
-.bz-fieldhead { display: flex; align-items: baseline; gap: 8px; }
-
-.bz-fieldlabel {
-  font-size: 0.83rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.bz-fieldhint {
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.bz-input {
-  width: 100%;
-  padding: 12px 13px;
-  border: 1px solid transparent;
-  border-radius: 11px;
-  background: var(--surface-sunken);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: var(--fs-body);
-  outline: none;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
-}
-.bz-input:focus { background: var(--surface-card); border-color: var(--emerald-600); }
-.bz-input::placeholder { color: var(--sand-400); }
-
-.bz-textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
-
-.bz-counter {
-  align-self: flex-end;
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  font-size: 0.62rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.bz-select {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  width: 100%;
-  padding: 9px 11px;
-  border: 1px solid transparent;
-  border-radius: 11px;
-  background: var(--surface-sunken);
-  font-family: inherit;
-  font-size: var(--fs-body);
-  color: var(--text-primary);
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
-}
-.bz-select:active { border-color: var(--hairline-strong); }
-.bz-select-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bz-select-label.is-placeholder { color: var(--sand-400); }
-.bz-select-caret { width: 15px; height: 15px; flex: none; color: var(--text-muted); }
-.bz-select-caret svg { width: 100%; height: 100%; display: block; }
-
-.bz-linkrow { display: flex; align-items: center; gap: 10px; }
-.bz-linkrow + .bz-linkrow { margin-top: 7px; }
-.bz-linkrow-icon { width: 17px; height: 17px; flex: none; color: var(--text-muted); }
-.bz-linkrow-icon svg { width: 100%; height: 100%; display: block; }
-.bz-input--flat { flex: 1; min-width: 0; }
-
-.bz-formerror {
-  margin: 0 0 12px;
-  padding: 10px 13px;
-  border-radius: 9px;
-  background: #fbeeeb;
-  color: #9c332a;
-  font-size: 0.84rem;
-  line-height: 1.45;
-}
-
-/* A way back out, not a third choice of equal standing. As a filled control
-   it made every sheet end in three same-weight slabs and the actual decision
-   stopped being obvious. */
-.bz-btn--last {
-  margin-top: 10px;
-  margin-bottom: 0;
-  background: none;
-  border-color: transparent;
-  box-shadow: none;
-  color: var(--accent);
-  font-size: var(--fs-sm);
-}
-.bz-btn--last:active { background: var(--surface-sunken); }
-
 /* ---------- submitted ---------- */
 
-.bz-done { text-align: center; padding-top: 26px; }
-.bz-done .bz-sheet-name { margin-bottom: 8px; }
-.bz-done .bz-sheet-desc { margin-bottom: 22px; }
+.bz-done { text-align: center; padding-top: 20px; }
+.bz-done .bz-sheet-title { padding-right: 0; margin-bottom: 8px; }
+.bz-done-text {
+  margin: 0 0 22px;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
 .bz-done-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   margin: 0 auto 14px;
   border-radius: 999px;
   background: var(--accent-light);
@@ -1743,56 +1754,39 @@
 .bz-done-icon svg { width: 24px; height: 24px; display: block; }
 
 /* ---------- my businesses ---------- */
+/* The owner's dashboard, and the one place open counts and positions belong.
+   Each listing is a block with its actions under it rather than a row with
+   two buttons crushed against the right edge. */
 
-.bz-minelist {
-  display: flex;
-  flex-direction: column;
-  margin: 4px 0 18px;
-  border: 1px solid var(--hairline);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
+.bz-minelist { display: flex; flex-direction: column; gap: 9px; margin: 2px 0 16px; }
 
 .bz-mine {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   padding: 13px;
+  border: 1px solid var(--hairline);
+  border-radius: 15px;
   background: var(--surface-card);
-  border-bottom: 1px solid var(--hairline);
+  box-shadow: var(--shadow-card);
 }
-.bz-mine:last-child { border-bottom: none; }
-
-.bz-mine-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-
-.bz-mine-act {
-  flex: none;
-  padding: 6px 12px;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 999px;
-  background: var(--surface-sunken);
-  font-family: inherit;
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  color: var(--accent);
-  cursor: pointer;
-}
-.bz-mine-name { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.bz-mine-head { display: flex; align-items: flex-start; gap: 12px; }
+.bz-mine-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.bz-mine-name { font-size: 0.94rem; font-weight: 700; color: var(--text-primary); }
+.bz-mine-cat { font-size: var(--fs-2xs); color: var(--text-muted); }
 
 .bz-mine-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 5px 9px;
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  gap: 5px 8px;
+  margin-top: 2px;
+  font-family: var(--font-mono);
   font-size: 0.63rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+.bz-mine-stat { white-space: nowrap; }
 
 .bz-status {
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
   font-size: 0.6rem;
   font-weight: 500;
@@ -1803,13 +1797,36 @@
 .bz-status--active  { background: var(--accent-light); color: var(--emerald-700); }
 .bz-status--off     { background: #fbeeeb; color: #9c332a; }
 
+.bz-mine-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--hairline);
+}
+
+.bz-mine-act {
+  flex: 1;
+  min-width: 120px;
+  padding: 9px 12px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 10px;
+  background: var(--surface-sunken);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.bz-mine-act:active { background: var(--accent-light); }
+.bz-mine-act--bid { color: var(--gold-600); border-color: var(--gold-300); }
+.bz-mine-act--bid:active { background: var(--gold-100); }
+
 /* ---------- bidding ---------- */
 
-.bz-bidnow {
-  display: flex;
-  gap: 10px;
-  margin: 4px 0 16px;
-}
+.bz-bidnow { display: flex; gap: 10px; margin: 2px 0 16px; }
 
 .bz-bidstat {
   flex: 1;
@@ -1818,19 +1835,17 @@
   gap: 3px;
   padding: 12px 13px;
   border: 1px solid var(--hairline);
-  border-radius: 12px;
+  border-radius: 13px;
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
 }
-
 .bz-bidstat-k {
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
-
 .bz-bidstat-v {
   font-size: 0.98rem;
   font-weight: 700;
@@ -1838,7 +1853,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.bz-bidopts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.bz-bidopts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 
 .bz-bidopt {
   display: flex;
@@ -1847,90 +1862,83 @@
   width: 100%;
   padding: 13px;
   border: 1.5px solid var(--hairline);
-  border-radius: 13px;
+  border-radius: 14px;
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+              transform var(--transition-fast);
 }
 .bz-bidopt:active { transform: scale(0.99); }
 .bz-bidopt.is-on { border-color: var(--gold-500); background: var(--gold-100); }
-
-/* A figure the owner already meets is shown, not hidden — it is how they see
-   what they are holding relative to what is on offer. */
+/* A figure the owner already meets is shown, not hidden: it is how they see
+   what they hold relative to what is on offer. */
 .bz-bidopt.is-held { opacity: 0.45; cursor: default; }
 
 .bz-bidopt-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-
 .bz-bidopt-amount {
   font-size: 0.96rem;
   font-weight: 700;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
-
 .bz-bidopt-due {
-  font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.65rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-.bz-mine-acts { display: flex; flex-direction: column; gap: 5px; flex: none; }
-.bz-mine-act--bid { color: var(--gold-600); border-color: var(--gold-300); }
-
-/* ---------- toast ---------- */
+/* ---------------------------------------------------------
+   TOAST
+   --------------------------------------------------------- */
 
 .bz-toast {
   position: fixed;
   left: 50%;
-  bottom: 26px;
-  z-index: 1000;
+  bottom: calc(26px + env(safe-area-inset-bottom));
+  z-index: 1300;
   transform: translate(-50%, 12px);
   max-width: 84vw;
-  padding: 10px 17px;
+  padding: 11px 18px;
   border-radius: 999px;
   background: var(--sand-900);
   color: #fff;
   font-size: 0.83rem;
+  line-height: 1.4;
+  text-align: center;
   opacity: 0;
   transition: opacity var(--transition-base), transform var(--transition-base);
   pointer-events: none;
 }
 .bz-toast.visible { opacity: 1; transform: translate(-50%, 0); }
 
-/* ---------- focus ---------- */
+/* ---------------------------------------------------------
+   FOCUS
+   --------------------------------------------------------- */
 
-.bz-row:focus-visible,
-.bz-reactbtn:focus-visible,
-.bz-input:focus-visible,
-.bz-select:focus-visible,
-.bz-logobtn:focus-visible,
-.bz-mine-act:focus-visible,
-.bz-bidopt:focus-visible,
-.bz-owner:focus-visible,
-.bz-cat:focus-visible,
-.bz-railchip:focus-visible,
-.bz-pick:focus-visible,
-.bz-action:focus-visible,
-.bz-chip:focus-visible,
-.bz-inlink:focus-visible,
-.bz-more:focus-visible,
-.bz-slot:focus-visible,
-.bz-btn:focus-visible,
-.bz-secmore:focus-visible,
-.bz-linkbtn:focus-visible {
+.bz-row:focus-visible, .bz-tile:focus-visible, .bz-owner:focus-visible,
+.bz-back:focus-visible, .bz-switch:focus-visible, .bz-search:focus-visible,
+.bz-search-clear:focus-visible, .bz-secmore:focus-visible, .bz-secinfo:focus-visible,
+.bz-cta-btn:focus-visible, .bz-chip:focus-visible,
+.bz-fact-act:focus-visible, .bz-more:focus-visible, .bz-inlink:focus-visible,
+.bz-reactbtn:focus-visible, .bz-report:focus-visible, .bz-mark:focus-visible,
+.bz-btn:focus-visible, .bz-linkbtn:focus-visible, .bz-pick:focus-visible,
+.bz-input:focus-visible, .bz-select:focus-visible, .bz-logobtn:focus-visible,
+.bz-mine-act:focus-visible, .bz-bidopt:focus-visible, .bz-dialog-close:focus-visible,
+.bz-viewer-close:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* ---------- full-screen image viewer ---------- */
-/* One transform on the stage carries both zoom and pan, so they cannot fight
+/* ---------------------------------------------------------
+   FULL-SCREEN IMAGE VIEWER
+   One transform on the stage carries both zoom and pan, so they cannot fight
    and one transition animates the way back to rest. The image is sized only
-   by max-width/max-height, which leaves its aspect ratio to the browser and
-   guarantees nothing is ever cropped at any zoom. */
+   by max-width/max-height, so nothing is ever cropped at any zoom.
+   --------------------------------------------------------- */
 
 .bz-viewer {
   position: fixed;
@@ -1993,10 +2001,9 @@
 
 /* =========================================================
    NIGHT MODE
-   Warm near-black rather than grey — the gold and the monogram
-   hues both sit better on it. Surface roles carry over: content
-   is a shade lighter than the ground, controls a shade darker
-   than content, sheets lighter than both.
+   Warm near-black rather than grey — the gold and the monogram hues both
+   sit better on it. Surface roles carry over: content a shade lighter than
+   the ground, controls a shade darker than content, overlays lighter still.
    ========================================================= */
 
 .night-mode .bz-scroll { background: #141210; }
@@ -2011,7 +2018,7 @@
 
 /* Content surfaces */
 .night-mode .bz-row,
-.night-mode .bz-cat,
+.night-mode .bz-tile,
 .night-mode .bz-pick,
 .night-mode .bz-state,
 .night-mode .bz-blank,
@@ -2020,40 +2027,47 @@
 .night-mode .bz-logopick,
 .night-mode .bz-mine,
 .night-mode .bz-prices,
-.night-mode .bz-skel-row,
-.night-mode .bz-action {
+.night-mode .bz-factlist,
+.night-mode .bz-cta-btn {
   background: #201d1a;
   border-color: rgba(255, 255, 255, 0.09);
 }
-.night-mode .bz-action { border-color: rgba(255, 255, 255, 0.14); }
-.night-mode .bz-action-icon { color: var(--emerald-400); }
-.night-mode .bz-action:active,
+.night-mode .bz-cta-btn { border-color: rgba(255, 255, 255, 0.14); }
+.night-mode .bz-cta-btn.is-primary {
+  background: linear-gradient(145deg, var(--emerald-700) 0%, #064e3b 100%);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+.night-mode .bz-cta-icon { color: var(--emerald-400); }
+.night-mode .bz-cta-btn:active,
 .night-mode .bz-chip:active,
-.night-mode .bz-inlink:active {
+.night-mode .bz-inlink:active,
+.night-mode .bz-fact-act:active {
   background: rgba(52, 211, 153, 0.12);
   border-color: var(--emerald-400);
 }
 .night-mode .bz-chip,
-.night-mode .bz-inlink { background: #262220; border-color: rgba(255, 255, 255, 0.1); }
+.night-mode .bz-inlink,
+.night-mode .bz-fact-act { background: #262220; border-color: rgba(255, 255, 255, 0.1); }
 .night-mode .bz-chip { color: #e6e1db; }
-.night-mode .bz-inlink { color: var(--emerald-400); }
+.night-mode .bz-inlink,
+.night-mode .bz-more,
+.night-mode .bz-fact-act,
+.night-mode .bz-linkbtn { color: var(--emerald-400); }
 .night-mode .bz-chip-icon { color: #a49d95; }
-.night-mode .bz-chip-tail { color: #6b655f; }
-.night-mode .bz-more { color: var(--emerald-400); }
-.night-mode .bz-action-verb { color: #e6e1db; }
-.night-mode .bz-action-val { color: #7d766e; }
+.night-mode .bz-chip-tail,
+.night-mode .bz-row-chev { color: #6b655f; }
 
 /* Control surfaces */
 .night-mode .bz-searchwrap,
 .night-mode .bz-input,
 .night-mode .bz-select,
 .night-mode .bz-glyph,
-.night-mode .bz-railchip,
 .night-mode .bz-reactbtn,
 .night-mode .bz-btn,
 .night-mode .bz-btn--ghost,
 .night-mode .bz-logobtn,
-.night-mode .bz-mine-act {
+.night-mode .bz-mine-act,
+.night-mode .bz-state-glyph {
   background: #262220;
   border-color: rgba(255, 255, 255, 0.1);
 }
@@ -2061,137 +2075,164 @@
 .night-mode .bz-searchwrap:focus-within,
 .night-mode .bz-input:focus { background: #201d1a; border-color: var(--emerald-400); }
 .night-mode .bz-row:active,
-.night-mode .bz-cat:active,
+.night-mode .bz-tile:active,
 .night-mode .bz-pick:active,
+.night-mode .bz-back:active,
+.night-mode .bz-switch:active,
 .night-mode .bz-btn:active { background: #2b2724; }
+.night-mode .bz-glyph--title { background: #201d1a; }
 
 /* Primary text */
 .night-mode .bz-title,
-.night-mode .bz-rowname,
-.night-mode .bz-sheet-name,
+.night-mode .bz-switch-name,
+.night-mode .bz-row-name,
+.night-mode .bz-tile-name,
+.night-mode .bz-ident-name,
+.night-mode .bz-sheet-title,
 .night-mode .bz-state-title,
+.night-mode .bz-blank-title,
 .night-mode .bz-prices-val,
 .night-mode .bz-search,
-.night-mode .bz-sectitle,
-.night-mode .bz-action { color: #e6e1db; }
+.night-mode .bz-fact-v,
+.night-mode .bz-cta-verb,
+.night-mode .bz-mine-name { color: #e6e1db; }
 
-/* Secondary text. These were all set to the primary value, which collapsed
-   the two levels into one: a description read exactly as loud as the name
-   above it, so night mode had no text hierarchy at all. */
-.night-mode .bz-rowdesc,
-.night-mode .bz-sheet-desc,
-.night-mode .bz-notes,
-.night-mode .bz-slot-text,
+/* Secondary text */
+.night-mode .bz-row-desc,
+.night-mode .bz-tile-about,
+.night-mode .bz-about-text,
+.night-mode .bz-sheet-text,
 .night-mode .bz-state-hint,
 .night-mode .bz-blank-body,
-.night-mode .bz-catchip,
-.night-mode .bz-cat-about { color: #a49d95; }
+.night-mode .bz-meta-cat,
+.night-mode .bz-sectitle,
+.night-mode .bz-step-body,
+.night-mode .bz-done-text,
+.night-mode .bz-detail-none,
+.night-mode .bz-cta-none-text,
+.night-mode .bz-owner-sub { color: #a49d95; }
 
 /* Muted text */
 .night-mode .bz-count,
 .night-mode .bz-meta,
 .night-mode .bz-seccount,
 .night-mode .bz-seclabel,
+.night-mode .bz-secinfo,
 .night-mode .bz-prices-note,
 .night-mode .bz-react-label,
-.night-mode .bz-cat-n,
+.night-mode .bz-report,
+.night-mode .bz-tile-n,
+.night-mode .bz-pick-about,
+.night-mode .bz-fact-k,
+.night-mode .bz-fact-icon,
+.night-mode .bz-cta-val,
+.night-mode .bz-ident-proof,
+.night-mode .bz-fine,
+.night-mode .bz-fieldnote,
+.night-mode .bz-logohint,
+.night-mode .bz-fieldhint,
+.night-mode .bz-counter,
+.night-mode .bz-mine-cat,
+.night-mode .bz-mine-meta,
+.night-mode .bz-bidstat-k,
+.night-mode .bz-bidopt-due,
+.night-mode .bz-back,
+.night-mode .bz-switch-caret,
+.night-mode .bz-select-caret,
+.night-mode .bz-linkrow-icon,
+.night-mode .bz-owner-icon,
 .night-mode .bz-search-icon,
 .night-mode .bz-search-clear { color: #7d766e; }
 
-.night-mode .bz-railchip { color: #a49d95; }
-.night-mode .bz-railchip.is-on {
-  background: rgba(52, 211, 153, 0.13);
-  border-color: rgba(52, 211, 153, 0.5);
-  color: #d6f5e7;
-}
-.night-mode .bz-secmore { color: var(--emerald-400); }
-.night-mode .bz-picker { border-color: rgba(255, 255, 255, 0.09); }
+.night-mode .bz-secmore,
+.night-mode .bz-btn--text,
+.night-mode .bz-mine-act,
+.night-mode .bz-owner-arrow { color: var(--emerald-400); }
+.night-mode .bz-ident-cat { color: var(--emerald-400); }
+
+.night-mode .bz-picker,
+.night-mode .bz-factlist,
+.night-mode .bz-minelist { border-color: rgba(255, 255, 255, 0.09); }
 .night-mode .bz-pick { border-bottom-color: rgba(255, 255, 255, 0.07); color: #e6e1db; }
-.night-mode .bz-pick.is-on { background: rgba(52, 211, 153, 0.1); box-shadow: inset 3px 0 0 var(--emerald-400); }
+.night-mode .bz-pick.is-on {
+  background: rgba(52, 211, 153, 0.1);
+  box-shadow: inset 3px 0 0 var(--emerald-400);
+}
 .night-mode .bz-pick.is-on .bz-glyph { background: #201d1a; border-color: rgba(52, 211, 153, 0.24); }
-.night-mode .bz-catchip { background: #262220; border-color: rgba(255, 255, 255, 0.11); }
+.night-mode .bz-fact { border-bottom-color: rgba(255, 255, 255, 0.07); }
+.night-mode .bz-meta-cat { background: #262220; border-color: rgba(255, 255, 255, 0.11); }
 
-/* The metals keep their own colour on the dark ground; only the card tint
-   drops to a whisper, so the badges stay the brightest thing in the row. */
-.night-mode .bz-row--paid { border-color: rgba(255, 255, 255, 0.1); }
-.night-mode .bz-row--r1 { background: rgba(232, 188, 60, 0.13); border-color: rgba(232, 188, 60, 0.4); }
-.night-mode .bz-row--r2 { background: rgba(232, 188, 60, 0.08); border-color: rgba(232, 188, 60, 0.26); }
-.night-mode .bz-row--r3 { background: rgba(232, 188, 60, 0.045); border-color: rgba(232, 188, 60, 0.16); }
-.night-mode .bz-badge--ghost { background: none; border-color: rgba(255, 255, 255, 0.18); color: #7d766e; }
-.night-mode .bz-topline::before { background: rgba(255, 255, 255, 0.09); }
-.night-mode .bz-topline-tag { background: #141210; border-color: rgba(255, 255, 255, 0.11); color: #c9a04a; }
+/* The metals keep their own colour on the dark ground. */
+.night-mode .bz-rank { border-color: #201d1a; }
 
-.night-mode .bz-owner { border-color: rgba(255,255,255,0.16); }
+.night-mode .bz-owner { border-color: rgba(255, 255, 255, 0.16); }
 .night-mode .bz-owner:active { background: #221f1c; border-color: var(--emerald-400); }
 .night-mode .bz-owner-title { color: #e6e1db; }
-.night-mode .bz-owner-sub { color: #a49d95; }
-.night-mode .bz-owner-arrow { color: var(--emerald-400); }
-.night-mode .bz-sheet-close { background: #262220; color: #a49d95; }
+.night-mode .bz-detail-none,
+.night-mode .bz-cta-none { border-color: rgba(255, 255, 255, 0.16); }
+.night-mode .bz-detail-foot { border-top-color: rgba(255, 255, 255, 0.09); }
 
-.night-mode .bz-step-n { background: rgba(52, 211, 153, 0.11); border-color: rgba(52, 211, 153, 0.4); color: var(--emerald-400); }
-.night-mode .bz-step-title { color: #e6e1db; }
-.night-mode .bz-step-body,
-.night-mode .bz-sheet-fine { color: #a49d95; }
-.night-mode .bz-btn--ghost { color: #e6e1db; }
-.night-mode .bz-btn--last { background: none; border-color: transparent; color: var(--emerald-400); }
-.night-mode .bz-btn--last:active { background: #262220; }
+.night-mode .bz-step-n {
+  background: rgba(52, 211, 153, 0.11);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: var(--emerald-400);
+}
+.night-mode .bz-step-title,
+.night-mode .bz-fieldlabel,
+.night-mode .bz-btn--ghost,
+.night-mode .bz-bidstat-v,
+.night-mode .bz-bidopt-amount { color: #e6e1db; }
+.night-mode .bz-btn--text:active { background: #262220; }
 .night-mode .bz-btn--block {
   background: linear-gradient(145deg, var(--emerald-700) 0%, #064e3b 100%);
   border-color: rgba(52, 211, 153, 0.3);
   color: #ffffff;
 }
-.night-mode .bz-react { border-top-color: rgba(255, 255, 255, 0.09); }
 .night-mode .bz-reactbtn { color: #a49d95; }
-.night-mode .bz-reactbtn.is-on { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.5); color: #6ee7b7; }
-.night-mode .bz-reactbtn:last-child.is-on { background: rgba(232, 112, 92, 0.13); border-color: rgba(232, 112, 92, 0.5); color: #f0917f; }
+.night-mode .bz-reactbtn.is-on {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #6ee7b7;
+}
+.night-mode .bz-reactbtn:last-child.is-on {
+  background: rgba(232, 112, 92, 0.13);
+  border-color: rgba(232, 112, 92, 0.5);
+  color: #f0917f;
+}
 .night-mode .bz-input,
 .night-mode .bz-select { color: #e6e1db; }
 .night-mode .bz-input::placeholder,
 .night-mode .bz-select-label.is-placeholder { color: #6b655f; }
-.night-mode .bz-fieldlabel { color: #e6e1db; }
-.night-mode .bz-fieldhint,
-.night-mode .bz-counter,
-.night-mode .bz-mine-meta { color: #7d766e; }
 .night-mode .bz-formerror { background: rgba(232, 112, 92, 0.13); color: #f0917f; }
-.night-mode .bz-done-icon { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.5); color: #6ee7b7; }
-.night-mode .bz-minelist { border-color: rgba(255, 255, 255, 0.09); }
-.night-mode .bz-mine { border-bottom-color: rgba(255, 255, 255, 0.07); }
-.night-mode .bz-mine-name,
-.night-mode .bz-cat-name,
-.night-mode .bz-blank-title { color: #e6e1db; }
-.night-mode .bz-logopreview { background: #262220; border-color: rgba(255, 255, 255, 0.08); }
-.night-mode .bz-logopreview--mono {
-  background: hsl(var(--h, 30) 20% 20%);
-  border-color: hsl(var(--h, 30) 18% 27%);
-  color: hsl(var(--h, 30) 48% 70%);
+.night-mode .bz-done-icon {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #6ee7b7;
 }
-.night-mode .bz-logohint { color: #7d766e; }
-.night-mode .bz-logobtn,
-.night-mode .bz-mine-act { color: #e6e1db; }
-.night-mode .bz-mine-act { color: var(--emerald-400); }
+.night-mode .bz-mine-acts { border-top-color: rgba(255, 255, 255, 0.08); }
 .night-mode .bz-mine-act--bid { color: #eab932; border-color: rgba(234, 185, 50, 0.35); }
-.night-mode .bz-bidstat-v,
-.night-mode .bz-bidopt-amount { color: #e6e1db; }
-.night-mode .bz-bidstat-k,
-.night-mode .bz-bidopt-due { color: #7d766e; }
+.night-mode .bz-mine-act--bid:active { background: rgba(234, 185, 50, 0.12); }
 .night-mode .bz-bidopt.is-on { border-color: #eab932; background: rgba(234, 185, 50, 0.11); }
 .night-mode .bz-status--pending,
 .night-mode .bz-status--unpaid { background: rgba(234, 185, 50, 0.14); color: #eab932; }
 .night-mode .bz-status--active { background: rgba(52, 211, 153, 0.13); color: #6ee7b7; }
 .night-mode .bz-status--off { background: rgba(232, 112, 92, 0.13); color: #f0917f; }
 
-.night-mode .bz-slot { border-color: rgba(255, 255, 255, 0.13); }
-.night-mode .bz-slot:active { background: #201d1a; }
-.night-mode .bz-slot-arrow { color: #eab932; }
-
 .night-mode .bz-logo { background: #262220; border-color: rgba(255, 255, 255, 0.08); }
-.night-mode .bz-logo--mono {
+.night-mode .bz-logo--mono,
+.night-mode .bz-logopreview--mono {
   background: hsl(var(--h, 30) 20% 20%);
   border-color: hsl(var(--h, 30) 18% 27%);
   color: hsl(var(--h, 30) 48% 70%);
 }
+.night-mode .bz-logopreview { background: #262220; border-color: rgba(255, 255, 255, 0.08); }
 
-.night-mode .bz-sheet { background: #1a1715; }
+.night-mode .bz-dialog { background: #1a1715; }
+.night-mode .bz-dialog--card {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+.night-mode .bz-dialog-close { background: #262220; color: #a49d95; }
+.night-mode .bz-dialog-grip-bar { background: rgba(255, 255, 255, 0.2); }
 .night-mode .bz-mark--auto { background: #262220; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.09); }
 .night-mode .bz-mark--photo { background: #262220; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
 .night-mode .bz-mark--mono {
@@ -2199,9 +2240,9 @@
   box-shadow: inset 0 0 0 1px hsl(var(--h, 30) 18% 27%);
   color: hsl(var(--h, 30) 48% 70%);
 }
-/* The same wash, held back: a colour lifted from a picture reads far
-   stronger against a near-black ground than against parchment. */
-.night-mode .bz-sheet::before {
+/* The same wash, held back: a colour lifted from a picture reads far stronger
+   against a near-black ground than against parchment. */
+.night-mode .bz-dialog::before {
   background: linear-gradient(
     180deg,
     rgba(var(--tint-rgb, 120, 113, 108), 0.18) 0%,
@@ -2210,7 +2251,6 @@
 }
 .night-mode .bz-prices-row { border-bottom-color: rgba(255, 255, 255, 0.07); }
 .night-mode .bz-prices-row.is-target { background: rgba(234, 185, 50, 0.1); }
-.night-mode .bz-sheet-grip-bar { background: rgba(255, 255, 255, 0.2); }
 .night-mode .bz-toast { background: #e6e1db; color: #1c1917; }
 .night-mode .bz-spinner { border-color: rgba(255, 255, 255, 0.12); border-top-color: var(--emerald-400); }
 .night-mode .bz-skel {
@@ -2218,12 +2258,16 @@
   background-size: 280% 100%;
 }
 
+/* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .bz-sheet, .bz-sheet-backdrop, .bz-toast, .bz-row, .bz-sticky,
-  .bz-viewer, .bz-mark { transition: none; }
+  .bz-dialog, .bz-backdrop, .bz-toast, .bz-row, .bz-tile, .bz-sticky,
+  .bz-viewer, .bz-mark, .bz-cta-btn, .bz-chip { transition: none; }
   .bz-spinner { animation: none; }
   /* The skeleton still has to be distinguishable from real content, so it
      keeps its tint and loses only the sweep. */
   .bz-skel { animation: none; background: var(--surface-sunken); }
+  .night-mode .bz-skel { background: #262220; }
 }
