@@ -1927,10 +1927,18 @@
     // the sheet is built.
     wrap.appendChild(identityBlock(business));
 
-    if (business.description) wrap.appendChild(descriptionNode(business.description));
-
+    // Reaching the business comes before reading about it: the name and the
+    // category already say what it is, and most people open a listing for
+    // the number. The description follows, under its own heading.
     var contact = contactNode(business.links || []);
     if (contact) wrap.appendChild(contact);
+
+    if (business.description) {
+      var about = el('div', 'bz-about');
+      about.appendChild(el('p', 'bz-seclabel', 'Haqida'));
+      about.appendChild(descriptionNode(business.description));
+      wrap.appendChild(about);
+    }
 
     wrap.appendChild(reactionBar(business));
     return wrap;

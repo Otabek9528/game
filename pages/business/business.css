@@ -994,8 +994,31 @@
   overflow: hidden;
 }
 .bz-sheet.visible { transform: translateY(0); }
-/* The business is the primary surface; it opens taller than a form or notice. */
-.bz-sheet--detail { min-height: 62vh; }
+/* The business is the primary surface, so it opens as one: full height, the
+   list reduced to a strip above it. At half height it read as a preview of a
+   page that never came. */
+.bz-sheet--detail { height: 94vh; max-height: 94vh; min-height: 0; }
+
+/* The scroll area is a column so the reaction row can sit at the bottom
+   edge of a tall sheet instead of floating wherever the content ran out. */
+.bz-sheet-scroll { display: flex; flex-direction: column; }
+.bz-sheet-scroll > * { flex: none; }
+.bz-detail { flex: 1 0 auto; display: flex; flex-direction: column; }
+.bz-detail .bz-react { margin-top: auto; padding-top: 18px; }
+
+/* Identity, centred: the profile-page reading, where the mark and the name
+   are the point and everything else hangs from them. */
+.bz-detail .bz-ident { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 4px 0 20px; }
+.bz-detail .bz-mark { width: 96px; height: 96px; border-radius: 26px; margin-bottom: 14px; font-size: 1.5rem; }
+.bz-detail .bz-mark-zoom { right: 6px; bottom: 6px; }
+.bz-detail .bz-ident-text { width: 100%; }
+.bz-detail .bz-sheet-eyebrow { margin-bottom: 6px; }
+.bz-detail .bz-sheet-name--lead { font-size: 1.62rem; margin-bottom: 8px; }
+.bz-detail .bz-meta { justify-content: center; }
+
+.bz-detail .bz-contact { margin-bottom: 22px; }
+.bz-about { margin-bottom: 8px; }
+.bz-about .bz-descbox { margin-bottom: 0; }
 
 .bz-sheet-close {
   position: absolute;
@@ -1018,7 +1041,8 @@
    1200px window is a strip; the same surface centred reads as a dialog. */
 @media (min-width: 640px) {
   .bz-sheet-backdrop { align-items: center; padding: 24px; }
-  .bz-sheet {
+  .bz-sheet, .bz-sheet--detail {
+    height: auto;
     max-height: 88vh;
     min-height: 0;
     border-radius: 20px;
