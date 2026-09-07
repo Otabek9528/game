@@ -41,7 +41,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
         <input type="search" class="bz-search" id="bzSearch"
-               placeholder="Biznes qidirish" autocomplete="off"
+               placeholder="Biznes yoki xizmat qidiring" autocomplete="off"
                autocapitalize="none" spellcheck="false" />
         <button class="bz-search-clear" id="bzSearchClear" type="button" aria-label="Tozalash" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -79,6 +79,9 @@
   <div class="bz-sheet-backdrop" id="sheetBackdrop" hidden>
     <div class="bz-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetName">
       <div class="bz-sheet-grip"><span class="bz-sheet-grip-bar"></span></div>
+      <button class="bz-sheet-close" id="sheetClose" type="button" aria-label="Yopish">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
       <div class="bz-sheet-scroll" id="sheetScroll"></div>
     </div>
   </div>

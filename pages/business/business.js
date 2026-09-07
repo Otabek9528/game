@@ -317,12 +317,8 @@
     likes.setAttribute('aria-label', business.likes + ' kishiga yoqdi');
     meta.appendChild(likes);
 
-    var taps = el('span', 'bz-stat');
-    taps.appendChild(iconSpan('bz-stat-icon', ICONS.eye));
-    taps.appendChild(el('span', null, String(business.taps)));
-    taps.setAttribute('aria-label', business.taps + ' marta ochilgan');
-    meta.appendChild(taps);
-
+    // Open counts are the owner's metric, not the visitor's; they live in
+    // "Mening bizneslarim" and nowhere public.
     return meta;
   }
 
@@ -511,7 +507,7 @@
     // out their trade has a free field in it — so it reads as quiet rather
     // than disabled.
     var tail = el('span', 'bz-cat-tail');
-    tail.appendChild(el('span', 'bz-cat-n', cat.count ? String(cat.count) : '—'));
+    tail.appendChild(el('span', 'bz-cat-n', cat.count ? cat.count + ' ta' : 'hali yo‘q'));
     tail.appendChild(iconSpan('bz-cat-arrow', ICONS.arrow));
     card.appendChild(tail);
 
@@ -656,10 +652,10 @@
         top.appendChild(businessRow(business, { rank: i + 1, showDescription: true }));
       });
 
-      var size = pricing.podiumSize || 3;
-      for (var pos = podium.length + 1; pos <= size; pos++) {
-        top.appendChild(emptySlot(pos));
-      }
+      // Open positions are an owner's concern. One quiet line instead of a
+      // dashed box per slot, which read as a gap in the list to everyone else.
+      var open = (pricing.podiumSize || 3) - podium.length;
+      if (open > 0) top.appendChild(openSlotsNote(open, podium.length + 1));
       host.appendChild(top);
     }
 
@@ -693,17 +689,17 @@
   // Deliberately carries no number. What a position costs is an owner's
   // business, not something to put in front of someone browsing for a bakery;
   // the figures live behind this tap, in the owner sheet.
-  function emptySlot(position) {
-    var slot = el('button', 'bz-slot');
-    slot.type = 'button';
-    slot.appendChild(el('span', 'bz-badge bz-badge--ghost', '#' + position));
-    slot.appendChild(el('span', 'bz-slot-text', 'Bu o‘rin bo‘sh'));
-    slot.appendChild(iconSpan('bz-slot-arrow', ICONS.arrow));
-    slot.addEventListener('click', function () {
+  function openSlotsNote(count, firstPosition) {
+    var note = el('button', 'bz-slot');
+    note.type = 'button';
+    note.appendChild(el('span', 'bz-slot-text',
+      count + ' ta o‘rin bo‘sh · biznes egalari uchun'));
+    note.appendChild(iconSpan('bz-slot-arrow', ICONS.arrow));
+    note.addEventListener('click', function () {
       haptic('light');
-      openOwnerSheet(position);
+      openOwnerSheet(firstPosition);
     });
-    return slot;
+    return note;
   }
 
   // ============================================
@@ -726,9 +722,9 @@
     card.type = 'button';
 
     var text = el('span', 'bz-owner-text');
-    text.appendChild(el('span', 'bz-owner-title', 'Biznesingiz bormi?'));
+    text.appendChild(el('span', 'bz-owner-title', 'Biznes egasimisiz?'));
     text.appendChild(el('span', 'bz-owner-sub',
-      'Katalogga qo‘shiling va yo‘nalishingizda yuqori o‘rinni egallang'));
+      'Biznesingizni katalogga qo‘shing — mijozlar sizni shu yerdan topadi'));
     card.appendChild(text);
     card.appendChild(iconSpan('bz-owner-arrow', ICONS.arrow));
 
@@ -914,7 +910,7 @@
     var descInput = el('textarea', 'bz-input bz-textarea');
     descInput.rows = 4;
     descInput.maxLength = 500;
-    descInput.placeholder = 'Nima taklif qilasiz, ish vaqti, yetkazib berish…';
+    descInput.placeholder = 'Xizmatlar, manzil, ish vaqti, yetkazib berish…';
     descInput.value = draft.description;
     var counter = el('span', 'bz-counter', draft.description.length + ' / 500');
     descInput.addEventListener('input', function () {
@@ -1949,7 +1945,9 @@
     var mine = business.myReaction || 0;
 
     var up = reactionBtn(ICONS.thumbUp, business.likes, mine === 1);
+    up.setAttribute('aria-label', 'Yoqdi');
     var down = reactionBtn(ICONS.thumbDown, business.dislikes, mine === -1);
+    down.setAttribute('aria-label', 'Yoqmadi');
     var busy = false;
 
     function send(value) {
@@ -1987,13 +1985,15 @@
     btn.type = 'button';
     btn.appendChild(iconSpan('bz-reactbtn-icon', icon));
     btn.appendChild(el('span', 'bz-reactbtn-n', String(count || 0)));
-    if (on) btn.classList.add('is-on');
+    btn.classList.toggle('is-on', !!on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     return btn;
   }
 
   function paint(btn, count, on) {
     btn.querySelector('.bz-reactbtn-n').textContent = String(count || 0);
     btn.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 
   // ============================================
@@ -2573,6 +2573,9 @@
     var scroll = $('sheetScroll');
     scroll.textContent = '';
     scroll.appendChild(content);
+    // The business itself gets a taller opening than a form or a notice.
+    $('sheet').classList.toggle('bz-sheet--detail',
+      !!(content.classList && content.classList.contains('bz-detail')));
 
     // Cleared for every sheet, then restored from the content itself, so a
     // business's colour can never be left sitting behind the submission form.
@@ -2821,6 +2824,10 @@
 
     $('sheetBackdrop').addEventListener('click', function (e) {
       if (e.target === $('sheetBackdrop')) closeSheet();
+    });
+    $('sheetClose').addEventListener('click', function () {
+      haptic('light');
+      closeSheet();
     });
     $('sheet').addEventListener('click', function (e) { e.stopPropagation(); });
     document.addEventListener('keydown', function (e) {

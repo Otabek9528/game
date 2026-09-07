@@ -677,7 +677,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 14px 13px;
+  padding: 10px 13px;
   margin-bottom: 7px;
   border: 1px dashed var(--hairline-strong);
   border-radius: 13px;
@@ -691,8 +691,8 @@
 
 .bz-slot-text {
   flex: 1;
-  font-size: var(--fs-sm);
-  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
 }
 
 .bz-slot-arrow { width: 15px; height: 15px; flex: none; color: var(--gold-600); }
@@ -880,34 +880,31 @@
    action on the page. It used to share both its tint and its weight with the
    category filter at the top, so the page opened with two equally loud
    emerald blocks doing unrelated jobs and neither read as the action. */
+/* Most readers are customers, not owners, so this is a quiet footer entry
+   rather than the loudest block on the page. Owners find it; nobody else has
+   to read past it. */
 .bz-owner {
   display: flex;
   align-items: center;
   gap: 13px;
   width: 100%;
   margin: 28px 0 10px;
-  padding: 17px 17px;
-  border: 1px solid var(--emerald-800);
-  border-radius: 16px;
-  background: linear-gradient(140deg, var(--emerald-700) 0%, var(--emerald-900) 100%);
-  color: #ffffff;
-  box-shadow: var(--shadow-lift);
+  padding: 14px 16px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 14px;
+  background: none;
+  color: var(--text-primary);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
-.bz-owner:active { transform: scale(0.985); box-shadow: var(--shadow-card); }
+.bz-owner:active { background: var(--surface-sunken); border-color: var(--emerald-600); }
 
-.bz-owner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.bz-owner-title {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading);
-  font-weight: 700;
-  letter-spacing: -0.005em;
-}
-.bz-owner-sub { font-size: var(--fs-xs); line-height: 1.45; color: rgba(255, 255, 255, 0.8); }
-.bz-owner-arrow { width: 18px; height: 18px; flex: none; color: rgba(255, 255, 255, 0.75); }
+.bz-owner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.bz-owner-title { font-size: var(--fs-sm); font-weight: 700; color: var(--text-primary); }
+.bz-owner-sub { font-size: var(--fs-xs); line-height: 1.45; color: var(--text-secondary); }
+.bz-owner-arrow { width: 16px; height: 16px; flex: none; color: var(--accent); }
 .bz-owner-arrow svg { width: 100%; height: 100%; display: block; }
 
 /* ---------- owner sheet ---------- */
@@ -976,6 +973,7 @@
 .bz-sheet-backdrop.visible { background: rgba(28, 25, 23, 0.5); }
 
 .bz-sheet {
+  position: relative;
   width: 100%;
   max-width: 560px;
   /* Never the whole screen: the feed stays visible behind it, so the sheet
@@ -996,6 +994,43 @@
   overflow: hidden;
 }
 .bz-sheet.visible { transform: translateY(0); }
+/* The business is the primary surface; it opens taller than a form or notice. */
+.bz-sheet--detail { min-height: 62vh; }
+
+.bz-sheet-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  padding: 8px;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.bz-sheet-close:active { background: var(--hairline-strong); }
+.bz-sheet-close svg { width: 100%; height: 100%; display: block; }
+
+/* Wide screens (desktop Telegram): a bottom sheet pinned to the floor of a
+   1200px window is a strip; the same surface centred reads as a dialog. */
+@media (min-width: 640px) {
+  .bz-sheet-backdrop { align-items: center; padding: 24px; }
+  .bz-sheet {
+    max-height: 88vh;
+    min-height: 0;
+    border-radius: 20px;
+    transform: translateY(24px) scale(0.98);
+    opacity: 0;
+    transition: transform var(--transition-base), opacity var(--transition-base);
+  }
+  .bz-sheet.visible { transform: none; opacity: 1; }
+  .bz-sheet .bz-sheet-grip { display: none; }
+  .bz-sheet .bz-sheet-scroll { padding-top: 22px; }
+  .bz-sticky > *, .bz-body { max-width: 640px; margin-left: auto; margin-right: auto; }
+}
 
 /* A generous drag zone, not just the bar. The bar is the signal; the whole
    strip above the content is the target. */
@@ -2062,12 +2097,12 @@
 .night-mode .bz-topline::before { background: rgba(255, 255, 255, 0.09); }
 .night-mode .bz-topline-tag { background: #141210; border-color: rgba(255, 255, 255, 0.11); color: #c9a04a; }
 
-.night-mode .bz-owner {
-  background: linear-gradient(140deg, #0d5741 0%, #07301f 100%);
-  border-color: rgba(52, 211, 153, 0.28);
-}
-.night-mode .bz-owner-sub { color: rgba(255, 255, 255, 0.72); }
-.night-mode .bz-owner-arrow { color: rgba(255, 255, 255, 0.7); }
+.night-mode .bz-owner { border-color: rgba(255,255,255,0.16); }
+.night-mode .bz-owner:active { background: #221f1c; border-color: var(--emerald-400); }
+.night-mode .bz-owner-title { color: #e6e1db; }
+.night-mode .bz-owner-sub { color: #a49d95; }
+.night-mode .bz-owner-arrow { color: var(--emerald-400); }
+.night-mode .bz-sheet-close { background: #262220; color: #a49d95; }
 
 .night-mode .bz-step-n { background: rgba(52, 211, 153, 0.11); border-color: rgba(52, 211, 153, 0.4); color: var(--emerald-400); }
 .night-mode .bz-step-title { color: #e6e1db; }
