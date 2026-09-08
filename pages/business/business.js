@@ -327,9 +327,60 @@
     return b;
   }
 
+  // ============================================
+  // REACTIONS
+  // ============================================
+  // The server answers a reaction with the new totals, and those totals are
+  // true of every place the business appears — the card in front of the
+  // person and the row in the list behind it. Holding them here is what stops
+  // the two from disagreeing until the page is reloaded.
+  //
+  // Superseded naturally: any later list fetch returns the server's own
+  // numbers, which are at least as fresh as these.
+
+  var reactions = {};        // business id -> { likes, dislikes, myReaction }
+
+  function applyReaction(business) {
+    var known = business && reactions[business.id];
+    if (known) {
+      business.likes = known.likes;
+      business.dislikes = known.dislikes;
+      business.myReaction = known.myReaction;
+    }
+    return business;
+  }
+
+  function rememberReaction(id, data) {
+    reactions[id] = {
+      likes: data.likes, dislikes: data.dislikes, myReaction: data.myReaction
+    };
+    repaintRows(id);
+  }
+
+  // Every row for this business that is on screen right now. The meta line is
+  // rebuilt rather than edited: a business going from zero likes to one has no
+  // line to edit yet.
+  function repaintRows(id) {
+    var rows = $('bzBody').querySelectorAll('.bz-row');
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (!row.bzBusiness || String(row.bzBusiness.id) !== String(id)) continue;
+      applyReaction(row.bzBusiness);
+      var body = row.querySelector('.bz-row-body');
+      var old = body.querySelector('.bz-meta');
+      var next = metaLine(row.bzBusiness, row.bzCategoryName);
+      if (old && next) body.replaceChild(next, old);
+      else if (old) body.removeChild(old);
+      else if (next) body.appendChild(next);
+    }
+  }
+
   function businessRow(business, opts) {
     opts = opts || {};
+    applyReaction(business);
     var row = button('bz-row');
+    row.bzBusiness = business;
+    row.bzCategoryName = opts.categoryName;
     row.setAttribute('aria-label', business.name +
       (opts.rank ? ', ' + t('category.rankLabel', { n: opts.rank }) : ''));
 
@@ -519,8 +570,8 @@
   // the shape of the whole catalogue before choosing; a reader who knows
   // what they want gets the search field above it.
 
-  function loadCategories() {
-    setView('loading');
+  function loadCategories(opts) {
+    if (!(opts && opts.quiet)) setView('loading');
     getJSON('/api/business/categories')
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
@@ -528,7 +579,7 @@
         syncChrome();
         renderCategories();
       })
-      .catch(function () { setView('error'); });
+      .catch(function () { if (!(opts && opts.quiet)) setView('error'); });
   }
 
   function renderCategories() {
@@ -601,15 +652,15 @@
     loadCategories();
   }
 
-  function loadCategory() {
-    setView('loading');
+  function loadCategory(opts) {
+    if (!(opts && opts.quiet)) setView('loading');
     getJSON('/api/business/list?category_id=' + encodeURIComponent(state.categoryId))
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
         state.pricing = data.pricing || null;
         renderCategory(data);
       })
-      .catch(function () { setView('error'); });
+      .catch(function () { if (!(opts && opts.quiet)) setView('error'); });
   }
 
   function renderCategory(data) {
@@ -687,8 +738,8 @@
     else backToCategories();
   }
 
-  function loadSearch() {
-    setView('loading');
+  function loadSearch(opts) {
+    if (!(opts && opts.quiet)) setView('loading');
     var q = state.query;
     getJSON('/api/business/feed?q=' + encodeURIComponent(q))
       .then(function (data) {
@@ -699,7 +750,9 @@
         }
         renderResults(data);
       })
-      .catch(function () { if (q === state.query) setView('error'); });
+      .catch(function () {
+        if (q === state.query && !(opts && opts.quiet)) setView('error');
+      });
   }
 
   function renderResults(data) {
@@ -846,6 +899,7 @@
     setBack(currentBack());
     if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
     lastFocus = null;
+    refreshAfterDialog();
   }
 
   function tintSheet(rgb) {
@@ -981,7 +1035,7 @@
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
         if (!$('sheetScroll').contains(wrap)) return;   // closed meanwhile
-        var full = detailBody(data.business);
+        var full = detailBody(applyReaction(data.business));
         $('sheetScroll').textContent = '';
         $('sheetScroll').appendChild(full);
         var heading = full.querySelector('h2');
@@ -1426,37 +1480,93 @@
   // ---------- reactions and report ----------
 
   function reactionBar(business) {
+    applyReaction(business);
+
     var bar = el('div', 'bz-react');
     bar.appendChild(el('span', 'bz-react-label', t('business.reactLabel')));
-    var mine = business.myReaction || 0;
 
-    var up = reactionBtn(ICONS.thumbUp, business.likes, mine === 1, t('business.reactUp'));
-    var down = reactionBtn(ICONS.thumbDown, business.dislikes, mine === -1, t('business.reactDown'));
-    var busy = false;
+    // What the server last confirmed. A failed request falls back to this
+    // rather than leaving the count wherever the optimistic guess put it.
+    var settled = {
+      mine: business.myReaction || 0,
+      likes: business.likes || 0,
+      dislikes: business.dislikes || 0
+    };
+    var shown = { mine: settled.mine, likes: settled.likes, dislikes: settled.dislikes };
 
-    function send(value) {
-      if (busy) return;
-      busy = true;
+    var up = reactionBtn(ICONS.thumbUp, shown.likes, shown.mine === 1, t('business.reactUp'));
+    var down = reactionBtn(ICONS.thumbDown, shown.dislikes, shown.mine === -1, t('business.reactDown'));
+
+    var desired = shown.mine;   // what the person has asked for
+    var sent = shown.mine;      // what the server has been told
+    var sending = false;
+
+    function paintBoth() {
+      paintReaction(up, shown.likes, shown.mine === 1);
+      paintReaction(down, shown.dislikes, shown.mine === -1);
+    }
+
+    // The counts move on the tap, not on the reply. A button that waits for a
+    // mobile round trip before changing reads as a button that did nothing,
+    // which is exactly how a second, cancelling tap gets provoked.
+    function tap(value) {
+      desired = (desired === value) ? 0 : value;
+
+      var likes = settled.likes, dislikes = settled.dislikes;
+      if (settled.mine === 1) likes--;
+      if (settled.mine === -1) dislikes--;
+      if (desired === 1) likes++;
+      if (desired === -1) dislikes++;
+
+      shown = { mine: desired, likes: likes, dislikes: dislikes };
+      paintBoth();
       haptic('light');
-      postJSON('/api/business/' + business.id + '/reaction',
-               { value: mine === value ? 0 : value })
+      pump();
+    }
+
+    // One request at a time. Taps made while one is in flight are not dropped
+    // — they move `desired`, and the difference is sent as soon as the
+    // current reply lands, so a quick like-then-unlike ends where the person
+    // left it instead of stopping at the first tap.
+    function pump() {
+      if (sending || desired === sent) return;
+      sending = true;
+      var value = desired;
+
+      postJSON('/api/business/' + business.id + '/reaction', { value: value })
         .then(function (data) {
-          mine = data.myReaction;
+          sending = false;
+          sent = data.myReaction;
+          settled = {
+            mine: data.myReaction, likes: data.likes, dislikes: data.dislikes
+          };
           business.myReaction = data.myReaction;
           business.likes = data.likes;
           business.dislikes = data.dislikes;
-          paintReaction(up, data.likes, mine === 1);
-          paintReaction(down, data.dislikes, mine === -1);
+          rememberReaction(business.id, data);
+
+          // Only take the server's numbers onto the screen once nothing newer
+          // is waiting; otherwise the count would flick back to an
+          // intermediate value between two quick taps.
+          if (desired === sent) {
+            shown = { mine: settled.mine, likes: settled.likes, dislikes: settled.dislikes };
+            paintBoth();
+          }
+          pump();
         })
         .catch(function (err) {
+          sending = false;
+          desired = sent = settled.mine;
+          shown = { mine: settled.mine, likes: settled.likes, dislikes: settled.dislikes };
+          paintBoth();
           showToast(t(err.code === 'no_init_data' || err.code === 'bad_signature'
             ? 'common.telegramOnly' : 'common.saveFailed'));
-        })
-        .then(function () { busy = false; });
+        });
     }
 
-    up.addEventListener('click', function () { send(1); });
-    down.addEventListener('click', function () { send(-1); });
+    up.addEventListener('click', function () { tap(1); });
+    down.addEventListener('click', function () { tap(-1); });
+
     var pair = el('span', 'bz-react-pair');
     pair.appendChild(up);
     pair.appendChild(down);
@@ -2003,10 +2113,13 @@
   }
 
   // A change made in a sheet should be true of the list behind it too.
-  function refreshCurrentView() {
-    if (state.mode === 'category') loadCategory();
-    else if (state.mode === 'search') loadSearch();
-    else loadCategories();
+  // opts.quiet keeps the current content on screen while the request runs and
+  // swallows a failure, so a refresh nobody asked for can never replace what
+  // somebody is reading with a spinner or an error card.
+  function refreshCurrentView(opts) {
+    if (state.mode === 'category') loadCategory(opts);
+    else if (state.mode === 'search') loadSearch(opts);
+    else loadCategories(opts);
   }
 
   // ---------- my businesses ----------
@@ -2605,6 +2718,159 @@
   }
 
   // ============================================
+  // KEEPING THE PAGE CURRENT
+  // ============================================
+  // A Mini App is not a page load — it can sit open in the background for
+  // hours and come back showing whatever the catalogue looked like when it
+  // was opened. Two answers, in this order:
+  //
+  //   the app refreshes itself on return, because it knows it went away
+  //   the person can pull the list down, because sometimes they just want to
+  //
+  // The first is the one that matters; the second is the escape hatch, and
+  // exists because people reach for it whether or not it is needed.
+
+  var STALE_AFTER = 60000;      // ms in the background before it is worth a refetch
+  var hiddenAt = 0;
+  var refreshPending = false;   // went stale behind an open dialog
+
+  function initFreshness() {
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { hiddenAt = Date.now(); return; }
+      if (!hiddenAt || Date.now() - hiddenAt < STALE_AFTER) return;
+      hiddenAt = 0;
+      // Never pull content out from under an open dialog; do it on close.
+      if (!$('sheetBackdrop').hidden) { refreshPending = true; return; }
+      refreshCurrentView({ quiet: true });
+    });
+  }
+
+  function refreshAfterDialog() {
+    if (!refreshPending) return;
+    refreshPending = false;
+    refreshCurrentView({ quiet: true });
+  }
+
+  // Pull to refresh. Only from the very top of the list, so it never competes
+  // with the scroll; the indicator follows the finger and commits past the
+  // threshold, so the gesture shows its own outcome before it completes.
+  var PULL_TRIGGER = 72;        // px held at rest to commit
+  var PULL_MAX = 110;           // px the indicator travels
+  var PULL_SLOP = 8;
+
+  function initPullRefresh() {
+    var scroll = $('bzScroll');
+    var pill = $('bzRefresh');
+    if (!scroll || !pill) return;
+
+    var startY = 0, dy = 0, pointer = null;
+    var armed = false, active = false, running = false;
+
+    // The indicator is fixed to the viewport, so it has to be told where to
+    // sit. It hangs off the bottom edge of the sticky header — measured, not
+    // assumed, because that header is a different height in a category than
+    // on the front page — and rides down from behind it as the list is
+    // pulled. Anchored to the scroll container instead it would ride down
+    // over the title.
+    function anchor() {
+      var head = $('bzSticky');
+      var edge = head ? head.getBoundingClientRect().bottom
+                      : scroll.getBoundingClientRect().top;
+      pill.style.setProperty('--anchor', Math.round(edge) + 'px');
+    }
+    anchor();
+    window.addEventListener('resize', anchor);
+
+    function place(distance) {
+      var travel = Math.min(PULL_MAX, distance);
+      pill.style.setProperty('--pull', travel + 'px');
+      pill.style.setProperty('--pull-in', String(Math.min(1, distance / PULL_TRIGGER)));
+      pill.classList.toggle('is-ready', distance >= PULL_TRIGGER);
+    }
+
+    function reset() {
+      pill.classList.remove('is-visible', 'is-ready', 'is-running');
+      pill.style.removeProperty('--pull');
+      pill.style.removeProperty('--pull-in');
+    }
+
+    function run() {
+      running = true;
+      pill.classList.add('is-running');
+      pill.classList.remove('is-ready');
+      pill.style.setProperty('--pull', PULL_TRIGGER + 'px');
+      pill.style.setProperty('--pull-in', '1');
+      buzz('success');
+
+      var done = false;
+      function finish() {
+        if (done) return;
+        done = true;
+        running = false;
+        reset();
+      }
+      // The loaders do not report back, so the indicator is held for long
+      // enough to read as a refresh and then released. Content swaps under it
+      // the moment the answer lands.
+      refreshCurrentView({ quiet: true });
+      setTimeout(finish, 700);
+    }
+
+    function stop() {
+      if (!armed) return;
+      window.removeEventListener('pointermove', onMove, { passive: false });
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      armed = false;
+      active = false;
+      pointer = null;
+      dy = 0;
+    }
+
+    function onMove(e) {
+      if (!armed || e.pointerId !== pointer) return;
+      dy = e.clientY - startY;
+      if (dy <= 0) {
+        if (active) { active = false; reset(); }
+        return;
+      }
+      if (scroll.scrollTop > 0) { stop(); reset(); return; }
+      if (!active) {
+        if (dy < PULL_SLOP) return;
+        active = true;
+        pill.classList.add('is-visible');
+      }
+      if (e.cancelable) e.preventDefault();
+      // Resistance, so the pull feels like it is pulling against something.
+      place(Math.pow(dy, 0.85));
+    }
+
+    function onUp(e) {
+      if (!armed || e.pointerId !== pointer) return;
+      var committed = active && Math.pow(dy, 0.85) >= PULL_TRIGGER;
+      stop();
+      if (committed) run();
+      else reset();
+    }
+
+    scroll.addEventListener('pointerdown', function (e) {
+      if (running || armed) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (scroll.scrollTop > 0) return;
+      if (e.target.closest && e.target.closest('input, textarea')) return;
+      anchor();
+      armed = true;
+      active = false;
+      pointer = e.pointerId;
+      startY = e.clientY;
+      dy = 0;
+      window.addEventListener('pointermove', onMove, { passive: false });
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
+  }
+
+  // ============================================
   // STICKY HEADER
   // ============================================
   // The header only draws its edge once something has scrolled under it.
@@ -2684,6 +2950,8 @@
     initSheetDrag();
     initViewer();
     initStickyState();
+    initFreshness();
+    initPullRefresh();
     syncChrome();
     loadCategories();
   }
