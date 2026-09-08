@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- Shown for the few frames before the script runs; business.text.js
+       (header.pageTitle) is what the tab ends up saying. Keep the two in step. -->
   <title>Biznes katalogi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,11 +34,11 @@
     <!-- Title + search stay put while the list moves under them. -->
     <div class="bz-sticky" id="bzSticky">
       <div class="bz-titlebar">
-        <button class="bz-back" id="bzBack" type="button" aria-label="Orqaga" hidden>
+        <button class="bz-back" id="bzBack" type="button" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
         </button>
         <div class="bz-titlewrap">
-          <h2 class="bz-title" id="bzTitle">Biznes katalogi</h2>
+          <h2 class="bz-title" id="bzTitle"></h2>
           <span class="bz-count" id="bzCount" aria-live="polite"></span>
         </div>
       </div>
@@ -45,10 +47,9 @@
         <span class="bz-search-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
-        <input type="search" class="bz-search" id="bzSearch"
-               placeholder="Biznes yoki xizmatni qidiring" autocomplete="off"
-               autocapitalize="none" spellcheck="false" aria-label="Qidirish" />
-        <button class="bz-search-clear" id="bzSearchClear" type="button" aria-label="Qidiruvni tozalash" hidden>
+        <input type="search" class="bz-search" id="bzSearch" autocomplete="off"
+               autocapitalize="none" spellcheck="false" />
+        <button class="bz-search-clear" id="bzSearchClear" type="button" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
@@ -60,9 +61,9 @@
       <span class="bz-state-glyph" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
       </span>
-      <p class="bz-state-title">Yuklab bo&#8216;lmadi</p>
-      <p class="bz-state-hint">Internet aloqasini tekshirib, qayta urinib ko&#8216;ring.</p>
-      <button class="bz-btn" id="bzRetry" type="button">Qayta urinish</button>
+      <p class="bz-state-title" id="bzErrorTitle"></p>
+      <p class="bz-state-hint" id="bzErrorBody"></p>
+      <button class="bz-btn" id="bzRetry" type="button"></button>
     </div>
 
   </main>
@@ -75,7 +76,7 @@
   <div class="bz-backdrop" id="sheetBackdrop" hidden>
     <div class="bz-dialog" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
       <div class="bz-dialog-grip" aria-hidden="true"><span class="bz-dialog-grip-bar"></span></div>
-      <button class="bz-dialog-close" id="sheetClose" type="button" aria-label="Yopish">
+      <button class="bz-dialog-close" id="sheetClose" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
       <div class="bz-dialog-scroll" id="sheetScroll"></div>
@@ -84,11 +85,11 @@
 
   <!-- FULL-SCREEN IMAGE VIEWER. Kept outside the dialog: the dialog's dismiss
        gesture listens on pointerdown there and would swallow the pinch. -->
-  <div class="bz-viewer" id="bzViewer" role="dialog" aria-modal="true" aria-label="Rasm" hidden>
+  <div class="bz-viewer" id="bzViewer" role="dialog" aria-modal="true" hidden>
     <div class="bz-viewer-stage" id="bzViewerStage">
       <img class="bz-viewer-img" id="bzViewerImg" alt="" draggable="false" />
     </div>
-    <button class="bz-viewer-close" id="bzViewerClose" type="button" aria-label="Yopish">
+    <button class="bz-viewer-close" id="bzViewerClose" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
     </button>
   </div>
@@ -98,6 +99,8 @@
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <script defer src="../../js/logger.js"></script>
   <script defer src="../../js/apiConfig.js"></script>
+  <!-- Every Uzbek word on this page. Edit business.text.js, not business.js. -->
+  <script defer src="business.text.js"></script>
   <script defer src="business.js"></script>
 
 </body>

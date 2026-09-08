@@ -6,6 +6,9 @@
 // concerns — listing, positions, prices — live behind one quiet entry at the
 // end of each list and never in the way of reading.
 //
+// Every visible word lives in business.text.js, so the Uzbek can be revised
+// without opening this file.
+//
 // Nothing owner-supplied reaches innerHTML. Names and descriptions go in as
 // text nodes; links are typed (kind, value) pairs rendered as buttons we
 // build, so a listing can never inject markup into a page carrying the
@@ -26,6 +29,40 @@
   try { tg.expand(); } catch (e) {}
   try { tg.disableVerticalSwipes(); } catch (e) {}
 
+  // ============================================
+  // TEXT
+  // ============================================
+  // business.text.js owns every word this page shows. t() takes a dotted path
+  // into it and fills {placeholders}. A path that is missing renders as
+  // itself rather than as "undefined", so a typo shows up on screen instead
+  // of silently blanking a button.
+
+  var TEXT = window.BUSINESS_TEXT || {};
+
+  function t(path, vars) {
+    var node = TEXT, parts = path.split('.');
+    for (var i = 0; i < parts.length && node != null; i++) node = node[parts[i]];
+    if (typeof node !== 'string') return path;
+    if (!vars) return node;
+    return node.replace(/\{(\w+)\}/g, function (whole, key) {
+      return Object.prototype.hasOwnProperty.call(vars, key) ? vars[key] : whole;
+    });
+  }
+
+  // Optional by design: a category the file says nothing about shows no line
+  // at all rather than its own key.
+  function categoryAbout(slug) {
+    var about = (TEXT.categoryAbout || {})[slug];
+    return typeof about === 'string' ? about : '';
+  }
+
+  // Error codes come from the server; the file maps each to a sentence, and
+  // anything unmapped falls back to the general apology.
+  function errorText(group, code) {
+    var text = (TEXT[group] || {})[code];
+    return typeof text === 'string' ? text : t('common.error');
+  }
+
   var API = (window.API_CONFIG ? window.API_CONFIG.BASE_URL : 'https://vegukin-api.duckdns.org/')
               .replace(/\/+$/, '');
   var TIMEOUT = 30000;
@@ -42,21 +79,6 @@
     'halal-market': 1, 'pishiriqlar': 2, 'tarjima': 3, 'pochta': 4,
     'aviakassa': 5, 'sim-telefon': 6, 'sugurta': 7, 'consulting': 8,
     'repetitor': 9, 'kosmetika': 10
-  };
-
-  // One line per category so a reader who does not know what "Tarjima va
-  // apostil" covers does not have to open it to find out.
-  var CATEGORY_ABOUT = {
-    'halal-market': 'Halol go‘sht, ziravorlar, oziq-ovqat',
-    'pishiriqlar':  'Non, patir, somsa, shirinliklar',
-    'tarjima':      'Hujjat tarjimasi va apostil',
-    'pochta':       'O‘zbekistonga posilka va yuk',
-    'aviakassa':    'Aviabilet va yo‘l hujjatlari',
-    'sim-telefon':  'SIM karta, telefon, aksessuarlar',
-    'sugurta':      'Sug‘urta va moliyaviy xizmatlar',
-    'consulting':   'Universitet va viza maslahati',
-    'repetitor':    'Til va fan o‘qituvchilari',
-    'kosmetika':    'Koreys kosmetikasi va parvarish'
   };
 
   function rankOf(category) { return CATEGORY_RANK[category.slug] || 99; }
@@ -175,8 +197,10 @@
     return box;
   }
 
+  // The digits are grouped here; the unit and its placement are the text
+  // file's business.
   function formatKRW(n) {
-    return Number(n || 0).toLocaleString('en-US') + ' won';
+    return t('common.currency', { amount: Number(n || 0).toLocaleString('en-US') });
   }
 
   function logoSrc(business, version) {
@@ -230,15 +254,17 @@
     store: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5V20h16v-9.5M3 8l1.5-4h15L21 8a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0Z"/><path d="M10 20v-5h4v5"/></svg>'
   };
 
-  var LINK_META = {
-    phone:     { icon: ICONS.phone,     label: 'Telefon' },
-    telegram:  { icon: ICONS.telegram,  label: 'Telegram' },
-    kakao:     { icon: ICONS.kakao,     label: 'KakaoTalk' },
-    website:   { icon: ICONS.globe,     label: 'Veb-sayt' },
-    instagram: { icon: ICONS.instagram, label: 'Instagram' },
-    tiktok:    { icon: ICONS.tiktok,    label: 'TikTok' },
-    appstore:  { icon: ICONS.appstore,  label: 'App Store' },
-    playstore: { icon: ICONS.playstore, label: 'Google Play' }
+  // Icons only. Each channel's name is text, so it lives in the text file
+  // under "channels" and is read with t('channels.' + kind).
+  var LINK_ICON = {
+    phone:     ICONS.phone,
+    telegram:  ICONS.telegram,
+    kakao:     ICONS.kakao,
+    website:   ICONS.globe,
+    instagram: ICONS.instagram,
+    tiktok:    ICONS.tiktok,
+    appstore:  ICONS.appstore,
+    playstore: ICONS.playstore
   };
 
   // ============================================
@@ -297,14 +323,15 @@
   // business, not judging a podium.
   function rankBadge(rank) {
     var b = el('span', 'bz-rank bz-rank--' + rank, String(rank));
-    b.setAttribute('aria-label', rank + '-o‘rin');
+    b.setAttribute('aria-label', t('category.rankLabel', { n: rank }));
     return b;
   }
 
   function businessRow(business, opts) {
     opts = opts || {};
     var row = button('bz-row');
-    row.setAttribute('aria-label', business.name + (opts.rank ? ', ' + opts.rank + '-o‘rin' : ''));
+    row.setAttribute('aria-label', business.name +
+      (opts.rank ? ', ' + t('category.rankLabel', { n: opts.rank }) : ''));
 
     var lead = el('span', 'bz-row-lead');
     lead.appendChild(logoNode(business));
@@ -345,7 +372,7 @@
       var likes = el('span', 'bz-meta-likes');
       likes.appendChild(iconSpan('bz-meta-icon', ICONS.heart));
       likes.appendChild(document.createTextNode(String(business.likes)));
-      likes.setAttribute('aria-label', business.likes + ' kishiga yoqdi');
+      likes.setAttribute('aria-label', t('business.likes', { n: business.likes }));
       parts.push(likes);
     }
     if (!parts.length) return null;
@@ -367,7 +394,7 @@
 
     if (opts.hint) {
       var info = button('bz-secinfo');
-      info.setAttribute('aria-label', 'Izoh');
+      info.setAttribute('aria-label', t('category.infoLabel'));
       info.appendChild(iconSpan(null, ICONS.info));
       info.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -378,7 +405,7 @@
 
     if (opts.onMore) {
       var more = button('bz-secmore');
-      more.appendChild(el('span', null, 'Barchasi'));
+      more.appendChild(el('span', null, t('search.seeAll')));
       more.appendChild(iconSpan('bz-secmore-icon', ICONS.arrow));
       more.addEventListener('click', function (e) { e.stopPropagation(); opts.onMore(); });
       head.appendChild(more);
@@ -404,15 +431,14 @@
     card.appendChild(iconSpan('bz-owner-icon', ICONS.store));
 
     var text = el('span', 'bz-owner-text');
-    text.appendChild(el('span', 'bz-owner-title', 'Biznes egasimisiz?'));
+    text.appendChild(el('span', 'bz-owner-title', t('owner.cardTitle')));
     var sub;
     if (opts.emptyCategory) {
-      sub = 'Bu yo‘nalishga birinchi bo‘lib qo‘shiling.';
+      sub = t('owner.cardBodyEmpty');
     } else if (opts.openSlots) {
-      sub = 'Biznesingizni qo‘shing. Bu yo‘nalishda ' + opts.openSlots +
-            ' ta yuqori o‘rin bo‘sh.';
+      sub = t('owner.cardBodySlots', { n: opts.openSlots });
     } else {
-      sub = 'Biznesingizni katalogga qo‘shing — mijozlar sizni shu yerdan topadi.';
+      sub = t('owner.cardBody');
     }
     text.appendChild(el('span', 'bz-owner-sub', sub));
     card.appendChild(text);
@@ -507,12 +533,11 @@
 
   function renderCategories() {
     var total = totalCount();
-    $('bzCount').textContent = total ? total + ' ta biznes' : '';
+    $('bzCount').textContent = total ? t('header.countAll', { n: total }) : '';
     var host = ready();
 
     if (!state.categories.length) {
-      host.appendChild(emptyBlock('Katalog hozircha bo‘sh',
-        'Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi.'));
+      host.appendChild(emptyBlock(t('directory.emptyTitle'), t('directory.emptyBody')));
       host.appendChild(ownerCard());
       return;
     }
@@ -527,9 +552,11 @@
     var tile = button('bz-tile' + (cat.count ? '' : ' is-quiet'));
     tile.appendChild(glyphNode(cat.icon, 'bz-glyph bz-glyph--tile'));
     tile.appendChild(el('span', 'bz-tile-name', cat.name));
-    var about = CATEGORY_ABOUT[cat.slug];
+    var about = categoryAbout(cat.slug);
     if (about) tile.appendChild(el('span', 'bz-tile-about', about));
-    tile.appendChild(el('span', 'bz-tile-n', cat.count ? cat.count + ' ta biznes' : 'Hozircha bo‘sh'));
+    tile.appendChild(el('span', 'bz-tile-n', cat.count
+      ? t('directory.tileCount', { n: cat.count })
+      : t('directory.tileEmpty')));
     tile.addEventListener('click', function () { openCategory(cat); });
     return tile;
   }
@@ -594,14 +621,12 @@
     // Short form here: inside a category the title bar also carries the
     // switcher, and "N ta biznes" pushed the category's own name into an
     // ellipsis on a 390px screen.
-    $('bzCount').textContent = data.total ? data.total + ' ta' : '';
+    $('bzCount').textContent = data.total ? t('header.countInCategory', { n: data.total }) : '';
     var host = ready();
 
     if (!podium.length && !rest.length) {
-      host.appendChild(emptyBlock(
-        'Bu yo‘nalishda hali biznes yo‘q',
-        'Yangi bizneslar qo‘shilgach shu yerda ko‘rinadi. Boshqa yo‘nalishlarga ham qarab ko‘ring.',
-        state.categoryIcon));
+      host.appendChild(emptyBlock(t('category.emptyTitle'), t('category.emptyBody'),
+                                  state.categoryIcon));
       host.appendChild(ownerCard({ emptyCategory: true }));
       return;
     }
@@ -611,9 +636,8 @@
     // ordinary rows with a rank badge, so the list still reads as a list.
     if (contested && podium.length) {
       var top = el('section', 'bz-section');
-      top.appendChild(sectionHeader('Yuqori o‘rinlar', {
-        hint: 'Bu o‘rinlar biznes egalari tomonidan band qilingan.'
-      }));
+      top.appendChild(sectionHeader(t('category.podiumTitle'),
+                                    { hint: t('category.podiumHint') }));
       podium.forEach(function (business, i) {
         top.appendChild(businessRow(business, { rank: i + 1 }));
       });
@@ -625,7 +649,7 @@
 
     if (rest.length) {
       var all = el('section', 'bz-section');
-      if (contested && podium.length) all.appendChild(sectionHeader('Boshqa bizneslar'));
+      if (contested && podium.length) all.appendChild(sectionHeader(t('category.restTitle')));
       rest.forEach(function (business) { all.appendChild(businessRow(business)); });
       host.appendChild(all);
     }
@@ -685,12 +709,12 @@
         { slug: b.category.slug, name: b.category.name, count: b.total });
     });
 
-    $('bzCount').textContent = data.total ? data.total + ' ta topildi' : '';
+    $('bzCount').textContent = data.total ? t('header.countFound', { n: data.total }) : '';
     var host = ready();
 
     if (!groups.length) {
-      host.appendChild(emptyBlock('Hech narsa topilmadi',
-        '“' + state.query + '” bo‘yicha biznes topilmadi. Boshqacha yozib ko‘ring yoki yo‘nalishlardan qidiring.'));
+      host.appendChild(emptyBlock(t('search.emptyTitle'),
+                                  t('search.emptyBody', { query: state.query })));
       return;
     }
 
@@ -742,7 +766,7 @@
     if (state.mode === 'category') {
       var sw = button('bz-switch');
       sw.setAttribute('aria-haspopup', 'dialog');
-      sw.setAttribute('aria-label', state.categoryName + ' — yo‘nalishni almashtirish');
+      sw.setAttribute('aria-label', t('header.switchLabel', { name: state.categoryName }));
       sw.appendChild(glyphNode(state.categoryIcon, 'bz-glyph bz-glyph--title'));
       sw.appendChild(el('span', 'bz-switch-name', state.categoryName));
       sw.appendChild(iconSpan('bz-switch-caret', ICONS.caret));
@@ -750,9 +774,9 @@
       title.appendChild(sw);
       title.classList.add('bz-title--switch');
     } else if (state.mode === 'search') {
-      title.textContent = 'Qidiruv';
+      title.textContent = t('header.searchTitle');
     } else {
-      title.textContent = 'Biznes katalogi';
+      title.textContent = t('header.pageTitle');
     }
   }
 
@@ -969,8 +993,8 @@
         if (!$('sheetScroll').contains(wrap)) return;
         fill.textContent = '';
         var err = el('div', 'bz-detail-error');
-        err.appendChild(el('p', 'bz-state-hint', 'Ma’lumotni yuklab bo‘lmadi.'));
-        var retry = button('bz-btn', 'Qayta urinish');
+        err.appendChild(el('p', 'bz-state-hint', t('business.loadFailed')));
+        var retry = button('bz-btn', t('common.retry'));
         retry.addEventListener('click', function () { openBusiness(businessId, seed); });
         err.appendChild(retry);
         fill.appendChild(err);
@@ -1002,7 +1026,7 @@
     // Reaching the business comes first: most people open a listing for the
     // number. Then where and when, then the owner's own words.
     var links = (business.links || []).filter(function (l) {
-      return LINK_META[l.kind] && l.value;
+      return LINK_ICON[l.kind] && l.value;
     }).sort(function (a, b) {
       return (CONTACT_RANK[a.kind] || 99) - (CONTACT_RANK[b.kind] || 99);
     });
@@ -1025,8 +1049,7 @@
     if (secondary.length) wrap.appendChild(linksBlock(secondary));
 
     if (!links.length && !facts.length && !parsed.text) {
-      wrap.appendChild(el('p', 'bz-detail-none',
-        'Bu biznes hali to‘liq ma’lumot kiritmagan.'));
+      wrap.appendChild(el('p', 'bz-detail-none', t('business.noInfo')));
     }
 
     var foot = el('div', 'bz-detail-foot');
@@ -1064,7 +1087,7 @@
     if (business.likes > 0) {
       var proof = el('p', 'bz-ident-proof');
       proof.appendChild(iconSpan('bz-ident-proof-icon', ICONS.heart));
-      proof.appendChild(document.createTextNode(business.likes + ' kishiga yoqdi'));
+      proof.appendChild(document.createTextNode(t('business.likes', { n: business.likes })));
       block.appendChild(proof);
     }
 
@@ -1099,7 +1122,7 @@
     }
     var src = logoSrc(business);
     var mark = button('bz-mark bz-mark--auto');
-    mark.setAttribute('aria-label', business.name + ' — rasmni kattalashtirish');
+    mark.setAttribute('aria-label', t('business.zoomLabel', { name: business.name }));
 
     var img = document.createElement('img');
     img.className = 'bz-mark-img';
@@ -1133,15 +1156,9 @@
   function isAndroid() { return (tg.platform || '').toLowerCase() === 'android'; }
 
   function actionVerb(kind) {
-    if (kind === 'phone') return isAndroid() ? 'Qo‘ng‘iroq qilish' : 'Raqamni nusxalash';
-    if (kind === 'telegram') return 'Telegramda yozish';
-    if (kind === 'kakao') return 'KakaoTalkda yozish';
-    if (kind === 'website') return 'Saytni ochish';
-    if (kind === 'instagram') return 'Instagramda ko‘rish';
-    if (kind === 'tiktok') return 'TikTokda ko‘rish';
-    if (kind === 'playstore') return 'Google Play’da ochish';
-    if (kind === 'appstore') return 'App Store’da ochish';
-    return 'Ochish';
+    if (kind === 'phone') return t(isAndroid() ? 'actions.phoneCall' : 'actions.phoneCopy');
+    var named = (TEXT.actions || {})[kind];
+    return typeof named === 'string' ? named : t('actions.open');
   }
 
   function ctaBlock(links) {
@@ -1150,8 +1167,8 @@
 
     if (!primary.length) {
       var none = el('div', 'bz-cta-none');
-      none.appendChild(el('span', 'bz-cta-none-text', 'Aloqa ma’lumotlari ko‘rsatilmagan.'));
-      var ask = button('bz-linkbtn', 'Admin orqali so‘rash');
+      none.appendChild(el('span', 'bz-cta-none-text', t('business.noContact')));
+      var ask = button('bz-linkbtn', t('business.noContactAsk'));
       ask.addEventListener('click', openAdmin);
       none.appendChild(ask);
       box.appendChild(none);
@@ -1165,9 +1182,8 @@
   }
 
   function ctaButton(link, primary) {
-    var meta = LINK_META[link.kind];
     var node = button('bz-cta-btn' + (primary ? ' is-primary' : ''));
-    node.appendChild(iconSpan('bz-cta-icon', meta.icon));
+    node.appendChild(iconSpan('bz-cta-icon', LINK_ICON[link.kind]));
     var text = el('span', 'bz-cta-text');
     text.appendChild(el('span', 'bz-cta-verb', actionVerb(link.kind)));
     text.appendChild(el('span', 'bz-cta-val', displayValue(link)));
@@ -1178,14 +1194,13 @@
 
   function linksBlock(links) {
     var box = el('div', 'bz-links');
-    box.appendChild(el('p', 'bz-seclabel', 'Boshqa havolalar'));
+    box.appendChild(el('p', 'bz-seclabel', t('business.linksTitle')));
     var chips = el('div', 'bz-chips');
     links.forEach(function (link) {
-      var meta = LINK_META[link.kind];
       var chip = button('bz-chip');
-      chip.appendChild(iconSpan('bz-chip-icon', meta.icon));
+      chip.appendChild(iconSpan('bz-chip-icon', LINK_ICON[link.kind]));
       chip.appendChild(el('span', 'bz-chip-text',
-        link.kind === 'website' ? displayValue(link) : meta.label));
+        link.kind === 'website' ? displayValue(link) : t('channels.' + link.kind)));
       chip.appendChild(iconSpan('bz-chip-tail', ICONS.external));
       chip.addEventListener('click', function () { activate(link); });
       chips.appendChild(chip);
@@ -1256,7 +1271,7 @@
 
   function factsBlock(facts) {
     var box = el('div', 'bz-facts');
-    box.appendChild(el('p', 'bz-seclabel', 'Asosiy ma’lumotlar'));
+    box.appendChild(el('p', 'bz-seclabel', t('business.factsTitle')));
     var list = el('dl', 'bz-factlist');
     facts.forEach(function (f) {
       var row = el('div', 'bz-fact');
@@ -1280,17 +1295,17 @@
     var b;
     if (f.kind === 'address') {
       b = button('bz-fact-act');
-      b.setAttribute('aria-label', 'Xaritada ko‘rish');
+      b.setAttribute('aria-label', t('actions.map'));
       b.appendChild(iconSpan(null, ICONS.pin));
       b.addEventListener('click', function () { openMap(f.value); });
     } else if (f.kind === 'phone') {
       b = button('bz-fact-act');
-      b.setAttribute('aria-label', isAndroid() ? 'Qo‘ng‘iroq qilish' : 'Raqamni nusxalash');
+      b.setAttribute('aria-label', t(isAndroid() ? 'actions.phoneCall' : 'actions.phoneCopy'));
       b.appendChild(iconSpan(null, isAndroid() ? ICONS.phone : ICONS.copy));
       b.addEventListener('click', function () { handlePhone(f.value.replace(/[^\d+]/g, '')); });
     } else if (f.kind === 'telegram') {
       b = button('bz-fact-act');
-      b.setAttribute('aria-label', 'Telegramda yozish');
+      b.setAttribute('aria-label', t('actions.telegram'));
       b.appendChild(iconSpan(null, ICONS.telegram));
       b.addEventListener('click', function () {
         openExternal({ kind: 'telegram', value: 'https://t.me/' + f.value.replace(/^@/, '') });
@@ -1301,7 +1316,7 @@
 
   function aboutBlock(text) {
     var box = el('div', 'bz-about');
-    box.appendChild(el('p', 'bz-seclabel', 'Biznes haqida'));
+    box.appendChild(el('p', 'bz-seclabel', t('business.aboutTitle')));
     var body = el('p', 'bz-about-text is-clamped');
     appendLinked(body, text);
     box.appendChild(body);
@@ -1318,11 +1333,11 @@
         body.classList.remove('is-clamped');
         return;
       }
-      var toggle = button('bz-more', 'To‘liq o‘qish');
+      var toggle = button('bz-more', t('business.readMore'));
       toggle.setAttribute('aria-expanded', 'false');
       toggle.addEventListener('click', function () {
         var clamped = body.classList.toggle('is-clamped');
-        toggle.textContent = clamped ? 'To‘liq o‘qish' : 'Yashirish';
+        toggle.textContent = t(clamped ? 'business.readMore' : 'business.readLess');
         toggle.setAttribute('aria-expanded', clamped ? 'false' : 'true');
         haptic('light');
       });
@@ -1362,6 +1377,13 @@
     return node;
   }
 
+  // What a link pasted into a description is called, and which app should
+  // open it. A plain brand name is the same word in every language and stays
+  // here; anything carrying an Uzbek word is a path into the text file.
+  //
+  // Order matters: the map hosts have to be tested before the generic
+  // messenger and search hosts they sit underneath, or a Kakao map link ends
+  // up labelled as the messenger.
   var HOST_LABEL = [
     [/(^|\.)play\.google\.com$/, 'Google Play', 'playstore'],
     [/(^|\.)apps\.apple\.com$/, 'App Store', 'appstore'],
@@ -1369,14 +1391,18 @@
     [/(^|\.)instagram\.com$/, 'Instagram', 'instagram'],
     [/(^|\.)tiktok\.com$/, 'TikTok', 'tiktok'],
     [/(^|\.)(t|telegram)\.me$/, 'Telegram', 'telegram'],
+    [/^map\.naver\.com$|(^|\.)naver\.me$/, 'hosts.naverMap', 'website'],
+    [/^map\.kakao\.com$/, 'hosts.kakaoMap', 'website'],
+    [/^maps\.google\.|^maps\.app\.goo\.gl$|^goo\.gl$/, 'hosts.googleMap', 'website'],
     [/(^|\.)kakao\.com$/, 'KakaoTalk', 'kakao'],
     [/(^|\.)youtube\.com$/, 'YouTube', 'website'],
-    [/(^|\.)youtu\.be$/, 'YouTube', 'website'],
-    [/(^|\.)naver\.(com|me)$/, 'Naver xarita', 'website'],
-    [/(^|\.)kakao\.com$/, 'Kakao xarita', 'website'],
-    [/(^|\.)google\.com$/, 'Google xarita', 'website'],
-    [/(^|\.)goo\.gl$/, 'Google xarita', 'website']
+    [/(^|\.)youtu\.be$/, 'YouTube', 'website']
   ];
+
+  // A label written as a text-file path is resolved when it is used.
+  function hostLabel(label) {
+    return label.indexOf('hosts.') === 0 ? t(label) : label;
+  }
 
   function hostOf(url) {
     try { return new URL(url).hostname.toLowerCase().replace(/^www\./, ''); }
@@ -1385,7 +1411,7 @@
   function prettyUrl(url) {
     var host = hostOf(url);
     for (var i = 0; i < HOST_LABEL.length; i++) {
-      if (HOST_LABEL[i][0].test(host)) return HOST_LABEL[i][1];
+      if (HOST_LABEL[i][0].test(host)) return hostLabel(HOST_LABEL[i][1]);
     }
     return host || url;
   }
@@ -1401,11 +1427,11 @@
 
   function reactionBar(business) {
     var bar = el('div', 'bz-react');
-    bar.appendChild(el('span', 'bz-react-label', 'Bu biznes sizga yoqdimi?'));
+    bar.appendChild(el('span', 'bz-react-label', t('business.reactLabel')));
     var mine = business.myReaction || 0;
 
-    var up = reactionBtn(ICONS.thumbUp, business.likes, mine === 1, 'Yoqdi');
-    var down = reactionBtn(ICONS.thumbDown, business.dislikes, mine === -1, 'Yoqmadi');
+    var up = reactionBtn(ICONS.thumbUp, business.likes, mine === 1, t('business.reactUp'));
+    var down = reactionBtn(ICONS.thumbDown, business.dislikes, mine === -1, t('business.reactDown'));
     var busy = false;
 
     function send(value) {
@@ -1423,9 +1449,8 @@
           paintReaction(down, data.dislikes, mine === -1);
         })
         .catch(function (err) {
-          showToast(err.code === 'no_init_data' || err.code === 'bad_signature'
-            ? 'Buning uchun sahifani Telegram ichida oching'
-            : 'Saqlab bo‘lmadi. Qayta urinib ko‘ring');
+          showToast(t(err.code === 'no_init_data' || err.code === 'bad_signature'
+            ? 'common.telegramOnly' : 'common.saveFailed'));
         })
         .then(function () { busy = false; });
     }
@@ -1460,7 +1485,7 @@
   function reportLink() {
     var b = button('bz-report');
     b.appendChild(iconSpan('bz-report-icon', ICONS.flag));
-    b.appendChild(el('span', null, 'Ma’lumot noto‘g‘rimi? Adminga xabar bering'));
+    b.appendChild(el('span', null, t('business.report')));
     b.addEventListener('click', openAdmin);
     return b;
   }
@@ -1477,7 +1502,7 @@
       return;
     }
     copyText(number).then(function (ok) {
-      if (ok) { buzz('success'); showToast('Raqam nusxalandi: ' + number); }
+      if (ok) { buzz('success'); showToast(t('actions.phoneCopied', { number: number })); }
       else showToast(number);
     });
   }
@@ -1548,48 +1573,42 @@
     var inCategory = state.mode === 'category';
 
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('p', 'bz-eyebrow', inCategory ? state.categoryName : 'Biznes egalari uchun'));
-    wrap.appendChild(el('h2', 'bz-sheet-title', 'Katalogga qo‘shilish'));
+    wrap.appendChild(el('p', 'bz-eyebrow', inCategory ? state.categoryName : t('owner.eyebrow')));
+    wrap.appendChild(el('h2', 'bz-sheet-title', t('owner.title')));
 
     var steps = el('ol', 'bz-steps');
-    steps.appendChild(stepRow('1', 'Biznesni kiritish',
-      'Bir martalik to‘lov — ' + formatKRW(pricing.listingFee || 5000) +
-      '. Biznesingiz katalogda doimiy qoladi.'));
-    steps.appendChild(stepRow('2', 'Yuqori o‘rin (ixtiyoriy)',
-      'Har bir yo‘nalishda dastlabki 3 ta o‘rin uchun taklif berish mumkin. ' +
-      'Bu kiritish to‘lovidan alohida.'));
-    steps.appendChild(stepRow('3', 'O‘rinni egallash',
-      'Hozirgi egasidan kamida ' + formatKRW(pricing.bidStep || 5000) +
-      ' ko‘proq summa taklif qilasiz. Avval taklif bergan bo‘lsangiz, faqat farqini to‘laysiz.'));
+    steps.appendChild(stepRow('1', t('owner.step1Title'),
+      t('owner.step1Body', { amount: formatKRW(pricing.listingFee || 5000) })));
+    steps.appendChild(stepRow('2', t('owner.step2Title'), t('owner.step2Body')));
+    steps.appendChild(stepRow('3', t('owner.step3Title'),
+      t('owner.step3Body', { amount: formatKRW(pricing.bidStep || 5000) })));
     wrap.appendChild(steps);
 
     if (inCategory && pricing.showBidding && prices['1']) {
-      wrap.appendChild(el('p', 'bz-seclabel', state.categoryName + ' — hozirgi narxlar'));
+      wrap.appendChild(el('p', 'bz-seclabel',
+        t('owner.pricesLabel', { category: state.categoryName })));
       var table = el('div', 'bz-prices');
       [1, 2, 3].forEach(function (pos) {
         if (!prices[String(pos)]) return;
         var row = el('div', 'bz-prices-row' + (pos === targetPosition ? ' is-target' : ''));
         row.appendChild(rankBadge(pos));
         row.appendChild(el('span', 'bz-prices-val', formatKRW(prices[String(pos)])));
-        row.appendChild(el('span', 'bz-prices-note', 'dan boshlab'));
+        row.appendChild(el('span', 'bz-prices-note', t('owner.pricesFrom')));
         table.appendChild(row);
       });
       wrap.appendChild(table);
-      wrap.appendChild(el('p', 'bz-fine',
-        'Ko‘rsatilgan summa yoki undan ko‘prog‘ini taklif qilsangiz, shu o‘rin yoki ' +
-        'undan yuqorisi sizniki bo‘ladi. To‘lov admin orqali amalga oshiriladi va ' +
-        'tasdiqlangach o‘rin yangilanadi. To‘lov qaytarilmaydi.'));
+      wrap.appendChild(el('p', 'bz-fine', t('owner.pricesFine')));
     } else if (!inCategory) {
-      var pick = button('bz-btn bz-btn--ghost', 'Yo‘nalish bo‘yicha narxlarni ko‘rish');
+      var pick = button('bz-btn bz-btn--ghost', t('owner.pricesPick'));
       pick.addEventListener('click', function () { openPicker(); });
       wrap.appendChild(pick);
     }
 
-    var submit = button('bz-btn bz-btn--block', 'Biznesimni qo‘shish');
+    var submit = button('bz-btn bz-btn--block', t('owner.submit'));
     submit.addEventListener('click', function () { openSubmitForm(); });
     wrap.appendChild(submit);
 
-    var mineBtn = button('bz-btn bz-btn--text', 'Mening bizneslarim');
+    var mineBtn = button('bz-btn bz-btn--text', t('owner.mine'));
     mineBtn.addEventListener('click', openMine);
     wrap.appendChild(mineBtn);
 
@@ -1608,28 +1627,16 @@
 
   // ---------- submission ----------
 
+  // Each field's label is the channel's name from the text file; the
+  // placeholders are examples of a format, not language, so they stay here.
   var LINK_FIELDS = [
-    { kind: 'phone',     label: 'Telefon',   placeholder: '010-1234-5678', mode: 'tel' },
-    { kind: 'telegram',  label: 'Telegram',  placeholder: '@username' },
-    { kind: 'instagram', label: 'Instagram', placeholder: '@username' },
-    { kind: 'website',   label: 'Veb-sayt',  placeholder: 'example.uz', mode: 'url' }
+    { kind: 'phone',     placeholder: '010-1234-5678', mode: 'tel' },
+    { kind: 'telegram',  placeholder: '@username' },
+    { kind: 'instagram', placeholder: '@username' },
+    { kind: 'website',   placeholder: 'example.uz', mode: 'url' }
   ];
 
-  var SUBMIT_ERRORS = {
-    bad_name: 'Nomni tekshiring: 2 tadan 80 tagacha belgi.',
-    bad_category: 'Yo‘nalishni tanlang.',
-    description_too_long: 'Tavsif juda uzun (500 belgigacha).',
-    no_contact: 'Kamida bitta aloqa usulini kiriting.',
-    invalid_phone: 'Telefon raqami noto‘g‘ri.',
-    invalid_handle: 'Username noto‘g‘ri: faqat harf, raqam, nuqta va pastki chiziq.',
-    invalid_url: 'Havola noto‘g‘ri.',
-    wrong_host: 'Havola bu maydonga mos emas.',
-    link_too_long: 'Havola juda uzun.',
-    duplicate: 'Bu nomdagi biznesingiz allaqachon yuborilgan.',
-    rate_limited: 'Bugungi limitga yetdingiz. Ertaga urinib ko‘ring.',
-    no_init_data: 'Buning uchun sahifani Telegram ichida oching.',
-    bad_signature: 'Telegram hisobingizni tasdiqlab bo‘lmadi.'
-  };
+  var DESC_MAX = 500;
 
   // Draft survives a trip to the category picker and back.
   var draft = { name: '', description: '', links: {}, category: null,
@@ -1661,28 +1668,31 @@
     }
 
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('p', 'bz-eyebrow', editing ? draft.category.name : 'Yangi biznes'));
-    wrap.appendChild(el('h2', 'bz-sheet-title', editing ? 'Ma’lumotlarni tahrirlash' : 'Biznesni qo‘shish'));
+    wrap.appendChild(el('p', 'bz-eyebrow', editing ? draft.category.name : t('form.eyebrowNew')));
+    wrap.appendChild(el('h2', 'bz-sheet-title', t(editing ? 'form.titleEdit' : 'form.titleNew')));
 
-    wrap.appendChild(logoPicker(editing ? existing : { name: draft.name || 'Yangi biznes', logo: null }));
+    wrap.appendChild(logoPicker(editing
+      ? existing
+      : { name: draft.name || t('form.eyebrowNew'), logo: null }));
 
     var form = el('div', 'bz-form');
 
-    var nameField = field('Biznes nomi', 'majburiy');
+    var nameField = field(t('form.nameLabel'), t('form.required'));
     var nameInput = el('input', 'bz-input');
     nameInput.type = 'text';
     nameInput.maxLength = 80;
-    nameInput.placeholder = 'Masalan: Samarqand Non';
+    nameInput.placeholder = t('form.namePlaceholder');
     nameInput.value = draft.name;
     nameInput.addEventListener('input', function () { draft.name = nameInput.value; });
     nameField.appendChild(nameInput);
     form.appendChild(nameField);
 
-    var catField = field('Yo‘nalish', 'majburiy');
+    var catField = field(t('form.categoryLabel'), t('form.required'));
     var catBtn = button('bz-select');
     catBtn.setAttribute('aria-haspopup', 'dialog');
     catBtn.appendChild(glyphNode(draft.category ? draft.category.icon : '◆', 'bz-glyph bz-glyph--pick'));
-    var catLabel = el('span', 'bz-select-label', draft.category ? draft.category.name : 'Tanlang');
+    var catLabel = el('span', 'bz-select-label',
+                      draft.category ? draft.category.name : t('form.categoryPick'));
     if (!draft.category) catLabel.classList.add('is-placeholder');
     catBtn.appendChild(catLabel);
     catBtn.appendChild(iconSpan('bz-select-caret', ICONS.caret));
@@ -1697,34 +1707,33 @@
 
     // The card lifts "Label: value" lines into fact rows, so the form shows
     // owners that shape rather than describing it.
-    var descField = field('Biznes haqida', 'ixtiyoriy');
+    var descField = field(t('form.descLabel'), t('form.optional'));
     var descInput = el('textarea', 'bz-input bz-textarea');
     descInput.rows = 5;
-    descInput.maxLength = 500;
-    descInput.placeholder = 'Manzil: Seoul, Itaewon-ro 12\nIsh vaqti: 09:00–21:00\nXizmatlar: yetkazib berish, buyurtma…';
+    descInput.maxLength = DESC_MAX;
+    descInput.placeholder = t('form.descPlaceholder');
     descInput.value = draft.description;
-    var counter = el('span', 'bz-counter', draft.description.length + ' / 500');
+    var counter = el('span', 'bz-counter',
+                     t('form.counter', { n: draft.description.length, max: DESC_MAX }));
     descInput.addEventListener('input', function () {
       draft.description = descInput.value;
-      counter.textContent = descInput.value.length + ' / 500';
+      counter.textContent = t('form.counter', { n: descInput.value.length, max: DESC_MAX });
     });
     descField.appendChild(descInput);
-    descField.appendChild(el('span', 'bz-fieldnote',
-      'Har bir ma’lumotni alohida qatorga yozing — “Manzil: …”, “Ish vaqti: …”. ' +
-      'Shunday yozilganlari mijozga alohida qator bo‘lib ko‘rinadi.'));
+    descField.appendChild(el('span', 'bz-fieldnote', t('form.descNote')));
     descField.appendChild(counter);
     form.appendChild(descField);
 
-    var linkField = field('Aloqa', 'kamida bittasi');
+    var linkField = field(t('form.linksLabel'), t('form.atLeastOne'));
     var inputs = {};
     LINK_FIELDS.forEach(function (spec) {
       var row = el('label', 'bz-linkrow');
-      row.appendChild(iconSpan('bz-linkrow-icon', LINK_META[spec.kind].icon));
+      row.appendChild(iconSpan('bz-linkrow-icon', LINK_ICON[spec.kind]));
       var input = el('input', 'bz-input bz-input--flat');
       input.type = 'text';
       input.maxLength = 200;
       input.placeholder = spec.placeholder;
-      input.setAttribute('aria-label', spec.label);
+      input.setAttribute('aria-label', t('channels.' + spec.kind));
       input.autocapitalize = 'none';
       input.spellcheck = false;
       if (spec.mode) input.inputMode = spec.mode;
@@ -1738,16 +1747,16 @@
     wrap.appendChild(form);
 
     wrap.appendChild(el('p', 'bz-fine', editing
-      ? 'O‘zgarishlar darhol saqlanadi, admin xabardor qilinadi.'
-      : 'Arizangizni admin ko‘rib chiqadi. Katalogga kiritish to‘lovi — ' +
-        formatKRW((state.pricing || {}).listingFee || 5000) + ', admin bilan kelishib to‘lanadi.'));
+      ? t('form.fineEdit')
+      : t('form.fineNew',
+          { amount: formatKRW((state.pricing || {}).listingFee || 5000) })));
 
     var error = el('p', 'bz-formerror');
     error.setAttribute('role', 'alert');
     error.hidden = true;
     wrap.appendChild(error);
 
-    var send = button('bz-btn bz-btn--block', editing ? 'Saqlash' : 'Yuborish');
+    var send = button('bz-btn bz-btn--block', t(editing ? 'form.save' : 'form.send'));
     wrap.appendChild(send);
 
     function readLinks() {
@@ -1757,7 +1766,7 @@
     }
 
     function fail(code) {
-      error.textContent = SUBMIT_ERRORS[code] || 'Xatolik yuz berdi. Qayta urinib ko‘ring.';
+      error.textContent = errorText('submitErrors', code);
       error.hidden = false;
       buzz('error');
     }
@@ -1774,7 +1783,7 @@
 
       sending = true;
       send.disabled = true;
-      send.textContent = editing ? 'Saqlanmoqda…' : 'Yuborilmoqda…';
+      send.textContent = t(editing ? 'form.saving' : 'form.sending');
       nameInput.blur();
 
       var body = {
@@ -1790,26 +1799,25 @@
           buzz('success');
           if (editing) {
             clearDraft();
-            showToast('Saqlandi');
+            showToast(t('common.saved'));
             openMine();
             refreshCurrentView();
             return;
           }
           var held = draft.logoBlob;
           if (!held) { clearDraft(); showSubmitted(); return; }
-          send.textContent = 'Logo yuklanmoqda…';
+          send.textContent = t('form.sendingLogo');
           return uploadLogo(data.id, held)
             .then(function () { clearDraft(); showSubmitted(); })
             .catch(function () {
               clearDraft();
-              showSubmitted('Biznes yuborildi, lekin logoni yuklab bo‘lmadi. ' +
-                            'Uni keyinroq «Mening bizneslarim» bo‘limidan qo‘shishingiz mumkin.');
+              showSubmitted(t('submitted.logoFailed'));
             });
         })
         .catch(function (err) {
           sending = false;
           send.disabled = false;
-          send.textContent = editing ? 'Saqlash' : 'Yuborish';
+          send.textContent = t(editing ? 'form.save' : 'form.send');
           fail(err.code);
         });
     });
@@ -1829,16 +1837,14 @@
   function showSubmitted(caveat) {
     var wrap = el('div', 'bz-sheet-body bz-done');
     wrap.appendChild(iconSpan('bz-done-icon', ICONS.check));
-    wrap.appendChild(el('h2', 'bz-sheet-title', 'Ariza yuborildi'));
-    wrap.appendChild(el('p', 'bz-done-text',
-      'Admin ko‘rib chiqqach biznesingiz katalogda paydo bo‘ladi. ' +
-      'To‘lov bo‘yicha admin siz bilan bog‘lanadi.'));
+    wrap.appendChild(el('h2', 'bz-sheet-title', t('submitted.title')));
+    wrap.appendChild(el('p', 'bz-done-text', t('submitted.body')));
     if (caveat) wrap.appendChild(el('p', 'bz-formerror', caveat));
 
-    var cta = button('bz-btn bz-btn--block', 'Admin bilan bog‘lanish');
+    var cta = button('bz-btn bz-btn--block', t('common.adminContact'));
     cta.addEventListener('click', openAdmin);
     wrap.appendChild(cta);
-    var mine = button('bz-btn bz-btn--text', 'Mening bizneslarim');
+    var mine = button('bz-btn bz-btn--text', t('owner.mine'));
     mine.addEventListener('click', openMine);
     wrap.appendChild(mine);
     mountSheet(wrap, { kind: 'card' });
@@ -1849,14 +1855,6 @@
   // not cross a mobile connection at full size. The server re-encodes anyway.
 
   var LOGO_EDGE = 512;
-
-  var LOGO_ERRORS = {
-    too_large: 'Rasm juda katta (6 MB gacha).',
-    not_an_image: 'Bu fayl rasm emas.',
-    bad_format: 'Bu format qo‘llab-quvvatlanmaydi.',
-    no_file: 'Rasm tanlanmadi.',
-    server_misconfigured: 'Rasm yuklash vaqtincha ishlamayapti.'
-  };
 
   // With a business id the file goes straight up. Without one — during
   // submission — it is held on the draft and sent once the listing has an id.
@@ -1870,12 +1868,12 @@
     box.appendChild(preview);
 
     var side = el('div', 'bz-logoside');
-    side.appendChild(el('span', 'bz-fieldlabel', 'Logo'));
-    var hint = el('span', 'bz-logohint',
-      deferred ? 'Ixtiyoriy. PNG yoki JPG, kvadrat bo‘lsa yaxshi.' : 'PNG yoki JPG, kvadrat bo‘lsa yaxshi.');
+    side.appendChild(el('span', 'bz-fieldlabel', t('form.logoLabel')));
+    var hint = el('span', 'bz-logohint', t(deferred ? 'form.logoHintNew' : 'form.logoHint'));
     side.appendChild(hint);
 
-    var pick = button('bz-logobtn', (business.logo || draft.logoBlob) ? 'Almashtirish' : 'Rasm tanlash');
+    var pick = button('bz-logobtn',
+      t((business.logo || draft.logoBlob) ? 'form.logoReplace' : 'form.logoPick'));
     side.appendChild(pick);
     box.appendChild(side);
 
@@ -1891,7 +1889,7 @@
       var file = input.files && input.files[0];
       input.value = '';
       if (!file) return;
-      hint.textContent = deferred ? 'Tayyorlanmoqda…' : 'Yuklanmoqda…';
+      hint.textContent = t(deferred ? 'form.logoPreparing' : 'form.logoUploading');
       pick.disabled = true;
 
       shrink(file)
@@ -1899,22 +1897,22 @@
           if (deferred) {
             setDraftLogo(blob);
             showLocalPreview(preview, blob);
-            hint.textContent = 'Tanlandi. Biznes bilan birga yuboriladi.';
-            pick.textContent = 'Almashtirish';
+            hint.textContent = t('form.logoChosen');
+            pick.textContent = t('form.logoReplace');
             haptic('light');
             return null;
           }
           return uploadLogo(business.id, blob).then(function (data) {
             business.logo = data.logo;
             paintPreview(preview, business, data.version);
-            hint.textContent = 'Saqlandi';
-            pick.textContent = 'Almashtirish';
+            hint.textContent = t('form.logoSaved');
+            pick.textContent = t('form.logoReplace');
             buzz('success');
             refreshCurrentView();
           });
         })
         .catch(function (err) {
-          hint.textContent = LOGO_ERRORS[err && err.code] || 'Yuklab bo‘lmadi. Boshqa rasm sinab ko‘ring.';
+          hint.textContent = errorText('logoErrors', (err && err.code) || 'generic');
           buzz('error');
         })
         .then(function () { pick.disabled = false; });
@@ -2013,18 +2011,19 @@
 
   // ---------- my businesses ----------
 
-  var STATUS_TEXT = {
-    pending_review: ['Ko‘rib chiqilmoqda', 'pending'],
-    unpaid: ['To‘lov kutilmoqda', 'unpaid'],
-    active: ['Katalogda', 'active'],
-    rejected: ['Qabul qilinmadi', 'off'],
-    suspended: ['To‘xtatilgan', 'off']
+  // Colour only; the words are in the text file under "status".
+  var STATUS_TONE = {
+    pending_review: 'pending',
+    unpaid:         'unpaid',
+    active:         'active',
+    rejected:       'off',
+    suspended:      'off'
   };
 
   function openMine() {
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('p', 'bz-eyebrow', 'Biznes egalari uchun'));
-    wrap.appendChild(el('h2', 'bz-sheet-title', 'Mening bizneslarim'));
+    wrap.appendChild(el('p', 'bz-eyebrow', t('owner.eyebrow')));
+    wrap.appendChild(el('h2', 'bz-sheet-title', t('mine.title')));
     var slot = el('div');
     slot.appendChild(el('div', 'bz-spinner'));
     wrap.appendChild(slot);
@@ -2039,19 +2038,19 @@
         slot.textContent = '';
         var items = (data && data.businesses) || [];
         if (!items.length) {
-          slot.appendChild(el('p', 'bz-sheet-text', 'Siz hali biznes qo‘shmagansiz.'));
+          slot.appendChild(el('p', 'bz-sheet-text', t('mine.empty')));
         } else {
           var list = el('div', 'bz-minelist');
           items.forEach(function (b) { list.appendChild(mineRow(b)); });
           slot.appendChild(list);
         }
-        var add = button('bz-btn bz-btn--block', 'Yangi biznes qo‘shish');
+        var add = button('bz-btn bz-btn--block', t('mine.add'));
         add.addEventListener('click', function () { openSubmitForm(); });
         slot.appendChild(add);
       })
       .catch(function () {
         slot.textContent = '';
-        slot.appendChild(el('p', 'bz-sheet-text', 'Yuklab bo‘lmadi. Qayta urinib ko‘ring.'));
+        slot.appendChild(el('p', 'bz-sheet-text', t('mine.loadFailed')));
       });
   }
 
@@ -2065,16 +2064,19 @@
     body.appendChild(el('span', 'bz-mine-cat', business.categoryName || ''));
 
     var meta = el('span', 'bz-mine-meta');
-    var st = STATUS_TEXT[business.status] || [business.status, 'off'];
-    meta.appendChild(el('span', 'bz-status bz-status--' + st[1], st[0]));
+    var tone = STATUS_TONE[business.status] || 'off';
+    var label = (TEXT.status || {})[business.status] || business.status;
+    meta.appendChild(el('span', 'bz-status bz-status--' + tone, label));
     if (business.status === 'active') {
-      if (business.position) meta.appendChild(el('span', 'bz-mine-stat', business.position + '-o‘rin'));
-      meta.appendChild(el('span', 'bz-mine-stat', (business.likes || 0) + ' kishiga yoqdi'));
-      meta.appendChild(el('span', 'bz-mine-stat', (business.taps || 0) + ' marta ochilgan'));
+      if (business.position) {
+        meta.appendChild(el('span', 'bz-mine-stat', t('mine.position', { n: business.position })));
+      }
+      meta.appendChild(el('span', 'bz-mine-stat', t('mine.likes', { n: business.likes || 0 })));
+      meta.appendChild(el('span', 'bz-mine-stat', t('mine.taps', { n: business.taps || 0 })));
     }
     if (business.pendingBid) {
       meta.appendChild(el('span', 'bz-status bz-status--pending',
-        'Taklif: ' + formatKRW(business.pendingBid.amount) + ' — kutilmoqda'));
+        t('mine.pendingBid', { amount: formatKRW(business.pendingBid.amount) })));
     }
     body.appendChild(meta);
     head.appendChild(body);
@@ -2083,14 +2085,14 @@
     // Rejected listings are not the owner's to fix; everything else is.
     if (business.status !== 'rejected') {
       var actions = el('div', 'bz-mine-acts');
-      var edit = button('bz-mine-act', 'Tahrirlash');
+      var edit = button('bz-mine-act', t('mine.edit'));
       edit.addEventListener('click', function () { haptic('light'); openSubmitForm(business); });
       actions.appendChild(edit);
 
       var pricing = business.pricing || {};
       if (business.status === 'active' && pricing.showBidding) {
         var bid = button('bz-mine-act bz-mine-act--bid',
-          business.pendingBid ? 'Taklifni bekor qilish' : 'Yuqori o‘rin olish');
+          t(business.pendingBid ? 'mine.cancelBid' : 'mine.bid'));
         bid.addEventListener('click', function () {
           haptic('light');
           if (business.pendingBid) cancelBid(business);
@@ -2105,15 +2107,6 @@
 
   // ---------- bidding ----------
 
-  var BID_ERRORS = {
-    too_low: 'Taklif juda past.',
-    not_higher: 'Taklif hozirgi summangizdan yuqori bo‘lishi kerak.',
-    already_pending: 'Sizda ko‘rib chiqilayotgan taklif bor.',
-    bidding_closed: 'Bu yo‘nalishda hali o‘rin uchun taklif qabul qilinmaydi.',
-    not_active: 'Biznes hali katalogda emas.',
-    bad_amount: 'Summani tekshiring.'
-  };
-
   function openBidForm(business) {
     var pricing = business.pricing || {};
     var prices = pricing.prices || {};
@@ -2121,22 +2114,22 @@
 
     var wrap = el('div', 'bz-sheet-body');
     wrap.appendChild(el('p', 'bz-eyebrow', business.categoryName || ''));
-    wrap.appendChild(el('h2', 'bz-sheet-title', 'Yuqori o‘rin olish'));
+    wrap.appendChild(el('h2', 'bz-sheet-title', t('bid.title')));
 
     var now = el('div', 'bz-bidnow');
-    now.appendChild(bidStat('Hozirgi o‘rin', business.position ? business.position + '-o‘rin' : '—'));
-    now.appendChild(bidStat('Sizning taklifingiz', held ? formatKRW(held) : '—'));
+    now.appendChild(bidStat(t('bid.nowPosition'), business.position
+      ? t('mine.position', { n: business.position }) : t('common.empty')));
+    now.appendChild(bidStat(t('bid.nowBid'), held ? formatKRW(held) : t('common.empty')));
     wrap.appendChild(now);
 
-    wrap.appendChild(el('p', 'bz-sheet-text',
-      'O‘rinni tanlang. Avvalgi taklifingiz bo‘lsa, faqat farqini to‘laysiz.'));
+    wrap.appendChild(el('p', 'bz-sheet-text', t('bid.lead')));
 
     var chosen = null;
     var options = el('div', 'bz-bidopts');
     var error = el('p', 'bz-formerror');
     error.setAttribute('role', 'alert');
     error.hidden = true;
-    var send = button('bz-btn bz-btn--block', 'Avval o‘rinni tanlang');
+    var send = button('bz-btn bz-btn--block', t('bid.pickFirst'));
     send.disabled = true;
 
     [1, 2, 3].forEach(function (pos) {
@@ -2148,8 +2141,9 @@
       var body = el('span', 'bz-bidopt-body');
       body.appendChild(el('span', 'bz-bidopt-amount', formatKRW(price)));
       var due = Math.max(0, price - held);
-      body.appendChild(el('span', 'bz-bidopt-due',
-        held ? 'qo‘shimcha to‘lov: ' + formatKRW(due) : 'eng kam summa'));
+      body.appendChild(el('span', 'bz-bidopt-due', held
+        ? t('bid.optionDue', { amount: formatKRW(due) })
+        : t('bid.optionMin')));
       opt.appendChild(body);
 
       if (price <= held) {
@@ -2167,7 +2161,7 @@
           opt.setAttribute('aria-pressed', 'true');
           error.hidden = true;
           send.disabled = false;
-          send.textContent = 'Taklif yuborish — ' + formatKRW(Math.max(0, price - held));
+          send.textContent = t('bid.sendWith', { amount: formatKRW(Math.max(0, price - held)) });
         });
       }
       options.appendChild(opt);
@@ -2175,23 +2169,21 @@
     wrap.appendChild(options);
     wrap.appendChild(error);
     wrap.appendChild(send);
-    wrap.appendChild(el('p', 'bz-fine',
-      'Taklif admin to‘lovni tasdiqlagandan keyin kuchga kiradi. Shu orada boshqa ' +
-      'biznes yuqoriroq taklif bersa, o‘rningiz o‘zgarishi mumkin. To‘lov qaytarilmaydi.'));
+    wrap.appendChild(el('p', 'bz-fine', t('bid.fine')));
 
     var sending = false;
     send.addEventListener('click', function () {
       if (sending || !chosen) return;
       sending = true;
       send.disabled = true;
-      send.textContent = 'Yuborilmoqda…';
+      send.textContent = t('bid.sending');
       postJSON('/api/business/' + business.id + '/bid', { amount: chosen })
         .then(function () { buzz('success'); showBidSent(); })
         .catch(function (err) {
           sending = false;
           send.disabled = false;
-          send.textContent = 'Taklif yuborish';
-          error.textContent = BID_ERRORS[err.code] || 'Xatolik yuz berdi. Qayta urinib ko‘ring.';
+          send.textContent = t('bid.send');
+          error.textContent = errorText('bidErrors', err.code);
           error.hidden = false;
           buzz('error');
         });
@@ -2210,13 +2202,12 @@
   function showBidSent() {
     var wrap = el('div', 'bz-sheet-body bz-done');
     wrap.appendChild(iconSpan('bz-done-icon', ICONS.clock));
-    wrap.appendChild(el('h2', 'bz-sheet-title', 'Taklif yuborildi'));
-    wrap.appendChild(el('p', 'bz-done-text',
-      'To‘lov bo‘yicha admin siz bilan bog‘lanadi. To‘lov tasdiqlangach o‘rningiz yangilanadi.'));
-    var cta = button('bz-btn bz-btn--block', 'Admin bilan bog‘lanish');
+    wrap.appendChild(el('h2', 'bz-sheet-title', t('bid.sentTitle')));
+    wrap.appendChild(el('p', 'bz-done-text', t('bid.sentBody')));
+    var cta = button('bz-btn bz-btn--block', t('common.adminContact'));
     cta.addEventListener('click', openAdmin);
     wrap.appendChild(cta);
-    var back = button('bz-btn bz-btn--text', 'Mening bizneslarim');
+    var back = button('bz-btn bz-btn--text', t('owner.mine'));
     back.addEventListener('click', openMine);
     wrap.appendChild(back);
     mountSheet(wrap, { kind: 'card' });
@@ -2226,8 +2217,8 @@
     fetch(API + '/api/business/' + business.id + '/bid', {
       method: 'DELETE', headers: authHeaders(false)
     })
-      .then(function () { showToast('Taklif bekor qilindi'); openMine(); })
-      .catch(function () { showToast('Bekor qilib bo‘lmadi'); });
+      .then(function () { showToast(t('mine.bidCancelled')); openMine(); })
+      .catch(function () { showToast(t('mine.bidCancelFailed')); });
   }
 
   // ---------- category picker ----------
@@ -2237,7 +2228,7 @@
   function openPicker(onChoose) {
     haptic('light');
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('h2', 'bz-sheet-title', onChoose ? 'Yo‘nalishni tanlang' : 'Yo‘nalishlar'));
+    wrap.appendChild(el('h2', 'bz-sheet-title', t(onChoose ? 'picker.titleChoose' : 'picker.title')));
 
     var list = el('div', 'bz-picker');
     list.setAttribute('role', 'list');
@@ -2245,7 +2236,7 @@
     if (!onChoose) {
       var all = button('bz-pick' + (state.mode === 'categories' ? ' is-on' : ''));
       all.appendChild(glyphNode('◆', 'bz-glyph bz-glyph--pick'));
-      all.appendChild(el('span', 'bz-pick-name', 'Barcha yo‘nalishlar'));
+      all.appendChild(el('span', 'bz-pick-name', t('picker.all')));
       all.appendChild(el('span', 'bz-pick-n', String(totalCount())));
       all.addEventListener('click', function () {
         closeSheet();
@@ -2264,10 +2255,10 @@
       row.appendChild(glyphNode(cat.icon, 'bz-glyph bz-glyph--pick'));
       var text = el('span', 'bz-pick-text');
       text.appendChild(el('span', 'bz-pick-name', cat.name));
-      var about = CATEGORY_ABOUT[cat.slug];
+      var about = categoryAbout(cat.slug);
       if (about) text.appendChild(el('span', 'bz-pick-about', about));
       row.appendChild(text);
-      row.appendChild(el('span', 'bz-pick-n', cat.count ? String(cat.count) : '—'));
+      row.appendChild(el('span', 'bz-pick-n', cat.count ? String(cat.count) : t('common.empty')));
 
       if (onChoose) {
         row.addEventListener('click', function () { onChoose(cat); });
@@ -2640,7 +2631,29 @@
   // INIT
   // ============================================
 
+  // The markup ships with no Uzbek in it: the few static strings are written
+  // in from the text file here, so there is exactly one place to edit.
+  function applyStaticText() {
+    document.title = t('header.pageTitle');
+    $('bzTitle').textContent = t('header.pageTitle');
+    $('bzBack').setAttribute('aria-label', t('common.back'));
+
+    var search = $('bzSearch');
+    search.placeholder = t('header.searchPlaceholder');
+    search.setAttribute('aria-label', t('header.searchLabel'));
+    $('bzSearchClear').setAttribute('aria-label', t('header.searchClear'));
+
+    $('bzErrorTitle').textContent = t('pageError.title');
+    $('bzErrorBody').textContent = t('pageError.body');
+    $('bzRetry').textContent = t('common.retry');
+
+    $('sheetClose').setAttribute('aria-label', t('common.close'));
+    $('bzViewer').setAttribute('aria-label', t('viewer.label'));
+    $('bzViewerClose').setAttribute('aria-label', t('common.close'));
+  }
+
   function init() {
+    applyStaticText();
     setBack(goHome);
 
     $('bzSearch').addEventListener('input', onSearchInput);
