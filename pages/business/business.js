@@ -1114,18 +1114,14 @@
 
     // Reaching the business comes first: most people open a listing for the
     // number. Then where and when, then the owner's own words.
-    var links = (business.links || []).filter(function (l) {
-      return LINK_ICON[l.kind] && l.value;
-    }).sort(function (a, b) {
-      return (CONTACT_RANK[a.kind] || 99) - (CONTACT_RANK[b.kind] || 99);
-    });
-
     var parsed = parseDescription(business.description || '');
+    var links = mergeLinks(business.links, parsed.links);
     // A number stated as an action button and again as a fact row is the same
     // number twice. The buttons keep it; the list drops it.
     var facts = parsed.facts.filter(function (f) { return !coveredByLink(f, links); });
+    var split = splitLinks(links);
 
-    wrap.appendChild(ctaBlock(links));
+    wrap.appendChild(ctaBlock(split.primary));
 
     // Address and hours before the social handles: they are what decides
     // whether someone can use this business today. A block labelled "key
@@ -1134,8 +1130,7 @@
     if (facts.length) wrap.appendChild(factsBlock(facts));
     if (parsed.text) wrap.appendChild(aboutBlock(parsed.text));
 
-    var secondary = links.slice(PRIMARY_SLOTS);
-    if (secondary.length) wrap.appendChild(linksBlock(secondary));
+    if (split.rest.length) wrap.appendChild(linksBlock(split.rest));
 
     if (!links.length && !facts.length && !parsed.text) {
       wrap.appendChild(el('p', 'bz-detail-none', t('business.noInfo')));
@@ -1266,6 +1261,20 @@
     instagram: 5, tiktok: 6, playstore: 7, appstore: 8
   };
   var PRIMARY_SLOTS = 2;
+  var STORE_KIND = { appstore: 1, playstore: 1 };
+
+  // Where the two prominent buttons stop and the chips begin. The app stores
+  // are one thing in two places, so the boundary never falls between them:
+  // the same app rendered as a large button on one store and a small chip on
+  // the other reads as a mistake. Either both lead, or both wait below.
+  function splitLinks(links) {
+    var n = Math.min(PRIMARY_SLOTS, links.length);
+    if (n > 0 && n < links.length &&
+        STORE_KIND[links[n - 1].kind] && STORE_KIND[links[n].kind]) {
+      n--;
+    }
+    return { primary: links.slice(0, n), rest: links.slice(n) };
+  }
 
   function isAndroid() { return (tg.platform || '').toLowerCase() === 'android'; }
 
@@ -1275,8 +1284,7 @@
     return typeof named === 'string' ? named : t('actions.open');
   }
 
-  function ctaBlock(links) {
-    var primary = links.slice(0, PRIMARY_SLOTS);
+  function ctaBlock(primary) {
     var box = el('div', 'bz-cta' + (primary.length === 1 ? ' bz-cta--solo' : ''));
 
     if (!primary.length) {
@@ -1300,7 +1308,8 @@
     node.appendChild(iconSpan('bz-cta-icon', LINK_ICON[link.kind]));
     var text = el('span', 'bz-cta-text');
     text.appendChild(el('span', 'bz-cta-verb', actionVerb(link.kind)));
-    text.appendChild(el('span', 'bz-cta-val', displayValue(link)));
+    var value = displayValue(link);
+    if (value) text.appendChild(el('span', 'bz-cta-val', value));
     node.appendChild(text);
     node.addEventListener('click', function () { activate(link); });
     return node;
@@ -1314,7 +1323,8 @@
       var chip = button('bz-chip');
       chip.appendChild(iconSpan('bz-chip-icon', LINK_ICON[link.kind]));
       chip.appendChild(el('span', 'bz-chip-text',
-        link.kind === 'website' ? displayValue(link) : t('channels.' + link.kind)));
+        link.kind === 'website' ? (displayValue(link) || t('channels.website'))
+                                : t('channels.' + link.kind)));
       chip.appendChild(iconSpan('bz-chip-tail', ICONS.external));
       chip.addEventListener('click', function () { activate(link); });
       chips.appendChild(chip);
@@ -1328,8 +1338,14 @@
     else openExternal(link);
   }
 
+  // What to print under the action's name. A store listing has no handle to
+  // show — its path is /store/apps/details — so it gets nothing rather than
+  // "@store", and the button carries only the verb.
+  var NO_HANDLE = { appstore: 1, playstore: 1 };
+
   function displayValue(link) {
     if (link.kind === 'phone') return link.value;
+    if (NO_HANDLE[link.kind]) return '';
     try {
       var u = new URL(link.value);
       if (link.kind === 'website') return u.hostname.replace(/^www\./, '');
@@ -1353,13 +1369,34 @@
   var PHONE_RE = /^\+?\d[\d\s\-().]{7,}$/;
   var HANDLE_RE = /^@?[A-Za-z0-9_.]{3,32}$/;
 
+  // A line, or a labelled value, that is nothing but a link — which is how an
+  // owner pastes a store listing or writes "Sayt: example.uz" — is a
+  // destination, not a sentence.
+  //
+  // The final label has to be alphabetic, which is what keeps "Narx: 10.000"
+  // and "Ish vaqti: 09.00" from being read as domain names.
+  // Written out in full, anything goes. Written bare, the last label has to
+  // look like a real suffix — two to six letters — which is what stops an
+  // Android package id such as "uz.bozoraka" from becoming a dead link.
+  var BARE_URL_RE = /^(?:https?:\/\/\S+|(?:[a-z0-9-]+\.)+[a-z]{2,6}(?:[\/?#]\S*)?)$/i;
+
   function parseDescription(text) {
-    var facts = [], rest = [];
+    var facts = [], rest = [], found = [];
+
     String(text || '').split(/\r?\n/).forEach(function (line) {
+      var bare = line.trim().replace(TRAILING, '');
+      // Standing on its own line: lift it out and let it join the business's
+      // other links, where a reader looks for somewhere to go. Left in place
+      // it renders as a pill stranded in the middle of a paragraph.
+      if (BARE_URL_RE.test(bare)) { found.push(bare); return; }
+
       var m = line.match(FACT_RE);
       var label = m && m[1], value = m && m[2];
       if (m && FACT_LABEL_OK.test(label) && !/\d$/.test(label) &&
           value.charAt(0) !== '/' && !/^https?$/i.test(label)) {
+        // "Sayt: example.uz" is a link with a word in front of it, not a fact
+        // whose value happens to be an address.
+        if (BARE_URL_RE.test(value)) { found.push(value); return; }
         var kind = ADDRESS_RE.test(label) ? 'address'
                  : HOURS_RE.test(label) ? 'hours'
                  : PRICE_RE.test(label) ? 'price'
@@ -1374,10 +1411,44 @@
         rest.push(line);
       }
     });
+
     return {
       facts: facts,
-      text: rest.join('\n').replace(/\n{3,}/g, '\n\n').trim()
+      text: rest.join('\n').replace(/\n{3,}/g, '\n\n').trim(),
+      links: found.map(function (raw) {
+        var href = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+        return { kind: hostKind(href), value: href };
+      })
     };
+  }
+
+  // The links the owner filled in and the ones they pasted into their
+  // description are the same thing to a reader, so they are one list. A typed
+  // link wins over a pasted duplicate of itself; otherwise the usual order
+  // applies, which puts the app stores last where they belong.
+  function mergeLinks(typed, found) {
+    var out = [], seen = {};
+
+    function key(link) {
+      return link.kind + '|' + String(link.value).toLowerCase()
+        .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/+$/, '');
+    }
+    function add(link, isTyped) {
+      if (!LINK_ICON[link.kind] || !link.value) return;
+      var k = key(link);
+      if (seen[k]) return;
+      seen[k] = true;
+      out.push({ kind: link.kind, value: link.value, typed: isTyped });
+    }
+
+    (typed || []).forEach(function (l) { add(l, true); });
+    (found || []).forEach(function (l) { add(l, false); });
+
+    return out.sort(function (a, b) {
+      var ra = CONTACT_RANK[a.kind] || 99, rb = CONTACT_RANK[b.kind] || 99;
+      if (ra !== rb) return ra - rb;
+      return a.typed === b.typed ? 0 : (a.typed ? -1 : 1);
+    });
   }
 
   var FACT_ICON = { address: ICONS.pin, hours: ICONS.clock, price: ICONS.tag,

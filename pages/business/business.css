@@ -1198,17 +1198,21 @@
 
 .bz-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 
+/* Sized as something you tap, not something you read. At 33px these were
+   under any reasonable touch target and read as tags rather than as places
+   to go. */
 .bz-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   max-width: 100%;
-  padding: 8px 11px;
+  min-height: 40px;
+  padding: 0 14px;
   border: 1px solid var(--hairline);
   border-radius: 999px;
   background: var(--surface-sunken);
   font-family: inherit;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
@@ -1216,7 +1220,7 @@
               transform var(--transition-fast);
 }
 .bz-chip:active { transform: scale(0.96); background: var(--accent-light); border-color: var(--emerald-600); }
-.bz-chip-icon { width: 14px; height: 14px; flex: none; color: var(--text-secondary); }
+.bz-chip-icon { width: 16px; height: 16px; flex: none; color: var(--text-secondary); }
 .bz-chip-icon svg { width: 100%; height: 100%; display: block; }
 .bz-chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bz-chip-tail { width: 10px; height: 10px; flex: none; color: var(--sand-400); }
