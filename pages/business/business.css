@@ -1060,15 +1060,19 @@
 /* The one public signal, in words rather than a bare glyph a reader has to
    guess at. Absent entirely at zero. */
 .bz-ident-proof {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 5px;
-  margin: 8px 0 0;
+  justify-content: center;
+  gap: 4px 14px;
+  margin: 9px 0 0;
   font-size: var(--fs-xs);
   color: var(--text-muted);
 }
-.bz-ident-proof-icon { width: 13px; height: 13px; opacity: 0.8; }
-.bz-ident-proof-icon svg { width: 100%; height: 100%; display: block; }
+
+.bz-proof { display: inline-flex; align-items: center; gap: 5px; }
+.bz-proof-icon { width: 13px; height: 13px; flex: none; opacity: 0.8; }
+.bz-proof-icon svg { width: 100%; height: 100%; display: block; }
 
 /* ---------- the actions ---------- */
 /* Most people open a listing for the number, so reaching the business is the
@@ -1286,6 +1290,9 @@
 
 .bz-about { margin-bottom: 20px; }
 
+/* Shown whole — see aboutBlock() for why the five-line clamp went. Blank
+   lines the owner typed are kept, so a description written as separate
+   thoughts stays that way instead of collapsing into one block. */
 .bz-about-text {
   margin: 0;
   font-size: var(--fs-body);
@@ -1294,29 +1301,6 @@
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
-.bz-about-text.is-clamped {
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  /* A soft edge on the last visible line says the text continues, before the
-     button below it is even read. */
-  -webkit-mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 74%, transparent 100%);
-}
-
-.bz-more {
-  margin-top: 6px;
-  padding: 4px 0;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  color: var(--accent);
-  cursor: pointer;
-}
-.bz-more:active { opacity: 0.6; }
 
 /* A URL inside owner text: a compact button in the line, not a 90-character
    string wrapping across three lines. */
@@ -2042,7 +2026,7 @@
 .bz-back:focus-visible, .bz-switch:focus-visible, .bz-search:focus-visible,
 .bz-search-clear:focus-visible, .bz-secmore:focus-visible, .bz-secinfo:focus-visible,
 .bz-cta-btn:focus-visible, .bz-chip:focus-visible,
-.bz-fact-act:focus-visible, .bz-more:focus-visible, .bz-inlink:focus-visible,
+.bz-fact-act:focus-visible, .bz-inlink:focus-visible,
 .bz-reactbtn:focus-visible, .bz-report:focus-visible, .bz-mark:focus-visible,
 .bz-btn:focus-visible, .bz-linkbtn:focus-visible, .bz-pick:focus-visible,
 .bz-input:focus-visible, .bz-select:focus-visible, .bz-logobtn:focus-visible,
@@ -2169,7 +2153,6 @@
 .night-mode .bz-fact-act { background: #262220; border-color: rgba(255, 255, 255, 0.1); }
 .night-mode .bz-chip { color: #e6e1db; }
 .night-mode .bz-inlink,
-.night-mode .bz-more,
 .night-mode .bz-fact-act,
 .night-mode .bz-linkbtn { color: var(--emerald-400); }
 .night-mode .bz-chip-icon { color: #a49d95; }

@@ -263,6 +263,7 @@
   // rest of the page is set in type and line icons.
 
   var ICONS = {
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-6.4 10-6.4S22 12 22 12s-3.6 6.4-10 6.4S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>',
     heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.3 4.3 12.6a4.9 4.9 0 0 1 6.9-6.9l.8.8.8-.8a4.9 4.9 0 1 1 6.9 6.9Z"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
     chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>',
@@ -1075,7 +1076,6 @@
         $('sheetScroll').appendChild(full);
         var heading = full.querySelector('h2');
         if (heading) heading.id = 'sheetTitle';
-        settleDescription(full);
         countTap(businessId);
       })
       .catch(function () {
@@ -1173,12 +1173,20 @@
     }
     block.appendChild(el('h2', 'bz-ident-name', business.name));
 
-    if (business.likes > 0) {
-      var proof = el('p', 'bz-ident-proof');
-      proof.appendChild(iconSpan('bz-ident-proof-icon', ICONS.heart));
-      proof.appendChild(document.createTextNode(t('business.likes', { n: business.likes })));
-      block.appendChild(proof);
-    }
+    // How many people have opened this listing, and how many liked it. Views
+    // are the more useful of the two to somebody deciding whether a business
+    // is real and active — a like needs a tap, a view only needs interest —
+    // so it leads.
+    //
+    // Depends on the detail endpoint returning the figure. It is read from
+    // whichever of the two names the server uses and skipped entirely when
+    // neither is present, so the line degrades to likes alone rather than
+    // printing a zero the business has not earned.
+    var views = firstNumber(business.views, business.taps);
+    var proof = el('p', 'bz-ident-proof');
+    if (views > 0) proof.appendChild(proofItem(ICONS.eye, t('business.views', { n: formatCount(views) })));
+    if (business.likes > 0) proof.appendChild(proofItem(ICONS.heart, t('business.likes', { n: business.likes })));
+    if (proof.childNodes.length) block.appendChild(proof);
 
     if (business.logo) {
       // The wash behind the mark is mixed from the picture's own colour, once
@@ -1199,6 +1207,23 @@
       block.dataset.tint = hueTintOf(business.name);
     }
     return block;
+  }
+
+  function proofItem(icon, text) {
+    var item = el('span', 'bz-proof');
+    item.appendChild(iconSpan('bz-proof-icon', icon));
+    item.appendChild(document.createTextNode(text));
+    return item;
+  }
+
+  // The server has called this field different things; take the first one
+  // that is actually a number rather than trusting either name.
+  function firstNumber() {
+    for (var i = 0; i < arguments.length; i++) {
+      var v = arguments[i];
+      if (typeof v === 'number' && isFinite(v)) return v;
+    }
+    return null;
   }
 
   function markNode(business) {
@@ -1403,35 +1428,20 @@
     return b || null;
   }
 
+  // Shown whole. It used to open clamped to five lines behind a "read more",
+  // which was right when the description sat above the phone number and a
+  // long one pushed it off the screen. The contact buttons are above it now,
+  // so the clamp was costing a tap and hiding half the text to protect
+  // something that had already moved. A description is capped at 500
+  // characters — about eleven lines — which is a card that scrolls, not a
+  // card that needs a lid.
   function aboutBlock(text) {
     var box = el('div', 'bz-about');
     box.appendChild(el('p', 'bz-seclabel', t('business.aboutTitle')));
-    var body = el('p', 'bz-about-text is-clamped');
+    var body = el('p', 'bz-about-text');
     appendLinked(body, text);
     box.appendChild(body);
     return box;
-  }
-
-  // Whether the description overflows its clamp is only knowable once it is
-  // laid out, so the "more" control is attached after the card is on screen.
-  function settleDescription(root) {
-    var body = root.querySelector('.bz-about-text');
-    if (!body) return;
-    requestAnimationFrame(function () {
-      if (body.scrollHeight - body.clientHeight < 4) {
-        body.classList.remove('is-clamped');
-        return;
-      }
-      var toggle = button('bz-more', t('business.readMore'));
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.addEventListener('click', function () {
-        var clamped = body.classList.toggle('is-clamped');
-        toggle.textContent = t(clamped ? 'business.readMore' : 'business.readLess');
-        toggle.setAttribute('aria-expanded', clamped ? 'false' : 'true');
-        haptic('light');
-      });
-      body.parentNode.appendChild(toggle);
-    });
   }
 
   // Text with any URLs turned into real buttons. Built from text nodes, never

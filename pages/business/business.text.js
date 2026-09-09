@@ -153,8 +153,9 @@ window.BUSINESS_TEXT = {
      business. The most-read screen on the page.
      ------------------------------------------------------- */
   business: {
-    // Under the name. Only appears once at least one person has
-    // reacted.
+    // Under the name, side by side. Each appears only once it has a real
+    // number behind it, so a new listing shows neither rather than two zeros.
+    views:        '{n} marta ko‘rilgan',
     likes:        '{n} kishiga yoqdi',
     // Read aloud for the logo, which opens full screen.
     zoomLabel:    '{name} — rasmni kattalashtirish',
@@ -163,10 +164,6 @@ window.BUSINESS_TEXT = {
     factsTitle:   'Asosiy ma’lumotlar',
     aboutTitle:   'Biznes haqida',
     linksTitle:   'Boshqa havolalar',
-
-    // A long description is folded after five lines.
-    readMore:     'To‘liq o‘qish',
-    readLess:     'Yashirish',
 
     // The business gave no phone, Telegram or website at all.
     noContact:    'Aloqa ma’lumotlari ko‘rsatilmagan.',
