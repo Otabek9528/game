@@ -346,9 +346,14 @@ window.BUSINESS_TEXT = {
     bid:        'Yuqori o‘rin olish',
     cancelBid:  'Taklifni bekor qilish',
 
+    // The three figures on an active listing. Labels sit under the number,
+    // so keep them to one short word. (short)
+    statViews:  'Ko‘rilgan',
+    statLikes:  'Yoqtirgan',
+    statPosition: 'O‘rin',
+
+    // Used in the bidding sheet, where the position is named in a sentence.
     position:   '{n}-o‘rin',
-    likes:      '{n} kishiga yoqdi',
-    taps:       '{n} marta ochilgan',
     pendingBid: 'Taklif: {amount} — kutilmoqda',
 
     bidCancelled:    'Taklif bekor qilindi',

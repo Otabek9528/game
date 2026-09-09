@@ -71,14 +71,49 @@
   // ============================================
   // CATEGORY ORDER
   // ============================================
-  // A fixed editorial ranking keyed by slug: what a family needs weekly, then
-  // what the paperwork of living here demands, then the once-or-twice-a-year
-  // things, then the discretionary. Server order stays alphabetical; this is
-  // a display decision only.
+  // The order the directory lists business types in, keyed by slug so
+  // renaming a category cannot move it. Server order stays alphabetical;
+  // this is a display decision only.
+  //
+  // Two rules, in this order:
+  //
+  //   related categories sit next to each other, in pairs
+  //   pairs are ranked by how many people need them and how often
+  //
+  // The pairing is not decoration. On a phone the directory is two columns,
+  // so a pair is a row, and each row reads as one errand: food, then home,
+  // then paperwork, then study. The previous order was a flat frequency list
+  // that split the paperwork apart — translation at 3, insurance at 7,
+  // university advice at 8 — so a reader sorting out their visa had to
+  // search three different parts of the screen for three related things.
+  //
+  // (Wider screens use three or four columns and the rows stop lining up
+  // with the pairs; almost every reader is on a phone. An empty category
+  // still sinks below the filled ones, which can split a pair — the grouping
+  // is the intent for a populated catalogue, not a guarantee.)
   var CATEGORY_RANK = {
-    'halal-market': 1, 'pishiriqlar': 2, 'tarjima': 3, 'pochta': 4,
-    'aviakassa': 5, 'sim-telefon': 6, 'sugurta': 7, 'consulting': 8,
-    'repetitor': 9, 'kosmetika': 10
+    // Food. Weekly, everybody, and the reason most people open the page.
+    'halal-market': 1,   // halal groceries
+    'pishiriqlar':  2,   // bread, pastries, somsa
+
+    // Home. Specific to living far from it, and needed by nearly everyone
+    // here several times a year.
+    'pochta':       3,   // parcels to Uzbekistan
+    'aviakassa':    4,   // flights
+
+    // Papers. Less often than food, but nothing else on this page is as
+    // urgent when it is needed: visas, residency, work, insurance.
+    'tarjima':      5,   // translation and apostille
+    'sugurta':      6,   // insurance
+
+    // Study. A narrower audience than the three above — students and the
+    // people about to become them — but a committed one.
+    'consulting':   7,   // university and visa advice
+    'repetitor':    8,   // language and subject tutors
+
+    // Occasional and discretionary.
+    'sim-telefon':  9,   // SIM and handsets, mostly on arrival
+    'kosmetika':   10    // cosmetics
   };
 
   function rankOf(category) { return CATEGORY_RANK[category.slug] || 99; }
@@ -2180,13 +2215,6 @@
     var tone = STATUS_TONE[business.status] || 'off';
     var label = (TEXT.status || {})[business.status] || business.status;
     meta.appendChild(el('span', 'bz-status bz-status--' + tone, label));
-    if (business.status === 'active') {
-      if (business.position) {
-        meta.appendChild(el('span', 'bz-mine-stat', t('mine.position', { n: business.position })));
-      }
-      meta.appendChild(el('span', 'bz-mine-stat', t('mine.likes', { n: business.likes || 0 })));
-      meta.appendChild(el('span', 'bz-mine-stat', t('mine.taps', { n: business.taps || 0 })));
-    }
     if (business.pendingBid) {
       meta.appendChild(el('span', 'bz-status bz-status--pending',
         t('mine.pendingBid', { amount: formatKRW(business.pendingBid.amount) })));
@@ -2194,6 +2222,20 @@
     body.appendChild(meta);
     head.appendChild(body);
     row.appendChild(head);
+
+    // How many people opened the listing is the reason an owner comes back to
+    // this screen, so it is read as a figure rather than found in a sentence.
+    // As one grey run-on line — "1310 marta ochilgan" at the end of a mono
+    // meta row — it was the least prominent thing on the card and the most
+    // valuable thing on it.
+    if (business.status === 'active') {
+      row.appendChild(statRow([
+        { key: t('mine.statViews'), value: formatCount(business.taps || 0) },
+        { key: t('mine.statLikes'), value: formatCount(business.likes || 0) },
+        { key: t('mine.statPosition'),
+          value: business.position ? String(business.position) : t('common.empty') }
+      ]));
+    }
 
     // Rejected listings are not the owner's to fix; everything else is.
     if (business.status !== 'rejected') {
@@ -2216,6 +2258,22 @@
       row.appendChild(actions);
     }
     return row;
+  }
+
+  function statRow(stats) {
+    var box = el('dl', 'bz-stats');
+    stats.forEach(function (stat) {
+      var cell = el('div', 'bz-stat');
+      cell.appendChild(el('dd', 'bz-stat-v', stat.value));
+      cell.appendChild(el('dt', 'bz-stat-k', stat.key));
+      box.appendChild(cell);
+    });
+    return box;
+  }
+
+  // Grouped so four figures do not read as one long number.
+  function formatCount(n) {
+    return Number(n || 0).toLocaleString('en-US');
   }
 
   // ---------- bidding ----------

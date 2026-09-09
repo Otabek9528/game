@@ -29,6 +29,12 @@
     </a>
   </header>
 
+  <!-- Pull-to-refresh indicator. Fixed rather than in the scroll flow, so it
+       floats under the header instead of pushing the list down. -->
+  <div class="bz-refresh" id="bzRefresh" role="status" aria-hidden="true">
+    <span class="bz-refresh-ring"></span>
+  </div>
+
   <main class="bz-scroll" id="bzScroll">
 
     <!-- Title + search stay put while the list moves under them. -->
