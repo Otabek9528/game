@@ -2,9 +2,12 @@
 //
 // Designed for the person looking for a business, not the person who owns
 // one. The directory is the landing; a category is one tap; a business opens
-// as a centred card that leads with who it is and how to reach it. Owner
-// concerns — listing, positions, prices — live behind one quiet entry at the
-// end of each list and never in the way of reading.
+// as a centred card that leads with who it is and how to reach it. The one
+// owner concern — getting listed — lives behind a quiet entry at the end of
+// each list and never in the way of reading.
+//
+// Inside a category, businesses are ordered by how many people liked them,
+// and an even count is settled by whoever was listed first.
 //
 // Every visible word lives in business.text.js, so the Uzbek can be revised
 // without opening this file.
@@ -66,6 +69,8 @@
   var API = (window.API_CONFIG ? window.API_CONFIG.BASE_URL : 'https://vegukin-api.duckdns.org/')
               .replace(/\/+$/, '');
   var TIMEOUT = 30000;
+  // Falls back only until /categories answers; the server is the authority.
+  var LISTING_FEE = 5000;
   var ADMIN = 'https://t.me/otabeksattarov';
 
   // ============================================
@@ -135,7 +140,8 @@
     categoryIcon: '',
     query: '',
     categories: [],
-    pricing: null,
+    // The one-time fee, as the server states it.
+    listingFee: null,
     // Where a search was started from, so clearing it lands the reader back
     // in the category they were reading rather than on the front page.
     returnTo: null
@@ -353,16 +359,6 @@
     box.style.setProperty('--h', hueOf(name));
   }
 
-  // A held position is marked, not shouted: a small numbered disc on the
-  // logo's corner. Gold, silver and bronze still say the order, but the row
-  // stays the same object as every other row — a reader is choosing a
-  // business, not judging a podium.
-  function rankBadge(rank) {
-    var b = el('span', 'bz-rank bz-rank--' + rank, String(rank));
-    b.setAttribute('aria-label', t('category.rankLabel', { n: rank }));
-    return b;
-  }
-
   // ============================================
   // REACTIONS
   // ============================================
@@ -417,13 +413,9 @@
     var row = button('bz-row');
     row.bzBusiness = business;
     row.bzCategoryName = opts.categoryName;
-    row.setAttribute('aria-label', business.name +
-      (opts.rank ? ', ' + t('category.rankLabel', { n: opts.rank }) : ''));
+    row.setAttribute('aria-label', business.name);
 
-    var lead = el('span', 'bz-row-lead');
-    lead.appendChild(logoNode(business));
-    if (opts.rank) lead.appendChild(rankBadge(opts.rank));
-    row.appendChild(lead);
+    row.appendChild(logoNode(business));
 
     var body = el('span', 'bz-row-body');
     body.appendChild(el('span', 'bz-row-name', business.name));
@@ -519,21 +511,14 @@
 
     var text = el('span', 'bz-owner-text');
     text.appendChild(el('span', 'bz-owner-title', t('owner.cardTitle')));
-    var sub;
-    if (opts.emptyCategory) {
-      sub = t('owner.cardBodyEmpty');
-    } else if (opts.openSlots) {
-      sub = t('owner.cardBodySlots', { n: opts.openSlots });
-    } else {
-      sub = t('owner.cardBody');
-    }
+    var sub = opts.emptyCategory ? t('owner.cardBodyEmpty') : t('owner.cardBody');
     text.appendChild(el('span', 'bz-owner-sub', sub));
     card.appendChild(text);
     card.appendChild(iconSpan('bz-owner-arrow', ICONS.chevron));
 
     card.addEventListener('click', function () {
       haptic('light');
-      openOwnerSheet(opts.openSlots ? (state.pricing && state.pricing.podiumSize || 3) - opts.openSlots + 1 : null);
+      openOwnerSheet();
     });
     return card;
   }
@@ -612,6 +597,7 @@
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
         state.categories = (data.categories || []).slice().sort(byCategoryOrder);
+        if (typeof data.listingFee === 'number') state.listingFee = data.listingFee;
         syncChrome();
         renderCategories();
       })
@@ -677,7 +663,6 @@
     state.categoryId = null;
     state.categoryName = '';
     state.categoryIcon = '';
-    state.pricing = null;
     state.query = '';
     state.returnTo = null;
     $('bzSearch').value = '';
@@ -693,56 +678,28 @@
     getJSON('/api/business/list?category_id=' + encodeURIComponent(state.categoryId))
       .then(function (data) {
         if (!data.success) throw new Error('bad_response');
-        state.pricing = data.pricing || null;
         renderCategory(data);
       })
       .catch(function () { if (!(opts && opts.quiet)) setView('error'); });
   }
 
   function renderCategory(data) {
-    var podium = data.podium || [];
-    var rest = data.businesses || [];
-    var pricing = data.pricing || {};
-    var contested = !!pricing.showBidding;
+    var businesses = data.businesses || [];
 
-    // Short form here: inside a category the title bar also carries the
-    // switcher, and "N ta biznes" pushed the category's own name into an
-    // ellipsis on a 390px screen.
     $('bzCount').textContent = data.total ? t('header.countInCategory', { n: data.total }) : '';
     var host = ready();
 
-    if (!podium.length && !rest.length) {
+    if (!businesses.length) {
       host.appendChild(emptyBlock(t('category.emptyTitle'), t('category.emptyBody'),
                                   state.categoryIcon));
       host.appendChild(ownerCard({ emptyCategory: true }));
       return;
     }
 
-    // Held positions lead, as bought. They are named honestly — a small
-    // label and a one-line explanation behind the info mark — and drawn as
-    // ordinary rows with a rank badge, so the list still reads as a list.
-    if (contested && podium.length) {
-      var top = el('section', 'bz-section');
-      top.appendChild(sectionHeader(t('category.podiumTitle'),
-                                    { hint: t('category.podiumHint') }));
-      podium.forEach(function (business, i) {
-        top.appendChild(businessRow(business, { rank: i + 1 }));
-      });
-      host.appendChild(top);
-    } else {
-      // No contest here: the server's podium is just the head of the list.
-      rest = podium.concat(rest);
-    }
-
-    if (rest.length) {
-      var all = el('section', 'bz-section');
-      if (contested && podium.length) all.appendChild(sectionHeader(t('category.restTitle')));
-      rest.forEach(function (business) { all.appendChild(businessRow(business)); });
-      host.appendChild(all);
-    }
-
-    var openSlots = contested ? Math.max(0, (pricing.podiumSize || 3) - podium.length) : 0;
-    host.appendChild(ownerCard({ openSlots: openSlots }));
+    var list = el('section', 'bz-section');
+    businesses.forEach(function (business) { list.appendChild(businessRow(business)); });
+    host.appendChild(list);
+    host.appendChild(ownerCard());
   }
 
   // ============================================
@@ -810,15 +767,12 @@
     groups.forEach(function (group) {
       var section = el('section', 'bz-section');
       var cat = group.category;
-      var all = (group.podium || []).concat(group.businesses || []);
-      var podiumLen = (group.podium || []).length;
-
       section.appendChild(sectionHeader(cat.name, {
         icon: cat.icon, count: group.total,
         onMore: function () { openCategory(cat); }
       }));
-      all.forEach(function (business, i) {
-        section.appendChild(businessRow(business, { rank: i < podiumLen ? i + 1 : null }));
+      (group.businesses || []).forEach(function (business) {
+        section.appendChild(businessRow(business));
       });
       host.appendChild(section);
     });
@@ -1793,42 +1747,19 @@
   // behind the owner card. A visitor browsing for a bakery never meets a
   // price; an owner gets the whole mechanism in one sheet.
 
-  function openOwnerSheet(targetPosition) {
-    var pricing = state.pricing || {};
-    var prices = pricing.prices || {};
-    var inCategory = state.mode === 'category';
-
+  function openOwnerSheet() {
     var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('p', 'bz-eyebrow', inCategory ? state.categoryName : t('owner.eyebrow')));
+    wrap.appendChild(el('p', 'bz-eyebrow', t('owner.eyebrow')));
     wrap.appendChild(el('h2', 'bz-sheet-title', t('owner.title')));
 
     var steps = el('ol', 'bz-steps');
-    steps.appendChild(stepRow('1', t('owner.step1Title'),
-      t('owner.step1Body', { amount: formatKRW(pricing.listingFee || 5000) })));
-    steps.appendChild(stepRow('2', t('owner.step2Title'), t('owner.step2Body')));
-    steps.appendChild(stepRow('3', t('owner.step3Title'),
-      t('owner.step3Body', { amount: formatKRW(pricing.bidStep || 5000) })));
+    steps.appendChild(stepRow('1', t('owner.step1Title'), t('owner.step1Body')));
+    steps.appendChild(stepRow('2', t('owner.step2Title'),
+      t('owner.step2Body', { amount: formatKRW(state.listingFee || LISTING_FEE) })));
+    steps.appendChild(stepRow('3', t('owner.step3Title'), t('owner.step3Body')));
     wrap.appendChild(steps);
 
-    if (inCategory && pricing.showBidding && prices['1']) {
-      wrap.appendChild(el('p', 'bz-seclabel',
-        t('owner.pricesLabel', { category: state.categoryName })));
-      var table = el('div', 'bz-prices');
-      [1, 2, 3].forEach(function (pos) {
-        if (!prices[String(pos)]) return;
-        var row = el('div', 'bz-prices-row' + (pos === targetPosition ? ' is-target' : ''));
-        row.appendChild(rankBadge(pos));
-        row.appendChild(el('span', 'bz-prices-val', formatKRW(prices[String(pos)])));
-        row.appendChild(el('span', 'bz-prices-note', t('owner.pricesFrom')));
-        table.appendChild(row);
-      });
-      wrap.appendChild(table);
-      wrap.appendChild(el('p', 'bz-fine', t('owner.pricesFine')));
-    } else if (!inCategory) {
-      var pick = button('bz-btn bz-btn--ghost', t('owner.pricesPick'));
-      pick.addEventListener('click', function () { openPicker(); });
-      wrap.appendChild(pick);
-    }
+    wrap.appendChild(el('p', 'bz-fine', t('owner.fine')));
 
     var submit = button('bz-btn bz-btn--block', t('owner.submit'));
     submit.addEventListener('click', function () { openSubmitForm(); });
@@ -1974,8 +1905,7 @@
 
     wrap.appendChild(el('p', 'bz-fine', editing
       ? t('form.fineEdit')
-      : t('form.fineNew',
-          { amount: formatKRW((state.pricing || {}).listingFee || 5000) })));
+      : t('form.fineNew', { amount: formatKRW(state.listingFee || LISTING_FEE) })));
 
     var error = el('p', 'bz-formerror');
     error.setAttribute('role', 'alert');
@@ -2296,10 +2226,6 @@
     var tone = STATUS_TONE[business.status] || 'off';
     var label = (TEXT.status || {})[business.status] || business.status;
     meta.appendChild(el('span', 'bz-status bz-status--' + tone, label));
-    if (business.pendingBid) {
-      meta.appendChild(el('span', 'bz-status bz-status--pending',
-        t('mine.pendingBid', { amount: formatKRW(business.pendingBid.amount) })));
-    }
     body.appendChild(meta);
     head.appendChild(body);
     row.appendChild(head);
@@ -2324,18 +2250,6 @@
       var edit = button('bz-mine-act', t('mine.edit'));
       edit.addEventListener('click', function () { haptic('light'); openSubmitForm(business); });
       actions.appendChild(edit);
-
-      var pricing = business.pricing || {};
-      if (business.status === 'active' && pricing.showBidding) {
-        var bid = button('bz-mine-act bz-mine-act--bid',
-          t(business.pendingBid ? 'mine.cancelBid' : 'mine.bid'));
-        bid.addEventListener('click', function () {
-          haptic('light');
-          if (business.pendingBid) cancelBid(business);
-          else openBidForm(business);
-        });
-        actions.appendChild(bid);
-      }
       row.appendChild(actions);
     }
     return row;
@@ -2355,122 +2269,6 @@
   // Grouped so four figures do not read as one long number.
   function formatCount(n) {
     return Number(n || 0).toLocaleString('en-US');
-  }
-
-  // ---------- bidding ----------
-
-  function openBidForm(business) {
-    var pricing = business.pricing || {};
-    var prices = pricing.prices || {};
-    var held = business.bidAmount || 0;
-
-    var wrap = el('div', 'bz-sheet-body');
-    wrap.appendChild(el('p', 'bz-eyebrow', business.categoryName || ''));
-    wrap.appendChild(el('h2', 'bz-sheet-title', t('bid.title')));
-
-    var now = el('div', 'bz-bidnow');
-    now.appendChild(bidStat(t('bid.nowPosition'), business.position
-      ? t('mine.position', { n: business.position }) : t('common.empty')));
-    now.appendChild(bidStat(t('bid.nowBid'), held ? formatKRW(held) : t('common.empty')));
-    wrap.appendChild(now);
-
-    wrap.appendChild(el('p', 'bz-sheet-text', t('bid.lead')));
-
-    var chosen = null;
-    var options = el('div', 'bz-bidopts');
-    var error = el('p', 'bz-formerror');
-    error.setAttribute('role', 'alert');
-    error.hidden = true;
-    var send = button('bz-btn bz-btn--block', t('bid.pickFirst'));
-    send.disabled = true;
-
-    [1, 2, 3].forEach(function (pos) {
-      var price = prices[String(pos)];
-      if (!price) return;
-      var opt = button('bz-bidopt');
-      opt.setAttribute('aria-pressed', 'false');
-      opt.appendChild(rankBadge(pos));
-      var body = el('span', 'bz-bidopt-body');
-      body.appendChild(el('span', 'bz-bidopt-amount', formatKRW(price)));
-      var due = Math.max(0, price - held);
-      body.appendChild(el('span', 'bz-bidopt-due', held
-        ? t('bid.optionDue', { amount: formatKRW(due) })
-        : t('bid.optionMin')));
-      opt.appendChild(body);
-
-      if (price <= held) {
-        opt.disabled = true;
-        opt.classList.add('is-held');
-      } else {
-        opt.addEventListener('click', function () {
-          chosen = price;
-          var all = options.querySelectorAll('.bz-bidopt');
-          for (var i = 0; i < all.length; i++) {
-            all[i].classList.remove('is-on');
-            all[i].setAttribute('aria-pressed', 'false');
-          }
-          opt.classList.add('is-on');
-          opt.setAttribute('aria-pressed', 'true');
-          error.hidden = true;
-          send.disabled = false;
-          send.textContent = t('bid.sendWith', { amount: formatKRW(Math.max(0, price - held)) });
-        });
-      }
-      options.appendChild(opt);
-    });
-    wrap.appendChild(options);
-    wrap.appendChild(error);
-    wrap.appendChild(send);
-    wrap.appendChild(el('p', 'bz-fine', t('bid.fine')));
-
-    var sending = false;
-    send.addEventListener('click', function () {
-      if (sending || !chosen) return;
-      sending = true;
-      send.disabled = true;
-      send.textContent = t('bid.sending');
-      postJSON('/api/business/' + business.id + '/bid', { amount: chosen })
-        .then(function () { buzz('success'); showBidSent(); })
-        .catch(function (err) {
-          sending = false;
-          send.disabled = false;
-          send.textContent = t('bid.send');
-          error.textContent = errorText('bidErrors', err.code);
-          error.hidden = false;
-          buzz('error');
-        });
-    });
-
-    mountSheet(wrap, { kind: 'sheet' });
-  }
-
-  function bidStat(label, value) {
-    var box = el('div', 'bz-bidstat');
-    box.appendChild(el('span', 'bz-bidstat-k', label));
-    box.appendChild(el('span', 'bz-bidstat-v', value));
-    return box;
-  }
-
-  function showBidSent() {
-    var wrap = el('div', 'bz-sheet-body bz-done');
-    wrap.appendChild(iconSpan('bz-done-icon', ICONS.clock));
-    wrap.appendChild(el('h2', 'bz-sheet-title', t('bid.sentTitle')));
-    wrap.appendChild(el('p', 'bz-done-text', t('bid.sentBody')));
-    var cta = button('bz-btn bz-btn--block', t('common.adminContact'));
-    cta.addEventListener('click', openAdmin);
-    wrap.appendChild(cta);
-    var back = button('bz-btn bz-btn--text', t('owner.mine'));
-    back.addEventListener('click', openMine);
-    wrap.appendChild(back);
-    mountSheet(wrap, { kind: 'card' });
-  }
-
-  function cancelBid(business) {
-    fetch(API + '/api/business/' + business.id + '/bid', {
-      method: 'DELETE', headers: authHeaders(false)
-    })
-      .then(function () { showToast(t('mine.bidCancelled')); openMine(); })
-      .catch(function () { showToast(t('mine.bidCancelFailed')); });
   }
 
   // ---------- category picker ----------

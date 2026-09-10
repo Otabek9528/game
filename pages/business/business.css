@@ -7,13 +7,13 @@
      category   — a list of businesses, one line each
      business   — a centred card: who they are, how to reach them
 
-   Owner material (listing, positions, prices) is a bottom sheet
-   one tap behind a quiet card at the end of each list, so it is
-   never in the way of reading and never hard to find.
+   Getting listed is the one owner concern, in a bottom sheet one
+   tap behind a quiet card at the end of each list — never in the
+   way of reading and never hard to find.
 
    Surface roles carry the structure (tokens in style.css):
    content sits on a lifted card, controls sit in a sunken well,
-   overlays float above both. Gold marks a paid position only.
+   overlays float above both.
    ========================================================= */
 
 /* Several blocks below set display on a class, which outranks the UA's
@@ -584,44 +584,6 @@
   color: hsl(var(--h, 30) 42% 34%);
 }
 
-/* ---------- rank badge ---------- */
-/* A held position is marked, not staged. The old treatment gave the top three
-   a gold-tinted card, a coloured border and a 40px medal at the head of the
-   row — an auction leaderboard sitting where a customer was trying to pick a
-   bakery. A small numbered disc on the logo's corner says the same thing and
-   leaves every row the same object. */
-
-.bz-rank {
-  position: absolute;
-  right: -5px;
-  bottom: -5px;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  border: 2px solid var(--surface-card);
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-.bz-rank--1 { background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%); color: #4a3400; }
-.bz-rank--2 { background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%); color: #39404a; }
-.bz-rank--3 { background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%); color: #fff; }
-
-/* In the price table it is a standalone chip, not an overlay. */
-.bz-prices-row .bz-rank,
-.bz-bidopt .bz-rank {
-  position: static;
-  width: 26px;
-  height: 26px;
-  border-width: 0;
-  font-size: 0.7rem;
-}
-
 /* ---------------------------------------------------------
    STATES
    --------------------------------------------------------- */
@@ -788,7 +750,7 @@
    OVERLAY
    One backdrop, two shapes. A business is the object of the page, so it
    opens as a centred card with room to be read as one thing. Tasks — forms,
-   lists, prices — open as a bottom sheet, which is where a keyboard expects
+   lists — open as a bottom sheet, which is where a keyboard expects
    them and where a swipe-down dismissal belongs.
    --------------------------------------------------------- */
 
@@ -1497,35 +1459,6 @@
 .bz-step-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
 .bz-step-body { font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary); }
 
-/* ---------- prices ---------- */
-
-.bz-prices {
-  border: 1px solid var(--hairline);
-  border-radius: 13px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  background: var(--surface-card);
-}
-.bz-prices-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 11px;
-  padding: 11px 13px;
-  border-bottom: 1px solid var(--hairline);
-}
-.bz-prices-row:last-child { border-bottom: none; }
-.bz-prices-row.is-target { background: var(--gold-100); }
-
-.bz-prices-val {
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-.bz-prices-note { font-size: 0.68rem; color: var(--text-muted); }
-
 /* ---------- buttons ---------- */
 
 .bz-btn {
@@ -1928,75 +1861,6 @@
   transition: background var(--transition-fast);
 }
 .bz-mine-act:active { background: var(--accent-light); }
-.bz-mine-act--bid { color: var(--gold-600); border-color: var(--gold-300); }
-.bz-mine-act--bid:active { background: var(--gold-100); }
-
-/* ---------- bidding ---------- */
-
-.bz-bidnow { display: flex; gap: 10px; margin: 2px 0 16px; }
-
-.bz-bidstat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 12px 13px;
-  border: 1px solid var(--hairline);
-  border-radius: 13px;
-  background: var(--surface-card);
-  box-shadow: var(--shadow-card);
-}
-.bz-bidstat-k {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.bz-bidstat-v {
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.bz-bidopts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-
-.bz-bidopt {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 13px;
-  border: 1.5px solid var(--hairline);
-  border-radius: 14px;
-  background: var(--surface-card);
-  box-shadow: var(--shadow-card);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: border-color var(--transition-fast), background var(--transition-fast),
-              transform var(--transition-fast);
-}
-.bz-bidopt:active { transform: scale(0.99); }
-.bz-bidopt.is-on { border-color: var(--gold-500); background: var(--gold-100); }
-/* A figure the owner already meets is shown, not hidden: it is how they see
-   what they hold relative to what is on offer. */
-.bz-bidopt.is-held { opacity: 0.45; cursor: default; }
-
-.bz-bidopt-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.bz-bidopt-amount {
-  font-size: 0.96rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-.bz-bidopt-due {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
 
 /* ---------------------------------------------------------
    TOAST
@@ -2034,7 +1898,7 @@
 .bz-reactbtn:focus-visible, .bz-report:focus-visible, .bz-mark:focus-visible,
 .bz-btn:focus-visible, .bz-linkbtn:focus-visible, .bz-pick:focus-visible,
 .bz-input:focus-visible, .bz-select:focus-visible, .bz-logobtn:focus-visible,
-.bz-mine-act:focus-visible, .bz-bidopt:focus-visible, .bz-dialog-close:focus-visible,
+.bz-mine-act:focus-visible, .bz-dialog-close:focus-visible,
 .bz-viewer-close:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -2108,8 +1972,7 @@
 
 /* =========================================================
    NIGHT MODE
-   Warm near-black rather than grey — the gold and the monogram hues both
-   sit better on it. Surface roles carry over: content a shade lighter than
+   Warm near-black rather than grey — the monogram hues sit better on it. Surface roles carry over: content a shade lighter than
    the ground, controls a shade darker than content, overlays lighter still.
    ========================================================= */
 
@@ -2129,11 +1992,8 @@
 .night-mode .bz-pick,
 .night-mode .bz-state,
 .night-mode .bz-blank,
-.night-mode .bz-bidstat,
-.night-mode .bz-bidopt,
 .night-mode .bz-logopick,
 .night-mode .bz-mine,
-.night-mode .bz-prices,
 .night-mode .bz-factlist,
 .night-mode .bz-cta-btn {
   background: #201d1a;
@@ -2197,7 +2057,6 @@
 .night-mode .bz-sheet-title,
 .night-mode .bz-state-title,
 .night-mode .bz-blank-title,
-.night-mode .bz-prices-val,
 .night-mode .bz-search,
 .night-mode .bz-fact-v,
 .night-mode .bz-cta-verb,
@@ -2224,7 +2083,6 @@
 .night-mode .bz-seccount,
 .night-mode .bz-seclabel,
 .night-mode .bz-secinfo,
-.night-mode .bz-prices-note,
 .night-mode .bz-react-label,
 .night-mode .bz-report,
 .night-mode .bz-tile-n,
@@ -2240,8 +2098,6 @@
 .night-mode .bz-counter,
 .night-mode .bz-mine-cat,
 .night-mode .bz-mine-meta,
-.night-mode .bz-bidstat-k,
-.night-mode .bz-bidopt-due,
 .night-mode .bz-back,
 .night-mode .bz-switch-caret,
 .night-mode .bz-select-caret,
@@ -2269,7 +2125,6 @@
 .night-mode .bz-meta-cat { background: #262220; border-color: rgba(255, 255, 255, 0.11); }
 
 /* The metals keep their own colour on the dark ground. */
-.night-mode .bz-rank { border-color: #201d1a; }
 
 .night-mode .bz-owner { border-color: rgba(255, 255, 255, 0.16); }
 .night-mode .bz-owner:active { background: #221f1c; border-color: var(--emerald-400); }
@@ -2286,8 +2141,6 @@
 .night-mode .bz-step-title,
 .night-mode .bz-fieldlabel,
 .night-mode .bz-btn--ghost,
-.night-mode .bz-bidstat-v,
-.night-mode .bz-bidopt-amount { color: #e6e1db; }
 .night-mode .bz-btn--text:active { background: #262220; }
 .night-mode .bz-btn--block {
   background: linear-gradient(145deg, var(--emerald-700) 0%, #064e3b 100%);
@@ -2316,9 +2169,6 @@
   color: #6ee7b7;
 }
 .night-mode .bz-mine-acts { border-top-color: rgba(255, 255, 255, 0.08); }
-.night-mode .bz-mine-act--bid { color: #eab932; border-color: rgba(234, 185, 50, 0.35); }
-.night-mode .bz-mine-act--bid:active { background: rgba(234, 185, 50, 0.12); }
-.night-mode .bz-bidopt.is-on { border-color: #eab932; background: rgba(234, 185, 50, 0.11); }
 .night-mode .bz-status--pending,
 .night-mode .bz-status--unpaid { background: rgba(234, 185, 50, 0.14); color: #eab932; }
 .night-mode .bz-status--active { background: rgba(52, 211, 153, 0.13); color: #6ee7b7; }
@@ -2355,8 +2205,6 @@
     rgba(var(--tint-rgb, 120, 113, 108), 0.07) 48%,
     rgba(var(--tint-rgb, 120, 113, 108), 0) 100%);
 }
-.night-mode .bz-prices-row { border-bottom-color: rgba(255, 255, 255, 0.07); }
-.night-mode .bz-prices-row.is-target { background: rgba(234, 185, 50, 0.1); }
 .night-mode .bz-toast { background: #e6e1db; color: #1c1917; }
 .night-mode .bz-spinner { border-color: rgba(255, 255, 255, 0.12); border-top-color: var(--emerald-400); }
 .night-mode .bz-skel {

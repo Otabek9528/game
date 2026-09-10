@@ -122,18 +122,8 @@ window.BUSINESS_TEXT = {
      BIR YO‘NALISH ICHIDA / INSIDE A CATEGORY
      ------------------------------------------------------- */
   category: {
-    // Heading over the paid positions. Shown only where positions
-    // are actually being bid on.
-    podiumTitle: 'Yuqori o‘rinlar',
-    // Behind the (i) beside that heading. Says plainly why those
-    // businesses are on top.
-    podiumHint:  'Bu o‘rinlar biznes egalari tomonidan band qilingan.',
-    // Heading over everyone else.
-    restTitle:   'Boshqa bizneslar',
     emptyTitle:  'Bu yo‘nalishda hali biznes yo‘q',
     emptyBody:   'Yangi bizneslar qo‘shilgach shu yerda ko‘rinadi. Boshqa yo‘nalishlarga ham qarab ko‘ring.',
-    // Read aloud for the small numbered badge on a logo.
-    rankLabel:   '{n}-o‘rin',
     infoLabel:   'Izoh'
   },
 
@@ -244,25 +234,20 @@ window.BUSINESS_TEXT = {
     cardBody:    'Biznesingizni katalogga qo‘shing — mijozlar sizni shu yerdan topadi.',
     // Shown in a category that has no businesses at all.
     cardBodyEmpty: 'Bu yo‘nalishga birinchi bo‘lib qo‘shiling.',
-    // Shown where a top position is still free.
-    cardBodySlots: 'Biznesingizni qo‘shing. Bu yo‘nalishda {n} ta yuqori o‘rin bo‘sh.',
 
     eyebrow:     'Biznes egalari uchun',
     title:       'Katalogga qo‘shilish',
 
-    step1Title:  'Biznesni kiritish',
-    step1Body:   'Bir martalik to‘lov — {amount}. Biznesingiz katalogda doimiy qoladi.',
-    step2Title:  'Yuqori o‘rin (ixtiyoriy)',
-    step2Body:   'Har bir yo‘nalishda dastlabki 3 ta o‘rin uchun taklif berish mumkin. Bu kiritish to‘lovidan alohida.',
-    step3Title:  'O‘rinni egallash',
-    step3Body:   'Hozirgi egasidan kamida {amount} ko‘proq summa taklif qilasiz. Avval taklif bergan bo‘lsangiz, faqat farqini to‘laysiz.',
+    step1Title:  'Ariza yuborish',
+    step1Body:   'Biznesingiz nomi, yo‘nalishi va aloqa ma’lumotlarini kiriting.',
+    step2Title:  'To‘lov',
+    step2Body:   'Bir martalik to‘lov — {amount}. Admin bilan kelishib to‘laysiz.',
+    step3Title:  'Katalogda',
+    step3Body:   'To‘lov tasdiqlangach biznesingiz katalogda ko‘rinadi va doimiy qoladi.',
 
-    // The price table, shown only inside a category.
-    pricesLabel: '{category} — hozirgi narxlar',
-    pricesFrom:  'dan boshlab',
-    pricesFine:  'Ko‘rsatilgan summa yoki undan ko‘prog‘ini taklif qilsangiz, shu o‘rin yoki undan yuqorisi sizniki bo‘ladi. To‘lov admin orqali amalga oshiriladi va tasdiqlangach o‘rin yangilanadi. To‘lov qaytarilmaydi.',
-    // Shown instead of the table when no category is open yet.
-    pricesPick:  'Yo‘nalish bo‘yicha narxlarni ko‘rish',
+    // Under the steps. Says plainly how the order is decided, so nobody has
+    // to wonder whether a place in the list can be bought.
+    fine:        'Ro‘yxatdagi tartib mijozlarning bahosiga qarab belgilanadi: eng ko‘p yoqtirilgan biznes yuqorida turadi. Baholar teng bo‘lsa, avvalroq qo‘shilgan biznes yuqorida bo‘ladi.',
 
     submit:      'Biznesimni qo‘shish',
     mine:        'Mening bizneslarim'
@@ -340,21 +325,13 @@ window.BUSINESS_TEXT = {
     add:        'Yangi biznes qo‘shish',
 
     edit:       'Tahrirlash',
-    bid:        'Yuqori o‘rin olish',
-    cancelBid:  'Taklifni bekor qilish',
 
     // The three figures on an active listing. Labels sit under the number,
     // so keep them to one short word. (short)
     statViews:  'Ko‘rilgan',
     statLikes:  'Yoqtirgan',
-    statPosition: 'O‘rin',
-
-    // Used in the bidding sheet, where the position is named in a sentence.
-    position:   '{n}-o‘rin',
-    pendingBid: 'Taklif: {amount} — kutilmoqda',
-
-    bidCancelled:    'Taklif bekor qilindi',
-    bidCancelFailed: 'Bekor qilib bo‘lmadi'
+    // Where the listing sits in its category, by likes.
+    statPosition: 'O‘rin'
   },
 
   /* -------------------------------------------------------
@@ -367,30 +344,6 @@ window.BUSINESS_TEXT = {
     active:         'Katalogda',
     rejected:       'Qabul qilinmadi',
     suspended:      'To‘xtatilgan'
-  },
-
-  /* -------------------------------------------------------
-     YUQORI O‘RIN UCHUN TAKLIF / BIDDING
-     ------------------------------------------------------- */
-  bid: {
-    title:        'Yuqori o‘rin olish',
-    nowPosition:  'Hozirgi o‘rin',
-    nowBid:       'Sizning taklifingiz',
-    lead:         'O‘rinni tanlang. Avvalgi taklifingiz bo‘lsa, faqat farqini to‘laysiz.',
-
-    // Under each amount: what this position costs from zero…
-    optionMin:    'eng kam summa',
-    // …or, if the owner already holds a bid, the difference.
-    optionDue:    'qo‘shimcha to‘lov: {amount}',
-
-    pickFirst:    'Avval o‘rinni tanlang',
-    sendWith:     'Taklif yuborish — {amount}',
-    send:         'Taklif yuborish',
-    sending:      'Yuborilmoqda…',
-
-    fine:         'Taklif admin to‘lovni tasdiqlagandan keyin kuchga kiradi. Shu orada boshqa biznes yuqoriroq taklif bersa, o‘rningiz o‘zgarishi mumkin. To‘lov qaytarilmaydi.',
-    sentTitle:    'Taklif yuborildi',
-    sentBody:     'To‘lov bo‘yicha admin siz bilan bog‘lanadi. To‘lov tasdiqlangach o‘rningiz yangilanadi.'
   },
 
   /* -------------------------------------------------------
@@ -451,18 +404,6 @@ window.BUSINESS_TEXT = {
     server_misconfigured: 'Rasm yuklash vaqtincha ishlamayapti.',
     // Any other failure.
     generic:              'Yuklab bo‘lmadi. Boshqa rasm sinab ko‘ring.'
-  },
-
-  /* -------------------------------------------------------
-     TAKLIF XATOLARI / BIDDING ERRORS
-     ------------------------------------------------------- */
-  bidErrors: {
-    too_low:        'Taklif juda past.',
-    not_higher:     'Taklif hozirgi summangizdan yuqori bo‘lishi kerak.',
-    already_pending: 'Sizda ko‘rib chiqilayotgan taklif bor.',
-    bidding_closed: 'Bu yo‘nalishda hali o‘rin uchun taklif qabul qilinmaydi.',
-    not_active:     'Biznes hali katalogda emas.',
-    bad_amount:     'Summani tekshiring.'
   }
 
 };
