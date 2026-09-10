@@ -400,29 +400,65 @@
       applyReaction(row.bzBusiness);
       var body = row.querySelector('.bz-row-body');
       var old = body.querySelector('.bz-meta');
-      var next = metaLine(row.bzBusiness, row.bzCategoryName);
+      var next = metaLine(row.bzBusiness, row.bzCategoryName,
+                          row.bzRanked ? row.bzBusiness.bzRank : null);
       if (old && next) body.replaceChild(next, old);
       else if (old) body.removeChild(old);
       else if (next) body.appendChild(next);
     }
   }
 
+  // ============================================
+  // STANDING
+  // ============================================
+  // A place in the top three, and only where it means something.
+  //
+  // Two rules keep the medals honest. A business nobody has reacted to has
+  // not won anything, so a zero-like listing never wears one however high the
+  // date ordering floated it. And equal likes are equal standing: ties share
+  // a place, and the place after a shared second is fourth, so the row below
+  // two silvers gets no bronze it did not earn.
+  //
+  // Only the category view ranks. Search results are a filtered slice, so the
+  // first row there is rarely the category's first.
+  function assignRanks(businesses) {
+    var place = 0, previous = null;
+    businesses.forEach(function (business, i) {
+      var likes = business.likes || 0;
+      if (likes !== previous) { place = i + 1; previous = likes; }
+      business.bzRank = (likes > 0 && place <= 3) ? place : null;
+    });
+    return businesses;
+  }
+
+  function rankBadge(rank) {
+    var badge = el('span', 'bz-rank bz-rank--' + rank, String(rank));
+    badge.setAttribute('aria-hidden', 'true');
+    return badge;
+  }
+
   function businessRow(business, opts) {
     opts = opts || {};
     applyReaction(business);
-    var row = button('bz-row');
+    var rank = opts.ranked ? business.bzRank : null;
+    var row = button('bz-row' + (rank ? ' bz-row--r' + rank : ''));
     row.bzBusiness = business;
     row.bzCategoryName = opts.categoryName;
-    row.setAttribute('aria-label', business.name);
+    row.bzRanked = !!opts.ranked;
+    row.setAttribute('aria-label', business.name +
+      (rank ? ', ' + t('category.rankLabel', { n: rank }) : ''));
 
-    row.appendChild(logoNode(business));
+    var lead = el('span', 'bz-row-lead');
+    lead.appendChild(logoNode(business));
+    if (rank) lead.appendChild(rankBadge(rank));
+    row.appendChild(lead);
 
     var body = el('span', 'bz-row-body');
     body.appendChild(el('span', 'bz-row-name', business.name));
     if (business.description) {
       body.appendChild(el('span', 'bz-row-desc', firstLine(business.description)));
     }
-    var meta = metaLine(business, opts.categoryName);
+    var meta = metaLine(business, opts.categoryName, rank);
     if (meta) body.appendChild(meta);
     row.appendChild(body);
 
@@ -444,11 +480,11 @@
 
   // Likes are the one public signal a visitor can use; zeros are noise, so
   // the line only appears once there is something to say.
-  function metaLine(business, categoryName) {
+  function metaLine(business, categoryName, rank) {
     var parts = [];
     if (categoryName) parts.push(el('span', 'bz-meta-cat', categoryName));
     if (business.likes > 0) {
-      var likes = el('span', 'bz-meta-likes');
+      var likes = el('span', 'bz-meta-likes' + (rank ? ' is-rank' + rank : ''));
       likes.appendChild(iconSpan('bz-meta-icon', ICONS.heart));
       likes.appendChild(document.createTextNode(String(business.likes)));
       likes.setAttribute('aria-label', t('business.likes', { n: business.likes }));
@@ -696,8 +732,17 @@
       return;
     }
 
+    assignRanks(businesses);
+
     var list = el('section', 'bz-section');
-    businesses.forEach(function (business) { list.appendChild(businessRow(business)); });
+    // Said once, above the list, so the order explains itself instead of
+    // looking arbitrary — and only where reactions are actually deciding it.
+    if (businesses[0] && businesses[0].bzRank) {
+      list.appendChild(el('p', 'bz-ordernote', t('category.orderNote')));
+    }
+    businesses.forEach(function (business) {
+      list.appendChild(businessRow(business, { ranked: true }));
+    });
     host.appendChild(list);
     host.appendChild(ownerCard());
   }

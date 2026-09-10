@@ -122,6 +122,11 @@ window.BUSINESS_TEXT = {
      BIR YO‘NALISH ICHIDA / INSIDE A CATEGORY
      ------------------------------------------------------- */
   category: {
+    // Above the list, when reactions are what put it in this order.
+    orderNote:   'Mijozlar eng ko‘p yoqtirgan bizneslar yuqorida',
+    // Read aloud for the medal on a logo; not shown on screen.
+    rankLabel:   '{n}-o‘rin',
+
     emptyTitle:  'Bu yo‘nalishda hali biznes yo‘q',
     emptyBody:   'Yangi bizneslar qo‘shilgach shu yerda ko‘rinadi. Boshqa yo‘nalishlarga ham qarab ko‘ring.',
     infoLabel:   'Izoh'

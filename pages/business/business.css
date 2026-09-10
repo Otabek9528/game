@@ -585,6 +585,94 @@
 }
 
 /* ---------------------------------------------------------
+   STANDING
+   The top three of a category, when reactions have actually decided it.
+
+   The treatment fades out as it descends: first place gets a warm ground,
+   a gold edge and the largest medal; second a cooler, quieter version of
+   the same; third the medal alone. By fourth the row is a plain row again,
+   which is what makes the first three read as a group at all.
+
+   The medals are struck rather than printed — a three-stop gradient with a
+   light inset along the top edge and a shadow under it — so the metal is
+   legible at 24px without a numeral being read.
+   --------------------------------------------------------- */
+
+.bz-rank {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 2px solid var(--surface-card);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.bz-rank--1 {
+  width: 25px; height: 25px; font-size: 0.72rem;
+  background: linear-gradient(150deg, #fbe08a 0%, #e8bc3c 46%, #b8871a 100%);
+  color: #4a3400;
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.75),
+              inset 0 -1.5px 2px rgba(120, 84, 0, 0.32),
+              0 1px 3px rgba(150, 110, 10, 0.35);
+}
+.bz-rank--2 {
+  width: 22px; height: 22px; font-size: 0.66rem;
+  background: linear-gradient(150deg, #f4f6f8 0%, #cbd1d9 48%, #98a0aa 100%);
+  color: #39404a;
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.9),
+              inset 0 -1.5px 2px rgba(90, 100, 112, 0.3),
+              0 1px 3px rgba(90, 100, 112, 0.24);
+}
+.bz-rank--3 {
+  width: 20px; height: 20px; font-size: 0.62rem;
+  background: linear-gradient(150deg, #eec39c 0%, #c8834a 50%, #96602f 100%);
+  color: #fff;
+  box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
+              inset 0 -1.5px 2px rgba(90, 52, 20, 0.34),
+              0 1px 3px rgba(120, 76, 38, 0.28);
+}
+
+/* First place sits on its own ground and carries a little more height. */
+.bz-row--r1 {
+  background: linear-gradient(180deg, #fdf6e4 0%, var(--surface-card) 72%);
+  border-color: #e6cf92;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  box-shadow: 0 1px 2px rgba(150, 110, 10, 0.08), 0 6px 18px -12px rgba(150, 110, 10, 0.5);
+}
+.bz-row--r1 .bz-row-name { font-weight: 700; }
+
+/* Second: the same idea, cooler and quieter. */
+.bz-row--r2 {
+  background: linear-gradient(180deg, #f6f8fa 0%, var(--surface-card) 68%);
+  border-color: #c8d0d9;
+}
+
+/* Third: the edge alone, no ground under it. */
+.bz-row--r3 { border-color: #e0c3a6; }
+
+/* The like count is why these rows are where they are, so on a medalled row
+   it stops being grey. */
+.bz-meta-likes.is-rank1 { color: var(--gold-600); font-weight: 600; }
+.bz-meta-likes.is-rank1 .bz-meta-icon { opacity: 1; }
+.bz-meta-likes.is-rank2,
+.bz-meta-likes.is-rank3 { color: var(--text-secondary); font-weight: 600; }
+
+/* Says once, above the list, what put it in this order. */
+.bz-ordernote {
+  margin: 0 0 10px;
+  padding-left: 2px;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------
    STATES
    --------------------------------------------------------- */
 
@@ -2125,6 +2213,24 @@
 .night-mode .bz-meta-cat { background: #262220; border-color: rgba(255, 255, 255, 0.11); }
 
 /* The metals keep their own colour on the dark ground. */
+
+/* The metals keep their own colour on the dark ground; only the grounds
+   under them drop to a whisper, so the medal stays the brightest thing. */
+.night-mode .bz-rank { border-color: #201d1a; }
+.night-mode .bz-row--r1 {
+  background: linear-gradient(180deg, rgba(232, 188, 60, 0.13) 0%, #201d1a 72%);
+  border-color: rgba(232, 188, 60, 0.42);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px -12px rgba(232, 188, 60, 0.4);
+}
+.night-mode .bz-row--r2 {
+  background: linear-gradient(180deg, rgba(203, 209, 217, 0.1) 0%, #201d1a 68%);
+  border-color: rgba(203, 209, 217, 0.34);
+}
+.night-mode .bz-row--r3 { border-color: rgba(200, 131, 74, 0.34); }
+.night-mode .bz-meta-likes.is-rank1 { color: #eab932; }
+.night-mode .bz-meta-likes.is-rank2,
+.night-mode .bz-meta-likes.is-rank3 { color: #a49d95; }
+.night-mode .bz-ordernote { color: #7d766e; }
 
 .night-mode .bz-owner { border-color: rgba(255, 255, 255, 0.16); }
 .night-mode .bz-owner:active { background: #221f1c; border-color: var(--emerald-400); }
