@@ -70,7 +70,7 @@
               .replace(/\/+$/, '');
   var TIMEOUT = 30000;
   // Falls back only until /categories answers; the server is the authority.
-  var LISTING_FEE = 5000;
+  var LISTING_FEE = 10000;
   var ADMIN = 'https://t.me/otabeksattarov';
 
   // ============================================

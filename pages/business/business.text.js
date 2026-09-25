@@ -46,7 +46,7 @@ window.BUSINESS_TEXT = {
      ------------------------------------------------------- */
   common: {
     // Money, everywhere it appears. {amount} arrives already
-    // grouped, e.g. "5,000".
+    // grouped, e.g. "10,000".
     currency:      '{amount} won',
     // Stands in for a value that does not exist yet.
     empty:         '—',
@@ -244,15 +244,15 @@ window.BUSINESS_TEXT = {
     title:       'Katalogga qo‘shilish',
 
     step1Title:  'Ariza yuborish',
-    step1Body:   'Biznesingiz nomi, yo‘nalishi va aloqa ma’lumotlarini kiriting.',
+    step1Body:   'Biznes logosi, nomi, yo‘nalishi va aloqa ma’lumotlarini kiriting.',
     step2Title:  'To‘lov',
-    step2Body:   'Bir martalik to‘lov — {amount}. Admin bilan kelishib to‘laysiz.',
+    step2Body:   'Bir martalik to‘lov - {amount}. Adminga to\'lov screenshotini yuborasiz.',
     step3Title:  'Katalogda',
-    step3Body:   'To‘lov tasdiqlangach biznesingiz katalogda ko‘rinadi va doimiy qoladi.',
+    step3Body:   'To‘lov tasdiqlangach biznesingiz katalogda ko‘rina boshlaydi.',
 
     // Under the steps. Says plainly how the order is decided, so nobody has
     // to wonder whether a place in the list can be bought.
-    fine:        'Ro‘yxatdagi tartib mijozlarning bahosiga qarab belgilanadi: eng ko‘p yoqtirilgan biznes yuqorida turadi. Baholar teng bo‘lsa, avvalroq qo‘shilgan biznes yuqorida bo‘ladi.',
+    fine:        'Katalogda ko\'rinish tartibi biznesga bosilgan klass soniga qarab belgilanadi: eng ko‘p yoqtirilgan biznes yuqorida turadi.',
 
     submit:      'Biznesimni qo‘shish',
     mine:        'Mening bizneslarim'
@@ -272,7 +272,7 @@ window.BUSINESS_TEXT = {
     atLeastOne:  'kamida bittasi',
 
     nameLabel:       'Biznes nomi',
-    namePlaceholder: 'Masalan: Samarqand Non',
+    namePlaceholder: 'Masalan: Azia Travel',
 
     categoryLabel:   'Yo‘nalish',
     categoryPick:    'Tanlang',
@@ -280,7 +280,7 @@ window.BUSINESS_TEXT = {
     descLabel:       'Biznes haqida',
     // The card turns "Nomi: qiymati" lines into their own rows, so
     // the placeholder shows that shape rather than describing it.
-    descPlaceholder: 'Manzil: Seoul, Itaewon-ro 12\nIsh vaqti: 09:00–21:00\nXizmatlar: yetkazib berish, buyurtma…',
+    descPlaceholder: 'Eng arzon aviabiletlar faqat bizda\nManzil: Seoul, Itaewon-ro 12\nIsh vaqti: 09:00–21:00\nXizmatlar: yetkazib berish, buyurtma…',
     descNote:        'Har bir ma’lumotni alohida qatorga yozing — “Manzil: …”, “Ish vaqti: …”. Shunday yozilganlari mijozga alohida qator bo‘lib ko‘rinadi.',
     // Characters used out of the limit.
     counter:         '{n} / {max}',
@@ -297,7 +297,7 @@ window.BUSINESS_TEXT = {
     logoChosen:      'Tanlandi. Biznes bilan birga yuboriladi.',
     logoSaved:       'Saqlandi',
 
-    fineNew:     'Arizangizni admin ko‘rib chiqadi. Katalogga kiritish to‘lovi — {amount}, admin bilan kelishib to‘lanadi.',
+    fineNew:     'Arizangizni admin ko‘rib chiqadi. Katalogga kiritish to‘lovi — {amount}.',
     fineEdit:    'O‘zgarishlar darhol saqlanadi, admin xabardor qilinadi.',
 
     send:        'Yuborish',
@@ -312,7 +312,7 @@ window.BUSINESS_TEXT = {
      ------------------------------------------------------- */
   submitted: {
     title:      'Ariza yuborildi',
-    body:       'Admin ko‘rib chiqqach biznesingiz katalogda paydo bo‘ladi. To‘lov bo‘yicha admin siz bilan bog‘lanadi.',
+    body:       'Admin ko‘rib chiqqach biznesingiz katalogda paydo bo‘ladi. To‘lov bo‘yicha quyida admin bilan bog‘laning.',
     // The listing went through but its picture did not.
     logoFailed: 'Biznes yuborildi, lekin logoni yuklab bo‘lmadi. Uni keyinroq «Mening bizneslarim» bo‘limidan qo‘shishingiz mumkin.'
   },
