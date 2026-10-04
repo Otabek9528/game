@@ -69,7 +69,7 @@ window.BUSINESS_TEXT = {
      ------------------------------------------------------- */
   header: {
     // Browser tab, and the title on the first screen. (short)
-    pageTitle:      'Biznes katalogi',
+    pageTitle:      'Tochkani Xo\'jayini - Biznes katalogi',
     // Title while showing search results. (short)
     searchTitle:    'Qidiruv',
     searchPlaceholder: 'Biznes yoki xizmatni qidiring',
