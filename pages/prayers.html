@@ -25,38 +25,41 @@
     .pb-wrap { max-width:480px; margin:0 auto; padding:14px 14px 0; }
 
     /* ---- location + gear row ---- */
-    .pb-loc-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:4px 2px 10px; }
-    /* Same grammar as the home card's chip — pin, city, refresh glyph — set as
-       plain text to match this page's header, with its age underneath. The
-       negative margin lets the pressed state bleed past the text edge. */
+    .pb-loc-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 12px; }
+    /* Location and settings are this page's two controls, so they share one
+       material: white, hairline border, 38px tall, edges flush with the cards
+       below. The pill keeps the home card's grammar — pin, city, age, refresh —
+       on one line, so it centres with the gear instead of hanging above it. */
     .pb-loc {
-      all:unset; box-sizing:border-box; display:flex; flex-direction:column; gap:1px; min-width:0;
-      padding:4px 10px 4px 6px; margin:-4px 0 -4px -6px; border-radius:12px; cursor:pointer;
-      transition:background .15s ease; -webkit-tap-highlight-color:transparent;
+      all:unset; box-sizing:border-box; display:inline-flex; align-items:center; gap:7px;
+      height:38px; min-width:0; padding:0 12px 0 11px;
+      background:var(--pb-surface); border:1px solid var(--pb-line); border-radius:999px;
+      color:var(--pb-emd); cursor:pointer; -webkit-tap-highlight-color:transparent;
+      transition:background .15s ease, transform .15s ease;
     }
-    .pb-loc:active { background:var(--pb-ems); }
-    .pb-loc:focus-visible { outline:2px solid var(--pb-em); outline-offset:1px; }
+    .pb-loc:active { transform:scale(0.98); background:var(--pb-ems); }
+    .pb-loc:focus-visible { outline:2px solid var(--pb-em); outline-offset:2px; }
     .pb-loc.is-busy { cursor:progress; }
-    .pb-loc-line { display:flex; align-items:center; gap:6px; min-width:0; color:var(--pb-emd); }
-    .pb-loc-line .ti-map-pin { font-size:18px; flex-shrink:0; }
-    .pb-loc-city { font-size:15px; font-weight:600; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
-    .pb-loc-refresh { display:inline-block; font-size:15px; color:var(--pb-em); opacity:.75; flex-shrink:0; }
-    /* indented past the pin (18px + 6px gap) so it starts under the city name */
-    .pb-loc-meta { font-size:11.5px; line-height:1.3; color:var(--pb-faint); padding-left:24px; white-space:nowrap; font-variant-numeric:tabular-nums; transition:color .25s ease; }
-    .pb-loc.is-busy .pb-loc-refresh { opacity:1; animation:pbSpin .9s linear infinite; }
+    .pb-loc .ti-map-pin { font-size:17px; flex-shrink:0; }
+    /* The city gives way first; the age never truncates. */
+    .pb-loc-city { font-size:14.5px; font-weight:600; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+    .pb-loc-meta { flex-shrink:0; font-size:12px; font-weight:500; color:var(--pb-sub); white-space:nowrap; font-variant-numeric:tabular-nums; transition:color .25s ease; }
+    .pb-loc-meta::before { content:'\00b7'; margin-right:7px; color:var(--pb-faint); }
+    .pb-loc-refresh { display:inline-block; font-size:16px; color:var(--pb-em); flex-shrink:0; margin-left:2px; }
+    .pb-loc.is-busy .pb-loc-refresh { animation:pbSpin .9s linear infinite; }
     .pb-loc.is-stale .pb-loc-meta { color:var(--pb-amb); }
     .pb-loc.is-error .pb-loc-meta { color:#c2410c; }
     .night-mode .pb-loc.is-error .pb-loc-meta { color:#fb923c; }
     .pb-loc.is-done { animation:pbDone .9s ease-out; }
     @keyframes pbSpin { to { transform:rotate(360deg); } }
-    @keyframes pbDone { from { background:var(--pb-ems); } to { background:transparent; } }
+    @keyframes pbDone { from { background:var(--pb-ems); } to { background:var(--pb-surface); } }
     @keyframes pbBreathe { from { opacity:1; } to { opacity:.3; } }
     @media (prefers-reduced-motion: reduce) {
       .pb-loc.is-busy .pb-loc-refresh { animation:pbBreathe 1.2s ease-in-out infinite alternate; }
       .pb-loc.is-done { animation:none; }
     }
     .pb-gear {
-      display:inline-flex; align-items:center; justify-content:center;
+      display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
       width:38px; height:38px; border-radius:50%; border:1px solid var(--pb-line);
       background:var(--pb-surface); color:var(--pb-sub); cursor:pointer;
       transition:background .15s ease, border-color .15s ease; -webkit-tap-highlight-color:transparent;
@@ -249,12 +252,10 @@
 
       <div class="pb-loc-row">
         <button type="button" class="pb-loc" id="locationRefreshBtn" data-location-refresh>
-          <span class="pb-loc-line">
-            <i class="ti ti-map-pin" aria-hidden="true"></i>
-            <span class="pb-loc-city" id="cityName">Yuklanmoqda...</span>
-            <i class="ti ti-refresh pb-loc-refresh" aria-hidden="true"></i>
-          </span>
+          <i class="ti ti-map-pin" aria-hidden="true"></i>
+          <span class="pb-loc-city" id="cityName">Yuklanmoqda...</span>
           <span class="pb-loc-meta" data-location-meta>&nbsp;</span>
+          <i class="ti ti-refresh pb-loc-refresh" aria-hidden="true"></i>
         </button>
         <button id="settingsGearBtn" class="pb-gear" type="button" aria-label="Sozlamalar"><i class="ti ti-settings" aria-hidden="true"></i></button>
       </div>
