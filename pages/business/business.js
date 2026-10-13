@@ -188,6 +188,9 @@
         if (!r.ok || !data.success) {
           var err = new Error(data.error || 'http_' + r.status);
           err.code = data.error;
+          // Which link field the server rejected, for a form with two
+          // Telegram inputs where "wrong link" alone does not say which.
+          err.field = data.field;
           throw err;
         }
         return data;
@@ -293,6 +296,9 @@
     expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
     copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5.5 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.9"/></svg>',
     flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4.5M5 4.5c4-2.4 8 2.4 14 0v10c-6 2.4-10-2.4-14 0"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15.1V8.9l5.2 3.1z"/></svg>',
+    facebook: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.8v3h2.6V21z"/></svg>',
+    megaphone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5v3a1.5 1.5 0 0 0 1.5 1.5H7l7.5 4.5V4.5L7 9H4.5A1.5 1.5 0 0 0 3 10.5Z"/><path d="M18 9a4 4 0 0 1 0 6M7 15l1.2 5"/></svg>',
     store: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5V20h16v-9.5M3 8l1.5-4h15L21 8a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0Z"/><path d="M10 20v-5h4v5"/></svg>'
   };
 
@@ -301,10 +307,13 @@
   var LINK_ICON = {
     phone:     ICONS.phone,
     telegram:  ICONS.telegram,
+    tgchannel: ICONS.megaphone,
     kakao:     ICONS.kakao,
     website:   ICONS.globe,
     instagram: ICONS.instagram,
     tiktok:    ICONS.tiktok,
+    youtube:   ICONS.youtube,
+    facebook:  ICONS.facebook,
     appstore:  ICONS.appstore,
     playstore: ICONS.playstore
   };
@@ -1127,9 +1136,12 @@
     // information" sitting under one labelled "other links" was the label
     // and the layout saying opposite things.
     if (facts.length) wrap.appendChild(factsBlock(facts));
-    if (parsed.text) wrap.appendChild(aboutBlock(parsed.text));
 
+    // The remaining links before the owner's prose: a row per place is a few
+    // lines, while a description runs to eleven, and left below it a channel
+    // or Instagram sat a full screen down where nobody scrolled to it.
     if (split.rest.length) wrap.appendChild(linksBlock(split.rest));
+    if (parsed.text) wrap.appendChild(aboutBlock(parsed.text));
 
     if (!links.length && !facts.length && !parsed.text) {
       wrap.appendChild(el('p', 'bz-detail-none', t('business.noInfo')));
@@ -1256,23 +1268,34 @@
   // Play Store URL, only to know it is there.
 
   var CONTACT_RANK = {
-    phone: 1, telegram: 2, kakao: 3, website: 4,
-    instagram: 5, tiktok: 6, playstore: 7, appstore: 8
+    phone: 1, telegram: 2, kakao: 3, tgchannel: 4, website: 5,
+    instagram: 6, tiktok: 7, youtube: 8, facebook: 9, playstore: 10, appstore: 11
   };
   var PRIMARY_SLOTS = 2;
   var STORE_KIND = { appstore: 1, playstore: 1 };
+  // Followed or watched, not written to. A channel is where to follow a
+  // business, not how to reach it, so it never takes a contact button from a
+  // way to reach them. Only a listing with nothing else gives it one, rather
+  // than showing none.
+  var FOLLOW_KIND = { tgchannel: 1, youtube: 1 };
 
   // Where the two prominent buttons stop and the chips begin. The app stores
   // are one thing in two places, so the boundary never falls between them:
   // the same app rendered as a large button on one store and a small chip on
   // the other reads as a mistake. Either both lead, or both wait below.
   function splitLinks(links) {
-    var n = Math.min(PRIMARY_SLOTS, links.length);
-    if (n > 0 && n < links.length &&
-        STORE_KIND[links[n - 1].kind] && STORE_KIND[links[n].kind]) {
+    var pool = links.filter(function (l) { return !FOLLOW_KIND[l.kind]; });
+    if (!pool.length) pool = links;
+    var n = Math.min(PRIMARY_SLOTS, pool.length);
+    if (n > 0 && n < pool.length &&
+        STORE_KIND[pool[n - 1].kind] && STORE_KIND[pool[n].kind]) {
       n--;
     }
-    return { primary: links.slice(0, n), rest: links.slice(n) };
+    var primary = pool.slice(0, n);
+    return {
+      primary: primary,
+      rest: links.filter(function (l) { return primary.indexOf(l) === -1; })
+    };
   }
 
   function isAndroid() { return (tg.platform || '').toLowerCase() === 'android'; }
@@ -1302,34 +1325,54 @@
     return box;
   }
 
+  // The number or handle is what the reader came for, so it is the large
+  // line; the verb under it says what the tap will do. The other way round,
+  // the verb wrapped onto two lines and the number was the smallest text in
+  // its own button.
   function ctaButton(link, primary) {
     var node = button('bz-cta-btn' + (primary ? ' is-primary' : ''));
     node.appendChild(iconSpan('bz-cta-icon', LINK_ICON[link.kind]));
-    var text = el('span', 'bz-cta-text');
-    text.appendChild(el('span', 'bz-cta-verb', actionVerb(link.kind)));
     var value = displayValue(link);
+    var text = el('span', 'bz-cta-text' + (value ? '' : ' bz-cta-text--bare'));
     if (value) text.appendChild(el('span', 'bz-cta-val', value));
+    text.appendChild(el('span', 'bz-cta-verb', actionVerb(link.kind)));
     node.appendChild(text);
     node.addEventListener('click', function () { activate(link); });
     return node;
   }
 
+  // One grouped list, a row per place: what it is, then whose. As chips,
+  // Instagram showed no handle while the buttons above did, a website showed
+  // only a domain, and a second Telegram link would have been a second chip
+  // reading "Telegram" with nothing to tell the two apart.
   function linksBlock(links) {
     var box = el('div', 'bz-links');
     box.appendChild(el('p', 'bz-seclabel', t('business.linksTitle')));
-    var chips = el('div', 'bz-chips');
+    var list = el('div', 'bz-linklist');
     links.forEach(function (link) {
-      var chip = button('bz-chip');
-      chip.appendChild(iconSpan('bz-chip-icon', LINK_ICON[link.kind]));
-      chip.appendChild(el('span', 'bz-chip-text',
-        link.kind === 'website' ? (displayValue(link) || t('channels.website'))
-                                : t('channels.' + link.kind)));
-      chip.appendChild(iconSpan('bz-chip-tail', ICONS.external));
-      chip.addEventListener('click', function () { activate(link); });
-      chips.appendChild(chip);
+      var row = button('bz-lrow');
+      row.appendChild(iconSpan('bz-lrow-icon bz-lrow-icon--' + link.kind, LINK_ICON[link.kind]));
+      var text = el('span', 'bz-lrow-text');
+      text.appendChild(el('span', 'bz-lrow-name', linkName(link)));
+      var value = displayValue(link);
+      if (value) text.appendChild(el('span', 'bz-lrow-val', value));
+      row.appendChild(text);
+      row.appendChild(iconSpan('bz-lrow-chev', ICONS.chevron));
+      row.addEventListener('click', function () { activate(link); });
+      list.appendChild(row);
     });
-    box.appendChild(chips);
+    box.appendChild(list);
     return box;
+  }
+
+  // A website that is really a map or a video is named for where it goes;
+  // any other is "Veb-sayt", with its address on the line underneath.
+  function linkName(link) {
+    if (link.kind === 'website') {
+      var named = prettyUrl(link.value);
+      return named !== hostOf(link.value) ? named : t('channels.website');
+    }
+    return t('channels.' + link.kind);
   }
 
   function activate(link) {
@@ -1349,10 +1392,57 @@
       var u = new URL(link.value);
       if (link.kind === 'website') return u.hostname.replace(/^www\./, '');
       var segs = u.pathname.split('/').filter(Boolean);
-      return segs.length ? '@' + segs[0].replace(/^@/, '') : u.hostname;
+      if (!segs.length) return u.hostname;
+      if (link.kind === 'youtube' || link.kind === 'facebook') return pageName(link.kind, segs, u);
+      // A private invite carries a token, not a name; "@+Xk3fQ…" would read
+      // as a broken handle.
+      if (isInvite(link, segs)) return t('channels.privateGroup');
+      return '@' + segs[0].replace(/^@/, '');
     } catch (e) {
       return link.value;
     }
+  }
+
+  // YouTube and Facebook addresses are mostly not a name: /channel/UC3x…,
+  // /watch?v=…, youtu.be/<video>, /profile.php?id=…, /groups/<id>. Only a
+  // real handle is printed; anything else shows the platform's name alone
+  // rather than "@channel" or "@profile.php".
+  var FB_NOT_NAME = { 'profile.php': 1, groups: 1, pages: 1, people: 1, share: 1, watch: 1, events: 1 };
+
+  function pageName(kind, segs, u) {
+    if (kind === 'youtube') {
+      if (u.hostname === 'youtu.be') return '';
+      if (segs[0].charAt(0) === '@') return segs[0];
+      if ((segs[0] === 'c' || segs[0] === 'user') && segs[1]) return '@' + segs[1];
+      return '';
+    }
+    if (FB_NOT_NAME[segs[0]] || /^\d+$/.test(segs[0])) return '';
+    return '@' + segs[0];
+  }
+
+  var TG_KIND = { telegram: 1, tgchannel: 1 };
+
+  function isInvite(link, segs) {
+    return !!TG_KIND[link.kind] && (segs[0].charAt(0) === '+' || segs[0] === 'joinchat');
+  }
+
+  // What the edit form opens on: the link as an owner would type it.
+  // displayValue is for reading and shortens on purpose — a website to its
+  // host, an invite to "Yopiq guruh" — so opening the form on it and saving
+  // stored the shortened text in place of the real link.
+  var HANDLE_KIND = { telegram: 1, tgchannel: 1, instagram: 1, tiktok: 1, youtube: 1, facebook: 1 };
+
+  function formValue(link) {
+    if (link.kind === 'phone') return link.value;
+    try {
+      var u = new URL(link.value);
+      var segs = u.pathname.split('/').filter(Boolean);
+      if (HANDLE_KIND[link.kind] && segs.length === 1 && !u.search && !isInvite(link, segs) &&
+          (link.kind !== 'youtube' || segs[0].charAt(0) === '@') && !FB_NOT_NAME[segs[0]]) {
+        return '@' + segs[0].replace(/^@/, '');
+      }
+    } catch (e) { /* stored as typed */ }
+    return String(link.value).replace(/^https:\/\//i, '');
   }
 
   // ---------- facts and description ----------
@@ -1377,13 +1467,16 @@
   // Written out in full, anything goes. Written bare, the last label has to
   // look like a real suffix — two to six letters — which is what stops an
   // Android package id such as "uz.bozoraka" from becoming a dead link.
+  var LEAD_MARKS = /^[^\p{L}\p{N}]+/u;
   var BARE_URL_RE = /^(?:https?:\/\/\S+|(?:[a-z0-9-]+\.)+[a-z]{2,6}(?:[\/?#]\S*)?)$/i;
 
   function parseDescription(text) {
     var facts = [], rest = [], found = [];
 
     String(text || '').split(/\r?\n/).forEach(function (line) {
-      var bare = line.trim().replace(TRAILING, '');
+      // Owners lead lines with an emoji or a bullet ("📩 t.me/support"); that
+      // still leaves a link standing alone on its line.
+      var bare = line.trim().replace(LEAD_MARKS, '').replace(TRAILING, '');
       // Standing on its own line: lift it out and let it join the business's
       // other links, where a reader looks for somewhere to go. Left in place
       // it renders as a pill stranded in the middle of a paragraph.
@@ -1516,7 +1609,9 @@
 
   // Text with any URLs turned into real buttons. Built from text nodes, never
   // innerHTML: nothing owner-supplied is parsed as markup.
-  var URL_RE = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+  // Known hosts count without "https://" too: "t.me/support" is how owners
+  // write a Telegram link, and as plain text it could not be tapped.
+  var URL_RE = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|\b(?:t\.me|telegram\.me|instagram\.com|tiktok\.com|youtube\.com|youtu\.be|facebook\.com|fb\.me|(?:open|pf)\.kakao\.com|naver\.me)\/[^\s<>"']+)/gi;
   var TRAILING = /[.,;:!?)\]]+$/;
 
   function appendLinked(node, text) {
@@ -1564,8 +1659,9 @@
     [/^map\.kakao\.com$/, 'hosts.kakaoMap', 'website'],
     [/^maps\.google\.|^maps\.app\.goo\.gl$|^goo\.gl$/, 'hosts.googleMap', 'website'],
     [/(^|\.)kakao\.com$/, 'KakaoTalk', 'kakao'],
-    [/(^|\.)youtube\.com$/, 'YouTube', 'website'],
-    [/(^|\.)youtu\.be$/, 'YouTube', 'website']
+    [/(^|\.)youtube\.com$/, 'YouTube', 'youtube'],
+    [/(^|\.)youtu\.be$/, 'YouTube', 'youtube'],
+    [/(^|\.)(facebook|fb)\.com$|^fb\.me$/, 'Facebook', 'facebook']
   ];
 
   // A label written as a text-file path is resolved when it is used.
@@ -1760,7 +1856,8 @@
     if (!/^https?:\/\//i.test(link.value)) return;   // never pass on another scheme
     haptic('light');
     try {
-      if (link.kind === 'telegram') tg.openTelegramLink(link.value);
+      // In-app only for t.me; Telegram rejects any other host here.
+      if (TG_KIND[link.kind] && /^https:\/\/t\.me\//i.test(link.value)) tg.openTelegramLink(link.value);
       else tg.openLink(link.value, { try_instant_view: false });
     } catch (e) {
       window.open(link.value, '_blank', 'noopener');
@@ -1829,12 +1926,17 @@
 
   // ---------- submission ----------
 
-  // Each field's label is the channel's name from the text file; the
-  // placeholders are examples of a format, not language, so they stay here.
+  // Each field's label is the channel's name from the text file. A
+  // placeholder that is only a format example stays here; one with words in
+  // it is a path into the text file, resolved when the form is drawn.
   var LINK_FIELDS = [
     { kind: 'phone',     placeholder: '010-1234-5678', mode: 'tel' },
-    { kind: 'telegram',  placeholder: '@username' },
+    { kind: 'telegram',  placeholder: 'form.telegramPlaceholder' },
+    { kind: 'tgchannel', placeholder: 'form.tgchannelPlaceholder' },
     { kind: 'instagram', placeholder: '@username' },
+    { kind: 'tiktok',    placeholder: '@username' },
+    { kind: 'youtube',   placeholder: '@channel' },
+    { kind: 'facebook',  placeholder: 'facebook.com/…' },
     { kind: 'website',   placeholder: 'example.uz', mode: 'url' }
   ];
 
@@ -1862,7 +1964,7 @@
         category: { id: existing.categoryId, name: existing.categoryName, icon: existing.categoryIcon },
         logo: existing.logo || null
       };
-      (existing.links || []).forEach(function (l) { draft.links[l.kind] = displayValue(l); });
+      (existing.links || []).forEach(function (l) { draft.links[l.kind] = formValue(l); });
     }
     if (!editing && draft.id) clearDraft();
     if (!draft.category && state.mode === 'category') {
@@ -1934,7 +2036,7 @@
       var input = el('input', 'bz-input bz-input--flat');
       input.type = 'text';
       input.maxLength = 200;
-      input.placeholder = spec.placeholder;
+      input.placeholder = spec.placeholder.indexOf('form.') === 0 ? t(spec.placeholder) : spec.placeholder;
       input.setAttribute('aria-label', t('channels.' + spec.kind));
       input.autocapitalize = 'none';
       input.spellcheck = false;
@@ -1945,6 +2047,8 @@
       row.appendChild(input);
       linkField.appendChild(row);
     });
+    // Two Telegram fields side by side need saying apart where they are typed.
+    linkField.appendChild(el('span', 'bz-fieldnote', t('form.linksNote')));
     form.appendChild(linkField);
     wrap.appendChild(form);
 
@@ -1966,8 +2070,14 @@
       }).filter(function (l) { return l.value; });
     }
 
-    function fail(code) {
-      error.textContent = errorText('submitErrors', code);
+    function fail(code, kind) {
+      var text = errorText('submitErrors', code);
+      // A link error names its field, and the cursor goes there.
+      if (kind && inputs[kind]) {
+        text = t('channels.' + kind) + ': ' + text;
+        inputs[kind].focus();
+      }
+      error.textContent = text;
       error.hidden = false;
       buzz('error');
     }
@@ -2019,7 +2129,7 @@
           sending = false;
           send.disabled = false;
           send.textContent = t(editing ? 'form.save' : 'form.send');
-          fail(err.code);
+          fail(err.code, err.field);
         });
     });
 

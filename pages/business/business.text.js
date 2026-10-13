@@ -188,10 +188,15 @@ window.BUSINESS_TEXT = {
     // number is copied instead — and the button says so first.
     phoneCopy:  'Raqamni nusxalash',
     telegram:   'Telegramda yozish',
+    // The business's own channel or group. Only on a button when the
+    // listing has no other way to reach it.
+    tgchannel:  'Telegramda ochish',
     kakao:      'KakaoTalkda yozish',
     website:    'Saytni ochish',
     instagram:  'Instagramda ko‘rish',
     tiktok:     'TikTokda ko‘rish',
+    youtube:    'YouTube’da ko‘rish',
+    facebook:   'Facebookda ochish',
     playstore:  'Google Play’da ochish',
     appstore:   'App Store’da ochish',
     open:       'Ochish',
@@ -208,10 +213,17 @@ window.BUSINESS_TEXT = {
   channels: {
     phone:     'Telefon',
     telegram:  'Telegram',
+    // The business's channel or group, as opposed to a person to write to.
+    tgchannel: 'Telegram kanal / guruh',
+    // Under the name in place of a handle, for a private invite link
+    // (t.me/+…), which has no public name to show. (short)
+    privateGroup: 'Yopiq guruh',
     kakao:     'KakaoTalk',
     website:   'Veb-sayt',
     instagram: 'Instagram',
     tiktok:    'TikTok',
+    youtube:   'YouTube',
+    facebook:  'Facebook',
     appstore:  'App Store',
     playstore: 'Google Play'
   },
@@ -286,6 +298,10 @@ window.BUSINESS_TEXT = {
     counter:         '{n} / {max}',
 
     linksLabel:      'Aloqa',
+    // Inside the two Telegram fields. Keep the @ in front.
+    telegramPlaceholder:  '@username (mijozlar yozishi uchun)',
+    tgchannelPlaceholder: '@kanal yoki t.me/+… havola',
+    linksNote:       'Telegram — mijozlar sizga yozadigan profil. Kanal / guruh — biznesingiz yangiliklari uchun; yopiq guruh bo‘lsa, taklif havolasini qo‘ying.',
 
     logoLabel:       'Logo',
     logoHint:        'PNG yoki JPG, kvadrat bo‘lsa yaxshi.',
