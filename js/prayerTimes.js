@@ -540,6 +540,14 @@ function paintFromCache() {
 
 document.addEventListener('DOMContentLoaded', function () {
   if (paintFromCache()) return;
+  // Saved location but no timings for it today (first open of the day, or settings
+  // changed). LocationManager no longer takes a fix on every open, so nothing else
+  // will trigger this fetch.
+  const loc = window.LocationManager ? LocationManager.getCurrentLocation() : null;
+  if (loc && loc.lat != null) {
+    updatePrayerData(loc.lat, loc.lon, loc.city);
+    return;
+  }
   // First-ever open: at least translate the countdown label instead of leaving
   // the Uzbek fallback baked into the markup.
   const labelEl = document.getElementById('countdownLabel');

@@ -38,17 +38,24 @@
   <div class="merged-content-panel">
     <!-- PRAYER SECTION (Fixed at top when scrolling) -->
     <section class="prayer-section-fixed">
-      <button class="prayer-card-timeline is-loading" id="prayerCardBtn">
-        <!-- Top Row: Date/Hijri on left, Location on right (same line) -->
+      <!-- A div, not a <button>: the location control inside is a real button, and
+           a <button> start tag inside another <button> closes the outer one. -->
+      <div class="prayer-card-timeline is-loading" id="prayerCardBtn" role="link" tabindex="0">
+        <!-- Top Row: Date/Hijri on left, Location on right. Each side is two lines,
+             so the city chip sits beside the weekday and its age beside the hijri. -->
         <div class="top-row">
           <div class="left-side">
             <p class="weekday" id="weekday">&nbsp;</p>
             <p class="hijri" id="hijri">&nbsp;</p>
           </div>
-          <div class="right-side">
-            <span class="location-icon">📍</span>
-            <span class="city-name" id="cityName">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-          </div>
+          <button type="button" class="right-side" id="locationRefreshBtn" data-location-refresh>
+            <span class="loc-chip">
+              <span class="location-icon" aria-hidden="true">📍</span>
+              <span class="city-name" id="cityName">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <svg class="loc-refresh-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11a8.1 8.1 0 0 0-15.5-2m-.5-4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>
+            </span>
+            <span class="loc-meta" data-location-meta>&nbsp;</span>
+          </button>
         </div>
 
         <!-- Countdown + the whole day -->
@@ -79,7 +86,7 @@
             <div class="strip-rail"><span class="strip-fill"></span></div>
           </div>
         </div>
-      </button>
+      </div>
     </section>
 
     <!-- SCROLLABLE FEATURES SECTION -->
@@ -325,6 +332,14 @@
 
     const prayerCardBtn = document.getElementById('prayerCardBtn');
     if (prayerCardBtn) {
+      // The card is a div (see markup), so keyboard activation is wired by hand.
+      prayerCardBtn.addEventListener('keydown', (e) => {
+        if (e.target !== prayerCardBtn) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          prayerCardBtn.click();
+        }
+      });
       prayerCardBtn.addEventListener('click', () => {
         // Haptic feedback
         try {

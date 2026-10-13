@@ -404,6 +404,34 @@ body {
   background: linear-gradient(90deg, var(--pl-gold), transparent);
 }
 
+/* Sits between the title and the cards, so it reads as a caption on the results. */
+.places-location-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: -6px 0 14px;
+  padding: 9px 12px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--pl-text-2);
+  background: var(--gold-100, #fef3c7);
+  border-radius: var(--pl-radius-sm);
+}
+
+.places-location-note::before {
+  content: '';
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-top: 0.5em;
+  border-radius: 50%;
+  background: var(--pl-gold);
+}
+
+.places-location-note[hidden] { display: none; }
+
+.night-mode .places-location-note { background: rgba(181, 134, 10, 0.16); }
+
 /* =========================================================
    LOADING / NO RESULTS
    ========================================================= */

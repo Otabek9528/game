@@ -320,6 +320,12 @@ const I18N = {
     'places.addressError': { uz: 'Manzil bo\'yicha qidirishda xatolik', ru: 'Ошибка поиска по адресу', en: 'Error searching by address' },
     'places.timeoutError': { uz: 'Server javob bermadi. Iltimos, qaytadan urinib ko\'ring.', ru: 'Сервер не отвечает. Попробуйте снова.', en: 'Server not responding. Please try again.' },
     'places.locationError': { uz: 'Joylashuv ma\'lumotlari topilmadi', ru: 'Местоположение не найдено', en: 'Location not found' },
+    'places.locating': { uz: 'Joylashuvingiz aniqlanmoqda...', ru: 'Определяем ваше местоположение...', en: 'Getting your location...' },
+    'places.savedLocationNote': {
+      uz: 'Joriy joylashuvni aniqlab bo\'lmadi — {city} ({when}) bo\'yicha ko\'rsatilmoqda',
+      ru: 'Не удалось определить текущее местоположение — показано для {city} ({when})',
+      en: 'Couldn\'t get your current location — showing results for {city} ({when})'
+    },
 
     // Places - Mosque specific
     'places.mosque.name': { uz: 'Masjid', ru: 'Мечеть', en: 'Mosque' },

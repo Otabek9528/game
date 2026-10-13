@@ -213,13 +213,23 @@ body {
     background: radial-gradient(circle at top right, rgba(6, 78, 59, 0.15) 0%, transparent 70%);
   }
 
-.night-mode .right-side {
+.night-mode .loc-chip {
     background: rgba(6, 78, 59, 0.25);
+    box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.12);
+  }
+
+.night-mode .right-side:active .loc-chip {
+    background: rgba(6, 78, 59, 0.42);
   }
 
 .night-mode .right-side .city-name {
     color: var(--emerald-400);
   }
+
+.night-mode .loc-refresh-icon { stroke: var(--emerald-400); }
+.night-mode .loc-meta { color: #7c7f7e; }
+.night-mode .right-side.is-stale .loc-meta { color: var(--gold-400); }
+.night-mode .right-side.is-error .loc-meta { color: #fb923c; }
 
 /* --- night mode: prayer card --- */
 .night-mode .strip-rail { background: rgba(255, 255, 255, 0.13); }
@@ -446,6 +456,12 @@ body {
   transform: translateY(0);
 }
 
+/* `all: unset` drops the native focus ring along with everything else. */
+.prayer-card-timeline:focus-visible {
+  outline: 2px solid var(--emerald-600);
+  outline-offset: 2px;
+}
+
 /* Top Row */
 .top-row {
   display: flex;
@@ -457,6 +473,9 @@ body {
   z-index: 1;
 }
 
+/* Space is split in the date's favour: the left side never goes narrower than
+   its longest line (weekday and hijri don't break internally), and the location
+   control takes what is left, truncating the city if it must. */
 .left-side {
   display: flex;
   flex-direction: row;
@@ -464,8 +483,7 @@ body {
   flex-wrap: wrap;
   column-gap: 8px;
   row-gap: 1px;
-  min-width: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
 }
 
 /* Demoted: the date is context, not the answer. It was the largest type on the
@@ -477,6 +495,7 @@ body {
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.35;
+  white-space: nowrap;
 }
 
 .left-side .hijri {
@@ -485,22 +504,63 @@ body {
   color: var(--text-muted);
   margin: 0;
   line-height: 1.35;
+  white-space: nowrap;
 }
 
+/* Location control: the chip says where, the line under it says how fresh.
+   The pair mirrors weekday/hijri on the left — the chip is lifted 3px so it
+   centres on the weekday line, which lands the age line on the hijri line.
+   The whole stack is one tap target; the card behind it navigates. */
 .right-side {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;   /* with the -3px lift, puts the age on the hijri baseline */
+  flex: 0 1 auto;
+  min-width: 96px;   /* chip stays recognisable and the age line never clips */
+  margin-top: -3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Visual stack is ~42px tall; reach a comfortable thumb target without moving it. */
+.right-side::before {
+  content: '';
+  position: absolute;
+  inset: -6px -8px;
+}
+
+.loc-chip {
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  max-width: 100%;
+  padding: 5px 9px 5px 10px;
   background: var(--emerald-50);
   border-radius: var(--radius-full);
-  flex-shrink: 0;
+  /* The faint ring is the difference between a label and a control. */
+  box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.12);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.right-side:active .loc-chip {
+  transform: scale(0.95);
+  background: var(--emerald-100);
+}
+
+.right-side:focus-visible .loc-chip {
+  outline: 2px solid var(--emerald-600);
+  outline-offset: 2px;
 }
 
 .right-side .location-icon {
   font-size: 0.8rem;
   line-height: 1;
   opacity: 0.75;
+  flex-shrink: 0;
 }
 
 .right-side .city-name {
@@ -508,6 +568,67 @@ body {
   font-weight: 600;
   color: var(--emerald-700);
   line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loc-refresh-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--emerald-600);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+/* Right edge matches the chip's inner padding, so it lines up under the icon. */
+.loc-meta {
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text-muted);
+  padding-right: 9px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--transition-base);
+}
+
+.right-side.is-busy { cursor: progress; }
+.right-side.is-busy .loc-refresh-icon {
+  opacity: 1;
+  animation: locSpin 0.9s linear infinite;
+}
+
+/* Past the auto-refresh window and still not updated (permission off, no fix):
+   the only state where the age is worth drawing the eye to. */
+.right-side.is-stale .loc-meta { color: var(--gold-600); }
+.right-side.is-error .loc-meta { color: #c2410c; }
+
+.right-side.is-done .loc-chip { animation: locDone 0.9s var(--ease-out); }
+
+@keyframes locSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes locDone {
+  0%   { box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.12), 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  100% { box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.12), 0 0 0 8px rgba(16, 185, 129, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .right-side.is-busy .loc-refresh-icon { animation: locBreathe 1.2s ease-in-out infinite alternate; }
+  .right-side.is-done .loc-chip { animation: none; }
+}
+
+@keyframes locBreathe {
+  from { opacity: 1; }
+  to   { opacity: 0.3; }
 }
 
 /* =========================
@@ -659,7 +780,8 @@ body {
 .prayer-card-timeline.is-loading .ps-cell .ps-time,
 .prayer-card-timeline.is-loading .left-side .weekday,
 .prayer-card-timeline.is-loading .left-side .hijri,
-.prayer-card-timeline.is-loading .right-side .city-name {
+.prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .city-name,
+.prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .loc-meta {
   color: transparent;
   background: var(--sand-100);
   border-radius: 5px;
@@ -669,15 +791,20 @@ body {
 .prayer-card-timeline.is-loading .ps-cell .ps-time { min-width: 38px; }
 .prayer-card-timeline.is-loading .left-side .weekday { min-width: 128px; }
 .prayer-card-timeline.is-loading .left-side .hijri { min-width: 86px; }
-.prayer-card-timeline.is-loading .right-side { background: var(--sand-100); }
-.prayer-card-timeline.is-loading .right-side .location-icon { opacity: 0; }
+/* While locating or after a failure the control stays readable: on a first-ever
+   open it is the only thing on the card that can explain the wait. */
+.prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .loc-chip { background: var(--sand-100); box-shadow: none; }
+.prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .location-icon,
+.prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .loc-refresh-icon { opacity: 0; }
+.prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .loc-meta { min-width: 52px; margin-right: 9px; padding-right: 0; }
 .night-mode .prayer-card-timeline.is-loading .arch-countdown,
 .night-mode .prayer-card-timeline.is-loading .ps-cell .ps-name,
 .night-mode .prayer-card-timeline.is-loading .ps-cell .ps-time,
 .night-mode .prayer-card-timeline.is-loading .left-side .weekday,
 .night-mode .prayer-card-timeline.is-loading .left-side .hijri,
-.night-mode .prayer-card-timeline.is-loading .right-side,
-.night-mode .prayer-card-timeline.is-loading .right-side .city-name { background: rgba(255,255,255,0.06); }
+.night-mode .prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .loc-chip,
+.night-mode .prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .city-name,
+.night-mode .prayer-card-timeline.is-loading .right-side:not(.is-busy):not(.is-error) .loc-meta { background: rgba(255,255,255,0.06); }
 .prayer-strip .progress-dot svg { display: block; width: 100%; height: 100%; }
 .prayer-strip .progress-dot path { fill: var(--emerald-600); stroke: none; }
 
@@ -1182,8 +1309,12 @@ body {
     font-size: 0.8rem;
   }
   
-  .right-side {
+  .loc-chip {
     padding: var(--space-xs) var(--space-sm);
+  }
+
+  .loc-meta {
+    padding-right: var(--space-sm);
   }
   
   .right-side .city-name {
@@ -1211,6 +1342,13 @@ body {
   .prayer-strip {
     margin-top: 11px;
   }
+}
+
+/* 320px-class screens with the longest weekday names: breaking the date is
+   the lesser evil once the location control is at its minimum. */
+@media (max-width: 340px) {
+  .left-side .weekday { white-space: normal; }
+  .right-side { min-width: 80px; }
 }
 
 @media (min-width: 481px) and (max-width: 640px) {

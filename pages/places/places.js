@@ -796,11 +796,15 @@ searchByAddressBtn.addEventListener('click', () => {
 });
 
 // Button 2: Search Nearby (current location)
+// Always takes a live fix: the saved one can be hours old, and "nearest" is only
+// as good as the point it is measured from.
 searchNearbyBtn.addEventListener('click', async () => {
   // Hide placeholder and address input, show loading
   searchPlaceholder.style.display = 'none';
   addressInputSection.style.display = 'none';
   placesPageTitle.style.display = 'block';
+  setLocationNote(null);
+  setLoadingText('places.locating', 'Joylashuvingiz aniqlanmoqda...');
   loadingIndicator.style.display = 'flex';
   placeCardsContainer.style.display = 'none';
   noResults.style.display = 'none';
@@ -810,15 +814,28 @@ searchNearbyBtn.addEventListener('click', async () => {
   setActiveMode('location');
   updatePageTitle();
   
-  const location = LocationManager.getCurrentLocation();
+  let location = null;
+  try {
+    location = await LocationManager.locate({ interactive: true });
+  } catch (err) {
+    // No live fix (GPS off, permission off, timeout). The last saved one beats an
+    // error screen, as long as the page says that's what it is.
+    const saved = LocationManager.getCurrentLocation();
+    if (saved && saved.lat && saved.lon) {
+      location = saved;
+      setLocationNote(saved);
+    }
+  }
   
   if (location && location.lat && location.lon) {
+    setLoadingText('places.loading', 'Joylar yuklanmoqda...');
     try {
       const places = await fetchNearbyPlaces(location.lat, location.lon, 5);
       loadingIndicator.style.display = 'none';
       await renderPlaceCards(places);
       saveSearchState();
     } catch (error) {
+      setLocationNote(null);
       const loadErrorText = window.I18N ? I18N.t('places.loadError') : `${CONFIG.namePlural}ni yuklashda xatolik yuz berdi`;
       const timeoutErrorText = window.I18N ? I18N.t('places.timeoutError') : 'Server javob bermadi. Iltimos, qaytadan urinib ko\'ring.';
       
@@ -834,6 +851,29 @@ searchNearbyBtn.addEventListener('click', async () => {
     showError(locationErrorText);
   }
 });
+
+function setLoadingText(key, fallback) {
+  const el = document.getElementById('loadingText');
+  if (!el) return;
+  el.setAttribute('data-i18n', key);
+  el.textContent = window.I18N ? I18N.t(key) : fallback;
+}
+
+// Shown when "near me" fell back to the saved location; `saved` null hides it.
+function setLocationNote(saved) {
+  const note = document.getElementById('placesLocationNote');
+  if (!note) return;
+  if (!saved) {
+    note.hidden = true;
+    return;
+  }
+  const when = LocationManager.formatAge(Date.now() - (saved.timestamp || 0));
+  const pattern = window.I18N ? I18N.t('places.savedLocationNote') : '';
+  note.textContent = (pattern && pattern !== 'places.savedLocationNote' ? pattern : 'Joriy joylashuvni aniqlab bo\'lmadi — {city} ({when}) bo\'yicha ko\'rsatilmoqda')
+    .replace('{city}', saved.city || '')
+    .replace('{when}', when.toLowerCase());
+  note.hidden = false;
+}
 
 // Search bar input handler
 searchBar.addEventListener('input', (e) => {
@@ -866,6 +906,8 @@ async function performAddressSearch(address) {
   currentMode = 'address';
   currentSearchAddress = address;
   setActiveMode('address');
+  setLocationNote(null);
+  setLoadingText('places.loading', 'Joylar yuklanmoqda...');
   
   // Hide placeholder, show loading
   searchPlaceholder.style.display = 'none';

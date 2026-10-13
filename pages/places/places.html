@@ -81,6 +81,9 @@
     <!-- Page Title (updated dynamically by JS) -->
     <h2 class="places-page-title" id="placesPageTitle" style="display: none;">🕌 Sizga eng yaqin 5 joy</h2>
 
+    <!-- "Near me" couldn't get a live fix and used the saved location instead -->
+    <p class="places-location-note" id="placesLocationNote" role="status" hidden></p>
+
     <!-- Initial Placeholder (shown before any search) -->
     <div class="search-placeholder" id="searchPlaceholder">
       <div class="placeholder-arrows">
@@ -93,7 +96,7 @@
     <!-- Loading Indicator -->
     <div class="loading-indicator" id="loadingIndicator" style="display: none;">
       <div class="spinner"></div>
-      <p data-i18n="places.loading">Joylar yuklanmoqda...</p>
+      <p id="loadingText" data-i18n="places.loading">Joylar yuklanmoqda...</p>
     </div>
 
     <!-- Place Cards Container -->
