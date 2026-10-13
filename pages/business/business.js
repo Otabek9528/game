@@ -476,15 +476,11 @@
     return row;
   }
 
-  // A row gets the first meaningful sentence of the description, with any
-  // "Label: value" lines collapsed to their values so the preview reads as
-  // prose rather than a form.
+  // A row previews the description as the owner wrote it, with raw links
+  // taken out: in a two-line preview nobody can tap them, and they crowd out
+  // the words that would help a reader choose.
   function firstLine(text) {
-    var parsed = parseDescription(text);
-    var lead = parsed.text || parsed.facts.map(function (f) { return f.value; }).join(' · ');
-    // A raw address in a two-line preview is noise: the reader cannot tap it
-    // here, and it crowds out the words that would help them choose.
-    return lead.replace(URL_RE, '').replace(/\s+/g, ' ').trim();
+    return String(text || '').replace(URL_RE, '').replace(/\s+/g, ' ').trim();
   }
 
   // Likes are the one public signal a visitor can use; zeros are noise, so
@@ -1121,29 +1117,21 @@
     wrap.appendChild(identityBlock(business));
 
     // Reaching the business comes first: most people open a listing for the
-    // number. Then where and when, then the owner's own words.
-    var parsed = parseDescription(business.description || '');
-    var links = mergeLinks(business.links, parsed.links);
-    // A number stated as an action button and again as a fact row is the same
-    // number twice. The buttons keep it; the list drops it.
-    var facts = parsed.facts.filter(function (f) { return !coveredByLink(f, links); });
+    // number. The buttons and the list carry only what the owner entered in
+    // the form; links written into the description stay in it.
+    var links = sortLinks(business.links);
+    var text = (business.description || '').trim();
     var split = splitLinks(links);
 
     wrap.appendChild(ctaBlock(split.primary));
-
-    // Address and hours before the social handles: they are what decides
-    // whether someone can use this business today. A block labelled "key
-    // information" sitting under one labelled "other links" was the label
-    // and the layout saying opposite things.
-    if (facts.length) wrap.appendChild(factsBlock(facts));
 
     // The remaining links before the owner's prose: a row per place is a few
     // lines, while a description runs to eleven, and left below it a channel
     // or Instagram sat a full screen down where nobody scrolled to it.
     if (split.rest.length) wrap.appendChild(linksBlock(split.rest));
-    if (parsed.text) wrap.appendChild(aboutBlock(parsed.text));
+    if (text) wrap.appendChild(descriptionBlock(text));
 
-    if (!links.length && !facts.length && !parsed.text) {
+    if (!links.length && !text) {
       wrap.appendChild(el('p', 'bz-detail-none', t('business.noInfo')));
     }
 
@@ -1154,17 +1142,13 @@
     return wrap;
   }
 
-  // True when a link button already carries this fact, so printing it again
-  // as a row would just be the same value twice on one screen.
-  function coveredByLink(fact, links) {
-    if (fact.kind !== 'phone' && fact.kind !== 'telegram') return false;
-    var mine = String(fact.value).toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (!mine) return false;
-    return links.some(function (l) {
-      if (l.kind !== fact.kind) return false;
-      var theirs = String(l.value).toLowerCase().replace(/[^a-z0-9]/g, '');
-      return theirs.indexOf(mine) !== -1 || mine.indexOf(theirs) !== -1;
-    });
+  // The usual order, contacts first and the app stores last; links of a kind
+  // the page has no icon for are left out rather than drawn blank.
+  function sortLinks(links) {
+    return (links || []).filter(function (l) { return LINK_ICON[l.kind] && l.value; })
+      .slice().sort(function (a, b) {
+        return (CONTACT_RANK[a.kind] || 99) - (CONTACT_RANK[b.kind] || 99);
+      });
   }
 
   // ---------- identity ----------
@@ -1445,199 +1429,204 @@
     return String(link.value).replace(/^https:\/\//i, '');
   }
 
-  // ---------- facts and description ----------
-  // Owners write free text, and most of what a visitor wants from it is
-  // structured: an address, hours, a price. Any line shaped "Label: value"
-  // is lifted into a fact row the eye can scan; the rest stays prose.
-
-  var FACT_RE = /^\s*([^:\n]{2,28}?)\s*:\s*(.{1,200}?)\s*$/;
-  var FACT_LABEL_OK = /[A-Za-zÀ-ɏЀ-ӿㄱ-힝]/;
-  var ADDRESS_RE = /manzil|adres|address|joylash|lokatsiya|location|주소/i;
-  var HOURS_RE = /ish vaqti|ish kun|vaqt|soat|hours|영업/i;
-  var PRICE_RE = /narx|price|가격/i;
-  var PHONE_RE = /^\+?\d[\d\s\-().]{7,}$/;
-  var HANDLE_RE = /^@?[A-Za-z0-9_.]{3,32}$/;
-
-  // A line, or a labelled value, that is nothing but a link — which is how an
-  // owner pastes a store listing or writes "Sayt: example.uz" — is a
-  // destination, not a sentence.
+  // ---------- the owner's description ----------
+  // Shown as the owner wrote it: nothing is lifted out, reordered or
+  // dropped, so the card says what they meant in the order they meant it.
+  // Pulling "Label: value" lines into a facts box broke on anything but the
+  // exact shape ("“📍Manzil" with the quote mark as a label) and tore an
+  // address out of the sentence it belonged to.
   //
-  // The final label has to be alphabetic, which is what keeps "Narx: 10.000"
-  // and "Ish vaqti: 09.00" from being read as domain names.
-  // Written out in full, anything goes. Written bare, the last label has to
-  // look like a real suffix — two to six letters — which is what stops an
-  // Android package id such as "uz.bozoraka" from becoming a dead link.
-  var LEAD_MARKS = /^[^\p{L}\p{N}]+/u;
-  var BARE_URL_RE = /^(?:https?:\/\/\S+|(?:[a-z0-9-]+\.)+[a-z]{2,6}(?:[\/?#]\S*)?)$/i;
+  // What the page adds is typography and taps, never content:
+  //
+  //   paragraphs     a blank line is a gap between blocks, not an empty line
+  //                  of full height
+  //   marked lines   a line led by an emoji, bullet or number hangs its text
+  //                  off the marker, so a wrapped line lines up under its own
+  //                  first word instead of under the emoji
+  //   lead-ins       a short line ending in ":" over more lines reads as the
+  //                  heading of what follows it
+  //   labels         "Ish vaqti: …" sets its label in weight, so a reader can
+  //                  scan down the left edge
+  //   addresses      tappable where they stand: copy, or open in Naver or
+  //                  Kakao Map — the two people in Korea actually navigate by
+  //   phone numbers  call on Android, copy on iPhone, as the buttons do
+  //   links          a compact button in the line, not a long raw address
 
-  function parseDescription(text) {
-    var facts = [], rest = [], found = [];
+  // An emoji (with any modifiers and joiners), a bullet, or "1." / "1)".
+  var MARKER_RE = /^\s*((?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:[\uFE0F\u200D\u20E3]|\p{Emoji_Modifier}|\p{Extended_Pictographic}|\p{Regional_Indicator})*|[-–—•·▪▫◦●○*✓✔➤►→]|\d{1,2}[.)])\s*/u;
+  var LEAD_IN_MAX = 40;
+  var LABEL_RE = /^([^\s:/][^:/]{0,22}?)\s*[:：]\s+(?=\S)/;
+  var LABEL_OK = /\p{L}/u;
+  var ADDRESS_LABEL_RE = /^(?:manzil|manzilimiz|adres|address|joylashuv|lokatsiya|location|주소)\b/i;
+  // A Korean street address: up to two place names, then a city, county or
+  // district, then a road ("…로" / "…길") with its number.
+  var KOREAN_ADDRESS_RE = /(?:[가-힣]{2,}\s+){0,2}[가-힣]+(?:시|군|구|읍|면)\s+[가-힣0-9\s\-]*?(?:로|길)\s*\d+(?:-\d+)?/;
+  // Mobile and landline with an area code, and the 15xx/16xx/18xx-xxxx
+  // company numbers. Years ("1998-2024") start with 19 and stay text.
+  // "+82 10-…" drops the leading 0 the local form has.
+  var PHONE_IN_TEXT_RE = /(?:\+82[\s-]?0?\d{1,2}|\b0\d{1,2})[\s-]?\d{3,4}[\s-]?\d{4}\b|\b1[568]\d{2}-\d{4}\b/g;
+  var HASHTAG_RE = /(^|\s)(#[\p{L}\p{N}_]{2,})/gu;
+  var URL_RE = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|\b(?:t\.me|telegram\.me|instagram\.com|tiktok\.com|youtube\.com|youtu\.be|facebook\.com|fb\.me|(?:open|pf)\.kakao\.com|naver\.me)\/[^\s<>"']+)/gi;
+  var TRAILING = /[.,;:!?)\]"'”’]+$/;
+  // Wrapping punctuation an owner puts around a line, which is not part of an
+  // address: "…201", or ‘…201’,
+  var WRAP_PUNCT = /^[\s"'“”‘’«»(\[]+|[\s"'“”‘’«»)\],.;]+$/g;
 
-    String(text || '').split(/\r?\n/).forEach(function (line) {
-      // Owners lead lines with an emoji or a bullet ("📩 t.me/support"); that
-      // still leaves a link standing alone on its line.
-      var bare = line.trim().replace(LEAD_MARKS, '').replace(TRAILING, '');
-      // Standing on its own line: lift it out and let it join the business's
-      // other links, where a reader looks for somewhere to go. Left in place
-      // it renders as a pill stranded in the middle of a paragraph.
-      if (BARE_URL_RE.test(bare)) { found.push(bare); return; }
-
-      var m = line.match(FACT_RE);
-      var label = m && m[1], value = m && m[2];
-      if (m && FACT_LABEL_OK.test(label) && !/\d$/.test(label) &&
-          value.charAt(0) !== '/' && !/^https?$/i.test(label)) {
-        // "Sayt: example.uz" is a link with a word in front of it, not a fact
-        // whose value happens to be an address.
-        if (BARE_URL_RE.test(value)) { found.push(value); return; }
-        var kind = ADDRESS_RE.test(label) ? 'address'
-                 : HOURS_RE.test(label) ? 'hours'
-                 : PRICE_RE.test(label) ? 'price'
-                 : /telegram/i.test(label) && HANDLE_RE.test(value) ? 'telegram'
-                 : PHONE_RE.test(value) ? 'phone'
-                 : 'text';
-        facts.push({
-          label: label.charAt(0).toUpperCase() + label.slice(1),
-          value: value, kind: kind
-        });
-      } else {
-        rest.push(line);
-      }
-    });
-
-    return {
-      facts: facts,
-      text: rest.join('\n').replace(/\n{3,}/g, '\n\n').trim(),
-      links: found.map(function (raw) {
-        var href = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
-        return { kind: hostKind(href), value: href };
-      })
-    };
-  }
-
-  // The links the owner filled in and the ones they pasted into their
-  // description are the same thing to a reader, so they are one list. A typed
-  // link wins over a pasted duplicate of itself; otherwise the usual order
-  // applies, which puts the app stores last where they belong.
-  function mergeLinks(typed, found) {
-    var out = [], seen = {};
-
-    function key(link) {
-      return link.kind + '|' + String(link.value).toLowerCase()
-        .replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/+$/, '');
-    }
-    function add(link, isTyped) {
-      if (!LINK_ICON[link.kind] || !link.value) return;
-      var k = key(link);
-      if (seen[k]) return;
-      seen[k] = true;
-      out.push({ kind: link.kind, value: link.value, typed: isTyped });
-    }
-
-    (typed || []).forEach(function (l) { add(l, true); });
-    (found || []).forEach(function (l) { add(l, false); });
-
-    return out.sort(function (a, b) {
-      var ra = CONTACT_RANK[a.kind] || 99, rb = CONTACT_RANK[b.kind] || 99;
-      if (ra !== rb) return ra - rb;
-      return a.typed === b.typed ? 0 : (a.typed ? -1 : 1);
-    });
-  }
-
-  var FACT_ICON = { address: ICONS.pin, hours: ICONS.clock, price: ICONS.tag,
-                    phone: ICONS.phone, telegram: ICONS.telegram, text: ICONS.info };
-
-  function factsBlock(facts) {
-    var box = el('div', 'bz-facts');
-    box.appendChild(el('p', 'bz-seclabel', t('business.factsTitle')));
-    var list = el('dl', 'bz-factlist');
-    facts.forEach(function (f) {
-      var row = el('div', 'bz-fact');
-      row.appendChild(iconSpan('bz-fact-icon', FACT_ICON[f.kind] || ICONS.info));
-      var text = el('div', 'bz-fact-text');
-      text.appendChild(el('dt', 'bz-fact-k', f.label));
-      var v = el('dd', 'bz-fact-v');
-      appendLinked(v, f.value);
-      text.appendChild(v);
-      row.appendChild(text);
-
-      var act = factAction(f);
-      if (act) row.appendChild(act);
-      list.appendChild(row);
-    });
-    box.appendChild(list);
-    return box;
-  }
-
-  function factAction(f) {
-    var b;
-    if (f.kind === 'address') {
-      b = button('bz-fact-act');
-      b.setAttribute('aria-label', t('actions.map'));
-      b.appendChild(iconSpan(null, ICONS.pin));
-      b.addEventListener('click', function () { openMap(f.value); });
-    } else if (f.kind === 'phone') {
-      b = button('bz-fact-act');
-      b.setAttribute('aria-label', t(isAndroid() ? 'actions.phoneCall' : 'actions.phoneCopy'));
-      b.appendChild(iconSpan(null, isAndroid() ? ICONS.phone : ICONS.copy));
-      b.addEventListener('click', function () { handlePhone(f.value.replace(/[^\d+]/g, '')); });
-    } else if (f.kind === 'telegram') {
-      b = button('bz-fact-act');
-      b.setAttribute('aria-label', t('actions.telegram'));
-      b.appendChild(iconSpan(null, ICONS.telegram));
-      b.addEventListener('click', function () {
-        openExternal({ kind: 'telegram', value: 'https://t.me/' + f.value.replace(/^@/, '') });
-      });
-    }
-    return b || null;
-  }
-
-  // Shown whole. It used to open clamped to five lines behind a "read more",
-  // which was right when the description sat above the phone number and a
-  // long one pushed it off the screen. The contact buttons are above it now,
-  // so the clamp was costing a tap and hiding half the text to protect
-  // something that had already moved. A description is capped at 500
-  // characters — about eleven lines — which is a card that scrolls, not a
-  // card that needs a lid.
-  function aboutBlock(text) {
+  function descriptionBlock(text) {
     var box = el('div', 'bz-about');
     box.appendChild(el('p', 'bz-seclabel', t('business.aboutTitle')));
-    var body = el('p', 'bz-about-text');
-    appendLinked(body, text);
+    var body = el('div', 'bz-desc');
+
+    String(text).replace(/\r\n?/g, '\n').split(/\n\s*\n/).forEach(function (chunk) {
+      var lines = chunk.split('\n').filter(function (l) { return l.trim(); });
+      if (!lines.length) return;
+      var block = el('div', 'bz-desc-block');
+      lines.forEach(function (line, i) {
+        block.appendChild(descLine(line, i < lines.length - 1));
+      });
+      body.appendChild(block);
+    });
+
     box.appendChild(body);
     return box;
   }
 
-  // Text with any URLs turned into real buttons. Built from text nodes, never
-  // innerHTML: nothing owner-supplied is parsed as markup.
-  // Known hosts count without "https://" too: "t.me/support" is how owners
-  // write a Telegram link, and as plain text it could not be tapped.
-  var URL_RE = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|\b(?:t\.me|telegram\.me|instagram\.com|tiktok\.com|youtube\.com|youtu\.be|facebook\.com|fb\.me|(?:open|pf)\.kakao\.com|naver\.me)\/[^\s<>"']+)/gi;
-  var TRAILING = /[.,;:!?)\]]+$/;
+  function descLine(raw, hasMoreBelow) {
+    var line = raw.trim();
+    var m = line.match(MARKER_RE);
+    var marker = m && m[0].trim() && m[0].length < line.length ? m[1] : null;
+    var rest = marker ? line.slice(m[0].length) : line;
 
-  function appendLinked(node, text) {
-    var last = 0, m;
-    URL_RE.lastIndex = 0;
-    while ((m = URL_RE.exec(text)) !== null) {
-      var raw = m[0];
-      var trail = (raw.match(TRAILING) || [''])[0];
-      if (trail) raw = raw.slice(0, raw.length - trail.length);
-      if (!raw) continue;
-      if (m.index > last) node.appendChild(document.createTextNode(text.slice(last, m.index)));
-      node.appendChild(inlineLinkNode(raw));
-      if (trail) node.appendChild(document.createTextNode(trail));
-      last = m.index + m[0].length;
+    var row = el('div', 'bz-dl' + (marker ? ' bz-dl--marked' : ''));
+    if (marker) row.appendChild(el('span', 'bz-dl-mark', marker));
+    var content = el('div', 'bz-dl-text');
+    row.appendChild(content);
+
+    if (hasMoreBelow && rest.length <= LEAD_IN_MAX && /[:：]$/.test(rest)) {
+      row.classList.add('bz-dl--lead');
+      content.textContent = rest;
+      return row;
     }
+
+    var address = findAddress(rest);
+    var label = rest.match(LABEL_RE);
+    if (label && LABEL_OK.test(label[1]) && !/^https?$/i.test(label[1])) {
+      content.appendChild(el('span', 'bz-dl-label', rest.slice(0, label[0].length)));
+      rest = rest.slice(label[0].length);
+    }
+    appendRich(content, rest, address && address.text);
+    if (address) content.appendChild(addressActions(address.query));
+    return row;
+  }
+
+  // The address in a line, if it has one: the whole value of a line labelled
+  // "Manzil: …", or a Korean street address wherever it sits in the line.
+  // `text` is what to mark in the line, `query` what to copy and search.
+  function findAddress(line) {
+    var label = line.match(LABEL_RE);
+    if (label && ADDRESS_LABEL_RE.test(label[1].replace(/^[^\p{L}]+/u, ''))) {
+      var query = line.slice(label[0].length).replace(WRAP_PUNCT, '');
+      if (query.length >= 4) return { text: query, query: query };
+    }
+    var k = line.match(KOREAN_ADDRESS_RE);
+    if (k) return { text: k[0].trim(), query: k[0].trim() };
+    return null;
+  }
+
+  // Text with its links, phone numbers, hashtags and the address made into
+  // what they are. Built from text nodes, never innerHTML: nothing an owner
+  // writes is parsed as markup.
+  function appendRich(node, text, addressText) {
+    var spans = [];
+    function collect(re, kind) {
+      re.lastIndex = 0;
+      var m;
+      while ((m = re.exec(text)) !== null) {
+        var start = m.index, value = m[0];
+        if (kind === 'tag') { start += m[1].length; value = m[2]; }
+        if (kind === 'url') {
+          var trail = (value.match(TRAILING) || [''])[0];
+          value = value.slice(0, value.length - trail.length);
+        }
+        if (value) spans.push({ start: start, end: start + value.length, kind: kind, value: value });
+        if (!re.global) break;
+      }
+    }
+    if (addressText) {
+      var at = text.indexOf(addressText);
+      if (at !== -1) spans.push({ start: at, end: at + addressText.length, kind: 'addr', value: addressText });
+    }
+    collect(URL_RE, 'url');
+    collect(PHONE_IN_TEXT_RE, 'phone');
+    collect(HASHTAG_RE, 'tag');
+
+    // Earlier first, and where two overlap the one found first wins: an
+    // address before a number inside it, a link before a number in its path.
+    var taken = [];
+    spans.forEach(function (s) {
+      var clash = taken.some(function (o) { return s.start < o.end && o.start < s.end; });
+      if (!clash) taken.push(s);
+    });
+    taken.sort(function (a, b) { return a.start - b.start; });
+
+    var last = 0;
+    taken.forEach(function (s) {
+      if (s.start > last) node.appendChild(document.createTextNode(text.slice(last, s.start)));
+      node.appendChild(richNode(s));
+      last = s.end;
+    });
     if (last < text.length) node.appendChild(document.createTextNode(text.slice(last)));
   }
 
+  function richNode(s) {
+    if (s.kind === 'url') return inlineLinkNode(s.value);
+    if (s.kind === 'tag') return el('span', 'bz-tag', s.value);
+    if (s.kind === 'addr') return el('span', 'bz-addr', s.value);
+    var phone = button('bz-inphone', s.value);
+    phone.setAttribute('aria-label',
+      t(isAndroid() ? 'actions.phoneCall' : 'actions.phoneCopy') + ': ' + s.value);
+    phone.addEventListener('click', function () { handlePhone(s.value.replace(/[^\d+]/g, '')); });
+    return phone;
+  }
+
+  // Under the address, inside the text column: copying it works with any
+  // navigator, and the two map buttons save the paste for the two most used.
+  function addressActions(query) {
+    var row = el('span', 'bz-addr-acts');
+    var copy = button('bz-addr-act', t('actions.copyAddress'));
+    copy.insertBefore(iconSpan('bz-addr-icon', ICONS.copy), copy.firstChild);
+    copy.addEventListener('click', function () {
+      copyText(query).then(function (ok) {
+        if (ok) { buzz('success'); showToast(t('actions.addressCopied')); }
+        else showToast(query);
+      });
+    });
+    row.appendChild(copy);
+    [['naver', 'https://map.naver.com/p/search/'], ['kakao', 'https://map.kakao.com/link/search/']]
+      .forEach(function (map) {
+        var b = button('bz-addr-act bz-addr-act--' + map[0],
+                       t(map[0] === 'naver' ? 'actions.naverMap' : 'actions.kakaoMap'));
+        b.insertBefore(el('span', 'bz-addr-badge', map[0] === 'naver' ? 'N' : 'K'), b.firstChild);
+        b.addEventListener('click', function () {
+          openExternal({ kind: 'website', value: map[1] + encodeURIComponent(query) });
+        });
+        row.appendChild(b);
+      });
+    return row;
+  }
+
+  // A link inside owner text. A profile reads as its handle, anything else as
+  // the name of where it goes, never as a long raw address.
   function inlineLinkNode(raw) {
     var href = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+    var kind = hostKind(href);
+    var link = { kind: kind, value: href };
+    var handle = HANDLE_KIND[kind] ? displayValue(link) : '';
     var node = button('bz-inlink');
-    node.appendChild(el('span', null, prettyUrl(href)));
-    node.appendChild(iconSpan('bz-inlink-icon', ICONS.external));
-    node.addEventListener('click', function () {
-      openExternal({ kind: hostKind(href), value: href });
-    });
+    if (LINK_ICON[kind] && kind !== 'website') node.appendChild(iconSpan('bz-inlink-icon', LINK_ICON[kind]));
+    node.appendChild(el('span', null, handle && handle.charAt(0) === '@' ? handle : prettyUrl(href)));
+    if (kind === 'website') node.appendChild(iconSpan('bz-inlink-icon', ICONS.external));
+    node.addEventListener('click', function () { openExternal(link); });
     return node;
   }
 
@@ -1862,11 +1851,6 @@
     } catch (e) {
       window.open(link.value, '_blank', 'noopener');
     }
-  }
-
-  function openMap(query) {
-    openExternal({ kind: 'website',
-      value: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query) });
   }
 
   function openAdmin() {

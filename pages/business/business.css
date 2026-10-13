@@ -1309,94 +1309,129 @@
 .bz-lrow-chev { width: 16px; height: 16px; flex: none; color: var(--sand-400); }
 .bz-lrow-chev svg { width: 100%; height: 100%; display: block; }
 
-/* ---------- facts ---------- */
-/* Owners write free text and most of what a visitor wants from it is
-   structured — an address, hours, a price. Any "Label: value" line is lifted
-   out of the paragraph into a row the eye can scan, and the ones worth
-   acting on carry their own action. */
-
-.bz-facts { margin-bottom: 20px; }
-
-.bz-factlist {
-  margin: 0;
-  border: 1px solid var(--hairline);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--surface-card);
-  box-shadow: var(--shadow-card);
-}
-
-.bz-fact {
-  display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  padding: 12px 13px;
-  border-bottom: 1px solid var(--hairline);
-}
-.bz-fact:last-child { border-bottom: none; }
-
-.bz-fact-icon { flex: none; width: 17px; height: 17px; margin-top: 2px; color: var(--text-muted); }
-.bz-fact-icon svg { width: 100%; height: 100%; display: block; }
-
-.bz-fact-text { flex: 1; min-width: 0; }
-
-.bz-fact-k {
-  margin: 0 0 2px;
-  font-size: var(--fs-2xs);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
-}
-.bz-fact-v {
-  margin: 0;
-  font-size: var(--fs-sm);
-  line-height: 1.45;
-  color: var(--text-primary);
-  overflow-wrap: anywhere;
-}
-
-.bz-fact-act {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  margin: -3px -4px 0 0;
-  padding: 8px;
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
-  background: var(--surface-sunken);
-  color: var(--accent);
-  cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
-}
-.bz-fact-act:active { background: var(--accent-light); border-color: var(--emerald-600); }
-.bz-fact-act svg { width: 100%; height: 100%; display: block; }
-
-/* ---------- about ---------- */
-/* The owner's own words, clamped so a long one cannot push everything else
-   below the fold, expanding in place. */
+/* ---------- description ---------- */
+/* The owner's words, in their order, with typography doing the structuring
+   a facts box used to do by force. See descriptionBlock() for the rules. */
 
 .bz-about { margin-bottom: 20px; }
 
-/* Shown whole — see aboutBlock() for why the five-line clamp went. Blank
-   lines the owner typed are kept, so a description written as separate
-   thoughts stays that way instead of collapsing into one block. */
-.bz-about-text {
-  margin: 0;
+.bz-desc {
   font-size: var(--fs-body);
-  line-height: 1.62;
+  line-height: 1.6;
   color: var(--text-secondary);
-  white-space: pre-line;
+  /* Korean breaks between words, not inside them ("2층" stays whole); a
+     token too long for the line still breaks rather than overflow. */
+  word-break: keep-all;
   overflow-wrap: anywhere;
 }
 
+/* A blank line in the text is a gap between thoughts, not a full empty line:
+   at 1.6 line height those came out as 24px holes. */
+.bz-desc-block + .bz-desc-block { margin-top: 14px; }
+.bz-dl + .bz-dl { margin-top: 2px; }
+
+/* A marked line hangs its text off the marker, so a line that wraps starts
+   again under its own first word rather than under the emoji. */
+.bz-dl--marked { display: flex; gap: 8px; }
+.bz-dl--marked + .bz-dl--marked { margin-top: 6px; }
+.bz-dl-mark {
+  flex: none;
+  width: 1.4em;
+  text-align: center;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.bz-dl-text { flex: 1; min-width: 0; }
+
+/* "Aloqa uchun:" over the lines it introduces: a heading for its block. */
+.bz-dl--lead { color: var(--text-primary); font-weight: 600; }
+.bz-desc-block .bz-dl--lead + .bz-dl { margin-top: 4px; }
+
+/* "Ish vaqti:" — the left edge a reader scans down. */
+.bz-dl-label { color: var(--text-primary); font-weight: 600; }
+
+.bz-tag { color: var(--accent); font-weight: 500; }
+
+/* The address stays in its sentence, marked as the thing the buttons under
+   it act on. */
+.bz-addr {
+  color: var(--text-primary);
+  font-weight: 500;
+  text-decoration: underline dotted var(--sand-400);
+  text-underline-offset: 4px;
+}
+/* One row of three equal parts: as free pills they wrapped onto a second
+   line on a phone, the third button alone under the other two. */
+.bz-addr-acts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  max-width: 380px;
+  margin: 8px 0 2px;
+}
+.bz-addr-act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  background: var(--surface-card);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+.bz-addr-act:active { transform: scale(0.96); background: var(--accent-light); border-color: var(--emerald-600); }
+.bz-addr-icon { width: 14px; height: 14px; color: var(--text-secondary); }
+.bz-addr-icon svg { width: 100%; height: 100%; display: block; }
+/* The map apps' own marks, as letters on their own colours. */
+.bz-addr-badge {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #fff;
+}
+.bz-addr-act--naver .bz-addr-badge { background: #03c75a; }
+.bz-addr-act--kakao .bz-addr-badge { background: #fee500; color: #3c1e1e; }
+
+/* A number in the text: a link in the line, as tappable as the buttons. */
+.bz-inphone {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 /* A URL inside owner text: a compact button in the line, not a 90-character
-   string wrapping across three lines. */
+   string wrapping across three lines. A profile shows its handle. */
 .bz-inlink {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  max-width: 100%;
   margin: 0 1px;
-  padding: 1px 7px 2px;
+  padding: 1px 8px 2px;
   border: 1px solid var(--hairline-strong);
   border-radius: 7px;
   background: var(--surface-sunken);
@@ -1409,8 +1444,9 @@
   vertical-align: baseline;
   -webkit-tap-highlight-color: transparent;
 }
+.bz-inlink > span:not(.bz-inlink-icon) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bz-inlink:active { background: var(--accent-light); border-color: var(--emerald-600); }
-.bz-inlink-icon { width: 10px; height: 10px; opacity: 0.75; }
+.bz-inlink-icon { flex: none; width: 12px; height: 12px; opacity: 0.85; }
 .bz-inlink-icon svg { width: 100%; height: 100%; display: block; }
 
 .bz-detail-none {
@@ -2015,7 +2051,7 @@
 .bz-back:focus-visible, .bz-switch:focus-visible, .bz-search:focus-visible,
 .bz-search-clear:focus-visible, .bz-secmore:focus-visible, .bz-secinfo:focus-visible,
 .bz-cta-btn:focus-visible, .bz-lrow:focus-visible,
-.bz-fact-act:focus-visible, .bz-inlink:focus-visible,
+.bz-addr-act:focus-visible, .bz-inphone:focus-visible, .bz-inlink:focus-visible,
 .bz-reactbtn:focus-visible, .bz-report:focus-visible, .bz-mark:focus-visible,
 .bz-btn:focus-visible, .bz-linkbtn:focus-visible, .bz-pick:focus-visible,
 .bz-input:focus-visible, .bz-select:focus-visible, .bz-logobtn:focus-visible,
@@ -2115,7 +2151,6 @@
 .night-mode .bz-blank,
 .night-mode .bz-logopick,
 .night-mode .bz-mine,
-.night-mode .bz-factlist,
 .night-mode .bz-cta-btn {
   background: #201d1a;
   border-color: rgba(255, 255, 255, 0.09);
@@ -2128,12 +2163,17 @@
 .night-mode .bz-cta-icon { color: var(--emerald-400); }
 .night-mode .bz-cta-btn:active,
 .night-mode .bz-inlink:active,
-.night-mode .bz-fact-act:active {
+.night-mode .bz-addr-act:active {
   background: rgba(52, 211, 153, 0.12);
   border-color: var(--emerald-400);
 }
 .night-mode .bz-inlink,
-.night-mode .bz-fact-act { background: #262220; border-color: rgba(255, 255, 255, 0.1); }
+.night-mode .bz-addr-act { background: #262220; border-color: rgba(255, 255, 255, 0.1); }
+.night-mode .bz-addr-act { color: #e6e1db; }
+.night-mode .bz-addr-icon { color: #a49d95; }
+.night-mode .bz-addr { color: #e6e1db; text-decoration-color: #6b655f; }
+.night-mode .bz-inphone,
+.night-mode .bz-tag { color: var(--emerald-400); }
 .night-mode .bz-linklist { background: #262220; border-color: rgba(255, 255, 255, 0.1); }
 .night-mode .bz-lrow + .bz-lrow { border-top-color: rgba(255, 255, 255, 0.08); }
 .night-mode .bz-lrow:active { background: rgba(52, 211, 153, 0.12); }
@@ -2148,7 +2188,6 @@
 .night-mode .bz-lrow-icon--facebook { background: rgba(24, 119, 242, 0.18); color: #5b9df7; }
 .night-mode .bz-lrow-icon--tiktok { background: rgba(255, 255, 255, 0.08); color: #e6e1db; }
 .night-mode .bz-inlink,
-.night-mode .bz-fact-act,
 .night-mode .bz-linkbtn { color: var(--emerald-400); }
 .night-mode .bz-lrow-chev,
 .night-mode .bz-row-chev { color: #6b655f; }
@@ -2188,7 +2227,8 @@
 .night-mode .bz-state-title,
 .night-mode .bz-blank-title,
 .night-mode .bz-search,
-.night-mode .bz-fact-v,
+.night-mode .bz-dl-label,
+.night-mode .bz-dl--lead,
 .night-mode .bz-cta-val,
 .night-mode .bz-cta-text--bare .bz-cta-verb,
 .night-mode .bz-mine-name { color: #e6e1db; }
@@ -2196,7 +2236,7 @@
 /* Secondary text */
 .night-mode .bz-row-desc,
 .night-mode .bz-tile-about,
-.night-mode .bz-about-text,
+.night-mode .bz-desc,
 .night-mode .bz-sheet-text,
 .night-mode .bz-state-hint,
 .night-mode .bz-blank-body,
@@ -2218,8 +2258,7 @@
 .night-mode .bz-report,
 .night-mode .bz-tile-n,
 .night-mode .bz-pick-about,
-.night-mode .bz-fact-k,
-.night-mode .bz-fact-icon,
+.night-mode .bz-dl-mark,
 .night-mode .bz-cta-verb,
 .night-mode .bz-ident-proof,
 .night-mode .bz-fine,
@@ -2244,7 +2283,6 @@
 .night-mode .bz-ident-cat { color: var(--emerald-400); }
 
 .night-mode .bz-picker,
-.night-mode .bz-factlist,
 .night-mode .bz-minelist { border-color: rgba(255, 255, 255, 0.09); }
 .night-mode .bz-pick { border-bottom-color: rgba(255, 255, 255, 0.07); color: #e6e1db; }
 .night-mode .bz-pick.is-on {
@@ -2252,7 +2290,6 @@
   box-shadow: inset 3px 0 0 var(--emerald-400);
 }
 .night-mode .bz-pick.is-on .bz-glyph { background: #201d1a; border-color: rgba(52, 211, 153, 0.24); }
-.night-mode .bz-fact { border-bottom-color: rgba(255, 255, 255, 0.07); }
 .night-mode .bz-meta-cat { background: #262220; border-color: rgba(255, 255, 255, 0.11); }
 
 /* The metals keep their own colour on the dark ground. */
@@ -2367,7 +2404,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bz-dialog, .bz-backdrop, .bz-toast, .bz-row, .bz-tile, .bz-sticky,
-  .bz-viewer, .bz-mark, .bz-cta-btn, .bz-lrow { transition: none; }
+  .bz-viewer, .bz-mark, .bz-cta-btn, .bz-lrow, .bz-addr-act { transition: none; }
   .bz-spinner { animation: none; }
   /* The skeleton still has to be distinguishable from real content, so it
      keeps its tint and loses only the sweep. */

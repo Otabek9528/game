@@ -156,7 +156,6 @@ window.BUSINESS_TEXT = {
     zoomLabel:    '{name} — rasmni kattalashtirish',
 
     // Section headings on the card.
-    factsTitle:   'Asosiy ma’lumotlar',
     aboutTitle:   'Biznes haqida',
     linksTitle:   'Boshqa havolalar',
 
@@ -200,7 +199,11 @@ window.BUSINESS_TEXT = {
     playstore:  'Google Play’da ochish',
     appstore:   'App Store’da ochish',
     open:       'Ochish',
-    map:        'Xaritada ko‘rish',
+    // Under an address in the description. (short — three share a row)
+    copyAddress: 'Nusxalash',
+    naverMap:   'Naver Map',
+    kakaoMap:   'Kakao Map',
+    addressCopied: 'Manzil nusxalandi',
     // Toast after the number is on the clipboard.
     phoneCopied: 'Raqam nusxalandi: {number}'
   },
