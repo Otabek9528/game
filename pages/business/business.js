@@ -1440,11 +1440,6 @@
   //
   //   paragraphs     a blank line is a gap between blocks, not an empty line
   //                  of full height
-  //   marked lines   a line led by an emoji, bullet or number hangs its text
-  //                  off the marker, so a wrapped line lines up under its own
-  //                  first word instead of under the emoji
-  //   lead-ins       a short line ending in ":" over more lines reads as the
-  //                  heading of what follows it
   //   labels         "Ish vaqti: …" sets its label in weight, so a reader can
   //                  scan down the left edge
   //   addresses      tappable where they stand: copy, or open in Naver or
@@ -1452,9 +1447,6 @@
   //   phone numbers  call on Android, copy on iPhone, as the buttons do
   //   links          a compact button in the line, not a long raw address
 
-  // An emoji (with any modifiers and joiners), a bullet, or "1." / "1)".
-  var MARKER_RE = /^\s*((?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:[\uFE0F\u200D\u20E3]|\p{Emoji_Modifier}|\p{Extended_Pictographic}|\p{Regional_Indicator})*|[-–—•·▪▫◦●○*✓✔➤►→]|\d{1,2}[.)])\s*/u;
-  var LEAD_IN_MAX = 40;
   var LABEL_RE = /^([^\s:/][^:/]{0,22}?)\s*[:：]\s+(?=\S)/;
   var LABEL_OK = /\p{L}/u;
   var ADDRESS_LABEL_RE = /^(?:manzil|manzilimiz|adres|address|joylashuv|lokatsiya|location|주소)\b/i;
@@ -1481,9 +1473,7 @@
       var lines = chunk.split('\n').filter(function (l) { return l.trim(); });
       if (!lines.length) return;
       var block = el('div', 'bz-desc-block');
-      lines.forEach(function (line, i) {
-        block.appendChild(descLine(line, i < lines.length - 1));
-      });
+      lines.forEach(function (line) { block.appendChild(descLine(line)); });
       body.appendChild(block);
     });
 
@@ -1491,22 +1481,11 @@
     return box;
   }
 
-  function descLine(raw, hasMoreBelow) {
-    var line = raw.trim();
-    var m = line.match(MARKER_RE);
-    var marker = m && m[0].trim() && m[0].length < line.length ? m[1] : null;
-    var rest = marker ? line.slice(m[0].length) : line;
-
-    var row = el('div', 'bz-dl' + (marker ? ' bz-dl--marked' : ''));
-    if (marker) row.appendChild(el('span', 'bz-dl-mark', marker));
-    var content = el('div', 'bz-dl-text');
-    row.appendChild(content);
-
-    if (hasMoreBelow && rest.length <= LEAD_IN_MAX && /[:：]$/.test(rest)) {
-      row.classList.add('bz-dl--lead');
-      content.textContent = rest;
-      return row;
-    }
+  // One line as the owner typed it, emoji and bullets included, flowing like
+  // any other text.
+  function descLine(raw) {
+    var rest = raw.trim();
+    var content = el('div', 'bz-dl');
 
     var address = findAddress(rest);
     var label = rest.match(LABEL_RE);
@@ -1516,7 +1495,7 @@
     }
     appendRich(content, rest, address && address.text);
     if (address) content.appendChild(addressActions(address.query));
-    return row;
+    return content;
   }
 
   // The address in a line, if it has one: the whole value of a line labelled

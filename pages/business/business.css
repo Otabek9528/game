@@ -1330,23 +1330,6 @@
 .bz-desc-block + .bz-desc-block { margin-top: 14px; }
 .bz-dl + .bz-dl { margin-top: 2px; }
 
-/* A marked line hangs its text off the marker, so a line that wraps starts
-   again under its own first word rather than under the emoji. */
-.bz-dl--marked { display: flex; gap: 8px; }
-.bz-dl--marked + .bz-dl--marked { margin-top: 6px; }
-.bz-dl-mark {
-  flex: none;
-  width: 1.4em;
-  text-align: center;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
-.bz-dl-text { flex: 1; min-width: 0; }
-
-/* "Aloqa uchun:" over the lines it introduces: a heading for its block. */
-.bz-dl--lead { color: var(--text-primary); font-weight: 600; }
-.bz-desc-block .bz-dl--lead + .bz-dl { margin-top: 4px; }
-
 /* "Ish vaqti:" — the left edge a reader scans down. */
 .bz-dl-label { color: var(--text-primary); font-weight: 600; }
 
@@ -2228,7 +2211,6 @@
 .night-mode .bz-blank-title,
 .night-mode .bz-search,
 .night-mode .bz-dl-label,
-.night-mode .bz-dl--lead,
 .night-mode .bz-cta-val,
 .night-mode .bz-cta-text--bare .bz-cta-verb,
 .night-mode .bz-mine-name { color: #e6e1db; }
@@ -2258,7 +2240,6 @@
 .night-mode .bz-report,
 .night-mode .bz-tile-n,
 .night-mode .bz-pick-about,
-.night-mode .bz-dl-mark,
 .night-mode .bz-cta-verb,
 .night-mode .bz-ident-proof,
 .night-mode .bz-fine,
