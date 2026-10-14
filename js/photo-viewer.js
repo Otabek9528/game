@@ -85,6 +85,14 @@
     prevBtn = root.querySelector('.pv-prev');
     nextBtn = root.querySelector('.pv-next');
 
+    // The places pages keep these words in places.text.js; the Uzbek above
+    // stays only for a page that does not load it.
+    if (window.PlacesText) {
+      root.querySelector('.pv-close').setAttribute('aria-label', PlacesText.t('viewer.close'));
+      prevBtn.setAttribute('aria-label', PlacesText.t('viewer.prev'));
+      nextBtn.setAttribute('aria-label', PlacesText.t('viewer.next'));
+    }
+
     root.querySelector('.pv-close').addEventListener('click', function (e) {
       e.stopPropagation(); close();
     });

@@ -39,17 +39,17 @@
 
     <!-- Search Buttons Section -->
     <div class="search-buttons-section">
-      <div class="mode-switch" role="group" aria-label="Qidiruv turi">
+      <div class="mode-switch" role="group" data-pt-aria="places.searchModeLabel">
         <!-- Search Nearby -->
         <button class="search-mode-btn nearby-btn" id="searchNearbyBtn">
           <span class="mode-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
-          <span class="mode-text" data-i18n="places.searchNearby">O'z atrofimdan izlash</span>
+          <span class="mode-text" data-pt="places.searchNearby"></span>
         </button>
 
         <!-- Search by Address -->
         <button class="search-mode-btn" id="searchByAddressBtn">
           <span class="mode-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></span>
-          <span class="mode-text" data-i18n="places.searchByAddress">Boshqa manzil atrofidan izlash</span>
+          <span class="mode-text" data-pt="places.searchByAddress"></span>
         </button>
       </div>
 
@@ -60,26 +60,25 @@
             type="text"
             class="search-bar"
             id="addressSearchBar"
-            placeholder="서울 강동구 구천면로 271"
           />
-          <button class="search-clear-btn" id="clearSearchBtn" style="display: none;" aria-label="Tozalash">
+          <button class="search-clear-btn" id="clearSearchBtn" style="display: none;" data-pt-aria="places.clearSearch">
             <span>✕</span>
           </button>
         </div>
         <p class="search-hint">
           <span class="info-footer-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg></span>
-          <span data-i18n="places.searchHint">Biror manzilni KOREYS tilida kiritish orqali o'sha hudud atrofidagi joylarni qidirish mumkin.</span>
+          <span data-pt="places.searchHint"></span>
         </p>
         <button class="search-action-btn" id="searchBtn">
           <span class="btn-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></span>
-          <span class="btn-text" data-i18n="places.searchButton">Qidirish</span>
+          <span class="btn-text" data-pt="places.searchButton"></span>
         </button>
       </div>
 
     </div>
 
     <!-- Page Title (updated dynamically by JS) -->
-    <h2 class="places-page-title" id="placesPageTitle" style="display: none;">🕌 Sizga eng yaqin 5 joy</h2>
+    <h2 class="places-page-title" id="placesPageTitle" style="display: none;"></h2>
 
     <!-- "Near me" couldn't get a live fix and used the saved location instead -->
     <p class="places-location-note" id="placesLocationNote" role="status" hidden></p>
@@ -89,14 +88,14 @@
       <div class="placeholder-arrows">
         <svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
       </div>
-      <p class="placeholder-text" data-i18n="places.placeholderText">Yuqoridagi tugmalardan birini tanlang</p>
-      <p class="placeholder-subtext" data-i18n="places.placeholderSubtext">O'z joylashuvingiz atrofidan yoki boshqa kiritilgan manzil atrofidan izlang</p>
+      <p class="placeholder-text" data-pt="places.placeholderText"></p>
+      <p class="placeholder-subtext" data-pt="places.placeholderSubtext"></p>
     </div>
 
     <!-- Loading Indicator -->
     <div class="loading-indicator" id="loadingIndicator" style="display: none;">
       <div class="spinner"></div>
-      <p id="loadingText" data-i18n="places.loading">Joylar yuklanmoqda...</p>
+      <p id="loadingText" data-pt="places.loading"></p>
     </div>
 
     <!-- Place Cards Container -->
@@ -107,22 +106,23 @@
     <!-- No Results Message -->
     <div class="no-results" id="noResults" style="display: none;">
       <div class="no-results-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6"/></svg></div>
-      <p class="no-results-text">Hech qanday joy topilmadi</p>
-      <p class="no-results-hint">Iltimos, boshqa manzilni sinab ko'ring</p>
+      <p class="no-results-text"></p>
+      <p class="no-results-hint" data-pt="places.noResultsHint"></p>
     </div>
 
     <!-- Info Footer -->
     <div class="info-footer">
       <div class="info-footer-icon"><svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 1 6 6c0 2.5-1.5 4-2.7 5.2-.8.8-1.3 1.4-1.3 2.3h-4c0-.9-.5-1.5-1.3-2.3C7.5 13 6 11.5 6 9a6 6 0 0 1 6-6Z"/><path d="M10 20h4M11 22.5h2"/></svg></div>
-      <p class="info-footer-text" data-i18n="places.infoFooter">
-        Yangi joy haqida xabar berish uchun <a href="https://t.me/MuslimVegukin" target="_blank">guruhimizga</a> o'tishingizni so'raymiz.
-      </p>
+      <p class="info-footer-text" data-pt-html="places.infoFooter"></p>
     </div>
 
   </div>
 
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <script defer src="../../js/i18n.js"></script>
+  <!-- Every word on this page lives in places.text.js. -->
+  <script defer src="places.text.js"></script>
+  <script defer src="places.i18n.js"></script>
   <script defer src="../../js/locationManager.js"></script>
   <script defer src="../../js/apiConfig.js"></script>
   <script defer src="../../js/photo-viewer.js"></script>

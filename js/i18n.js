@@ -287,77 +287,11 @@ const I18N = {
     },
         
     
-    // Places page - Common
-    'places.searchNearby': { uz: 'O\'z atrofimdan izlash', ru: 'Искать рядом со мной', en: 'Search nearby' },
-    'places.searchByAddress': { uz: 'Boshqa manzil atrofidan izlash', ru: 'Искать по адресу', en: 'Search by address' },
-    'places.searchHint': { 
-      uz: '💡 Biror manzilni KOREYS tilida kiritish orqali o\'sha hudud atrofidagi joylarni qidirish mumkin.',
-      ru: '💡 Введите адрес на КОРЕЙСКОМ языке для поиска мест в этом районе.',
-      en: '💡 Enter an address in KOREAN to search for places in that area.'
-    },
-    'places.searchButton': { uz: 'Qidirish', ru: 'Поиск', en: 'Search' },
-    'places.placeholderText': { uz: 'Yuqoridagi tugmalardan birini tanlang', ru: 'Выберите одну из кнопок выше', en: 'Select one of the buttons above' },
-    'places.placeholderSubtext': { 
-      uz: 'O\'z joylashuvingiz atrofidan yoki boshqa kiritilgan manzil atrofidan izlang',
-      ru: 'Ищите рядом с вашим местоположением или по другому адресу',
-      en: 'Search near your location or around another address'
-    },
-    'places.loading': { uz: 'Joylar yuklanmoqda...', ru: 'Загрузка мест...', en: 'Loading places...' },
-    'places.loadingPhotos': { uz: 'Rasmlar yuklanmoqda...', ru: 'Загрузка фото...', en: 'Loading photos...' },
-    'places.loadingHint': { uz: 'Internet tezligingizga bog\'liq', ru: 'Зависит от скорости интернета', en: 'Depends on internet speed' },
-    'places.noResults': { uz: 'Hech qanday joy topilmadi', ru: 'Ничего не найдено', en: 'No places found' },
-    'places.noResultsHint': { uz: 'Iltimos, boshqa manzilni sinab ko\'ring', ru: 'Попробуйте другой адрес', en: 'Please try another address' },
-    'places.infoFooter': { 
-      uz: 'Yangi joy haqida xabar berish uchun <a href="https://t.me/MuslimVegukin" target="_blank">guruhimizga</a> o\'tishingizni so\'raymiz.',
-      ru: 'Чтобы сообщить о новом месте, присоединяйтесь к <a href="https://t.me/MuslimVegukin" target="_blank">нашей группе</a>.',
-      en: 'To report a new place, please join <a href="https://t.me/MuslimVegukin" target="_blank">our group</a>.'
-    },
-    'places.noInfo': { uz: 'Ma\'lumot yo\'q', ru: 'Нет данных', en: 'No info' },
-    'places.noAddress': { uz: 'Manzil ma\'lumoti yo\'q', ru: 'Адрес не указан', en: 'No address info' },
-    'places.noRating': { uz: 'Izoh qoldirilmagan', ru: 'Нет отзывов', en: 'No reviews' },
-    'places.error': { uz: 'Xatolik yuz berdi', ru: 'Произошла ошибка', en: 'An error occurred' },
-    'places.loadError': { uz: 'Joylarni yuklashda xatolik yuz berdi', ru: 'Ошибка загрузки мест', en: 'Error loading places' },
-    'places.addressError': { uz: 'Manzil bo\'yicha qidirishda xatolik', ru: 'Ошибка поиска по адресу', en: 'Error searching by address' },
-    'places.timeoutError': { uz: 'Server javob bermadi. Iltimos, qaytadan urinib ko\'ring.', ru: 'Сервер не отвечает. Попробуйте снова.', en: 'Server not responding. Please try again.' },
-    'places.locationError': { uz: 'Joylashuv ma\'lumotlari topilmadi', ru: 'Местоположение не найдено', en: 'Location not found' },
-    'places.locating': { uz: 'Joylashuvingiz aniqlanmoqda...', ru: 'Определяем ваше местоположение...', en: 'Getting your location...' },
-    'places.savedLocationNote': {
-      uz: 'Joriy joylashuvni aniqlab bo\'lmadi — {city} ({when}) bo\'yicha ko\'rsatilmoqda',
-      ru: 'Не удалось определить текущее местоположение — показано для {city} ({when})',
-      en: 'Couldn\'t get your current location — showing results for {city} ({when})'
-    },
 
-    // Places - Mosque specific
-    'places.mosque.name': { uz: 'Masjid', ru: 'Мечеть', en: 'Mosque' },
-    'places.mosque.namePlural': { uz: 'Masjidlar', ru: 'Мечети', en: 'Mosques' },
-    'places.mosque.pageTitle': { uz: 'Sizga eng yaqin 5 masjid', ru: '5 ближайших мечетей', en: '5 nearest mosques' },
-    'places.mosque.searchedTitle': { uz: 'Izlangan joyga eng yaqinlari', ru: 'Ближайшие к искомому месту', en: 'Nearest to searched location' },
-    'places.mosque.noResults': { uz: 'Hech qanday masjid topilmadi', ru: 'Мечети не найдены', en: 'No mosques found' },
 
-    // Places - Restaurant specific
-    'places.restaurant.name': { uz: 'Oshxona', ru: 'Ресторан', en: 'Restaurant' },
-    'places.restaurant.namePlural': { uz: 'Oshxonalar', ru: 'Рестораны', en: 'Restaurants' },
-    'places.restaurant.pageTitle': { uz: 'Sizga eng yaqin 5 oshxona', ru: '5 ближайших ресторанов', en: '5 nearest restaurants' },
-    'places.restaurant.searchedTitle': { uz: 'Izlangan joyga eng yaqinlari', ru: 'Ближайшие к искомому месту', en: 'Nearest to searched location' },
-    'places.restaurant.noResults': { uz: 'Hech qanday oshxona topilmadi', ru: 'Рестораны не найдены', en: 'No restaurants found' },
     
-    'places.menuAvailable': { uz: 'Menyu mavjud',         ru: 'Меню доступно',     en: 'Menu available' },
-    'places.menuPreview':   { uz: 'Menyudan namunalar',   ru: 'Из меню',           en: 'From the menu' },
-    'places.viewAllDishes': { uz: 'Hammasini ko\'rish',   ru: 'Все блюда',         en: 'View all' },
     
-    'detail.menuCtaTitle':  { uz: 'Menyu va onlayn buyurtma',                              ru: 'Меню и онлайн-заказ',                       en: 'Menu & online order' },
-'detail.menuCtaSub':    { uz: 'Stoldan yoki olib ketish uchun buyurtma bering',         ru: 'Закажите в зале или на вынос',              en: 'Order for dine-in or takeout' },
-'detail.menuInfoLabel': { uz: 'RESTORAN EGASIMISIZ?',                                   ru: 'ВЫ ВЛАДЕЛЕЦ?',                              en: 'ARE YOU THE OWNER?' },
-'detail.menuInfoText':  { uz: "Menyungizni Muslim Vegukin orqali onlayn taqdim qilish va mijozlardan to'g'ridan-to'g'ri buyurtma qabul qilishni xohlasangiz, biz bilan bog'laning.",
-                          ru: 'Если вы хотите представить свое меню онлайн через Muslim Vegukin и принимать заказы напрямую от клиентов, свяжитесь с нами.',
-                          en: 'If you would like to showcase your menu online through Muslim Vegukin and accept orders directly from customers, contact us.' },
 
-    // Places - Shop specific
-    'places.shop.name': { uz: 'Do\'kon', ru: 'Магазин', en: 'Shop' },
-    'places.shop.namePlural': { uz: 'Do\'konlar', ru: 'Магазины', en: 'Shops' },
-    'places.shop.pageTitle': { uz: 'Sizga eng yaqin 5 do\'kon', ru: '5 ближайших магазинов', en: '5 nearest shops' },
-    'places.shop.searchedTitle': { uz: 'Izlangan joyga eng yaqinlari', ru: 'Ближайшие к искомому месту', en: 'Nearest to searched location' },
-    'places.shop.noResults': { uz: 'Hech qanday do\'kon topilmadi', ru: 'Магазины не найдены', en: 'No shops found' },
 
     // Qibla page
     'qibla.title': { uz: 'Qibla Yo\'nalishi', ru: 'Направление Киблы', en: 'Qibla Direction' },
@@ -485,46 +419,9 @@ const I18N = {
     'weekday.saturday': { uz: 'Shanba', ru: 'Суббота', en: 'Saturday' },
     'weekday.sunday': { uz: 'Yakshanba', ru: 'Воскресенье', en: 'Sunday' },
 
-    // Detail page - Common
-    'detail.retry': { uz: 'Qaytadan urinish', ru: 'Попробовать снова', en: 'Try again' },
-    'detail.contact': { uz: 'Kontakt', ru: 'Контакт', en: 'Contact' },
-    'detail.address': { uz: 'Manzil', ru: 'Адрес', en: 'Address' },
-    'detail.reviews': { uz: 'Izohlar', ru: 'Отзывы', en: 'Reviews' },
-    'detail.navigation': { uz: 'Navigatsiya', ru: 'Навигация', en: 'Navigation' },
-    'detail.leaveReview': { uz: 'Izoh qoldirish', ru: 'Оставить отзыв', en: 'Leave a review' },
-    'detail.noReviews': { uz: 'Hali izoh yo\'q', ru: 'Пока нет отзывов', en: 'No reviews yet' },
-    'detail.noReviewsYet': { uz: 'Hali Izohlar yo\'q', ru: 'Пока нет отзывов', en: 'No reviews yet' },
-    'detail.noReviewText': { uz: 'Izoh matni yo\'q', ru: 'Нет текста отзыва', en: 'No review text' },
-    'detail.addressCopied': { uz: 'Manzil nusxalandi! ✅', ru: 'Адрес скопирован! ✅', en: 'Address copied! ✅' },
-    'detail.reviewHintTitle': { uz: 'Izohingizda quyidagilarni yozishingiz mumkin:', ru: 'В отзыве вы можете написать:', en: 'In your review you can write:' },
-    'detail.reviewHint2': { uz: 'Ochilish va yopilish vaqtlari', ru: 'Время открытия и закрытия', en: 'Opening and closing times' },
-    'detail.reviewHint3': { uz: 'Kirish eshikdagi parol (agar bor bo\'lsa)', ru: 'Пароль на входной двери (если есть)', en: 'Door password (if any)' },
-    'detail.reviewHint4': { uz: 'Lokatsiyaga olib boriladigan yo\'l tushuntirishlar', ru: 'Описание пути к месту', en: 'Directions to the location' },
-    'detail.rate': { uz: 'Baholang:', ru: 'Оцените:', en: 'Rate:' },
-    'detail.reviewPlaceholder': { uz: 'Izohingizni yozing ...', ru: 'Напишите ваш отзыв ...', en: 'Write your review ...' },
-    'detail.submit': { uz: 'Yuborish', ru: 'Отправить', en: 'Submit' },
-    'detail.loading': { uz: 'Yuklanmoqda...', ru: 'Загрузка...', en: 'Loading...' },
-    'detail.thankYou': { uz: 'Rahmat!', ru: 'Спасибо!', en: 'Thank you!' },
-    'detail.reviewReceived': { uz: 'Izohingiz muvaffaqiyatli qabul qilindi va ko\'rib chiqilmoqda.', ru: 'Ваш отзыв успешно получен и находится на рассмотрении.', en: 'Your review has been received and is being reviewed.' },
-    'detail.selectRating': { uz: 'Iltimos, baho tanlang!', ru: 'Пожалуйста, выберите оценку!', en: 'Please select a rating!' },
-    'detail.submitError': { uz: 'Xatolik yuz berdi. Internetni tekshiring.', ru: 'Произошла ошибка. Проверьте интернет.', en: 'An error occurred. Check your internet.' },
-    'detail.tryAgain': { uz: 'Qaytadan urinib ko\'ring', ru: 'Попробуйте снова', en: 'Try again' },
-    'detail.idNotFound': { uz: 'ID topilmadi. Iltimos, orqaga qaytib, qaytadan tanlang.', ru: 'ID не найден. Вернитесь назад и выберите снова.', en: 'ID not found. Please go back and select again.' },
-    'detail.loadError': { uz: 'Ma\'lumotlarni yuklashda xatolik yuz berdi. Iltimos, internetni tekshirib, qaytadan urinib ko\'ring.', ru: 'Ошибка загрузки данных. Проверьте интернет и попробуйте снова.', en: 'Error loading data. Please check internet and try again.' },
-    'detail.timeoutError': { uz: 'Server javob bermadi (30 soniya). Server uyg\'onayotgan bo\'lishi mumkin, iltimos 1 daqiqa kuting va qaytadan urinib ko\'ring.', ru: 'Сервер не отвечает (30 сек). Сервер может просыпаться, подождите 1 минуту и попробуйте снова.', en: 'Server not responding (30 sec). Server may be waking up, please wait 1 minute and try again.' },
-    'detail.notFound': { uz: 'Topilmadi. Bu bazadan o\'chirilgan bo\'lishi mumkin.', ru: 'Не найдено. Возможно, удалено из базы.', en: 'Not found. May have been removed from database.' },
 
-    // Detail page - Mosque specific
-    'detail.mosque.title': { uz: 'Masjid Ma\'lumotlari', ru: 'Информация о мечети', en: 'Mosque Information' },
-    'detail.mosque.reviewPrompt': { uz: 'Masjid haqida fikringiz', ru: 'Ваше мнение о мечети', en: 'Your opinion about the mosque' },
 
-    // Detail page - Restaurant specific
-    'detail.restaurant.title': { uz: 'Oshxona Ma\'lumotlari', ru: 'Информация о ресторане', en: 'Restaurant Information' },
-    'detail.restaurant.reviewPrompt': { uz: 'Oshxona haqida fikringiz', ru: 'Ваше мнение о ресторане', en: 'Your opinion about the restaurant' },
 
-    // Detail page - Shop specific
-    'detail.shop.title': { uz: 'Do\'kon Ma\'lumotlari', ru: 'Информация о магазине', en: 'Shop Information' },
-    'detail.shop.reviewPrompt': { uz: 'Do\'kon haqida fikringiz', ru: 'Ваше мнение о магазине', en: 'Your opinion about the shop' },
 
     // Months
     'month.0': { uz: 'Yanvar', ru: 'Январь', en: 'January' },
@@ -1066,172 +963,13 @@ const I18N = {
     'hk.cal.pullToRefresh':    { uz: 'Yangilash',   ru: 'Oбновления', en: 'Refresh' },
     'hk.cal.releaseToRefresh': { uz: 'Yangilash', ru: 'Oбновления', en: 'Refresh'},
     // ---------- Place detail: social links + owner note ----------
-    'detail.social.title': { uz: 'Ijtimoiy tarmoqlarda', ru: 'Соцсети', en: 'Social media' },
-    'detail.social.addMorePrompt': {
-      uz: 'Boshqa tarmoqdagi sahifasini bilasizmi?',
-      ru: 'Знаете страницу в другой соцсети?',
-      en: 'Know a page on another network?'
-    },
-    'detail.social.emptyPrompt': {
-      uz: 'Bu joy ijtimoiy tarmoqlarda bormi?',
-      ru: 'Знаете соцсети этого места?',
-      en: 'Do you know this place\'s social media?'
-    },
-    'detail.sheet.pickTitle': {
-      uz: 'Nimani qo\'shmoqchisiz?',
-      ru: 'Что хотите добавить?',
-      en: 'What would you like to add?'
-    },
-    'detail.social.add': { uz: 'Qo\'shish', ru: 'Добавить', en: 'Add' },
-    'detail.social.pending': { uz: 'Ko\'rib chiqilmoqda', ru: 'На проверке', en: 'Under review' },
-    'detail.social.suggestEdit': { uz: 'O\'zgartirish taklif qilish', ru: 'Предложить изменение', en: 'Suggest a correction' },
-    'detail.social.inviteLink': { uz: 'Havola', ru: 'Ссылка', en: 'Link' },
 
-    'detail.note.title': { uz: 'Muassasa haqida', ru: 'О заведении', en: 'About the venue' },
-    'detail.note.empty': {
-      uz: 'Ish vaqti va dam olish kunlari hali qo\'shilmagan.',
-      ru: 'Часы работы и выходные пока не указаны.',
-      en: 'Opening hours and days off have not been added yet.'
-    },
-    'detail.note.addCta': { uz: 'Ma\'lumot qo\'shish', ru: 'Добавить информацию', en: 'Add information' },
-    'detail.note.pending': { uz: 'Ko\'rib chiqilmoqda', ru: 'На проверке', en: 'Under review' },
 
     // ---------- Place detail: submission sheet ----------
-    'detail.sheet.addTitle': {
-      uz: '{platform} havolasini qo\'shish',
-      ru: 'Добавить ссылку {platform}',
-      en: 'Add {platform} link'
-    },
-    'detail.sheet.editTitle': {
-      uz: '{platform} havolasini o\'zgartirish',
-      ru: 'Изменить ссылку {platform}',
-      en: 'Change {platform} link'
-    },
-    'detail.sheet.noteAddTitle': { uz: 'Ma\'lumot qo\'shish', ru: 'Добавить информацию', en: 'Add information' },
-    'detail.sheet.noteEditTitle': { uz: 'Ma\'lumotni o\'zgartirish', ru: 'Изменить информацию', en: 'Change information' },
-    'detail.sheet.current': { uz: 'Hozirgi', ru: 'Сейчас', en: 'Current' },
-    'detail.sheet.telegramHint': { uz: '@username yoki t.me havolasi', ru: '@username или ссылка t.me', en: '@username or a t.me link' },
-    'detail.sheet.tiktokHint': { uz: '@username yoki tiktok.com havolasi', ru: '@username или ссылка tiktok.com', en: '@username or a tiktok.com link' },
-    'detail.sheet.instagramHint': { uz: '@username yoki instagram.com havolasi', ru: '@username или ссылка instagram.com', en: '@username or an instagram.com link' },
-    'detail.sheet.noteHint': {
-      uz: 'Ish vaqti, dam olish kunlari yoki e\'lon.',
-      ru: 'Часы работы, выходные или объявление.',
-      en: 'Opening hours, days off or an announcement.'
-    },
-    'detail.sheet.notePlaceholder': {
-      uz: 'Masalan:\nDu-Ju: 11:00 - 22:00\nShanba: yopiq',
-      ru: 'Например:\nПн-Пт: 11:00 - 22:00\nСуббота: выходной',
-      en: 'For example:\nMon-Fri: 11:00 - 22:00\nSaturday: closed'
-    },
-    'detail.sheet.moderationNote': {
-      uz: 'Taklifingiz admin tekshiruvidan so\'ng chop etiladi.',
-      ru: 'Ваше предложение появится после проверки админом.',
-      en: 'Your suggestion will appear after an admin reviews it.'
-    },
-    'detail.sheet.cancel': { uz: 'Bekor qilish', ru: 'Отмена', en: 'Cancel' },
-    'detail.sheet.send': { uz: 'Yuborish', ru: 'Отправить', en: 'Send' },
-    'detail.sheet.sending': { uz: 'Yuborilmoqda...', ru: 'Отправляется...', en: 'Sending...' },
 
     // ---------- Place detail: submission results ----------
     // Keys match the `code` field the API returns, so a new server code only
     // needs a key here — the frontend needs no change.
-    'detail.submit.ok': {
-      uz: 'Rahmat! Taklifingiz ko\'rib chiqilmoqda.',
-      ru: 'Спасибо! Ваше предложение на проверке.',
-      en: 'Thank you! Your suggestion is under review.'
-    },
-    'detail.submit.err.empty': { uz: 'Avval to\'ldiring.', ru: 'Сначала заполните поле.', en: 'Please fill this in first.' },
-    'detail.submit.err.too_short': { uz: 'Juda qisqa.', ru: 'Слишком коротко.', en: 'That is too short.' },
-    'detail.submit.err.too_long': {
-      uz: 'Matn juda uzun — 500 belgidan oshmasin.',
-      ru: 'Текст слишком длинный — не более 500 символов.',
-      en: 'That is too long — please keep it under 500 characters.'
-    },
-    'detail.submit.err.wrong_host': {
-      uz: 'Bu havola boshqa saytga tegishli. Iltimos, to\'g\'ri havolani kiriting.',
-      ru: 'Эта ссылка ведёт на другой сайт. Введите правильную ссылку.',
-      en: 'That link points to a different site. Please enter the right one.'
-    },
-    'detail.submit.err.invalid_handle': {
-      uz: 'Username noto\'g\'ri. Faqat harflar, raqamlar va pastki chiziq.',
-      ru: 'Неверный username. Только буквы, цифры и подчёркивание.',
-      en: 'That username is not valid. Letters, digits and underscores only.'
-    },
-    'detail.submit.err.invalid_url': { uz: 'Bu havolaga o\'xshamaydi.', ru: 'Это не похоже на ссылку.', en: 'That does not look like a link.' },
-    'detail.submit.err.invalid_scheme': {
-      uz: 'Faqat http va https havolalar qabul qilinadi.',
-      ru: 'Принимаются только ссылки http и https.',
-      en: 'Only http and https links are accepted.'
-    },
-    'detail.submit.err.incomplete': { uz: 'Havola to\'liq emas.', ru: 'Ссылка неполная.', en: 'That link is incomplete.' },
-    'detail.submit.err.invalid_invite': { uz: 'Taklif havolasi to\'liq emas.', ru: 'Пригласительная ссылка неполная.', en: 'That invite link is incomplete.' },
-    'detail.submit.err.not_a_profile': {
-      uz: 'Bu post havolasi. Iltimos, profil havolasini yuboring.',
-      ru: 'Это ссылка на публикацию. Отправьте ссылку на профиль.',
-      en: 'That is a link to a post. Please send the profile link.'
-    },
-    'detail.submit.err.already_pending': {
-      uz: 'Bu ma\'lumot bo\'yicha taklif allaqachon ko\'rib chiqilmoqda.',
-      ru: 'Предложение по этому полю уже на проверке.',
-      en: 'A change to this is already waiting for review.'
-    },
-    'detail.submit.err.same_as_current': {
-      uz: 'Bu allaqachon saqlangan ma\'lumot.',
-      ru: 'Это уже сохранено.',
-      en: 'That is already what is saved.'
-    },
-    'detail.submit.err.rate_limited': {
-      uz: 'Bugungi takliflar limitiga yetdingiz. Ertaga urinib ko\'ring.',
-      ru: 'Вы исчерпали лимит предложений на сегодня. Попробуйте завтра.',
-      en: 'You have reached today\'s limit. Please try again tomorrow.'
-    },
-    'detail.submit.err.place_not_found': { uz: 'Bu joy topilmadi.', ru: 'Это место не найдено.', en: 'That place was not found.' },
-    'detail.submit.err.invalid_field': { uz: 'Noma\'lum maydon.', ru: 'Неизвестное поле.', en: 'Unknown field.' },
-    'detail.submit.err.no_init_data': {
-      uz: 'Iltimos, bu sahifani Telegram ichida oching.',
-      ru: 'Пожалуйста, откройте эту страницу внутри Telegram.',
-      en: 'Please open this page inside Telegram.'
-    },
-    'detail.submit.err.bad_init_data': {
-      uz: 'Iltimos, sahifani qaytadan oching.',
-      ru: 'Пожалуйста, откройте страницу заново.',
-      en: 'Please reopen the page.'
-    },
-    'detail.submit.err.bad_signature': {
-      uz: 'Telegram hisobingizni tasdiqlab bo\'lmadi.',
-      ru: 'Не удалось подтвердить ваш аккаунт Telegram.',
-      en: 'Could not verify your Telegram account.'
-    },
-    'detail.submit.err.stale_init_data': {
-      uz: 'Sessiya muddati tugadi. Sahifani qaytadan oching.',
-      ru: 'Сессия истекла. Откройте страницу заново.',
-      en: 'Your session expired. Please reopen the page.'
-    },
-    'detail.submit.err.no_user': {
-      uz: 'Telegram hisobingizni o\'qib bo\'lmadi.',
-      ru: 'Не удалось прочитать ваш аккаунт Telegram.',
-      en: 'Could not read your Telegram account.'
-    },
-    'detail.submit.err.server_misconfigured': {
-      uz: 'Takliflar vaqtincha ishlamayapti.',
-      ru: 'Предложения временно недоступны.',
-      en: 'Submissions are temporarily unavailable.'
-    },
-    'detail.submit.err.server_error': {
-      uz: 'Xatolik yuz berdi. Qaytadan urinib ko\'ring.',
-      ru: 'Произошла ошибка. Попробуйте снова.',
-      en: 'Something went wrong. Please try again.'
-    },
-    'detail.submit.err.timeout': {
-      uz: 'Server javob bermadi. Qaytadan urinib ko\'ring.',
-      ru: 'Сервер не ответил. Попробуйте снова.',
-      en: 'The server did not respond. Please try again.'
-    },
-    'detail.submit.err.network': {
-      uz: 'Internetga ulanib bo\'lmadi. Qaytadan urinib ko\'ring.',
-      ru: 'Нет соединения с интернетом. Попробуйте снова.',
-      en: 'Could not reach the internet. Please try again.'
-    },
 
     'hk.cal.refreshing':       { uz: 'Yangilanmoqda…',            ru: 'Обновление…',             en: 'Refreshing…' },
   },

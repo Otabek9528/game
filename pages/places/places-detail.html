@@ -38,14 +38,14 @@
     
     <div class="detail-loading" id="detailLoading">
       <div class="detail-spinner"></div>
-      <p data-i18n="common.loading">Yuklanmoqda...</p>
+      <p data-pt="detail.loadingPage"></p>
     </div>
 
     <div class="detail-error" id="detailError" style="display: none;">
       <p class="detail-error-icon"><svg class="pl-icon" viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#c2453a" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg></p>
-      <p class="detail-error-text" data-i18n="places.error">Xatolik yuz berdi</p>
-      <p class="detail-error-hint" id="errorMessage">Ma'lumotlarni yuklashda muammo. Iltimos, qaytadan urinib ko'ring.</p>
-      <button class="retry-button" onclick="loadPlaceDetail()" data-i18n="detail.retry">Qaytadan urinish</button>
+      <p class="detail-error-text" data-pt="places.error"></p>
+      <p class="detail-error-hint" id="errorMessage" data-pt="detail.loadErrorDefault"></p>
+      <button class="retry-button" onclick="loadPlaceDetail()" data-pt="detail.retry"></button>
     </div>
 
     <div id="detailContent" style="display: none;"></div>
@@ -71,7 +71,7 @@
         <div class="pd-sheet-picker" id="pdSheetPicker" hidden></div>
 
         <div class="pd-sheet-current" id="pdSheetCurrent" hidden>
-          <span class="pd-sheet-current-label" data-i18n="detail.sheet.current">Hozirgi</span>
+          <span class="pd-sheet-current-label" data-pt="detail.sheet.current"></span>
           <span class="pd-sheet-current-value" id="pdSheetCurrentValue"></span>
         </div>
 
@@ -89,16 +89,14 @@
 
         <p class="pd-sheet-error" id="pdSheetError" role="alert" hidden></p>
 
-        <p class="pd-sheet-moderation" id="pdSheetModeration" data-i18n="detail.sheet.moderationNote">
-          Taklifingiz administrator tekshiruvidan so'ng chop etiladi.
-        </p>
+        <p class="pd-sheet-moderation" id="pdSheetModeration" data-pt="detail.sheet.moderationNote"></p>
       </div>
 
       <div class="pd-sheet-actions">
         <button type="button" class="pd-sheet-btn pd-sheet-btn--ghost"
-                id="pdSheetCancel" data-i18n="detail.sheet.cancel">Bekor qilish</button>
+                id="pdSheetCancel" data-pt="common.cancel"></button>
         <button type="button" class="pd-sheet-btn pd-sheet-btn--primary"
-                id="pdSheetSend" data-i18n="detail.sheet.send">Yuborish</button>
+                id="pdSheetSend" data-pt="detail.sheet.send"></button>
       </div>
 
     </div>
@@ -108,6 +106,9 @@
 
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <script defer src="../../js/i18n.js"></script>
+  <!-- Every word on this page lives in places.text.js. -->
+  <script defer src="places.text.js"></script>
+  <script defer src="places.i18n.js"></script>
   <script defer src="../../js/apiConfig.js"></script>
   <script defer src="../../js/photo-viewer.js"></script>
   <script defer src="places-detail.js"></script>

@@ -1,47 +1,19 @@
-// places.js - Generic place finder (handles Mosques, Restaurants, Shops) with I18N support
+// places.js - Generic place finder (handles Mosques, Restaurants, Shops).
+// Every word comes from places.text.js via PlacesText.
 
 // ============================================
-// PLACE TYPE CONFIGURATIONS (with I18N support)
+// PLACE TYPE CONFIGURATIONS
 // ============================================
+// Behaviour per place type only. Every word lives in places.text.js.
 
 const PLACE_CONFIGS = {
-  mosque: {
-    name: 'Masjid',
-    namePlural: 'Masjidlar',
-    nameGenitive: 'Masjid',
-    icon: '🕌',
-    buildingType: 'Masjid',
-    defaultPhoto: '../../assets/mosque.png',
-    searchPlaceholder: '서울 강동구 구천면로 271',
-    pageTitle: 'Sizga eng yaqin 5 masjid',
-    searchedTitle: 'Izlangan joyga eng yaqinlari',
-    noResultsText: 'Hech qanday masjid topilmadi'
-  },
-  restaurant: {
-    name: 'Oshxona',
-    namePlural: 'Oshxonalar',
-    nameGenitive: 'Oshxona',
-    icon: '🍽️',
-    buildingType: 'Oshxona',
-    defaultPhoto: '../../assets/restaurant.jpg',
-    searchPlaceholder: '서울 강남구 테헤란로 123',
-    pageTitle: 'Sizga eng yaqin 5 oshxona',
-    searchedTitle: 'Izlangan joyga eng yaqinlari',
-    noResultsText: 'Hech qanday oshxona topilmadi'
-  },
-  shop: {
-    name: 'Do\'kon',
-    namePlural: 'Do\'konlar',
-    nameGenitive: 'Do\'kon',
-    icon: '🏪',
-    buildingType: "Do'kon",
-    defaultPhoto: '../../assets/store.jpg',
-    searchPlaceholder: '서울 용산구 이태원로 123',
-    pageTitle: 'Sizga eng yaqin 5 do\'kon',
-    searchedTitle: 'Izlangan joyga eng yaqinlari',
-    noResultsText: 'Hech qanday do\'kon topilmadi'
-  }
+  mosque:     { icon: '🕌', buildingType: 'Masjid',  defaultPhoto: '../../assets/mosque.png' },
+  restaurant: { icon: '🍽️', buildingType: 'Oshxona', defaultPhoto: '../../assets/restaurant.jpg' },
+  shop:       { icon: '🏪', buildingType: "Do'kon",  defaultPhoto: '../../assets/store.jpg' }
 };
+
+const T = PlacesText.t;
+const esc = PlacesText.esc;
 
 // ============================================
 // INLINE SVG ICONS (UI chrome — replaces emoji)
@@ -54,20 +26,17 @@ const PL_ICONS = {
   image: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-4.5-4.5L7 21"/></svg>'
 };
 
-// Get translated config based on current language
+// Config for a place type with its words in the current language.
 function getTranslatedConfig(placeType) {
-  const base = PLACE_CONFIGS[placeType] || PLACE_CONFIGS.mosque;
-  
-  // If I18N not loaded, return base config
-  if (!window.I18N) return base;
-  
+  const type = PLACE_CONFIGS[placeType] ? placeType : 'mosque';
   return {
-    ...base,
-    name: I18N.t(`places.${placeType}.name`) !== `places.${placeType}.name` ? I18N.t(`places.${placeType}.name`) : base.name,
-    namePlural: I18N.t(`places.${placeType}.namePlural`) !== `places.${placeType}.namePlural` ? I18N.t(`places.${placeType}.namePlural`) : base.namePlural,
-    pageTitle: I18N.t(`places.${placeType}.pageTitle`) !== `places.${placeType}.pageTitle` ? I18N.t(`places.${placeType}.pageTitle`) : base.pageTitle,
-    searchedTitle: I18N.t(`places.${placeType}.searchedTitle`) !== `places.${placeType}.searchedTitle` ? I18N.t(`places.${placeType}.searchedTitle`) : base.searchedTitle,
-    noResultsText: I18N.t(`places.${placeType}.noResults`) !== `places.${placeType}.noResults` ? I18N.t(`places.${placeType}.noResults`) : base.noResultsText
+    ...PLACE_CONFIGS[type],
+    name: T(`types.${type}`),
+    namePlural: T(`types.${type}s`),
+    pageTitle: T(`places.${type}.pageTitle`),
+    searchedTitle: T(`places.${type}.searchedTitle`),
+    noResultsText: T(`places.${type}.noResults`),
+    searchPlaceholder: T(`places.${type}.searchExample`)
   };
 }
 
@@ -85,8 +54,8 @@ try {
 
 // Get place type from URL parameter
 const urlParams = new URLSearchParams(window.location.search);
-const PLACE_TYPE = urlParams.get('type') || 'mosque';
-let CONFIG = PLACE_CONFIGS[PLACE_TYPE] || PLACE_CONFIGS.mosque;
+const PLACE_TYPE = PLACE_CONFIGS[urlParams.get('type')] ? urlParams.get('type') : 'mosque';
+let CONFIG = getTranslatedConfig(PLACE_TYPE);
 
 const STATE_KEY = `${PLACE_TYPE}_search_state`;
 
@@ -164,7 +133,7 @@ function clearSearchState() {
 }
 
 // ============================================
-// UI UPDATES (with I18N)
+// UI UPDATES
 // ============================================
 
 function updatePageTitle() {
@@ -179,31 +148,20 @@ function updatePageTitle() {
 function updateUIText() {
   CONFIG = getTranslatedConfig(PLACE_TYPE);
   
-  // Update page title
-  document.title = window.I18N ? I18N.t('places.pageTitle').replace('{type}', CONFIG.namePlural) : `Yaqin ${CONFIG.namePlural}`;
-  
-  // Update search placeholder
+  document.title = T('places.pageTitle', { type: CONFIG.namePlural });
+
   if (searchBar) {
     searchBar.placeholder = CONFIG.searchPlaceholder;
   }
-  
-  // Update no results text
+
   const noResultsText = document.querySelector('.no-results-text');
   if (noResultsText) {
     noResultsText.textContent = CONFIG.noResultsText;
   }
-  
-  // Update data-i18n elements
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (window.I18N) {
-      const trans = I18N.t(key);
-      if (trans !== key) {
-        el.innerHTML = trans;
-      }
-    }
-  });
-  
+
+  // Everything marked data-pt in places.html
+  PlacesText.apply();
+
   updatePageTitle();
 }
 
@@ -382,13 +340,13 @@ async function discoverPhotos(photoPath, maxPhotos = 10) {
 // CAROUSEL FUNCTIONS (with Lazy Loading)
 // ============================================
 
-// Create skeleton placeholder while loading (with I18N)
+// Create skeleton placeholder while loading
 function createSkeletonCard(placeId) {
-  const loadingText = window.I18N ? I18N.t('places.loadingPhotos') : 'Rasmlar yuklanmoqda...';
-  const hintText = window.I18N ? I18N.t('places.loadingHint') : 'Internet tezligingizga bog\'liq';
-  
+  const loadingText = T('places.loadingPhotos');
+  const hintText = T('places.loadingHint');
+
   return `
-    <div class="place-photo-skeleton" data-place-id="${placeId}">
+    <div class="place-photo-skeleton" data-place-id="${esc(placeId)}">
       <div class="skeleton-shimmer"></div>
       <div class="skeleton-text">
         <span class="skeleton-icon">${PL_ICONS.image}</span>
@@ -402,27 +360,23 @@ function createSkeletonCard(placeId) {
 // Create single photo display
 function createSinglePhoto(photo, placeId) {
   return `
-    <div class="place-photo-single" data-photos='${JSON.stringify([photo])}' data-place-id="${placeId}">
-      <img src="${photo}" alt="${CONFIG.name} photo" loading="lazy" />
+    <div class="place-photo-single" data-photos="${esc(JSON.stringify([photo]))}" data-place-id="${esc(placeId)}">
+      <img src="${esc(photo)}" alt="${esc(photoAlt())}" loading="lazy" />
     </div>
   `;
 }
 
+function photoAlt() {
+  return T('places.photoAlt', { name: CONFIG.name });
+}
+
 function createPhotoCarousel(placeId, photos) {
   if (!photos || photos.length === 0) {
-    return `
-      <div class="place-photo-single" data-photos='["${CONFIG.defaultPhoto}"]' data-place-id="${placeId}">
-        <img src="${CONFIG.defaultPhoto}" alt="${CONFIG.name} photo" loading="lazy" />
-      </div>
-    `;
+    return createSinglePhoto(CONFIG.defaultPhoto, placeId);
   }
-  
+
   if (photos.length === 1) {
-    return `
-      <div class="place-photo-single" data-photos='${JSON.stringify(photos)}' data-place-id="${placeId}">
-        <img src="${photos[0]}" alt="${CONFIG.name} photo" loading="lazy" />
-      </div>
-    `;
+    return createSinglePhoto(photos[0], placeId);
   }
   
   let photosHTML = '';
@@ -433,8 +387,8 @@ function createPhotoCarousel(placeId, photos) {
                          index === 1 ? 'right' : 'hidden';
     
     photosHTML += `
-      <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${photo}">
-        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" loading="lazy" />
+      <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${esc(photo)}">
+        <img src="${esc(photo)}" alt="${esc(photoAlt())} ${index + 1}" loading="lazy" />
       </div>
     `;
     
@@ -444,7 +398,7 @@ function createPhotoCarousel(placeId, photos) {
   });
   
   return `
-    <div class="photo-carousel" data-place-id="${placeId}" data-photos='${JSON.stringify(photos)}'>
+    <div class="photo-carousel" data-place-id="${esc(placeId)}" data-photos="${esc(JSON.stringify(photos))}">
       <div class="carousel-track">
         ${photosHTML}
       </div>
@@ -644,7 +598,7 @@ function setupLazyLoading() {
 }
 
 // ============================================
-// RENDERING (Optimized with I18N)
+// RENDERING
 // ============================================
 
 function renderStars(rating) {
@@ -657,7 +611,7 @@ function renderStars(rating) {
 }
 
 function generateStarRating(averageRating, reviewCount) {
-  const noRatingText = window.I18N ? I18N.t('places.noRating') : 'Izoh qoldirilmagan';
+  const noRatingText = T('places.noRating');
   
   if (!reviewCount || reviewCount === 0) {
     return `<span class="chip-muted">${noRatingText}</span>`;
@@ -679,6 +633,11 @@ async function renderPlaceCards(places) {
   
   if (!places || places.length === 0) {
     loadingIndicator.style.display = 'none';
+    // Reset both lines: an earlier error may have left its own text here.
+    const noResultsText = document.querySelector('.no-results-text');
+    const noResultsHint = document.querySelector('.no-results-hint');
+    if (noResultsText) noResultsText.textContent = CONFIG.noResultsText;
+    if (noResultsHint) noResultsHint.textContent = T('places.noResultsHint');
     noResults.style.display = 'block';
     placeCardsContainer.style.display = 'none';
     return;
@@ -690,9 +649,8 @@ async function renderPlaceCards(places) {
   // Setup lazy loading observer
   setupLazyLoading();
   
-  // Translated texts
-  const noInfoText = window.I18N ? I18N.t('places.noInfo') : 'Ma\'lumot yo\'q';
-  const noAddressText = window.I18N ? I18N.t('places.noAddress') : 'Manzil ma\'lumoti yo\'q';
+  const noInfoText = T('places.noInfo');
+  const noAddressText = T('places.noAddress');
   
   // Render all cards immediately with skeletons
   for (const place of places) {
@@ -702,7 +660,9 @@ async function renderPlaceCards(places) {
     card.setAttribute('data-photo-path', place.photo || '');
     
     const starRatingHTML = generateStarRating(place.averageRating, place.reviewCount);
-	const distanceDisplay = (place.distance !== null && place.distance !== undefined) ? place.distance.toFixed(2) : 'N/A';
+    const distanceDisplay = (place.distance !== null && place.distance !== undefined)
+      ? T('places.distanceKm', { n: Number(place.distance).toFixed(2) })
+      : T('places.noDistance');
     const phoneDisplay = place.phone || noInfoText;
     
     card.innerHTML = `
@@ -716,21 +676,21 @@ async function renderPlaceCards(places) {
         </div>
         <div class="chip chip-distance">
           ${PL_ICONS.pin}
-          <span>${distanceDisplay} km</span>
+          <span>${esc(distanceDisplay)}</span>
         </div>
       </div>
       
       <div class="place-card-content">
-        <h3 class="place-name">${place.name}</h3>
-        <p class="place-name-ko">${place.city || 'Unknown City'}</p>
+        <h3 class="place-name">${esc(place.name)}</h3>
+        <p class="place-name-ko">${esc(place.city || T('places.unknownCity'))}</p>
         <div class="place-info">
           <div class="place-info-item">
             <span class="info-icon">${PL_ICONS.phone}</span>
-            <span class="info-text">${phoneDisplay}</span>
+            <span class="info-text">${esc(phoneDisplay)}</span>
           </div>
           <div class="place-info-item">
             <span class="info-icon">${PL_ICONS.pin}</span>
-            <span class="info-text">${place.address || noAddressText}</span>
+            <span class="info-text">${esc(place.address || noAddressText)}</span>
           </div>
         </div>
       </div>
@@ -768,7 +728,7 @@ function showError(message) {
   const noResultsText = document.querySelector('.no-results-text');
   const noResultsHint = document.querySelector('.no-results-hint');
   
-  const errorTitle = window.I18N ? I18N.t('places.error') : 'Xatolik yuz berdi';
+  const errorTitle = T('places.error');
   if (noResultsText) noResultsText.textContent = errorTitle;
   if (noResultsHint) noResultsHint.textContent = message;
 }
@@ -804,7 +764,7 @@ searchNearbyBtn.addEventListener('click', async () => {
   addressInputSection.style.display = 'none';
   placesPageTitle.style.display = 'block';
   setLocationNote(null);
-  setLoadingText('places.locating', 'Joylashuvingiz aniqlanmoqda...');
+  setLoadingText('places.locating');
   loadingIndicator.style.display = 'flex';
   placeCardsContainer.style.display = 'none';
   noResults.style.display = 'none';
@@ -828,7 +788,7 @@ searchNearbyBtn.addEventListener('click', async () => {
   }
   
   if (location && location.lat && location.lon) {
-    setLoadingText('places.loading', 'Joylar yuklanmoqda...');
+    setLoadingText('places.loading');
     try {
       const places = await fetchNearbyPlaces(location.lat, location.lon, 5);
       loadingIndicator.style.display = 'none';
@@ -836,27 +796,20 @@ searchNearbyBtn.addEventListener('click', async () => {
       saveSearchState();
     } catch (error) {
       setLocationNote(null);
-      const loadErrorText = window.I18N ? I18N.t('places.loadError') : `${CONFIG.namePlural}ni yuklashda xatolik yuz berdi`;
-      const timeoutErrorText = window.I18N ? I18N.t('places.timeoutError') : 'Server javob bermadi. Iltimos, qaytadan urinib ko\'ring.';
-      
-      let errorMessage = loadErrorText;
-      if (error.name === 'TimeoutError') {
-        errorMessage = timeoutErrorText;
-      }
+      const errorMessage = error.name === 'TimeoutError' ? T('places.timeoutError') : T('places.loadError');
       showError(errorMessage);
     }
   } else {
     loadingIndicator.style.display = 'none';
-    const locationErrorText = window.I18N ? I18N.t('places.locationError') : 'Joylashuv ma\'lumotlari topilmadi';
-    showError(locationErrorText);
+    showError(T('places.locationError'));
   }
 });
 
-function setLoadingText(key, fallback) {
+function setLoadingText(key) {
   const el = document.getElementById('loadingText');
   if (!el) return;
-  el.setAttribute('data-i18n', key);
-  el.textContent = window.I18N ? I18N.t(key) : fallback;
+  el.setAttribute('data-pt', key);   // so a language change re-applies it
+  el.textContent = T(key);
 }
 
 // Shown when "near me" fell back to the saved location; `saved` null hides it.
@@ -868,10 +821,7 @@ function setLocationNote(saved) {
     return;
   }
   const when = LocationManager.formatAge(Date.now() - (saved.timestamp || 0));
-  const pattern = window.I18N ? I18N.t('places.savedLocationNote') : '';
-  note.textContent = (pattern && pattern !== 'places.savedLocationNote' ? pattern : 'Joriy joylashuvni aniqlab bo\'lmadi — {city} ({when}) bo\'yicha ko\'rsatilmoqda')
-    .replace('{city}', saved.city || '')
-    .replace('{when}', when.toLowerCase());
+  note.textContent = T('places.savedLocationNote', { city: saved.city || '', when: when.toLowerCase() });
   note.hidden = false;
 }
 
@@ -907,8 +857,8 @@ async function performAddressSearch(address) {
   currentSearchAddress = address;
   setActiveMode('address');
   setLocationNote(null);
-  setLoadingText('places.loading', 'Joylar yuklanmoqda...');
-  
+  setLoadingText('places.loading');
+
   // Hide placeholder, show loading
   searchPlaceholder.style.display = 'none';
   placesPageTitle.style.display = 'block';
@@ -926,15 +876,7 @@ async function performAddressSearch(address) {
     await renderPlaceCards(places);
     saveSearchState();
   } catch (error) {
-    const addressErrorText = window.I18N ? I18N.t('places.addressError') : 'Manzil bo\'yicha qidirishda xatolik. Iltimos, boshqa manzilni sinab ko\'ring.';
-    const timeoutErrorText = window.I18N ? I18N.t('places.timeoutError') : 'Server javob bermadi (30 soniya). Iltimos, bir oz kuting va qaytadan urinib ko\'ring.';
-    
-    let errorMessage = addressErrorText;
-    if (error.name === 'TimeoutError') {
-      errorMessage = timeoutErrorText;
-    }
-    
-    showError(errorMessage);
+    showError(error.name === 'TimeoutError' ? T('places.timeoutError') : T('places.addressError'));
   }
 }
 

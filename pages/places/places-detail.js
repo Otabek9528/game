@@ -1,41 +1,20 @@
-// places-detail.js - Place detail page functionality with I18N support
+// places-detail.js - Place detail page.
+// Every word comes from places.text.js via PlacesText.
 
 // ============================================
-// PLACE TYPE CONFIGURATIONS (with I18N support)
+// PLACE TYPE CONFIGURATIONS
 // ============================================
+// Behaviour per place type only.
 
 const PLACE_CONFIGS = {
-  mosque: {
-    name: 'Masjid',
-    namePlural: 'Masjidlar',
-    nameGenitive: 'Masjid',
-    icon: '🕌',
-    buildingType: 'Masjid',
-    defaultPhoto: '../../assets/mosque.png',
-    detailTitle: 'Masjid Ma\'lumotlari',
-    reviewPrompt: 'Masjid haqida fikringiz'
-  },
-  restaurant: {
-    name: 'Oshxona',
-    namePlural: 'Oshxonalar',
-    nameGenitive: 'Oshxona',
-    icon: '🍽️',
-    buildingType: 'Restoran',
-    defaultPhoto: '../../assets/restaurant.jpg',
-    detailTitle: 'Oshxona Ma\'lumotlari',
-    reviewPrompt: 'Oshxona haqida fikringiz'
-  },
-  shop: {
-    name: 'Do\'kon',
-    namePlural: 'Do\'konlar',
-    nameGenitive: 'Do\'kon',
-    icon: '🏪',
-    buildingType: "Do'kon",
-    defaultPhoto: '../../assets/store.jpg',
-    detailTitle: 'Do\'kon Ma\'lumotlari',
-    reviewPrompt: 'Do\'kon haqida fikringiz'
-  }
+  mosque:     { icon: '🕌', buildingType: 'Masjid',  defaultPhoto: '../../assets/mosque.png' },
+  restaurant: { icon: '🍽️', buildingType: 'Oshxona', defaultPhoto: '../../assets/restaurant.jpg' },
+  shop:       { icon: '🏪', buildingType: "Do'kon",  defaultPhoto: '../../assets/store.jpg' }
 };
+
+const T = PlacesText.t;
+const esc = PlacesText.esc;
+const safeUrl = PlacesText.safeUrl;
 
 // ============================================
 // INLINE SVG ICONS (UI chrome — replaces emoji)
@@ -65,28 +44,23 @@ async function incrementViewCount(placeId) {
 }
 
 
-// Get translated config based on current language
+// Config for a place type with its words in the current language.
 function getTranslatedConfig(placeType) {
-  const base = PLACE_CONFIGS[placeType] || PLACE_CONFIGS.mosque;
-  
-  // If I18N not loaded, return base config
-  if (!window.I18N) return base;
-  
+  const type = PLACE_CONFIGS[placeType] ? placeType : 'mosque';
   return {
-    ...base,
-    name: I18N.t(`places.${placeType}.name`) !== `places.${placeType}.name` ? I18N.t(`places.${placeType}.name`) : base.name,
-    namePlural: I18N.t(`places.${placeType}.namePlural`) !== `places.${placeType}.namePlural` ? I18N.t(`places.${placeType}.namePlural`) : base.namePlural,
-    detailTitle: I18N.t(`detail.${placeType}.title`) !== `detail.${placeType}.title` ? I18N.t(`detail.${placeType}.title`) : base.detailTitle,
-    reviewPrompt: I18N.t(`detail.${placeType}.reviewPrompt`) !== `detail.${placeType}.reviewPrompt` ? I18N.t(`detail.${placeType}.reviewPrompt`) : base.reviewPrompt
+    ...PLACE_CONFIGS[type],
+    name: T(`types.${type}`),
+    namePlural: T(`types.${type}s`),
+    detailTitle: T(`detail.${type}.title`),
+    reviewPrompt: T(`detail.${type}.reviewPrompt`)
   };
 }
 
 // Get place type from URL parameter
 const urlParams = new URLSearchParams(window.location.search);
-const PLACE_TYPE = urlParams.get('type') || 'mosque';
-let CONFIG = PLACE_CONFIGS[PLACE_TYPE] || PLACE_CONFIGS.mosque;
+const PLACE_TYPE = PLACE_CONFIGS[urlParams.get('type')] ? urlParams.get('type') : 'mosque';
+let CONFIG = getTranslatedConfig(PLACE_TYPE);
 
-// Update page title
 document.title = CONFIG.detailTitle;
 
 // ============================================
@@ -133,8 +107,8 @@ const errorMessage = document.getElementById('errorMessage');
 // ============================================
 // The old inline modal + zoom block lived here. It is replaced by the
 // shared PhotoViewer, which also powers places.html.
-// openImageModal / closeImageModal are kept as thin wrappers because
-// createDetailPhotoCarousel() emits inline onclick="openImageModal(...)".
+// openImageModal / closeImageModal are thin wrappers used by the photo
+// click handlers attached in renderPlaceDetail() and initDetailCarousel().
 
 PhotoViewer.configure({
   onOpen: function () {
@@ -254,12 +228,12 @@ async function discoverPhotos(photoPath, maxPhotos = 10) {
 // Shown while the probing above runs, so the card is readable immediately
 // instead of waiting on photos. Reuses the skeleton from places.css.
 function detailPhotoSkeleton() {
-  const loading = window.I18N ? I18N.t('places.loadingPhotos') : 'Rasmlar yuklanmoqda...';
+  const loading = T('places.loadingPhotos');
   return `
     <div class="detail-photo-skeleton">
       <div class="skeleton-shimmer"></div>
       <div class="skeleton-text">
-        <span class="skeleton-message">${loading}</span>
+        <span class="skeleton-message">${esc(loading)}</span>
       </div>
     </div>
   `;
@@ -271,16 +245,14 @@ function detailPhotoSkeleton() {
 // ============================================
 
 function createDetailPhotoCarousel(photos) {
+  // A single photo gets its click handler in renderPlaceDetail, after it is
+  // in the page, so no photo path is ever written into an onclick string.
   if (!photos || photos.length === 0) {
-    return `
-      <img src="${CONFIG.defaultPhoto}" alt="${CONFIG.name} photo" class="detail-single-photo" onclick="openImageModal(['${CONFIG.defaultPhoto}'], 0)" />
-    `;
+    return `<img src="${esc(CONFIG.defaultPhoto)}" alt="${esc(photoAlt())}" class="detail-single-photo" />`;
   }
-  
+
   if (photos.length === 1) {
-    return `
-      <img src="${photos[0]}" alt="${CONFIG.name} photo" class="detail-single-photo" onclick="openImageModal(['${photos[0]}'], 0)" />
-    `;
+    return `<img src="${esc(photos[0])}" alt="${esc(photoAlt())}" class="detail-single-photo" />`;
   }
   
   let photosHTML = '';
@@ -291,8 +263,8 @@ function createDetailPhotoCarousel(photos) {
                          index === 1 ? 'right' : 'hidden';
     
     photosHTML += `
-      <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${photo}">
-        <img src="${photo}" alt="${CONFIG.name} photo ${index + 1}" />
+      <div class="carousel-photo ${positionClass}" data-index="${index}" data-photo="${esc(photo)}">
+        <img src="${esc(photo)}" alt="${esc(photoAlt())} ${index + 1}" />
       </div>
     `;
     
@@ -302,7 +274,7 @@ function createDetailPhotoCarousel(photos) {
   });
   
   return `
-    <div class="photo-carousel" id="detailCarousel" data-photos='${JSON.stringify(photos)}'>
+    <div class="photo-carousel" id="detailCarousel" data-photos="${esc(JSON.stringify(photos))}">
       <div class="carousel-track">
         ${photosHTML}
       </div>
@@ -311,6 +283,10 @@ function createDetailPhotoCarousel(photos) {
       </div>
     </div>
   `;
+}
+
+function photoAlt() {
+  return T('places.photoAlt', { name: CONFIG.name });
 }
 
 function initDetailCarousel(photoCount) {
@@ -381,7 +357,7 @@ function initDetailCarousel(photoCount) {
 }
 
 // ============================================
-// RATING AND REVIEW FUNCTIONS (with I18N)
+// RATING AND REVIEW FUNCTIONS
 // ============================================
 
 function renderStars(rating) {
@@ -394,7 +370,7 @@ function renderStars(rating) {
 }
 
 function generateStarRating(reviews) {
-  const noRatingText = window.I18N ? I18N.t('detail.noReviews') : 'Hali izoh yo\'q';
+  const noRatingText = T('detail.noReviews');
   
   if (!reviews || reviews.length === 0) {
     return `<span class="detail-chip--muted">${noRatingText}</span>`;
@@ -409,7 +385,7 @@ function generateStarRating(reviews) {
 function formatDate(dateString) {
   try {
     const date = new Date(dateString);
-    const lang = window.I18N ? I18N.getLanguage() : 'uz';
+    const lang = PlacesText.lang();
     const locale = lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'uz-UZ';
     return date.toLocaleDateString(locale, { 
       year: 'numeric', 
@@ -422,8 +398,8 @@ function formatDate(dateString) {
 }
 
 function renderReviews(reviews) {
-  const noReviewsText = window.I18N ? I18N.t('detail.noReviewsYet') : 'Hali Izohlar yo\'q';
-  const noTextText = window.I18N ? I18N.t('detail.noReviewText') : 'Izoh matni yo\'q';
+  const noReviewsText = T('detail.noReviewsYet');
+  const noTextText = T('detail.noReviewText');
   
   if (!reviews || reviews.length === 0) {
     return `<div class="no-reviews">${noReviewsText}</div>`;
@@ -440,9 +416,9 @@ function renderReviews(reviews) {
           <div class="review-rating">
             <span class="review-stars">${stars}</span>
           </div>
-          <span class="review-date">${date}</span>
+          <span class="review-date">${esc(date)}</span>
         </div>
-        <p class="review-text">${review.text || noTextText}</p>
+        <p class="review-text">${esc(review.text || noTextText)}</p>
       </div>
     `;
   });
@@ -451,12 +427,11 @@ function renderReviews(reviews) {
 }
 
 function copyAddress(address, event) {
-  const noAddressText = window.I18N ? I18N.t('places.noAddress') : 'Manzil ma\'lumoti yo\'q';
-  if (!address || address === noAddressText) return;
-  
+  if (!address) return;
+
   event.stopPropagation();
-  
-  const copiedText = window.I18N ? I18N.t('detail.addressCopied') : 'Manzil nusxalandi! ✅';
+
+  const copiedText = T('detail.addressCopied');
   
   navigator.clipboard.writeText(address).then(() => {
     const item = event.currentTarget;
@@ -476,7 +451,7 @@ function copyAddress(address, event) {
 }
 
 // ============================================
-// RENDER PLACE DETAIL (with I18N)
+// RENDER PLACE DETAIL
 // ============================================
 
 // The detail API has no user coordinates, so it may omit distance.
@@ -507,42 +482,45 @@ async function renderPlaceDetail(place) {
   const reviewsHTML = renderReviews(place.reviews);
   const reviewCount = place.reviews ? place.reviews.length : 0;
   const hasDistance = place.distance !== null && place.distance !== undefined;
-  const distanceDisplay = hasDistance ? Number(place.distance).toFixed(1) : 'N/A';
-  
-  // Translated texts
-  const t = window.I18N ? (key) => I18N.t(key) : (key) => key;
-  const noInfoText = t('places.noInfo') !== 'places.noInfo' ? t('places.noInfo') : 'Ma\'lumot yo\'q';
-  const noAddressText = t('places.noAddress') !== 'places.noAddress' ? t('places.noAddress') : 'Manzil ma\'lumoti yo\'q';
-  const contactTitle = t('detail.contact') !== 'detail.contact' ? t('detail.contact') : 'Kontakt';
-  const addressTitle = t('detail.address') !== 'detail.address' ? t('detail.address') : 'Manzil';
-  const reviewsTitle = t('detail.reviews') !== 'detail.reviews' ? t('detail.reviews') : 'Izohlar';
-  const navigationTitle = t('detail.navigation') !== 'detail.navigation' ? t('detail.navigation') : 'Navigatsiya';
-  const leaveReviewText = t('detail.leaveReview') !== 'detail.leaveReview' ? t('detail.leaveReview') : 'Izoh qoldirish';
-  const reviewHintTitle = t('detail.reviewHintTitle') !== 'detail.reviewHintTitle' ? t('detail.reviewHintTitle') : 'Izohingizda quyidagilarni yozishingiz mumkin:';
+  const distanceDisplay = hasDistance ? T('places.distanceKm', { n: Number(place.distance).toFixed(1) }) : T('places.noDistance');
+
+  const noInfoText = T('places.noInfo');
+  const noAddressText = T('places.noAddress');
+  const contactTitle = T('detail.contact');
+  const addressTitle = T('detail.address');
+  const reviewsTitle = T('detail.reviews');
+  const navigationTitle = T('detail.navigation');
+  const leaveReviewText = T('detail.leaveReview');
+  const reviewHintTitle = T('detail.reviewHintTitle');
   const reviewHint1 = CONFIG.reviewPrompt;
-  const reviewHint2 = t('detail.reviewHint2') !== 'detail.reviewHint2' ? t('detail.reviewHint2') : 'Ochilish va yopilish vaqtlari';
-  const reviewHint3 = t('detail.reviewHint3') !== 'detail.reviewHint3' ? t('detail.reviewHint3') : 'Kirish eshikdagi parol (agar bor bo\'lsa)';
-  const reviewHint4 = t('detail.reviewHint4') !== 'detail.reviewHint4' ? t('detail.reviewHint4') : 'Lokatsiyaga olib boriladigan yo\'l tushuntirishlar';
-  const rateText = t('detail.rate') !== 'detail.rate' ? t('detail.rate') : 'Baholang:';
-  const reviewPlaceholder = t('detail.reviewPlaceholder') !== 'detail.reviewPlaceholder' ? t('detail.reviewPlaceholder') : 'Izohingizni yozing ...';
-  const submitText = t('detail.submit') !== 'detail.submit' ? t('detail.submit') : 'Yuborish';
-  const thankYouText = t('detail.thankYou') !== 'detail.thankYou' ? t('detail.thankYou') : 'Rahmat!';
-  const reviewReceivedText = t('detail.reviewReceived') !== 'detail.reviewReceived' ? t('detail.reviewReceived') : 'Izohingiz muvaffaqiyatli qabul qilindi va ko\'rib chiqilmoqda.';
-  
+  const reviewHint2 = T('detail.reviewHint2');
+  const reviewHint3 = T('detail.reviewHint3');
+  const reviewHint4 = T('detail.reviewHint4');
+  const rateText = T('detail.rate');
+  const reviewPlaceholder = T('detail.reviewPlaceholder');
+  const submitText = T('detail.reviewSubmit');
+  const thankYouText = T('detail.thankYou');
+  const reviewReceivedText = T('detail.reviewReceived');
+  const kakaoUrl = safeUrl(place.kakaoMapUrl);
+  const naverUrl = safeUrl(place.naverMapUrl);
+
   // Process phone numbers - split if multiple
   function renderPhoneNumbers(phoneString) {
     if (!phoneString) {
-      return `<span class="detail-text">${noInfoText}</span>`;
+      return `<span class="detail-text">${esc(noInfoText)}</span>`;
     }
-    
+
     const phones = phoneString.split(',').map(p => p.trim()).filter(p => p);
-    
+    // The dialler only needs the number itself; anything else is dropped
+    // from the href so it cannot carry markup or another scheme.
+    const tel = (phone) => esc(phone.replace(/[^0-9+\-() ]/g, ''));
+
     if (phones.length === 1) {
-      return `<a href="tel:${phones[0]}" class="detail-link">${phones[0]}</a>`;
+      return `<a href="tel:${tel(phones[0])}" class="detail-link">${esc(phones[0])}</a>`;
     }
-    
-    return phones.map(phone => 
-      `<a href="tel:${phone}" class="detail-link detail-phone-line">${phone}</a>`
+
+    return phones.map(phone =>
+      `<a href="tel:${tel(phone)}" class="detail-link detail-phone-line">${esc(phone)}</a>`
     ).join('');
   }
   
@@ -553,9 +531,9 @@ async function renderPlaceDetail(place) {
       </div>
       
       <div class="detail-head">
-        <p class="detail-eyebrow">${PL_ICONS.rub} ${CONFIG.name}</p>
-        <h1 class="detail-title">${place.name}</h1>
-        <p class="detail-subtitle">${place.city || 'Unknown City'}</p>
+        <p class="detail-eyebrow">${PL_ICONS.rub} ${esc(CONFIG.name)}</p>
+        <h1 class="detail-title">${esc(place.name)}</h1>
+        <p class="detail-subtitle">${esc(place.city || T('places.unknownCity'))}</p>
         <div class="detail-chips">
           <div class="detail-chip detail-chip--rating">
             ${starRatingHTML}
@@ -563,7 +541,7 @@ async function renderPlaceDetail(place) {
           ${hasDistance ? `
             <div class="detail-chip detail-chip--distance">
               ${PL_ICONS.pin}
-              <span>${distanceDisplay} km</span>
+              <span>${esc(distanceDisplay)}</span>
             </div>
           ` : ''}
         </div>
@@ -571,7 +549,7 @@ async function renderPlaceDetail(place) {
       
       <div class="detail-content">
         <div class="detail-section">
-          <h3 class="detail-section-title">${PL_ICONS.rub} ${contactTitle}</h3>
+          <h3 class="detail-section-title">${PL_ICONS.rub} ${esc(contactTitle)}</h3>
           <div class="detail-info-item">
             <span class="detail-icon">${PL_ICONS.phone}</span>
             <div style="flex: 1;">
@@ -581,10 +559,10 @@ async function renderPlaceDetail(place) {
         </div>
         
         <div class="detail-section">
-          <h3 class="detail-section-title">${PL_ICONS.rub} ${addressTitle}</h3>
-          <div class="detail-info-item" style="cursor: pointer;" onclick="copyAddress('${(place.address || '').replace(/'/g, "\\'")}', event)">
+          <h3 class="detail-section-title">${PL_ICONS.rub} ${esc(addressTitle)}</h3>
+          <div class="detail-info-item" id="pdAddressItem" style="cursor: pointer;">
             <span class="detail-icon">${PL_ICONS.pin}</span>
-            <span class="detail-text">${place.address || noAddressText}</span>
+            <span class="detail-text">${esc(place.address || noAddressText)}</span>
             <span class="detail-copy-mark">${PL_ICONS.copy}</span>
           </div>
         </div>
@@ -596,7 +574,7 @@ async function renderPlaceDetail(place) {
 
         ${reviewCount > 0 ? `
           <div class="detail-section">
-            <h3 class="detail-section-title">${PL_ICONS.rub} ${reviewsTitle} (${reviewCount})</h3>
+            <h3 class="detail-section-title">${PL_ICONS.rub} ${esc(reviewsTitle)} (${reviewCount})</h3>
             <div class="reviews-container">
               ${reviewsHTML}
             </div>
@@ -606,7 +584,7 @@ async function renderPlaceDetail(place) {
         <div class="detail-section review-section">
           <div class="review-collapsible">
             <button class="review-toggle-btn" id="reviewToggleBtn">
-              <span class="toggle-label">${PL_ICONS.pen} ${leaveReviewText}</span>
+              <span class="toggle-label">${PL_ICONS.pen} ${esc(leaveReviewText)}</span>
               <span class="toggle-arrow" id="reviewToggleArrow">▼</span>
             </button>
             <div id="reviewCollapsible" style="display: none;">
@@ -614,14 +592,14 @@ async function renderPlaceDetail(place) {
               
               <div class="review-form-body">
                 <div class="review-hints">
-                  <p class="review-hints-title">${reviewHintTitle}</p>
-                  <p class="review-hint-line">✅ ${reviewHint1}</p>
-                  <p class="review-hint-line">🕌 ${reviewHint2}</p>
-                  <p class="review-hint-line">📋 ${reviewHint3}</p>
-                  <p class="review-hint-line">🗺️ ${reviewHint4}</p>
+                  <p class="review-hints-title">${esc(reviewHintTitle)}</p>
+                  <p class="review-hint-line">✅ ${esc(reviewHint1)}</p>
+                  <p class="review-hint-line">🕌 ${esc(reviewHint2)}</p>
+                  <p class="review-hint-line">📋 ${esc(reviewHint3)}</p>
+                  <p class="review-hint-line">🗺️ ${esc(reviewHint4)}</p>
                 </div>
                 
-                <p class="rate-label">${rateText}</p>
+                <p class="rate-label">${esc(rateText)}</p>
                 <div class="star-rating-input" id="starRatingInput">
                   <span class="star-input" data-rating="1">${PL_ICONS.star}</span>
                   <span class="star-input" data-rating="2">${PL_ICONS.star}</span>
@@ -632,14 +610,14 @@ async function renderPlaceDetail(place) {
                 <textarea 
                   class="review-textarea" 
                   id="reviewText" 
-                  placeholder="${reviewPlaceholder}"></textarea>
-                <button class="review-submit-btn" id="submitReviewBtn">${submitText}</button>
+                  placeholder="${esc(reviewPlaceholder)}"></textarea>
+                <button class="review-submit-btn" id="submitReviewBtn">${esc(submitText)}</button>
               </div>
               
               <div id="reviewSuccessMessage" class="review-success" style="display: none;">
                 <div class="review-success-icon">${PL_ICONS.check}</div>
-                <h3>${thankYouText}</h3>
-                <p>${reviewReceivedText}</p>
+                <h3>${esc(thankYouText)}</h3>
+                <p>${esc(reviewReceivedText)}</p>
               </div>
             </div>
           </div>
@@ -648,16 +626,16 @@ async function renderPlaceDetail(place) {
       </div>
     </div>
     
-    ${(place.kakaoMapUrl || place.naverMapUrl) ? `
-      <div class="nav-dock" aria-label="${navigationTitle}">
-        ${place.kakaoMapUrl ? `
-          <a href="${place.kakaoMapUrl}" target="_blank" class="dock-btn dock-btn--kakao">
+    ${(kakaoUrl || naverUrl) ? `
+      <div class="nav-dock" aria-label="${esc(navigationTitle)}">
+        ${kakaoUrl ? `
+          <a href="${esc(kakaoUrl)}" target="_blank" class="dock-btn dock-btn--kakao">
             ${PL_ICONS.nav}
             <span>KakaoMap</span>
           </a>
         ` : ''}
-        ${place.naverMapUrl ? `
-          <a href="${place.naverMapUrl}" target="_blank" rel="noopener" class="dock-btn dock-btn--naver" onclick="event.preventDefault(); window.Telegram.WebApp.openLink('${place.naverMapUrl}', {try_instant_view: false});">
+        ${naverUrl ? `
+          <a href="${esc(naverUrl)}" target="_blank" rel="noopener" class="dock-btn dock-btn--naver" id="pdNaverLink">
             ${PL_ICONS.nav}
             <span>NaverMap</span>
           </a>
@@ -665,7 +643,21 @@ async function renderPlaceDetail(place) {
       </div>
     ` : ''}
   `;
-  
+
+  // Handlers are attached here rather than written into onclick strings, so
+  // no place-supplied value ever ends up inside executable markup.
+  const addressItem = document.getElementById('pdAddressItem');
+  if (addressItem) {
+    addressItem.addEventListener('click', (e) => copyAddress(place.address || '', e));
+  }
+  const naverLink = document.getElementById('pdNaverLink');
+  if (naverLink) {
+    naverLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.Telegram.WebApp.openLink(naverUrl, { try_instant_view: false });
+    });
+  }
+
   initReviewSubmission(place.id);
 
   // Social links + owner note. Mounted last so it can read place.pendingFields.
@@ -676,7 +668,13 @@ async function renderPlaceDetail(place) {
     const section = document.querySelector('.detail-photo-section');
     if (!section) return;                     // navigated away mid-probe
     section.innerHTML = createDetailPhotoCarousel(photos);
-    if (photos.length > 1) initDetailCarousel(photos.length);
+    if (photos.length > 1) {
+      initDetailCarousel(photos.length);
+    } else {
+      const single = section.querySelector('.detail-single-photo');
+      const src = photos.length ? photos[0] : CONFIG.defaultPhoto;
+      if (single) single.addEventListener('click', () => openImageModal([src], 0));
+    }
   });
 }
 
@@ -684,7 +682,7 @@ async function renderPlaceDetail(place) {
 
 
 // ============================================
-// REVIEW SUBMISSION (with I18N)
+// REVIEW SUBMISSION
 // ============================================
 
 function initReviewSubmission(placeId) {
@@ -697,12 +695,10 @@ function initReviewSubmission(placeId) {
   
   let selectedRating = 0;
   
-  // Translated texts
-  const t = window.I18N ? (key) => I18N.t(key) : (key) => key;
-  const selectRatingText = t('detail.selectRating') !== 'detail.selectRating' ? t('detail.selectRating') : 'Iltimos, baho tanlang!';
-  const loadingText = t('detail.loading') !== 'detail.loading' ? t('detail.loading') : 'Yuklanmoqda...';
-  const submitText = t('detail.submit') !== 'detail.submit' ? t('detail.submit') : 'Yuborish';
-  const errorText = t('detail.submitError') !== 'detail.submitError' ? t('detail.submitError') : 'Xatolik yuz berdi. Internetni tekshiring.';
+  const selectRatingText = T('detail.selectRating');
+  const loadingText = T('detail.loading');
+  const submitText = T('detail.reviewSubmit');
+  const errorText = T('detail.submitError');
   
   toggleBtn.addEventListener('click', () => {
     const isVisible = collapsible.style.display !== 'none';
@@ -761,8 +757,7 @@ function initReviewSubmission(placeId) {
           window.location.reload();
         }, 2000);
       } else {
-        const tryAgainText = t('detail.tryAgain') !== 'detail.tryAgain' ? t('detail.tryAgain') : 'Qaytadan urinib ko\'ring';
-        tg.showAlert('Xatolik: ' + (result.error || tryAgainText));
+        tg.showAlert(T('detail.errorPrefix', { error: result.error || T('detail.tryAgain') }));
         submitBtn.disabled = false;
         submitBtn.textContent = submitText;
       }
@@ -775,7 +770,7 @@ function initReviewSubmission(placeId) {
 }
 
 // ============================================
-// ERROR HANDLING & PAGE LOADING (with I18N)
+// ERROR HANDLING & PAGE LOADING
 // ============================================
 
 function showError(message) {
@@ -790,12 +785,14 @@ async function loadPlaceDetail() {
   
   const placeId = getPlaceId();
   
-  // Translated texts
-  const t = window.I18N ? (key) => I18N.t(key) : (key) => key;
-  const idNotFoundText = t('detail.idNotFound') !== 'detail.idNotFound' ? t('detail.idNotFound') : `${CONFIG.name} ID topilmadi. Iltimos, orqaga qaytib, qaytadan tanlang.`;
-  const loadErrorText = t('detail.loadError') !== 'detail.loadError' ? t('detail.loadError') : `Ma'lumotlarni yuklashda xatolik yuz berdi. Iltimos, internetni tekshirib, qaytadan urinib ko'ring.`;
-  const timeoutErrorText = t('detail.timeoutError') !== 'detail.timeoutError' ? t('detail.timeoutError') : 'Server javob bermadi (30 soniya). Server uyg\'onayotgan bo\'lishi mumkin, iltimos 1 daqiqa kuting va qaytadan urinib ko\'ring.';
-  const notFoundErrorText = t('detail.notFound') !== 'detail.notFound' ? t('detail.notFound') : `${CONFIG.name} topilmadi. Bu ${CONFIG.name.toLowerCase()} bazadan o'chirilgan bo'lishi mumkin.`;
+  // Loading, error and retry text in the page itself. Applied here rather
+  // than only after a successful load, so the error screen is translated too.
+  PlacesText.apply();
+
+  const idNotFoundText = T('detail.idNotFound');
+  const loadErrorText = T('detail.loadError');
+  const timeoutErrorText = T('detail.timeoutError');
+  const notFoundErrorText = T('detail.notFound');
   
   if (!placeId) {
     showError(idNotFoundText);
@@ -892,13 +889,7 @@ console.log('✅ Places Detail JS loaded');
 
   function $(id) { return document.getElementById(id); }
 
-  function t(key, fallback) {
-    if (window.I18N) {
-      var v = I18N.t(key);
-      if (v !== key) return v;
-    }
-    return fallback;
-  }
+  function t(key, vars) { return PlacesText.t(key, vars); }
 
   function haptic(kind) {
     try { tg.HapticFeedback.impactOccurred(kind || 'light'); } catch (e) {}
@@ -908,18 +899,8 @@ console.log('✅ Places Detail JS loaded');
     try { tg.HapticFeedback.notificationOccurred(kind); } catch (e) {}
   }
 
-  // The page ships data-i18n attributes but nothing ever applied them, so the
-  // loading/error/retry strings were stuck in Uzbek. Applying them here fixes
-  // those too. textContent, not innerHTML — none of these keys carry markup.
-  function applyI18n(root) {
-    var scope = root || document;
-    var nodes = scope.querySelectorAll('[data-i18n]');
-    for (var i = 0; i < nodes.length; i++) {
-      var key = nodes[i].getAttribute('data-i18n');
-      var val = window.I18N ? I18N.t(key) : key;
-      if (val && val !== key) nodes[i].textContent = val;
-    }
-  }
+  // Sheet labels marked data-pt in places-detail.html.
+  function applyI18n(root) { PlacesText.apply(root); }
 
   // Section headings pair a trusted constant SVG with a translated label.
   // The icon goes in via innerHTML; the label always via a text node, so no
@@ -947,10 +928,10 @@ console.log('✅ Places Detail JS loaded');
       var segs = u.pathname.split('/').filter(Boolean);
       if (!segs.length) return url;
       if (field === 'telegram' && (segs[0].charAt(0) === '+' || segs[0] === 'joinchat')) {
-        return t('detail.social.inviteLink', 'Havola');
+        return t('detail.social.inviteLink');
       }
       if (field === 'tiktok' && (u.hostname === 'vm.tiktok.com' || u.hostname === 'vt.tiktok.com')) {
-        return t('detail.social.inviteLink', 'Havola');
+        return t('detail.social.inviteLink');
       }
       return '@' + segs[0].replace(/^@/, '');
     } catch (e) {
@@ -1012,7 +993,7 @@ console.log('✅ Places Detail JS loaded');
 
     var link = document.createElement('a');
     link.className = 'pd-social-link';
-    link.href = value;
+    link.href = PlacesText.safeUrl(value) || '#';
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.appendChild(iconSpan('pd-social-icon', p.icon));
@@ -1084,12 +1065,12 @@ console.log('✅ Places Detail JS loaded');
       return;
     }
 
-    host.appendChild(sectionTitle(t('detail.social.title', 'Ijtimoiy tarmoqlar')));
+    host.appendChild(sectionTitle(t('detail.social.title')));
 
     if (!shown.length) {
       host.appendChild(quietPrompt(
-        t('detail.social.emptyPrompt', 'Bu joyning ijtimoiy tarmoqlarini bilasizmi?'),
-        t('detail.social.add', 'Qo\'shish'),
+        t('detail.social.emptyPrompt'),
+        t('detail.social.add'),
         function () { pickField(offerable); }));
       return;
     }
@@ -1106,8 +1087,8 @@ console.log('✅ Places Detail JS loaded');
     // text link as the all-empty state, so the real links keep the focus.
     if (offerable.length) {
       host.appendChild(quietPrompt(
-        t('detail.social.addMorePrompt', 'Boshqa tarmoqdagi sahifasini bilasizmi?'),
-        t('detail.social.add', 'Qo\'shish'),
+        t('detail.social.addMorePrompt'),
+        t('detail.social.add'),
         function () { pickField(offerable); }));
     }
   }
@@ -1130,7 +1111,7 @@ console.log('✅ Places Detail JS loaded');
       return;
     }
 
-    host.appendChild(sectionTitle(t('detail.note.title', 'Muassasa haqida')));
+    host.appendChild(sectionTitle(t('detail.note.title')));
 
     if (value) {
       // The section heading already says whose words these are, so the card
@@ -1150,8 +1131,8 @@ console.log('✅ Places Detail JS loaded');
     }
 
     host.appendChild(quietPrompt(
-      t('detail.note.empty', 'Ish vaqti va dam olish kunlari hali qo\'shilmagan.'),
-      t('detail.note.addCta', 'Ma\'lumot qo\'shish'),
+      t('detail.note.empty'),
+      t('detail.note.addCta'),
       function () { openSheet('note', null); }));
   }
 
@@ -1186,7 +1167,7 @@ console.log('✅ Places Detail JS loaded');
       picker.appendChild(row);
     });
 
-    showSheet('pick', t('detail.sheet.pickTitle', 'Nimani qo\'shmoqchisiz?'), PD_ICONS.plus);
+    showSheet('pick', t('detail.sheet.pickTitle'), PD_ICONS.plus);
   }
 
   function platformFor(field) {
@@ -1199,15 +1180,14 @@ console.log('✅ Places Detail JS loaded');
   function sheetTitleText(field, isEdit) {
     if (field === 'note') {
       return isEdit
-        ? t('detail.sheet.noteEditTitle', 'Ma\'lumotni o\'zgartirish')
-        : t('detail.sheet.noteAddTitle', 'Ma\'lumot qo\'shish');
+        ? t('detail.sheet.noteEditTitle')
+        : t('detail.sheet.noteAddTitle');
     }
     var p = platformFor(field);
     var name = p ? p.label : field;
-    var tpl = isEdit
-      ? t('detail.sheet.editTitle', '{platform} havolasini o\'zgartirish')
-      : t('detail.sheet.addTitle', '{platform} havolasini qo\'shish');
-    return tpl.replace('{platform}', name);
+    return isEdit
+      ? t('detail.sheet.editTitle', { platform: name })
+      : t('detail.sheet.addTitle', { platform: name });
   }
 
   // Shared open mechanics for both sheet modes ('pick' and 'input').
@@ -1266,8 +1246,7 @@ console.log('✅ Places Detail JS loaded');
 
     if (isNote) {
       area.value = current || '';
-      area.placeholder = t('detail.sheet.notePlaceholder',
-        'Masalan:\nDu-Ju: 11:00 - 22:00\nShanba: yopiq');
+      area.placeholder = t('detail.sheet.notePlaceholder');
       updateCounter();
     } else {
       input.value = '';
@@ -1285,8 +1264,8 @@ console.log('✅ Places Detail JS loaded');
     }
 
     $('pdSheetHint').textContent = isNote
-      ? t('detail.sheet.noteHint', 'Ish vaqti, dam olish kunlari yoki e\'lon.')
-      : t(p ? p.hintKey : '', '@username yoki havola');
+      ? t('detail.sheet.noteHint')
+      : (p ? t(p.hintKey) : '');
 
     setSending(false);
     showSheet('input', sheetTitleText(field, !!current),
@@ -1342,8 +1321,8 @@ console.log('✅ Places Detail JS loaded');
     if (!btn) return;
     btn.disabled = on;
     btn.textContent = on
-      ? t('detail.sheet.sending', 'Yuborilmoqda...')
-      : t('detail.sheet.send', 'Yuborish');
+      ? t('detail.sheet.sending')
+      : t('detail.sheet.send');
   }
 
   function updateCounter() {
@@ -1359,10 +1338,8 @@ console.log('✅ Places Detail JS loaded');
   // server's own English text, so a new code still says something useful.
   function messageForCode(code, serverText) {
     var key = 'detail.submit.err.' + code;
-    var msg = window.I18N ? I18N.t(key) : key;
-    if (msg && msg !== key) return msg;
-    return serverText || t('detail.submit.err.server_error',
-      'Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+    if (PlacesText.has(key)) return t(key);
+    return serverText || t('detail.submit.err.server_error');
   }
 
   function submit() {
@@ -1373,7 +1350,7 @@ console.log('✅ Places Detail JS loaded');
     var value = isNote ? $('pdSheetTextarea').value : $('pdSheetInput').value;
 
     if (!value || !value.trim()) {
-      setError(t('detail.submit.err.empty', 'Avval to\'ldiring.'));
+      setError(t('detail.submit.err.empty'));
       return;
     }
 
@@ -1403,8 +1380,7 @@ console.log('✅ Places Detail JS loaded');
           renderSocial();
           renderNote();
           notify('success');
-          showToast(t('detail.submit.ok',
-            'Rahmat! Taklifingiz ko\'rib chiqilmoqda.'));
+          showToast(t('detail.submit.ok'));
           return;
         }
 
@@ -1436,10 +1412,8 @@ console.log('✅ Places Detail JS loaded');
       .catch(function (err) {
         setSending(false);
         setError(err && err.name === 'TimeoutError'
-          ? t('detail.submit.err.timeout',
-              'Server javob bermadi. Qaytadan urinib ko\'ring.')
-          : t('detail.submit.err.network',
-              'Internetga ulanib bo\'lmadi. Qaytadan urinib ko\'ring.'));
+          ? t('detail.submit.err.timeout')
+          : t('detail.submit.err.network'));
         notify('error');
       });
   }
