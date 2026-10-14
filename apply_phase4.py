@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+"""
+Phase 4 (frontend): announcements and owner claims on the place page; Uzbek review dates.
+
+Run from the root of the `game` repository (the folder with index.html):
+
+    python apply_phase4.py            apply the changes to your working tree
+    python apply_phase4.py --check    only test whether they apply cleanly
+    python apply_phase4.py --show     print the changes (a git diff) without applying
+    python apply_phase4.py --revert   undo them again
+
+It only edits files. Nothing is committed or pushed — review with
+`git status` / `git diff`, then commit and push yourself.
+
+Built against commit 10a7201 ('places_notification' = Phase 3b). If your copy has moved on since, the script
+falls back to a 3-way merge and tells you about any file it could not
+merge cleanly.
+"""
+import base64, os, subprocess, sys, zlib
+
+PATCH = zlib.decompress(base64.b64decode("""
+eNrtXHtvG9eV/9+f4ppblGTIGZGSTElUZEeR5UapXrDoJmm2MC45l+RYwxl6ZiiZdgU4KfrYTRdBiy52F9h2sVhg/1ks4KZJmiZx
+CvQTSF8hn2TPOffOzJ0HJVlxAyxQJzZn7tzHOeee+zuPe2csu99nhjGwQ8bnxnwggrmxw3vxj2GJkNuO2QsC1r2gwjXbtcQj1l3p
+LXGLm+YN0RQNvsiajUZrcfGaYRgXjnGtVqtdPM5rrzGjuTDfqC+wGv0uNtlrr11jpmsPhqEx8izBzLFlBF7P5o4R2o4wDG5Z7Anr
+8t7hwPcmrtVmoc/dYMx94Yar7CTffGz3DoVv+N5xpqE/6PLK/I0bdZb80zAbi9ULujGAlMPQO9SL7Z7nQvc9z/H8Nvu7frPfFH3s
+p3atNvcKW7vqn2s1xtj67u7evd2NzZ3N3c4B3N1me2/tbt5lG9vrWzuMVbpeGHoj5vVZOBSsx32rSu0O+EgwbxI6tisY8s8DVtp6
+7A3ZQ8+xbN8OhqVVauOLIGR2wB5ObBGyUDwKTerhynSzV+aQdZQQd12Qd0+AeCw7ADWYtlnfEY9W6V8D6BC90PbcNkpvMnJX2YCP
+26BuY6gy4v7Ado3Qi0tO0r2+O7QtS7g/0nt3PVco2auqRm8ojqAKSsIYCpzZNmusRvN1xP2KYYwdYzQJhVXVB5EtTXimpvjYtsIh
+EOOL0SqLupJ3qRHHwrVsd8CeoCDTjGMJd+yBa9ihGAXAOOiu8KmceF8ay0qS+zYz5sePWAP+W1QP+p4bGoH9WAAX5jIOjqUzuLlW
+KyQsz1PDXElxFd2nJelweyS5ishT1BENqDsGMZdiK03wYkRxaj6a5o0bL8CHJATvSGsN6OsQeNFGst2h8O0wWYYb3mjsBcIn7Yzl
+gcAEDSNuUM4rqGkFNF9GYVAC2B2obczZYkZ1DV/w3lAbtBnJsGBqc1LKk0FSn6/mhzhveViXNBrDcOScj+ZYQ5mNHp9f6LVapsmX
+G0tiWVzabFAfF9oNqkWGozFfb4HdgJ+FBTIb+OfVOcs+unlNu0J9evU6DL72zTCYZXCYbezt7O8dbN6Nn3Zw3j3Xma4ycST8KQNV
+C9kxt8MAJtUnnOUWqIXJ0jw9gOe24wTMVqjLvgnyrsGU3iSuQQAMFkkQrJXQig4FLBK0f5bvjUvMtrB43XVfj4ukrtyUNBQ111od
+yHvfc8RayQL77A1KjPs2R4vJnbVS6E+EKnF4VziOsLpT1bhjh44o3YyYLaR04Nvj0s1XwbK7hc+AFR+ez2GFm2q2z+tvKLiVDAmV
+hgu5OiHRlTAp6WQWD7kxDtdKkdExZUUYdriQjHoxDV3PmqZoGGtVYizSCNinexhnrLfC1Q7+Ds/THz3QoEhnh27BEYA2rRJgzyNH
+uINwuFaCRdrAYaIO9NGKGBmB5uqMQLXCiRrablgoPxhnD5ZKPIEXd9WDlmBNNHY2VEm+j/RUFMiZsFHr6q68VwsgI+5xjhbh+55O
+yaa8l4uBO8IPC/u6hIZwcoWClJJ0J+DeuSycjqF3eVPKq1boMv0GcH0I+KOLi4PkHW02et5o5LlmT5YDpbLvlzD02LfBsE11uACn
+o0gRgkl3ZIcFg+uySq6jq2t5+YUeT9jtyBs5IUHIw0kQYZF9BEVjzwHXS5skZSxI+3qALiGzRB8chcDvrZWGYTgO2nOwOhwx8PnI
+9PzB3IMgvjeORdfg4zEgOSkjdXDz0vb1wQUx2YMoJJvvNpeX+gumuSwafWv5xqVt64NLRGQPZEC2sLyMdhV/mvNgV1kf5gl1Em3Y
+iIe3eSgqMI/iIPTBi6yCJwhCC8HcPZEmGDxKMHtYg60xVxyzbItVvZ7DwRNdY4RzAeKTiSWV6qqcebvPKrIK2LXy5HGZffe77Lod
+7PJd6rJalZ4o/pmbY68jtgk/YEN+JMDPYfced8UhAy0Ph8yFaChgldJ8Y77FdhorbL5UldHPsedbAUPNAJdRGWeCKBBKbJElvdRV
+ABR3KmUlOFlUrprgXtlhpVwvR9RHjQ7FFFogveZAhHcmjvOOAM+tSlzFIqpmHt5i0QjYsjO0A3xQZu1U+R4w4NODeFBfhBPfBQph
+3Do6fu14bDlQXbLRVty8Gz3dwdtK9Ufsxz9m5XKdTdtFRJ9E7J2kJtLrAfABm8l0+ZMyMuFPjLv3kOzkiXDpiXCNewfE0OSxce+H
+ZaUZin4aOvS2qePbsf5U5EjI2DUFU1MgDDpxJyNw93tAOGlya34JNbm1sFBfRkXmwdTtJersAyIJnxTvNomzQhNfjfQ4Y0sKSlI2
+C13MdYVqI4h7AjbHvGMXIITiFJPdsdEFYt2pVPaorhm5azPsbYSUGpaq+wx2FdOr36lrkk2LVnlrqVVfemHZwEI7oJQMBiaHAasp
+Rl0PJoztkFW2YLZBKwIPnFqICbBLbsmlZaoA9I4tHAvWl1rmx4Bx3rFJg24+Cn0eVJl2A8sM+lV0rBY1eouHvaFqQ9eZJrV8k0iY
+1cycZMZSTO8PvdALwIz4iBS8D75HnHDB5Al3kMkpxAAMTIAQLvEGYVfPg3hAtq4oEeBNHfC7akIPbiWWfIWeBChpinJajWa9ifmx
+VrNRbzZwrnC9gV0zweOulL/+958q8GRyptibB7AWuSWssiT9GpL+QuGOAQ3eWu9svMH2t7a3GUDm9yePeWgHQ/ZjtrhQYl0R2JYg
+3mXwjP5BFSLsOba719m6s7Wx3tna2z1g6/tb0DwYgktJmk9gi1PDxrAaGHctxvU1U70isdglpjQC0KwARoHJIMLKAcIrlHg09CSg
+GfO9yWBIBV0vNFkHpxAnHOaQuhtPuo7dW2XHQ4Hgyl7BDl+RrYl6EDb4TvBv3/dGSqnpQR3a2D3qm3qCFjDzKrqjyjhqYA9ckIft
+2ojHHKmGONEOJU0S22G9PJyIAAJCds3Q1IPsnUTcXS+0+2hYMo9B58pAKwsALnthWenvEfdxOu6/vn6wiW3UMsCijb3dO1vfQ8ua
+3JlY7/69u9tKDZs36k0Mt1vzzfrC4gurIf4BhI4cqSMxmBzaLvhMtmlNIPx0A/KpwIj6guRZmfv7udp35upgh2R7ov9e5w2g7/bm
+AXDwbtn17qMM76NXCaBf7nIrX4DCBvfPF1gALXAW8VJOzf0Rrk63bw+ghlX+EQrLkINtgSDu7925A0OVXw2OBjEmy6xZiR3Z4vh1
+79FaCRNG84vwf4lmeq2ECZYSyt87BF+zN/ExN72BKZuo1KCM21ppPi7AHE+Pj9dKlJxOFT/wbDcuJydWQr+KsW++OuagO2Addlps
+mbdYi1JYTQb+W6PXYEtsga3g3zcWggVjni0YK6U5rVGzYS6w+SZvmiuLjP5p0H8LJlxhzTng/iboUUowu1eQS1oS53ICtM+b87wF
+pOFfoshQd8DTotkymkBfy1wx5uF3mZsr5ooi3FzCJNmw2UoXQoMbPaMJP01sYwB/9Lu8nhqFyaF/mJLRitlizRVzebhoLnMcEP9S
+ZQNKWOOHupww3RmtSLnWt1xcmZFjc/16JRzgcgsHZgQCcs8hErFEVfANweuK5X4codwa63MnEPEDCV5rmIBVJd1JME2q1aTJzqDO
+wIPFSqgjs1XgVDnSHVaoFfJDESS4SfClMlSao0AoVRkBUnpWnaHA6gzTHLFjjvR44xB95thVl9Xb6rceFWOKBrz3NoiqvAG+KOiK
+0QHTUgbogPAKQJnjqBB6eS6u4beNLeDGQHagSoFQpSPLTuIRCA2cNlvven54QDdmaI+ENwkrGvjd3ryzfm+7c2B2tnY29+51qsrh
+1aISySMyZuIlcPfmwd6uGZCPCrgsK6gGauL7AmawEqNwTYkLO8n5Ab4ItNhGdQCFJjIPsUIPtSGN/FGtJyegTLkOLRLIk8TVRC6u
+Y4/eIcoJn0M43gMMD8hLJ+1JtZCTKXxfRXaU9qCOTcqIYDeV8hudzj4rA3fYt4y9q0lEhH+gstnDfbU1OSpdU1s0EPczbVNN0Xof
+Ywda6UlymYQOPK6QxCvyQq2zWDKUOKiMAoplDTbTHUXl0h1SalfNF1FXaRQg6WB0W4GrWKQ4DIoCA1MZF3WkKpJcyyiR9GPSWvmw
+mkR5ZZXHUXpc1mPn67GogXicOBs8B8z3eH2GK4s6K+jLFSEExYepvhLra1I6Yq9fiXqvsuuYd24WUaVyJJjtS3WnU6aF/0MeVMBO
+o2tDxAUmqkM8kD7C7FrpZZcQI6TsyKE4kX5RPEdDPg7tXgXcEivxvhda9eYiuj2tRn1h/kpuzwmjpQoMQ7cn0cjGedph/HW1w3iJ
+2mG8XO0wvh3tMM7XjtosdKi9NHRQalCLyXgS2dJ2dFFPFKOdXNaVorbVb11S2JY/9djhaMdXZLZOqpRTo33QF4ywat8gHHzxgV5e
+KFd7aaFc7SWFciD8bCiXjdVqWPS38KMo/Kj9Lfy4XPgRSSodRdRmRRG1XBRRK4wiUtZSZggrcbYU6weOhx1YXm+C2RxMG286lNh5
+fbplVcpji1b3AVSLrSOZIWoI9uy6yjJKSFxVNri1VF8GE7zUWJF53BfMf6WwfDBwREI0+fHIZMHYiZEsiCtiI82UfZhl0VK+mEzY
+mElIqDnX6tmFvaX83MjDSKbgmGOcFc1xJMGlpfoCJm+Wmiv1+at5MZraXIdB4j0cqTM7oKjmiD+qNOqqrAY2MmpyC8CgjfY/6kwp
+Fi46JWjlfJUdPOMSu4lKKLmHSgRSA1XKhuWjq/IcH9tz0g+YI2rmyA9w0Qu4d3eLTgO5Isr0mrZVrScTG8WoGhvl/b2DDu1X3N7c
+3uxslutR5W8WuWqqhbGq6hMDyHY2qnxCuyjt/IYZRDdxyytHuYYMk6J+ZsSkRibaehlRqZGEeJeOSw19m+YbRKapfl40Nk011qJT
+rfxEv0lFqHH5SdLTSTWl/FGG5Vw1vJKq62F1/Oc8/YrAZ9Ycxp3oYHGdpJggUmqa0VGEWCOpsiEBBcMZdzLqCgxlIpDJ1NKkFwGE
+0pKyPi0Rouryo2uJtXsuCVIv6ffLqXxFBoW0QbJVrjxWrAWxiLMLSUWGRSJO4FiHZCidJaY4zskIKR2HniMCPVAqEIC6yXWX5zKj
+SCkO094HGbKl+WU6K750o1WfX7zKLkRuvxCzkoy2+9ryB6MlJqMldtVo6Urnta8y0I4XIDq0GXensLzZiE/ZsW+HAgpSO2smuwsg
+wic+x51p3HcLht4YGuJ5xTjGoZ0QfwQBDW3orkbdCgdDFAFi5eqEeGndF2zqTYgBqnyrRMdUMWpyZG9JPAhROx7GoHom2zz3cGQd
+94ypKR8IIk+GX3wasCGA6whoAt9dUFtYAHXiRkWADPwlR+asSQyyXzB7GOO9WPy1s/426Aaei0tHHjub31vff2Nvd/OvGphBHPRy
+Q7MFYOVokUNUFoUZrDlccFps8Qc3tpcgONOeGXCVjj+aUIMvMhVzwN/WrMBs443NH9y9UnT2AlGr+XLj1tEKw6i1ZbTO4Wt7b+P7
+/w9i8Z7t9xzAFKClCT32pvLXXytlou55tnR0w4HI+/Kho+32vags8Rgwy5KkTZLUCDiacWiJJ2DenAThgSDblA48LZ/35fbQSUG3
+zLaYcZNNXEqthJQBOxTjUAJNghR2wLyxcKNOA/WSQ3YwOvh5IB6qQDeV6vtOxbY0h3VWHGur8/5aSzuQSKz7u/vb6xub9zvv7G9K
+f2ZENcrZpj3u7gMUpvcHSdIQc1a0jsEHxWLTDvYQR6vqrYbimDzeeet6j4DV72DwHZ1uSW8QYIWC8DepgIMicVDRlMoWhW5R5YgQ
+OSK9LQD8lrVOYia1iBfr0sFwOkynMUon/DRO0YviyckcrLXphv6UnKn4ARkXWZ44JkRLDVetdqjKF7hcjZ7nOHwc2F3QInUqGFgs
+3QS/OfFryueegFU9ybQCnnzVDmntgTLmOtMPNqtWJAKqmLUvEMBSsCKCXoVqVbFInXU+p2PtvSWt3wiYky7iI7fyXFg5PtUXTxvN
+gjqtlT7bdpM1tKlMxJw7zy4b63QQkOaIvxlx2qkkc6pabwPwlfG8n9tms0k6qVZTzI2LOLpepGfgnkhFy2qexiJpsQ5jqY3R2QKg
+NiWdO3kcENGsHFGckIrbReRtxeKn6vuS4W84phLbecN+s/4B+scRVyyloRetpNRLXNEq2pgxDtaJmYh1OMVNauIRuWwX5vONzs42
+oA1ytpo8ikHtuvZAnlqg4gg8cUWnsBOfV6mWyS0L3Fo33LaDUMBISKrdOyzX6TG9K1PVepavrqmuic1Ux/S4qg6Ozu4aHHo/pNbR
+xnZNnfUw8ET4XnL6lAoy1kI5++C2VNCqxrqljBBmUfZhQu1ApDNAnnOknwqQJ79ThwrifCnEGMcbchiyZtcx0RX8QPgBdLYebgs8
+IgrGp6C4Um6Z8zDJmfMH6U4r0h1IyPMOpRklIivXr8P9arL/n06d5o8PZHZq46MXsjcVOva0oau5kwVpEScTVEntHr6UTHCtgB1F
+tDa18aJRZdA0G3WT0HScQ7FlxZTJRskUVCbvRANdJsV6Xo4pnpai5IA2jTlwjBPKWqWs45mrcIncjp5pTnRGJ3RGrmb2MPn8SWbT
+mxxGMEv3yaspo1KnLVXigSnS9EMwl0zH1PTkY4EaRzgSvzRLL/gUQQmYS0A5cmHJ59RAM3q5ELhN3NsuWdquQt68IxsIeY4hDUyU
+4XW0vjdTYhQOvbKhsu8oIXwfkw6AJTUSrMenhYt2MsYXD9S7ZWlnWrcGKMly1TzizkSY8jU6HeC1mqqrmNBehk6XzOUc+Xo762/H
+tcg0Iuqbat+qnH0XzjBcfPGjDl3cpISFwW40ZkCRwDWA66TiuTFTSZTkuRr1+EJXQj+2i4mHR6ZlB7yL7zJozbA8zVYHBkq57mqw
+tNsu3/8qFxPtkfqQXvUcUEGyo5WCyCc2st8uzqKs6HXLrFqoavhMagimrynMfTfCwR+lVJNq0qOh51i0wC8fE2ntZIO0iLXHexJO
+1KARzYTDoMvp+ZOE0vEindKoEb0xCY3SIWGkVmr9luOxNP2T+zeqPLPaVvVIMnpXuRhOknoSlzSFxftEY1WThNIkI8Cisxnrrj2i
+Hbo7MPWi2OrEHSULE3yzSvnIpiBSw3Mi6KJqJxftctZy7hV4PyiA18nlNb1+fwM9wcqQu5YjdrjtJk8TYjKNXNlGLq2YloznI0vB
+AJTWu94kZLtsLLwxvgr99dPfMM5cuyfCqTotTNLH82DyODHWj19kx+kZYRq/VosyL6uF21vl723m/IlIgy90KWiv15cKGbF9qeOv
+QBoeTYuTQpgIiYxZNe8p5iyQWgRalZwV0uNZSaKKZNXuIm05ZHoo1FTd6SjaZ53hg+rAmcLGGXy+vIWXA7xi45ldpsmy8cXIA8c7
+t3Kyy2tmPRGqI5OZHWl56CTTCzjIISyhQOunWgAe0u86qbP55YYui/PsAI4XZxPxDe8joRKK5Olh06o0AV1nkjial1n76XU8a7Wf
+hxD5qCfvO7hWWnmCKB+RUx1yumZ4SaGPgZCeW1T+XWIw9NUiRuOQTLCeZ4xjTIoayO2Svs/MbkLP2/Yo65Hr6Hw7hTNdnYFWReHP
+peFq1s57SCc9ZUx7cYR0IcAVrL9yWQOaojnK1pmdbltj+uZ9cRVtG19n+dY5bdrnZR0BnhsI9k2NwlmOhQz/NKdRf0kgF8+9+B5/
+yq8N6XsDurt4DlZnw8PzOLgwcAQbTU5dMLTHdPrLF0feIfjmgY2f3Iq3R+QueFt+7Ms7lm//8GM+NdMWMR2CgmZnQ1A7jkClcSoO
+QeOVdUHwmTZacsNi4lop0xdLrmu71h5wlcYiapBBoqgTzSeNozH62gXo++y8WqI2WU9ZhkLnpeSgQraRWl/5RrY7noRlPX+FUs56
+xGmUSnyFvGU+hy5N+zLJHgBI7g+EtETCVDuUHSqrFq2gmIDEouWGPRRTC/TmgoHpswioZptBj48Ffdsh8UpmD521T9rb2rd1EIw2
+MeMnCCDxjiatnXWX3lGO/FZcHYTm6rxeAH1bE0eo0+iux0q0y1nCj2iFdP5mKHyh1pDaH5XDAi/6tuit1F1bJ2P27qiykvmZzqp7
+vDDiqEZDOCUulb/MTxZalglgxAZ4CQNhZRWyoEe1OxRPlYZgkWcgR47iuaJ37gtP3qj3FC76ckr0cY7iL5pET9VXU/pNscL5kml2
+hdXozq9c+NWUuP3Mb6bENfBY0uIKfUsBf5otPJMUcYsbwAf3O5tvd+jdxzjdLH/q8heBGQS2D4O0Y09g8rjNSu9MDmFqRt5D/Ain
+WaozfwKlp/9y+uz0D2dPz35y+sfTz0+fyUcCAorStuwKS+JXHkHH79IuJX1OI8Dvm9A3UaLXG8ZDPODTjb6b0kOrFqpPvag39keB
+cI5EEPdXgbIpG/s2TFnqYyom6xxjVfmlFTwJPBpxIxBj7sPYVp29yd0JB6e2b/tBFCEigZMgsOnAksU23YGDb5ZIavHYTnKiQFGp
+Gspvl7QTUCGhTbkLVqTeF0c+d+oj7od1PvYFXk7r9nTi4j9OnR8NYMHV0XTzrl/3DunH9ab4Y4lD+CnFbhrJPbklWZcUIqlS/Qst
+7XgGn1gnxhOi8ySavmiuSqmm8Udc2nHT6YkxtR12URexDpGJuC36fOKE7UTbqLMdXnYmIy90uO/abIp6FQwtzkYTPhp5JttyQnvk
+wYw95NOQWzAVE5hdu8sOvTIePAYNiw+ekw7+9vQTBgr4MajiF6dfnb139ksG2pjo5Wdn72MRPn9++vzsg9NPTHb6H6dfnf757Cn8
++3uo9Kez96GT00/O/uHsVwxKn53+EYehj5OsNHBBLTWid+7OX1CSpP+Ert47ew+G/hBIg8v3T59Bt58Agc9g8N/B/ec0uBwYK9Co
+z6HFz85+wk4/Yh2V+pO8PIe6H51+pfFOUn/Hm+DpkiCgN/cejW1fWHi6jjYLk9MobtybWYoXPM137FNlVff1CXvgTdmkN5y4YAQe
+wgIMeWDZDxGgYU7EgAc2E18//TcHhp5Oup7PmefAmjczunr6OxDxP559CPR/ARJ4TkKB2fgCZfNPwP9Xp384/YqdfkkyA0Hh5Ven
+n8Lt+wzm832ap2fY/OxDmkpq88XZLwFxoN2f4eZjKPoIGjyFZh+f/UrN858YjfkMBkPJf3L2MzOzcPbUgcPsYUP6SAwdCkx9EUQd
+DozeAjMz6y7eIykWposWWsqNOw6ItDfEHWhNqjnR/TpN/gx5gQJ/iupbKIksy52Y/PgTMXgikmdFkGWOHIP7qC/BZDz2/BAd+DSb
+Ozx4YFuwrpXaAK+OfcgC7+un/woACKBXoB2/IUUgbn6OUw68puYN9AV5e17IINSBJiCGD7NsqsOo4Be6oKOh/AYXMRZILynDHgTm
+9/E0530V62V564hDiGr8yRFg1uEk5FMvxGUgefOOgGl8J+IxgBQUjE22fgQhLJugMKjIBwDrDe2HtgOxUE4I/4UcPzt7D5AAGP/s
+7Beo2qdfolieR/ONMECIBXUADFAksFQkhkmBfE7I9htaPB8j7JGGAPR9dvZTQjXCpC9xTREY0VLMCg4gRQoLJCLPt6o8QxAdcqVV
+IE8bmWzfETyQ518ZuE1gJNAgg8h9PGmLiR4rJ2pwV+5TPiU2MFJaYOUBSrzHEuRjKAU+QTUQ3J8R06AGKKHPJHSiwnyOCyH2PN6i
+M8eBh+/MELlk4Evp8XG+AbkGeR0GGvCgLesKZ2Cj+fGC4YgXzRoantPfSywCgj6R7RD2QcgfYTlOTVbA3xdizEhauLVCTXpDcEp6
+EGEFmqxYhM99+YHwtBUFSBlOrImlQwnqGeiYbzsKS1I26X8ROgBSCUz/BJQ9j4AjMp4RXKDZW5LfK1tqLdSbzYvNHtG0qa9370hb
+EIn2Sw8yS9uvYYp/kVJxpd5ZHNC0+Blp8We4cHQQyJlHL85IKEXG05ldgZohlTivoQoKs7qxFYyIpzp7Dd/Zpd2oI55Y6q3bzIe5
+kJXkAXKIa8Dd9PwBlzbSJgvJ1vVnCicBWEIJMuhySgQNoJ8utHFZ1xuAHOGK2t/mR+CGCrAd9uORfStvNp6RPqIinn2ok3v6WYpc
+QtQvwEP5OS4nRqL+ElohMiifhLTmKTotqDDvnX4ElvzTSOAMJwonABrV2dnPyTr9/uyDNC4pBywzl+iEUaWPaaV8KqvdysORTy68
+zgX65jobAy96E1ud2j8eeqCwjsMoj94L5dsBHuig6B1CRS5LQDV0c85wo8R2J+JWSXuXEZeiXBKtJi6J5ca8/Ezd+SuCqKcgOoHL
+UjraUhiYzrt++3gYRBYvR8Y7UmVpzX799L9jGn6XdspgxC/l44hp7A9LYlZV3jsfC5yLtuxqaIuTtTzfoslqLV8evw5gtT1BBTtR
+blpg93kIVCVOmkVrO49fpPI57+QTdEMZBsann+d8UfaX/5GD/eWLAtySFtT1jjW/jAfJGy74vo5sXuio3RUPRK/ARUvYc+yBDagC
+oDKF0JtnUDtmeER4cwB44ziUEEUUCng9D2+RnhZA0WWQPZHGLGePzBM7/WfpIzHp/kpg+Srq/OyDen5NzIa1s5+YRXiTNxm4hpXs
+jnkgXUo+HoO8MODagQgMA60YgTAlNY0cKeoB83dmIawsLzYAT2rLy0vyjfLzFDVaTspJpdN8sRP1DsQQdtrphumMF+1vcXnIqOjC
+2YiW8q44zgtDC/V5EC61M6Cx98j2gY4lcJNdiwN17gmoUxQq6pkjqANDPkePX1Yj46FCxSSRhOcyl5jFp4GshXFZUIrfTcZYd5+7
+wmnrAEqzMMZiWL4e+B7BMAVfEH6ffaDUR1eQzxPmMaGIsTNP+ipF2wrf8qBKR/EL0nsywExGhQmPB8lATNQpTWGJxd/7weTm/wGD
+NWW1
+"""))
+
+
+def git(args, data=None):
+    return subprocess.run(["git"] + args, input=data, capture_output=True)
+
+
+def main():
+    mode = sys.argv[1] if len(sys.argv) > 1 else ""
+    if mode == "--show":
+        sys.stdout.write(PATCH.decode("utf-8"))
+        return 0
+    if not (os.path.isfile("index.html") and os.path.isdir(os.path.join("pages", "places"))):
+        print("Run this from the root of the game repository (where index.html is).")
+        return 1
+    if git(["rev-parse", "--is-inside-work-tree"]).returncode != 0:
+        print("git was not found, or this folder is not a git repository.")
+        return 1
+
+    reverse = ["-R"] if mode == "--revert" else []
+    check = git(["apply", "--check", "--whitespace=nowarn"] + reverse + ["-"], PATCH)
+    if mode == "--check":
+        print("Applies cleanly." if check.returncode == 0 else check.stderr.decode())
+        return check.returncode
+
+    if check.returncode == 0:
+        res = git(["apply", "--whitespace=nowarn"] + reverse + ["-"], PATCH)
+    else:
+        print("Does not apply directly; trying a 3-way merge...")
+        res = git(["apply", "--3way", "--whitespace=nowarn"] + reverse + ["-"], PATCH)
+    out = (res.stdout + res.stderr).decode().strip()
+    if out:
+        print(out)
+    if res.returncode != 0:
+        print("\nNot applied. Nothing was changed unless a file is listed above as merged with conflicts.")
+        return res.returncode
+
+    print("Done:", "reverted." if reverse else "changes applied.")
+    print(git(["status", "--short"]).stdout.decode())
+    print("Review with `git diff`, then commit and push yourself.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

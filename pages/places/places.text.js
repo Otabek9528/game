@@ -498,6 +498,16 @@ window.PLACES_TEXT = {
       }
     },
     loadingPage:       { uz: "Yuklanmoqda...", ru: "Загрузка...", en: "Loading..." },
+    // Review dates in Uzbek, which phone browsers cannot format by themselves
+    // (they print "2026 M09 2"). Twelve names, comma-separated, January first.
+    // Russian and English dates come from the browser.
+    months: {
+      uz: "yanvar,fevral,mart,aprel,may,iyun,iyul,avgust,sentabr,oktabr,noyabr,dekabr",
+      ru: "",
+      en: ""
+    },
+    dateThisYear:  { uz: "{d}-{month}", ru: "", en: "" },
+    dateOtherYear: { uz: "{y}-yil {d}-{month}", ru: "", en: "" },
     loadErrorDefault: {
       uz: "Ma'lumotlarni yuklashda muammo. Iltimos, qaytadan urinib ko'ring.",
       ru: "Не удалось загрузить данные. Попробуйте ещё раз.",
@@ -690,6 +700,32 @@ window.PLACES_TEXT = {
       ru: "Сессия устарела. Откройте страницу в Telegram заново.",
       en: "Your session expired. Reopen the page in Telegram."
     },
+    not_owner: {
+      uz: "Bu joy uchun faqat tasdiqlangan egasi e’lon yubora oladi.",
+      ru: "Объявления для этого места может отправлять только подтверждённый владелец.",
+      en: "Only the confirmed owner can post announcements for this place."
+    },
+    has_owner: {
+      uz: "Bu joyning egasi allaqachon tasdiqlangan.",
+      ru: "Владелец этого места уже подтверждён.",
+      en: "This place already has a confirmed owner."
+    },
+    claim_not_supported: {
+      uz: "Masjidlar uchun egalik so‘ralmaydi.",
+      ru: "Для мечетей владение не подтверждается.",
+      en: "Mosques don’t have owners here."
+    },
+    too_many_pending: {
+      uz: "Tekshiruvni kutayotgan so‘rovlaringiz ko‘p. Avval ular ko‘rib chiqilsin.",
+      ru: "У вас слишком много запросов на проверке. Дождитесь их рассмотрения.",
+      en: "You have too many requests waiting for review. Please wait until they’re handled."
+    },
+    text_empty: { uz: "Avval matn yozing.", ru: "Сначала напишите текст.", en: "Write something first." },
+    text_too_long: {
+      uz: "Matn 1000 belgidan oshmasin.",
+      ru: "Не больше 1000 символов.",
+      en: "Keep it under 1000 characters."
+    },
     not_found: {
       uz: "Bu hudud allaqachon o‘chirilgan.",
       ru: "Этот район уже удалён.",
@@ -727,6 +763,11 @@ window.PLACES_TEXT = {
       uz: "Egalik so‘rovingiz ko‘rib chiqilmoqda.",
       ru: "Ваш запрос на владение рассматривается.",
       en: "Your ownership request is being reviewed."
+    },
+    confirm: {
+      uz: "Ismingiz, @username va Telegram ID raqamingiz administratorga yuboriladi. Administrator egalikni tekshirish uchun siz bilan bog‘lanadi. Davom etasizmi?",
+      ru: "Ваше имя, @username и Telegram ID получит администратор. Он свяжется с вами, чтобы проверить владение. Продолжить?",
+      en: "Your name, @username and Telegram ID go to the admin, who will contact you to check that you own this place. Continue?"
     }
   },
 
@@ -761,6 +802,7 @@ window.PLACES_TEXT = {
       en: "Sent for review"
     },
     empty:             { uz: "Avval matn yozing.", ru: "Сначала напишите текст.", en: "Write something first." },
+    sending:           { uz: "Yuborilmoqda…", ru: "Отправляем…", en: "Sending…" },
     tooLong: {
       uz: "Matn 1000 belgidan oshmasin.",
       ru: "Не больше 1000 символов.",
@@ -826,6 +868,11 @@ window.PLACES_TEXT = {
       uz: "Siz {name} egasi sifatida tasdiqlandingiz.",
       ru: "Вы подтверждены как владелец «{name}».",
       en: "You’re now confirmed as the owner of {name}."
+    },
+    claimRejected: {
+      uz: "{name} egaligi bo‘yicha so‘rovingiz tasdiqlanmadi. Savollar bo‘lsa, administratorga yozing.",
+      ru: "Ваш запрос на владение «{name}» не подтверждён. Если есть вопросы, напишите администратору.",
+      en: "Your ownership request for {name} wasn’t approved. Message the admin if you have questions."
     }
   },
 
@@ -840,7 +887,8 @@ window.PLACES_TEXT = {
     },
     pendingClaim: { uz: "Yangi egalik so‘rovi", ru: "Новый запрос на владение", en: "New ownership request" },
     last7:        { uz: "Oxirgi 7 kunda: {n} ta e’lon", ru: "За 7 дней: {n} объявл.", en: "Last 7 days: {n} posts" },
-    openPanel:    { uz: "Admin panelda ochish", ru: "Открыть в админке", en: "Open in admin panel" }
+    openPanel:    { uz: "Admin panelda ochish", ru: "Открыть в админке", en: "Open in admin panel" },
+    roleOwner:    { uz: "ega", ru: "владелец", en: "owner" }
   }
 
 };

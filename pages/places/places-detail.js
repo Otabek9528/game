@@ -388,6 +388,12 @@ function formatDate(dateString) {
   try {
     const date = new Date(dateString);
     const lang = PlacesText.lang();
+    if (lang === 'uz' && !isNaN(date)) {
+      // Browsers have no Uzbek month names ("2026 M09 2"); the words live in places.text.js.
+      const months = T('detail.months').split(',');
+      const key = date.getFullYear() === new Date().getFullYear() ? 'detail.dateThisYear' : 'detail.dateOtherYear';
+      return T(key, { d: date.getDate(), month: months[date.getMonth()] || '', y: date.getFullYear() });
+    }
     const locale = lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'uz-UZ';
     return date.toLocaleDateString(locale, { 
       year: 'numeric', 
@@ -627,6 +633,8 @@ async function renderPlaceDetail(place) {
             </div>
           </div>
 
+          <!-- Announcements / owner claim. Filled by PlaceAnnounce. -->
+          <div class="pd-announce" id="pdAnnounce" hidden></div>
         </div>
       </div>
     </div>
@@ -668,6 +676,7 @@ async function renderPlaceDetail(place) {
   // Social links + owner note. Mounted last so it can read place.pendingFields.
   if (window.PlaceExtras) PlaceExtras.mount(place);
   if (window.PlaceWatch) PlaceWatch.mount(place);
+  if (window.PlaceAnnounce) PlaceAnnounce.mount(place);
 
   // Photos arrive after the card is already on screen.
   discoverPhotos(place.photo, 10).then(function (photos) {
@@ -1601,13 +1610,10 @@ console.log('✅ Places Detail JS loaded');
 
 
 // ============================================
-// WATCH PILL  ("Kuzatish | 43" beside the place type)
+// NOTIFICATIONS API  (shared by the watch pill and announcements)
 // ============================================
-// Watching sends this place's news to the user through the bot. The count is
-// public; whether *this* user watches comes from place.watch, which the
-// server fills from the signed initData sent with the detail request.
 
-(function () {
+const Notify = (function () {
   'use strict';
 
   var API_BASE = (window.API_CONFIG && API_CONFIG.BASE_URL
@@ -1615,16 +1621,34 @@ console.log('✅ Places Detail JS loaded');
     : 'https://vegukin-api.duckdns.org/').replace(/\/+$/, '');
   var AUTH_CODES = ['no_init_data', 'bad_init_data', 'bad_signature', 'no_user', 'server_misconfigured'];
 
-  var ICON_OFF = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
-  var ICON_ON = '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a6.3 6.3 0 0 0-6.3 6.3c0 4.6-1.4 6.9-2.4 8a.9.9 0 0 0 .7 1.5h16a.9.9 0 0 0 .7-1.5c-1-1.1-2.4-3.4-2.4-8A6.3 6.3 0 0 0 12 2.2Z"/><path d="M9.6 19.8h4.8a2.4 2.4 0 0 1-4.8 0Z"/></svg>';
+  function signedIn() { return !!(tg && tg.initData); }
 
-  var place = null;
-  var watching = false;
-  var count = 0;
-  var busy = false;
+  // Signed initData goes with every call; the server takes the user from it.
+  function request(method, path, body) {
+    var opts = {
+      method: method,
+      headers: { 'Content-Type': 'application/json', 'X-Init-Data': (tg && tg.initData) || '' },
+      signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
+    };
+    if (body) opts.body = JSON.stringify(body);
+    return fetch(API_BASE + path, opts).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok || data.success === false) {
+          var err = new Error(data.error || ('HTTP ' + res.status));
+          err.code = data.code || ('http_' + res.status);
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
 
-  function toast(msg) {
-    if (window.PlaceExtras && PlaceExtras.toast) PlaceExtras.toast(msg);
+  function errorText(err) {
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') return T('common.timeout');
+    if (!err.code && err instanceof TypeError) return T('common.network');
+    if (AUTH_CODES.indexOf(err.code) !== -1) return T('common.telegramOnly');
+    if (err.code && PlacesText.has('notifyErrors.' + err.code)) return T('notifyErrors.' + err.code);
+    return T('common.error');
   }
 
   function haptic(kind) {
@@ -1636,13 +1660,31 @@ console.log('✅ Places Detail JS loaded');
     } catch (e) {}
   }
 
-  function errorText(err) {
-    if (err.name === 'TimeoutError' || err.name === 'AbortError') return T('common.timeout');
-    if (!err.code && err instanceof TypeError) return T('common.network');
-    if (AUTH_CODES.indexOf(err.code) !== -1) return T('common.telegramOnly');
-    if (err.code && PlacesText.has('notifyErrors.' + err.code)) return T('notifyErrors.' + err.code);
-    return T('common.error');
+  function toast(msg) {
+    if (window.PlaceExtras && PlaceExtras.toast) PlaceExtras.toast(msg);
   }
+
+  return { request: request, errorText: errorText, haptic: haptic, toast: toast, signedIn: signedIn };
+})();
+
+
+// ============================================
+// WATCH PILL  ("Kuzatish | 43" beside the place type)
+// ============================================
+// Watching sends this place's news to the user through the bot. The count is
+// public; whether *this* user watches comes from place.watch, which the
+// server fills from the signed initData sent with the detail request.
+
+(function () {
+  'use strict';
+
+  var ICON_OFF = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+  var ICON_ON = '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a6.3 6.3 0 0 0-6.3 6.3c0 4.6-1.4 6.9-2.4 8a.9.9 0 0 0 .7 1.5h16a.9.9 0 0 0 .7-1.5c-1-1.1-2.4-3.4-2.4-8A6.3 6.3 0 0 0 12 2.2Z"/><path d="M9.6 19.8h4.8a2.4 2.4 0 0 1-4.8 0Z"/></svg>';
+
+  var place = null;
+  var watching = false;
+  var count = 0;
+  var busy = false;
 
   function render() {
     var slot = document.getElementById('pdWatchSlot');
@@ -1667,8 +1709,8 @@ console.log('✅ Places Detail JS loaded');
 
   function toggle() {
     if (busy || !place) return;
-    if (!(tg && tg.initData)) {
-      toast(T('common.telegramOnly'));
+    if (!Notify.signedIn()) {
+      Notify.toast(T('common.telegramOnly'));
       return;
     }
     var was = watching;
@@ -1677,36 +1719,22 @@ console.log('✅ Places Detail JS loaded');
     watching = !was;
     count = Math.max(0, count + (watching ? 1 : -1));
     busy = true;
-    haptic('light');
+    Notify.haptic('light');
     render();
 
-    fetch(API_BASE + '/api/notify/watch/' + encodeURIComponent(place.id), {
-      method: watching ? 'POST' : 'DELETE',
-      headers: { 'Content-Type': 'application/json', 'X-Init-Data': tg.initData },
-      body: JSON.stringify({ lang: PlacesText.lang() }),
-      signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
-    })
-      .then(function (res) {
-        return res.json().catch(function () { return {}; }).then(function (data) {
-          if (!res.ok || data.success === false) {
-            var err = new Error(data.error || ('HTTP ' + res.status));
-            err.code = data.code || ('http_' + res.status);
-            throw err;
-          }
-          return data;
-        });
-      })
+    Notify.request(watching ? 'POST' : 'DELETE', '/api/notify/watch/' + encodeURIComponent(place.id),
+                   { lang: PlacesText.lang() })
       .then(function (data) {
         watching = !!data.watching;
         if (typeof data.watchCount === 'number') count = data.watchCount;
-        haptic('success');
-        toast(T(watching ? 'watch.toastOn' : 'watch.toastOff'));
+        Notify.haptic('success');
+        Notify.toast(T(watching ? 'watch.toastOn' : 'watch.toastOff'));
       })
       .catch(function (err) {
         watching = was;
         count = wasCount;
-        haptic('error');
-        toast(errorText(err));
+        Notify.haptic('error');
+        Notify.toast(Notify.errorText(err));
       })
       .then(function () {
         busy = false;
@@ -1728,3 +1756,244 @@ console.log('✅ Places Detail JS loaded');
   window.PlaceWatch = { mount: mount };
 })();
 
+
+// ============================================
+// ANNOUNCEMENTS AND OWNER CLAIM  (bottom of the card)
+// ============================================
+// Mosques: anyone may write an announcement. Restaurants and shops: only the
+// confirmed owner; anyone else sees a quiet "Are you the owner?" line while
+// the place has no owner. Every post waits for the admin, so the page only
+// says how many are waiting, and the bot tells the writer the outcome.
+
+(function () {
+  'use strict';
+
+  var MAX = 1000;
+  var ICON_MEGAPHONE = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4a1 1 0 0 0 1 1h3l6 4V5L7 9H4a1 1 0 0 0-1 1Z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg>';
+  var ICON_CHEVRON = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
+  var ICON_CLOCK = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+
+  var place = null;
+  var info = null;          // place.watch from the API
+  var claimJustSent = false;
+  var drafts = {};          // place id -> unsent text, kept while the page is open
+  var sending = false;
+  var reachSeq = 0;
+
+  function $(id) { return document.getElementById(id); }
+  function isMosque() { return PLACE_TYPE === 'mosque'; }
+  function canPost() { return !!info && (isMosque() || info.isOwner); }
+
+  function render() {
+    var box = $('pdAnnounce');
+    if (!box || !place) return;
+    if (!info) { box.hidden = true; return; }
+
+    var html = '';
+    if (canPost()) {
+      var label = T(isMosque() && !info.isOwner ? 'announce.mosqueEntry' : 'announce.ownerEntry');
+      html += '<div class="review-collapsible pd-ann-box">' +
+        '<button type="button" class="review-toggle-btn" id="pdAnnOpen">' +
+        '<span class="toggle-label">' + ICON_MEGAPHONE + ' ' + esc(label) + '</span>' +
+        '<span class="pd-ann-chev">' + ICON_CHEVRON + '</span></button></div>';
+    }
+    if (info.pendingAnnouncements > 0) {
+      html += '<p class="pd-ann-pending">' + ICON_CLOCK +
+        '<span>' + esc(T('announce.pendingLine', { n: info.pendingAnnouncements })) + '</span></p>';
+    }
+    if (!isMosque() && !info.hasOwner && !info.isOwner) {
+      if (claimJustSent) {
+        html += '<p class="pd-ann-claim">' + esc(T('claim.sent')) + '</p>';
+      } else if (info.claimPending) {
+        html += '<p class="pd-ann-claim">' + esc(T('claim.pending')) + '</p>';
+      } else {
+        html += '<p class="pd-ann-claim">' + esc(T('claim.prompt')) + ' ' +
+          '<button type="button" class="pd-quiet-link" id="pdClaim">' + esc(T('claim.link')) + '</button></p>';
+      }
+    }
+    box.innerHTML = html;
+    box.hidden = !html;
+    var open = $('pdAnnOpen');
+    if (open) open.addEventListener('click', openSheet);
+    var claim = $('pdClaim');
+    if (claim) claim.addEventListener('click', startClaim);
+  }
+
+  // ---- Owner claim ----
+
+  function confirmBox(text) {
+    return new Promise(function (resolve) {
+      try {
+        if (tg && tg.showConfirm && (!tg.isVersionAtLeast || tg.isVersionAtLeast('6.2'))) {
+          tg.showConfirm(text, function (ok) { resolve(!!ok); });
+          return;
+        }
+      } catch (e) {}
+      resolve(window.confirm(text));
+    });
+  }
+
+  function startClaim() {
+    if (!Notify.signedIn()) {
+      Notify.toast(T('common.telegramOnly'));
+      return;
+    }
+    confirmBox(T('claim.confirm')).then(function (ok) {
+      if (!ok) return;
+      Notify.request('POST', '/api/notify/claim/' + encodeURIComponent(place.id), { lang: PlacesText.lang() })
+        .then(function () {
+          info.claimPending = true;
+          claimJustSent = true;
+          Notify.haptic('success');
+          render();
+        })
+        .catch(function (err) {
+          Notify.haptic('error');
+          if (err.code === 'has_owner') { info.hasOwner = true; render(); }
+          Notify.toast(Notify.errorText(err));
+        });
+    });
+  }
+
+  // ---- Composer sheet ----
+
+  function isOpen() { var b = $('pdAnnBackdrop'); return !!b && !b.hidden; }
+
+  function setError(text) {
+    var el = $('pdAnnError');
+    el.textContent = text || '';
+    el.hidden = !text;
+  }
+
+  function updateCounter() {
+    var n = $('pdAnnText').value.length;
+    var c = $('pdAnnCounter');
+    c.textContent = n + ' / ' + MAX;
+    c.classList.toggle('pd-sheet-counter--near', n > MAX - 50);
+  }
+
+  function setSending(on) {
+    sending = on;
+    var btn = $('pdAnnSend');
+    btn.disabled = on;
+    btn.textContent = T(on ? 'announce.sending' : 'announce.submit');
+  }
+
+  function onBack() { closeSheet(); }
+
+  function openSheet() {
+    if (!Notify.signedIn()) {
+      Notify.toast(T('common.telegramOnly'));
+      return;
+    }
+    var area = $('pdAnnText');
+    area.value = drafts[place.id] || '';
+    area.placeholder = T(isMosque() && !info.isOwner ? 'announce.placeholderMosque' : 'announce.placeholderOwner');
+    $('pdAnnPlace').textContent = place.name || '';
+    $('pdAnnReach').hidden = true;
+    setError('');
+    setSending(false);
+    updateCounter();
+
+    var backdrop = $('pdAnnBackdrop');
+    var sheet = $('pdAnnSheet');
+    backdrop.hidden = false;
+    requestAnimationFrame(function () {
+      backdrop.classList.add('visible');
+      sheet.classList.add('visible');
+    });
+    Notify.haptic('light');
+    try {
+      tg.BackButton.offClick(handleMainBackButton);
+      tg.BackButton.onClick(onBack);
+    } catch (e) {}
+
+    // "About N people" — a nicety; the sheet works without it.
+    var my = ++reachSeq;
+    Notify.request('GET', '/api/notify/announce/' + encodeURIComponent(place.id) + '/reach')
+      .then(function (data) {
+        if (my !== reachSeq || !isOpen()) return;
+        var el = $('pdAnnReach');
+        el.textContent = T('announce.reach', { n: data.count });
+        el.hidden = false;
+      })
+      .catch(function () {});
+  }
+
+  function closeSheet() {
+    if (!isOpen()) return;
+    var backdrop = $('pdAnnBackdrop');
+    var sheet = $('pdAnnSheet');
+    drafts[place.id] = $('pdAnnText').value;
+    backdrop.classList.remove('visible');
+    sheet.classList.remove('visible');
+    setTimeout(function () { if (!sheet.classList.contains('visible')) backdrop.hidden = true; }, 280);
+    var area = $('pdAnnText');
+    if (document.activeElement === area) area.blur();
+    try {
+      tg.BackButton.offClick(onBack);
+      tg.BackButton.onClick(handleMainBackButton);
+    } catch (e) {}
+  }
+
+  function send() {
+    if (sending) return;
+    var text = $('pdAnnText').value.trim();
+    if (!text) { setError(T('announce.empty')); return; }
+    if (text.length > MAX) { setError(T('announce.tooLong')); return; }
+    setError('');
+    setSending(true);
+    Notify.request('POST', '/api/notify/announce/' + encodeURIComponent(place.id),
+                   { text: text, lang: PlacesText.lang() })
+      .then(function (data) {
+        drafts[place.id] = '';
+        $('pdAnnText').value = '';
+        info.pendingAnnouncements = typeof data.pendingAnnouncements === 'number'
+          ? data.pendingAnnouncements : (info.pendingAnnouncements || 0) + 1;
+        setSending(false);
+        closeSheet();
+        render();
+        Notify.haptic('success');
+        Notify.toast(T('announce.sentToast'));
+      })
+      .catch(function (err) {
+        setSending(false);
+        Notify.haptic('error');
+        // Ownership was revoked since the page loaded: the row goes away.
+        if (err.code === 'not_owner') { info.isOwner = false; render(); }
+        setError(Notify.errorText(err));
+      });
+  }
+
+  var bound = false;
+  function bindOnce() {
+    if (bound) return;
+    bound = true;
+    $('pdAnnCancel').addEventListener('click', closeSheet);
+    $('pdAnnSend').addEventListener('click', send);
+    $('pdAnnText').addEventListener('input', function () { updateCounter(); setError(''); });
+    $('pdAnnBackdrop').addEventListener('click', function (e) {
+      if (e.target === e.currentTarget) closeSheet();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isOpen()) closeSheet();
+    });
+  }
+
+  function mount(placeData) {
+    place = placeData || null;
+    // An API without the notifications module sends no "watch": nothing here.
+    info = place && place.watch ? place.watch : null;
+    claimJustSent = false;
+    if (!$('pdAnnBackdrop')) return;
+    bindOnce();
+    render();
+  }
+
+  window.addEventListener('languageChanged', function () {
+    render();
+    if (isOpen()) setSending(sending);
+  });
+
+  window.PlaceAnnounce = { mount: mount };
+})();
