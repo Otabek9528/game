@@ -871,6 +871,41 @@ a.nt-chip:hover, a.nt-chip:active { background: var(--pl-accent-soft); color: va
 
 .nt-preview-svg { display: block; width: 100%; height: 100%; }
 
+/* --- Real map (Leaflet + OpenStreetMap) --- */
+/* Its own stacking context, so Leaflet's panes stay under the legend. */
+.nt-map {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--pl-surface-2);
+  font-family: inherit;
+  /* A preview only: touches go to the sheet, not the map. */
+  pointer-events: none;
+}
+
+.nt-map[hidden] { display: none; }
+
+/* OpenStreetMap's colours, toned down so the rings and dots lead. */
+.nt-map .leaflet-tile-pane { filter: saturate(0.35) brightness(1.04) contrast(0.92); }
+
+.nt-map .leaflet-control-attribution {
+  pointer-events: auto;
+  margin: 0;
+  padding: 1px 6px;
+  border-radius: 0 0 0 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #57534e;
+  font-size: 9.5px;
+  line-height: 1.5;
+}
+
+.nt-map .leaflet-control-attribution a { color: inherit; text-decoration: none; }
+
+.nt-map-pin { background: none; border: none; }
+.nt-map-pin svg { display: block; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3)); }
+
+.nt-preview-empty, .nt-legend { z-index: 1; }
+
 .nt-preview-empty {
   position: absolute;
   inset: 0;
@@ -1059,3 +1094,5 @@ a.nt-chip:hover, a.nt-chip:active { background: var(--pl-accent-soft); color: va
 .night-mode .pd-sheet-error { background: rgba(232, 124, 115, 0.12); color: #e87c73; }
 .night-mode .pd-toast { background: #2a2a2a; border: 1px solid var(--pl-line); }
 .night-mode .nt-loc.is-error { background: rgba(232, 124, 115, 0.1); }
+.night-mode .nt-map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(0.3) brightness(0.95) contrast(0.9); }
+.night-mode .nt-map .leaflet-control-attribution { background: rgba(28, 28, 28, 0.8); color: #b8b8b2; }

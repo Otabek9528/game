@@ -481,6 +481,7 @@
 
     $('ntSheetTitle').textContent = T(area ? 'areaSheet.editTitle' : 'areaSheet.addTitle');
     setSheetError('');
+    loadLeaflet();
     renderSheet();
 
     var backdrop = $('ntSheetBackdrop');
@@ -693,57 +694,126 @@
   }
 
   // --- Live preview: rings scale with the radius; dots are real places ---
+  // A real map (Leaflet + OpenStreetMap tiles) when it can load; until then,
+  // or when it cannot (offline, tiles blocked), a drawn schematic of the same
+  // rings and dots stands in. Both use the same CSS classes for their shapes.
+
+  var LEAFLET_BASE = '../../js/vendor/leaflet-1.9.4/';
+  var leafletLoading = null;
+  var map = null;          // { m, layer, fitKey } once created
+  var mapFailed = false;
+
+  // Loaded the first time the sheet opens, so the page itself stays light.
+  function loadLeaflet() {
+    if (leafletLoading) return leafletLoading;
+    leafletLoading = new Promise(function (resolve, reject) {
+      if (window.L && L.map) { resolve(); return; }
+      var css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = LEAFLET_BASE + 'leaflet.css';
+      document.head.appendChild(css);
+      var js = document.createElement('script');
+      js.src = LEAFLET_BASE + 'leaflet.js';
+      js.onload = function () { if (window.L && L.map) resolve(); else reject(new Error('no L')); };
+      js.onerror = function () { reject(new Error('leaflet failed to load')); };
+      document.head.appendChild(js);
+    });
+    leafletLoading.then(renderPreview, function () { mapFailed = true; });
+    return leafletLoading;
+  }
+
+  function ensureMap() {
+    if (map) return map;
+    // A preview, not a map to explore: no dragging or zooming, so it never
+    // fights the sheet's own scrolling.
+    var m = L.map('ntMap', {
+      zoomControl: false, dragging: false, touchZoom: false, doubleClickZoom: false,
+      scrollWheelZoom: false, boxZoom: false, keyboard: false, zoomSnap: 0.25
+    });
+    m.attributionControl.setPrefix(false);
+    m.attributionControl.setPosition('topright');
+    var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+    }).addTo(m);
+    // Tiles that never arrive leave a grey box; the schematic says more.
+    var loaded = 0;
+    var failed = 0;
+    tiles.on('tileload', function () { loaded++; });
+    tiles.on('tileerror', function () {
+      if (++failed >= 4 && loaded === 0 && !mapFailed) {
+        mapFailed = true;
+        renderPreview();
+      }
+    });
+    map = { m: m, layer: L.layerGroup().addTo(m), fitKey: '' };
+    return map;
+  }
+
+  var PIN_SVG = '<svg viewBox="-12 -31 24 32" width="24" height="32" aria-hidden="true">' +
+    '<path class="nt-pin" d="M0 0C-2-6-10-10.5-10-18.5a10 10 0 1 1 20 0C10-10.5 2-6 0 0Z"/>' +
+    '<circle class="nt-pin-hole" cx="0" cy="-18.5" r="3.8"/></svg>';
+
+  function drawMap(c, pts, s) {
+    var m = map.m;
+    m.invalidateSize(false);
+    map.layer.clearLayers();
+    RADII.slice().reverse().forEach(function (r) {
+      L.circle([c.lat, c.lon], {
+        radius: r * 1000, interactive: false,
+        className: 'nt-ring' + (r === s.radius ? ' nt-ring--on' : '')
+      }).addTo(map.layer);
+    });
+    var dim = [];
+    var lit = [];
+    (pts || []).forEach(function (p) {
+      var on = p.km <= s.radius && s.types.indexOf(p.type) !== -1;
+      (on ? lit : dim).push(L.circleMarker([p.lat, p.lon], {
+        radius: on ? 5 : 3.2, interactive: false, fillOpacity: 1,
+        className: on ? 'nt-dot nt-dot--' + p.type : 'nt-dot--off'
+      }));
+    });
+    dim.concat(lit).forEach(function (mk) { mk.addTo(map.layer); });
+    L.marker([c.lat, c.lon], {
+      interactive: false, keyboard: false,
+      icon: L.divIcon({ className: 'nt-map-pin', html: PIN_SVG, iconSize: [24, 32], iconAnchor: [12, 32] })
+    }).addTo(map.layer);
+
+    // Fit the chosen ring, leaving room for the legend along the bottom.
+    // Only when the centre or radius changed, so ticking a type keeps the view.
+    var key = c.lat + ',' + c.lon + ',' + s.radius;
+    if (key !== map.fitKey) {
+      map.fitKey = key;
+      m.fitBounds(L.latLng(c.lat, c.lon).toBounds(s.radius * 2000), {
+        paddingTopLeft: [10, 10], paddingBottomRight: [10, 32], animate: false
+      });
+    }
+  }
 
   var SVG_W = 340;
   var SVG_H = 168;
 
-  function renderPreview() {
-    if (!sheet) return;
-    var s = sheet;
-    var svg = $('ntPreviewSvg');
-    var c = activeCenter();
-    var pts = s.points[s.source];
-    var busy = s.source === 'location' ? s.locating : s.finding;
+  function drawSchematic(c, pts, s) {
     var cx = SVG_W / 2;
     var cy = SVG_H / 2 - 8;
-
-    $('ntPreview').classList.toggle('is-busy', busy || (c && !pts));
-
-    var grid = '';
-    for (var gx = 17; gx < SVG_W; gx += 34) grid += '<line class="nt-grid" x1="' + gx + '" y1="0" x2="' + gx + '" y2="' + SVG_H + '"/>';
-    for (var gy = 16; gy < SVG_H; gy += 34) grid += '<line class="nt-grid" x1="0" y1="' + gy + '" x2="' + SVG_W + '" y2="' + gy + '"/>';
-
-    var emptyEl = $('ntPreviewEmpty');
-    var legend = $('ntLegend');
-    if (!c) {
-      svg.innerHTML = '';
-      emptyEl.textContent = busy
-        ? T(s.source === 'location' ? 'areaSheet.locating' : 'areaSheet.finding')
-        : T('areaSheet.noCenter');
-      legend.hidden = true;
-      return;
-    }
-    emptyEl.textContent = '';
+    var out = '';
+    for (var gx = 17; gx < SVG_W; gx += 34) out += '<line class="nt-grid" x1="' + gx + '" y1="0" x2="' + gx + '" y2="' + SVG_H + '"/>';
+    for (var gy = 16; gy < SVG_H; gy += 34) out += '<line class="nt-grid" x1="0" y1="' + gy + '" x2="' + SVG_W + '" y2="' + gy + '"/>';
 
     // The chosen ring always has the same size on screen; bigger rings run off the edge.
     var pxPerKm = 58 / s.radius;
     var kmPerLon = 111.32 * Math.cos(c.lat * Math.PI / 180);
     var kmPerLat = 110.57;
-    var out = grid;
     RADII.slice().reverse().forEach(function (r) {
       out += '<circle class="nt-ring' + (r === s.radius ? ' nt-ring--on' : '') + '" cx="' + cx + '" cy="' + cy +
         '" r="' + (r * pxPerKm).toFixed(1) + '"/>';
     });
-
-    var counts = { mosque: 0, restaurant: 0, shop: 0 };
     var dim = '';
     var lit = '';
     (pts || []).forEach(function (p) {
       var x = cx + (p.lon - c.lon) * kmPerLon * pxPerKm;
       var y = cy - (p.lat - c.lat) * kmPerLat * pxPerKm;
-      var inside = p.km <= s.radius;
-      var on = inside && s.types.indexOf(p.type) !== -1;
-      if (on) counts[p.type]++;
+      var on = p.km <= s.radius && s.types.indexOf(p.type) !== -1;
       if (x < -6 || x > SVG_W + 6 || y < -6 || y > SVG_H + 6) return;
       if (on) lit += '<circle class="nt-dot nt-dot--' + p.type + '" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4.6"/>';
       else dim += '<circle class="nt-dot--off" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3"/>';
@@ -752,9 +822,47 @@
     out += '<g transform="translate(' + cx + ' ' + cy + ')">' +
       '<path class="nt-pin" d="M0 0C-2-6-10-10.5-10-18.5a10 10 0 1 1 20 0C10-10.5 2-6 0 0Z"/>' +
       '<circle class="nt-pin-hole" cx="0" cy="-18.5" r="3.8"/></g>';
-    svg.innerHTML = out;
+    $('ntPreviewSvg').innerHTML = out;
+  }
+
+  function renderPreview() {
+    if (!sheet) return;
+    var s = sheet;
+    var c = activeCenter();
+    var pts = s.points[s.source];
+    var busy = s.source === 'location' ? s.locating : s.finding;
+    var emptyEl = $('ntPreviewEmpty');
+    var legend = $('ntLegend');
+
+    $('ntPreview').classList.toggle('is-busy', !!(busy || (c && !pts)));
+
+    // The map is shown before it is created: Leaflet measures its box.
+    var useMap = !!(c && window.L && L.map && !mapFailed);
+    $('ntMap').hidden = !useMap;
+    $('ntPreviewSvg').style.display = useMap ? 'none' : '';
+
+    if (!c) {
+      $('ntPreviewSvg').innerHTML = '';
+      emptyEl.textContent = busy
+        ? T(s.source === 'location' ? 'areaSheet.locating' : 'areaSheet.finding')
+        : T('areaSheet.noCenter');
+      legend.hidden = true;
+      return;
+    }
+    emptyEl.textContent = '';
+
+    if (useMap) {
+      ensureMap();
+      drawMap(c, pts, s);
+    } else {
+      drawSchematic(c, pts, s);
+    }
 
     if (!pts) { legend.hidden = true; return; }
+    var counts = { mosque: 0, restaurant: 0, shop: 0 };
+    pts.forEach(function (p) {
+      if (p.km <= s.radius && s.types.indexOf(p.type) !== -1) counts[p.type]++;
+    });
     var items = s.types.filter(function (t) { return counts[t] > 0; }).map(function (t) {
       var key = 'areaSheet.count' + t.charAt(0).toUpperCase() + t.slice(1);
       return '<span class="nt-legend-item"><span class="nt-legend-dot nt-dot--' + t + '" style="background: var(--nt-' + t + ')"></span>' +
