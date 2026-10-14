@@ -149,7 +149,9 @@ async function fetchPlaceDetail(id) {
   try {
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      // Signed initData lets the server say whether this user watches the
+      // place. Without it the page still loads, as a signed-out view.
+      headers: { 'Content-Type': 'application/json', 'X-Init-Data': (tg && tg.initData) || '' },
       signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
     });
     
@@ -531,7 +533,10 @@ async function renderPlaceDetail(place) {
       </div>
       
       <div class="detail-head">
-        <p class="detail-eyebrow">${PL_ICONS.rub} ${esc(CONFIG.name)}</p>
+        <div class="detail-eyebrow-row">
+          <p class="detail-eyebrow">${PL_ICONS.rub} ${esc(CONFIG.name)}</p>
+          <span class="pd-watch-slot" id="pdWatchSlot"></span>
+        </div>
         <h1 class="detail-title">${esc(place.name)}</h1>
         <p class="detail-subtitle">${esc(place.city || T('places.unknownCity'))}</p>
         <div class="detail-chips">
@@ -662,6 +667,7 @@ async function renderPlaceDetail(place) {
 
   // Social links + owner note. Mounted last so it can read place.pendingFields.
   if (window.PlaceExtras) PlaceExtras.mount(place);
+  if (window.PlaceWatch) PlaceWatch.mount(place);
 
   // Photos arrive after the card is already on screen.
   discoverPhotos(place.photo, 10).then(function (photos) {
@@ -1590,6 +1596,135 @@ console.log('✅ Places Detail JS loaded');
     }
   });
 
-  window.PlaceExtras = { mount: mount };
+  window.PlaceExtras = { mount: mount, toast: showToast };
+})();
+
+
+// ============================================
+// WATCH PILL  ("Kuzatish | 43" beside the place type)
+// ============================================
+// Watching sends this place's news to the user through the bot. The count is
+// public; whether *this* user watches comes from place.watch, which the
+// server fills from the signed initData sent with the detail request.
+
+(function () {
+  'use strict';
+
+  var API_BASE = (window.API_CONFIG && API_CONFIG.BASE_URL
+    ? API_CONFIG.BASE_URL
+    : 'https://vegukin-api.duckdns.org/').replace(/\/+$/, '');
+  var AUTH_CODES = ['no_init_data', 'bad_init_data', 'bad_signature', 'no_user', 'server_misconfigured'];
+
+  var ICON_OFF = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+  var ICON_ON = '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a6.3 6.3 0 0 0-6.3 6.3c0 4.6-1.4 6.9-2.4 8a.9.9 0 0 0 .7 1.5h16a.9.9 0 0 0 .7-1.5c-1-1.1-2.4-3.4-2.4-8A6.3 6.3 0 0 0 12 2.2Z"/><path d="M9.6 19.8h4.8a2.4 2.4 0 0 1-4.8 0Z"/></svg>';
+
+  var place = null;
+  var watching = false;
+  var count = 0;
+  var busy = false;
+
+  function toast(msg) {
+    if (window.PlaceExtras && PlaceExtras.toast) PlaceExtras.toast(msg);
+  }
+
+  function haptic(kind) {
+    try {
+      var h = tg && tg.HapticFeedback;
+      if (!h) return;
+      if (kind === 'success' || kind === 'error') h.notificationOccurred(kind);
+      else h.impactOccurred('light');
+    } catch (e) {}
+  }
+
+  function errorText(err) {
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') return T('common.timeout');
+    if (!err.code && err instanceof TypeError) return T('common.network');
+    if (AUTH_CODES.indexOf(err.code) !== -1) return T('common.telegramOnly');
+    if (err.code && PlacesText.has('notifyErrors.' + err.code)) return T('notifyErrors.' + err.code);
+    return T('common.error');
+  }
+
+  function render() {
+    var slot = document.getElementById('pdWatchSlot');
+    if (!slot || !place) return;
+    var btn = slot.querySelector('.pd-watch');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pd-watch';
+      btn.innerHTML = '<span class="pd-watch-main"><span class="pd-watch-icon"></span>' +
+        '<span class="pd-watch-label"></span></span><span class="pd-watch-count"></span>';
+      btn.addEventListener('click', toggle);
+      slot.appendChild(btn);
+    }
+    btn.classList.toggle('is-on', watching);
+    btn.setAttribute('aria-pressed', watching ? 'true' : 'false');
+    btn.querySelector('.pd-watch-icon').innerHTML = watching ? ICON_ON : ICON_OFF;
+    btn.querySelector('.pd-watch-label').textContent = T(watching ? 'watch.watching' : 'watch.button');
+    btn.querySelector('.pd-watch-count').textContent = String(count);
+    btn.setAttribute('aria-label', T(watching ? 'watch.watching' : 'watch.button') + ' · ' + T('watch.countLabel', { n: count }));
+  }
+
+  function toggle() {
+    if (busy || !place) return;
+    if (!(tg && tg.initData)) {
+      toast(T('common.telegramOnly'));
+      return;
+    }
+    var was = watching;
+    var wasCount = count;
+    // Optimistic: the pill flips at once and settles on the server's count.
+    watching = !was;
+    count = Math.max(0, count + (watching ? 1 : -1));
+    busy = true;
+    haptic('light');
+    render();
+
+    fetch(API_BASE + '/api/notify/watch/' + encodeURIComponent(place.id), {
+      method: watching ? 'POST' : 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'X-Init-Data': tg.initData },
+      body: JSON.stringify({ lang: PlacesText.lang() }),
+      signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
+    })
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok || data.success === false) {
+            var err = new Error(data.error || ('HTTP ' + res.status));
+            err.code = data.code || ('http_' + res.status);
+            throw err;
+          }
+          return data;
+        });
+      })
+      .then(function (data) {
+        watching = !!data.watching;
+        if (typeof data.watchCount === 'number') count = data.watchCount;
+        haptic('success');
+        toast(T(watching ? 'watch.toastOn' : 'watch.toastOff'));
+      })
+      .catch(function (err) {
+        watching = was;
+        count = wasCount;
+        haptic('error');
+        toast(errorText(err));
+      })
+      .then(function () {
+        busy = false;
+        render();
+      });
+  }
+
+  function mount(placeData) {
+    place = placeData || null;
+    // An API without the notifications module sends no "watch": no pill.
+    if (!place || !place.watch) return;
+    watching = !!place.watch.watching;
+    count = Number(place.watch.watchCount) || 0;
+    render();
+  }
+
+  window.addEventListener('languageChanged', render);
+
+  window.PlaceWatch = { mount: mount };
 })();
 

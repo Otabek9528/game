@@ -6,9 +6,9 @@ const I18N = {
   STORAGE_KEY: 'vegukin_language',
 
   availableFeatures: {
-    uz: ['mosque', 'restaurant', 'shop', 'qibla', 'qna', 'barcode', 'business', 'housing', 'cars', 'hikorea', 'jobs', 'parcel', 'vegukinShops', 'links', 'donation', 'community', 'news', 'events', 'market'],
-    ru: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community', 'hikorea'],
-    en: ['mosque', 'restaurant', 'shop', 'qibla', 'barcode', 'donation', 'community', 'hikorea']
+    uz: ['mosque', 'restaurant', 'shop', 'notifications', 'qibla', 'qna', 'barcode', 'business', 'housing', 'cars', 'hikorea', 'jobs', 'parcel', 'vegukinShops', 'links', 'donation', 'community', 'news', 'events', 'market'],
+    ru: ['mosque', 'restaurant', 'shop', 'notifications', 'qibla', 'barcode', 'donation', 'community', 'hikorea'],
+    en: ['mosque', 'restaurant', 'shop', 'notifications', 'qibla', 'barcode', 'donation', 'community', 'hikorea']
   },
 
   translations: {
@@ -20,6 +20,7 @@ const I18N = {
     'feature.mosques': { uz: 'Masjidlar', ru: 'Мечети', en: 'Mosques' },
     'feature.restaurants': { uz: 'Oshxonalar', ru: 'Рестораны', en: 'Restaurants' },
     'feature.shops': { uz: 'Do\'konlar', ru: 'Магазины', en: 'Shops' },
+    'feature.notifications': { uz: 'Bildirishnomalar', ru: 'Уведомления', en: 'Notifications' },
     'feature.qibla': { uz: 'Qibla', ru: 'Кибла', en: 'Qibla' },
     'feature.qna': { uz: 'Zikr ahlidan so\'rang', ru: 'Zikr ahlidan so\'rang', en: 'Zikr ahlidan so\'rang' },
     'feature.hikorea': { uz: 'Immigratsiya xizmatlari', ru: 'Иммиграционные службы', en: 'Immigration services' },

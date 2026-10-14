@@ -522,22 +522,22 @@ window.PLACES_TEXT = {
      ======================================================= */
 
   /* -------------------------------------------------------
-     BOSH SAHIFA / HOME CARD
-     ------------------------------------------------------- */
-  home: {
-    card: { uz: "Bildirishnomalar", ru: "Уведомления", en: "Notifications" }
-  },
-
-  /* -------------------------------------------------------
      BILDIRISHNOMALAR SAHIFASI / NOTIFICATIONS PAGE
      ------------------------------------------------------- */
   page: {
     title: { uz: "Bildirishnomalar", ru: "Уведомления", en: "Notifications" },
     via: {
-      uz: "Xabarlar {bot} orqali keladi",
-      ru: "Сообщения приходят через {bot}",
-      en: "Messages arrive via {bot}"
-    }
+      uz: "Xabarlar Telegramda shu botdan keladi",
+      ru: "Сообщения приходят в Telegram от этого бота",
+      en: "Messages arrive in Telegram from this bot"
+    },
+    loading:   { uz: "Yuklanmoqda…", ru: "Загрузка…", en: "Loading…" },
+    loadError: {
+      uz: "Obunalaringizni yuklab bo‘lmadi.",
+      ru: "Не удалось загрузить ваши подписки.",
+      en: "Couldn’t load your subscriptions."
+    },
+    retry:     { uz: "Qayta urinish", ru: "Повторить", en: "Try again" }
   },
 
   /* -------------------------------------------------------
@@ -579,9 +579,19 @@ window.PLACES_TEXT = {
     add:             { uz: "Hudud qo‘shish", ru: "Добавить район", en: "Add area" },
     currentLocation: { uz: "Joriy joylashuvim", ru: "Моё местоположение", en: "My current location" },
     radius:          { uz: "{km} km radius", ru: "радиус {km} км", en: "{km} km radius" },
+    fromLocation:    { uz: "Joylashuvimdan", ru: "По геолокации", en: "From my location" },
     inside:          { uz: "hozir {n} ta joy", ru: "сейчас мест: {n}", en: "{n} places now" },
     edit:            { uz: "Tahrirlash", ru: "Изменить", en: "Edit" },
-    delete:          { uz: "O‘chirish", ru: "Удалить", en: "Delete" }
+    delete:          { uz: "O‘chirish", ru: "Удалить", en: "Delete" },
+    menu:            { uz: "Amallar", ru: "Действия", en: "Actions" },
+    deleteConfirm: {
+      uz: "Bu hudud bo‘yicha xabarlar to‘xtatilsinmi?",
+      ru: "Отключить сообщения по этому району?",
+      en: "Stop messages for this area?"
+    },
+    saved:           { uz: "Hudud saqlandi", ru: "Район сохранён", en: "Area saved" },
+    updated:         { uz: "Hudud yangilandi", ru: "Район обновлён", en: "Area updated" },
+    deleted:         { uz: "Hudud o‘chirildi", ru: "Район удалён", en: "Area deleted" }
   },
 
   /* -------------------------------------------------------
@@ -594,7 +604,8 @@ window.PLACES_TEXT = {
       ru: "Чтобы следить за местом, нажмите «Следить» на его странице.",
       en: "To watch a place, tap “Watch” on its page."
     },
-    removed: { uz: "Kuzatuvdan olib tashlandi", ru: "Удалено из отслеживаемых", en: "Removed from watched places" }
+    removed: { uz: "Kuzatuvdan olib tashlandi", ru: "Удалено из отслеживаемых", en: "Removed from watched places" },
+    stop:    { uz: "Kuzatishni to‘xtatish", ru: "Перестать следить", en: "Stop watching" }
   },
 
   /* -------------------------------------------------------
@@ -611,7 +622,28 @@ window.PLACES_TEXT = {
       ru: "Введите адрес на корейском",
       en: "Enter the address in Korean"
     },
+    addressExample:  { uz: "서울 동대문구 회기로 56", ru: "서울 동대문구 회기로 56", en: "서울 동대문구 회기로 56" },
     located:         { uz: "Hozirgina aniqlandi", ru: "Определено только что", en: "Located just now" },
+    locating:        { uz: "Joylashuv aniqlanmoqda…", ru: "Определяем местоположение…", en: "Finding your location…" },
+    savedCenter:     { uz: "Saqlangan markaz", ru: "Сохранённый центр", en: "Saved centre" },
+    relocate:        { uz: "Qayta aniqlash", ru: "Обновить", en: "Update" },
+    find:            { uz: "Topish", ru: "Найти", en: "Find" },
+    finding:         { uz: "Manzil qidirilmoqda…", ru: "Ищем адрес…", en: "Looking up the address…" },
+    noCenter: {
+      uz: "Markazni tanlang — bu yerda qamrov ko‘rinadi.",
+      ru: "Выберите центр — здесь появится охват.",
+      en: "Pick a centre to see what the circle covers."
+    },
+    nothingInside: {
+      uz: "Bu radiusda hozircha joy yo‘q",
+      ru: "В этом радиусе пока нет мест",
+      en: "No places in this radius yet"
+    },
+    locationFailed: {
+      uz: "Joylashuvni aniqlab bo‘lmadi. Manzilni kiriting yoki qayta urinib ko‘ring.",
+      ru: "Не удалось определить местоположение. Введите адрес или попробуйте ещё раз.",
+      en: "Couldn’t get your location. Enter an address or try again."
+    },
     radius:          { uz: "Radius", ru: "Радиус", en: "Radius" },
     countMosque:     { uz: "{n} masjid", ru: "Мечети: {n}", en: "Mosques: {n}" },
     countRestaurant: { uz: "{n} oshxona", ru: "Рестораны: {n}", en: "Restaurants: {n}" },
@@ -626,6 +658,42 @@ window.PLACES_TEXT = {
       uz: "Yangi joy ochilsa, yopilsa, telefon raqami yoki nomi o‘zgarsa va e’lon berilsa — Telegramda xabar olasiz.",
       ru: "Мы напишем в Telegram, если место откроется, закроется, сменит телефон или название, или опубликует объявление.",
       en: "We’ll message you in Telegram when a place opens, closes, changes its phone or name, or posts an announcement."
+    }
+  },
+
+  /* -------------------------------------------------------
+     XATOLAR / ERRORS from the notifications API, by code
+     ------------------------------------------------------- */
+  notifyErrors: {
+    address_not_found: {
+      uz: "Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.",
+      ru: "Адрес не найден. Попробуйте написать точнее, на корейском.",
+      en: "That address wasn’t found. Try writing it more precisely, in Korean."
+    },
+    rate_limited: {
+      uz: "So‘rovlar juda ko‘p. Bir daqiqadan so‘ng urinib ko‘ring.",
+      ru: "Слишком много запросов. Попробуйте через минуту.",
+      en: "Too many requests. Please try again in a minute."
+    },
+    too_many_areas: {
+      uz: "Hududlar juda ko‘p. Keraksizlarini o‘chiring.",
+      ru: "Слишком много районов. Удалите ненужные.",
+      en: "Too many areas. Delete the ones you don’t need."
+    },
+    place_not_found: {
+      uz: "Bu joy endi mavjud emas.",
+      ru: "Этого места больше нет.",
+      en: "This place no longer exists."
+    },
+    stale_init_data: {
+      uz: "Sessiya eskirdi. Sahifani Telegramda qayta oching.",
+      ru: "Сессия устарела. Откройте страницу в Telegram заново.",
+      en: "Your session expired. Reopen the page in Telegram."
+    },
+    not_found: {
+      uz: "Bu hudud allaqachon o‘chirilgan.",
+      ru: "Этот район уже удалён.",
+      en: "This area was already deleted."
     }
   },
 

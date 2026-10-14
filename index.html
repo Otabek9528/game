@@ -158,6 +158,7 @@
       mosque: { icon: '🕌', labelKey: 'feature.mosques', href: 'pages/places/places.html?type=mosque' },
       restaurant: { icon: '🍽️', labelKey: 'feature.restaurants', href: 'pages/places/places.html?type=restaurant' },
       shop: { icon: '🏪', labelKey: 'feature.shops', href: 'pages/places/places.html?type=shop' },
+      notifications: { icon: '🔔', labelKey: 'feature.notifications', href: 'pages/places/notifications.html', isNew: true },
       qibla: { icon: '🕋', labelKey: 'feature.qibla', href: 'pages/qibla/qibla.html'}, 
       qna: { icon: '🌐', labelKey: 'feature.qna', href: 'pages/questions/qna.html'},
       barcode: { icon: '🧪', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html', isNew: true},  // ← NEW FEATURE
@@ -235,7 +236,7 @@
       if (!container) return;
       
       const availableFeatures = window.I18N ? I18N.getAvailableFeatures() : 
-        ['mosque', 'restaurant', 'shop', 'qibla', 'parcel', 'vegukinShops', 'links', 'jobs', 'donation', 'barcode', 'community', 'hikorea'];
+        ['mosque', 'restaurant', 'shop', 'notifications', 'qibla', 'parcel', 'vegukinShops', 'links', 'jobs', 'donation', 'barcode', 'community', 'hikorea'];
       
       container.innerHTML = '';
       
