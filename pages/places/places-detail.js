@@ -7,9 +7,9 @@
 // Behaviour per place type only.
 
 const PLACE_CONFIGS = {
-  mosque:     { icon: '🕌', buildingType: 'Masjid',  defaultPhoto: '../../assets/mosque.png' },
-  restaurant: { icon: '🍽️', buildingType: 'Oshxona', defaultPhoto: '../../assets/restaurant.jpg' },
-  shop:       { icon: '🏪', buildingType: "Do'kon",  defaultPhoto: '../../assets/store.jpg' }
+  mosque:     { icon: '🕌', buildingType: 'Masjid',  defaultPhoto: '../../assets/place-mosque.svg' },
+  restaurant: { icon: '🍽️', buildingType: 'Oshxona', defaultPhoto: '../../assets/place-restaurant.svg' },
+  shop:       { icon: '🏪', buildingType: "Do'kon",  defaultPhoto: '../../assets/place-shop.svg' }
 };
 
 const T = PlacesText.t;
@@ -621,6 +621,7 @@ async function renderPlaceDetail(place) {
                 <textarea 
                   class="review-textarea" 
                   id="reviewText" 
+                  maxlength="1000"
                   placeholder="${esc(reviewPlaceholder)}"></textarea>
                 <button class="review-submit-btn" id="submitReviewBtn">${esc(submitText)}</button>
               </div>
@@ -737,28 +738,25 @@ function initReviewSubmission(placeId) {
       return;
     }
     
+    // Who writes the review comes from the signed Telegram data, so it can
+    // only be sent from inside Telegram.
+    if (!Notify.signedIn()) {
+      tg.showAlert(T('common.telegramOnly'));
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = loadingText;
     
     try {
-      const userId = tg.initDataUnsafe?.user?.id || 'web_user';
-      
       const reviewData = {
         place_id: placeId,
         mosque_id: placeId,  // Backward compatibility
-        user_id: userId,
         rating: selectedRating,
-        review_text: reviewText.value.trim() || '',
-        timestamp: new Date().toISOString()
+        review_text: reviewText.value.trim() || ''
       };
       
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/review/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewData)
-      });
-      
-      const result = await response.json();
+      const result = await Notify.request('POST', '/api/review/submit', reviewData);
       
       if (result.success) {
         document.querySelector('.review-collapsible .review-form-body').style.display = 'none';
@@ -771,13 +769,11 @@ function initReviewSubmission(placeId) {
         setTimeout(() => {
           window.location.reload();
         }, 2000);
-      } else {
-        tg.showAlert(T('detail.errorPrefix', { error: result.error || T('detail.tryAgain') }));
-        submitBtn.disabled = false;
-        submitBtn.textContent = submitText;
       }
     } catch (error) {
-      tg.showAlert(errorText);
+      // A refusal with a code (already reviewed today, too long, …) says why;
+      // anything else gets the general message.
+      tg.showAlert(error.code ? Notify.errorText(error) : errorText);
       submitBtn.disabled = false;
       submitBtn.textContent = submitText;
     }

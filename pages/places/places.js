@@ -7,9 +7,9 @@
 // Behaviour per place type only. Every word lives in places.text.js.
 
 const PLACE_CONFIGS = {
-  mosque:     { icon: '🕌', buildingType: 'Masjid',  defaultPhoto: '../../assets/mosque.png' },
-  restaurant: { icon: '🍽️', buildingType: 'Oshxona', defaultPhoto: '../../assets/restaurant.jpg' },
-  shop:       { icon: '🏪', buildingType: "Do'kon",  defaultPhoto: '../../assets/store.jpg' }
+  mosque:     { icon: '🕌', buildingType: 'Masjid',  defaultPhoto: '../../assets/place-mosque.svg' },
+  restaurant: { icon: '🍽️', buildingType: 'Oshxona', defaultPhoto: '../../assets/place-restaurant.svg' },
+  shop:       { icon: '🏪', buildingType: "Do'kon",  defaultPhoto: '../../assets/place-shop.svg' }
 };
 
 const T = PlacesText.t;

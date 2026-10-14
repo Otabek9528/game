@@ -1028,3 +1028,7 @@ body {
   .place-name { font-size: 1.18rem; }
   :root { --pl-media-h: 195px; }
 }
+
+/* Placeholder pictures (assets/place-*.svg) for places without photos are
+   light; at night they are dimmed so they do not glare. */
+.night-mode img[src*="assets/place-"] { filter: brightness(0.72) saturate(0.85); }

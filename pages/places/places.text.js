@@ -720,6 +720,17 @@ window.PLACES_TEXT = {
       ru: "У вас слишком много запросов на проверке. Дождитесь их рассмотрения.",
       en: "You have too many requests waiting for review. Please wait until they’re handled."
     },
+    review_too_soon: {
+      uz: "Bu joyga bugun izoh qoldirgansiz. Ertaga yana yozishingiz mumkin.",
+      ru: "Вы уже оставили отзыв об этом месте сегодня. Можно снова завтра.",
+      en: "You’ve already reviewed this place today. You can again tomorrow."
+    },
+    too_many_reviews: {
+      uz: "Bugun juda ko‘p izoh qoldirdingiz. Ertaga urinib ko‘ring.",
+      ru: "Сегодня вы оставили слишком много отзывов. Попробуйте завтра.",
+      en: "You’ve left too many reviews today. Please try again tomorrow."
+    },
+    invalid_rating: { uz: "Bahoni tanlang.", ru: "Выберите оценку.", en: "Choose a rating." },
     text_empty: { uz: "Avval matn yozing.", ru: "Сначала напишите текст.", en: "Write something first." },
     text_too_long: {
       uz: "Matn 1000 belgidan oshmasin.",
