@@ -547,7 +547,18 @@ window.PLACES_TEXT = {
       ru: "Не удалось загрузить ваши подписки.",
       en: "Couldn’t load your subscriptions."
     },
-    retry:     { uz: "Qayta urinish", ru: "Повторить", en: "Try again" }
+    retry:     { uz: "Qayta urinish", ru: "Повторить", en: "Try again" },
+    blocked: {
+      uz: "Bot sizga xabar yubora olmayapti, shuning uchun yangiliklar kelmaydi. Ruxsat bering yoki botni ochib, «Start» tugmasini bosing.",
+      ru: "Бот не может писать вам, поэтому новости не приходят. Разрешите сообщения или откройте бота и нажмите «Start».",
+      en: "The bot can’t message you, so no news arrives. Allow messages, or open the bot and tap “Start”."
+    },
+    allow:     { uz: "Ruxsat berish", ru: "Разрешить", en: "Allow" },
+    helloSent: {
+      uz: "Sinov xabari yuborildi. Botni tekshiring.",
+      ru: "Отправили проверочное сообщение. Загляните в бота.",
+      en: "A test message is on its way. Check the bot."
+    }
   },
 
   /* -------------------------------------------------------
@@ -756,6 +767,11 @@ window.PLACES_TEXT = {
       en: "News will arrive in Telegram"
     },
     toastOff:   { uz: "Kuzatish to‘xtatildi", ru: "Вы больше не следите", en: "You stopped watching" },
+    needsWrite: {
+      uz: "Bot sizga xabar yuborishiga ruxsat bermasangiz, yangiliklar kelmaydi.",
+      ru: "Без разрешения на сообщения бот не сможет присылать новости.",
+      en: "Without permission to message you, the bot can’t send you news."
+    },
     countLabel: { uz: "{n} kishi kuzatmoqda", ru: "Следят: {n}", en: "{n} people watching" }
   },
 
@@ -855,6 +871,13 @@ window.PLACES_TEXT = {
     fromOwner:       { uz: "Joy egasidan", ru: "От владельца", en: "From the owner" },
     btnOpen:         { uz: "Joyni ochish", ru: "Открыть", en: "Open place" },
     btnStop:         { uz: "To‘xtatish", ru: "Отключить", en: "Stop" },
+    btnSettings:     { uz: "Bildirishnomalar", ru: "Уведомления", en: "Notifications" },
+    welcomeTitle:    { uz: "Bildirishnomalar yoqildi", ru: "Уведомления включены", en: "Notifications are on" },
+    welcomeBody: {
+      uz: "Kuzatayotgan joylaringiz va hududlaringiz bo‘yicha yangiliklar shu yerga keladi.",
+      ru: "Новости о местах и районах, за которыми вы следите, будут приходить сюда.",
+      en: "News about the places and areas you watch will arrive here."
+    },
     stoppedArea: {
       uz: "Bu hudud bo‘yicha xabarlar to‘xtatildi.",
       ru: "Сообщения по этому району отключены.",

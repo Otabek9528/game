@@ -269,71 +269,11 @@ async function fetchPlacesByAddress(address, limit = 5) {
 // PHOTO FUNCTIONS (Optimized with Lazy Loading)
 // ============================================
 
-function checkImageExists(url) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = url;
-  });
-}
-
-// Quick check for first photo only (fast initial load)
-async function getFirstPhoto(photoPath) {
-  const extensions = ['jpg', 'jpeg', 'png'];
-  const basePath = `../../${photoPath}`;
-  
-  for (const ext of extensions) {
-    const photoUrl = `${basePath}/1.${ext}`;
-    const exists = await checkImageExists(photoUrl);
-    if (exists) {
-      return photoUrl;
-    }
-  }
-  return null;
-}
-
-// Discover all photos (called lazily when card becomes visible)
-async function discoverPhotos(photoPath, maxPhotos = 10) {
-  const extensions = ['jpg', 'jpeg', 'png'];
-  const basePath = `../../${photoPath}`;
-
-  // Finding photos costs round trips, not bytes: every miss is a 404 we wait
-  // on. Asking for one extension of one index at a time meant a card with
-  // three photos spent a dozen serial requests before showing anything. A
-  // batch asks for every extension of every index at once, so the usual card
-  // resolves in a single round trip.
-  const BATCH = 5;
-  const found = [];
-
-  for (let start = 1; start <= maxPhotos; start += BATCH) {
-    const indices = [];
-    for (let i = start; i < start + BATCH && i <= maxPhotos; i++) indices.push(i);
-
-    const hits = await Promise.all(indices.map(async (i) => {
-      const perExt = await Promise.all(extensions.map(async (ext) => {
-        const url = `${basePath}/${i}.${ext}`;
-        try {
-          return (await checkImageExists(url)) ? url : null;
-        } catch (e) {
-          return null;
-        }
-      }));
-      // Extension order is the preference order, so keep the first hit.
-      return perExt.find(Boolean) || null;
-    }));
-
-    // Numbering has to stay contiguous from 1: stop at the first gap even if
-    // later indices exist, otherwise a stray 7.jpg would appear as photo 2.
-    let gap = false;
-    for (const hit of hits) {
-      if (!hit) { gap = true; break; }
-      found.push(hit);
-    }
-    if (gap) break;
-  }
-
-  return found;
+// Which photos a place has comes from places.photos.js: Photos/manifest.json
+// and WebP copies when tools/build-photos.py has been run, the old filename
+// probing otherwise.
+function discoverPhotos(photoPath) {
+  return PlacePhotos.all(photoPath);
 }
 
 // ============================================
@@ -575,7 +515,7 @@ function setupLazyLoading() {
           loadedPlaces.add(placeId);
           
           // Discover all photos for this place
-          discoverPhotos(photoPath, 10).then(photos => {
+          discoverPhotos(photoPath).then(photos => {
             if (photos.length > 0) {
               upgradeToCarousel(placeId, photos);
             } else {

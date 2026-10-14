@@ -37,6 +37,13 @@
       <span data-pt="page.via"></span>
     </p>
 
+    <!-- The bot cannot message this person: blocked, or never allowed. -->
+    <div class="nt-blocked" id="ntBlocked" role="status" hidden>
+      <svg class="pl-icon nt-blocked-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="m2 2 20 20"/></svg>
+      <p class="nt-blocked-text" data-pt="page.blocked"></p>
+      <button type="button" class="nt-btn nt-blocked-btn" id="ntAllow" data-pt="page.allow"></button>
+    </div>
+
     <!-- Loading -->
     <div class="nt-state" id="ntLoading">
       <div class="spinner"></div>
@@ -246,11 +253,12 @@
   </div>
 
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script defer src="../../js/i18n.js"></script>
-  <!-- Every word on this page lives in places.text.js. -->
+  <!-- Every word on this page lives in places.text.js. The language comes
+       from localStorage, so the shared i18n.js (82 KB) is not needed here.
+       locationManager.js is loaded by notifications.js when it is needed. -->
   <script defer src="places.text.js"></script>
   <script defer src="places.i18n.js"></script>
-  <script defer src="../../js/locationManager.js"></script>
+  <script defer src="places.photos.js"></script>
   <script defer src="../../js/apiConfig.js"></script>
   <script defer src="notifications.js"></script>
 

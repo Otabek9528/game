@@ -8,8 +8,9 @@
        data-pt-placeholder="key"  placeholder attribute
        data-pt-aria="key"         aria-label attribute
 
-   The language comes from the shared I18N module (the user picks it on
-   the home screen), falling back to Uzbek for anything not translated. */
+   The language is the one the user picked on the home screen: from the
+   shared I18N module where a page loads it, otherwise straight from
+   localStorage, where I18N keeps it. Uzbek for anything not translated. */
 (function () {
   'use strict';
 

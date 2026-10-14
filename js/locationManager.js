@@ -88,7 +88,11 @@ const LocationManager = {
     if (window.I18N && typeof I18N.getLanguage === 'function') {
       return I18N.getLanguage();
     }
-    return localStorage.getItem('appLanguage') || 'uz';
+    // Pages without i18n.js (the places pages): the language the user picked
+    // on the home screen, saved by i18n.js under this key.
+    let lang = null;
+    try { lang = localStorage.getItem('vegukin_language') || localStorage.getItem('appLanguage'); } catch (e) {}
+    return ['uz', 'ru', 'en'].includes(lang) ? lang : 'uz';
   },
 
   // Get translation

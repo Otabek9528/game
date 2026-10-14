@@ -63,6 +63,40 @@
 .nt-btn--ghost { background: var(--pl-surface-2); color: var(--pl-text); }
 .nt-btn[hidden] { display: none; }
 
+/* --- The bot cannot message this person --- */
+.nt-blocked {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: start;
+  margin: 0 0 16px;
+  padding: 13px 14px;
+  border: 1px solid rgba(212, 162, 26, 0.38);
+  border-radius: var(--pl-radius-sm);
+  background: rgba(212, 162, 26, 0.10);
+}
+
+.nt-blocked[hidden] { display: none; }
+.nt-blocked-icon { width: 20px; height: 20px; color: var(--pl-gold); margin-top: 1px; }
+
+.nt-blocked-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--pl-text);
+}
+
+.nt-blocked-btn {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 8px;
+  padding: 9px 16px;
+  background: var(--pl-accent);
+  color: #fff;
+}
+
+.nt-blocked-btn:disabled { opacity: 0.6; }
+
 /* =========================================================
    FIRST VISIT
    ========================================================= */
@@ -683,6 +717,10 @@ a.nt-chip:hover, a.nt-chip:active { background: var(--pl-accent-soft); color: va
   border-top: 1px solid var(--pl-line);
 }
 
+/* Inside Telegram the sheet saves with Telegram's own bottom button. */
+.uses-main-button .pd-sheet-actions { display: none; }
+.uses-main-button .nt-sheet-body { padding-bottom: 20px; }
+
 .pd-sheet-btn {
   flex: 1;
   padding: 13px 18px;
@@ -1083,6 +1121,7 @@ a.nt-chip:hover, a.nt-chip:active { background: var(--pl-accent-soft); color: va
 .night-mode .nt-choice:not(.nt-choice--primary) { background: var(--pl-surface); }
 .night-mode .nt-choice--primary { border-bottom-color: #053d2f; }
 .night-mode .nt-radar-km { background: var(--emerald-500, #10b981); color: #052e22; }
+.night-mode .nt-blocked-btn { color: #052e22; }
 .night-mode .nt-add { border-color: rgba(16, 185, 129, 0.35); }
 .night-mode .nt-bell { border-color: rgba(16, 185, 129, 0.3); }
 .night-mode .nt-menu { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6); }

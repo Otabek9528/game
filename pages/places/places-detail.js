@@ -32,18 +32,6 @@ const PL_ICONS = {
   rub: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="6.2" y="6.2" width="11.6" height="11.6"/><rect x="6.2" y="6.2" width="11.6" height="11.6" transform="rotate(45 12 12)"/></svg>'
 };
 
-async function incrementViewCount(placeId) {
-  try {
-    await fetch(`${API_CONFIG.BASE_URL}/api/place/${placeId}/view`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
-  } catch (e) {
-    console.log('View count error:', e);
-  }
-}
-
-
 // Config for a place type with its words in the current language.
 function getTranslatedConfig(placeType) {
   const type = PLACE_CONFIGS[placeType] ? placeType : 'mosque';
@@ -144,14 +132,17 @@ function getPlaceId() {
 }
 
 async function fetchPlaceDetail(id) {
-  const url = `${API_CONFIG.BASE_URL}/api/place/${id}`;
+  // view=1 counts this visit in the same request (it used to be a second
+  // POST /view call).
+  const url = `${API_CONFIG.BASE_URL}/api/place/${encodeURIComponent(id)}?view=1`;
   
   try {
     const response = await fetch(url, {
       method: 'GET',
       // Signed initData lets the server say whether this user watches the
-      // place. Without it the page still loads, as a signed-out view.
-      headers: { 'Content-Type': 'application/json', 'X-Init-Data': (tg && tg.initData) || '' },
+      // place. Without it the page still loads, as a signed-out view. No
+      // Content-Type: a GET has no body.
+      headers: { 'X-Init-Data': (tg && tg.initData) || '' },
       signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
     });
     
@@ -175,59 +166,11 @@ async function fetchPlaceDetail(id) {
 // PHOTO FUNCTIONS
 // ============================================
 
-function checkImageExists(url) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = url;
-  });
-}
+// Which photos a place has comes from places.photos.js: Photos/manifest.json
+// and WebP copies when tools/build-photos.py has been run, the old filename
+// probing otherwise.
 
-async function discoverPhotos(photoPath, maxPhotos = 10) {
-  const extensions = ['jpg', 'jpeg', 'png'];
-  const basePath = `../../${photoPath}`;
-
-  // Photos are found by probing filenames, so the cost is round trips, not
-  // bytes. Probing one extension at a time and one index at a time meant ~11
-  // sequential requests before the first photo was known — seconds on mobile
-  // data. A batch fires every extension of every index in the batch at once,
-  // so the usual place resolves in a single round trip.
-  const BATCH = 5;
-  const found = [];
-
-  for (let start = 1; start <= maxPhotos; start += BATCH) {
-    const indices = [];
-    for (let i = start; i < start + BATCH && i <= maxPhotos; i++) indices.push(i);
-
-    const hits = await Promise.all(indices.map(async (i) => {
-      const perExt = await Promise.all(extensions.map(async (ext) => {
-        const url = `${basePath}/${i}.${ext}`;
-        try {
-          return (await checkImageExists(url)) ? url : null;
-        } catch (e) {
-          return null;
-        }
-      }));
-      // Extension order is the preference order, so keep the first hit.
-      return perExt.find(Boolean) || null;
-    }));
-
-    // Numbering has to stay contiguous from 1: stop at the first gap even if
-    // later indices exist, otherwise a stray 7.jpg would appear as photo 2.
-    let gap = false;
-    for (const hit of hits) {
-      if (!hit) { gap = true; break; }
-      found.push(hit);
-    }
-    if (gap) break;
-  }
-
-  return found;
-}
-
-
-// Shown while the probing above runs, so the card is readable immediately
+// Shown while the photos are looked up, so the card is readable immediately
 // instead of waiting on photos. Reuses the skeleton from places.css.
 function detailPhotoSkeleton() {
   const loading = T('places.loadingPhotos');
@@ -680,7 +623,7 @@ async function renderPlaceDetail(place) {
   if (window.PlaceAnnounce) PlaceAnnounce.mount(place);
 
   // Photos arrive after the card is already on screen.
-  discoverPhotos(place.photo, 10).then(function (photos) {
+  PlacePhotos.all(place.photo).then(function (photos) {
     const section = document.querySelector('.detail-photo-section');
     if (!section) return;                     // navigated away mid-probe
     section.innerHTML = createDetailPhotoCarousel(photos);
@@ -817,7 +760,6 @@ async function loadPlaceDetail() {
   try {
     const place = await fetchPlaceDetail(placeId);
     console.log(`📊 View count for "${place.name}": ${place.view_count || 0}`);
-    incrementViewCount(placeId);
     
     detailLoading.style.display = 'none';
     detailContent.style.display = 'block';
@@ -1623,10 +1565,13 @@ const Notify = (function () {
   function request(method, path, body) {
     var opts = {
       method: method,
-      headers: { 'Content-Type': 'application/json', 'X-Init-Data': (tg && tg.initData) || '' },
+      headers: { 'X-Init-Data': (tg && tg.initData) || '' },
       signal: AbortSignal.timeout(API_CONFIG.DEFAULTS.TIMEOUT)
     };
-    if (body) opts.body = JSON.stringify(body);
+    if (body) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
     return fetch(API_BASE + path, opts).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (data) {
         if (!res.ok || data.success === false) {
@@ -1660,7 +1605,31 @@ const Notify = (function () {
     if (window.PlaceExtras && PlaceExtras.toast) PlaceExtras.toast(msg);
   }
 
-  return { request: request, errorText: errorText, haptic: haptic, toast: toast, signedIn: signedIn };
+  // The bot can only message people who let it. Telegram reports that in
+  // initData; when it says no, ask (Telegram 6.9+) before subscribing, so
+  // nobody watches a place and silently never hears about it. Telegram
+  // answers yes at once, without a dialog, when the bot may already write.
+  var writeOk = false;
+  function ensureWriteAccess() {
+    return new Promise(function (resolve) {
+      var user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+      if (writeOk || !user || user.allows_write_to_pm) { resolve(true); return; }
+      try {
+        if (tg.requestWriteAccess && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9')) {
+          tg.requestWriteAccess(function (granted) {
+            writeOk = !!granted;
+            resolve(!!granted);
+          });
+          return;
+        }
+      } catch (e) {}
+      // Older Telegram cannot ask; the server finds out when it sends.
+      resolve(true);
+    });
+  }
+
+  return { request: request, errorText: errorText, haptic: haptic, toast: toast, signedIn: signedIn,
+           ensureWriteAccess: ensureWriteAccess };
 })();
 
 
@@ -1699,8 +1668,12 @@ const Notify = (function () {
     btn.setAttribute('aria-pressed', watching ? 'true' : 'false');
     btn.querySelector('.pd-watch-icon').innerHTML = watching ? ICON_ON : ICON_OFF;
     btn.querySelector('.pd-watch-label').textContent = T(watching ? 'watch.watching' : 'watch.button');
-    btn.querySelector('.pd-watch-count').textContent = String(count);
-    btn.setAttribute('aria-label', T(watching ? 'watch.watching' : 'watch.button') + ' · ' + T('watch.countLabel', { n: count }));
+    // "0" reads as "nobody cares"; the count appears from the first watcher.
+    var countEl = btn.querySelector('.pd-watch-count');
+    countEl.textContent = count > 0 ? String(count) : '';
+    countEl.hidden = count <= 0;
+    btn.setAttribute('aria-label', T(watching ? 'watch.watching' : 'watch.button') +
+      (count > 0 ? ' · ' + T('watch.countLabel', { n: count }) : ''));
   }
 
   function toggle() {
@@ -1709,6 +1682,18 @@ const Notify = (function () {
       Notify.toast(T('common.telegramOnly'));
       return;
     }
+    if (watching) { flip(); return; }
+    // Turning on: first make sure the bot may message this person.
+    busy = true;
+    Notify.ensureWriteAccess().then(function (ok) {
+      busy = false;
+      if (ok) { flip(); return; }
+      Notify.haptic('error');
+      Notify.toast(T('watch.needsWrite'));
+    });
+  }
+
+  function flip() {
     var was = watching;
     var wasCount = count;
     // Optimistic: the pill flips at once and settles on the server's count.
@@ -1873,6 +1858,47 @@ const Notify = (function () {
     var btn = $('pdAnnSend');
     btn.disabled = on;
     btn.textContent = T(on ? 'announce.sending' : 'announce.submit');
+    var mb = mainButton();
+    if (mb && isOpen()) {
+      try {
+        if (on) { mb.showProgress(false); mb.disable(); }
+        else { mb.hideProgress(); mb.enable(); }
+      } catch (e) {}
+    }
+  }
+
+  // Inside Telegram the send button is Telegram's own, at the bottom of the
+  // screen: it stays above the keyboard while typing, where the sheet's
+  // button would be covered. Elsewhere the sheet keeps its own buttons.
+  function mainButton() {
+    try {
+      if (tg && tg.initData && tg.MainButton && tg.MainButton.setParams) return tg.MainButton;
+    } catch (e) {}
+    return null;
+  }
+
+  function showMainButton() {
+    var mb = mainButton();
+    $('pdAnnSheet').classList.toggle('uses-main-button', !!mb);
+    if (!mb) return;
+    try {
+      mb.setParams({ text: T('announce.submit'), color: '#059669', text_color: '#ffffff',
+                     is_active: true, is_visible: true });
+      mb.offClick(send);
+      mb.onClick(send);
+    } catch (e) {
+      $('pdAnnSheet').classList.remove('uses-main-button');
+    }
+  }
+
+  function hideMainButton() {
+    var mb = mainButton();
+    if (!mb) return;
+    try {
+      mb.offClick(send);
+      mb.hideProgress();
+      mb.hide();
+    } catch (e) {}
   }
 
   function onBack() { closeSheet(); }
@@ -1888,12 +1914,13 @@ const Notify = (function () {
     $('pdAnnPlace').textContent = place.name || '';
     $('pdAnnReach').hidden = true;
     setError('');
-    setSending(false);
     updateCounter();
 
     var backdrop = $('pdAnnBackdrop');
     var sheet = $('pdAnnSheet');
     backdrop.hidden = false;
+    showMainButton();
+    setSending(false);
     requestAnimationFrame(function () {
       backdrop.classList.add('visible');
       sheet.classList.add('visible');
@@ -1909,6 +1936,8 @@ const Notify = (function () {
     Notify.request('GET', '/api/notify/announce/' + encodeURIComponent(place.id) + '/reach')
       .then(function (data) {
         if (my !== reachSeq || !isOpen()) return;
+        // Nobody watching yet: say nothing rather than "about 0 people".
+        if (!(data.count > 0)) return;
         var el = $('pdAnnReach');
         el.textContent = T('announce.reach', { n: data.count });
         el.hidden = false;
@@ -1926,6 +1955,7 @@ const Notify = (function () {
     setTimeout(function () { if (!sheet.classList.contains('visible')) backdrop.hidden = true; }, 280);
     var area = $('pdAnnText');
     if (document.activeElement === area) area.blur();
+    hideMainButton();
     try {
       tg.BackButton.offClick(onBack);
       tg.BackButton.onClick(handleMainBackButton);
@@ -1988,7 +2018,10 @@ const Notify = (function () {
 
   window.addEventListener('languageChanged', function () {
     render();
-    if (isOpen()) setSending(sending);
+    if (isOpen()) {
+      showMainButton();
+      setSending(sending);
+    }
   });
 
   window.PlaceAnnounce = { mount: mount };

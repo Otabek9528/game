@@ -205,6 +205,8 @@
 
 .pd-watch:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
 
+.pd-watch-count[hidden] { display: none; }
+
 .night-mode .pd-watch.is-on { border-color: rgba(16, 185, 129, 0.35); }
 .night-mode .pd-watch.is-on .pd-watch-count { border-left-color: rgba(16, 185, 129, 0.25); }
 
@@ -1091,6 +1093,10 @@
   padding: 14px 20px 20px;
   flex-shrink: 0;
 }
+
+/* Inside Telegram the composer sends with Telegram's own bottom button. */
+.uses-main-button .pd-sheet-actions { display: none; }
+.uses-main-button .pd-sheet-body { padding-bottom: 20px; }
 
 .pd-sheet-btn {
   flex: 1;

@@ -5,6 +5,9 @@
 //
 // Bot message buttons link here as notifications.html?stop=place:<id> or
 // ?stop=area:<id>; that unsubscribes first, then shows the page.
+//
+// locationManager.js is loaded only when "My location" is used, so opening
+// the page does not start a location fix.
 (function () {
   'use strict';
 
@@ -27,7 +30,7 @@
     bell: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a6.3 6.3 0 0 0-6.3 6.3c0 4.6-1.4 6.9-2.4 8a.9.9 0 0 0 .7 1.5h16a.9.9 0 0 0 .7-1.5c-1-1.1-2.4-3.4-2.4-8A6.3 6.3 0 0 0 12 2.2Z"/><path d="M9.6 19.8h4.8a2.4 2.4 0 0 1-4.8 0Z"/></svg>'
   };
 
-  var state = { areas: [], watches: [] };
+  var state = { areas: [], watches: [], subscriber: null };
   var photoFound = {};   // placeId -> photo URL, or '' when it has none
 
   function $(id) { return document.getElementById(id); }
@@ -76,9 +79,12 @@
     var opts = {
       method: method,
       // Signed initData — the server verifies it and takes the user from it.
-      headers: { 'Content-Type': 'application/json', 'X-Init-Data': initData() }
+      headers: { 'X-Init-Data': initData() }
     };
-    if (body) opts.body = JSON.stringify(body);
+    if (body) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
     if (window.AbortSignal && AbortSignal.timeout) opts.signal = AbortSignal.timeout(20000);
     return fetch(API + path, opts).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (data) {
@@ -100,6 +106,29 @@
     if (AUTH_CODES.indexOf(err.code) !== -1) return T('common.telegramOnly');
     if (err.code && PlacesText.has('notifyErrors.' + err.code)) return T('notifyErrors.' + err.code);
     return T('common.error');
+  }
+
+  // The bot can only message people who let it. Telegram reports that in
+  // initData; when it says no, ask (Telegram 6.9+) before a new area is
+  // saved, so nobody subscribes and silently never hears anything. Telegram
+  // answers yes at once, without a dialog, when the bot may already write.
+  var writeOk = false;
+  function ensureWriteAccess() {
+    return new Promise(function (resolve) {
+      var user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+      if (writeOk || !user || user.allows_write_to_pm) { resolve(true); return; }
+      try {
+        if (tg.requestWriteAccess && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9')) {
+          tg.requestWriteAccess(function (granted) {
+            writeOk = !!granted;
+            resolve(!!granted);
+          });
+          return;
+        }
+      } catch (e) {}
+      // Older Telegram cannot ask; the server finds out when it sends.
+      resolve(true);
+    });
   }
 
   // ============================================
@@ -142,6 +171,7 @@
     if (which) {
       $('ntEmpty').hidden = true;
       $('ntLists').hidden = true;
+      $('ntBlocked').hidden = true;
     }
   }
 
@@ -182,6 +212,7 @@
       .then(function (data) {
         state.areas = data.areas || [];
         state.watches = data.watches || [];
+        state.subscriber = data.subscriber || null;
         showState(null);
         render();
       })
@@ -210,7 +241,43 @@
     }).join('');
   }
 
+  // The sender switches a person off when Telegram refuses a message (they
+  // blocked the bot, or never allowed it). Nothing reaches them until that
+  // changes, so the page says so above everything else.
+  function renderBlocked() {
+    $('ntBlocked').hidden = !(state.subscriber && state.subscriber.active === false);
+  }
+
+  var helloBusy = false;
+  function allowMessages() {
+    if (helloBusy) return;
+    helloBusy = true;
+    $('ntAllow').disabled = true;
+    ensureWriteAccess()
+      .then(function (ok) {
+        if (!ok) {
+          haptic('error');
+          toast(T('watch.needsWrite'));
+          return;
+        }
+        // Switches the person back on and sends a test message; if the bot
+        // still cannot reach them, the sender switches them off again.
+        return api('POST', '/api/notify/hello', { lang: lang() }).then(function () {
+          if (state.subscriber) state.subscriber.active = true;
+          renderBlocked();
+          haptic('success');
+          toast(T('page.helloSent'));
+        });
+      })
+      .catch(function (err) { toast(errorText(err)); })
+      .then(function () {
+        helloBusy = false;
+        $('ntAllow').disabled = false;
+      });
+  }
+
   function render() {
+    renderBlocked();
     var empty = !state.areas.length && !state.watches.length;
     $('ntEmpty').hidden = !empty;
     $('ntLists').hidden = empty;
@@ -267,13 +334,6 @@
     }).join('');
   }
 
-  // Photo_path is a folder; the first photo is 1.jpg / 1.jpeg / 1.png.
-  function photoCandidates(w) {
-    var path = String(w.photo || '');
-    if (!path || !/^[\w\-./ ]+$/.test(path) || path.indexOf('..') !== -1) return [];
-    return ['jpg', 'jpeg', 'png'].map(function (ext) { return '../../' + path + '/1.' + ext; });
-  }
-
   // No photo: the type's emoji on a tinted tile, as on the home screen.
   function emojiThumb(img, type) {
     var tile = document.createElement('span');
@@ -315,22 +375,25 @@
       '</div>';
     }).join('');
 
-    // Walk each thumbnail through its candidates until one loads. The answer
-    // is remembered, so a re-render does not probe the same files again.
+    // Small first photos from places.photos.js. The answer is remembered, so
+    // a re-render does not look the same place up again.
     var rows = $('ntPlaceList').querySelectorAll('.nt-place');
     for (var i = 0; i < rows.length; i++) {
       (function (img, w) {
+        function show(url) {
+          photoFound[w.placeId] = url || '';
+          if (!url) { emojiThumb(img, w.type); return; }
+          img.addEventListener('error', function () {
+            photoFound[w.placeId] = '';
+            emojiThumb(img, w.type);
+          });
+          img.src = url;
+        }
         var known = photoFound[w.placeId];
-        var candidates = known != null ? (known ? [known] : []) : photoCandidates(w);
-        if (!candidates.length) { photoFound[w.placeId] = ''; emojiThumb(img, w.type); return; }
-        var k = 0;
-        img.addEventListener('load', function () { photoFound[w.placeId] = candidates[k]; });
-        img.addEventListener('error', function () {
-          if (++k < candidates.length) { img.src = candidates[k]; return; }
-          photoFound[w.placeId] = '';
-          emojiThumb(img, w.type);
+        if (known != null) { show(known); return; }
+        PlacePhotos.thumb(w.photo).then(function (url) {
+          if (img.isConnected) show(url);
         });
-        img.src = candidates[0];
       })(rows[i].querySelector('img'), state.watches[i]);
     }
   }
@@ -449,6 +512,39 @@
 
   function isSheetOpen() { return !!sheet; }
 
+  // Inside Telegram, Save is Telegram's own button at the bottom of the
+  // screen: it stays above the keyboard while an address is typed, where the
+  // sheet's button would be covered. Elsewhere the sheet keeps its buttons.
+  function mainButton() {
+    try {
+      if (tg && tg.initData && tg.MainButton && tg.MainButton.setParams) return tg.MainButton;
+    } catch (e) {}
+    return null;
+  }
+
+  function showMainButton() {
+    var mb = mainButton();
+    $('ntSheet').classList.toggle('uses-main-button', !!mb);
+    if (!mb) return;
+    try {
+      mb.offClick(save);
+      mb.onClick(save);
+      mb.setParams({ text: T('common.save'), text_color: '#ffffff', is_visible: true });
+    } catch (e) {
+      $('ntSheet').classList.remove('uses-main-button');
+    }
+  }
+
+  function hideMainButton() {
+    var mb = mainButton();
+    if (!mb) return;
+    try {
+      mb.offClick(save);
+      mb.hideProgress();
+      mb.hide();
+    } catch (e) {}
+  }
+
   function openSheet(area) {
     closeMenu();
     sheet = {
@@ -482,6 +578,7 @@
     $('ntSheetTitle').textContent = T(area ? 'areaSheet.editTitle' : 'areaSheet.addTitle');
     setSheetError('');
     loadLeaflet();
+    showMainButton();
     renderSheet();
 
     var backdrop = $('ntSheetBackdrop');
@@ -511,6 +608,7 @@
     setTimeout(function () { if (!sheet) backdrop.hidden = true; }, 280);
     var input = $('ntAddrInput');
     if (document.activeElement === input) input.blur();
+    hideMainButton();
     restoreBack();
   }
 
@@ -527,18 +625,45 @@
     }
   }
 
+  var locationLoading = null;
+
+  // locationManager.js, the first time a location is needed.
+  function loadLocationManager() {
+    if (window.LocationManager && LocationManager.request) return Promise.resolve();
+    if (locationLoading) return locationLoading;
+    locationLoading = new Promise(function (resolve, reject) {
+      var js = document.createElement('script');
+      js.src = '../../js/locationManager.js';
+      js.onload = function () {
+        if (window.LocationManager && LocationManager.request) resolve();
+        else reject(new Error('no LocationManager'));
+      };
+      js.onerror = function () {
+        locationLoading = null;   // a later tap may try again
+        reject(new Error('locationManager.js failed to load'));
+      };
+      document.head.appendChild(js);
+    });
+    return locationLoading;
+  }
+
   function locate() {
     if (!sheet) return;
     var s = sheet;
     s.locating = true;
     s.locError = false;
     renderSheet();
-    if (!window.LocationManager || !LocationManager.request) {
+    loadLocationManager().then(function () {
+      if (sheet === s) locateNow(s);
+    }, function () {
+      if (sheet !== s) return;
       s.locating = false;
       s.locError = true;
       renderSheet();
-      return;
-    }
+    });
+  }
+
+  function locateNow(s) {
     var req = LocationManager.request(true);
     // The fresh fix, not the saved one: the saved location ignores moves
     // under 3 km, which is too coarse for a 5 km circle.
@@ -690,7 +815,20 @@
   }
 
   function updateSave() {
-    $('ntSheetSave').disabled = !canSave();
+    var ok = canSave();
+    $('ntSheetSave').disabled = !ok;
+    var mb = mainButton();
+    if (!mb || !sheet) return;
+    try {
+      if (sheet.saving) {
+        mb.showProgress(false);
+      } else {
+        mb.hideProgress();
+        // A disabled MainButton looks the same as an enabled one on some
+        // clients, so the colour says it too.
+        mb.setParams({ is_active: ok, color: ok ? '#059669' : '#9fb5ab' });
+      }
+    } catch (e) {}
   }
 
   // --- Live preview: rings scale with the radius; dots are real places ---
@@ -875,6 +1013,24 @@
   function save() {
     if (!canSave()) return;
     var s = sheet;
+    // A new area: first make sure the bot may message this person.
+    if (s.editId == null && !s.writeChecked) {
+      s.saving = true;
+      updateSave();
+      ensureWriteAccess().then(function (ok) {
+        if (sheet !== s) return;
+        s.saving = false;
+        if (!ok) {
+          updateSave();
+          haptic('error');
+          setSheetError(T('watch.needsWrite'));
+          return;
+        }
+        s.writeChecked = true;
+        save();
+      });
+      return;
+    }
     var body = { radiusKm: s.radius, types: s.types.slice(), lang: lang() };
     if (s.source === 'location') {
       var c = s.centers.location;
@@ -961,6 +1117,7 @@
 
   function bind() {
     $('ntRetry').addEventListener('click', load);
+    $('ntAllow').addEventListener('click', allowMessages);
     $('ntEmptyAddArea').addEventListener('click', function () { openSheet(null); });
     $('ntAddArea').addEventListener('click', function () { openSheet(null); });
 
@@ -1067,6 +1224,7 @@
       render();
       if (sheet) {
         $('ntSheetTitle').textContent = T(sheet.editId != null ? 'areaSheet.editTitle' : 'areaSheet.addTitle');
+        showMainButton();
         renderSheet();
       }
     });
