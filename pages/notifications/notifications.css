@@ -717,10 +717,6 @@ a.nt-chip:hover, a.nt-chip:active { background: var(--pl-accent-soft); color: va
   border-top: 1px solid var(--pl-line);
 }
 
-/* Inside Telegram the sheet saves with Telegram's own bottom button. */
-.uses-main-button .pd-sheet-actions { display: none; }
-.uses-main-button .nt-sheet-body { padding-bottom: 20px; }
-
 .pd-sheet-btn {
   flex: 1;
   padding: 13px 18px;

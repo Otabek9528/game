@@ -4,7 +4,9 @@
 // page only manages what triggers them. Every word comes from places.text.js.
 //
 // Bot message buttons link here as notifications.html?stop=place:<id> or
-// ?stop=area:<id>; that unsubscribes first, then shows the page.
+// ?stop=area:<id>; that unsubscribes first, then shows the page. Messages
+// sent before the page moved here link to pages/places/notifications.html,
+// which forwards to this page.
 //
 // locationManager.js is loaded only when "My location" is used, so opening
 // the page does not start a location fix.
@@ -236,7 +238,7 @@
   // Shortcuts into the three place lists, where watching starts.
   function typeLinks() {
     return TYPES.map(function (t) {
-      return '<a class="nt-chip" href="places.html?type=' + t + '"><span class="nt-chip-emoji" aria-hidden="true">' +
+      return '<a class="nt-chip" href="../places/places.html?type=' + t + '"><span class="nt-chip-emoji" aria-hidden="true">' +
         EMOJI[t] + '</span>' + esc(T('types.' + t + 's')) + '</a>';
     }).join('');
   }
@@ -400,7 +402,7 @@
 
   function openPlace(row) {
     var type = row.getAttribute('data-type') || 'mosque';
-    window.location.href = 'places-detail.html?type=' + encodeURIComponent(type) +
+    window.location.href = '../places/places-detail.html?type=' + encodeURIComponent(type) +
       '&id=' + encodeURIComponent(row.getAttribute('data-place'));
   }
 
@@ -512,39 +514,6 @@
 
   function isSheetOpen() { return !!sheet; }
 
-  // Inside Telegram, Save is Telegram's own button at the bottom of the
-  // screen: it stays above the keyboard while an address is typed, where the
-  // sheet's button would be covered. Elsewhere the sheet keeps its buttons.
-  function mainButton() {
-    try {
-      if (tg && tg.initData && tg.MainButton && tg.MainButton.setParams) return tg.MainButton;
-    } catch (e) {}
-    return null;
-  }
-
-  function showMainButton() {
-    var mb = mainButton();
-    $('ntSheet').classList.toggle('uses-main-button', !!mb);
-    if (!mb) return;
-    try {
-      mb.offClick(save);
-      mb.onClick(save);
-      mb.setParams({ text: T('common.save'), text_color: '#ffffff', is_visible: true });
-    } catch (e) {
-      $('ntSheet').classList.remove('uses-main-button');
-    }
-  }
-
-  function hideMainButton() {
-    var mb = mainButton();
-    if (!mb) return;
-    try {
-      mb.offClick(save);
-      mb.hideProgress();
-      mb.hide();
-    } catch (e) {}
-  }
-
   function openSheet(area) {
     closeMenu();
     sheet = {
@@ -578,7 +547,6 @@
     $('ntSheetTitle').textContent = T(area ? 'areaSheet.editTitle' : 'areaSheet.addTitle');
     setSheetError('');
     loadLeaflet();
-    showMainButton();
     renderSheet();
 
     var backdrop = $('ntSheetBackdrop');
@@ -608,7 +576,6 @@
     setTimeout(function () { if (!sheet) backdrop.hidden = true; }, 280);
     var input = $('ntAddrInput');
     if (document.activeElement === input) input.blur();
-    hideMainButton();
     restoreBack();
   }
 
@@ -815,20 +782,7 @@
   }
 
   function updateSave() {
-    var ok = canSave();
-    $('ntSheetSave').disabled = !ok;
-    var mb = mainButton();
-    if (!mb || !sheet) return;
-    try {
-      if (sheet.saving) {
-        mb.showProgress(false);
-      } else {
-        mb.hideProgress();
-        // A disabled MainButton looks the same as an enabled one on some
-        // clients, so the colour says it too.
-        mb.setParams({ is_active: ok, color: ok ? '#059669' : '#9fb5ab' });
-      }
-    } catch (e) {}
+    $('ntSheetSave').disabled = !canSave();
   }
 
   // --- Live preview: rings scale with the radius; dots are real places ---
@@ -1224,7 +1178,6 @@
       render();
       if (sheet) {
         $('ntSheetTitle').textContent = T(sheet.editId != null ? 'areaSheet.editTitle' : 'areaSheet.addTitle');
-        showMainButton();
         renderSheet();
       }
     });

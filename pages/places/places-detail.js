@@ -1858,47 +1858,6 @@ const Notify = (function () {
     var btn = $('pdAnnSend');
     btn.disabled = on;
     btn.textContent = T(on ? 'announce.sending' : 'announce.submit');
-    var mb = mainButton();
-    if (mb && isOpen()) {
-      try {
-        if (on) { mb.showProgress(false); mb.disable(); }
-        else { mb.hideProgress(); mb.enable(); }
-      } catch (e) {}
-    }
-  }
-
-  // Inside Telegram the send button is Telegram's own, at the bottom of the
-  // screen: it stays above the keyboard while typing, where the sheet's
-  // button would be covered. Elsewhere the sheet keeps its own buttons.
-  function mainButton() {
-    try {
-      if (tg && tg.initData && tg.MainButton && tg.MainButton.setParams) return tg.MainButton;
-    } catch (e) {}
-    return null;
-  }
-
-  function showMainButton() {
-    var mb = mainButton();
-    $('pdAnnSheet').classList.toggle('uses-main-button', !!mb);
-    if (!mb) return;
-    try {
-      mb.setParams({ text: T('announce.submit'), color: '#059669', text_color: '#ffffff',
-                     is_active: true, is_visible: true });
-      mb.offClick(send);
-      mb.onClick(send);
-    } catch (e) {
-      $('pdAnnSheet').classList.remove('uses-main-button');
-    }
-  }
-
-  function hideMainButton() {
-    var mb = mainButton();
-    if (!mb) return;
-    try {
-      mb.offClick(send);
-      mb.hideProgress();
-      mb.hide();
-    } catch (e) {}
   }
 
   function onBack() { closeSheet(); }
@@ -1914,13 +1873,12 @@ const Notify = (function () {
     $('pdAnnPlace').textContent = place.name || '';
     $('pdAnnReach').hidden = true;
     setError('');
+    setSending(false);
     updateCounter();
 
     var backdrop = $('pdAnnBackdrop');
     var sheet = $('pdAnnSheet');
     backdrop.hidden = false;
-    showMainButton();
-    setSending(false);
     requestAnimationFrame(function () {
       backdrop.classList.add('visible');
       sheet.classList.add('visible');
@@ -1955,7 +1913,6 @@ const Notify = (function () {
     setTimeout(function () { if (!sheet.classList.contains('visible')) backdrop.hidden = true; }, 280);
     var area = $('pdAnnText');
     if (document.activeElement === area) area.blur();
-    hideMainButton();
     try {
       tg.BackButton.offClick(onBack);
       tg.BackButton.onClick(handleMainBackButton);
@@ -2018,10 +1975,7 @@ const Notify = (function () {
 
   window.addEventListener('languageChanged', function () {
     render();
-    if (isOpen()) {
-      showMainButton();
-      setSending(sending);
-    }
+    if (isOpen()) setSending(sending);
   });
 
   window.PlaceAnnounce = { mount: mount };

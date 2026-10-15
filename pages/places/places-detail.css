@@ -1094,10 +1094,6 @@
   flex-shrink: 0;
 }
 
-/* Inside Telegram the composer sends with Telegram's own bottom button. */
-.uses-main-button .pd-sheet-actions { display: none; }
-.uses-main-button .pd-sheet-body { padding-bottom: 20px; }
-
 .pd-sheet-btn {
   flex: 1;
   padding: 13px 18px;
