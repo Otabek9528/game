@@ -6,7 +6,10 @@ plugins {
 
 android {
     namespace = "com.vegukin.muslim_vegukin"
-    compileSdk = flutter.compileSdkVersion
+    // 37, not Flutter's default 36: permission_handler (camera access for the
+    // ingredient scanner) requires it. This only sets which Android APIs the
+    // code is compiled against; phones running older Android are unaffected.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
