@@ -7,9 +7,20 @@ touched by anything here.
 **What exists so far**
 
 - First-launch language screen (Uzbek / Russian / English), remembered on the
-  phone. Later it can be changed from inside the app.
-- A placeholder home screen.
+  phone. Later it can be changed from the home screen.
+- Home screen, same layout as the web app: prayer card (date, Hijri date,
+  city, countdown, the day's six times), business directory band, and every
+  section as a tile.
+- Sections open their **web pages inside the app** until each one is rebuilt
+  natively. The app stands in for Telegram, so the pages' back button, links,
+  pop-ups and vibration work. Anything that signs the user in (posting,
+  reviews, watches, notifications) still needs Telegram for now.
+- Sections that exist only in Uzbek are shown to everyone, tagged **UZ**.
 - Android app name, launcher icon and splash screen.
+
+The web pages are loaded from the address in `lib/core/config.dart`
+(`webBase`, this repository's GitHub Pages site). Change it there if the bot
+serves them from somewhere else.
 
 ---
 
@@ -73,25 +84,30 @@ uninstall the app, then run it again.
 
 ```
 mobile/
-├── lib/                        ← all the app's code (Dart)
-│   ├── main.dart               ← starts the app
-│   ├── app.dart                ← theme, languages, first screen
+├── lib/                          ← all the app's code (Dart)
+│   ├── main.dart                 ← starts the app, creates the services
+│   ├── app.dart                  ← theme, languages, first screen
+│   ├── app_services.dart         ← what every screen can use
 │   ├── core/
-│   │   ├── app_language.dart   ← the three languages + phone-language guess
-│   │   ├── locale_controller.dart ← remembers the chosen language
-│   │   ├── theme.dart          ← colours and fonts (from the web app)
-│   │   └── widgets/khatam.dart ← the eight-pointed star mark and patterns
+│   │   ├── config.dart           ← web app and API addresses
+│   │   ├── app_language.dart     ← the three languages + phone-language guess
+│   │   ├── locale_controller.dart← remembers the chosen language
+│   │   ├── key_value_store.dart  ← small saved values (location, times)
+│   │   ├── theme.dart            ← colours and fonts (from the web app)
+│   │   └── widgets/khatam.dart   ← the eight-pointed star mark and patterns
 │   ├── features/
 │   │   ├── onboarding/language_screen.dart
-│   │   └── home/home_screen.dart
-│   └── l10n/                   ← translations
-│       ├── app_uz.arb          ← Uzbek (main file, with notes for translators)
+│   │   ├── home/                 ← home screen, prayer card, list of sections
+│   │   ├── prayer/               ← location, prayer times, countdown logic
+│   │   └── web/web_feature_screen.dart ← shows a web page, plays Telegram's part
+│   └── l10n/                     ← translations
+│       ├── app_uz.arb            ← Uzbek (main file, with notes for translators)
 │       ├── app_ru.arb
 │       └── app_en.arb
-├── assets/fonts/               ← Playfair Display, Amiri (+ their licence)
-├── test/                       ← automatic tests
-├── android/                    ← Android-only settings (icon, splash, name)
-└── ios/                        ← iOS-only settings (later)
+├── assets/fonts/                 ← Playfair Display, Amiri (+ their licence)
+├── test/                         ← automatic tests
+├── android/                      ← Android-only settings (icon, splash, permissions)
+└── ios/                          ← iOS-only settings (later)
 ```
 
 **Adding or changing text**: edit the three `.arb` files (same key in each),

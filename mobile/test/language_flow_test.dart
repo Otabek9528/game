@@ -1,48 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muslim_vegukin/app.dart';
-import 'package:muslim_vegukin/core/locale_controller.dart';
+import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
 
-class MemoryStore implements LanguageStore {
-  MemoryStore([this.value]);
-
-  String? value;
-
-  @override
-  String? read() => value;
-
-  @override
-  Future<void> write(String code) async => value = code;
-}
-
-/// Starts the app on a phone-sized screen (by default 411×891, a Pixel 7).
-Future<MemoryStore> launch(
-  WidgetTester tester, {
-  String? saved,
-  List<Locale> device = const [Locale('ko')],
-  Size screen = const Size(411, 891),
-  double textScale = 1,
-}) async {
-  tester.view
-    ..physicalSize = screen * 3
-    ..devicePixelRatio = 3;
-  tester.platformDispatcher.textScaleFactorTestValue = textScale;
-  addTearDown(tester.view.reset);
-  addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-
-  final store = MemoryStore(saved);
-  await tester.pumpWidget(VegukinApp(
-    controller: LocaleController(store),
-    deviceLocales: device,
-  ));
-  await tester.pumpAndSettle();
-  return store;
-}
+import 'support/fakes.dart';
 
 void main() {
   testWidgets('first launch asks for a language, pre-selecting the phone one',
       (tester) async {
-    final store = await launch(tester, device: const [Locale('ru')]);
+    final app = TestApp();
+    await app.launch(tester, device: const [Locale('ru')]);
 
     expect(find.text('O‘zbekcha'), findsOneWidget);
     expect(find.text('Русский'), findsOneWidget);
@@ -50,12 +16,19 @@ void main() {
     expect(find.text('На каком языке продолжим?'), findsOneWidget);
     expect(find.text('Продолжить'), findsOneWidget);
     // Nothing is saved until the user confirms.
-    expect(store.value, isNull);
+    expect(app.languageStore.value, isNull);
+  });
+
+  testWidgets('first launch never asks for location on its own', (tester) async {
+    final app = TestApp(location: FakeLocation(access: LocationAccess.denied));
+    await app.launch(tester);
+
+    expect(app.location.requests, 0);
   });
 
   testWidgets('each option describes itself in its own language',
       (tester) async {
-    await launch(tester);
+    await TestApp().launch(tester);
 
     expect(find.text('Barcha bo‘limlar mavjud'), findsOneWidget);
     expect(find.text('Часть разделов пока только на узбекском'), findsOneWidget);
@@ -64,32 +37,34 @@ void main() {
 
   testWidgets('picking a language previews it, Continue saves it',
       (tester) async {
-    final store = await launch(tester);
+    final app = TestApp();
+    await app.launch(tester);
     expect(find.text('Davom etish'), findsOneWidget);
 
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(find.text('Which language suits you?'), findsOneWidget);
     expect(find.text('Davom etish'), findsNothing);
-    expect(store.value, isNull);
+    expect(app.languageStore.value, isNull);
 
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    expect(store.value, 'en');
-    expect(find.text('The home screen is the next step.'), findsOneWidget);
+    expect(app.languageStore.value, 'en');
+    expect(find.text('Business Directory'), findsOneWidget);
   });
 
   testWidgets('a saved language skips the picker', (tester) async {
-    await launch(tester, saved: 'ru');
+    await TestApp(language: 'ru').launch(tester);
 
     expect(find.text('Русский'), findsNothing);
-    expect(find.text('Главная'), findsOneWidget);
+    expect(find.text('Бизнес-каталог'), findsOneWidget);
   });
 
   testWidgets('the language can be changed later from home', (tester) async {
-    final store = await launch(tester, saved: 'en');
+    final app = TestApp(language: 'en');
+    await app.launch(tester);
 
-    await tester.tap(find.text('Change language'));
+    await tester.tap(find.byTooltip('Change language'));
     await tester.pumpAndSettle();
     expect(find.text('Save'), findsOneWidget);
 
@@ -98,12 +73,13 @@ void main() {
     await tester.tap(find.text('Saqlash'));
     await tester.pumpAndSettle();
 
-    expect(store.value, 'uz');
-    expect(find.text('Bosh sahifa'), findsOneWidget);
+    expect(app.languageStore.value, 'uz');
+    expect(find.text('Biznes Katalogi'), findsOneWidget);
   });
 
   testWidgets('fits a small phone with very large text', (tester) async {
-    await launch(tester, screen: const Size(320, 568), textScale: 1.8);
+    final app = TestApp();
+    await app.launch(tester, screen: const Size(320, 568), textScale: 1.8);
 
     // Overflow would have failed the test already; the button must still be
     // reachable by scrolling.
@@ -114,11 +90,12 @@ void main() {
     );
     await tester.tap(find.text('Davom etish'));
     await tester.pumpAndSettle();
-    expect(find.text('Bosh sahifa'), findsOneWidget);
+    expect(app.languageStore.value, 'uz');
   });
 
   testWidgets('still usable with the phone turned sideways', (tester) async {
-    final store = await launch(tester, screen: const Size(891, 411));
+    final app = TestApp();
+    await app.launch(tester, screen: const Size(891, 411));
 
     await tester.scrollUntilVisible(
       find.text('Davom etish'),
@@ -127,6 +104,6 @@ void main() {
     );
     await tester.tap(find.text('Davom etish'));
     await tester.pumpAndSettle();
-    expect(store.value, 'uz');
+    expect(app.languageStore.value, 'uz');
   });
 }

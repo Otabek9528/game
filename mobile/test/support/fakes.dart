@@ -1,0 +1,178 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:muslim_vegukin/app.dart';
+import 'package:muslim_vegukin/app_services.dart';
+import 'package:muslim_vegukin/core/key_value_store.dart';
+import 'package:muslim_vegukin/core/locale_controller.dart';
+import 'package:muslim_vegukin/features/home/feature_catalog.dart';
+import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
+import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
+import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
+
+class MemoryLanguageStore implements LanguageStore {
+  MemoryLanguageStore([this.value]);
+
+  String? value;
+
+  @override
+  String? read() => value;
+
+  @override
+  Future<void> write(String code) async => value = code;
+}
+
+class MemoryStore implements KeyValueStore {
+  final values = <String, String>{};
+
+  @override
+  String? read(String key) => values[key];
+
+  @override
+  Future<void> write(String key, String value) async => values[key] = value;
+}
+
+class FakeLocation implements LocationSource {
+  FakeLocation({
+    this.access = LocationAccess.granted,
+    this.afterRequest = LocationAccess.granted,
+    this.lat = 37.32,
+    this.lon = 126.83,
+    this.city = 'Ansan',
+  });
+
+  LocationAccess access;
+  LocationAccess afterRequest;
+  double lat;
+  double lon;
+  String? city;
+  bool failFix = false;
+  int requests = 0;
+  int fixes = 0;
+  int cityLookups = 0;
+
+  @override
+  Future<LocationAccess> check() async => access;
+
+  @override
+  Future<LocationAccess> request() async {
+    requests++;
+    return access = afterRequest;
+  }
+
+  @override
+  Future<({double lat, double lon})> current() async {
+    fixes++;
+    if (failFix) throw Exception('no fix');
+    return (lat: lat, lon: lon);
+  }
+
+  @override
+  Future<String?> cityName(double lat, double lon) async {
+    cityLookups++;
+    return city;
+  }
+
+  @override
+  Future<void> openAppSettings() async {}
+
+  @override
+  Future<void> openLocationSettings() async {}
+}
+
+/// Returns the same clock times every day: 05:00, 06:30, 12:00, 15:30,
+/// 18:00, 19:30.
+class FakeTimes implements PrayerTimesSource {
+  int calls = 0;
+  bool fail = false;
+  PrayerSettings? lastSettings;
+
+  @override
+  Future<PrayerDay> fetchDay(DateTime day, SavedLocation place, PrayerSettings settings) async {
+    calls++;
+    lastSettings = settings;
+    if (fail) throw Exception('offline');
+    return dayAt(day, key: PrayerDay.keyFor(day, settings, place));
+  }
+}
+
+PrayerDay dayAt(DateTime day, {String key = 'k'}) {
+  DateTime at(int h, int m) => DateTime(day.year, day.month, day.day, h, m);
+  return PrayerDay(
+    date: DateTime(day.year, day.month, day.day),
+    times: {
+      Prayer.fajr: at(5, 0),
+      Prayer.sunrise: at(6, 30),
+      Prayer.dhuhr: at(12, 0),
+      Prayer.asr: at(15, 30),
+      Prayer.maghrib: at(18, 0),
+      Prayer.isha: at(19, 30),
+    },
+    hijriDay: 6,
+    hijriMonth: 5,
+    hijriYear: 1448,
+    key: key,
+  );
+}
+
+/// Saturday 17 October 2026, 11:00 — between sunrise and Dhuhr.
+final testNow = DateTime(2026, 10, 17, 11, 0, 0);
+
+class OpenedFeatures {
+  final ids = <String>[];
+  void call(BuildContext context, Feature feature, AppServices services) => ids.add(feature.id);
+}
+
+class TestApp {
+  TestApp({
+    String? language,
+    FakeLocation? location,
+    FakeTimes? times,
+    MemoryStore? store,
+    DateTime? now,
+    BusinessStats? stats = const BusinessStats(businesses: 5, categories: 10),
+  })  : languageStore = MemoryLanguageStore(language),
+        location = location ?? FakeLocation(),
+        times = times ?? FakeTimes(),
+        store = store ?? MemoryStore() {
+    final clockNow = now ?? testNow;
+    prayer = PrayerController(
+      location: this.location,
+      times: this.times,
+      store: this.store,
+      clock: () => clockNow,
+    );
+    services = AppServices(
+      locale: LocaleController(languageStore),
+      prayer: prayer,
+      openFeature: opened.call,
+      businessStats: () async => stats,
+    );
+  }
+
+  final MemoryLanguageStore languageStore;
+  final FakeLocation location;
+  final FakeTimes times;
+  final MemoryStore store;
+  final opened = OpenedFeatures();
+  late final PrayerController prayer;
+  late final AppServices services;
+
+  /// Starts the app on a phone-sized screen (by default 411×891, a Pixel 7).
+  Future<void> launch(
+    WidgetTester tester, {
+    List<Locale> device = const [Locale('ko')],
+    Size screen = const Size(411, 891),
+    double textScale = 1,
+  }) async {
+    tester.view
+      ..physicalSize = screen * 3
+      ..devicePixelRatio = 3;
+    tester.platformDispatcher.textScaleFactorTestValue = textScale;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await prayer.start();
+    await tester.pumpWidget(VegukinApp(services: services, deviceLocales: device));
+    await tester.pumpAndSettle();
+  }
+}

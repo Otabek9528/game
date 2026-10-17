@@ -36,18 +36,86 @@
     "description": "Reassurance under the first-launch button."
   },
 
-  "homeTitle": "Bosh sahifa",
-  "@homeTitle": {
-    "description": "Title of the home screen."
-  },
-
-  "homePlaceholder": "Bosh sahifa keyingi bosqichda quriladi.",
-  "@homePlaceholder": {
-    "description": "Temporary text until the home screen is built."
-  },
-
   "changeLanguage": "Tilni o‘zgartirish",
   "@changeLanguage": {
     "description": "Opens the language picker from inside the app."
-  }
+  },
+
+  "prayerFajr": "Bomdod",
+  "@prayerFajr": { "description": "Short prayer name, fits a sixth of the screen width." },
+  "prayerSunrise": "Quyosh",
+  "@prayerSunrise": { "description": "Sunrise: the end of Fajr, not a prayer. Short form." },
+  "prayerDhuhr": "Peshin",
+  "prayerAsr": "Asr",
+  "prayerMaghrib": "Shom",
+  "prayerIsha": "Xufton",
+
+  "untilFajr": "Bomdodgacha",
+  "@untilFajr": { "description": "Label above the countdown to the next prayer." },
+  "untilFajrEnds": "Bomdod tugashiga",
+  "@untilFajrEnds": { "description": "Countdown label between Fajr and sunrise: time left for Fajr." },
+  "untilDhuhr": "Peshingacha",
+  "untilAsr": "Asrgacha",
+  "untilMaghrib": "Shomgacha",
+  "untilIsha": "Xuftongacha",
+
+  "locationPlaceholder": "Joylashuv",
+  "@locationPlaceholder": { "description": "Shown instead of a city name before the first location fix." },
+  "locating": "Aniqlanmoqda…",
+  "locationJustNow": "Hozirgina",
+  "@locationJustNow": { "description": "How old the saved location is: under a minute." },
+  "locationMinutesAgo": "{count} daqiqa oldin",
+  "@locationMinutesAgo": { "placeholders": { "count": { "type": "int" } } },
+  "locationHoursAgo": "{count} soat oldin",
+  "@locationHoursAgo": { "placeholders": { "count": { "type": "int" } } },
+  "locationDaysAgo": "{count} kun oldin",
+  "@locationDaysAgo": { "placeholders": { "count": { "type": "int" } } },
+  "locationFailedShort": "Aniqlab bo‘lmadi",
+  "refreshLocation": "Joylashuvni yangilash",
+  "@refreshLocation": { "description": "Screen-reader label of the city chip." },
+
+  "locationNeededTitle": "Namoz vaqtlari uchun joylashuv kerak",
+  "locationNeededBody": "Vaqtlar shahringiz bo‘yicha hisoblanadi. Joylashuv faqat shu uchun ishlatiladi.",
+  "useMyLocation": "Joylashuvni aniqlash",
+  "locationDeniedBody": "Ilovaga joylashuvga ruxsat berilmagan. Uni ilova sozlamalarida yoqing.",
+  "openSettings": "Sozlamalarni ochish",
+  "locationOffBody": "Telefonda joylashuv (GPS) o‘chirilgan.",
+  "turnOnLocation": "Yoqish",
+  "locationFailedBody": "Joylashuvni aniqlab bo‘lmadi.",
+  "timesFailedBody": "Namoz vaqtlarini yuklab bo‘lmadi. Internetni tekshiring.",
+  "retry": "Qayta urinish",
+
+  "newBadge": "Yangi",
+  "@newBadge": { "description": "Small tag on new sections. Keep it one short word." },
+  "uzOnlyHint": "Faqat o‘zbek tilida",
+  "@uzOnlyHint": { "description": "Screen-reader text of the UZ tag on Uzbek-only sections." },
+
+  "featurePrayers": "Namoz vaqtlari",
+  "featureMosques": "Masjidlar",
+  "featureRestaurants": "Oshxonalar",
+  "featureShops": "Do‘konlar",
+  "featureNotifications": "Bildirishnomalar",
+  "featureQibla": "Qibla",
+  "featureQna": "Zikr ahlidan so‘rang",
+  "featureBarcode": "Mahsulot tarkibini tekshirish",
+  "featureHousing": "Uy-joy e’lonlari",
+  "featureCars": "Vegukin Cars",
+  "featureHikorea": "Immigratsiya xizmatlari",
+  "featureJobs": "Ish e’lonlari",
+  "featureParcel": "Pochta",
+  "featureLinks": "Foydali linklar",
+  "featureDonation": "Qo‘llab-quvvatlash",
+  "featureCommunity": "Jamoa",
+  "featureBusiness": "Biznes Katalogi",
+
+  "businessTagline": "Koreyadagi o‘zbek bizneslari",
+  "@businessTagline": { "description": "Under the business directory title until the live count loads." },
+  "businessCount": "{count} ta biznes",
+  "@businessCount": { "placeholders": { "count": { "type": "int" } } },
+  "categoryCount": "{count} ta yo‘nalish",
+  "@categoryCount": { "placeholders": { "count": { "type": "int" } } },
+
+  "webLoadFailed": "Sahifani ochib bo‘lmadi. Internetni tekshiring.",
+  "webReload": "Yangilash",
+  "webOpenInBrowser": "Brauzerda ochish"
 }

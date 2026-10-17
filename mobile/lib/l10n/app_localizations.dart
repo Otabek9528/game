@@ -142,23 +142,341 @@ abstract class AppLocalizations {
   /// **'Tilni keyinroq sozlamalardan o‘zgartirish mumkin'**
   String get changeLaterHint;
 
-  /// Title of the home screen.
-  ///
-  /// In uz, this message translates to:
-  /// **'Bosh sahifa'**
-  String get homeTitle;
-
-  /// Temporary text until the home screen is built.
-  ///
-  /// In uz, this message translates to:
-  /// **'Bosh sahifa keyingi bosqichda quriladi.'**
-  String get homePlaceholder;
-
   /// Opens the language picker from inside the app.
   ///
   /// In uz, this message translates to:
   /// **'Tilni o‘zgartirish'**
   String get changeLanguage;
+
+  /// Short prayer name, fits a sixth of the screen width.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod'**
+  String get prayerFajr;
+
+  /// Sunrise: the end of Fajr, not a prayer. Short form.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh'**
+  String get prayerSunrise;
+
+  /// No description provided for @prayerDhuhr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Peshin'**
+  String get prayerDhuhr;
+
+  /// No description provided for @prayerAsr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Asr'**
+  String get prayerAsr;
+
+  /// No description provided for @prayerMaghrib.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shom'**
+  String get prayerMaghrib;
+
+  /// No description provided for @prayerIsha.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xufton'**
+  String get prayerIsha;
+
+  /// Label above the countdown to the next prayer.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdodgacha'**
+  String get untilFajr;
+
+  /// Countdown label between Fajr and sunrise: time left for Fajr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod tugashiga'**
+  String get untilFajrEnds;
+
+  /// No description provided for @untilDhuhr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Peshingacha'**
+  String get untilDhuhr;
+
+  /// No description provided for @untilAsr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Asrgacha'**
+  String get untilAsr;
+
+  /// No description provided for @untilMaghrib.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shomgacha'**
+  String get untilMaghrib;
+
+  /// No description provided for @untilIsha.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xuftongacha'**
+  String get untilIsha;
+
+  /// Shown instead of a city name before the first location fix.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuv'**
+  String get locationPlaceholder;
+
+  /// No description provided for @locating.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aniqlanmoqda…'**
+  String get locating;
+
+  /// How old the saved location is: under a minute.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozirgina'**
+  String get locationJustNow;
+
+  /// No description provided for @locationMinutesAgo.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} daqiqa oldin'**
+  String locationMinutesAgo(int count);
+
+  /// No description provided for @locationHoursAgo.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} soat oldin'**
+  String locationHoursAgo(int count);
+
+  /// No description provided for @locationDaysAgo.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} kun oldin'**
+  String locationDaysAgo(int count);
+
+  /// No description provided for @locationFailedShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aniqlab bo‘lmadi'**
+  String get locationFailedShort;
+
+  /// Screen-reader label of the city chip.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvni yangilash'**
+  String get refreshLocation;
+
+  /// No description provided for @locationNeededTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz vaqtlari uchun joylashuv kerak'**
+  String get locationNeededTitle;
+
+  /// No description provided for @locationNeededBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vaqtlar shahringiz bo‘yicha hisoblanadi. Joylashuv faqat shu uchun ishlatiladi.'**
+  String get locationNeededBody;
+
+  /// No description provided for @useMyLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvni aniqlash'**
+  String get useMyLocation;
+
+  /// No description provided for @locationDeniedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ilovaga joylashuvga ruxsat berilmagan. Uni ilova sozlamalarida yoqing.'**
+  String get locationDeniedBody;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sozlamalarni ochish'**
+  String get openSettings;
+
+  /// No description provided for @locationOffBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonda joylashuv (GPS) o‘chirilgan.'**
+  String get locationOffBody;
+
+  /// No description provided for @turnOnLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get turnOnLocation;
+
+  /// No description provided for @locationFailedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvni aniqlab bo‘lmadi.'**
+  String get locationFailedBody;
+
+  /// No description provided for @timesFailedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz vaqtlarini yuklab bo‘lmadi. Internetni tekshiring.'**
+  String get timesFailedBody;
+
+  /// No description provided for @retry.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinish'**
+  String get retry;
+
+  /// Small tag on new sections. Keep it one short word.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi'**
+  String get newBadge;
+
+  /// Screen-reader text of the UZ tag on Uzbek-only sections.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faqat o‘zbek tilida'**
+  String get uzOnlyHint;
+
+  /// No description provided for @featurePrayers.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz vaqtlari'**
+  String get featurePrayers;
+
+  /// No description provided for @featureMosques.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masjidlar'**
+  String get featureMosques;
+
+  /// No description provided for @featureRestaurants.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oshxonalar'**
+  String get featureRestaurants;
+
+  /// No description provided for @featureShops.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘konlar'**
+  String get featureShops;
+
+  /// No description provided for @featureNotifications.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar'**
+  String get featureNotifications;
+
+  /// No description provided for @featureQibla.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qibla'**
+  String get featureQibla;
+
+  /// No description provided for @featureQna.
+  ///
+  /// In uz, this message translates to:
+  /// **'Zikr ahlidan so‘rang'**
+  String get featureQna;
+
+  /// No description provided for @featureBarcode.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulot tarkibini tekshirish'**
+  String get featureBarcode;
+
+  /// No description provided for @featureHousing.
+  ///
+  /// In uz, this message translates to:
+  /// **'Uy-joy e’lonlari'**
+  String get featureHousing;
+
+  /// No description provided for @featureCars.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vegukin Cars'**
+  String get featureCars;
+
+  /// No description provided for @featureHikorea.
+  ///
+  /// In uz, this message translates to:
+  /// **'Immigratsiya xizmatlari'**
+  String get featureHikorea;
+
+  /// No description provided for @featureJobs.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish e’lonlari'**
+  String get featureJobs;
+
+  /// No description provided for @featureParcel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pochta'**
+  String get featureParcel;
+
+  /// No description provided for @featureLinks.
+  ///
+  /// In uz, this message translates to:
+  /// **'Foydali linklar'**
+  String get featureLinks;
+
+  /// No description provided for @featureDonation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘llab-quvvatlash'**
+  String get featureDonation;
+
+  /// No description provided for @featureCommunity.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jamoa'**
+  String get featureCommunity;
+
+  /// No description provided for @featureBusiness.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznes Katalogi'**
+  String get featureBusiness;
+
+  /// Under the business directory title until the live count loads.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreyadagi o‘zbek bizneslari'**
+  String get businessTagline;
+
+  /// No description provided for @businessCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta biznes'**
+  String businessCount(int count);
+
+  /// No description provided for @categoryCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta yo‘nalish'**
+  String categoryCount(int count);
+
+  /// No description provided for @webLoadFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sahifani ochib bo‘lmadi. Internetni tekshiring.'**
+  String get webLoadFailed;
+
+  /// No description provided for @webReload.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangilash'**
+  String get webReload;
+
+  /// No description provided for @webOpenInBrowser.
+  ///
+  /// In uz, this message translates to:
+  /// **'Brauzerda ochish'**
+  String get webOpenInBrowser;
 }
 
 class _AppLocalizationsDelegate

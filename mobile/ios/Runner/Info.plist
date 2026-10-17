@@ -6,6 +6,10 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Prayer times and nearby places are shown for your city.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The ingredient check scans product barcodes with the camera.</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>uz</string>

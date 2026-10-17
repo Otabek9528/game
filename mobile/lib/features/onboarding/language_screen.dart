@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../app_services.dart';
 import '../../core/app_language.dart';
-import '../../core/locale_controller.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
@@ -18,12 +18,12 @@ import '../home/home_screen.dart';
 class LanguageScreen extends StatefulWidget {
   const LanguageScreen({
     super.key,
-    required this.controller,
+    required this.services,
     required this.initialLanguage,
     this.isOnboarding = true,
   });
 
-  final LocaleController controller;
+  final AppServices services;
 
   /// Highlighted when the screen opens: the saved choice, or a guess from the
   /// phone's settings on first launch.
@@ -79,7 +79,7 @@ class _LanguageScreenState extends State<LanguageScreen>
     if (_saving) return;
     setState(() => _saving = true);
     HapticFeedback.lightImpact();
-    await widget.controller.choose(_selected);
+    await widget.services.locale.choose(_selected);
     if (!mounted) return;
 
     final navigator = Navigator.of(context);
@@ -90,7 +90,7 @@ class _LanguageScreenState extends State<LanguageScreen>
     navigator.pushReplacement(
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 450),
-        pageBuilder: (_, _, _) => HomeScreen(controller: widget.controller),
+        pageBuilder: (_, _, _) => HomeScreen(services: widget.services),
         transitionsBuilder: (_, animation, _, child) => FadeTransition(
           opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
           child: child,
