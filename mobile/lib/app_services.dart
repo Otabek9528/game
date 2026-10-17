@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 import 'core/config.dart';
+import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/prayer/prayer_controller.dart';
+import 'features/widget/home_widget_bridge.dart';
 
 /// Opens a section: for now, its web page inside the app.
 typedef FeatureOpener = void Function(
@@ -42,17 +45,63 @@ class BusinessStats {
   }
 }
 
+/// The app asks for its permissions once, on first launch, and never again
+/// on its own. Afterwards only the user's own taps (e.g. the prayer card's
+/// "use my location" button) can bring a permission dialog back.
+abstract interface class PermissionsGate {
+  /// Location, then camera — only the first time it is called.
+  Future<void> askOnce();
+
+  /// Whether the camera may be used, without asking.
+  Future<bool> cameraGranted();
+
+  Future<void> openAppSettings();
+}
+
+class DevicePermissions implements PermissionsGate {
+  DevicePermissions(this._store, this._prayer);
+
+  final KeyValueStore _store;
+  final PrayerController _prayer;
+
+  @override
+  Future<void> askOnce() async {
+    if (_store.read('permissions_asked') != null) return;
+    await _store.write('permissions_asked', '1');
+    await _prayer.locate(userAsked: true);
+    try {
+      await ph.Permission.camera.request();
+    } catch (_) {}
+  }
+
+  @override
+  Future<bool> cameraGranted() async {
+    try {
+      return await ph.Permission.camera.isGranted;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  Future<void> openAppSettings() => ph.openAppSettings();
+}
+
 /// Everything the screens need, created once in main().
 class AppServices {
   const AppServices({
     required this.locale,
     required this.prayer,
+    required this.permissions,
     required this.openFeature,
+    required this.homeWidget,
     this.businessStats = BusinessStats.fetch,
   });
 
   final LocaleController locale;
   final PrayerController prayer;
+  final PermissionsGate permissions;
   final FeatureOpener openFeature;
+  final HomeWidgetBridge homeWidget;
   final Future<BusinessStats?> Function() businessStats;
 }

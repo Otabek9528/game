@@ -240,4 +240,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webOpenInBrowser => 'Open in browser';
+
+  @override
+  String get cameraDenied => 'Camera access is off for this app';
+
+  @override
+  String get widgetOpenApp => 'Open the app to see prayer times';
 }

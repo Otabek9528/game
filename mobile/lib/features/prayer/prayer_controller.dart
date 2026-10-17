@@ -61,7 +61,13 @@ class PrayerController extends ChangeNotifier {
   PrayerStatus status = PrayerStatus.starting;
   PrayerSettings settings = const PrayerSettings();
   SavedLocation? place;
+
+  /// Today's times, once known.
   PrayerDay? day;
+
+  /// Today and the week after it, kept for the home-screen widget and so the
+  /// card rolls over to a new day without the network.
+  List<PrayerDay> days = const [];
 
   /// A location request is running.
   bool locating = false;
@@ -81,10 +87,10 @@ class PrayerController extends ChangeNotifier {
   Future<void> start() async {
     settings = _readJson('prayer_settings', PrayerSettings.fromJson) ?? settings;
     place = _readJson('location', SavedLocation.fromJson);
-    final cached = _readJson('prayer_day', PrayerDay.fromJson);
-    if (place != null && cached != null && cached.key == _todayKey) {
-      day = cached;
-      status = PrayerStatus.ready;
+    days = _readDays();
+    if (place != null) {
+      day = _todayFrom(days);
+      if (day != null) status = PrayerStatus.ready;
     }
     notifyListeners();
 
@@ -158,6 +164,8 @@ class PrayerController extends ChangeNotifier {
   /// Cheap to call often: it only fetches when something changed.
   Future<void> loadTimes() async {
     if (place == null || _fetching) return;
+    // Past midnight, tomorrow's times may already be saved.
+    day = _todayFrom(days) ?? (day?.date == _today ? day : null);
     _fetching = true;
     try {
       // Loops because the place, settings or date can change while a request
@@ -165,9 +173,15 @@ class PrayerController extends ChangeNotifier {
       while (day?.key != _todayKey) {
         if (day == null) _setStatus(PrayerStatus.loading);
         try {
-          final fetched = await _times.fetchDay(_today, place!, settings);
-          day = fetched;
-          await _store.write('prayer_day', jsonEncode(fetched.toJson()));
+          final fetched = await _times.fetchDays(_today, daysAhead, place!, settings);
+          final today = _todayFrom(fetched);
+          if (today == null) throw StateError('no times for today');
+          days = fetched;
+          day = today;
+          await _store.write(
+            'prayer_days',
+            jsonEncode([for (final d in fetched) d.toJson()]),
+          );
         } catch (_) {
           // Yesterday's times would be wrong today; only keep [day] if it is
           // still for today (e.g. only the place moved a little).
@@ -204,13 +218,11 @@ class PrayerController extends ChangeNotifier {
     if (_isStale) await locate();
   }
 
-  /// For web pages that ask for the position: true once the app may read it,
-  /// asking the user if it still can.
-  Future<bool> ensureLocationAccess() async {
-    var access = await _location.check();
-    if (access == LocationAccess.denied) access = await _location.request();
-    return access == LocationAccess.granted;
-  }
+  /// For web pages that ask for the position. Never shows the permission
+  /// dialog: the app asks once, at first launch, and only the user's own taps
+  /// ask again.
+  Future<bool> hasLocationAccess() async =>
+      await _location.check() == LocationAccess.granted;
 
   Future<void> openAppSettings() => _location.openAppSettings();
   Future<void> openLocationSettings() => _location.openLocationSettings();
@@ -219,6 +231,30 @@ class PrayerController extends ChangeNotifier {
       place == null || _clock().difference(place!.timestamp) > staleAfter;
 
   String get _todayKey => PrayerDay.keyFor(_today, settings, place!);
+
+  /// How many days [loadTimes] fetches: today plus a week.
+  static const daysAhead = 8;
+
+  PrayerDay? _todayFrom(List<PrayerDay> list) {
+    if (place == null) return null;
+    final key = _todayKey;
+    for (final d in list) {
+      if (d.key == key) return d;
+    }
+    return null;
+  }
+
+  List<PrayerDay> _readDays() {
+    final raw = _store.read('prayer_days');
+    if (raw == null) return const [];
+    try {
+      return [
+        for (final d in jsonDecode(raw) as List) PrayerDay.fromJson(d as Map<String, dynamic>),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
 
   PrayerStatus _statusFor(LocationAccess access) => switch (access) {
         LocationAccess.deniedForever => PrayerStatus.permissionBlocked,

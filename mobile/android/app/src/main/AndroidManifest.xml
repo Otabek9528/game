@@ -34,6 +34,33 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Home-screen widgets: widget/PrayerWidgets.kt. The large one also
+             hears clock, time zone and language changes, and redraws both. -->
+        <receiver
+            android:name=".widget.LargePrayerWidget"
+            android:exported="false"
+            android:label="@string/widget_large_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_prayer_large_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.SmallPrayerWidget"
+            android:exported="false"
+            android:label="@string/widget_small_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_prayer_small_info" />
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

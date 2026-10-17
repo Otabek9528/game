@@ -5,11 +5,13 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
 import 'app_services.dart';
+import 'core/app_language.dart';
 import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/prayer/prayer_sources.dart';
 import 'features/web/web_feature_screen.dart';
+import 'features/widget/home_widget_bridge.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,14 +34,24 @@ Future<void> main() async {
     times: AladhanSource(),
     store: store,
   );
+  final locale = LocaleController(await PrefsLanguageStore.open());
+  final homeWidget = HomeWidgetBridge();
   final services = AppServices(
-    locale: LocaleController(await PrefsLanguageStore.open()),
+    locale: locale,
     prayer: prayer,
+    permissions: DevicePermissions(store, prayer),
     openFeature: openWebFeature,
+    homeWidget: homeWidget,
   );
 
-  // Fills the prayer card from the saved day straight away. It never asks for
-  // permission on its own; that waits for the user to tap the card's button.
+  // The home-screen widgets show what the prayer card shows, in the app's
+  // language; they are refreshed whenever either changes.
+  void publish() => homeWidget.publish(prayer, locale.language ?? AppLanguage.uz);
+  prayer.addListener(publish);
+  locale.addListener(publish);
+
+  // Fills the prayer card from the saved days straight away. Permissions are
+  // asked once, from the home screen, after the language is chosen.
   prayer.start();
 
   runApp(VegukinApp(

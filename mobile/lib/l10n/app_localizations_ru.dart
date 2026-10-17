@@ -251,4 +251,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get webOpenInBrowser => 'Открыть в браузере';
+
+  @override
+  String get cameraDenied => 'Нет доступа к камере';
+
+  @override
+  String get widgetOpenApp => 'Откройте приложение, чтобы увидеть время намаза';
 }

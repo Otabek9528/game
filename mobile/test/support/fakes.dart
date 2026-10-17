@@ -8,6 +8,7 @@ import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
+import 'package:muslim_vegukin/features/widget/home_widget_bridge.dart';
 
 class MemoryLanguageStore implements LanguageStore {
   MemoryLanguageStore([this.value]);
@@ -87,12 +88,43 @@ class FakeTimes implements PrayerTimesSource {
   PrayerSettings? lastSettings;
 
   @override
-  Future<PrayerDay> fetchDay(DateTime day, SavedLocation place, PrayerSettings settings) async {
+  Future<List<PrayerDay>> fetchDays(
+    DateTime from,
+    int count,
+    SavedLocation place,
+    PrayerSettings settings,
+  ) async {
     calls++;
     lastSettings = settings;
     if (fail) throw Exception('offline');
-    return dayAt(day, key: PrayerDay.keyFor(day, settings, place));
+    return [
+      for (var i = 0; i < count; i++)
+        dayAt(
+          DateTime(from.year, from.month, from.day + i),
+          key: PrayerDay.keyFor(DateTime(from.year, from.month, from.day + i), settings, place),
+        ),
+    ];
   }
+}
+
+class FakePermissions implements PermissionsGate {
+  FakePermissions(this.prayer);
+
+  final PrayerController prayer;
+  int asks = 0;
+  bool camera = true;
+
+  @override
+  Future<void> askOnce() async {
+    if (asks++ > 0) return;
+    await prayer.locate(userAsked: true);
+  }
+
+  @override
+  Future<bool> cameraGranted() async => camera;
+
+  @override
+  Future<void> openAppSettings() async {}
 }
 
 PrayerDay dayAt(DateTime day, {String key = 'k'}) {
@@ -141,10 +173,13 @@ class TestApp {
       store: this.store,
       clock: () => clockNow,
     );
+    permissions = FakePermissions(prayer);
     services = AppServices(
       locale: LocaleController(languageStore),
       prayer: prayer,
+      permissions: permissions,
       openFeature: opened.call,
+      homeWidget: HomeWidgetBridge(),
       businessStats: () async => stats,
     );
   }
@@ -155,6 +190,7 @@ class TestApp {
   final MemoryStore store;
   final opened = OpenedFeatures();
   late final PrayerController prayer;
+  late final FakePermissions permissions;
   late final AppServices services;
 
   /// Starts the app on a phone-sized screen (by default 411×891, a Pixel 7).

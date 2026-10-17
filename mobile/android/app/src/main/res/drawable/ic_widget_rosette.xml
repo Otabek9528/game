@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Faint rosette (two eight-pointed stars, one turned, twice over) behind the
+     widget's corner, as behind the mark on the welcome screen. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <path
+        android:strokeColor="@color/widget_rosette"
+        android:strokeWidth="1"
+        android:pathData="M60.00,5.00 L76.09,21.09 L98.91,21.09 L98.91,43.91 L115.00,60.00 L98.91,76.09 L98.91,98.91 L76.09,98.91 L60.00,115.00 L43.91,98.91 L21.09,98.91 L21.09,76.09 L5.00,60.00 L21.09,43.91 L21.09,21.09 L43.91,21.09 Z M81.05,9.19 L89.75,30.21 L110.84,38.94 L102.11,60.03 L110.81,81.05 L89.79,89.75 L81.06,110.84 L59.97,102.11 L38.95,110.81 L30.25,89.79 L9.16,81.06 L17.89,59.97 L9.19,38.95 L30.21,30.25 L38.94,9.16 L60.03,17.89 Z M60.00,20.40 L71.58,31.98 L88.02,31.98 L88.02,48.42 L99.60,60.00 L88.02,71.58 L88.02,88.02 L71.58,88.02 L60.00,99.60 L48.42,88.02 L31.98,88.02 L31.98,71.58 L20.40,60.00 L31.98,48.42 L31.98,31.98 L48.42,31.98 Z M75.15,23.41 L81.42,38.55 L96.61,44.84 L90.32,60.02 L96.59,75.15 L81.45,81.42 L75.16,96.61 L59.98,90.32 L44.85,96.59 L38.58,81.45 L23.39,75.16 L29.68,59.98 L23.41,44.85 L38.55,38.58 L44.84,23.39 L60.02,29.68 Z" />
+</vector>

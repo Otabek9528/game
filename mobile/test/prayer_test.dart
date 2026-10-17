@@ -111,7 +111,8 @@ void main() {
       expect(app.prayer.status, PrayerStatus.ready);
       expect(app.prayer.place?.city, 'Ansan');
       expect(app.store.read('location'), isNotNull);
-      expect(app.store.read('prayer_day'), isNotNull);
+      expect(app.store.read('prayer_days'), isNotNull);
+      expect(app.prayer.days, hasLength(PrayerController.daysAhead));
     });
 
     test('a saved place and day show at once, with no network', () async {
@@ -148,6 +149,21 @@ void main() {
       expect(app.prayer.place!.city, 'Ansan');
       expect(app.location.cityLookups, 1);
       expect(app.times.calls, 1);
+    });
+
+    test('past midnight, saved days are used without the network', () async {
+      final first = TestApp();
+      await first.prayer.start();
+      expect(first.times.calls, 1);
+
+      final tomorrow = TestApp(
+        store: first.store,
+        now: testNow.add(const Duration(days: 1)),
+      );
+      await tomorrow.prayer.start();
+      expect(tomorrow.prayer.status, PrayerStatus.ready);
+      expect(tomorrow.prayer.day!.date, DateTime(2026, 10, 18));
+      expect(tomorrow.times.calls, 0);
     });
 
     test('times that fail to load say so', () async {

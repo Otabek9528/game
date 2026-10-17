@@ -19,11 +19,19 @@ void main() {
     expect(app.languageStore.value, isNull);
   });
 
-  testWidgets('first launch never asks for location on its own', (tester) async {
+  testWidgets('permissions are asked once, after the language is chosen', (tester) async {
     final app = TestApp(location: FakeLocation(access: LocationAccess.denied));
     await app.launch(tester);
-
     expect(app.location.requests, 0);
+
+    await tester.tap(find.text('Davom etish'));
+    await tester.pumpAndSettle();
+    expect(app.location.requests, 1);
+
+    // Coming back to the app never asks again.
+    app.prayer.refresh();
+    await tester.pumpAndSettle();
+    expect(app.location.requests, 1);
   });
 
   testWidgets('each option describes itself in its own language',

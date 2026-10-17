@@ -3,4 +3,13 @@
     <!-- Brand emerald, same as the app's welcome header (lib/core/theme.dart). -->
     <color name="splash_background">#FF064E3B</color>
     <color name="ic_launcher_background">#FF065F46</color>
+
+    <!-- Home-screen widgets. Light mode here, dark mode in values-night. -->
+    <color name="widget_ink">#FF292524</color>
+    <color name="widget_soft">#FF57534E</color>
+    <color name="widget_faint">#FF8A847D</color>
+    <color name="widget_accent">#FF047857</color>
+    <color name="widget_current_bg">#FFECFDF5</color>
+    <color name="widget_chip_stroke">#59047857</color>
+    <color name="widget_rosette">#1A047857</color>
 </resources>

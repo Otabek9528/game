@@ -7,31 +7,60 @@ import 'package:http/http.dart' as http;
 import '../../core/config.dart';
 import 'prayer_models.dart';
 
-/// Fetches one day's prayer times.
+/// Fetches prayer times.
 abstract interface class PrayerTimesSource {
-  Future<PrayerDay> fetchDay(
-    DateTime day,
+  /// [count] consecutive days starting at [from]. A week ahead lets the
+  /// home-screen widget roll over to new days without the app being opened.
+  Future<List<PrayerDay>> fetchDays(
+    DateTime from,
+    int count,
     SavedLocation place,
     PrayerSettings settings,
   );
 }
 
 /// Prayer times from Aladhan — the same service and parameters as the web
-/// app, so both show the same minutes.
+/// app, so both show the same minutes. Uses the month calendar endpoint: one
+/// request covers the whole range (two when it crosses into the next month).
 class AladhanSource implements PrayerTimesSource {
   AladhanSource([http.Client? client]) : _client = client ?? http.Client();
 
   final http.Client _client;
 
   @override
-  Future<PrayerDay> fetchDay(
-    DateTime day,
+  Future<List<PrayerDay>> fetchDays(
+    DateTime from,
+    int count,
     SavedLocation place,
     PrayerSettings settings,
   ) async {
+    final first = DateTime(from.year, from.month, from.day);
+    final wanted = [for (var i = 0; i < count; i++) DateTime(first.year, first.month, first.day + i)];
+    final months = {for (final d in wanted) (d.year, d.month)};
+
+    final byDate = <String, Map<String, dynamic>>{};
+    for (final (year, month) in months) {
+      for (final entry in await _month(year, month, place, settings)) {
+        final gregorian = (entry['date'] as Map<String, dynamic>)['gregorian'] as Map<String, dynamic>;
+        byDate['${gregorian['date']}'] = entry;
+      }
+    }
+
     String two(int n) => n.toString().padLeft(2, '0');
-    final date = '${two(day.day)}-${two(day.month)}-${day.year}';
-    final url = AppConfig.prayerApiBase.resolve('timings/$date').replace(
+    return [
+      for (final d in wanted)
+        if (byDate['${two(d.day)}-${two(d.month)}-${d.year}'] case final entry?)
+          PrayerDay.fromAladhan(entry, date: d, key: PrayerDay.keyFor(d, settings, place)),
+    ];
+  }
+
+  Future<List<Map<String, dynamic>>> _month(
+    int year,
+    int month,
+    SavedLocation place,
+    PrayerSettings settings,
+  ) async {
+    final url = AppConfig.prayerApiBase.resolve('calendar/$year/$month').replace(
       queryParameters: {
         'latitude': '${place.lat}',
         'longitude': '${place.lon}',
@@ -44,11 +73,7 @@ class AladhanSource implements PrayerTimesSource {
       throw http.ClientException('Aladhan ${response.statusCode}', url);
     }
     final body = jsonDecode(response.body) as Map<String, dynamic>;
-    return PrayerDay.fromAladhan(
-      body['data'] as Map<String, dynamic>,
-      date: day,
-      key: PrayerDay.keyFor(day, settings, place),
-    );
+    return (body['data'] as List).cast<Map<String, dynamic>>();
   }
 }
 

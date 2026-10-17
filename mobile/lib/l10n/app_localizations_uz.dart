@@ -211,4 +211,10 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get webOpenInBrowser => 'Brauzerda ochish';
+
+  @override
+  String get cameraDenied => 'Kameraga ruxsat berilmagan';
+
+  @override
+  String get widgetOpenApp => 'Namoz vaqtlari uchun ilovani oching';
 }

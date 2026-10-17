@@ -8,21 +8,18 @@
   "saveAction": "Save",
   "changeLaterHint": "You can change this later in Settings",
   "changeLanguage": "Change language",
-
   "prayerFajr": "Fajr",
   "prayerSunrise": "Sunrise",
   "prayerDhuhr": "Dhuhr",
   "prayerAsr": "Asr",
   "prayerMaghrib": "Maghrib",
   "prayerIsha": "Isha",
-
   "untilFajr": "Until Fajr",
   "untilFajrEnds": "Until Fajr ends",
   "untilDhuhr": "Until Dhuhr",
   "untilAsr": "Until Asr",
   "untilMaghrib": "Until Maghrib",
   "untilIsha": "Until Isha",
-
   "locationPlaceholder": "Location",
   "locating": "Locating…",
   "locationJustNow": "Just now",
@@ -31,7 +28,6 @@
   "locationDaysAgo": "{count, plural, one{1 day ago} other{{count} days ago}}",
   "locationFailedShort": "Couldn’t locate",
   "refreshLocation": "Update location",
-
   "locationNeededTitle": "Prayer times need your location",
   "locationNeededBody": "Times are calculated for your city. Your location is used only for this.",
   "useMyLocation": "Use my location",
@@ -42,10 +38,8 @@
   "locationFailedBody": "Couldn’t find your location.",
   "timesFailedBody": "Couldn’t load prayer times. Check your connection.",
   "retry": "Try again",
-
   "newBadge": "New",
   "uzOnlyHint": "Uzbek only",
-
   "featurePrayers": "Prayer times",
   "featureMosques": "Mosques",
   "featureRestaurants": "Restaurants",
@@ -63,12 +57,12 @@
   "featureDonation": "Support us",
   "featureCommunity": "Community",
   "featureBusiness": "Business Directory",
-
   "businessTagline": "Uzbek businesses in Korea",
   "businessCount": "{count, plural, one{1 business} other{{count} businesses}}",
   "categoryCount": "{count, plural, one{1 category} other{{count} categories}}",
-
   "webLoadFailed": "Couldn’t open this page. Check your connection.",
   "webReload": "Reload",
-  "webOpenInBrowser": "Open in browser"
+  "webOpenInBrowser": "Open in browser",
+  "cameraDenied": "Camera access is off for this app",
+  "widgetOpenApp": "Open the app to see prayer times"
 }

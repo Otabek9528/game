@@ -40,16 +40,21 @@ void main() {
     expect(find.text('UNTIL DHUHR'), findsOneWidget);
   });
 
-  testWidgets('without location, the card explains and asks with a button', (tester) async {
-    final app = TestApp(language: 'en', location: FakeLocation(access: LocationAccess.denied));
+  testWidgets('refused at first launch: the card explains, its button asks again', (tester) async {
+    final app = TestApp(
+      language: 'en',
+      location: FakeLocation(access: LocationAccess.denied, afterRequest: LocationAccess.denied),
+    );
     await app.launch(tester);
 
+    // The one-time ask happened and was refused.
+    expect(app.location.requests, 1);
     expect(find.text('Prayer times need your location'), findsOneWidget);
-    expect(app.location.requests, 0);
 
+    app.location.afterRequest = LocationAccess.granted;
     await tester.tap(find.text('Use my location'));
     await tester.pumpAndSettle();
-    expect(app.location.requests, 1);
+    expect(app.location.requests, 2);
     expect(find.text('UNTIL DHUHR'), findsOneWidget);
   });
 

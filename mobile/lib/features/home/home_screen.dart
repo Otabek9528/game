@@ -32,6 +32,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // First launch: location and camera, asked once, over the home screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _services.permissions.askOnce();
+      await _takeWidgetAction();
+    });
+  }
+
+  /// Opened by tapping the city on a home-screen widget: refresh it.
+  Future<void> _takeWidgetAction() async {
+    if (await _services.homeWidget.takeLaunchAction() == 'refresh_location') {
+      await _services.prayer.locate(userAsked: true);
+    }
   }
 
   @override
@@ -44,7 +56,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Back from the background (or from system settings after allowing
     // location): pick up a new day, a stale location or a new permission.
-    if (state == AppLifecycleState.resumed) _services.prayer.refresh();
+    if (state == AppLifecycleState.resumed) {
+      _services.prayer.refresh();
+      _takeWidgetAction();
+    }
   }
 
   Future<void> _refresh() async {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_open_app">Откройте приложение, чтобы увидеть время намаза</string>
+    <string name="widget_large_label">Время намаза</string>
+    <string name="widget_large_description">Время намазов на сегодня, отсчёт до следующего намаза, дата и дата по хиджре.</string>
+    <string name="widget_small_label">Следующий намаз</string>
+    <string name="widget_small_description">Отсчёт до следующего намаза, город и дата.</string>
+</resources>

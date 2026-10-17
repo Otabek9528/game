@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -122,7 +121,7 @@ class _WebFeatureScreenState extends State<WebFeatureScreen> {
         ..setMediaPlaybackRequiresUserGesture(false)
         ..setGeolocationPermissionsPromptCallbacks(
           onShowPrompt: (_) async => GeolocationPermissionsResponse(
-            allow: await widget.services.prayer.ensureLocationAccess(),
+            allow: await widget.services.prayer.hasLocationAccess(),
             retain: false,
           ),
         );
@@ -219,10 +218,24 @@ class _WebFeatureScreenState extends State<WebFeatureScreen> {
   }
 
   Future<void> _onPermissionRequest(WebViewPermissionRequest request) async {
-    // The ingredient scanner uses the camera.
+    // The ingredient scanner uses the camera. The app asked for it once at
+    // first launch; a page never brings the dialog back, it points to the
+    // settings instead.
     if (request.types.contains(WebViewPermissionResourceType.camera)) {
-      final granted = await Permission.camera.request().isGranted;
-      return granted ? request.grant() : request.deny();
+      if (await widget.services.permissions.cameraGranted()) return request.grant();
+      await request.deny();
+      if (!mounted) return;
+      final s = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(s.cameraDenied),
+          action: SnackBarAction(
+            label: s.openSettings,
+            onPressed: widget.services.permissions.openAppSettings,
+          ),
+        ),
+      );
+      return;
     }
     return request.deny();
   }

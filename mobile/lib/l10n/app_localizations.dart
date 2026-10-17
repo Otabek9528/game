@@ -477,6 +477,18 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Brauzerda ochish'**
   String get webOpenInBrowser;
+
+  /// Shown when a page needs the camera and the user did not allow it at first launch; the action opens the app settings.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kameraga ruxsat berilmagan'**
+  String get cameraDenied;
+
+  /// Home-screen widget, before the app has a location and prayer times.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz vaqtlari uchun ilovani oching'**
+  String get widgetOpenApp;
 }
 
 class _AppLocalizationsDelegate
