@@ -1,0 +1,53 @@
+{
+  "@@locale": "uz",
+
+  "tagline": "Koreyadagi musulmonlar uchun",
+  "@tagline": {
+    "description": "One-line description under the app name on the welcome screen."
+  },
+
+  "greetingLabel": "Assalomu alaykum",
+  "@greetingLabel": {
+    "description": "What screen readers say for the Arabic greeting السلام عليكم."
+  },
+
+  "languageQuestion": "Qaysi tilda davom etamiz?",
+  "@languageQuestion": {
+    "description": "Title above the language list."
+  },
+
+  "languageNote": "Barcha bo‘limlar mavjud",
+  "@languageNote": {
+    "description": "Shown under THIS language's own tile, always in this language, so a speaker knows what they get before choosing. Uzbek has every section; the others say which sections are Uzbek-only."
+  },
+
+  "continueAction": "Davom etish",
+  "@continueAction": {
+    "description": "Confirms the language on first launch."
+  },
+
+  "saveAction": "Saqlash",
+  "@saveAction": {
+    "description": "Confirms the language when changing it later."
+  },
+
+  "changeLaterHint": "Tilni keyinroq sozlamalardan o‘zgartirish mumkin",
+  "@changeLaterHint": {
+    "description": "Reassurance under the first-launch button."
+  },
+
+  "homeTitle": "Bosh sahifa",
+  "@homeTitle": {
+    "description": "Title of the home screen."
+  },
+
+  "homePlaceholder": "Bosh sahifa keyingi bosqichda quriladi.",
+  "@homePlaceholder": {
+    "description": "Temporary text until the home screen is built."
+  },
+
+  "changeLanguage": "Tilni o‘zgartirish",
+  "@changeLanguage": {
+    "description": "Opens the language picker from inside the app."
+  }
+}

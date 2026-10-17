@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand emerald, same as the app's welcome header (lib/core/theme.dart). -->
+    <color name="splash_background">#FF064E3B</color>
+    <color name="ic_launcher_background">#FF065F46</color>
+</resources>

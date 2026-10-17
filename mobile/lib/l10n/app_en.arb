@@ -1,0 +1,13 @@
+{
+  "@@locale": "en",
+  "tagline": "For Muslims in Korea",
+  "greetingLabel": "Peace be upon you",
+  "languageQuestion": "Which language suits you?",
+  "languageNote": "Some sections are in Uzbek only for now",
+  "continueAction": "Continue",
+  "saveAction": "Save",
+  "changeLaterHint": "You can change this later in Settings",
+  "homeTitle": "Home",
+  "homePlaceholder": "The home screen is the next step.",
+  "changeLanguage": "Change language"
+}

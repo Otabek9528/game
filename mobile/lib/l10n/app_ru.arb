@@ -1,0 +1,13 @@
+{
+  "@@locale": "ru",
+  "tagline": "Для мусульман в Корее",
+  "greetingLabel": "Ассаляму алейкум",
+  "languageQuestion": "На каком языке продолжим?",
+  "languageNote": "Часть разделов пока только на узбекском",
+  "continueAction": "Продолжить",
+  "saveAction": "Сохранить",
+  "changeLaterHint": "Язык можно изменить позже в настройках",
+  "homeTitle": "Главная",
+  "homePlaceholder": "Главная страница появится на следующем этапе.",
+  "changeLanguage": "Сменить язык"
+}
