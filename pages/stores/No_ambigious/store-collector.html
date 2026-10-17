@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Do'kon mahsulotlari</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="store-collector.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <script>
+    (function () {
+      if (localStorage.getItem('theme') === 'night') {
+        document.documentElement.classList.add('night-mode');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ===== APP HEADER ===== -->
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration:none;color:inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <!-- ===== OFFLINE BANNER ===== -->
+  <div class="sc-offline-banner" id="offlineBanner" style="display:none;">
+    <span class="sc-offline-banner__dot"></span>
+    <span class="sc-offline-banner__text">Internet yo'q — o'zgarishlar yuborilmaydi</span>
+  </div>
+
+  <!-- ===== TAB BAR ===== -->
+  <nav class="sc-tabs" id="tabBar">
+    <button class="sc-tab sc-tab--active" data-tab="collect" id="tabCollect">
+      <span class="sc-tab__icon">📷</span>
+      <span class="sc-tab__label">Skanerlash</span>
+    </button>
+    <button class="sc-tab" data-tab="mine" id="tabMine">
+      <span class="sc-tab__icon">📋</span>
+      <span class="sc-tab__label">Mening ro'yxatim</span>
+      <span class="sc-tab__badge" id="mineBadge" style="display:none;">0</span>
+    </button>
+  </nav>
+
+  <!-- ===== MAIN PAGE ===== -->
+  <main class="sc-page" id="page">
+
+    <!-- ==================================================
+         TAB: COLLECT
+         ================================================== -->
+    <section class="sc-tabpane" id="paneCollect">
+
+      <!-- ========================================
+           STATE: STORE PICKER (entry point)
+           ======================================== -->
+      <div class="sc-state" id="stateStorePicker" style="display:block;">
+        <div class="sc-hero">
+          <div class="sc-hero__badge">1-qadam</div>
+          <h2 class="sc-hero__title">Qaysi do'konda ekanligingizni tanlang</h2>
+          <p class="sc-hero__desc">Mahsulot skanerlashdan oldin do'konni belgilang. Har bir do'kon uchun alohida yozuv saqlanadi.</p>
+        </div>
+
+        <div class="store-grid" id="storeGrid">
+          <button class="store-card store-card--gs25" data-store="GS25">
+            <span class="store-card__logo">GS25</span>
+            <span class="store-card__check">✓</span>
+          </button>
+          <button class="store-card store-card--cu" data-store="CU">
+            <span class="store-card__logo">CU</span>
+            <span class="store-card__check">✓</span>
+          </button>
+          <button class="store-card store-card--seven" data-store="7-Eleven">
+            <span class="store-card__logo">7-<em>Eleven</em></span>
+            <span class="store-card__check">✓</span>
+          </button>
+          <button class="store-card store-card--emart" data-store="Emart24">
+            <span class="store-card__logo">emart<em>24</em></span>
+            <span class="store-card__check">✓</span>
+          </button>
+          <button class="store-card store-card--nobrand" data-store="No Brand">
+            <span class="store-card__logo">No Brand</span>
+            <span class="store-card__check">✓</span>
+          </button>          
+          <button class="store-card store-card--daiso" data-store="Daiso">
+            <span class="store-card__logo">DAISO</span>
+            <span class="store-card__check">✓</span>
+          </button>
+        </div>
+
+        <p class="sc-hint">💡 Tanlagan do'koningizni keyinchalik o'zgartirishingiz mumkin.</p>
+      </div>
+
+      <!-- ========================================
+           STATE: PERMISSION (camera CTA)
+           ======================================== -->
+      <div class="sc-state" id="statePermission" style="display:none;">
+        <div class="sc-hero sc-hero--permission">
+          <div class="selected-chip" id="selectedChipPerm">
+            <span class="selected-chip__label">Tanlangan do'kon:</span>
+            <span class="selected-chip__value" id="permStoreName">—</span>
+            <button class="selected-chip__change" id="changeStoreBtnPerm">O'zgartirish</button>
+          </div>
+
+          <div class="permission-visual">
+            <div class="permission-visual__camera">📷</div>
+            <div class="permission-visual__pulse"></div>
+          </div>
+
+          <h2 class="sc-hero__title">Mahsulotni skanerlang</h2>
+          <p class="sc-hero__desc">Shtrix-kodni kameraga yo'naltiring. Agar mahsulot bazada bo'lmasa, qo'shish imkoniyati beriladi.</p>
+
+          <button class="sc-btn sc-btn--primary sc-btn--block" id="startScanBtn">
+            <span>📷</span>
+            <span>Kamerani ochish</span>
+            <span class="sc-btn__arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================================
+           STATE: SCANNER
+           ======================================== -->
+      <div class="sc-state" id="stateScanner" style="display:none;">
+        <div class="selected-chip selected-chip--float" id="selectedChipScan">
+          <span class="selected-chip__label">Do'kon:</span>
+          <span class="selected-chip__value" id="scanStoreName">—</span>
+          <button class="selected-chip__change" id="changeStoreBtnScan">O'zgartirish</button>
+        </div>
+
+        <div class="viewfinder">
+          <div class="viewfinder__screen">
+            <video id="videoElement" autoplay playsinline muted></video>
+            <div class="viewfinder__overlay">
+              <div class="scan-frame">
+                <span class="scan-corner scan-corner--tl"></span>
+                <span class="scan-corner scan-corner--tr"></span>
+                <span class="scan-corner scan-corner--bl"></span>
+                <span class="scan-corner scan-corner--br"></span>
+                <div class="scan-beam" id="scanBeam"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="viewfinder__controls">
+            <button class="vf-btn" id="torchBtn" title="Chiroq" style="display:none;">💡</button>
+            <div class="status-pill" id="statusPill">
+              <span class="status-pill__dot"></span>
+              <span class="status-pill__text" id="statusText">Shtrix-kod qidirilmoqda…</span>
+            </div>
+            <button class="vf-btn" id="switchCamBtn" title="Kamerani almashtirish" style="display:none;">🔄</button>
+          </div>
+        </div>
+
+        <div class="sc-tip">
+          <span>💡</span>
+          <p>Yaxshiroq skanerlash uchun mahsulotni yorug' joyda va kameraga <strong>parallel</strong> tuting.</p>
+        </div>
+      </div>
+
+      <!-- ========================================
+           STATE: ALREADY ADDED (exact match)
+           ======================================== -->
+      <div class="sc-state" id="stateAlreadyAdded" style="display:none;">
+        <div class="result-card result-card--info">
+          <div class="result-card__icon">ℹ️</div>
+          <h3 class="result-card__title">Bu mahsulot ushbu do'konda allaqachon qo'shilgan</h3>
+          <p class="result-card__desc">Quyidagi yozuv bazada mavjud. Agar siz kiritgan bo'lsangiz, "Mening ro'yxatim" bo'limidan tahrirlashingiz mumkin.</p>
+
+          <div class="product-preview" id="alreadyAddedPreview">
+            <!-- Populated by JS: photo, name, verdict badge, store chip, flags grid, barcode -->
+          </div>
+
+          <div class="result-card__actions">
+            <button class="sc-btn sc-btn--primary sc-btn--block" id="scanNextBtnAlready">
+              <span>📷</span>
+              <span>Keyingi mahsulotni skanerlash</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================
+           STATE: CROSS-STORE PROMPT
+           (barcode exists elsewhere, not at selected store)
+           ======================================== -->
+      <div class="sc-state" id="stateCrossStore" style="display:none;">
+        <div class="result-card result-card--cross">
+          <div class="result-card__icon">🔎</div>
+          <h3 class="result-card__title">Bu mahsulot boshqa do'konlarda allaqachon ro'yxatdan o'tgan</h3>
+          <p class="result-card__desc">Quyidagi mahsulot boshqa do'konlarda mavjud. Agar bu <strong><span id="crossTargetStore">—</span></strong> do'konidagi xuddi shu mahsulot bo'lsa, qo'shing. Ingredientlar farq qilsa, keyingi bosqichda o'zgartirishingiz mumkin.</p>
+
+          <div class="product-preview" id="crossPreview">
+            <!-- Populated by JS with one product card (from first other_stores entry) -->
+          </div>
+
+          <div class="cross-store-list" id="crossStoreList">
+            <!-- If >1 other stores: list them as chips. Populated by JS. -->
+          </div>
+
+          <div class="result-card__actions result-card__actions--split">
+            <button class="sc-btn sc-btn--ghost" id="crossRejectBtn">
+              <span>Yo'q, boshqa mahsulot</span>
+            </button>
+            <button class="sc-btn sc-btn--primary" id="crossAcceptBtn">
+              <span>Ha, bu o'sha mahsulot</span>
+              <span class="sc-btn__arrow">→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================
+           STATE: SUBMISSION FORM
+           ======================================== -->
+      <div class="sc-state" id="stateForm" style="display:none;">
+
+        <!-- Header chip -->
+        <div class="form-header">
+          <div class="form-header__meta">
+            <span class="form-header__label">Do'kon</span>
+            <span class="form-header__store" id="formStoreName">—</span>
+          </div>
+          <div class="form-header__meta">
+            <span class="form-header__label">Shtrix-kod</span>
+            <code class="form-header__barcode" id="formBarcode">—</code>
+          </div>
+        </div>
+
+        <!-- Mode banner (shown when cross-store prefill is active) -->
+        <div class="form-banner" id="formPrefillBanner" style="display:none;">
+          <span>ℹ️</span>
+          <p>Ma'lumotlar boshqa do'kondagi yozuvdan olindi. Zarur bo'lsa tekshirib chiqing va o'zgartiring.</p>
+        </div>
+
+        <!-- Category -->
+        <section class="form-section">
+          <h4 class="form-section__title">
+            <span class="form-section__num">1</span>
+            Kategoriya
+            <span class="form-section__req">*</span>
+          </h4>
+          <div class="category-grid" id="categoryGrid">
+            <!-- 13 categories, hardcoded -->
+            <button class="cat-chip" data-cat="Drinks">
+              <span class="cat-chip__icon">🥤</span><span class="cat-chip__label">Ichimliklar</span>
+            </button>
+            <button class="cat-chip" data-cat="Snacks">
+              <span class="cat-chip__icon">🍿</span><span class="cat-chip__label">Gazaklar</span>
+            </button>
+            <button class="cat-chip" data-cat="Sweets">
+              <span class="cat-chip__icon">🍬</span><span class="cat-chip__label">Shirinliklar</span>
+            </button>
+            <button class="cat-chip" data-cat="Ice Cream">
+              <span class="cat-chip__icon">🍦</span><span class="cat-chip__label">Muzqaymoq</span>
+            </button>
+            <button class="cat-chip" data-cat="Baked Goods">
+              <span class="cat-chip__icon">🥐</span><span class="cat-chip__label">Non mahsulotlari</span>
+            </button>
+            <button class="cat-chip" data-cat="Cup Noodles/Ramen">
+              <span class="cat-chip__icon">🍜</span><span class="cat-chip__label">Lag'mon / Ramen</span>
+            </button>
+            <button class="cat-chip" data-cat="Lunchbox/Dosirak">
+              <span class="cat-chip__icon">🍩</span><span class="cat-chip__label">Pechenya/Pishiriqlar</span>
+            </button>
+            <button class="cat-chip" data-cat="Dairy">
+              <span class="cat-chip__icon">🥛</span><span class="cat-chip__label">Sut mahsulotlari</span>
+            </button>
+            <button class="cat-chip" data-cat="Canned Food">
+              <span class="cat-chip__icon">🥫</span><span class="cat-chip__label">Konserva</span>
+            </button>
+            <button class="cat-chip" data-cat="Frozen Food">
+              <span class="cat-chip__icon">🧊</span><span class="cat-chip__label">Muzlatilgan</span>
+            </button>
+            <button class="cat-chip" data-cat="Condiments/Sauces">
+              <span class="cat-chip__icon">🧂</span><span class="cat-chip__label">Sous va ziravorlar</span>
+            </button>
+            <button class="cat-chip" data-cat="Fruits/Vegetables">
+              <span class="cat-chip__icon">🥬</span><span class="cat-chip__label">Meva va sabzavot</span>
+            </button>
+            <button class="cat-chip" data-cat="Dried Food">
+              <span class="cat-chip__icon">🌾</span><span class="cat-chip__label">Quruq mahsulot</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Flags -->
+        <section class="form-section">
+          <h4 class="form-section__title">
+            <span class="form-section__num">2</span>
+            Tarkibdagi belgilar
+            <span class="form-section__req">*</span>
+          </h4>
+          <p class="form-section__hint">Kamida bitta belgini tanlang. <strong>"Barchasi halol"</strong> tanlansa, boshqalari o'chiriladi va aksincha.</p>
+
+          <div class="flag-list" id="flagList">
+
+            <button class="flag-toggle" data-flag="allhalal" id="flagAllHalal">
+              <span class="flag-toggle__icon">☪️</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Barchasi halol</p>
+                <p class="flag-toggle__desc">Ta'qiqlangan tarkib yo'q, ishlab chiqarish ham toza</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </button>
+
+            <div class="flag-divider"><span>yoki alohida belgilar</span></div>
+
+            <button class="flag-toggle" data-flag="pork" id="flagPork">
+              <span class="flag-toggle__icon">🐖</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Cho'chqa mahsuloti</p>
+                <p class="flag-toggle__desc">Tarkibda cho'chqa go'shti yoki jelatini bor</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </button>
+
+            <button class="flag-toggle" data-flag="alcohol" id="flagAlcohol">
+              <span class="flag-toggle__icon">🍷</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Alkogol</p>
+                <p class="flag-toggle__desc">Spirt, vino, pivo yoki shunga o'xshash</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </button>
+
+            <button class="flag-toggle" data-flag="meat" id="flagMeat">
+              <span class="flag-toggle__icon">🍗</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Boshqa go'sht</p>
+                <p class="flag-toggle__desc">Halol bo'lmagan mol, tovuq va boshqa go'sht</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </button>
+
+            <button class="flag-toggle" data-flag="seafood" id="flagSeafood">
+              <span class="flag-toggle__icon">🦐</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Dengiz mahsulotlari</p>
+                <p class="flag-toggle__desc">Qisqichbaqa, kalmar, ustritsa va h.k.</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </button>
+
+            <button class="flag-toggle" data-flag="factory" id="flagFactory">
+              <span class="flag-toggle__icon">🏭</span>
+              <div class="flag-toggle__content">
+                <p class="flag-toggle__name">Bir xil zavod</p>
+                <p class="flag-toggle__desc">Ta'qiqlangan mahsulotlar ishlab chiqariladigan zavodda tayyorlangan</p>
+              </div>
+              <div class="flag-toggle__check"></div>
+            </button>
+
+          </div>
+        </section>
+
+        <!-- Photo -->
+        <section class="form-section">
+          <h4 class="form-section__title">
+            <span class="form-section__num">3</span>
+            Mahsulot rasmi
+            <span class="form-section__req">*</span>
+          </h4>
+
+          <!-- Prefilled-from-other-store photo preview -->
+          <div class="photo-box" id="photoBox">
+
+            <!-- Empty state: "Take photo" CTA -->
+            <div class="photo-box__empty" id="photoEmpty">
+              <div class="photo-box__icon">📸</div>
+              <p class="photo-box__hint">Rasmni qo'shing</p>
+              <button class="sc-btn sc-btn--ghost sc-btn--sm" id="openPhotoBtn">
+                <span>📷</span>
+                <span>Kamerani ochish</span>
+              </button>
+            </div>
+
+            <!-- Capture state (video preview + shutter) -->
+            <div class="photo-box__capture" id="photoCapture" style="display:none;">
+              <div class="capture-camera">
+                <video id="captureVideo" autoplay playsinline muted></video>
+                <div class="crosshair"></div>
+                <div class="shutter-row">
+                  <button class="shutter-btn" id="shutterBtn" title="Suratga olish"></button>
+                </div>
+              </div>
+              <button class="photo-box__cancel" id="cancelPhotoBtn">✕ Bekor qilish</button>
+            </div>
+
+            <!-- Preview state (image + retake) -->
+            <div class="photo-box__preview" id="photoPreview" style="display:none;">
+              <img id="photoPreviewImg" alt="Mahsulot rasmi" />
+              <div class="photo-box__preview-actions">
+                <button class="sc-btn sc-btn--ghost sc-btn--sm" id="retakePhotoBtn">
+                  <span>🔄</span><span>Qayta olish</span>
+                </button>
+                <button class="sc-btn sc-btn--ghost sc-btn--sm sc-btn--danger" id="removePhotoBtn">
+                  <span>🗑️</span><span>O'chirish</span>
+                </button>
+              </div>
+              <span class="photo-box__tag" id="photoSourceTag" style="display:none;">Boshqa do'kondan olindi</span>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Sticky submit bar -->
+        <div class="form-footer">
+          <button class="sc-btn sc-btn--ghost" id="formCancelBtn">
+            <span>✕</span><span>Bekor qilish</span>
+          </button>
+          <button class="sc-btn sc-btn--primary sc-btn--grow" id="formSubmitBtn" disabled>
+            <span>✓</span><span>Yuborish</span>
+          </button>
+        </div>
+
+        <p class="form-note">
+          <span>ℹ️</span>
+          <span>Yuborilgandan so'ng ma'lumot darhol bazaga qo'shiladi va boshqa foydalanuvchilarga ko'rinadi.</span>
+        </p>
+
+      </div>
+
+      <!-- ========================================
+           STATE: SUBMITTING (spinner)
+           ======================================== -->
+      <div class="sc-state" id="stateSubmitting" style="display:none;">
+        <div class="uploading-card">
+          <div class="uploading-spinner"></div>
+          <p class="uploading-card__text">Yuborilmoqda…</p>
+        </div>
+      </div>
+
+      <!-- ========================================
+           STATE: SUCCESS
+           ======================================== -->
+      <div class="sc-state" id="stateSuccess" style="display:none;">
+        <div class="result-card result-card--success">
+          <div class="result-card__icon result-card__icon--pop">✅</div>
+          <h3 class="result-card__title">Rahmat! Ma'lumot qo'shildi</h3>
+          <p class="result-card__desc">Mahsulot <strong><span id="successStoreName">—</span></strong> do'koniga qo'shildi. Keyingi mahsulotni skanerlashingiz mumkin.</p>
+
+          <div class="product-preview" id="successPreview">
+            <!-- Populated by JS with the just-created row -->
+          </div>
+
+          <div class="result-card__actions result-card__actions--split">
+            <button class="sc-btn sc-btn--ghost" id="successGotoMineBtn">
+              <span>📋</span><span>Mening ro'yxatim</span>
+            </button>
+            <button class="sc-btn sc-btn--primary" id="successScanNextBtn">
+              <span>📷</span><span>Keyingisi</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================
+           STATE: ERROR
+           ======================================== -->
+      <div class="sc-state" id="stateError" style="display:none;">
+        <div class="result-card result-card--error">
+          <div class="result-card__icon">⚠️</div>
+          <h3 class="result-card__title" id="errorTitle">Xatolik yuz berdi</h3>
+          <p class="result-card__desc" id="errorMessage">Iltimos, qaytadan urinib ko'ring.</p>
+          <div class="result-card__actions">
+            <button class="sc-btn sc-btn--primary sc-btn--block" id="errorRetryBtn">
+              <span>🔄</span><span>Qayta urinib ko'rish</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         TAB: MINE (My Submissions)
+         ================================================== -->
+    <section class="sc-tabpane" id="paneMine" style="display:none;">
+
+      <div class="sc-state" id="stateMineList" style="display:block;">
+
+        <div class="mine-header">
+          <h2 class="mine-header__title">Siz qo'shgan mahsulotlar</h2>
+          <p class="mine-header__count" id="mineCountText">0 ta yozuv</p>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="mine-filters" id="mineFilters">
+          <button class="mine-filter mine-filter--active" data-filter="all">Barchasi</button>
+          <button class="mine-filter" data-filter="joiz">✅ Joiz</button>
+          <button class="mine-filter" data-filter="shubhali">⚠️ Shubhali</button>
+          <button class="mine-filter" data-filter="nojoiz">⛔ Nojoiz</button>
+        </div>
+
+        <!-- List -->
+        <div class="mine-list" id="mineList">
+          <!-- Populated by JS: .mine-card elements -->
+        </div>
+
+        <!-- Empty state -->
+        <div class="mine-empty" id="mineEmpty" style="display:none;">
+          <div class="mine-empty__icon">📭</div>
+          <h3 class="mine-empty__title">Hozircha yozuvlar yo'q</h3>
+          <p class="mine-empty__desc">Birinchi mahsulotingizni qo'shing — u bu yerda ko'rinadi va siz istagan vaqtda tahrirlashingiz mumkin.</p>
+          <button class="sc-btn sc-btn--primary" id="mineEmptyCtaBtn">
+            <span>📷</span><span>Skanerlashga o'tish</span>
+          </button>
+        </div>
+
+        <!-- Loading state -->
+        <div class="mine-loading" id="mineLoading" style="display:none;">
+          <div class="uploading-spinner"></div>
+          <p>Yuklanmoqda…</p>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+
+  <!-- ==================================================
+       MODAL: DELETE CONFIRMATION
+       ================================================== -->
+  <div class="sc-modal" id="deleteModal" style="display:none;">
+    <div class="sc-modal__backdrop" id="deleteBackdrop"></div>
+    <div class="sc-modal__sheet">
+      <div class="sc-modal__icon">🗑️</div>
+      <h3 class="sc-modal__title">Yozuvni o'chirishni xohlaysizmi?</h3>
+      <p class="sc-modal__desc">Bu amalni bekor qilib bo'lmaydi. Mahsulot bazadan butunlay o'chiriladi.</p>
+      <div class="product-preview product-preview--compact" id="deletePreview">
+        <!-- Populated by JS with the target row -->
+      </div>
+      <div class="sc-modal__actions">
+        <button class="sc-btn sc-btn--ghost" id="deleteCancelBtn">Bekor qilish</button>
+        <button class="sc-btn sc-btn--danger" id="deleteConfirmBtn">
+          <span>🗑️</span><span>O'chirish</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       MODAL: EDIT (wraps the same form, opened as sheet)
+       Reuses #stateForm — populated via JS
+       ================================================== -->
+  <div class="sc-modal sc-modal--edit" id="editModal" style="display:none;">
+    <div class="sc-modal__backdrop" id="editBackdrop"></div>
+    <div class="sc-modal__sheet sc-modal__sheet--tall">
+      <div class="sc-modal__handle"></div>
+      <div class="sc-modal__topbar">
+        <button class="sc-modal__close" id="editCloseBtn">✕</button>
+        <h3 class="sc-modal__topbar-title">Yozuvni tahrirlash</h3>
+        <button class="sc-btn sc-btn--primary sc-btn--sm" id="editSaveBtn">Saqlash</button>
+      </div>
+      <div class="sc-modal__body" id="editBody">
+        <!-- JS injects editable copies of category grid + flag list + photo box + store/barcode selector -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       FULLSCREEN IMAGE VIEWER
+       ================================================== -->
+  <div class="sc-fullscreen" id="fullscreenViewer" style="display:none;">
+    <button class="sc-fullscreen__close" id="fullscreenClose" aria-label="Yopish">✕</button>
+    <img class="sc-fullscreen__img" id="fullscreenImg" src="" alt="" />
+  </div>
+
+  <!-- ==================================================
+       TOAST
+       ================================================== -->
+  <div class="sc-toast" id="toast" style="display:none;">
+    <span class="sc-toast__icon" id="toastIcon">ℹ️</span>
+    <span class="sc-toast__text" id="toastText">—</span>
+  </div>
+
+
+  <!-- ===== SCRIPTS (loaded in dependency order) ===== -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@aspect-dev/barcode-scanner@0.3.0/dist/barcode-scanner.umd.js"></script>
+
+  <!-- Reused modules from the existing barcode feature -->
+  <script src="camera.js"></script>
+  <script src="scanner.js"></script>
+
+  <!-- New modules for this feature -->
+  <script src="store-utils.js"></script>
+  <script src="store-ui.js"></script>
+  <script src="store-form.js"></script>
+  <script src="store-submissions.js"></script>
+  <script src="store-edit.js"></script>
+  <script src="store-app.js"></script>
+
+
+</body>
+</html>

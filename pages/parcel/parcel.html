@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pochta Yuborish</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="parcel.css" />
+  
+    <script>
+  if (localStorage.getItem('theme') === 'night') {
+    document.documentElement.classList.add('night-mode');
+  }
+    </script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration: none; color: inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <!-- PARCEL CONTAINER -->
+  <div class="parcel-container">
+    
+    <!-- Hero Section -->
+    <div class="parcel-hero">
+      <div class="hero-icon">📦</div>
+      <h2 class="hero-title">Pochta Yuborish</h2>
+      <p class="hero-subtitle">Kuryer topib, pochtangizni yetkazing</p>
+    </div>
+
+    <!-- ============================== -->
+    <!-- STEP 0: Direction Selection     -->
+    <!-- ============================== -->
+    <div class="direction-section" id="directionSection">
+      <p class="section-label">Yo'nalishni tanlang:</p>
+      <div class="direction-buttons">
+        <button class="direction-btn" id="dirBtnUzbKor" data-direction="0">
+          <div class="dir-flags">
+            <span class="dir-flag">🇺🇿</span>
+            <span class="dir-arrow-icon">
+              <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
+                <path d="M0 7H24M24 7L18 1M24 7L18 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="dir-flag">🇰🇷</span>
+          </div>
+          <span class="dir-label">O'zbekistondan Koreyaga</span>
+        </button>
+        <button class="direction-btn" id="dirBtnKorUzb" data-direction="1">
+          <div class="dir-flags">
+            <span class="dir-flag">🇰🇷</span>
+            <span class="dir-arrow-icon">
+              <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
+                <path d="M0 7H24M24 7L18 1M24 7L18 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="dir-flag">🇺🇿</span>
+          </div>
+          <span class="dir-label">Koreyadan O'zbekistonga</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================== -->
+    <!-- STEP 1: Search Methods          -->
+    <!-- (Hidden until direction chosen) -->
+    <!-- ============================== -->
+    <div class="search-methods" id="searchMethods" style="display: none;">
+      
+      <!-- Active Direction Indicator -->
+      <div class="active-direction" id="activeDirection">
+        <div class="active-dir-content">
+          <span class="active-dir-flags" id="activeDirFlags"></span>
+          <span class="active-dir-text" id="activeDirText"></span>
+        </div>
+        <button class="change-dir-btn" id="changeDirBtn">O'zgartirish</button>
+      </div>
+
+      <p class="methods-hint">Qidiruv usulini tanlang:</p>
+      
+      <!-- Search Buttons -->
+      <div class="method-buttons">
+        <button class="method-btn date-btn" id="searchByDateBtn">
+          <span class="method-icon">📅</span>
+          <div class="method-info">
+            <span class="method-title">Sana bo'yicha</span>
+            <span class="method-desc">Uchish sanasi asosida izlash</span>
+          </div>
+          <span class="method-arrow">→</span>
+        </button>
+        
+        <button class="method-btn city-btn" id="searchByCityBtn">
+          <span class="method-icon">🏙</span>
+          <div class="method-info">
+            <span class="method-title">Shahar bo'yicha</span>
+            <span class="method-desc">Manzil asosida izlash</span>
+          </div>
+          <span class="method-arrow">→</span>
+        </button>
+      </div>
+
+      <!-- Info Card -->
+      <div class="info-card">
+        <div class="info-header">
+          <span class="info-icon">💡</span>
+          <span class="info-title">Qanday ishlaydi?</span>
+        </div>
+        <ul class="info-list">
+          <li>
+            <span class="step-num">1</span>
+            <span>Yo'nalish va qidiruv usulini tanlang</span>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <span>E'lonni ko'rib chiqing va kuryer bilan bog'laning</span>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <span>Pochtangizni xavfsiz yetkazing!</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Dates List Section (Hidden by default) -->
+    <div class="list-section" id="datesSection" style="display: none;">
+      <div class="section-header">
+        <button class="back-btn" id="datesBackBtn">
+          <span>←</span>
+          <span>Orqaga</span>
+        </button>
+        <h3 class="section-heading">📅 Sanani tanlang</h3>
+      </div>
+      
+      <div class="dates-list" id="datesList">
+        <!-- Dates will be populated by JS -->
+      </div>
+
+      <div class="loading-indicator" id="datesLoading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Yuklanmoqda...</p>
+      </div>
+
+      <div class="empty-state" id="datesEmpty" style="display: none;">
+        <span class="empty-icon">📭</span>
+        <p>Hozircha e'lonlar mavjud emas</p>
+      </div>
+    </div>
+
+    <!-- Cities List Section with Tabs (Hidden by default) -->
+    <div class="list-section" id="citiesSection" style="display: none;">
+      <div class="section-header">
+        <button class="back-btn" id="citiesBackBtn">
+          <span>←</span>
+          <span>Orqaga</span>
+        </button>
+        <h3 class="section-heading">🏙 Shaharni tanlang</h3>
+      </div>
+      
+      <!-- Country Tabs -->
+      <div class="country-tabs">
+        <button class="country-tab active" id="tabUzb" data-country="uzb">
+          <span>🇺🇿</span>
+          <span>O'zbekiston</span>
+        </button>
+        <button class="country-tab" id="tabKor" data-country="kor">
+          <span>🇰🇷</span>
+          <span>Koreya</span>
+        </button>
+      </div>
+      
+      <div class="cities-list" id="citiesList">
+        <!-- Cities will be populated by JS -->
+      </div>
+
+      <div class="loading-indicator" id="citiesLoading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Yuklanmoqda...</p>
+      </div>
+
+      <div class="empty-state" id="citiesEmpty" style="display: none;">
+        <span class="empty-icon">🏙</span>
+        <p>Shaharlar topilmadi</p>
+      </div>
+    </div>
+
+    <!-- Posts Section (Hidden by default) -->
+    <div class="list-section" id="postsSection" style="display: none;">
+      <div class="section-header">
+        <button class="back-btn" id="postsBackBtn">
+          <span>←</span>
+          <span>Orqaga</span>
+        </button>
+        <h3 class="section-heading" id="postsHeading">📋 E'lonlar</h3>
+      </div>
+      
+      <div class="posts-list" id="postsList">
+        <!-- Posts will be populated by JS -->
+      </div>
+
+      <div class="loading-indicator" id="postsLoading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Yuklanmoqda...</p>
+      </div>
+
+      <div class="empty-state" id="postsEmpty" style="display: none;">
+        <span class="empty-icon">📭</span>
+        <p>E'lonlar topilmadi</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/logger.js"></script>
+  <script src="../../js/apiConfig.js"></script>
+  <script src="parcel.js"></script>
+
+</body>
+</html>

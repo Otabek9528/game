@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title data-i18n="bc.store.pageTitle">Do'kon Mahsulotlari</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="barcode.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <script>
+  (function() {
+    if (localStorage.getItem('theme') === 'night') {
+      document.documentElement.classList.add('night-mode');
+    }
+  })();
+  </script>
+</head>
+<body>
+
+  <!-- ===== APP HEADER ===== -->
+  <header class="app__header">
+    <a href="../../index.html" class="header-content" style="text-decoration:none;color:inherit;">
+      <img src="../../assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <h1>Muslim Vegukin Bot</h1>
+    </a>
+  </header>
+
+  <!-- ===== MAIN CONTAINER ===== -->
+  <div class="page" id="page">
+
+    <!-- ========================================
+         STORE HERO
+         ======================================== -->
+    <section class="store-hero" id="storeHero">
+      <div class="store-hero__emblem-wrap">
+        <img class="store-hero__emblem" id="storeHeroEmblem" src="" alt="" />
+      </div>
+      <div class="store-hero__text">
+        <h2 class="store-hero__name" id="storeHeroName">—</h2>
+        <p class="store-hero__meta" id="storeHeroMeta">
+          <span id="storeHeroCount">—</span>
+          <span data-i18n="bc.stores.products">ta mahsulot</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- ========================================
+         VERDICT TABS
+         ======================================== -->
+    <div class="verdict-tabs" id="verdictTabs" role="tablist">
+      <button class="verdict-tab verdict-tab--joiz is-active"
+              data-verdict="joiz" role="tab" aria-selected="true" type="button">
+        <span class="verdict-tab__emoji">✅</span>
+        <span class="verdict-tab__label" data-i18n="bc.badgeJoiz">Joiz</span>
+        <span class="verdict-tab__count" id="tabCountJoiz">0</span>
+      </button>
+      <button class="verdict-tab verdict-tab--shubhali"
+              data-verdict="shubhali" role="tab" aria-selected="false" type="button">
+        <span class="verdict-tab__emoji">⚠️</span>
+        <span class="verdict-tab__label" data-i18n="bc.badgeShubhali">Shubhali</span>
+        <span class="verdict-tab__count" id="tabCountShubhali">0</span>
+      </button>
+      <button class="verdict-tab verdict-tab--nojoiz"
+              data-verdict="nojoiz" role="tab" aria-selected="false" type="button">
+        <span class="verdict-tab__emoji">⛔</span>
+        <span class="verdict-tab__label" data-i18n="bc.badgeTaqiqlangan">Ta'qiqlangan</span>
+        <span class="verdict-tab__count" id="tabCountNojoiz">0</span>
+      </button>
+    </div>
+
+    <!-- ========================================
+         CATEGORY PANEL (M9)
+         ======================================== -->
+    <div class="cat-panel" id="catPanel">
+      <button class="cat-panel__toggle" id="catPanelToggle" type="button" aria-expanded="false">
+        <span class="cat-panel__toggle-left">
+          <span class="cat-panel__toggle-icon">🗂</span>
+          <span class="cat-panel__toggle-label" data-i18n="bc.store.category">Turkum</span>
+          <span class="cat-panel__toggle-active" id="catPanelActiveLabel" data-i18n="bc.store.allCats">Hammasi</span>
+        </span>
+        <span class="cat-panel__toggle-chev" id="catPanelChev">▾</span>
+      </button>
+      <div class="cat-panel__grid" id="catPanelGrid" hidden>
+        <!-- Populated by store.js -->
+      </div>
+    </div>
+
+    <!-- ========================================
+         PRODUCT GRID
+         ======================================== -->
+    <div class="store-grid" id="storeGrid">
+      <!-- Populated by store.js -->
+    </div>
+
+    <!-- ========================================
+         EMPTY STATE
+         ======================================== -->
+    <div class="store-empty" id="storeEmpty" style="display:none;">
+      <div class="store-empty__emoji">🔎</div>
+      <p class="store-empty__title" id="storeEmptyTitle" data-i18n="bc.store.emptyTitle">
+        Mahsulot topilmadi
+      </p>
+      <p class="store-empty__desc" data-i18n="bc.store.emptyDesc">
+        Boshqa turkum yoki hukm bo'yicha qidiring.
+      </p>
+    </div>
+
+    <!-- ========================================
+         LOAD MORE
+         ======================================== -->
+    <div class="store-loadmore" id="storeLoadMore" style="display:none;">
+      <button class="btn btn--ghost btn--full" id="loadMoreBtn" type="button">
+        <span data-i18n="bc.store.loadMore">Ko'proq ko'rsatish</span>
+      </button>
+    </div>
+
+  </div><!-- /page -->
+
+  <!-- ========================================
+       PRODUCT DETAIL MODAL (reused)
+       ======================================== -->
+  <div class="modal-overlay" id="productModal" style="display:none;">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-sheet">
+      <div class="modal-sheet__handle"></div>
+      <button class="modal-sheet__close" id="modalCloseBtn">✕</button>
+      <div class="modal-verdict" id="modalVerdict">
+        <span class="modal-verdict__emoji" id="modalVerdictEmoji"></span>
+        <span class="modal-verdict__label" id="modalVerdictLabel"></span>
+      </div>
+      <div class="modal-img-wrap" id="modalImgWrap" style="display:none;">
+        <img class="modal-img" id="modalImg" src="" alt="" />
+      </div>
+      <h3 class="modal-name" id="modalName">—</h3>
+      <div class="modal-barcode" id="modalBarcode">—</div>
+      <div class="modal-halal" id="modalHalalGrid"></div>
+      <div class="modal-ambiguous" id="modalAmbiguous" style="display:none;">
+        <span>❓</span>
+        <span class="modal-ambiguous__text" id="modalAmbiguousText"></span>
+      </div>
+      <div class="modal-factory" id="modalFactory" style="display:none;">
+        <span id="modalFactoryIcon"></span>
+        <span class="modal-factory__text" id="modalFactoryText"></span>
+      </div>
+      <div class="modal-ingredients" id="modalIngredients" style="display:none;">
+        <p class="modal-ingredients__label" data-i18n="bc.ingredientsLabel">🧪 Tarkibi:</p>
+        <p class="modal-ingredients__text" id="modalIngredientsText"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN IMAGE VIEWER -->
+  <div class="fullscreen-img-overlay" id="fullscreenViewer">
+    <button class="fullscreen-img-close" id="fullscreenClose">✕</button>
+    <img id="fullscreenImg" src="" alt="Full size" />
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="../../js/logger.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="store.js"></script>
+
+</body>
+</html>

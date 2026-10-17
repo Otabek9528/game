@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>E'lon berish</title>
+<script>try{var t=localStorage.getItem('cars_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}</script>
+<link rel="stylesheet" href="sell.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar"><div class="row">
+    <button class="iconbtn" id="navBack" aria-label="Orqaga"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 id="topTitle">Mening e'lonlarim</h1>
+  </div></header>
+
+  <!-- ===== MY LISTINGS ===== -->
+  <section id="viewList" class="view on"><div class="scroll">
+    <button class="addbtn" id="btnNew">
+      <span class="plus"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></span>
+      <span class="tw"><b>Yangi e'lon qo'shish</b><span>Mashinangizni soting</span></span>
+      <span class="chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </button>
+    <div id="myList"></div>
+  </div></section>
+
+  <!-- ===== CREATE / EDIT FORM ===== -->
+  <section id="viewForm" class="view"><div class="formscroll" id="formScroll"></div></section>
+
+  <!-- sticky submit bar (shown on form view) -->
+  <div class="subbar" id="subBar" style="display:none">
+    <button class="btn ghost sm" id="btnPreview">Ko'rish</button>
+    <button class="btn primary" id="btnSubmit">Ko'rib chiqishga yuborish</button>
+  </div>
+
+  <!-- ===== bottom sheet (pickers) ===== -->
+  <div class="sheetback" id="sheetBack"></div>
+  <div class="sheet" id="sheet">
+    <div class="grab"></div>
+    <div class="sh-head"><h3 id="sheetTitle">Tanlang</h3><button class="x" id="sheetX"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="sh-search" id="sheetSearchWrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="sheetSearch" placeholder="Qidirish" autocomplete="off"></div>
+    <div class="sh-body" id="sheetBody"></div>
+  </div>
+
+  <!-- ===== modal ===== -->
+  <div class="modalback" id="modalBack"><div class="modal" id="modal"></div></div>
+
+  <!-- file input -->
+  <input type="file" id="fileInput" accept="image/*,video/mp4,video/quicktime" multiple hidden>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>window.CARS_API_BASE = "https://vegukin-api.duckdns.org/api/cars";</script>
+<script src="sell.js"></script>
+</body>
+</html>
