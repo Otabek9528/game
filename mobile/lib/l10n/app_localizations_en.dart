@@ -866,12 +866,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parcelCall => 'Call';
 
   @override
-  String get parcelCopy => 'Copy';
-
-  @override
-  String get parcelCopied => 'Copied';
-
-  @override
   String get parcelContactInText => 'The courier’s contact is in the message';
 
   @override
@@ -882,6 +876,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get parcelSearchCity => 'Search a city';
+
+  @override
+  String get parcelNoticeTitle => 'Be careful';
+
+  @override
+  String get parcelNotice =>
+      'These posts are taken from Telegram groups. We are not connected with the couriers — we only show their posts. There may be scammers among them. We are not responsible for any damage.';
+
+  @override
+  String get parcelNoticeShort =>
+      'Posts from Telegram groups. We’re not connected with the couriers.';
+
+  @override
+  String get parcelNoticeOk => 'I understand';
+
+  @override
+  String get parcelWaking => 'The server is waking up, one moment…';
+
+  @override
+  String get parcelOffline =>
+      'No connection. Showing the posts loaded last time.';
+
+  @override
+  String get parcelSearch => 'Search';
+
+  @override
+  String get parcelSearchPosts => 'Search posts';
+
+  @override
+  String parcelSearching(int done, int total) {
+    return 'Searching… $done/$total days';
+  }
+
+  @override
+  String get parcelNothingFound => 'Nothing found';
+
+  @override
+  String get parcelSavedTitle => 'Saved posts';
+
+  @override
+  String get parcelSave => 'Save';
+
+  @override
+  String get parcelUnsave => 'Remove from saved';
+
+  @override
+  String get parcelSavedEmpty =>
+      'No saved posts yet. Tap the bookmark on a post to keep it.';
+
+  @override
+  String get parcelRemoved => 'Removed';
+
+  @override
+  String get parcelUndo => 'Undo';
+
+  @override
+  String get parcelShare => 'Share';
+
+  @override
+  String get parcelEnd => 'No more posts';
+
+  @override
+  String parcelDraft(String route, String date) {
+    return 'Hello! I’m writing about a parcel for your flight on $date ($route).';
+  }
+
+  @override
+  String parcelDraftNoDate(String route) {
+    return 'Hello! I’m writing about a parcel for your flight ($route).';
+  }
 
   @override
   String get themeToDay => 'Day mode';

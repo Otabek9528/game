@@ -39,6 +39,8 @@ class ParcelDate {
     if (d == null || m == null || y == null) return null;
     return ParcelDate(date: DateTime(y, m, d), key: key, count: _int(json['count']));
   }
+
+  Map<String, dynamic> toJson() => {'date_formatted': key, 'count': count};
 }
 
 /// A city in the posts, and how many there are for it.
@@ -52,6 +54,8 @@ class ParcelCity {
     final name = '${json['city'] ?? ''}'.trim();
     return name.isEmpty ? null : ParcelCity(name: name, count: _int(json['count']));
   }
+
+  Map<String, dynamic> toJson() => {'city': name, 'count': count};
 }
 
 /// A courier's post, as they wrote it in the Telegram group.
@@ -77,12 +81,30 @@ class ParcelPost {
     final direction = json['direction'];
     final d = direction is num ? direction.toInt() : int.tryParse('${direction ?? ''}');
     return ParcelPost(
-      text: (text(json['message_text']) ?? '').replaceAll(' ', ' '),
+      text: (text(json['message_text']) ?? '').replaceAll('\u00a0', ' '),
       username: text(json['username'])?.replaceAll('@', ''),
       telegramId: text(json['telegram_id']),
       flightTime: text(json['flight_time']),
       direction: d == 0 || d == 1 ? ParcelDirection.values[d!] : null,
     );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'message_text': text,
+        'username': username,
+        'telegram_id': telegramId,
+        'flight_time': flightTime,
+        'direction': direction?.api,
+      };
+
+  /// The same post gets the same id on every load (the API gives none).
+  String get id {
+    // FNV-1a: stable across runs, unlike String.hashCode.
+    var h = 0x811c9dc5;
+    for (final unit in '$username|$telegramId|$flightTime|$text'.codeUnits) {
+      h = ((h ^ unit) * 0x01000193) & 0xffffffff;
+    }
+    return h.toRadixString(16);
   }
 }
 

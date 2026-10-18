@@ -1588,18 +1588,6 @@ abstract class AppLocalizations {
   /// **'Qo‘ng‘iroq qilish'**
   String get parcelCall;
 
-  /// No description provided for @parcelCopy.
-  ///
-  /// In uz, this message translates to:
-  /// **'Nusxa olish'**
-  String get parcelCopy;
-
-  /// No description provided for @parcelCopied.
-  ///
-  /// In uz, this message translates to:
-  /// **'Nusxa olindi'**
-  String get parcelCopied;
-
   /// No description provided for @parcelContactInText.
   ///
   /// In uz, this message translates to:
@@ -1623,6 +1611,126 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Shaharni qidirish'**
   String get parcelSearchCity;
+
+  /// No description provided for @parcelNoticeTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ehtiyot bo‘ling'**
+  String get parcelNoticeTitle;
+
+  /// No description provided for @parcelNotice.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu e’lonlar Telegram guruhlaridan olinadi. Biz kuryerlar bilan bog‘liq emasmiz — faqat ularning e’lonlarini ko‘rsatamiz. Orada firibgarlar ham bo‘lishi mumkin. Yuzaga kelgan har qanday zarar uchun javobgar emasmiz.'**
+  String get parcelNotice;
+
+  /// No description provided for @parcelNoticeShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlar Telegram guruhlaridan. Biz kuryerlar bilan bog‘liq emasmiz.'**
+  String get parcelNoticeShort;
+
+  /// No description provided for @parcelNoticeOk.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tushundim'**
+  String get parcelNoticeOk;
+
+  /// No description provided for @parcelWaking.
+  ///
+  /// In uz, this message translates to:
+  /// **'Server ishga tushmoqda, biroz kuting…'**
+  String get parcelWaking;
+
+  /// No description provided for @parcelOffline.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet aloqasi yo‘q. Oxirgi yuklangan e’lonlar ko‘rsatilmoqda.'**
+  String get parcelOffline;
+
+  /// No description provided for @parcelSearch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish'**
+  String get parcelSearch;
+
+  /// No description provided for @parcelSearchPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlardan qidirish'**
+  String get parcelSearchPosts;
+
+  /// No description provided for @parcelSearching.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirilmoqda… {done}/{total} kun'**
+  String parcelSearching(int done, int total);
+
+  /// No description provided for @parcelNothingFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsa topilmadi'**
+  String get parcelNothingFound;
+
+  /// No description provided for @parcelSavedTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlangan e’lonlar'**
+  String get parcelSavedTitle;
+
+  /// No description provided for @parcelSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get parcelSave;
+
+  /// No description provided for @parcelUnsave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlanganlardan olib tashlash'**
+  String get parcelUnsave;
+
+  /// No description provided for @parcelSavedEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha saqlangan e’lon yo‘q. E’londagi belgini bosib saqlang.'**
+  String get parcelSavedEmpty;
+
+  /// No description provided for @parcelRemoved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Olib tashlandi'**
+  String get parcelRemoved;
+
+  /// No description provided for @parcelUndo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bekor qilish'**
+  String get parcelUndo;
+
+  /// No description provided for @parcelShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get parcelShare;
+
+  /// No description provided for @parcelEnd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa e’lonlar yo‘q'**
+  String get parcelEnd;
+
+  /// No description provided for @parcelDraft.
+  ///
+  /// In uz, this message translates to:
+  /// **'Assalomu alaykum! {route} reysingiz ({date}) bo‘yicha pochta haqida yozyapman.'**
+  String parcelDraft(String route, String date);
+
+  /// No description provided for @parcelDraftNoDate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Assalomu alaykum! {route} reysingiz bo‘yicha pochta haqida yozyapman.'**
+  String parcelDraftNoDate(String route);
 
   /// No description provided for @themeToDay.
   ///

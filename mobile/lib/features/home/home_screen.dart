@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
+import '../parcel/parcel_controller.dart';
 import '../parcel/parcel_screen.dart';
 import '../qibla/qibla_screen.dart';
 import 'feature_catalog.dart';
@@ -38,6 +40,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // First launch: location, camera and "Alarms & reminders", asked once,
     // over the home screen.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Someone who uses the parcel page: its lists are fetched behind the
+      // home screen, so the page opens fresh even on a slow line.
+      unawaited(warmParcels(_services.parcels, _services.store));
       await _services.permissions.askOnce();
       await _takeWidgetAction();
       await _offerExactAlarms();

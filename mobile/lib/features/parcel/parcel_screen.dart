@@ -1,8 +1,8 @@
-import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import '../../app_services.dart';
 import '../../core/app_language.dart';
@@ -11,13 +11,17 @@ import '../../l10n/app_localizations.dart';
 import '../prayer/calendar_text.dart';
 import 'parcel_controller.dart';
 import 'parcel_models.dart';
-import 'post_card.dart';
+import 'parcel_pages.dart';
+import 'parcel_parts.dart';
 
 /// Couriers flying between Uzbekistan and Korea who carry parcels: the web
-/// page (pages/parcel/) rebuilt. Its four steps (direction, how to search,
-/// a list, the posts) become one screen: the route on top, remembered and
-/// swapped with a tap; under it the days couriers fly with the chosen
-/// day's posts, or the cities.
+/// page (pages/parcel/) rebuilt as one screen. The route sits on top
+/// (remembered, swapped with a tap) and folds into the bar on scrolling.
+/// By date, the coming days follow one another in one list, each under its
+/// own heading, with a strip of days pinned above that follows the scroll
+/// and jumps on a tap. By city, the cities. Posts can be searched, saved
+/// and shared; reaching a courier goes through a one-time notice that the
+/// app only shows posts from Telegram groups.
 class ParcelScreen extends StatefulWidget {
   const ParcelScreen({super.key, required this.services});
 
@@ -27,45 +31,112 @@ class ParcelScreen extends StatefulWidget {
   State<ParcelScreen> createState() => _ParcelScreenState();
 }
 
-class _ParcelScreenState extends State<ParcelScreen> {
+class _ParcelScreenState extends State<ParcelScreen> with WidgetsBindingObserver {
   late final ParcelController _c = ParcelController(
     source: widget.services.parcels,
     store: widget.services.store,
   );
+  late final _actions = PostActions(controller: _c, services: widget.services);
+  final _scroll = ScrollController();
+  final _strip = ScrollController();
+  final _search = TextEditingController();
+
+  bool _searching = false;
+  String _query = '';
 
   /// The swap button turns half a turn each time.
   double _turns = 0;
-  String _query = '';
-  final _search = TextEditingController();
+  bool _noticeOpen = false;
+
+  /// The day whose posts are at the top of the list.
+  String? _active;
+
+  /// Where each day's section starts, as a scroll offset: noted while the
+  /// sections are laid out.
+  final _tops = <String, double>{};
+  final _soon = <String>{};
+
+  static const _bar = 56.0;
+  static const _heroExtra = 136.0;
+  static const _stripHeight = 98.0;
+  static const _searchHeight = 62.0;
+  static const _chipsHeight = 62.0;
+  static const _dayHeight = 44.0;
 
   AppLanguage get _language => widget.services.locale.language ?? AppLanguage.uz;
+  double get _heroMin => MediaQuery.paddingOf(context).top + _bar;
+  double get _heroMax => _heroMin + _heroExtra;
+
+  bool get _showSearch =>
+      _searching || (_c.mode == ParcelMode.byCity && (_c.cities?.data?.length ?? 0) > 8);
+
+  bool get _showStrip => _c.mode == ParcelMode.byDate && !_c.dates.failed && (_c.dates.data?.isNotEmpty ?? true);
+
+  double get _pinnedHeight =>
+      (_showSearch ? _searchHeight : 0) +
+      (_c.mode == ParcelMode.byCity ? _chipsHeight : (_showStrip ? _stripHeight : 0));
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _scroll.addListener(_follow);
     _c.start();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _c.dispose();
+    _scroll.dispose();
+    _strip.dispose();
     _search.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _c.refreshIfOld();
   }
 
   void _swap() {
     HapticFeedback.selectionClick();
     setState(() {
       _turns += 0.5;
-      _query = '';
-      _search.clear();
+      _active = null;
+      _tops.clear();
+      _setQuery('');
     });
+    if (_scroll.hasClients) _scroll.jumpTo(0);
     _c.swap();
+  }
+
+  void _setMode(ParcelMode mode) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _setQuery('');
+      _searching = false;
+    });
+    _c.setMode(mode);
+  }
+
+  void _setQuery(String value) {
+    _query = value;
+    if (_search.text != value) _search.text = value;
+    if (normalizeSearch(value).isNotEmpty && _c.mode == ParcelMode.byDate) _c.wantAll();
+  }
+
+  void _toggleSearch() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _searching = !_searching;
+      if (!_searching) _setQuery('');
+    });
   }
 
   Future<void> _refresh() async {
     final ok = await _c.refresh();
-    if (!ok && mounted) _failed(context);
+    if (!ok && mounted) showFailed(context);
   }
 
   void _openCity(ParcelCity city) {
@@ -83,9 +154,86 @@ class _ParcelScreenState extends State<ParcelScreen> {
     );
   }
 
+  void _openSaved() {
+    HapticFeedback.selectionClick();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => ParcelSavedScreen(services: widget.services, controller: _c)),
+    );
+  }
+
+  /// A day's section was laid out: where it starts, and whether it is near
+  /// enough to the screen for its posts to load.
+  void _onSection(String key, SliverConstraints constraints) {
+    _tops[key] = constraints.precedingScrollExtent;
+    if (constraints.remainingCacheExtent <= 0) return;
+    if (_soon.add(key) && _soon.length == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final keys = _soon.toList();
+        _soon.clear();
+        if (!mounted) return;
+        keys.forEach(_c.want);
+        _follow();
+      });
+    }
+  }
+
+  /// The strip follows the list: the day at the top is the one marked.
+  void _follow() {
+    if (_c.mode != ParcelMode.byDate || !_scroll.hasClients) return;
+    final feed = _c.feed;
+    if (feed.isEmpty) return;
+    final offset = _scroll.offset;
+    final line = offset + math.max(_heroMin, _heroMax - offset) + _pinnedHeight + 8;
+    var active = feed.first.key;
+    for (final day in feed) {
+      final top = _tops[day.key];
+      if (top == null || top > line) break;
+      active = day.key;
+    }
+    if (active != _active) {
+      setState(() => _active = active);
+      _reveal(active);
+    }
+  }
+
+  /// Scrolls the strip so the day is in the middle of it.
+  void _reveal(String key) {
+    final dates = _c.dates.data;
+    if (dates == null || !_strip.hasClients) return;
+    final at = dates.indexWhere((d) => d.key == key);
+    if (at < 0) return;
+    final width = _strip.position.viewportDimension;
+    final target = (14 + at * 80 + 35 - width / 2).clamp(0.0, _strip.position.maxScrollExtent);
+    _strip.animateTo(target, duration: const Duration(milliseconds: 250), curve: Curves.easeOutCubic);
+  }
+
+  double _offsetFor(double top) => math.max(0, top - _heroMin - _pinnedHeight);
+
+  /// A tap on a day: the list scrolls to it when every day before it is
+  /// loaded (so it won't move on the way); otherwise the list starts from it.
+  void _jump(ParcelDate day) {
+    HapticFeedback.selectionClick();
+    final feed = _c.feed;
+    final at = feed.indexWhere((d) => d.key == day.key);
+    final top = _tops[day.key];
+    final settled = at >= 0 && feed.take(at).every((d) => _c.day(d.key).data != null);
+    setState(() => _active = day.key);
+    _reveal(day.key);
+    if (top != null && settled && normalizeSearch(_query).isEmpty) {
+      _scroll.animateTo(_offsetFor(top), duration: const Duration(milliseconds: 400), curve: Curves.easeOutCubic);
+      return;
+    }
+    _c.pick(day);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final top = _tops[day.key];
+      if (top == null || !_scroll.hasClients) return;
+      final target = _offsetFor(top);
+      if (_scroll.offset > target) _scroll.jumpTo(target);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final bottom = MediaQuery.paddingOf(context).bottom;
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -93,386 +241,404 @@ class _ParcelScreenState extends State<ParcelScreen> {
       child: Scaffold(
         backgroundColor: p.page,
         body: ListenableBuilder(
-          listenable: _c,
-          builder: (context, _) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _Hero(
-                title: s.parcelTitle,
-                onInfo: () => showHowItWorks(context),
-                child: _Route(direction: _c.direction, turns: _turns, onSwap: _swap),
-              ),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _refresh,
-                  color: p.accent,
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      SliverToBoxAdapter(child: _modes(context)),
-                      ...(_c.mode == ParcelMode.byDate ? _byDate(context) : _byCity(context)),
-                      SliverToBoxAdapter(child: SizedBox(height: 24 + bottom)),
-                    ],
+          listenable: Listenable.merge([_c, _c.saved]),
+          builder: (context, _) {
+            if (normalizeSearch(_query).isNotEmpty && _c.mode == ParcelMode.byDate) {
+              // Days that arrived since the search began are searched too.
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _c.wantAll();
+              });
+            }
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              color: p.accent,
+              edgeOffset: _heroMax,
+              child: CustomScrollView(
+                controller: _scroll,
+                physics: const AlwaysScrollableScrollPhysics(),
+                // The next day's posts start loading before it scrolls in.
+                scrollCacheExtent: const ScrollCacheExtent.pixels(700),
+                slivers: [
+                  SliverPersistentHeader(pinned: true, delegate: _hero(context)),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+                    sliver: SliverToBoxAdapter(
+                      child: NoticeCard(
+                        seen: _c.noticeSeen,
+                        open: _noticeOpen,
+                        onOk: () {
+                          HapticFeedback.selectionClick();
+                          _c.acknowledgeNotice();
+                        },
+                        onToggle: () => setState(() => _noticeOpen = !_noticeOpen),
+                      ),
+                    ),
                   ),
-                ),
+                  if (_c.offline)
+                    const SliverPadding(
+                      padding: EdgeInsets.fromLTRB(14, 10, 14, 0),
+                      sliver: SliverToBoxAdapter(child: OfflineNote()),
+                    ),
+                  if (_pinnedHeight > 0)
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _Pinned(height: _pinnedHeight, color: p.page, child: _pinned(context)),
+                    ),
+                  ...(_c.mode == ParcelMode.byDate ? _days(context) : _cities(context)),
+                  SliverToBoxAdapter(child: SizedBox(height: 24 + bottom)),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _modes(BuildContext context) {
+  _HeroDelegate _hero(BuildContext context) {
     final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 4),
-      child: SegmentedButton<ParcelMode>(
-        segments: [
-          ButtonSegment(value: ParcelMode.byDate, label: Text(s.parcelByDate), icon: const Icon(Icons.event_rounded)),
-          ButtonSegment(
-            value: ParcelMode.byCity,
-            label: Text(s.parcelByCity),
-            icon: const Icon(Icons.location_city_rounded),
+    final saved = _c.saved.items.length;
+    return _HeroDelegate(
+      top: MediaQuery.paddingOf(context).top,
+      title: s.parcelTitle,
+      palette: VegukinPalette.of(context),
+      updating: _c.updating,
+      route: Row(
+        children: [
+          Expanded(
+            child: Place(label: s.parcelFrom, country: _c.direction.from, name: countryName(s, _c.direction.from)),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: _SwapButton(turns: _turns, tooltip: s.parcelSwap, onTap: _swap),
+          ),
+          Expanded(
+            child: Place(
+              label: s.parcelTo,
+              country: _c.direction.to,
+              name: countryName(s, _c.direction.to),
+              end: true,
+            ),
           ),
         ],
-        selected: {_c.mode},
-        showSelectedIcon: false,
-        onSelectionChanged: (v) {
-          HapticFeedback.selectionClick();
-          _c.setMode(v.first);
-        },
-        style: SegmentedButton.styleFrom(
-          selectedBackgroundColor: p.action,
-          selectedForegroundColor: Colors.white,
-          foregroundColor: p.inkSoft,
-          backgroundColor: p.card,
-          side: BorderSide(color: p.hairline),
+      ),
+      modes: _Modes(mode: _c.mode, onChanged: _setMode),
+      compact: _CompactRoute(direction: _c.direction, tooltip: s.parcelSwap, onTap: _swap),
+      actions: [
+        IconButton(
+          onPressed: _toggleSearch,
+          tooltip: s.parcelSearch,
+          icon: Icon(_searching ? Icons.search_off_rounded : Icons.search_rounded, color: Colors.white),
         ),
+        IconButton(
+          onPressed: _openSaved,
+          tooltip: s.parcelSavedTitle,
+          icon: Badge(
+            isLabelVisible: saved > 0,
+            label: Text('$saved'),
+            backgroundColor: Brand.gold400,
+            textColor: const Color(0xFF3B2A05),
+            child: const Icon(Icons.bookmarks_outlined, color: Colors.white),
+          ),
+        ),
+        IconButton(
+          onPressed: () => showHowItWorks(context),
+          tooltip: s.parcelHowTitle,
+          icon: const Icon(Icons.help_outline_rounded, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  /// Under the bar, pinned: the search field when open, and the strip of
+  /// days or the countries.
+  Widget _pinned(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final dates = _c.dates;
+    return Column(
+      children: [
+        if (_showSearch)
+          SizedBox(
+            height: _searchHeight,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+              child: SearchField(
+                controller: _search,
+                autofocus: _searching,
+                hint: _c.mode == ParcelMode.byDate ? s.parcelSearchPosts : s.parcelSearchCity,
+                onChanged: (v) => setState(() => _setQuery(v)),
+                onClose: _searching ? _toggleSearch : null,
+              ),
+            ),
+          ),
+        if (_c.mode == ParcelMode.byCity)
+          SizedBox(height: _chipsHeight, child: _countries(context))
+        else if (_showStrip)
+          SizedBox(
+            height: _stripHeight,
+            child: dates.loading
+                ? const StripSkeleton()
+                : ListView.separated(
+                    controller: _strip,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 2),
+                    clipBehavior: Clip.none,
+                    itemCount: dates.data!.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 10),
+                    itemBuilder: (context, i) {
+                      final day = dates.data![i];
+                      return DayChip(
+                        date: day,
+                        selected: day.key == (_active ?? _c.feed.firstOrNull?.key),
+                        past: _c.isPast(day),
+                        language: _language,
+                        onTap: () => _jump(day),
+                      );
+                    },
+                  ),
+          ),
+      ],
+    );
+  }
+
+  Widget _countries(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+      child: Row(
+        children: [
+          for (final country in ParcelCountry.values) ...[
+            Expanded(
+              child: CountryChip(
+                country: country,
+                label: countryName(s, country),
+                selected: _c.country == country,
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  setState(() => _setQuery(''));
+                  _c.setCountry(country);
+                },
+              ),
+            ),
+            if (country == ParcelCountry.uzb) const SizedBox(width: 10),
+          ],
+        ],
       ),
     );
   }
 
-  List<Widget> _byDate(BuildContext context) {
+  List<Widget> _days(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final dates = _c.dates;
     if (dates.loading) {
       return [
-        const SliverToBoxAdapter(child: _StripSkeleton()),
-        const SliverToBoxAdapter(child: SizedBox(height: 18)),
-        ..._postsSkeleton(),
+        if (_c.slow) const SliverToBoxAdapter(child: WakingNote()),
+        const SliverToBoxAdapter(child: SizedBox(height: 10)),
+        ...postSlivers(context, const Fetch.loading(), onRetry: _c.refresh, card: (_) => const SizedBox()),
       ];
     }
-    if (dates.failed) return [_fill(_Problem(onRetry: _c.refresh))];
-    final list = dates.data!;
-    if (list.isEmpty) {
+    if (dates.failed) return [fillRemaining(Problem(onRetry: _c.refresh))];
+    if (dates.data!.isEmpty) {
       return [
-        _fill(_Empty(
+        fillRemaining(EmptyState(
           text: s.parcelNoDates,
-          action: s.parcelSeeOther(_routeName(s, _c.direction.other)),
+          action: s.parcelSeeOther(routeName(s, _c.direction.other)),
           onAction: _swap,
           showHow: true,
         )),
       ];
     }
-    final selected = _c.selected!;
-    final count = _c.posts.data?.length ?? selected.count;
+    final query = normalizeSearch(_query);
+    final feed = _c.feed;
+    final sections = <Widget>[];
+    var settled = 0;
+    var found = 0;
+    for (final day in feed) {
+      final fetch = _c.day(day.key);
+      if (!fetch.loading) settled++;
+      var posts = fetch.data;
+      if (query.isNotEmpty) {
+        // While searching, only days with a match show.
+        if (posts == null) continue;
+        posts = posts.where((post) => postMatches(post, query)).toList();
+        if (posts.isEmpty) continue;
+        found += posts.length;
+      }
+      sections.add(_section(context, day, fetch, posts));
+    }
+    final note = TextStyle(fontSize: 13, color: p.inkMuted);
     return [
-      SliverToBoxAdapter(
-        child: _DayStrip(
-          dates: list,
-          selected: selected,
-          language: _language,
-          onSelect: (d) {
-            HapticFeedback.selectionClick();
-            _c.select(d);
-          },
-        ),
-      ),
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  gregorianLine(selected.date, _language),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: p.ink),
-                ),
-              ),
-              Text(s.parcelPostCount(count), style: TextStyle(fontSize: 13, color: p.inkMuted)),
-            ],
-          ),
-        ),
-      ),
-      ..._posts(_c.posts, onRetry: _c.refresh),
-    ];
-  }
-
-  List<Widget> _byCity(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final cities = _c.cities;
-    final chips = SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
-        child: Row(
-          children: [
-            for (final country in ParcelCountry.values) ...[
-              Expanded(
-                child: _CountryChip(
-                  country: country,
-                  label: _countryName(s, country),
-                  selected: _c.country == country,
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    setState(() {
-                      _query = '';
-                      _search.clear();
-                    });
-                    _c.setCountry(country);
-                  },
-                ),
-              ),
-              if (country == ParcelCountry.uzb) const SizedBox(width: 10),
-            ],
-          ],
-        ),
-      ),
-    );
-    if (cities == null || cities.loading) return [chips, const _ListSkeleton()];
-    if (cities.failed) return [chips, _fill(_Problem(onRetry: _c.refresh))];
-    final list = cities.data!;
-    if (list.isEmpty) return [chips, _fill(_Empty(text: s.parcelNoCities))];
-    final query = _query.trim().toLowerCase();
-    final shown = query.isEmpty ? list : list.where((c) => c.name.toLowerCase().contains(query)).toList();
-    return [
-      chips,
-      if (list.length > 8)
+      if (query.isNotEmpty && settled < feed.length)
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 6, 14, 4),
-            child: _SearchField(
-              controller: _search,
-              hint: s.parcelSearchCity,
-              onChanged: (v) => setState(() => _query = v),
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
+            child: Row(
+              children: [
+                SizedBox.square(dimension: 14, child: CircularProgressIndicator(strokeWidth: 2, color: p.accent)),
+                const SizedBox(width: 10),
+                Text(s.parcelSearching(settled, feed.length), style: note),
+              ],
             ),
           ),
         ),
-      if (shown.isEmpty)
-        _fill(_Empty(text: s.parcelNoCities))
-      else
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-          sliver: SliverToBoxAdapter(
-            child: _CityList(cities: shown, onOpen: _openCity),
+      ...sections,
+      if (query.isNotEmpty && settled == feed.length && found == 0)
+        fillRemaining(EmptyState(text: s.parcelNothingFound, icon: Icons.search_off_rounded))
+      else if (query.isEmpty && settled == feed.length)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Text(s.parcelEnd, textAlign: TextAlign.center, style: note),
           ),
         ),
     ];
   }
 
-  List<Widget> _posts(Fetch<List<ParcelPost>> posts, {required Future<bool> Function() onRetry}) =>
-      postSlivers(context, posts, onRetry: onRetry, onOpen: widget.services.openLink);
-
-  List<Widget> _postsSkeleton() => postSlivers(context, const Fetch.loading(), onRetry: _c.refresh, onOpen: (_) async {});
-}
-
-/// The posts of a city, from the city list.
-class ParcelCityScreen extends StatefulWidget {
-  const ParcelCityScreen({
-    super.key,
-    required this.services,
-    required this.controller,
-    required this.city,
-    required this.country,
-    required this.direction,
-  });
-
-  final AppServices services;
-  final ParcelController controller;
-  final String city;
-  final ParcelCountry country;
-  final ParcelDirection direction;
-
-  @override
-  State<ParcelCityScreen> createState() => _ParcelCityScreenState();
-}
-
-class _ParcelCityScreenState extends State<ParcelCityScreen> {
-  Fetch<List<ParcelPost>> _posts = const Fetch.loading();
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<bool> _load() async {
-    try {
-      final list = await widget.controller.postsByCity(widget.city, widget.country, widget.direction);
-      if (mounted) setState(() => _posts = Fetch.done(list));
-      return true;
-    } catch (_) {
-      if (mounted && _posts.data == null) setState(() => _posts = const Fetch.failed());
-      return false;
-    }
-  }
-
-  Future<bool> _retry() {
-    setState(() => _posts = const Fetch.loading());
-    return _load();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  /// A day: a marker that notes where it starts, its heading (pinned while
+  /// its posts scroll), and its posts.
+  Widget _section(BuildContext context, ParcelDate day, Fetch<List<ParcelPost>> fetch, List<ParcelPost>? posts) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final bottom = MediaQuery.paddingOf(context).bottom;
-    final count = _posts.data?.length;
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
-      child: Scaffold(
-        backgroundColor: p.page,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _Hero(
-              title: '${widget.country.flag} ${widget.city}',
-              child: Text(
-                [_routeName(s, widget.direction), if (count != null) s.parcelPostCount(count)].join('  ·  '),
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white70),
-              ),
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverLayoutBuilder(
+          builder: (context, constraints) {
+            _onSection(day.key, constraints);
+            return const SliverToBoxAdapter(child: SizedBox.shrink());
+          },
+        ),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _DayHeading(
+            height: _dayHeight,
+            title: gregorianLine(day.date, _language),
+            count: s.parcelPostCount(posts?.length ?? day.count),
+            past: _c.isPast(day),
+            palette: p,
+          ),
+        ),
+        if (fetch.failed)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+              child: Problem(onRetry: () async {
+                _c.retryDay(day.key);
+                return true;
+              }),
             ),
-            Expanded(
-              child: RefreshIndicator(
-                color: p.accent,
-                onRefresh: () async {
-                  if (!await _load() && context.mounted) _failed(context);
-                },
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    const SliverToBoxAdapter(child: SizedBox(height: 14)),
-                    ...postSlivers(context, _posts, onRetry: _retry, onOpen: widget.services.openLink),
-                    SliverToBoxAdapter(child: SizedBox(height: 24 + bottom)),
-                  ],
+          )
+        else if (posts == null)
+          const SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 14),
+            sliver: SliverToBoxAdapter(child: PostSkeleton()),
+          )
+        else if (posts.isEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+              child: Text(s.parcelNoPosts, style: TextStyle(fontSize: 13.5, color: p.inkMuted)),
+            ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            sliver: SliverList.separated(
+              itemCount: posts.length,
+              itemBuilder: (context, i) => _actions.card(context, posts[i], _c.direction),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
+            ),
+          ),
+        const SliverToBoxAdapter(child: SizedBox(height: 14)),
+      ],
+    );
+  }
+
+  List<Widget> _cities(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final cities = _c.cities;
+    if (cities == null || cities.loading) {
+      return [if (_c.slow) const SliverToBoxAdapter(child: WakingNote()), const ListSkeleton()];
+    }
+    if (cities.failed) return [fillRemaining(Problem(onRetry: _c.refresh))];
+    final list = cities.data!;
+    if (list.isEmpty) return [fillRemaining(EmptyState(text: s.parcelNoCities))];
+    final query = normalizeSearch(_query);
+    final shown = query.isEmpty ? list : list.where((c) => normalizeSearch(c.name).contains(query)).toList();
+    if (shown.isEmpty) return [fillRemaining(EmptyState(text: s.parcelNoCities, icon: Icons.search_off_rounded))];
+    return [
+      SliverPadding(
+        padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+        sliver: SliverToBoxAdapter(child: CityList(cities: shown, onOpen: _openCity)),
+      ),
+    ];
+  }
+}
+
+/// The emerald top. Open: the bar, the route and the two ways to search.
+/// Scrolled: just the bar, with the route as a small swap button.
+class _HeroDelegate extends SliverPersistentHeaderDelegate {
+  _HeroDelegate({
+    required this.top,
+    required this.title,
+    required this.palette,
+    required this.updating,
+    required this.route,
+    required this.modes,
+    required this.compact,
+    required this.actions,
+  });
+
+  final double top;
+  final String title;
+  final VegukinPalette palette;
+  final bool updating;
+  final Widget route;
+  final Widget modes;
+  final Widget compact;
+  final List<Widget> actions;
+
+  static const _bar = _ParcelScreenState._bar;
+  static const _extra = _ParcelScreenState._heroExtra;
+
+  @override
+  double get minExtent => top + _bar;
+
+  @override
+  double get maxExtent => top + _bar + _extra;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final t = (shrinkOffset / _extra).clamp(0.0, 1.0);
+    const radius = BorderRadius.vertical(bottom: Radius.circular(22));
+    return SizedBox.expand(
+      child: DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: palette.hero.sublist(1)),
+        borderRadius: radius,
+        boxShadow: t > 0.95 ? const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 2))] : null,
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          children: [
+            Positioned(
+              left: 16,
+              right: 16,
+              top: top + _bar + 2 - shrinkOffset,
+              child: Opacity(
+                opacity: (1 - t * 1.6).clamp(0.0, 1.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [route, const SizedBox(height: 12), modes],
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// The posts in their states: placeholders while loading, a retry when
-/// they couldn't load, a note when there are none.
-List<Widget> postSlivers(
-  BuildContext context,
-  Fetch<List<ParcelPost>> posts, {
-  required Future<bool> Function() onRetry,
-  required Future<void> Function(Uri) onOpen,
-}) {
-  final s = AppLocalizations.of(context);
-  if (posts.loading) {
-    return [
-      SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        sliver: SliverList.separated(
-          itemCount: 2,
-          itemBuilder: (_, _) => const _PostSkeleton(),
-          separatorBuilder: (_, _) => const SizedBox(height: 12),
-        ),
-      ),
-    ];
-  }
-  if (posts.failed) return [_fill(_Problem(onRetry: onRetry))];
-  final list = posts.data!;
-  if (list.isEmpty) return [_fill(_Empty(text: s.parcelNoPosts))];
-  return [
-    SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      sliver: SliverList.separated(
-        itemCount: list.length,
-        itemBuilder: (_, i) => PostCard(post: list[i], onOpen: onOpen),
-        separatorBuilder: (_, _) => const SizedBox(height: 12),
-      ),
-    ),
-  ];
-}
-
-/// "Qanday ishlaydi?": the web page's three steps.
-Future<void> showHowItWorks(BuildContext context) {
-  final s = AppLocalizations.of(context);
-  final p = VegukinPalette.of(context);
-  return showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    backgroundColor: p.card,
-    builder: (context) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(22, 0, 22, 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(s.parcelHowTitle, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: p.ink)),
-            const SizedBox(height: 4),
-            Text(s.parcelTagline, style: TextStyle(fontSize: 14, color: p.inkMuted)),
-            const SizedBox(height: 14),
-            const _HowSteps(),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-void _failed(BuildContext context) {
-  ScaffoldMessenger.maybeOf(context)
-    ?..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      content: Text(AppLocalizations.of(context).parcelError),
-      behavior: SnackBarBehavior.floating,
-    ));
-}
-
-Widget _fill(Widget child) => SliverFillRemaining(hasScrollBody: false, child: child);
-
-String _routeName(AppLocalizations s, ParcelDirection d) =>
-    d == ParcelDirection.uzbToKor ? s.parcelUzbToKor : s.parcelKorToUzb;
-
-String _countryName(AppLocalizations s, ParcelCountry c) => c == ParcelCountry.uzb ? s.parcelUzbekistan : s.parcelKorea;
-
-String _capital(String text) => text.isEmpty ? text : text[0].toUpperCase() + text.substring(1);
-
-/// The emerald top: the bar, and under it [child] (the route, or a
-/// subtitle).
-class _Hero extends StatelessWidget {
-  const _Hero({required this.title, required this.child, this.onInfo});
-
-  final String title;
-  final Widget child;
-  final VoidCallback? onInfo;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero.sublist(1)),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 56,
+            Positioned(
+              left: 0,
+              right: 0,
+              top: top,
+              height: _bar,
               child: Row(
                 children: [
                   const SizedBox(width: 4),
@@ -482,627 +648,227 @@ class _Hero extends StatelessWidget {
                     icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                   ),
                   Expanded(
-                    child: Text(
-                      title,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: Brand.displayFont,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      layoutBuilder: (current, previous) =>
+                          Stack(alignment: Alignment.centerLeft, children: [...previous, ?current]),
+                      child: t < 0.6
+                          ? Text(
+                              title,
+                              key: const ValueKey('title'),
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontFamily: Brand.displayFont,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            )
+                          : KeyedSubtree(key: const ValueKey('route'), child: compact),
                     ),
                   ),
-                  if (onInfo != null)
-                    IconButton(
-                      onPressed: onInfo,
-                      tooltip: s.parcelHowTitle,
-                      icon: const Icon(Icons.help_outline_rounded, color: Colors.white),
-                    ),
-                  const SizedBox(width: 4),
+                  ...actions,
+                  const SizedBox(width: 2),
                 ],
               ),
             ),
-            Padding(padding: const EdgeInsets.fromLTRB(16, 2, 16, 18), child: child),
+            if (updating)
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: LinearProgressIndicator(minHeight: 2, color: Brand.gold300, backgroundColor: Colors.transparent),
+              ),
           ],
         ),
       ),
-    );
-  }
-}
-
-/// From and to, with the swap between them, as flight searches do it.
-class _Route extends StatelessWidget {
-  const _Route({required this.direction, required this.turns, required this.onSwap});
-
-  final ParcelDirection direction;
-  final double turns;
-  final VoidCallback onSwap;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    return Row(
-      children: [
-        Expanded(child: _Place(label: s.parcelFrom, country: direction.from, name: _countryName(s, direction.from))),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Material(
-            color: Colors.white,
-            shape: const CircleBorder(),
-            elevation: 3,
-            shadowColor: Colors.black38,
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: onSwap,
-              child: Tooltip(
-                message: s.parcelSwap,
-                child: SizedBox.square(
-                  dimension: 46,
-                  child: AnimatedRotation(
-                    turns: turns,
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutBack,
-                    child: const Icon(Icons.swap_horiz_rounded, color: Brand.emerald700, size: 26),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: _Place(label: s.parcelTo, country: direction.to, name: _countryName(s, direction.to), end: true),
-        ),
-      ],
-    );
-  }
-}
-
-class _Place extends StatelessWidget {
-  const _Place({required this.label, required this.country, required this.name, this.end = false});
-
-  final String label;
-  final ParcelCountry country;
-  final String name;
-  final bool end;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 11),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.13),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-      ),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        child: Column(
-          key: ValueKey(country),
-          crossAxisAlignment: end ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Text(label, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white70)),
-            const SizedBox(height: 3),
-            Row(
-              mainAxisAlignment: end ? MainAxisAlignment.end : MainAxisAlignment.start,
-              children: [
-                Text(country.flag, style: const TextStyle(fontSize: 19)),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(
-                    name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
-}
-
-/// The days couriers fly, side by side; each with its post count.
-class _DayStrip extends StatelessWidget {
-  const _DayStrip({required this.dates, required this.selected, required this.language, required this.onSelect});
-
-  final List<ParcelDate> dates;
-  final ParcelDate selected;
-  final AppLanguage language;
-  final ValueChanged<ParcelDate> onSelect;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
-        clipBehavior: Clip.none,
-        itemCount: dates.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
-        itemBuilder: (context, i) => _DayChip(
-          date: dates[i],
-          selected: dates[i].key == selected.key,
-          language: language,
-          onTap: () => onSelect(dates[i]),
-        ),
-      ),
-    );
-  }
+  bool shouldRebuild(_HeroDelegate old) => true;
 }
 
-class _DayChip extends StatelessWidget {
-  const _DayChip({required this.date, required this.selected, required this.language, required this.onTap});
+/// Pinned under the bar.
+class _Pinned extends SliverPersistentHeaderDelegate {
+  _Pinned({required this.height, required this.color, required this.child});
 
-  final ParcelDate date;
-  final bool selected;
-  final AppLanguage language;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    final now = DateTime.now();
-    final days = DateTime.utc(date.date.year, date.date.month, date.date.day)
-        .difference(DateTime.utc(now.year, now.month, now.day))
-        .inDays;
-    final top = switch (days) {
-      0 => s.dayToday,
-      1 => s.dayTomorrow,
-      _ => _capital(DateFormat.E(language.code).format(date.date)),
-    };
-    final ink = selected ? Colors.white : p.ink;
-    final soft = selected ? Colors.white70 : p.inkMuted;
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Material(
-          color: selected ? p.action : p.card,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: selected ? p.action : p.hairline),
-          ),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              width: 70,
-              height: 84,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    top,
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: soft),
-                  ),
-                  Text(
-                    '${date.date.day}',
-                    style: TextStyle(fontSize: 25, height: 1.15, fontWeight: FontWeight.w800, color: ink),
-                  ),
-                  Text(
-                    _capital(DateFormat.MMM(language.code).format(date.date)),
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: soft),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (date.count > 0)
-          Positioned(
-            top: -7,
-            right: -5,
-            child: Container(
-              constraints: const BoxConstraints(minWidth: 22),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Brand.gold400,
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: p.page, width: 2),
-              ),
-              child: Text(
-                '${date.count}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFF3B2A05)),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _CountryChip extends StatelessWidget {
-  const _CountryChip({required this.country, required this.label, required this.selected, required this.onTap});
-
-  final ParcelCountry country;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return Material(
-      color: selected ? p.cardSelected : p.card,
-      shape: StadiumBorder(side: BorderSide(color: selected ? p.accent : p.hairline, width: selected ? 1.5 : 1)),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const StadiumBorder(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(country.flag, style: const TextStyle(fontSize: 17)),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  label,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w700,
-                    color: selected ? p.accent : p.inkSoft,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SearchField extends StatelessWidget {
-  const _SearchField({required this.controller, required this.hint, required this.onChanged});
-
-  final TextEditingController controller;
-  final String hint;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      textInputAction: TextInputAction.search,
-      decoration: InputDecoration(
-        hintText: hint,
-        prefixIcon: Icon(Icons.search_rounded, color: p.inkMuted),
-        filled: true,
-        fillColor: p.card,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: p.hairline)),
-        enabledBorder:
-            OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: p.hairline)),
-        focusedBorder:
-            OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: p.accent)),
-      ),
-    );
-  }
-}
-
-class _CityList extends StatelessWidget {
-  const _CityList({required this.cities, required this.onOpen});
-
-  final List<ParcelCity> cities;
-  final ValueChanged<ParcelCity> onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return Material(
-      color: p.card,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: p.hairline),
-      ),
-      child: Column(
-        children: [
-          for (final (i, city) in cities.indexed) ...[
-            if (i > 0) Divider(height: 1, indent: 62, color: p.hairline),
-            InkWell(
-              onTap: () => onOpen(city),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(color: p.cardSelected, shape: BoxShape.circle),
-                      child: Icon(Icons.location_on_rounded, size: 19, color: p.accent),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        city.name,
-                        style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: p.ink),
-                      ),
-                    ),
-                    Text(s.parcelPostCount(city.count), style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
-                    Icon(Icons.chevron_right_rounded, color: p.inkMuted),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _Problem extends StatelessWidget {
-  const _Problem({required this.onRetry});
-
-  final Future<bool> Function() onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 32, 28, 32),
-      child: Column(
-        children: [
-          Icon(Icons.cloud_off_rounded, size: 44, color: p.inkMuted),
-          const SizedBox(height: 12),
-          Text(
-            s.parcelError,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14.5, height: 1.45, color: p.inkSoft),
-          ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () {
-              HapticFeedback.selectionClick();
-              onRetry();
-            },
-            icon: const Icon(Icons.refresh_rounded),
-            label: Text(s.retry),
-            style: FilledButton.styleFrom(minimumSize: const Size(180, 48)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Empty extends StatelessWidget {
-  const _Empty({required this.text, this.action, this.onAction, this.showHow = false});
-
-  final String text;
-  final String? action;
-  final VoidCallback? onAction;
-  final bool showHow;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 28, 22, 20),
-      child: Column(
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(color: p.cardSelected, shape: BoxShape.circle),
-            child: Icon(Icons.inbox_rounded, size: 36, color: p.accent),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, height: 1.45, fontWeight: FontWeight.w600, color: p.inkSoft),
-          ),
-          if (action != null) ...[
-            const SizedBox(height: 14),
-            OutlinedButton.icon(
-              onPressed: onAction,
-              icon: const Icon(Icons.swap_horiz_rounded),
-              label: Text(action!, textAlign: TextAlign.center),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: p.accent,
-                minimumSize: const Size(0, 46),
-                side: BorderSide(color: p.accent.withValues(alpha: 0.5)),
-                shape: const StadiumBorder(),
-              ),
-            ),
-          ],
-          if (showHow) ...[
-            const SizedBox(height: 26),
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-              decoration: BoxDecoration(
-                color: p.gold.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: p.gold.withValues(alpha: 0.25)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(s.parcelHowTitle, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink)),
-                  const SizedBox(height: 10),
-                  const _HowSteps(),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _HowSteps extends StatelessWidget {
-  const _HowSteps();
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return Column(
-      children: [
-        for (final (i, step) in [s.parcelHow1, s.parcelHow2, s.parcelHow3].indexed)
-          Padding(
-            padding: EdgeInsets.only(top: i == 0 ? 0 : 10),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 13,
-                  backgroundColor: p.action,
-                  child: Text(
-                    '${i + 1}',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(child: Text(step, style: TextStyle(fontSize: 14, height: 1.35, color: p.inkSoft))),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-/// Grey shapes that breathe while the real ones load.
-class _Pulse extends StatefulWidget {
-  const _Pulse({required this.child});
-
+  final double height;
+  final Color color;
   final Widget child;
 
   @override
-  State<_Pulse> createState() => _PulseState();
-}
-
-class _PulseState extends State<_Pulse> with SingleTickerProviderStateMixin {
-  late final _a = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat(reverse: true);
+  double get minExtent => height;
 
   @override
-  void dispose() {
-    _a.dispose();
-    super.dispose();
+  double get maxExtent => height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) =>
+      SizedBox.expand(child: ColoredBox(color: color, child: child));
+
+  @override
+  bool shouldRebuild(_Pinned old) => true;
+}
+
+/// A day's heading, pinned under the strip while its posts pass.
+class _DayHeading extends SliverPersistentHeaderDelegate {
+  _DayHeading({required this.height, required this.title, required this.count, required this.past, required this.palette});
+
+  final double height;
+  final String title;
+  final String count;
+  final bool past;
+  final VegukinPalette palette;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final p = palette;
+    // A header's child picks its own height: it must fill its slot.
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: p.page,
+        border: overlapsContent ? Border(bottom: BorderSide(color: p.hairline)) : null,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: past ? p.inkMuted : p.ink),
+            ),
+          ),
+          Text(count, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
+        ],
+      ),
+    );
   }
 
   @override
-  Widget build(BuildContext context) =>
-      FadeTransition(opacity: Tween(begin: 0.45, end: 1.0).animate(_a), child: widget.child);
+  bool shouldRebuild(_DayHeading old) =>
+      old.title != title || old.count != count || old.past != past || old.palette != palette || old.height != height;
 }
 
-class _Bone extends StatelessWidget {
-  const _Bone({this.width, required this.height, this.radius = 8});
+class _SwapButton extends StatelessWidget {
+  const _SwapButton({required this.turns, required this.tooltip, required this.onTap});
 
-  final double? width;
-  final double height;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: VegukinPalette.of(context).hairline,
-          borderRadius: BorderRadius.circular(radius),
-        ),
-      );
-}
-
-class _StripSkeleton extends StatelessWidget {
-  const _StripSkeleton();
-
-  @override
-  Widget build(BuildContext context) => _Pulse(
-        child: SizedBox(
-          height: 100,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
-            itemCount: 6,
-            separatorBuilder: (_, _) => const SizedBox(width: 10),
-            itemBuilder: (_, _) => const _Bone(width: 70, height: 84, radius: 16),
-          ),
-        ),
-      );
-}
-
-class _PostSkeleton extends StatelessWidget {
-  const _PostSkeleton();
+  final double turns;
+  final String tooltip;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return _Pulse(
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: p.card,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: p.hairline),
-        ),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _Bone(width: 42, height: 42, radius: 21),
-                SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [_Bone(width: 130, height: 13), SizedBox(height: 7), _Bone(width: 90, height: 11)],
-                ),
-              ],
+    return Material(
+      color: Colors.white,
+      shape: const CircleBorder(),
+      elevation: 3,
+      shadowColor: Colors.black38,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Tooltip(
+          message: tooltip,
+          child: SizedBox.square(
+            dimension: 46,
+            child: AnimatedRotation(
+              turns: turns,
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOutBack,
+              child: const Icon(Icons.swap_horiz_rounded, color: Brand.emerald700, size: 26),
             ),
-            SizedBox(height: 16),
-            _Bone(height: 12),
-            SizedBox(height: 8),
-            _Bone(height: 12),
-            SizedBox(height: 8),
-            _Bone(width: 180, height: 12),
-            SizedBox(height: 16),
-            _Bone(height: 44, radius: 22),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _ListSkeleton extends StatelessWidget {
-  const _ListSkeleton();
+/// The route in the folded bar: 🇰🇷 → 🇺🇿, a tap swaps it.
+class _CompactRoute extends StatelessWidget {
+  const _CompactRoute({required this.direction, required this.tooltip, required this.onTap});
+
+  final ParcelDirection direction;
+  final String tooltip;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => SliverPadding(
-        padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-        sliver: SliverToBoxAdapter(
-          child: _Pulse(
-            child: Column(
-              children: [
-                for (var i = 0; i < 5; i++)
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.white.withValues(alpha: 0.16),
+          shape: const StadiumBorder(),
+          child: InkWell(
+            onTap: onTap,
+            customBorder: const StadiumBorder(),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 6, 10, 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(direction.from.flag, style: const TextStyle(fontSize: 18)),
                   const Padding(
-                    padding: EdgeInsets.only(bottom: 10),
-                    child: _Bone(height: 56, radius: 14),
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: Icon(Icons.arrow_forward_rounded, size: 16, color: Colors.white70),
                   ),
-              ],
+                  Text(direction.to.flag, style: const TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.swap_horiz_rounded, size: 20, color: Colors.white),
+                ],
+              ),
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
+}
+
+/// By date or by city, white on the emerald.
+class _Modes extends StatelessWidget {
+  const _Modes({required this.mode, required this.onChanged});
+
+  final ParcelMode mode;
+  final ValueChanged<ParcelMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    return SizedBox(
+      height: 42,
+      child: SegmentedButton<ParcelMode>(
+        segments: [
+          ButtonSegment(value: ParcelMode.byDate, label: Text(s.parcelByDate), icon: const Icon(Icons.event_rounded)),
+          ButtonSegment(
+            value: ParcelMode.byCity,
+            label: Text(s.parcelByCity),
+            icon: const Icon(Icons.location_city_rounded),
+          ),
+        ],
+        selected: {mode},
+        showSelectedIcon: false,
+        expandedInsets: EdgeInsets.zero,
+        onSelectionChanged: (v) => onChanged(v.first),
+        style: SegmentedButton.styleFrom(
+          selectedBackgroundColor: Colors.white,
+          selectedForegroundColor: Brand.emerald800,
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.white.withValues(alpha: 0.12),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+        ),
+      ),
+    );
+  }
 }

@@ -214,6 +214,7 @@ class TestApp {
       businessStats: () async => stats,
       parcels: this.parcels,
       openLink: (uri) async => links.add(uri),
+      shareText: (text) async => shared.add(text),
     );
   }
 
@@ -227,6 +228,9 @@ class TestApp {
 
   /// What the app opened outside itself: Telegram, the dialer, the browser.
   final links = <Uri>[];
+
+  /// What the app handed to the share sheet.
+  final shared = <String>[];
   late final PrayerController prayer;
   late final FakePermissions permissions;
   late final ReminderController reminders;

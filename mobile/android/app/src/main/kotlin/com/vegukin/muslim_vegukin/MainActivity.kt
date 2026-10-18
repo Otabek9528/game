@@ -115,6 +115,20 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        /** "vegukin/share": Android's share sheet, see lib/core/share.dart. */
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/share").setMethodCallHandler { call, result ->
+            when (call.method) {
+                "text" -> {
+                    val send = Intent(Intent.ACTION_SEND)
+                        .setType("text/plain")
+                        .putExtra(Intent.EXTRA_TEXT, call.arguments as String)
+                    startActivity(Intent.createChooser(send, null))
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
     }
 
     override fun onDestroy() {

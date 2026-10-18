@@ -548,12 +548,57 @@
   "parcelHow3": "Pochtangizni xavfsiz yetkazing!",
   "parcelWriteTelegram": "Telegramda yozish",
   "parcelCall": "Qo‘ng‘iroq qilish",
-  "parcelCopy": "Nusxa olish",
-  "parcelCopied": "Nusxa olindi",
   "parcelContactInText": "Kuryer kontakti xabarda ko‘rsatilgan",
   "parcelShowMore": "Ko‘proq",
   "parcelShowLess": "Yig‘ish",
   "parcelSearchCity": "Shaharni qidirish",
+  "parcelNoticeTitle": "Ehtiyot bo‘ling",
+  "parcelNotice": "Bu e’lonlar Telegram guruhlaridan olinadi. Biz kuryerlar bilan bog‘liq emasmiz — faqat ularning e’lonlarini ko‘rsatamiz. Orada firibgarlar ham bo‘lishi mumkin. Yuzaga kelgan har qanday zarar uchun javobgar emasmiz.",
+  "parcelNoticeShort": "E’lonlar Telegram guruhlaridan. Biz kuryerlar bilan bog‘liq emasmiz.",
+  "parcelNoticeOk": "Tushundim",
+  "parcelWaking": "Server ishga tushmoqda, biroz kuting…",
+  "parcelOffline": "Internet aloqasi yo‘q. Oxirgi yuklangan e’lonlar ko‘rsatilmoqda.",
+  "parcelSearch": "Qidirish",
+  "parcelSearchPosts": "E’lonlardan qidirish",
+  "parcelSearching": "Qidirilmoqda… {done}/{total} kun",
+  "@parcelSearching": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "parcelNothingFound": "Hech narsa topilmadi",
+  "parcelSavedTitle": "Saqlangan e’lonlar",
+  "parcelSave": "Saqlash",
+  "parcelUnsave": "Saqlanganlardan olib tashlash",
+  "parcelSavedEmpty": "Hozircha saqlangan e’lon yo‘q. E’londagi belgini bosib saqlang.",
+  "parcelRemoved": "Olib tashlandi",
+  "parcelUndo": "Bekor qilish",
+  "parcelShare": "Ulashish",
+  "parcelEnd": "Boshqa e’lonlar yo‘q",
+  "parcelDraft": "Assalomu alaykum! {route} reysingiz ({date}) bo‘yicha pochta haqida yozyapman.",
+  "@parcelDraft": {
+    "placeholders": {
+      "route": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "parcelDraftNoDate": "Assalomu alaykum! {route} reysingiz bo‘yicha pochta haqida yozyapman.",
+  "@parcelDraftNoDate": {
+    "placeholders": {
+      "route": {
+        "type": "String"
+      }
+    }
+  },
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

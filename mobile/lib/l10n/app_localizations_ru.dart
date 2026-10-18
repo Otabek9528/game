@@ -884,12 +884,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get parcelCall => 'Позвонить';
 
   @override
-  String get parcelCopy => 'Копировать';
-
-  @override
-  String get parcelCopied => 'Скопировано';
-
-  @override
   String get parcelContactInText => 'Контакт курьера указан в сообщении';
 
   @override
@@ -900,6 +894,76 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get parcelSearchCity => 'Поиск города';
+
+  @override
+  String get parcelNoticeTitle => 'Будьте осторожны';
+
+  @override
+  String get parcelNotice =>
+      'Эти объявления взяты из Telegram-групп. Мы не связаны с курьерами — мы только показываем их объявления. Среди них могут быть мошенники. Мы не несём ответственности за любой ущерб.';
+
+  @override
+  String get parcelNoticeShort =>
+      'Объявления из Telegram-групп. Мы не связаны с курьерами.';
+
+  @override
+  String get parcelNoticeOk => 'Понятно';
+
+  @override
+  String get parcelWaking => 'Сервер запускается, подождите немного…';
+
+  @override
+  String get parcelOffline =>
+      'Нет связи. Показаны последние загруженные объявления.';
+
+  @override
+  String get parcelSearch => 'Поиск';
+
+  @override
+  String get parcelSearchPosts => 'Поиск по объявлениям';
+
+  @override
+  String parcelSearching(int done, int total) {
+    return 'Ищем… $done/$total дн.';
+  }
+
+  @override
+  String get parcelNothingFound => 'Ничего не найдено';
+
+  @override
+  String get parcelSavedTitle => 'Сохранённые объявления';
+
+  @override
+  String get parcelSave => 'Сохранить';
+
+  @override
+  String get parcelUnsave => 'Убрать из сохранённых';
+
+  @override
+  String get parcelSavedEmpty =>
+      'Сохранённых объявлений пока нет. Нажмите на значок в объявлении, чтобы сохранить его.';
+
+  @override
+  String get parcelRemoved => 'Удалено';
+
+  @override
+  String get parcelUndo => 'Отменить';
+
+  @override
+  String get parcelShare => 'Поделиться';
+
+  @override
+  String get parcelEnd => 'Больше объявлений нет';
+
+  @override
+  String parcelDraft(String route, String date) {
+    return 'Здравствуйте! Пишу по поводу посылки на ваш рейс $date ($route).';
+  }
+
+  @override
+  String parcelDraftNoDate(String route) {
+    return 'Здравствуйте! Пишу по поводу посылки на ваш рейс ($route).';
+  }
 
   @override
   String get themeToDay => 'Дневной режим';

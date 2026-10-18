@@ -8,12 +8,28 @@ import 'linkify.dart';
 import 'parcel_models.dart';
 
 /// A courier's post: who and when they fly, what they wrote (phones,
-/// Telegram names and links tappable), and the ways to reach them.
+/// Telegram names and links tappable), the ways to reach them, sharing,
+/// and a bookmark.
 class PostCard extends StatefulWidget {
-  const PostCard({super.key, required this.post, required this.onOpen});
+  const PostCard({
+    super.key,
+    required this.post,
+    required this.route,
+    required this.onOpen,
+    required this.onShare,
+    required this.saved,
+    required this.onSave,
+  });
 
   final ParcelPost post;
+
+  /// "Koreyadan O‘zbekistonga": for the message to the courier and for
+  /// sharing.
+  final String route;
   final Future<void> Function(Uri) onOpen;
+  final Future<void> Function(String) onShare;
+  final bool saved;
+  final VoidCallback onSave;
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -46,16 +62,25 @@ class _PostCardState extends State<PostCard> {
     widget.onOpen(uri);
   }
 
-  void _copy() {
+  /// Telegram opens the chat with a first message ready (the user still
+  /// taps Send). Spaces as %20: Android leaves a "+" as it is.
+  Uri _telegram(AppLocalizations s, String username) {
+    final flight = widget.post.flightTime;
+    final draft = flight == null ? s.parcelDraftNoDate(widget.route) : s.parcelDraft(widget.route, flight);
+    return Uri.parse('https://t.me/$username?text=${Uri.encodeComponent(draft)}');
+  }
+
+  /// The post as a message for someone else: route, flight, contact, text.
+  void _share() {
     HapticFeedback.selectionClick();
-    Clipboard.setData(ClipboardData(text: widget.post.text));
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    messenger?.hideCurrentSnackBar();
-    messenger?.showSnackBar(SnackBar(
-      content: Text(AppLocalizations.of(context).parcelCopied),
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(seconds: 2),
-    ));
+    final post = widget.post;
+    widget.onShare([
+      '📦 ${widget.route}',
+      if (post.flightTime != null) '✈️ ${post.flightTime}',
+      if (post.username != null) '👤 @${post.username}',
+      '',
+      post.text,
+    ].join('\n'));
   }
 
   @override
@@ -95,6 +120,7 @@ class _PostCardState extends State<PostCard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _Avatar(username: username),
               const SizedBox(width: 12),
@@ -132,9 +158,19 @@ class _PostCardState extends State<PostCard> {
                   ],
                 ),
               ),
+              IconButton(
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  widget.onSave();
+                },
+                tooltip: widget.saved ? s.parcelUnsave : s.parcelSave,
+                visualDensity: VisualDensity.compact,
+                color: widget.saved ? p.gold : p.inkMuted,
+                icon: Icon(widget.saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded),
+              ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           LayoutBuilder(
             builder: (context, box) {
               final measure = TextPainter(
@@ -174,7 +210,7 @@ class _PostCardState extends State<PostCard> {
               if (username != null)
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: () => _go(Uri.parse('https://t.me/$username')),
+                    onPressed: () => _go(_telegram(s, username)),
                     icon: const Icon(Icons.send_rounded, size: 18),
                     label: Text(s.parcelWriteTelegram, overflow: TextOverflow.ellipsis),
                     style: FilledButton.styleFrom(minimumSize: const Size(0, 44)),
@@ -205,10 +241,10 @@ class _PostCardState extends State<PostCard> {
               ],
               const SizedBox(width: 4),
               IconButton(
-                onPressed: _copy,
-                tooltip: s.parcelCopy,
+                onPressed: _share,
+                tooltip: s.parcelShare,
                 color: p.inkMuted,
-                icon: const Icon(Icons.copy_rounded, size: 20),
+                icon: const Icon(Icons.share_rounded, size: 21),
               ),
             ],
           ),

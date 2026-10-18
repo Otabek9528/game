@@ -842,12 +842,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get parcelCall => 'Qo‘ng‘iroq qilish';
 
   @override
-  String get parcelCopy => 'Nusxa olish';
-
-  @override
-  String get parcelCopied => 'Nusxa olindi';
-
-  @override
   String get parcelContactInText => 'Kuryer kontakti xabarda ko‘rsatilgan';
 
   @override
@@ -858,6 +852,76 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get parcelSearchCity => 'Shaharni qidirish';
+
+  @override
+  String get parcelNoticeTitle => 'Ehtiyot bo‘ling';
+
+  @override
+  String get parcelNotice =>
+      'Bu e’lonlar Telegram guruhlaridan olinadi. Biz kuryerlar bilan bog‘liq emasmiz — faqat ularning e’lonlarini ko‘rsatamiz. Orada firibgarlar ham bo‘lishi mumkin. Yuzaga kelgan har qanday zarar uchun javobgar emasmiz.';
+
+  @override
+  String get parcelNoticeShort =>
+      'E’lonlar Telegram guruhlaridan. Biz kuryerlar bilan bog‘liq emasmiz.';
+
+  @override
+  String get parcelNoticeOk => 'Tushundim';
+
+  @override
+  String get parcelWaking => 'Server ishga tushmoqda, biroz kuting…';
+
+  @override
+  String get parcelOffline =>
+      'Internet aloqasi yo‘q. Oxirgi yuklangan e’lonlar ko‘rsatilmoqda.';
+
+  @override
+  String get parcelSearch => 'Qidirish';
+
+  @override
+  String get parcelSearchPosts => 'E’lonlardan qidirish';
+
+  @override
+  String parcelSearching(int done, int total) {
+    return 'Qidirilmoqda… $done/$total kun';
+  }
+
+  @override
+  String get parcelNothingFound => 'Hech narsa topilmadi';
+
+  @override
+  String get parcelSavedTitle => 'Saqlangan e’lonlar';
+
+  @override
+  String get parcelSave => 'Saqlash';
+
+  @override
+  String get parcelUnsave => 'Saqlanganlardan olib tashlash';
+
+  @override
+  String get parcelSavedEmpty =>
+      'Hozircha saqlangan e’lon yo‘q. E’londagi belgini bosib saqlang.';
+
+  @override
+  String get parcelRemoved => 'Olib tashlandi';
+
+  @override
+  String get parcelUndo => 'Bekor qilish';
+
+  @override
+  String get parcelShare => 'Ulashish';
+
+  @override
+  String get parcelEnd => 'Boshqa e’lonlar yo‘q';
+
+  @override
+  String parcelDraft(String route, String date) {
+    return 'Assalomu alaykum! $route reysingiz ($date) bo‘yicha pochta haqida yozyapman.';
+  }
+
+  @override
+  String parcelDraftNoDate(String route) {
+    return 'Assalomu alaykum! $route reysingiz bo‘yicha pochta haqida yozyapman.';
+  }
 
   @override
   String get themeToDay => 'Kunduzgi rejim';

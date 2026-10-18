@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 import 'core/config.dart';
 import 'core/key_value_store.dart';
 import 'core/links.dart';
+import 'core/share.dart' as share;
 import 'core/locale_controller.dart';
 import 'core/theme_controller.dart';
 import 'features/home/feature_catalog.dart';
@@ -135,6 +136,7 @@ class AppServices {
     this.businessStats = BusinessStats.fetch,
     this.parcels = const HttpParcelSource(),
     this.openLink = openExternalLink,
+    this.shareText = share.shareText,
   });
 
   final KeyValueStore store;
@@ -152,4 +154,7 @@ class AppServices {
 
   /// Telegram, the dialer, the browser.
   final Future<void> Function(Uri) openLink;
+
+  /// Android's share sheet.
+  final Future<void> Function(String) shareText;
 }
