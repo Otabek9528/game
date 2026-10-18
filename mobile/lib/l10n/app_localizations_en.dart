@@ -1398,9 +1398,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barcodeAlsoAt => 'Also available at:';
 
   @override
-  String get barcodeCode => 'Barcode';
-
-  @override
   String get barcodeCopyCode => 'Copy the code';
 
   @override
@@ -1410,34 +1407,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barcodeScanNext => 'Scan the next one';
 
   @override
-  String get barcodeShare => 'Share';
-
-  @override
-  String get barcodeReport => 'Report a mistake';
-
-  @override
-  String barcodeReportTemplate(String name, String code) {
-    return '⚠️ Mistake\nProduct: $name\nBarcode: $code\nWhat is wrong: ';
-  }
-
-  @override
   String get barcodeNotFound => 'Product not found';
 
   @override
   String get barcodeNotFoundDesc =>
       'This product is not in the database yet. It may be added later.';
-
-  @override
-  String get barcodeAddProduct => 'Help add it to the database';
-
-  @override
-  String get barcodeAddProductHint =>
-      'The template will be copied. Paste it in the group with photos of the product and its ingredients.';
-
-  @override
-  String barcodeAddTemplate(String code) {
-    return '📦 New product\nBarcode: $code\nName: \nStore: \n(attach photos of the product and its ingredients)';
-  }
 
   @override
   String get barcodeOfflineTitle => 'No connection';

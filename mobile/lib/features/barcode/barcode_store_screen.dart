@@ -428,8 +428,8 @@ class _CategoryChip extends StatelessWidget {
     final p = VegukinPalette.of(context);
     final ink = selected ? Colors.white : p.ink;
     return Material(
-      color: selected ? p.accent : p.card,
-      shape: StadiumBorder(side: BorderSide(color: selected ? p.accent : p.hairline)),
+      color: selected ? Brand.emerald700 : p.card,
+      shape: StadiumBorder(side: BorderSide(color: selected ? Brand.emerald700 : p.hairline)),
       child: InkWell(
         onTap: onTap,
         customBorder: const StadiumBorder(),
@@ -486,8 +486,13 @@ class _ProductCard extends StatelessWidget {
                     right: 8,
                     child: Container(
                       padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: Icon(style.icon, size: 22, color: style.color),
+                      decoration: BoxDecoration(
+                        color: style.solid,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                      ),
+                      child: Icon(style.icon, size: 18, color: Colors.white),
                     ),
                   ),
                 ],

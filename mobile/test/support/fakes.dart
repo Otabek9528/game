@@ -442,6 +442,7 @@ class FakeBarcodes implements BarcodeSource {
     verdict: Verdict.joiz,
     name: '롯데 칠성사이다 500ml',
     nameEnglish: 'Chilsung Cider',
+    image: '/api/v2/image/8801043014809.jpg',
     ingredients: '정제수, 설탕, 이산화탄소, 구연산, 향료',
     category: 'Drinks',
     source: 'store_products',
@@ -468,6 +469,9 @@ class FakeBarcodes implements BarcodeSource {
   );
 
   final products = {for (final p in [cola, sausage, cookie]) p.barcode: p};
+
+  /// The photo every store product gets; none by default.
+  String? storeImage;
 
   List<StoreSummary> storeList = const [
     StoreSummary(store: 'GS25', count: 120),
@@ -520,6 +524,7 @@ class FakeBarcodes implements BarcodeSource {
           verdict: verdict,
           name: '${category ?? 'Mahsulot'} ${i + 1}',
           category: category ?? (i.isEven ? 'Drinks' : 'Snacks'),
+          image: storeImage,
         ),
     ];
     final page = all.skip(offset).take(limit).toList();

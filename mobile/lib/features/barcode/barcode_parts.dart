@@ -83,7 +83,8 @@ class StoreEmblem extends StatelessWidget {
   }
 }
 
-/// A product's photo, or a parcel icon when there is none or it won't load.
+/// A product's photo filling its frame (cropped, never with bars beside
+/// it), or a parcel icon when there is none or it won't load.
 class ProductPhoto extends StatelessWidget {
   const ProductPhoto(this.product, {super.key, this.iconSize = 34});
 
@@ -99,15 +100,27 @@ class ProductPhoto extends StatelessWidget {
       child: Center(child: Icon(Icons.inventory_2_outlined, size: iconSize, color: p.inkMuted)),
     );
     if (url == null) return placeholder;
-    return ColoredBox(
-      color: Colors.white,
-      child: Image.network(
-        url.toString(),
-        fit: BoxFit.contain,
-        errorBuilder: (_, _, _) => placeholder,
-        frameBuilder: (context, child, frame, sync) =>
-            frame == null && !sync ? ColoredBox(color: p.cardSelected) : child,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        ImageProvider image = NetworkImage(url.toString());
+        // Decoded near the size shown, not at the photo's own: a phone photo
+        // is 1080×1920, and a store's list of them at full size scrolls
+        // slowly and fills the memory. Twice the frame's long side, so a
+        // photo of any shape still covers the frame sharply.
+        if (constraints.biggest.isFinite) {
+          final side = (constraints.biggest.longestSide * MediaQuery.devicePixelRatioOf(context) * 2).round();
+          image = ResizeImage(image, width: side, height: side, policy: ResizeImagePolicy.fit);
+        }
+        return Image(
+          image: image,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (_, _, _) => placeholder,
+          frameBuilder: (context, child, frame, sync) =>
+              frame == null && !sync ? ColoredBox(color: p.cardSelected) : child,
+        );
+      },
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
-import '../support/support_data.dart';
 import '../support/support_parts.dart';
 import 'barcode_controller.dart';
 import 'barcode_models.dart';
@@ -23,7 +22,7 @@ Future<void> showLookupSheet(BuildContext context, AppServices services, Barcode
         builder: (context, _) => switch (checks.lookup) {
           Found(:final product, :final saved) =>
             ProductView(product: product, services: services, scroll: scroll, saved: saved, onNext: () => Navigator.pop(context)),
-          NotFound(:final code) => _NotFoundView(code: code, services: services, scroll: scroll),
+          NotFound(:final code) => _NotFoundView(code: code, scroll: scroll),
           Offline(:final code) => _OfflineView(code: code, scroll: scroll, onRetry: () => checks.check(code)),
           Checking(:final code) => _CheckingView(code: code, scroll: scroll),
           null => const SizedBox.shrink(),
@@ -84,24 +83,6 @@ class _ProductViewState extends State<ProductView> {
 
   Product get _product => widget.product;
 
-  void _share() {
-    HapticFeedback.selectionClick();
-    final s = AppLocalizations.of(context);
-    widget.services.shareText([
-      _product.title,
-      '${VerdictStyle.label(s, _product.verdict)} — ${VerdictStyle.description(s, _product.verdict)}',
-      '${s.barcodeCode}: ${_product.barcode}',
-      '',
-      'Muslim Vegukin · ${CommunityGroup.url}',
-    ].join('\n'));
-  }
-
-  Future<void> _report() async {
-    final s = AppLocalizations.of(context);
-    await copyWithNote(context, s.barcodeReportTemplate(_product.title, _product.barcode), s.communityTemplateCopied);
-    await widget.services.openLink(Uri.parse(CommunityGroup.url));
-  }
-
   void _openPhoto() {
     final url = _product.imageUrl;
     if (url == null) return;
@@ -160,7 +141,30 @@ class _ProductViewState extends State<ProductView> {
               onTap: _openPhoto,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: SizedBox(width: 92, height: 92, child: ProductPhoto(_product)),
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      if (_product.imageUrl case final url?)
+                        Hero(tag: '$url', child: ProductPhoto(_product))
+                      else
+                        ProductPhoto(_product),
+                      // Opens full screen.
+                      if (_product.imageUrl != null)
+                        Positioned(
+                          right: 6,
+                          bottom: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.45), shape: BoxShape.circle),
+                            child: const Icon(Icons.zoom_out_map_rounded, size: 14, color: Colors.white),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 14),
@@ -227,26 +231,6 @@ class _ProductViewState extends State<ProductView> {
             ),
           ),
         ],
-        const SizedBox(height: 14),
-        Row(
-          children: [
-            IconButton.outlined(
-              onPressed: _share,
-              tooltip: s.barcodeShare,
-              icon: const Icon(Icons.share_rounded, size: 20),
-              style: IconButton.styleFrom(minimumSize: const Size(46, 46), side: BorderSide(color: p.hairlineStrong)),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _report,
-                icon: const Icon(Icons.flag_outlined, size: 19),
-                label: Text(s.barcodeReport, maxLines: 1, overflow: TextOverflow.ellipsis),
-                style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-              ),
-            ),
-          ],
-        ),
       ],
     );
     if (next == null) return list;
@@ -600,9 +584,8 @@ class _CheckingView extends StatelessWidget {
   final ScrollController scroll;
 
   @override
-  Widget build(BuildContext context) => ListView(
-        controller: scroll,
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+  Widget build(BuildContext context) => _Centred(
+        scroll: scroll,
         children: [
           _StateHead(
             icon: const SizedBox.square(dimension: 34, child: CircularProgressIndicator(strokeWidth: 3)),
@@ -613,18 +596,39 @@ class _CheckingView extends StatelessWidget {
       );
 }
 
+/// [children] in the middle of the sheet, scrolling if they outgrow it.
+class _Centred extends StatelessWidget {
+  const _Centred({required this.scroll, required this.children});
+
+  final ScrollController scroll;
+  final List<Widget> children;
+
+  static const _padding = EdgeInsets.fromLTRB(20, 0, 20, 24);
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          controller: scroll,
+          padding: _padding,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: (constraints.maxHeight - _padding.vertical).clamp(0, double.infinity)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            ),
+          ),
+        ),
+      );
+}
+
+/// As on the web page: not in the database yet, and the way back to the
+/// camera.
 class _NotFoundView extends StatelessWidget {
-  const _NotFoundView({required this.code, required this.services, required this.scroll});
+  const _NotFoundView({required this.code, required this.scroll});
 
   final String code;
-  final AppServices services;
   final ScrollController scroll;
-
-  Future<void> _add(BuildContext context) async {
-    final s = AppLocalizations.of(context);
-    await copyWithNote(context, s.barcodeAddTemplate(code), s.communityTemplateCopied);
-    await services.openLink(Uri.parse(CommunityGroup.url));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -633,34 +637,14 @@ class _NotFoundView extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: ListView(
-            controller: scroll,
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+          child: _Centred(
+            scroll: scroll,
             children: [
               _StateHead(
                 icon: Icon(Icons.search_off_rounded, size: 36, color: p.inkMuted),
                 title: s.barcodeNotFound,
                 code: code,
                 body: s.barcodeNotFoundDesc,
-              ),
-              const SizedBox(height: 18),
-              // A dead end turned into an entry for the database.
-              SupportCard(
-                color: p.gold.withValues(alpha: 0.08),
-                edge: p.gold.withValues(alpha: 0.3),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    IconLine(icon: Icons.add_a_photo_rounded, tint: p.gold, title: s.barcodeAddProduct, body: s.barcodeAddProductHint),
-                    const SizedBox(height: 12),
-                    FilledButton.tonalIcon(
-                      onPressed: () => _add(context),
-                      icon: const Icon(Icons.send_rounded, size: 19),
-                      label: Text(s.communityTemplateGo),
-                      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),
@@ -682,9 +666,8 @@ class _OfflineView extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    return ListView(
-      controller: scroll,
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+    return _Centred(
+      scroll: scroll,
       children: [
         _StateHead(
           icon: Icon(Icons.wifi_off_rounded, size: 34, color: p.inkMuted),
@@ -711,27 +694,51 @@ class _PhotoScreen extends StatelessWidget {
   final Uri url;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: InteractiveViewer(
+  Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          // Expand: a stack sizes itself to its loose children otherwise, and
+          // the photo was squeezed into the close button's corner.
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              InteractiveViewer(
                 maxScale: 5,
-                child: Center(child: Image.network(url.toString(), fit: BoxFit.contain)),
-              ),
-            ),
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: IconButton.filledTonal(
-                  onPressed: () => Navigator.pop(context),
-                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                  icon: const Icon(Icons.close_rounded),
+                child: Hero(
+                  tag: '$url',
+                  child: Image.network(
+                    url.toString(),
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, progress) => progress == null
+                        ? child
+                        : const Center(
+                            child: SizedBox.square(
+                              dimension: 34,
+                              child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
+                            ),
+                          ),
+                    errorBuilder: (_, _, _) =>
+                        const Center(child: Icon(Icons.broken_image_outlined, size: 48, color: Colors.white54)),
+                  ),
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                top: 0,
+                left: 0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: IconButton.filledTonal(
+                      onPressed: () => Navigator.pop(context),
+                      tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
 }

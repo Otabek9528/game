@@ -2566,12 +2566,6 @@ abstract class AppLocalizations {
   /// **'Boshqa do‘konlarda ham bor:'**
   String get barcodeAlsoAt;
 
-  /// No description provided for @barcodeCode.
-  ///
-  /// In uz, this message translates to:
-  /// **'Shtrix-kod'**
-  String get barcodeCode;
-
   /// No description provided for @barcodeCopyCode.
   ///
   /// In uz, this message translates to:
@@ -2590,24 +2584,6 @@ abstract class AppLocalizations {
   /// **'Keyingisini skanerlash'**
   String get barcodeScanNext;
 
-  /// No description provided for @barcodeShare.
-  ///
-  /// In uz, this message translates to:
-  /// **'Ulashish'**
-  String get barcodeShare;
-
-  /// No description provided for @barcodeReport.
-  ///
-  /// In uz, this message translates to:
-  /// **'Xatoni bildirish'**
-  String get barcodeReport;
-
-  /// Copied for the group when reporting a mistake in a product.
-  ///
-  /// In uz, this message translates to:
-  /// **'⚠️ Xato\nMahsulot: {name}\nShtrix-kod: {code}\nXato nimada: '**
-  String barcodeReportTemplate(String name, String code);
-
   /// No description provided for @barcodeNotFound.
   ///
   /// In uz, this message translates to:
@@ -2619,24 +2595,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.'**
   String get barcodeNotFoundDesc;
-
-  /// No description provided for @barcodeAddProduct.
-  ///
-  /// In uz, this message translates to:
-  /// **'Bazaga qo‘shishga yordam bering'**
-  String get barcodeAddProduct;
-
-  /// No description provided for @barcodeAddProductHint.
-  ///
-  /// In uz, this message translates to:
-  /// **'Shablon nusxalanadi. Guruhga joylab, mahsulot va tarkibi rasmini yuboring.'**
-  String get barcodeAddProductHint;
-
-  /// Copied for the group when a scanned product is not in the database.
-  ///
-  /// In uz, this message translates to:
-  /// **'📦 Yangi mahsulot\nShtrix-kod: {code}\nNomi: \nDo‘kon: \n(mahsulot va tarkibi rasmini ilova qiling)'**
-  String barcodeAddTemplate(String code);
 
   /// No description provided for @barcodeOfflineTitle.
   ///

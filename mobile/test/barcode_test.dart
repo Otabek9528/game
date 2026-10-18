@@ -116,27 +116,31 @@ void main() {
       expect(app.links.last.host, 'telegra.ph');
     });
 
-    testWidgets('shared, and a mistake reported with a template', (tester) async {
+    testWidgets('the photo opens full screen, filling it', (tester) async {
       final app = await openScanner(tester, language: 'en');
       app.cameras.single.read(cola);
       await tester.pumpAndSettle();
-      await tapInSheet(tester, find.byTooltip('Share'));
-      expect(app.shared.single, contains('Permissible'));
-      expect(app.shared.single, contains('Barcode: $cola'));
-      await tapInSheet(tester, find.text('Report a mistake'));
-      expect(copied.last, startsWith('⚠️ Mistake\nProduct: 롯데 칠성사이다 500ml\nBarcode: $cola'));
-      expect(app.links.last, Uri.parse('https://t.me/MuslimVegukin'));
+      await tester.tap(find.byIcon(Icons.zoom_out_map_rounded));
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(InteractiveViewer)), const Size(411, 891));
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+      expect(find.byType(InteractiveViewer), findsNothing);
+      expect(inSheet(find.text('Permissible')), findsOneWidget);
     });
 
-    testWidgets('not in the database: a template to add it', (tester) async {
+    testWidgets('not in the database: said so, as on the web page', (tester) async {
       final app = await openScanner(tester);
-      app.cameras.single.read(unknown);
+      final camera = app.cameras.single;
+      camera.read(unknown);
       await tester.pumpAndSettle();
       expect(inSheet(find.text('Mahsulot topilmadi')), findsOneWidget);
+      expect(find.text('Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.'), findsOneWidget);
       expect(app.activity.actions.last, 'scanner_not_found:$unknown');
-      await tapInSheet(tester, find.text('Nusxalash va guruhni ochish'));
-      expect(copied.last, startsWith('📦 Yangi mahsulot\nShtrix-kod: $unknown'));
-      expect(app.links.last, Uri.parse('https://t.me/MuslimVegukin'));
+      await tester.tap(find.text('Keyingisini skanerlash'));
+      await tester.pumpAndSettle();
+      expect(camera.status, CameraStatus.running);
+      expect(app.links, isEmpty);
     });
 
     testWidgets('no connection is not "not found"; a code seen before answers from the phone', (tester) async {

@@ -1376,9 +1376,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get barcodeAlsoAt => 'Boshqa do‘konlarda ham bor:';
 
   @override
-  String get barcodeCode => 'Shtrix-kod';
-
-  @override
   String get barcodeCopyCode => 'Kodni nusxalash';
 
   @override
@@ -1388,34 +1385,11 @@ class AppLocalizationsUz extends AppLocalizations {
   String get barcodeScanNext => 'Keyingisini skanerlash';
 
   @override
-  String get barcodeShare => 'Ulashish';
-
-  @override
-  String get barcodeReport => 'Xatoni bildirish';
-
-  @override
-  String barcodeReportTemplate(String name, String code) {
-    return '⚠️ Xato\nMahsulot: $name\nShtrix-kod: $code\nXato nimada: ';
-  }
-
-  @override
   String get barcodeNotFound => 'Mahsulot topilmadi';
 
   @override
   String get barcodeNotFoundDesc =>
       'Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.';
-
-  @override
-  String get barcodeAddProduct => 'Bazaga qo‘shishga yordam bering';
-
-  @override
-  String get barcodeAddProductHint =>
-      'Shablon nusxalanadi. Guruhga joylab, mahsulot va tarkibi rasmini yuboring.';
-
-  @override
-  String barcodeAddTemplate(String code) {
-    return '📦 Yangi mahsulot\nShtrix-kod: $code\nNomi: \nDo‘kon: \n(mahsulot va tarkibi rasmini ilova qiling)';
-  }
 
   @override
   String get barcodeOfflineTitle => 'Internet yo‘q';

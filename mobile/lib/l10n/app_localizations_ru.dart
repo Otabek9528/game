@@ -1413,9 +1413,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get barcodeAlsoAt => 'Также есть в этих магазинах:';
 
   @override
-  String get barcodeCode => 'Штрих-код';
-
-  @override
   String get barcodeCopyCode => 'Скопировать код';
 
   @override
@@ -1425,34 +1422,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get barcodeScanNext => 'Сканировать следующий';
 
   @override
-  String get barcodeShare => 'Поделиться';
-
-  @override
-  String get barcodeReport => 'Сообщить об ошибке';
-
-  @override
-  String barcodeReportTemplate(String name, String code) {
-    return '⚠️ Ошибка\nПродукт: $name\nШтрих-код: $code\nВ чём ошибка: ';
-  }
-
-  @override
   String get barcodeNotFound => 'Продукт не найден';
 
   @override
   String get barcodeNotFoundDesc =>
       'Этот продукт пока отсутствует в базе. Возможно, он будет добавлен позже.';
-
-  @override
-  String get barcodeAddProduct => 'Помогите добавить его в базу';
-
-  @override
-  String get barcodeAddProductHint =>
-      'Шаблон скопируется. Вставьте его в группе и пришлите фото продукта и состава.';
-
-  @override
-  String barcodeAddTemplate(String code) {
-    return '📦 Новый продукт\nШтрих-код: $code\nНазвание: \nМагазин: \n(приложите фото продукта и состава)';
-  }
 
   @override
   String get barcodeOfflineTitle => 'Нет подключения';

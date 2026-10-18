@@ -769,37 +769,11 @@
   "barcodeGeneralDb": "Umumiy ma’lumotlar bazasi",
   "barcodeStoreUnknown": "Do‘kon belgilanmagan",
   "barcodeAlsoAt": "Boshqa do‘konlarda ham bor:",
-  "barcodeCode": "Shtrix-kod",
   "barcodeCopyCode": "Kodni nusxalash",
   "barcodeCopied": "Nusxalandi",
   "barcodeScanNext": "Keyingisini skanerlash",
-  "barcodeShare": "Ulashish",
-  "barcodeReport": "Xatoni bildirish",
-  "barcodeReportTemplate": "⚠️ Xato\nMahsulot: {name}\nShtrix-kod: {code}\nXato nimada: ",
-  "@barcodeReportTemplate": {
-    "description": "Copied for the group when reporting a mistake in a product.",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "code": {
-        "type": "String"
-      }
-    }
-  },
   "barcodeNotFound": "Mahsulot topilmadi",
   "barcodeNotFoundDesc": "Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.",
-  "barcodeAddProduct": "Bazaga qo‘shishga yordam bering",
-  "barcodeAddProductHint": "Shablon nusxalanadi. Guruhga joylab, mahsulot va tarkibi rasmini yuboring.",
-  "barcodeAddTemplate": "📦 Yangi mahsulot\nShtrix-kod: {code}\nNomi: \nDo‘kon: \n(mahsulot va tarkibi rasmini ilova qiling)",
-  "@barcodeAddTemplate": {
-    "description": "Copied for the group when a scanned product is not in the database.",
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
-  },
   "barcodeOfflineTitle": "Internet yo‘q",
   "barcodeOfflineBody": "Mahsulotni tekshirish uchun internet kerak. Ulanishni tekshirib, qayta urinib ko‘ring.",
   "barcodeSaved": "Avval saqlangan natija · internet yo‘q",
