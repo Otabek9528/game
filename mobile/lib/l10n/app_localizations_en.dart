@@ -252,10 +252,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exactAlarmsBody =>
-      'To let the widget switch to the next prayer right on time, turn on “Alarms & reminders”.';
+      'So the home-screen widget switches to the next prayer right on time, turn on “Alarms & reminders” on the next page.';
 
   @override
-  String get exactAlarmsAllow => 'Turn on';
+  String get exactAlarmsAllow => 'Continue';
 
   @override
   String get exactAlarmsLater => 'Not now';

@@ -223,10 +223,10 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get exactAlarmsBody =>
-      'Namoz vaqti kirishi bilan vidjet keyingi namozga o‘tishi uchun «Signal va eslatmalar» ruxsatini yoqing.';
+      'Bosh ekrandagi vidjet namoz vaqti kirishi bilan keyingi namozga o‘tishi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.';
 
   @override
-  String get exactAlarmsAllow => 'Yoqish';
+  String get exactAlarmsAllow => 'Davom etish';
 
   @override
   String get exactAlarmsLater => 'Keyinroq';

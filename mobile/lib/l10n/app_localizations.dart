@@ -496,16 +496,16 @@ abstract class AppLocalizations {
   /// **'Vidjet aniq ishlashi uchun'**
   String get exactAlarmsTitle;
 
-  /// Offered once when a home-screen widget exists and Android 14+ keeps the exact-alarm permission off.
+  /// Asked once at first launch, after location and camera, when Android 14+ keeps the exact-alarm permission off.
   ///
   /// In uz, this message translates to:
-  /// **'Namoz vaqti kirishi bilan vidjet keyingi namozga o‘tishi uchun «Signal va eslatmalar» ruxsatini yoqing.'**
+  /// **'Bosh ekrandagi vidjet namoz vaqti kirishi bilan keyingi namozga o‘tishi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.'**
   String get exactAlarmsBody;
 
   /// No description provided for @exactAlarmsAllow.
   ///
   /// In uz, this message translates to:
-  /// **'Yoqish'**
+  /// **'Davom etish'**
   String get exactAlarmsAllow;
 
   /// No description provided for @exactAlarmsLater.

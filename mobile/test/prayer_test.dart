@@ -151,6 +151,23 @@ void main() {
       expect(app.times.calls, 1);
     });
 
+    test('a place named by the old district-level lookup is renamed, once', () async {
+      final first = TestApp(location: FakeLocation(city: 'Boyovut Tumani'));
+      await first.prayer.start();
+      first.store.values.remove('city_lookup'); // saved by an older version
+
+      final updated = TestApp(store: first.store, location: FakeLocation(city: 'Shirin'));
+      await updated.prayer.start();
+      expect(updated.prayer.place!.city, 'Shirin');
+      expect(updated.location.cityLookups, 1);
+      expect(updated.location.fixes, 0);
+
+      final again = TestApp(store: first.store, location: FakeLocation(city: 'Shirin'));
+      await again.prayer.start();
+      expect(again.prayer.place!.city, 'Shirin');
+      expect(again.location.cityLookups, 0);
+    });
+
     test('past midnight, saved days are used without the network', () async {
       final first = TestApp();
       await first.prayer.start();

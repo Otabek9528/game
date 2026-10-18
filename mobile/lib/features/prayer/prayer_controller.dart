@@ -105,8 +105,26 @@ class PrayerController extends ChangeNotifier {
     }
 
     await loadTimes();
+    await _renameFromOldLookup();
     if (_isStale) await locate();
   }
+
+  /// Places saved before the city lookup matched the web app's were named
+  /// after their district ("Boyovut Tumani" for Shirin): looked up again, once.
+  Future<void> _renameFromOldLookup() async {
+    final saved = place;
+    if (saved == null || _store.read(_cityLookupKey) == _cityLookup) return;
+    final city = await _location.cityName(saved.lat, saved.lon);
+    if (city == null) return; // Offline: next start.
+    await _store.write(_cityLookupKey, _cityLookup);
+    if (city == saved.city || place != saved) return;
+    place = saved.copyWith(city: city);
+    await _store.write('location', jsonEncode(place!.toJson()));
+    notifyListeners();
+  }
+
+  static const _cityLookupKey = 'city_lookup';
+  static const _cityLookup = 'street';
 
   /// Takes a new location fix and refreshes the times if the place changed.
   /// [userAsked]: the user tapped a button, so the permission dialog may show.
@@ -140,6 +158,7 @@ class PrayerController extends ChangeNotifier {
         updated = previous.copyWith(timestamp: _clock());
       } else {
         final city = await _location.cityName(fix.lat, fix.lon);
+        if (city != null) await _store.write(_cityLookupKey, _cityLookup);
         updated = SavedLocation(
           lat: fix.lat,
           lon: fix.lon,

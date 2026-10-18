@@ -49,11 +49,12 @@ class BusinessStats {
 /// on its own. Afterwards only the user's own taps (e.g. the prayer card's
 /// "use my location" button) can bring a permission dialog back.
 abstract interface class PermissionsGate {
-  /// Location, then camera — only the first time it is called.
+  /// Location, then camera — only the first time it is called. "Alarms &
+  /// reminders" follows: see [shouldOfferExactAlarms].
   Future<void> askOnce();
 
-  /// True once, the first time a home-screen widget needs "Alarms &
-  /// reminders" to switch prayers on time; the caller explains and offers it.
+  /// True once, at first launch, when "Alarms & reminders" is off; the caller
+  /// explains it and opens its page. The widgets need it to switch on time.
   Future<bool> shouldOfferExactAlarms();
 
   Future<void> openExactAlarmSettings();

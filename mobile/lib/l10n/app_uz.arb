@@ -161,10 +161,10 @@
     "description": "Home-screen widget, before the app has a location and prayer times."
   },
   "exactAlarmsTitle": "Vidjet aniq ishlashi uchun",
-  "exactAlarmsBody": "Namoz vaqti kirishi bilan vidjet keyingi namozga o‘tishi uchun «Signal va eslatmalar» ruxsatini yoqing.",
-  "exactAlarmsAllow": "Yoqish",
+  "exactAlarmsBody": "Bosh ekrandagi vidjet namoz vaqti kirishi bilan keyingi namozga o‘tishi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.",
+  "exactAlarmsAllow": "Davom etish",
   "exactAlarmsLater": "Keyinroq",
   "@exactAlarmsBody": {
-    "description": "Offered once when a home-screen widget exists and Android 14+ keeps the exact-alarm permission off."
+    "description": "Asked once at first launch, after location and camera, when Android 14+ keeps the exact-alarm permission off."
   }
 }

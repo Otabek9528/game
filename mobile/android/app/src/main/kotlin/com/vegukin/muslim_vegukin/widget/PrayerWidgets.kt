@@ -16,6 +16,7 @@ import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import com.vegukin.muslim_vegukin.MainActivity
@@ -128,11 +129,27 @@ object PrayerWidgets {
 
         val day = moment.day
         if (large) {
+            val width = widthDp(manager, id, 320)
             views.setTextViewText(R.id.date_line1, day.line1)
             views.setTextViewText(R.id.date_line2, day.line2)
+            // On a narrow launcher the dates and the city step down with the
+            // width, so the countdown stays the largest thing.
+            val fit = ((width - 32) / 301f).coerceIn(0.82f, 1f)
+            views.setTextViewTextSize(R.id.date_line1, TypedValue.COMPLEX_UNIT_SP, 13.5f * fit)
+            views.setTextViewTextSize(R.id.date_line2, TypedValue.COMPLEX_UNIT_SP, 12f * fit)
+            views.setTextViewTextSize(R.id.city, TypedValue.COMPLEX_UNIT_SP, 13f * fit)
+            // One size for the whole strip, from the widget's width: each cell
+            // keeps air around its text. In sp, so a larger phone font still
+            // counts, up to what fits.
+            val cell = (width - 32) / 6f - 8f
+            val fontScale = context.resources.configuration.fontScale
+            val nameSp = minOf(10.5f, cell / (4.2f * fontScale))
+            val timeSp = minOf(14.5f, cell / (2.9f * fontScale))
             // As in the app: the window we are in is filled, the next one is
             // coloured.
             for (i in 0 until 6) {
+                views.setTextViewTextSize(names[i], TypedValue.COMPLEX_UNIT_SP, nameSp)
+                views.setTextViewTextSize(times[i], TypedValue.COMPLEX_UNIT_SP, timeSp)
                 val current = i == moment.current
                 val marked = current || i == moment.next
                 views.setTextViewText(names[i], data.names[i])
@@ -154,8 +171,7 @@ object PrayerWidgets {
             views.setTextViewText(R.id.next, "${data.names[moment.next]} · ${hhmm(moment.nextAt)}")
             views.setTextViewText(R.id.date_short, day.short)
             // On a narrow launcher the city keeps the room; the date goes.
-            val widthDp = manager.getAppWidgetOptions(id).getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 150)
-            views.setViewVisibility(R.id.date_short, if (widthDp >= 150) View.VISIBLE else View.GONE)
+            views.setViewVisibility(R.id.date_short, if (widthDp(manager, id, 150) >= 150) View.VISIBLE else View.GONE)
         }
 
         views.setImageViewBitmap(R.id.rail, rail(context, manager, id, large, moment.dayFraction))
@@ -177,6 +193,11 @@ object PrayerWidgets {
             else -> "00:%s"
         }
     }
+
+    /** The widget's width on the home screen (portrait), in dp. */
+    private fun widthDp(manager: AppWidgetManager, id: Int, fallback: Int): Int =
+        manager.getAppWidgetOptions(id).getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
+            .takeIf { it > 0 } ?: fallback
 
     /** Text colour from a day/night colour resource; follows the theme on Android 12+. */
     private fun tint(context: Context, views: RemoteViews, viewId: Int, colorRes: Int) {
@@ -211,7 +232,7 @@ object PrayerWidgets {
      * Redraws the widgets at the next moment their content changes: a prayer
      * time (the countdown moves on to the next prayer), an hour or ten hours
      * before it (the countdown's format), or midnight (a new day). Exact when
-     * Android allows it ("Alarms & reminders", asked once by the app); it
+     * Android allows it ("Alarms & reminders", asked at first launch); it
      * then also wakes the phone, so the widget is right the moment the screen
      * turns on. Otherwise Android may run it up to ten minutes late.
      */
@@ -247,13 +268,6 @@ object PrayerWidgets {
         return (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).canScheduleExactAlarms()
     }
 
-    /** A widget is on the home screen, but its alarms can't be exact. */
-    fun exactAlarmsMissing(context: Context): Boolean {
-        if (canAlarmExactly(context)) return false
-        val manager = AppWidgetManager.getInstance(context)
-        return listOf(LargePrayerWidget::class.java, SmallPrayerWidget::class.java)
-            .any { manager.getAppWidgetIds(ComponentName(context, it)).isNotEmpty() }
-    }
 
     private fun cancelSchedule(context: Context) {
         val alarms = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -276,10 +290,8 @@ object PrayerWidgets {
      */
     private fun rail(context: Context, manager: AppWidgetManager, id: Int, large: Boolean, fraction: Float): Bitmap {
         val density = context.resources.displayMetrics.density
-        val options = manager.getAppWidgetOptions(id)
-        val widthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, if (large) 320 else 150)
         val paddingDp = if (large) 32 else 28
-        val width = (((widthDp - paddingDp).coerceAtLeast(80)) * density).toInt()
+        val width = (((widthDp(manager, id, if (large) 320 else 150) - paddingDp).coerceAtLeast(80)) * density).toInt()
         val height = (12 * density).toInt()
 
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)

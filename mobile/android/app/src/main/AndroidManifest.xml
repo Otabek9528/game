@@ -9,7 +9,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <!-- The home-screen widget switches to the next prayer on the dot. Android
          14+ keeps this off until the user allows "Alarms & reminders"; the app
-         offers that once, when a widget is on the home screen. -->
+         asks once, at first launch, with location and camera. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application

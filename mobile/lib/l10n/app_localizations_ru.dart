@@ -263,10 +263,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get exactAlarmsBody =>
-      'Чтобы виджет переключался на следующий намаз ровно в его время, включите разрешение «Будильники и напоминания».';
+      'Чтобы виджет на главном экране переключался на следующий намаз точно в срок, включите «Будильники и напоминания» на следующей странице.';
 
   @override
-  String get exactAlarmsAllow => 'Включить';
+  String get exactAlarmsAllow => 'Продолжить';
 
   @override
   String get exactAlarmsLater => 'Позже';

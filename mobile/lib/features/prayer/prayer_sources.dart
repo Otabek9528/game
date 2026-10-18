@@ -134,11 +134,12 @@ class DeviceLocationSource implements LocationSource {
   @override
   Future<String?> cityName(double lat, double lon) async {
     try {
+      // The web app's lookup (js/locationManager.js): street level, so a
+      // town is named rather than its district ("Shirin", not "Boyovut").
       final url = Uri.https('nominatim.openstreetmap.org', '/reverse', {
         'lat': '$lat',
         'lon': '$lon',
         'format': 'json',
-        'zoom': '10',
         'accept-language': 'en',
       });
       final response = await _client

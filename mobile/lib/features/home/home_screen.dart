@@ -32,7 +32,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // First launch: location and camera, asked once, over the home screen.
+    // First launch: location, camera and "Alarms & reminders", asked once,
+    // over the home screen.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _services.permissions.askOnce();
       await _takeWidgetAction();
@@ -40,8 +41,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
-  /// A widget was added and Android 14+ keeps "Alarms & reminders" off:
-  /// without it the widget's countdown can't switch on the dot. Asked once.
+  /// "Alarms & reminders" has no system dialog: a short explanation, then
+  /// its page. Without it the widget's countdown can't switch on the dot.
   Future<void> _offerExactAlarms() async {
     if (!await _services.permissions.shouldOfferExactAlarms() || !mounted) return;
     final s = AppLocalizations.of(context);
@@ -78,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // location): pick up a new day, a stale location or a new permission.
     if (state == AppLifecycleState.resumed) {
       _services.prayer.refresh();
-      _takeWidgetAction().then((_) => _offerExactAlarms());
+      _takeWidgetAction();
     }
   }
 

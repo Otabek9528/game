@@ -71,10 +71,10 @@ class SavedLocation {
         'timestamp': timestamp.millisecondsSinceEpoch,
       };
 
-  SavedLocation copyWith({DateTime? timestamp}) => SavedLocation(
+  SavedLocation copyWith({String? city, DateTime? timestamp}) => SavedLocation(
         lat: lat,
         lon: lon,
-        city: city,
+        city: city ?? this.city,
         timestamp: timestamp ?? this.timestamp,
       );
 

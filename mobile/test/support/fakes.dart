@@ -121,7 +121,7 @@ class FakePermissions implements PermissionsGate {
     await prayer.locate(userAsked: true);
   }
 
-  /// A widget is on the home screen without "Alarms & reminders".
+  /// "Alarms & reminders" is off (Android 14+ at first launch).
   bool exactAlarmsMissing = false;
   bool _exactAlarmsOffered = false;
   int exactAlarmSettingsOpened = 0;

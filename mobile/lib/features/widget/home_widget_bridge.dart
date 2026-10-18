@@ -37,8 +37,8 @@ class HomeWidgetBridge {
     }
   }
 
-  /// True when a widget is on the home screen but Android won't let it
-  /// switch to the next prayer on the dot ("Alarms & reminders" is off).
+  /// True when Android won't let the widgets switch to the next prayer on
+  /// the dot: "Alarms & reminders" is off (Android 14+ starts with it off).
   Future<bool> exactAlarmsMissing() async {
     try {
       return await _channel.invokeMethod<bool>('exactAlarmsMissing') ?? false;

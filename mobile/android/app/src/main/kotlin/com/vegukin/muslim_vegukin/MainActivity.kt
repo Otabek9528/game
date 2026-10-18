@@ -39,7 +39,7 @@ class MainActivity : FlutterActivity() {
                     PrayerWidgets.updateAll(this)
                     result.success(null)
                 }
-                "exactAlarmsMissing" -> result.success(PrayerWidgets.exactAlarmsMissing(this))
+                "exactAlarmsMissing" -> result.success(!PrayerWidgets.canAlarmExactly(this))
                 "openExactAlarmSettings" -> {
                     if (Build.VERSION.SDK_INT >= 31) {
                         startActivity(
