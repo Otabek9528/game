@@ -9,6 +9,7 @@ import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
+import '../barcode/barcode_screen.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
 import '../links/links_screen.dart';
@@ -84,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _openPrayers() {
     HapticFeedback.lightImpact();
+    _services.activity.log('prayers');
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => PrayersScreen(services: _services)),
     );
@@ -113,9 +115,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _open(Feature feature) {
     HapticFeedback.lightImpact();
+    // Each opening counted, as the web home page counts its cards.
+    _services.activity.log(feature.id);
     final native = switch (feature.id) {
       // The phone's full sensors and camera.
       'qibla' => (BuildContext _) => QiblaScreen(services: _services),
+      'barcode' => (BuildContext _) => BarcodeScreen(services: _services),
       'parcel' => (BuildContext _) => ParcelScreen(services: _services),
       'links' => (BuildContext _) => LinksScreen(services: _services),
       'donation' => (BuildContext _) => DonationScreen(services: _services),

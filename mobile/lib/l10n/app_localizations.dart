@@ -2368,6 +2368,504 @@ abstract class AppLocalizations {
   /// **'🐛 Xato\nQaysi bo‘limda: \nNima bo‘ldi: \nNima bo‘lishi kerak edi: \n\nTelefon: {phone}\nIlova: {version}'**
   String communityTemplateBug(String phone, String version);
 
+  /// No description provided for @barcodeTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tarkib tekshirish'**
+  String get barcodeTitle;
+
+  /// No description provided for @barcodeHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shtrix kodni ramkaga to‘g‘rilang'**
+  String get barcodeHint;
+
+  /// No description provided for @barcodeChecking.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tekshirilmoqda…'**
+  String get barcodeChecking;
+
+  /// No description provided for @barcodeTypeCode.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kodni kiritish'**
+  String get barcodeTypeCode;
+
+  /// No description provided for @barcodeTorch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Chiroq'**
+  String get barcodeTorch;
+
+  /// No description provided for @barcodeSwitchCamera.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamerani almashtirish'**
+  String get barcodeSwitchCamera;
+
+  /// No description provided for @barcodeBackToCamera.
+  ///
+  /// In uz, this message translates to:
+  /// **'Skanerlash'**
+  String get barcodeBackToCamera;
+
+  /// No description provided for @barcodeCameraOffTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kameraga ruxsat berilmagan'**
+  String get barcodeCameraOffTitle;
+
+  /// No description provided for @barcodeCameraOffBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Skanerlash uchun kameraga ruxsat bering yoki kodni qo‘lda kiriting.'**
+  String get barcodeCameraOffBody;
+
+  /// No description provided for @barcodeOpenSettings.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sozlamalarni ochish'**
+  String get barcodeOpenSettings;
+
+  /// No description provided for @barcodeCameraError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kameraga ulanib bo‘lmadi.'**
+  String get barcodeCameraError;
+
+  /// No description provided for @barcodeRetry.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinish'**
+  String get barcodeRetry;
+
+  /// No description provided for @barcodeVerdictJoiz.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joiz'**
+  String get barcodeVerdictJoiz;
+
+  /// No description provided for @barcodeVerdictShubhali.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shubhali'**
+  String get barcodeVerdictShubhali;
+
+  /// No description provided for @barcodeVerdictNojoiz.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joiz emas'**
+  String get barcodeVerdictNojoiz;
+
+  /// No description provided for @barcodeVerdictJoizDesc.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tarkibida ta’qiqlangan ingredientlar topilmadi'**
+  String get barcodeVerdictJoizDesc;
+
+  /// No description provided for @barcodeVerdictShubhaliDesc.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ta’qiqlangan moddalar yo‘q, lekin bir zavodda ishlab chiqarilgan yoki ayrim ingredientlar o‘zagi HAYVONlardan olingan bo‘lishi mumkin.'**
+  String get barcodeVerdictShubhaliDesc;
+
+  /// No description provided for @barcodeVerdictNojoizDesc.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tarkibida ta’qiqlangan ingredientlar aniqlandi'**
+  String get barcodeVerdictNojoizDesc;
+
+  /// No description provided for @barcodePork.
+  ///
+  /// In uz, this message translates to:
+  /// **'Cho‘chqa'**
+  String get barcodePork;
+
+  /// No description provided for @barcodeAlcohol.
+  ///
+  /// In uz, this message translates to:
+  /// **'Alkogol'**
+  String get barcodeAlcohol;
+
+  /// No description provided for @barcodeMeat.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa go‘sht'**
+  String get barcodeMeat;
+
+  /// No description provided for @barcodeSeafood.
+  ///
+  /// In uz, this message translates to:
+  /// **'Dengiz mahsulotlari'**
+  String get barcodeSeafood;
+
+  /// No description provided for @barcodeAbsent.
+  ///
+  /// In uz, this message translates to:
+  /// **'yo‘q'**
+  String get barcodeAbsent;
+
+  /// No description provided for @barcodePresent.
+  ///
+  /// In uz, this message translates to:
+  /// **'bor'**
+  String get barcodePresent;
+
+  /// No description provided for @barcodeAmbiguous.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 bor — o‘simlik yoki HAYVON YOG‘idan olinishi mumkin.'**
+  String get barcodeAmbiguous;
+
+  /// No description provided for @barcodeFactoryWarn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulot ta’qiqlangan ingredientlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.'**
+  String get barcodeFactoryWarn;
+
+  /// No description provided for @barcodeFactoryOk.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulot ishlab chiqarilgan zavod/uskunalarda ta’qiqlangan mahsulotlar ishlatilmaydi.'**
+  String get barcodeFactoryOk;
+
+  /// No description provided for @barcodeIngredients.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tarkibi'**
+  String get barcodeIngredients;
+
+  /// No description provided for @barcodeDoubtfulLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shubhali mahsulotni yesa bo‘ladimi?'**
+  String get barcodeDoubtfulLink;
+
+  /// No description provided for @barcodeFoundIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Topildi:'**
+  String get barcodeFoundIn;
+
+  /// No description provided for @barcodeGeneralDb.
+  ///
+  /// In uz, this message translates to:
+  /// **'Umumiy ma’lumotlar bazasi'**
+  String get barcodeGeneralDb;
+
+  /// No description provided for @barcodeStoreUnknown.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘kon belgilanmagan'**
+  String get barcodeStoreUnknown;
+
+  /// No description provided for @barcodeAlsoAt.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa do‘konlarda ham bor:'**
+  String get barcodeAlsoAt;
+
+  /// No description provided for @barcodeCode.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shtrix-kod'**
+  String get barcodeCode;
+
+  /// No description provided for @barcodeCopyCode.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kodni nusxalash'**
+  String get barcodeCopyCode;
+
+  /// No description provided for @barcodeCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxalandi'**
+  String get barcodeCopied;
+
+  /// No description provided for @barcodeScanNext.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyingisini skanerlash'**
+  String get barcodeScanNext;
+
+  /// No description provided for @barcodeShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get barcodeShare;
+
+  /// No description provided for @barcodeReport.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatoni bildirish'**
+  String get barcodeReport;
+
+  /// Copied for the group when reporting a mistake in a product.
+  ///
+  /// In uz, this message translates to:
+  /// **'⚠️ Xato\nMahsulot: {name}\nShtrix-kod: {code}\nXato nimada: '**
+  String barcodeReportTemplate(String name, String code);
+
+  /// No description provided for @barcodeNotFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulot topilmadi'**
+  String get barcodeNotFound;
+
+  /// No description provided for @barcodeNotFoundDesc.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.'**
+  String get barcodeNotFoundDesc;
+
+  /// No description provided for @barcodeAddProduct.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bazaga qo‘shishga yordam bering'**
+  String get barcodeAddProduct;
+
+  /// No description provided for @barcodeAddProductHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shablon nusxalanadi. Guruhga joylab, mahsulot va tarkibi rasmini yuboring.'**
+  String get barcodeAddProductHint;
+
+  /// Copied for the group when a scanned product is not in the database.
+  ///
+  /// In uz, this message translates to:
+  /// **'📦 Yangi mahsulot\nShtrix-kod: {code}\nNomi: \nDo‘kon: \n(mahsulot va tarkibi rasmini ilova qiling)'**
+  String barcodeAddTemplate(String code);
+
+  /// No description provided for @barcodeOfflineTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet yo‘q'**
+  String get barcodeOfflineTitle;
+
+  /// No description provided for @barcodeOfflineBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulotni tekshirish uchun internet kerak. Ulanishni tekshirib, qayta urinib ko‘ring.'**
+  String get barcodeOfflineBody;
+
+  /// No description provided for @barcodeSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avval saqlangan natija · internet yo‘q'**
+  String get barcodeSaved;
+
+  /// No description provided for @barcodeRecent.
+  ///
+  /// In uz, this message translates to:
+  /// **'So‘nggi tekshiruvlar'**
+  String get barcodeRecent;
+
+  /// No description provided for @barcodeClear.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tozalash'**
+  String get barcodeClear;
+
+  /// No description provided for @barcodeTypeTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shtrix-kodni kiriting'**
+  String get barcodeTypeTitle;
+
+  /// No description provided for @barcodeTypeHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shtrixlar ostidagi raqamlar: 8 tadan 14 tagacha.'**
+  String get barcodeTypeHint;
+
+  /// No description provided for @barcodeSearch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish'**
+  String get barcodeSearch;
+
+  /// No description provided for @barcodeErrEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shtrix-kod kiriting.'**
+  String get barcodeErrEmpty;
+
+  /// No description provided for @barcodeErrNonDigit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faqat raqamlar kiriting.'**
+  String get barcodeErrNonDigit;
+
+  /// No description provided for @barcodeErrLength.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shtrix-kod 8 dan 14 tagacha raqamdan iborat bo‘lishi kerak.'**
+  String get barcodeErrLength;
+
+  /// No description provided for @barcodeErrChecksum.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shtrix-kod noto‘g‘ri. Raqamlarni tekshiring.'**
+  String get barcodeErrChecksum;
+
+  /// No description provided for @barcodeStores.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘konlar'**
+  String get barcodeStores;
+
+  /// How many products a store has.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} ta mahsulot}}'**
+  String barcodeProducts(int count);
+
+  /// No description provided for @barcodeSoon.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaqinda'**
+  String get barcodeSoon;
+
+  /// No description provided for @barcodeStoresError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘konlar yuklanmadi'**
+  String get barcodeStoresError;
+
+  /// No description provided for @barcodeAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hammasi'**
+  String get barcodeAll;
+
+  /// No description provided for @barcodeStoreEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulot topilmadi'**
+  String get barcodeStoreEmpty;
+
+  /// No description provided for @barcodeStoreEmptyDesc.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa turkum yoki hukmni tanlang.'**
+  String get barcodeStoreEmptyDesc;
+
+  /// No description provided for @barcodeProductsError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulotlar yuklanmadi'**
+  String get barcodeProductsError;
+
+  /// No description provided for @barcodeCheckConnection.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internetni tekshirib, qayta urinib ko‘ring.'**
+  String get barcodeCheckConnection;
+
+  /// No description provided for @barcodeContribTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Halol baza yig‘ishga sherik bo‘ling'**
+  String get barcodeContribTitle;
+
+  /// No description provided for @barcodeContribBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulotlar tarkibini o‘qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do‘konlaridagi halol mahsulotlar bazasini birgalikda yig‘amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — ortingizdan sadaqa-i joriyangizni qoldiring.'**
+  String get barcodeContribBody;
+
+  /// No description provided for @barcodeContribCta.
+  ///
+  /// In uz, this message translates to:
+  /// **'Adminga yozish'**
+  String get barcodeContribCta;
+
+  /// No description provided for @barcodeDisclaimer.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu ma’lumotlar faqat mahsulot tarkibi asosida taqdim etilgan bo‘lib, *xatoliklar bo‘lishi mumkin*. Biz rasmiy diniy hukm (fatvo) bermaymiz. Xatolik topsangiz, Telegram guruhimizga xabar bering.'**
+  String get barcodeDisclaimer;
+
+  /// No description provided for @barcodeCatDrinks.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ichimliklar'**
+  String get barcodeCatDrinks;
+
+  /// No description provided for @barcodeCatSnacks.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yengil ovqatlar'**
+  String get barcodeCatSnacks;
+
+  /// No description provided for @barcodeCatSweets.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shirinliklar'**
+  String get barcodeCatSweets;
+
+  /// No description provided for @barcodeCatIceCream.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muzqaymoq'**
+  String get barcodeCatIceCream;
+
+  /// No description provided for @barcodeCatBaked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Non mahsulotlari'**
+  String get barcodeCatBaked;
+
+  /// No description provided for @barcodeCatNoodles.
+  ///
+  /// In uz, this message translates to:
+  /// **'Lag‘mon/Ramen'**
+  String get barcodeCatNoodles;
+
+  /// No description provided for @barcodeCatLunchbox.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pechenya/Pishiriqlar'**
+  String get barcodeCatLunchbox;
+
+  /// No description provided for @barcodeCatDairy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sut mahsulotlari'**
+  String get barcodeCatDairy;
+
+  /// No description provided for @barcodeCatCanned.
+  ///
+  /// In uz, this message translates to:
+  /// **'Konserva'**
+  String get barcodeCatCanned;
+
+  /// No description provided for @barcodeCatFrozen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muzlatilgan'**
+  String get barcodeCatFrozen;
+
+  /// No description provided for @barcodeCatSauces.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ziravor/Souslar'**
+  String get barcodeCatSauces;
+
+  /// No description provided for @barcodeCatFruits.
+  ///
+  /// In uz, this message translates to:
+  /// **'Meva/Sabzavot'**
+  String get barcodeCatFruits;
+
+  /// No description provided for @barcodeCatDried.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quritilgan'**
+  String get barcodeCatDried;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

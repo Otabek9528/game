@@ -736,6 +736,116 @@
       }
     }
   },
+  "barcodeTitle": "Tarkib tekshirish",
+  "barcodeHint": "Shtrix kodni ramkaga to‘g‘rilang",
+  "barcodeChecking": "Tekshirilmoqda…",
+  "barcodeTypeCode": "Kodni kiritish",
+  "barcodeTorch": "Chiroq",
+  "barcodeSwitchCamera": "Kamerani almashtirish",
+  "barcodeBackToCamera": "Skanerlash",
+  "barcodeCameraOffTitle": "Kameraga ruxsat berilmagan",
+  "barcodeCameraOffBody": "Skanerlash uchun kameraga ruxsat bering yoki kodni qo‘lda kiriting.",
+  "barcodeOpenSettings": "Sozlamalarni ochish",
+  "barcodeCameraError": "Kameraga ulanib bo‘lmadi.",
+  "barcodeRetry": "Qayta urinish",
+  "barcodeVerdictJoiz": "Joiz",
+  "barcodeVerdictShubhali": "Shubhali",
+  "barcodeVerdictNojoiz": "Joiz emas",
+  "barcodeVerdictJoizDesc": "Tarkibida ta’qiqlangan ingredientlar topilmadi",
+  "barcodeVerdictShubhaliDesc": "Ta’qiqlangan moddalar yo‘q, lekin bir zavodda ishlab chiqarilgan yoki ayrim ingredientlar o‘zagi HAYVONlardan olingan bo‘lishi mumkin.",
+  "barcodeVerdictNojoizDesc": "Tarkibida ta’qiqlangan ingredientlar aniqlandi",
+  "barcodePork": "Cho‘chqa",
+  "barcodeAlcohol": "Alkogol",
+  "barcodeMeat": "Boshqa go‘sht",
+  "barcodeSeafood": "Dengiz mahsulotlari",
+  "barcodeAbsent": "yo‘q",
+  "barcodePresent": "bor",
+  "barcodeAmbiguous": "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 bor — o‘simlik yoki HAYVON YOG‘idan olinishi mumkin.",
+  "barcodeFactoryWarn": "Mahsulot ta’qiqlangan ingredientlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.",
+  "barcodeFactoryOk": "Mahsulot ishlab chiqarilgan zavod/uskunalarda ta’qiqlangan mahsulotlar ishlatilmaydi.",
+  "barcodeIngredients": "Tarkibi",
+  "barcodeDoubtfulLink": "Shubhali mahsulotni yesa bo‘ladimi?",
+  "barcodeFoundIn": "Topildi:",
+  "barcodeGeneralDb": "Umumiy ma’lumotlar bazasi",
+  "barcodeStoreUnknown": "Do‘kon belgilanmagan",
+  "barcodeAlsoAt": "Boshqa do‘konlarda ham bor:",
+  "barcodeCode": "Shtrix-kod",
+  "barcodeCopyCode": "Kodni nusxalash",
+  "barcodeCopied": "Nusxalandi",
+  "barcodeScanNext": "Keyingisini skanerlash",
+  "barcodeShare": "Ulashish",
+  "barcodeReport": "Xatoni bildirish",
+  "barcodeReportTemplate": "⚠️ Xato\nMahsulot: {name}\nShtrix-kod: {code}\nXato nimada: ",
+  "@barcodeReportTemplate": {
+    "description": "Copied for the group when reporting a mistake in a product.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "barcodeNotFound": "Mahsulot topilmadi",
+  "barcodeNotFoundDesc": "Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.",
+  "barcodeAddProduct": "Bazaga qo‘shishga yordam bering",
+  "barcodeAddProductHint": "Shablon nusxalanadi. Guruhga joylab, mahsulot va tarkibi rasmini yuboring.",
+  "barcodeAddTemplate": "📦 Yangi mahsulot\nShtrix-kod: {code}\nNomi: \nDo‘kon: \n(mahsulot va tarkibi rasmini ilova qiling)",
+  "@barcodeAddTemplate": {
+    "description": "Copied for the group when a scanned product is not in the database.",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "barcodeOfflineTitle": "Internet yo‘q",
+  "barcodeOfflineBody": "Mahsulotni tekshirish uchun internet kerak. Ulanishni tekshirib, qayta urinib ko‘ring.",
+  "barcodeSaved": "Avval saqlangan natija · internet yo‘q",
+  "barcodeRecent": "So‘nggi tekshiruvlar",
+  "barcodeClear": "Tozalash",
+  "barcodeTypeTitle": "Shtrix-kodni kiriting",
+  "barcodeTypeHint": "Shtrixlar ostidagi raqamlar: 8 tadan 14 tagacha.",
+  "barcodeSearch": "Qidirish",
+  "barcodeErrEmpty": "Shtrix-kod kiriting.",
+  "barcodeErrNonDigit": "Faqat raqamlar kiriting.",
+  "barcodeErrLength": "Shtrix-kod 8 dan 14 tagacha raqamdan iborat bo‘lishi kerak.",
+  "barcodeErrChecksum": "Shtrix-kod noto‘g‘ri. Raqamlarni tekshiring.",
+  "barcodeStores": "Do‘konlar",
+  "barcodeProducts": "{count, plural, other{{count} ta mahsulot}}",
+  "@barcodeProducts": {
+    "description": "How many products a store has.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "barcodeSoon": "Yaqinda",
+  "barcodeStoresError": "Do‘konlar yuklanmadi",
+  "barcodeAll": "Hammasi",
+  "barcodeStoreEmpty": "Mahsulot topilmadi",
+  "barcodeStoreEmptyDesc": "Boshqa turkum yoki hukmni tanlang.",
+  "barcodeProductsError": "Mahsulotlar yuklanmadi",
+  "barcodeCheckConnection": "Internetni tekshirib, qayta urinib ko‘ring.",
+  "barcodeContribTitle": "Halol baza yig‘ishga sherik bo‘ling",
+  "barcodeContribBody": "Mahsulotlar tarkibini o‘qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do‘konlaridagi halol mahsulotlar bazasini birgalikda yig‘amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — ortingizdan sadaqa-i joriyangizni qoldiring.",
+  "barcodeContribCta": "Adminga yozish",
+  "barcodeDisclaimer": "Bu ma’lumotlar faqat mahsulot tarkibi asosida taqdim etilgan bo‘lib, *xatoliklar bo‘lishi mumkin*. Biz rasmiy diniy hukm (fatvo) bermaymiz. Xatolik topsangiz, Telegram guruhimizga xabar bering.",
+  "barcodeCatDrinks": "Ichimliklar",
+  "barcodeCatSnacks": "Yengil ovqatlar",
+  "barcodeCatSweets": "Shirinliklar",
+  "barcodeCatIceCream": "Muzqaymoq",
+  "barcodeCatBaked": "Non mahsulotlari",
+  "barcodeCatNoodles": "Lag‘mon/Ramen",
+  "barcodeCatLunchbox": "Pechenya/Pishiriqlar",
+  "barcodeCatDairy": "Sut mahsulotlari",
+  "barcodeCatCanned": "Konserva",
+  "barcodeCatFrozen": "Muzlatilgan",
+  "barcodeCatSauces": "Ziravor/Souslar",
+  "barcodeCatFruits": "Meva/Sabzavot",
+  "barcodeCatDried": "Quritilgan",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

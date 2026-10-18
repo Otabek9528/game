@@ -1270,6 +1270,282 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
+  String get barcodeTitle => 'Tarkib tekshirish';
+
+  @override
+  String get barcodeHint => 'Shtrix kodni ramkaga to‘g‘rilang';
+
+  @override
+  String get barcodeChecking => 'Tekshirilmoqda…';
+
+  @override
+  String get barcodeTypeCode => 'Kodni kiritish';
+
+  @override
+  String get barcodeTorch => 'Chiroq';
+
+  @override
+  String get barcodeSwitchCamera => 'Kamerani almashtirish';
+
+  @override
+  String get barcodeBackToCamera => 'Skanerlash';
+
+  @override
+  String get barcodeCameraOffTitle => 'Kameraga ruxsat berilmagan';
+
+  @override
+  String get barcodeCameraOffBody =>
+      'Skanerlash uchun kameraga ruxsat bering yoki kodni qo‘lda kiriting.';
+
+  @override
+  String get barcodeOpenSettings => 'Sozlamalarni ochish';
+
+  @override
+  String get barcodeCameraError => 'Kameraga ulanib bo‘lmadi.';
+
+  @override
+  String get barcodeRetry => 'Qayta urinish';
+
+  @override
+  String get barcodeVerdictJoiz => 'Joiz';
+
+  @override
+  String get barcodeVerdictShubhali => 'Shubhali';
+
+  @override
+  String get barcodeVerdictNojoiz => 'Joiz emas';
+
+  @override
+  String get barcodeVerdictJoizDesc =>
+      'Tarkibida ta’qiqlangan ingredientlar topilmadi';
+
+  @override
+  String get barcodeVerdictShubhaliDesc =>
+      'Ta’qiqlangan moddalar yo‘q, lekin bir zavodda ishlab chiqarilgan yoki ayrim ingredientlar o‘zagi HAYVONlardan olingan bo‘lishi mumkin.';
+
+  @override
+  String get barcodeVerdictNojoizDesc =>
+      'Tarkibida ta’qiqlangan ingredientlar aniqlandi';
+
+  @override
+  String get barcodePork => 'Cho‘chqa';
+
+  @override
+  String get barcodeAlcohol => 'Alkogol';
+
+  @override
+  String get barcodeMeat => 'Boshqa go‘sht';
+
+  @override
+  String get barcodeSeafood => 'Dengiz mahsulotlari';
+
+  @override
+  String get barcodeAbsent => 'yo‘q';
+
+  @override
+  String get barcodePresent => 'bor';
+
+  @override
+  String get barcodeAmbiguous =>
+      'Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 bor — o‘simlik yoki HAYVON YOG‘idan olinishi mumkin.';
+
+  @override
+  String get barcodeFactoryWarn =>
+      'Mahsulot ta’qiqlangan ingredientlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.';
+
+  @override
+  String get barcodeFactoryOk =>
+      'Mahsulot ishlab chiqarilgan zavod/uskunalarda ta’qiqlangan mahsulotlar ishlatilmaydi.';
+
+  @override
+  String get barcodeIngredients => 'Tarkibi';
+
+  @override
+  String get barcodeDoubtfulLink => 'Shubhali mahsulotni yesa bo‘ladimi?';
+
+  @override
+  String get barcodeFoundIn => 'Topildi:';
+
+  @override
+  String get barcodeGeneralDb => 'Umumiy ma’lumotlar bazasi';
+
+  @override
+  String get barcodeStoreUnknown => 'Do‘kon belgilanmagan';
+
+  @override
+  String get barcodeAlsoAt => 'Boshqa do‘konlarda ham bor:';
+
+  @override
+  String get barcodeCode => 'Shtrix-kod';
+
+  @override
+  String get barcodeCopyCode => 'Kodni nusxalash';
+
+  @override
+  String get barcodeCopied => 'Nusxalandi';
+
+  @override
+  String get barcodeScanNext => 'Keyingisini skanerlash';
+
+  @override
+  String get barcodeShare => 'Ulashish';
+
+  @override
+  String get barcodeReport => 'Xatoni bildirish';
+
+  @override
+  String barcodeReportTemplate(String name, String code) {
+    return '⚠️ Xato\nMahsulot: $name\nShtrix-kod: $code\nXato nimada: ';
+  }
+
+  @override
+  String get barcodeNotFound => 'Mahsulot topilmadi';
+
+  @override
+  String get barcodeNotFoundDesc =>
+      'Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.';
+
+  @override
+  String get barcodeAddProduct => 'Bazaga qo‘shishga yordam bering';
+
+  @override
+  String get barcodeAddProductHint =>
+      'Shablon nusxalanadi. Guruhga joylab, mahsulot va tarkibi rasmini yuboring.';
+
+  @override
+  String barcodeAddTemplate(String code) {
+    return '📦 Yangi mahsulot\nShtrix-kod: $code\nNomi: \nDo‘kon: \n(mahsulot va tarkibi rasmini ilova qiling)';
+  }
+
+  @override
+  String get barcodeOfflineTitle => 'Internet yo‘q';
+
+  @override
+  String get barcodeOfflineBody =>
+      'Mahsulotni tekshirish uchun internet kerak. Ulanishni tekshirib, qayta urinib ko‘ring.';
+
+  @override
+  String get barcodeSaved => 'Avval saqlangan natija · internet yo‘q';
+
+  @override
+  String get barcodeRecent => 'So‘nggi tekshiruvlar';
+
+  @override
+  String get barcodeClear => 'Tozalash';
+
+  @override
+  String get barcodeTypeTitle => 'Shtrix-kodni kiriting';
+
+  @override
+  String get barcodeTypeHint =>
+      'Shtrixlar ostidagi raqamlar: 8 tadan 14 tagacha.';
+
+  @override
+  String get barcodeSearch => 'Qidirish';
+
+  @override
+  String get barcodeErrEmpty => 'Shtrix-kod kiriting.';
+
+  @override
+  String get barcodeErrNonDigit => 'Faqat raqamlar kiriting.';
+
+  @override
+  String get barcodeErrLength =>
+      'Shtrix-kod 8 dan 14 tagacha raqamdan iborat bo‘lishi kerak.';
+
+  @override
+  String get barcodeErrChecksum =>
+      'Shtrix-kod noto‘g‘ri. Raqamlarni tekshiring.';
+
+  @override
+  String get barcodeStores => 'Do‘konlar';
+
+  @override
+  String barcodeProducts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta mahsulot',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get barcodeSoon => 'Yaqinda';
+
+  @override
+  String get barcodeStoresError => 'Do‘konlar yuklanmadi';
+
+  @override
+  String get barcodeAll => 'Hammasi';
+
+  @override
+  String get barcodeStoreEmpty => 'Mahsulot topilmadi';
+
+  @override
+  String get barcodeStoreEmptyDesc => 'Boshqa turkum yoki hukmni tanlang.';
+
+  @override
+  String get barcodeProductsError => 'Mahsulotlar yuklanmadi';
+
+  @override
+  String get barcodeCheckConnection =>
+      'Internetni tekshirib, qayta urinib ko‘ring.';
+
+  @override
+  String get barcodeContribTitle => 'Halol baza yig‘ishga sherik bo‘ling';
+
+  @override
+  String get barcodeContribBody =>
+      'Mahsulotlar tarkibini o‘qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do‘konlaridagi halol mahsulotlar bazasini birgalikda yig‘amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — ortingizdan sadaqa-i joriyangizni qoldiring.';
+
+  @override
+  String get barcodeContribCta => 'Adminga yozish';
+
+  @override
+  String get barcodeDisclaimer =>
+      'Bu ma’lumotlar faqat mahsulot tarkibi asosida taqdim etilgan bo‘lib, *xatoliklar bo‘lishi mumkin*. Biz rasmiy diniy hukm (fatvo) bermaymiz. Xatolik topsangiz, Telegram guruhimizga xabar bering.';
+
+  @override
+  String get barcodeCatDrinks => 'Ichimliklar';
+
+  @override
+  String get barcodeCatSnacks => 'Yengil ovqatlar';
+
+  @override
+  String get barcodeCatSweets => 'Shirinliklar';
+
+  @override
+  String get barcodeCatIceCream => 'Muzqaymoq';
+
+  @override
+  String get barcodeCatBaked => 'Non mahsulotlari';
+
+  @override
+  String get barcodeCatNoodles => 'Lag‘mon/Ramen';
+
+  @override
+  String get barcodeCatLunchbox => 'Pechenya/Pishiriqlar';
+
+  @override
+  String get barcodeCatDairy => 'Sut mahsulotlari';
+
+  @override
+  String get barcodeCatCanned => 'Konserva';
+
+  @override
+  String get barcodeCatFrozen => 'Muzlatilgan';
+
+  @override
+  String get barcodeCatSauces => 'Ziravor/Souslar';
+
+  @override
+  String get barcodeCatFruits => 'Meva/Sabzavot';
+
+  @override
+  String get barcodeCatDried => 'Quritilgan';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

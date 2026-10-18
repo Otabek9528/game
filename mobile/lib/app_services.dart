@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart' as ph;
 
+import 'core/activity_log.dart';
 import 'core/config.dart';
 import 'core/key_value_store.dart';
 import 'core/links.dart';
@@ -11,6 +12,8 @@ import 'core/share.dart' as share;
 import 'core/system.dart';
 import 'core/locale_controller.dart';
 import 'core/theme_controller.dart';
+import 'features/barcode/barcode_camera.dart';
+import 'features/barcode/barcode_source.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/links/links_controller.dart';
 import 'features/parcel/parcel_source.dart';
@@ -134,6 +137,7 @@ class AppServices {
     required this.openFeature,
     required this.homeWidget,
     required this.reminders,
+    required this.activity,
     this.qiblaDevice = const AndroidQiblaDevice(),
     this.businessStats = BusinessStats.fetch,
     this.parcels = const HttpParcelSource(),
@@ -141,6 +145,8 @@ class AppServices {
     this.shareText = share.shareText,
     this.linksScript = fetchLinksScript,
     this.system = const AndroidSystem(),
+    this.barcodes = const HttpBarcodeSource(),
+    this.barcodeCamera = MobileScannerCamera.new,
   });
 
   final KeyValueStore store;
@@ -152,6 +158,9 @@ class AppServices {
   final FeatureOpener openFeature;
   final HomeWidgetBridge homeWidget;
   final ReminderController reminders;
+
+  /// What people open, counted on the server like the web app's visits.
+  final ActivityLog activity;
   final QiblaDevice qiblaDevice;
   final Future<BusinessStats?> Function() businessStats;
   final ParcelSource parcels;
@@ -167,4 +176,10 @@ class AppServices {
 
   /// Other apps on the phone (banking apps), and the phone itself.
   final SystemBridge system;
+
+  /// The halal database behind the ingredient check.
+  final BarcodeSource barcodes;
+
+  /// A new camera for the ingredient check's scanner.
+  final ScannerCameraFactory barcodeCamera;
 }

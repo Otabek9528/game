@@ -7,7 +7,11 @@ import 'package:muslim_vegukin/app.dart';
 import 'package:muslim_vegukin/app_services.dart';
 import 'package:muslim_vegukin/core/key_value_store.dart';
 import 'package:muslim_vegukin/core/locale_controller.dart';
+import 'package:muslim_vegukin/core/activity_log.dart';
 import 'package:muslim_vegukin/core/system.dart';
+import 'package:muslim_vegukin/features/barcode/barcode_camera.dart';
+import 'package:muslim_vegukin/features/barcode/barcode_models.dart';
+import 'package:muslim_vegukin/features/barcode/barcode_source.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/parcel/parcel_models.dart';
@@ -146,8 +150,10 @@ class FakePermissions implements PermissionsGate {
   @override
   Future<bool> cameraGranted() async => camera;
 
+  int settingsOpened = 0;
+
   @override
-  Future<void> openAppSettings() async {}
+  Future<void> openAppSettings() async => settingsOpened++;
 }
 
 PrayerDay dayAt(DateTime day, {String key = 'k'}) {
@@ -177,6 +183,14 @@ final testNow = DateTime(2026, 10, 17, 11, 0, 0);
 class OpenedFeatures {
   final ids = <String>[];
   void call(BuildContext context, Feature feature, AppServices services) => ids.add(feature.id);
+}
+
+/// The actions the app reported, as `action` or `action:detail`.
+class FakeActivityLog implements ActivityLog {
+  final actions = <String>[];
+
+  @override
+  void log(String action, [String? detail]) => actions.add(detail == null ? action : '$action:$detail');
 }
 
 class TestApp {
@@ -211,6 +225,7 @@ class TestApp {
       openFeature: opened.call,
       homeWidget: HomeWidgetBridge(),
       reminders: reminders,
+      activity: activity,
       qiblaDevice: qibla,
       businessStats: () async => stats,
       parcels: this.parcels,
@@ -218,6 +233,12 @@ class TestApp {
       shareText: (text) async => shared.add(text),
       linksScript: () async => linksScript,
       system: system,
+      barcodes: barcodes,
+      barcodeCamera: () {
+        final camera = FakeScannerCamera(denied: cameraDenied);
+        cameras.add(camera);
+        return camera;
+      },
     );
   }
 
@@ -226,6 +247,7 @@ class TestApp {
   final FakeTimes times;
   final MemoryStore store;
   final opened = OpenedFeatures();
+  final activity = FakeActivityLog();
   final qibla = FakeQiblaDevice();
   final FakeParcels parcels;
 
@@ -238,6 +260,11 @@ class TestApp {
   /// The web page's links script; null: not reachable.
   String? linksScript;
   final system = FakeSystem();
+  final barcodes = FakeBarcodes();
+
+  /// Each camera the ingredient check opened, the last one current.
+  final cameras = <FakeScannerCamera>[];
+  bool cameraDenied = false;
   late final PrayerController prayer;
   late final FakePermissions permissions;
   late final ReminderController reminders;
@@ -399,4 +426,190 @@ class FakeSystem implements SystemBridge {
   @override
   Future<DeviceInfo?> device() async =>
       const DeviceInfo(phone: 'samsung SM-S906N', android: '14', version: '1.0.0 (1)');
+}
+
+/// The halal database: three known products, three stores. [fail]: no
+/// connection.
+class FakeBarcodes implements BarcodeSource {
+  bool fail = false;
+  final lookedUp = <String>[];
+
+  /// Each store page asked for, as `verdict/category/offset`.
+  final pages = <String>[];
+
+  static const cola = Product(
+    barcode: '8801043014809',
+    verdict: Verdict.joiz,
+    name: '롯데 칠성사이다 500ml',
+    nameEnglish: 'Chilsung Cider',
+    ingredients: '정제수, 설탕, 이산화탄소, 구연산, 향료',
+    category: 'Drinks',
+    source: 'store_products',
+    store: 'GS25',
+    otherStores: ['CU', '7-Eleven'],
+    sameFactory: false,
+  );
+  static const sausage = Product(
+    barcode: '8801234567893',
+    verdict: Verdict.nojoiz,
+    name: '돼지고기 소시지',
+    pork: true,
+    meat: true,
+    source: 'general',
+  );
+  static const cookie = Product(
+    barcode: '8809999999997',
+    verdict: Verdict.shubhali,
+    name: '초코 쿠키',
+    ambiguous: true,
+    sameFactory: true,
+    source: 'store_products',
+    store: 'CU',
+  );
+
+  final products = {for (final p in [cola, sausage, cookie]) p.barcode: p};
+
+  List<StoreSummary> storeList = const [
+    StoreSummary(store: 'GS25', count: 120),
+    StoreSummary(store: 'CU', count: 45),
+    StoreSummary(store: 'Daiso', count: 3),
+  ];
+
+  @override
+  Future<Product?> product(String code) async {
+    lookedUp.add(code);
+    if (fail) throw const BarcodeException('offline');
+    return products[code];
+  }
+
+  @override
+  Future<List<StoreSummary>> stores() async {
+    if (fail) throw const BarcodeException('offline');
+    return storeList;
+  }
+
+  @override
+  Future<StoreMeta> store(String store) async {
+    if (fail) throw const BarcodeException('offline');
+    return const StoreMeta(
+      total: 120,
+      byVerdict: {Verdict.joiz: 45, Verdict.shubhali: 3, Verdict.nojoiz: 0},
+      categories: [
+        ('Drinks', {Verdict.joiz: 30, Verdict.shubhali: 1, Verdict.nojoiz: 0}),
+        ('Snacks', {Verdict.joiz: 15, Verdict.shubhali: 2, Verdict.nojoiz: 0}),
+      ],
+    );
+  }
+
+  /// 45 permissible products, 3 doubtful, none prohibited.
+  @override
+  Future<ProductPage> storeProducts(
+    String store, {
+    required Verdict verdict,
+    String? category,
+    int offset = 0,
+    int limit = 20,
+  }) async {
+    pages.add('${verdict.name}/${category ?? '-'}/$offset');
+    if (fail) throw const BarcodeException('offline');
+    final count = switch (verdict) { Verdict.joiz => category == 'Snacks' ? 15 : 45, Verdict.shubhali => 3, Verdict.nojoiz => 0 };
+    final all = [
+      for (var i = 0; i < count; i++)
+        Product(
+          barcode: '88000000${i.toString().padLeft(5, '0')}',
+          verdict: verdict,
+          name: '${category ?? 'Mahsulot'} ${i + 1}',
+          category: category ?? (i.isEven ? 'Drinks' : 'Snacks'),
+        ),
+    ];
+    final page = all.skip(offset).take(limit).toList();
+    return ProductPage(products: page, total: all.length, hasMore: offset + page.length < all.length);
+  }
+}
+
+/// The camera, played by the test: [read] a code.
+class FakeScannerCamera extends ScannerCamera {
+  FakeScannerCamera({this.denied = false});
+
+  bool denied;
+  CameraStatus _status = CameraStatus.starting;
+  bool _torch = false;
+  int starts = 0;
+  int pauses = 0;
+
+  @override
+  CameraStatus get status => _status;
+
+  @override
+  bool get hasTorch => true;
+
+  @override
+  bool get torchOn => _torch;
+
+  @override
+  bool get canSwitch => true;
+
+  void read(String code) => onCode?.call(code);
+
+  @override
+  Widget preview(Rect window) => CustomPaint(painter: _FakeScene(window));
+
+  @override
+  Future<void> start() async {
+    starts++;
+    _status = denied ? CameraStatus.denied : CameraStatus.running;
+    notifyListeners();
+  }
+
+  @override
+  Future<void> pause() async {
+    pauses++;
+    if (_status == CameraStatus.running) _status = CameraStatus.paused;
+    notifyListeners();
+  }
+
+  @override
+  Future<void> toggleTorch() async {
+    _torch = !_torch;
+    notifyListeners();
+  }
+
+  @override
+  Future<void> switchCamera() async {}
+}
+
+/// A shelf in a convenience store, roughly: a packet with a barcode in the
+/// window.
+class _FakeScene extends CustomPainter {
+  _FakeScene(this.window);
+
+  final Rect window;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF5B4636), Color(0xFF2B3A44), Color(0xFF1C2328)],
+        ).createShader(Offset.zero & size),
+    );
+    final packet = window.inflate(48);
+    canvas.drawRRect(RRect.fromRectAndRadius(packet, const Radius.circular(14)), Paint()..color = const Color(0xFFE53935));
+    final label = Rect.fromCenter(center: window.center, width: window.width * 0.62, height: window.height * 0.62);
+    canvas.drawRect(label, Paint()..color = Colors.white);
+    final bars = Paint()..color = Colors.black;
+    var x = label.left + 10;
+    var i = 0;
+    while (x < label.right - 10) {
+      final w = [1.5, 3.0, 1.5, 2.2, 4.0][i++ % 5];
+      canvas.drawRect(Rect.fromLTWH(x, label.top + 8, w, label.height - 26), bars);
+      x += w + [1.6, 2.4, 1.6, 3.2][i % 4];
+    }
+  }
+
+  @override
+  bool shouldRepaint(_FakeScene old) => old.window != window;
 }

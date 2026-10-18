@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
 import 'app_services.dart';
+import 'core/activity_log.dart';
 import 'core/app_language.dart';
 import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
@@ -48,6 +49,7 @@ Future<void> main() async {
     openFeature: openWebFeature,
     homeWidget: homeWidget,
     reminders: reminders,
+    activity: HttpActivityLog(store),
   );
 
   // The home-screen widgets and the prayer reminders follow the prayer

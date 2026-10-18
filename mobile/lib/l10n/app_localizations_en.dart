@@ -1294,6 +1294,277 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get barcodeTitle => 'Ingredient check';
+
+  @override
+  String get barcodeHint => 'Fit the barcode inside the frame';
+
+  @override
+  String get barcodeChecking => 'Checking…';
+
+  @override
+  String get barcodeTypeCode => 'Type the code';
+
+  @override
+  String get barcodeTorch => 'Flashlight';
+
+  @override
+  String get barcodeSwitchCamera => 'Switch camera';
+
+  @override
+  String get barcodeBackToCamera => 'Scan';
+
+  @override
+  String get barcodeCameraOffTitle => 'No camera access';
+
+  @override
+  String get barcodeCameraOffBody =>
+      'Allow the camera to scan, or type the code in.';
+
+  @override
+  String get barcodeOpenSettings => 'Open settings';
+
+  @override
+  String get barcodeCameraError => 'Could not connect to the camera.';
+
+  @override
+  String get barcodeRetry => 'Retry';
+
+  @override
+  String get barcodeVerdictJoiz => 'Permissible';
+
+  @override
+  String get barcodeVerdictShubhali => 'Doubtful';
+
+  @override
+  String get barcodeVerdictNojoiz => 'Prohibited';
+
+  @override
+  String get barcodeVerdictJoizDesc => 'No prohibited ingredients found';
+
+  @override
+  String get barcodeVerdictShubhaliDesc =>
+      'No prohibited substances, but it is made in the same factory, or some ingredients MIGHT come from animals.';
+
+  @override
+  String get barcodeVerdictNojoizDesc => 'Prohibited ingredients detected';
+
+  @override
+  String get barcodePork => 'Pork';
+
+  @override
+  String get barcodeAlcohol => 'Alcohol';
+
+  @override
+  String get barcodeMeat => 'Other meat';
+
+  @override
+  String get barcodeSeafood => 'Seafood';
+
+  @override
+  String get barcodeAbsent => 'none';
+
+  @override
+  String get barcodePresent => 'present';
+
+  @override
+  String get barcodeAmbiguous =>
+      'Contains 트랜스지방, 쇼트닝, 향료 or 글리세린 — may be of plant or animal FAT origin.';
+
+  @override
+  String get barcodeFactoryWarn =>
+      'Made on equipment that also makes prohibited products.';
+
+  @override
+  String get barcodeFactoryOk =>
+      'No prohibited products are made on this equipment.';
+
+  @override
+  String get barcodeIngredients => 'Ingredients';
+
+  @override
+  String get barcodeDoubtfulLink => 'Can I eat doubtful products?';
+
+  @override
+  String get barcodeFoundIn => 'Found in:';
+
+  @override
+  String get barcodeGeneralDb => 'General database';
+
+  @override
+  String get barcodeStoreUnknown => 'Store not specified';
+
+  @override
+  String get barcodeAlsoAt => 'Also available at:';
+
+  @override
+  String get barcodeCode => 'Barcode';
+
+  @override
+  String get barcodeCopyCode => 'Copy the code';
+
+  @override
+  String get barcodeCopied => 'Copied';
+
+  @override
+  String get barcodeScanNext => 'Scan the next one';
+
+  @override
+  String get barcodeShare => 'Share';
+
+  @override
+  String get barcodeReport => 'Report a mistake';
+
+  @override
+  String barcodeReportTemplate(String name, String code) {
+    return '⚠️ Mistake\nProduct: $name\nBarcode: $code\nWhat is wrong: ';
+  }
+
+  @override
+  String get barcodeNotFound => 'Product not found';
+
+  @override
+  String get barcodeNotFoundDesc =>
+      'This product is not in the database yet. It may be added later.';
+
+  @override
+  String get barcodeAddProduct => 'Help add it to the database';
+
+  @override
+  String get barcodeAddProductHint =>
+      'The template will be copied. Paste it in the group with photos of the product and its ingredients.';
+
+  @override
+  String barcodeAddTemplate(String code) {
+    return '📦 New product\nBarcode: $code\nName: \nStore: \n(attach photos of the product and its ingredients)';
+  }
+
+  @override
+  String get barcodeOfflineTitle => 'No connection';
+
+  @override
+  String get barcodeOfflineBody =>
+      'Checking needs the internet. Check your connection and try again.';
+
+  @override
+  String get barcodeSaved => 'Saved result · offline';
+
+  @override
+  String get barcodeRecent => 'Recent checks';
+
+  @override
+  String get barcodeClear => 'Clear';
+
+  @override
+  String get barcodeTypeTitle => 'Enter the barcode';
+
+  @override
+  String get barcodeTypeHint => 'The digits under the bars: 8 to 14 of them.';
+
+  @override
+  String get barcodeSearch => 'Search';
+
+  @override
+  String get barcodeErrEmpty => 'Please enter a barcode.';
+
+  @override
+  String get barcodeErrNonDigit => 'Digits only.';
+
+  @override
+  String get barcodeErrLength => 'A barcode has 8 to 14 digits.';
+
+  @override
+  String get barcodeErrChecksum => 'Invalid barcode. Check the digits.';
+
+  @override
+  String get barcodeStores => 'Stores';
+
+  @override
+  String barcodeProducts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count products',
+      one: '$count product',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get barcodeSoon => 'Soon';
+
+  @override
+  String get barcodeStoresError => 'Could not load stores';
+
+  @override
+  String get barcodeAll => 'All';
+
+  @override
+  String get barcodeStoreEmpty => 'No products found';
+
+  @override
+  String get barcodeStoreEmptyDesc => 'Try another category or verdict.';
+
+  @override
+  String get barcodeProductsError => 'Couldn’t load products';
+
+  @override
+  String get barcodeCheckConnection => 'Check your connection and try again.';
+
+  @override
+  String get barcodeContribTitle => 'Help us build the halal database';
+
+  @override
+  String get barcodeContribBody =>
+      'For those who can read product ingredients: together we collect a halal database for GS25, CU, 7-Eleven, Emart24, No Brand and Daiso. Every entry reaches thousands of people.';
+
+  @override
+  String get barcodeContribCta => 'Contact admin';
+
+  @override
+  String get barcodeDisclaimer =>
+      'This information is based on product ingredients only and *may contain errors*. We do not issue official religious rulings (fatwa). If you find an error, please report it in our Telegram group.';
+
+  @override
+  String get barcodeCatDrinks => 'Drinks';
+
+  @override
+  String get barcodeCatSnacks => 'Snacks';
+
+  @override
+  String get barcodeCatSweets => 'Sweets';
+
+  @override
+  String get barcodeCatIceCream => 'Ice cream';
+
+  @override
+  String get barcodeCatBaked => 'Baked goods';
+
+  @override
+  String get barcodeCatNoodles => 'Noodles / Ramen';
+
+  @override
+  String get barcodeCatLunchbox => 'Cookies / Pastry';
+
+  @override
+  String get barcodeCatDairy => 'Dairy';
+
+  @override
+  String get barcodeCatCanned => 'Canned food';
+
+  @override
+  String get barcodeCatFrozen => 'Frozen food';
+
+  @override
+  String get barcodeCatSauces => 'Condiments / Sauces';
+
+  @override
+  String get barcodeCatFruits => 'Fruits / Vegetables';
+
+  @override
+  String get barcodeCatDried => 'Dried food';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

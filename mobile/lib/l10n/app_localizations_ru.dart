@@ -1309,6 +1309,280 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get barcodeTitle => 'Проверка состава';
+
+  @override
+  String get barcodeHint => 'Наведите рамку на штрих-код';
+
+  @override
+  String get barcodeChecking => 'Проверка…';
+
+  @override
+  String get barcodeTypeCode => 'Ввести код';
+
+  @override
+  String get barcodeTorch => 'Фонарик';
+
+  @override
+  String get barcodeSwitchCamera => 'Сменить камеру';
+
+  @override
+  String get barcodeBackToCamera => 'Сканировать';
+
+  @override
+  String get barcodeCameraOffTitle => 'Нет доступа к камере';
+
+  @override
+  String get barcodeCameraOffBody =>
+      'Разрешите доступ к камере, чтобы сканировать, или введите код вручную.';
+
+  @override
+  String get barcodeOpenSettings => 'Открыть настройки';
+
+  @override
+  String get barcodeCameraError => 'Не удалось подключиться к камере.';
+
+  @override
+  String get barcodeRetry => 'Повторить';
+
+  @override
+  String get barcodeVerdictJoiz => 'Допустимо';
+
+  @override
+  String get barcodeVerdictShubhali => 'Сомнительно';
+
+  @override
+  String get barcodeVerdictNojoiz => 'Запрещено';
+
+  @override
+  String get barcodeVerdictJoizDesc => 'Запрещённые ингредиенты не обнаружены';
+
+  @override
+  String get barcodeVerdictShubhaliDesc =>
+      'Запрещённых веществ нет, но продукт произведён на том же заводе, или же некоторые ингредиенты МОГУТ быть животного происхождения.';
+
+  @override
+  String get barcodeVerdictNojoizDesc => 'Обнаружены запрещённые ингредиенты';
+
+  @override
+  String get barcodePork => 'Свинина';
+
+  @override
+  String get barcodeAlcohol => 'Алкоголь';
+
+  @override
+  String get barcodeMeat => 'Другое мясо';
+
+  @override
+  String get barcodeSeafood => 'Морепродукты';
+
+  @override
+  String get barcodeAbsent => 'нет';
+
+  @override
+  String get barcodePresent => 'есть';
+
+  @override
+  String get barcodeAmbiguous =>
+      'Содержит 트랜스지방, 쇼트닝, 향료 или 글리세린 — может быть растительного или животного происхождения (жир).';
+
+  @override
+  String get barcodeFactoryWarn =>
+      'Продукт произведён на оборудовании, где производятся запрещённые продукты.';
+
+  @override
+  String get barcodeFactoryOk =>
+      'На заводе/оборудовании не производятся запрещённые продукты.';
+
+  @override
+  String get barcodeIngredients => 'Состав';
+
+  @override
+  String get barcodeDoubtfulLink => 'Можно ли есть сомнительные продукты?';
+
+  @override
+  String get barcodeFoundIn => 'Найдено:';
+
+  @override
+  String get barcodeGeneralDb => 'Общая база данных';
+
+  @override
+  String get barcodeStoreUnknown => 'Магазин не указан';
+
+  @override
+  String get barcodeAlsoAt => 'Также есть в этих магазинах:';
+
+  @override
+  String get barcodeCode => 'Штрих-код';
+
+  @override
+  String get barcodeCopyCode => 'Скопировать код';
+
+  @override
+  String get barcodeCopied => 'Скопировано';
+
+  @override
+  String get barcodeScanNext => 'Сканировать следующий';
+
+  @override
+  String get barcodeShare => 'Поделиться';
+
+  @override
+  String get barcodeReport => 'Сообщить об ошибке';
+
+  @override
+  String barcodeReportTemplate(String name, String code) {
+    return '⚠️ Ошибка\nПродукт: $name\nШтрих-код: $code\nВ чём ошибка: ';
+  }
+
+  @override
+  String get barcodeNotFound => 'Продукт не найден';
+
+  @override
+  String get barcodeNotFoundDesc =>
+      'Этот продукт пока отсутствует в базе. Возможно, он будет добавлен позже.';
+
+  @override
+  String get barcodeAddProduct => 'Помогите добавить его в базу';
+
+  @override
+  String get barcodeAddProductHint =>
+      'Шаблон скопируется. Вставьте его в группе и пришлите фото продукта и состава.';
+
+  @override
+  String barcodeAddTemplate(String code) {
+    return '📦 Новый продукт\nШтрих-код: $code\nНазвание: \nМагазин: \n(приложите фото продукта и состава)';
+  }
+
+  @override
+  String get barcodeOfflineTitle => 'Нет подключения';
+
+  @override
+  String get barcodeOfflineBody =>
+      'Для проверки нужен интернет. Проверьте подключение и попробуйте снова.';
+
+  @override
+  String get barcodeSaved => 'Сохранённый результат · нет интернета';
+
+  @override
+  String get barcodeRecent => 'Недавние проверки';
+
+  @override
+  String get barcodeClear => 'Очистить';
+
+  @override
+  String get barcodeTypeTitle => 'Введите штрих-код';
+
+  @override
+  String get barcodeTypeHint => 'Цифры под штрихами: от 8 до 14.';
+
+  @override
+  String get barcodeSearch => 'Найти';
+
+  @override
+  String get barcodeErrEmpty => 'Введите штрих-код.';
+
+  @override
+  String get barcodeErrNonDigit => 'Используйте только цифры.';
+
+  @override
+  String get barcodeErrLength => 'Штрих-код должен содержать от 8 до 14 цифр.';
+
+  @override
+  String get barcodeErrChecksum => 'Штрих-код некорректен. Проверьте цифры.';
+
+  @override
+  String get barcodeStores => 'Магазины';
+
+  @override
+  String barcodeProducts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count товаров',
+      few: '$count товара',
+      one: '$count товар',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get barcodeSoon => 'Скоро';
+
+  @override
+  String get barcodeStoresError => 'Не удалось загрузить магазины';
+
+  @override
+  String get barcodeAll => 'Все';
+
+  @override
+  String get barcodeStoreEmpty => 'Товары не найдены';
+
+  @override
+  String get barcodeStoreEmptyDesc =>
+      'Попробуйте другую категорию или вердикт.';
+
+  @override
+  String get barcodeProductsError => 'Не удалось загрузить товары';
+
+  @override
+  String get barcodeCheckConnection =>
+      'Проверьте подключение и попробуйте снова.';
+
+  @override
+  String get barcodeContribTitle => 'Помогите нам собрать халяль-базу';
+
+  @override
+  String get barcodeContribBody =>
+      'Для тех, кто умеет читать состав продуктов: вместе собираем халяль-базу для GS25, CU, 7-Eleven, Emart24, No Brand и Daiso. Каждая запись помогает тысячам людей.';
+
+  @override
+  String get barcodeContribCta => 'Написать админу';
+
+  @override
+  String get barcodeDisclaimer =>
+      'Эта информация предоставлена только на основе состава продукта и *может содержать ошибки*. Мы не выносим официальных религиозных решений (фатва). Если нашли ошибку, сообщите в нашу Telegram-группу.';
+
+  @override
+  String get barcodeCatDrinks => 'Напитки';
+
+  @override
+  String get barcodeCatSnacks => 'Снеки';
+
+  @override
+  String get barcodeCatSweets => 'Сладости';
+
+  @override
+  String get barcodeCatIceCream => 'Мороженое';
+
+  @override
+  String get barcodeCatBaked => 'Выпечка';
+
+  @override
+  String get barcodeCatNoodles => 'Лапша / Рамен';
+
+  @override
+  String get barcodeCatLunchbox => 'Печенье / Выпечка';
+
+  @override
+  String get barcodeCatDairy => 'Молочные';
+
+  @override
+  String get barcodeCatCanned => 'Консервы';
+
+  @override
+  String get barcodeCatFrozen => 'Замороженные';
+
+  @override
+  String get barcodeCatSauces => 'Приправы / Соусы';
+
+  @override
+  String get barcodeCatFruits => 'Фрукты / Овощи';
+
+  @override
+  String get barcodeCatDried => 'Сушёные';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override
