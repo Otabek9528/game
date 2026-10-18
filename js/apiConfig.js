@@ -39,6 +39,16 @@ const API_CONFIG = {
   }
 };
 
+
+const ASSET_VERSION = '2026-10-18';
+
+// Appends the token. Safe to call twice and safe on data:/blob: URLs.
+function assetUrl(path) {
+  if (!path || /^(data|blob):/i.test(path)) return path;
+  if (path.indexOf('v=' + ASSET_VERSION) !== -1) return path;
+  return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + ASSET_VERSION;
+}
+
 // Helper function to build full API URLs
 function getApiUrl(endpoint, params = {}) {
   const url = new URL(API_CONFIG.BASE_URL + endpoint);
@@ -56,5 +66,7 @@ function getApiUrl(endpoint, params = {}) {
 // Make available globally
 window.API_CONFIG = API_CONFIG;
 window.getApiUrl = getApiUrl;
+window.ASSET_VERSION = ASSET_VERSION;
+window.assetUrl = assetUrl;
 
 console.log('✅ API Config loaded:', API_CONFIG.BASE_URL);
