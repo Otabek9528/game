@@ -49,10 +49,16 @@ void main() {
     c.dispose();
   });
 
-  testWidgets('an uncalibrated compass asks for calibration, then both steps finish it', (tester) async {
+  testWidgets('an uncalibrated compass says so; calibration runs when asked, both steps', (tester) async {
     final (c, d) = await started(tester);
     await feed(tester, d, 10, top: 100, status: 1, accuracy: 40);
     await tester.pump(const Duration(seconds: 2));
+    // Never sent there by itself.
+    expect(c.phase, QiblaPhase.compass);
+    expect(c.issue, SignalIssue.needsCalibration);
+    expect(c.quality, 1);
+
+    c.recalibrate();
     expect(c.phase, QiblaPhase.calibrating);
     expect(c.step, CalibrationStep.move);
 
@@ -81,6 +87,69 @@ void main() {
     await feed(tester, d, 120, top: 10, status: 1, accuracy: 40);
     expect(c.step, CalibrationStep.move);
     expect(c.movements, QiblaController.movementsNeeded - 4);
+    c.dispose();
+  });
+
+  testWidgets('skipping calibration goes back to the compass', (tester) async {
+    final (c, d) = await started(tester);
+    await feed(tester, d, 5, top: 100);
+    c.recalibrate();
+    await feed(tester, d, 20, top: 150, status: 2, accuracy: 10);
+    expect(c.phase, QiblaPhase.calibrating);
+    c.skipCalibration();
+    expect(c.phase, QiblaPhase.compass);
+    expect(c.calibrationDone, isFalse);
+    c.dispose();
+  });
+
+  testWidgets('aligned holds until the phone is clearly past the edge', (tester) async {
+    final (c, d) = await started(tester);
+    // [off] degrees short of the Qibla: magnetic = Qibla − off − declination.
+    Future<Facing> at(double off) async {
+      await feed(tester, d, 40, top: 285.75 - off + 8.94);
+      return c.facing;
+    }
+
+    expect(await at(4), Facing.aligned);
+    expect(await at(7), Facing.aligned, reason: 'inside the 3° release band');
+    expect(await at(9), Facing.close);
+    expect(await at(6), Facing.close, reason: 'back in only at 5°');
+    expect(await at(4), Facing.aligned);
+    expect(await at(17), Facing.close);
+    expect(await at(19), Facing.turn);
+    c.dispose();
+  });
+
+  testWidgets('tapping the real sun corrects the compass, and undo restores it', (tester) async {
+    now = DateTime.utc(2026, 10, 18, 3); // noon in Ansan: the sun is up
+    final (c, d) = await started(tester);
+    await feed(tester, d, 20, top: 200, tilt: 85, camera: 200);
+    final before = c.heading;
+    final sun = c.sun!;
+    expect(sun.up, isTrue);
+
+    // The page put the real sun at a bearing 7° short of its true one:
+    // everything it shows is 7° low.
+    c.correctBySun(sun.azimuth - 7);
+    expect(c.correction, closeTo(7, 1e-9));
+    expect(c.heading, closeTo(normalizeDegrees(before + 7), 1e-6));
+    // It holds for the readings that follow.
+    await feed(tester, d, 20, top: 200, tilt: 85, camera: 200);
+    expect(c.heading, closeTo(normalizeDegrees(before + 7), 0.01));
+
+    c.clearCorrection();
+    expect(c.correction, 0);
+    await feed(tester, d, 20, top: 200, tilt: 85, camera: 200);
+    expect(c.heading, closeTo(before, 0.01));
+    c.dispose();
+  });
+
+  testWidgets('no sun, no correction', (tester) async {
+    now = DateTime.utc(2026, 10, 18, 14); // 23:00 in Ansan
+    final (c, d) = await started(tester);
+    await feed(tester, d, 10, top: 200);
+    c.correctBySun(100);
+    expect(c.correction, 0);
     c.dispose();
   });
 

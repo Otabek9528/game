@@ -45,7 +45,11 @@ class QiblaController extends ChangeNotifier {
   static const _tiltWarn = 35.0;
   static const _accuracyGate = 15.0;
   static const _stuckRevert = Duration(milliseconds: 2500);
-  static const _quickCheck = Duration(seconds: 2);
+
+  /// How far past a step's edge the phone must turn before the page steps
+  /// back out of it: a hand wavering at 5° shouldn't flash "aligned" on and
+  /// off.
+  static const releaseBeyond = 3.0;
 
   QiblaPhase phase = QiblaPhase.loading;
 
@@ -61,6 +65,10 @@ class QiblaController extends ChangeNotifier {
   /// Smoothed, from TRUE north.
   double heading = 0;
 
+  /// Degrees added to the compass after the user showed it where the sun
+  /// really is, in the camera: undoes a magnet's pull for this visit.
+  double correction = 0;
+
   /// Before smoothing and declination: the sensor's own number.
   double rawMagnetic = 0;
   int quality = 0;
@@ -74,9 +82,6 @@ class QiblaController extends ChangeNotifier {
   bool calibrationDone = false;
 
   StreamSubscription<CompassReading>? _sub;
-  Timer? _quickTimer;
-  bool _quickChecking = false;
-  final _quickSamples = <double>[];
   final _history = <double>[];
 
   /// The last second of headings: how much the compass wavers.
@@ -102,12 +107,28 @@ class QiblaController extends ChangeNotifier {
   /// −180…180: how far to turn, positive to the right.
   double get difference => qibla == null ? 0 : signedDifference(heading, qibla!.bearing);
 
-  Facing get facing {
-    final d = difference.abs();
-    if (d <= alignedWithin) return Facing.aligned;
-    if (d <= closeWithin) return Facing.close;
-    if (d <= turnWithin) return Facing.turn;
-    return Facing.far;
+  Facing get facing => _facing;
+  Facing _facing = Facing.far;
+
+  /// Closer steps are entered at their edge; farther ones only once the
+  /// phone is [releaseBeyond] past it.
+  Facing _classify(double d) {
+    final next = d <= alignedWithin
+        ? Facing.aligned
+        : d <= closeWithin
+            ? Facing.close
+            : d <= turnWithin
+                ? Facing.turn
+                : Facing.far;
+    if (next.index < _facing.index) {
+      final edge = switch (_facing) {
+        Facing.aligned => alignedWithin,
+        Facing.close => closeWithin,
+        _ => turnWithin,
+      };
+      if (d <= edge + releaseBeyond) return _facing;
+    }
+    return next;
   }
 
   /// The magnetic field's strength here per the model, µT: far from it the
@@ -136,14 +157,12 @@ class QiblaController extends ChangeNotifier {
     }
     unawaited(_device.keepScreenOn(true));
     _listen();
-    _startQuickCheck();
   }
 
   /// Leaving the page or the app.
   void pause() {
     _sub?.cancel();
     _sub = null;
-    _quickTimer?.cancel();
     unawaited(_device.keepScreenOn(false));
   }
 
@@ -155,7 +174,6 @@ class QiblaController extends ChangeNotifier {
     _seeded = false;
     unawaited(_device.keepScreenOn(true));
     _listen();
-    if (phase == QiblaPhase.loading) _startQuickCheck();
   }
 
   @override
@@ -164,12 +182,40 @@ class QiblaController extends ChangeNotifier {
     super.dispose();
   }
 
-  /// The "Qayta kalibratsiya" button: the full two steps, whatever the
-  /// signal says.
-  void recalibrate() {
-    _quickTimer?.cancel();
-    _quickChecking = false;
-    _startCalibration();
+  /// The "Kalibrlash" button: the full two steps, whatever the signal says.
+  /// The page never sends the user here by itself; a poor signal says so
+  /// and offers this.
+  void recalibrate() => _startCalibration();
+
+  /// Back to the compass without finishing.
+  void skipCalibration() {
+    if (phase != QiblaPhase.calibrating) return;
+    calibrationDone = false;
+    _set(QiblaPhase.compass);
+  }
+
+  /// The user tapped the real sun in the camera, where the page put the
+  /// direction [seenAt]. The sun's true bearing is known, so the compass is
+  /// off by the difference.
+  void correctBySun(double seenAt) {
+    final sun = this.sun;
+    if (sun == null || !sun.up) return;
+    _shift(signedDifference(seenAt, sun.azimuth));
+  }
+
+  void clearCorrection() => _shift(-correction);
+
+  void _shift(double by) {
+    if (by == 0) return;
+    correction = signedDifference(0, correction + by);
+    heading = normalizeDegrees(heading + by);
+    for (final list in [_history, _jitter]) {
+      for (var i = 0; i < list.length; i++) {
+        list[i] = normalizeDegrees(list[i] + by);
+      }
+    }
+    _facing = _classify(difference.abs());
+    notifyListeners();
   }
 
   void setCameraMode(bool on) {
@@ -208,7 +254,7 @@ class QiblaController extends ChangeNotifier {
     // Lying flat the top edge shows the way; standing up, the back camera.
     final facingMagnetic = cameraMode || r.tilt >= 45 ? r.camera : r.top;
     rawMagnetic = normalizeDegrees(facingMagnetic);
-    final trueHeading = normalizeDegrees(facingMagnetic + (magnet?.declination ?? 0));
+    final trueHeading = normalizeDegrees(facingMagnetic + (magnet?.declination ?? 0) + correction);
     _recording?.add(trueHeading);
 
     _history.add(trueHeading);
@@ -220,10 +266,12 @@ class QiblaController extends ChangeNotifier {
     final follow = cameraMode ? 0.25 : 0.35;
     heading = _seeded ? normalizeDegrees(heading + signedDifference(heading, filtered) * follow) : filtered;
     _seeded = true;
+    _facing = _classify(difference.abs());
 
     _watchField(r);
     _rate(r);
-    if (_quickChecking) _quickEvaluate(trueHeading, r);
+    // Straight to the compass: calibration only when asked for.
+    if (phase == QiblaPhase.loading) phase = QiblaPhase.compass;
     if (phase == QiblaPhase.calibrating) _calibrate(trueHeading, r);
     notifyListeners();
   }
@@ -284,36 +332,6 @@ class QiblaController extends ChangeNotifier {
       quality = rating.$1;
       issue = rating.$2;
       _pending = null;
-    }
-  }
-
-  // ---------------------------------------------------------------- quick check
-
-  /// A silent check on opening: a steady, calibrated, undisturbed compass
-  /// goes straight to the compass; otherwise, calibration.
-  void _startQuickCheck() {
-    _quickChecking = true;
-    _quickSamples.clear();
-    _quickTimer?.cancel();
-    _quickTimer = Timer(_quickCheck, () {
-      if (_quickChecking) {
-        _quickChecking = false;
-        _startCalibration();
-      }
-    });
-  }
-
-  void _quickEvaluate(double h, CompassReading r) {
-    _quickSamples.add(h);
-    if (_quickSamples.length < 8) return;
-    final recent = _quickSamples.sublist(_quickSamples.length - 8);
-    final steady = circularStats(recent).std <= _stableStd;
-    final calibrated = r.status >= 2 && (r.accuracy < 0 || r.accuracy < _accuracyGate);
-    if (steady && calibrated && r.tilt < _tiltWarn && !_disturbed) {
-      _quickChecking = false;
-      _quickTimer?.cancel();
-      calibrationDone = true;
-      _set(QiblaPhase.compass);
     }
   }
 

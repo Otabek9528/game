@@ -8,11 +8,13 @@ import 'qibla_controller.dart';
 
 /// Calibration in two steps, as on the web page: turn the phone through a
 /// figure of eight until the eight turns are counted, then hold it flat
-/// and still until the ring fills.
+/// and still until the ring fills. Always skippable: the compass may
+/// already be good enough.
 class CalibrationView extends StatelessWidget {
-  const CalibrationView({super.key, required this.controller});
+  const CalibrationView({super.key, required this.controller, required this.onSkip});
 
   final QiblaController controller;
+  final VoidCallback onSkip;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class CalibrationView extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
       decoration: BoxDecoration(
         color: p.card,
         borderRadius: BorderRadius.circular(24),
@@ -103,6 +105,12 @@ class CalibrationView extends StatelessWidget {
             progress,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: p.accent),
+          ),
+          const SizedBox(height: 6),
+          TextButton(
+            onPressed: onSkip,
+            style: TextButton.styleFrom(foregroundColor: p.inkMuted, minimumSize: const Size(120, 44)),
+            child: Text(s.qiblaSkip),
           ),
         ],
       ),

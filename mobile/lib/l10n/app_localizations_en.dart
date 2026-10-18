@@ -614,9 +614,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaAngle => 'Qibla angle';
 
   @override
-  String get qiblaYourDirection => 'Your direction';
-
-  @override
   String get qiblaLocation => 'Location';
 
   @override
@@ -654,9 +651,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get qiblaRecalibrate => 'Recalibrate';
-
-  @override
   String get qiblaTipsTitle => 'For better accuracy';
 
   @override
@@ -689,21 +683,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiblaTurnLeft => 'Turn left';
-
-  @override
-  String qiblaTurnRightBy(int degrees) {
-    return 'Turn right $degrees°';
-  }
-
-  @override
-  String qiblaTurnLeftBy(int degrees) {
-    return 'Turn left $degrees°';
-  }
-
-  @override
-  String qiblaDegreesLeft(int degrees) {
-    return '$degrees° to go';
-  }
 
   @override
   String get qiblaModeCompass => 'Compass';
@@ -779,6 +758,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiblaCalDone => '✓ Calibration complete!';
+
+  @override
+  String get qiblaCalibrateShort => 'Calibrate';
+
+  @override
+  String get qiblaSkip => 'Skip';
+
+  @override
+  String get qiblaUndo => 'Undo';
+
+  @override
+  String get qiblaSunMarker => 'Sun';
+
+  @override
+  String get qiblaSunTapHint => 'Sun not in the ring? Tap the real sun';
+
+  @override
+  String get qiblaSunNotThere =>
+      'Tap the sun itself: it sits on the dashed line';
+
+  @override
+  String qiblaSunCorrected(String degrees) {
+    return 'Corrected by the sun: $degrees°';
+  }
+
+  @override
+  String get qiblaSunCheckCamera => 'Check with the camera';
 
   @override
   String get themeToDay => 'Day mode';

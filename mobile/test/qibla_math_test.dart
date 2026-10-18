@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:muslim_vegukin/features/qibla/camera_projection.dart';
 import 'package:muslim_vegukin/features/qibla/qibla_math.dart';
 
 void main() {
@@ -76,5 +79,25 @@ void main() {
     final s = circularStats([359, 1, 0]);
     expect(signedDifference(s.mean, 0).abs(), lessThan(1e-9));
     expect(s.std, lessThan(1));
+  });
+
+  test('the camera projection and its inverse agree, with pitch and roll', () {
+    const pose = CameraPose(heading: 100, pitch: 12, roll: -6, hFov: 38, vFov: 64, size: Size(400, 860));
+    // Straight ahead is the middle of the picture, however the phone rolls.
+    final middle = pose.project(100, 12)!;
+    expect(middle.dx, closeTo(200, 1e-9));
+    expect(middle.dy, closeTo(430, 1e-9));
+    for (final (az, el) in [(110.0, 20.0), (85.0, 0.0), (95.5, 35.0), (118.0, -10.0)]) {
+      final (backAz, backEl) = pose.unproject(pose.project(az, el)!);
+      expect(backAz, closeTo(az, 1e-9));
+      expect(backEl, closeTo(el, 1e-9));
+    }
+    // Behind the camera: nowhere on the picture.
+    expect(pose.project(280, 0), isNull);
+    // Level and unrolled, the horizon runs through the middle, and a point
+    // half the field of view to the right lands on the right edge.
+    const level = CameraPose(heading: 0, pitch: 0, roll: 0, hFov: 40, vFov: 60, size: Size(400, 800));
+    expect(level.project(20, 0)!.dx, closeTo(400, 1e-9));
+    expect(level.project(-20, 0)!.dy, closeTo(400, 1e-9));
   });
 }

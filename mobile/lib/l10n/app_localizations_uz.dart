@@ -587,9 +587,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get qiblaAngle => 'Qibla burchagi';
 
   @override
-  String get qiblaYourDirection => 'Siz qaragan yo‘nalish';
-
-  @override
   String get qiblaLocation => 'Joylashuv';
 
   @override
@@ -627,9 +624,6 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
-  String get qiblaRecalibrate => 'Qayta kalibratsiya';
-
-  @override
   String get qiblaTipsTitle => 'Aniqroq natija uchun';
 
   @override
@@ -662,21 +656,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get qiblaTurnLeft => 'Chapga buriling';
-
-  @override
-  String qiblaTurnRightBy(int degrees) {
-    return '$degrees° o‘ngga buriling';
-  }
-
-  @override
-  String qiblaTurnLeftBy(int degrees) {
-    return '$degrees° chapga buriling';
-  }
-
-  @override
-  String qiblaDegreesLeft(int degrees) {
-    return '$degrees° qoldi';
-  }
 
   @override
   String get qiblaModeCompass => 'Kompas';
@@ -754,6 +733,34 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get qiblaCalDone => '✓ Kalibratsiya tayyor!';
+
+  @override
+  String get qiblaCalibrateShort => 'Kalibrlash';
+
+  @override
+  String get qiblaSkip => 'O‘tkazib yuborish';
+
+  @override
+  String get qiblaUndo => 'Bekor qilish';
+
+  @override
+  String get qiblaSunMarker => 'Quyosh';
+
+  @override
+  String get qiblaSunTapHint =>
+      'Quyosh doirada emasmi? Haqiqiy quyoshga bosing';
+
+  @override
+  String get qiblaSunNotThere =>
+      'Quyoshning o‘ziga bosing: u punktir chiziqda turadi';
+
+  @override
+  String qiblaSunCorrected(String degrees) {
+    return 'Quyosh bo‘yicha tuzatildi: $degrees°';
+  }
+
+  @override
+  String get qiblaSunCheckCamera => 'Kamerada tekshirish';
 
   @override
   String get themeToDay => 'Kunduzgi rejim';

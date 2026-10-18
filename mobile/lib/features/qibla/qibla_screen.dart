@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -125,6 +127,11 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
     if (mounted) await _c.start();
   }
 
+  void _calibrate() {
+    HapticFeedback.selectionClick();
+    _c.recalibrate();
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
@@ -134,55 +141,64 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
       value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
         backgroundColor: p.page,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _TopBar(title: s.qiblaTitle, onTitleTap: _titleTap),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: _c,
-                builder: (context, _) => switch (_c.phase) {
-                  QiblaPhase.loading => _Message(
-                      icon: Icons.explore_rounded,
-                      title: s.qiblaPreparing,
-                      body: s.qiblaHoldFlat,
-                      busy: true,
-                    ),
-                  QiblaPhase.noLocation => _Message(
-                      icon: Icons.location_off_rounded,
-                      title: s.locationNeededTitle,
-                      body: s.qiblaNoLocation,
-                      action: s.useMyLocation,
-                      onAction: _locate,
-                    ),
-                  QiblaPhase.noCompass => _Message(
-                      icon: Icons.explore_off_rounded,
-                      title: s.qiblaNoCompassTitle,
-                      body: s.qiblaNoCompass,
-                    ),
-                  QiblaPhase.calibrating => ListView(
-                      padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
-                      children: [
-                        CalibrationView(controller: _c),
-                        const SizedBox(height: 14),
-                        const TipsCard(),
-                      ],
-                    ),
-                  QiblaPhase.compass => _compass(context, language),
-                },
-              ),
-            ),
-          ],
+        body: ListenableBuilder(
+          listenable: _c,
+          builder: (context, _) {
+            if (_c.phase == QiblaPhase.compass && _c.cameraMode) return _camera(context, language);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _TopBar(title: s.qiblaTitle, onTitleTap: _titleTap),
+                Expanded(
+                  child: switch (_c.phase) {
+                    QiblaPhase.loading => _Message(
+                        icon: Icons.explore_rounded,
+                        title: s.qiblaPreparing,
+                        body: s.qiblaHoldFlat,
+                        busy: true,
+                      ),
+                    QiblaPhase.noLocation => _Message(
+                        icon: Icons.location_off_rounded,
+                        title: s.locationNeededTitle,
+                        body: s.qiblaNoLocation,
+                        action: s.useMyLocation,
+                        onAction: _locate,
+                      ),
+                    QiblaPhase.noCompass => _Message(
+                        icon: Icons.explore_off_rounded,
+                        title: s.qiblaNoCompassTitle,
+                        body: s.qiblaNoCompass,
+                      ),
+                    QiblaPhase.calibrating => ListView(
+                        padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
+                        children: [
+                          CalibrationView(
+                            controller: _c,
+                            onSkip: () {
+                              HapticFeedback.selectionClick();
+                              _c.skipCalibration();
+                            },
+                          ),
+                          const SizedBox(height: 14),
+                          const TipsCard(open: true),
+                        ],
+                      ),
+                    QiblaPhase.compass => _compass(context, language),
+                  },
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _compass(BuildContext context, AppLanguage language) {
+  /// Compass or camera.
+  Widget _modes(BuildContext context, {bool overCamera = false}) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final bottom = MediaQuery.paddingOf(context).bottom;
-    final toggle = Padding(
+    return Padding(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
       child: SegmentedButton<bool>(
         segments: [
@@ -195,55 +211,75 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
         style: SegmentedButton.styleFrom(
           selectedBackgroundColor: p.action,
           selectedForegroundColor: Colors.white,
-          foregroundColor: p.inkSoft,
-          backgroundColor: p.card,
-          side: BorderSide(color: p.hairline),
+          foregroundColor: overCamera ? Colors.white : p.inkSoft,
+          backgroundColor: overCamera ? Colors.black.withValues(alpha: 0.35) : p.card,
+          side: BorderSide(color: overCamera ? Colors.white24 : p.hairline),
         ),
       ),
     );
+  }
 
-    if (_c.cameraMode) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          toggle,
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(14, 12, 14, 12 + bottom),
-              child: CameraQiblaView(
-                controller: _c,
-                feed: _feed,
-                problem: _cameraProblem,
-                onOpenSettings: widget.services.permissions.openAppSettings,
-                instruction: turnInstruction(s, _c),
-                markerLabel: _c.qibla == null
-                    ? s.featureQibla
-                    : '${s.featureQibla} · ${NumberFormat.decimalPattern(language.code).format(_c.qibla!.distanceKm.round())} km',
-              ),
-            ),
+  /// The camera fills the screen; the bar and the switch float over it.
+  Widget _camera(BuildContext context, AppLanguage language) {
+    final s = AppLocalizations.of(context);
+    final padding = MediaQuery.paddingOf(context);
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        CameraQiblaView(
+          controller: _c,
+          feed: _feed,
+          problem: _cameraProblem,
+          onOpenSettings: widget.services.permissions.openAppSettings,
+          instruction: turnInstruction(s, _c),
+          markerLabel: _c.qibla == null
+              ? s.featureQibla
+              : '${s.featureQibla} · ${NumberFormat.decimalPattern(language.code).format(_c.qibla!.distanceKm.round())} km',
+          // The bar (56) and the switch (12 + 40 + 10).
+          insets: EdgeInsets.only(top: padding.top + 56 + 62, bottom: padding.bottom),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _TopBar(title: s.qiblaTitle, onTitleTap: _titleTap, overCamera: true),
+              _modes(context, overCamera: true),
+            ],
           ),
-        ],
-      );
-    }
+        ),
+      ],
+    );
+  }
 
+  /// Everything needed while turning fits on one screen: what to do, the
+  /// dial, whether to trust it, and the figures. The sun check and the tips
+  /// follow below.
+  Widget _compass(BuildContext context, AppLanguage language) {
+    final s = AppLocalizations.of(context);
+    final media = MediaQuery.of(context);
     final sun = _c.sun;
     final accuracy = _c.reading?.accuracy ?? -1;
+    // The switch, the banner, the signal and figures cards, and the gaps
+    // between them take about 340; the dial gets the rest.
+    final room = media.size.height - media.padding.top - 56 - media.padding.bottom - 340;
+    final dial = math.min(360.0, room).clamp(220.0, 360.0);
     return ListView(
-      padding: EdgeInsets.only(bottom: 24 + bottom),
+      padding: EdgeInsets.only(bottom: 24 + media.padding.bottom),
       children: [
-        toggle,
+        _modes(context),
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TurnBanner(controller: _c),
-              const SizedBox(height: 10),
-              AnglesCard(controller: _c),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 360),
+                  constraints: BoxConstraints(maxWidth: dial),
                   child: CompassDial(
                     heading: _c.heading,
                     qibla: _c.qibla?.bearing ?? 0,
@@ -257,27 +293,12 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              PlaceCard(controller: _c, language: language),
-              const SizedBox(height: 10),
-              SignalCard(controller: _c),
-              const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  _c.recalibrate();
-                },
-                icon: const Icon(Icons.refresh_rounded),
-                label: Text(s.qiblaRecalibrate),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: p.accent,
-                  minimumSize: const Size.fromHeight(48),
-                  side: BorderSide(color: p.accent.withValues(alpha: 0.5)),
-                  shape: const StadiumBorder(),
-                ),
-              ),
               const SizedBox(height: 14),
-              SunCard(controller: _c, language: language),
+              SignalCard(controller: _c, onCalibrate: _calibrate),
+              const SizedBox(height: 10),
+              FiguresCard(controller: _c, language: language),
+              const SizedBox(height: 14),
+              SunCard(controller: _c, language: language, onCheckCamera: () => _setCamera(true)),
               const SizedBox(height: 10),
               const TipsCard(),
             ],
@@ -289,18 +310,23 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.title, required this.onTitleTap});
+  const _TopBar({required this.title, required this.onTitleTap, this.overCamera = false});
 
   final String title;
   final VoidCallback onTitleTap;
+
+  /// Over the camera the bar is clear: the picture shows through.
+  final bool overCamera;
 
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero.sublist(1)),
-      ),
+      decoration: overCamera
+          ? const BoxDecoration()
+          : BoxDecoration(
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero.sublist(1)),
+            ),
       child: SafeArea(
         bottom: false,
         child: SizedBox(

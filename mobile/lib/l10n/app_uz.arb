@@ -395,7 +395,6 @@
   "qiblaWest": "G‘arb",
   "qiblaDirection": "Yo‘nalish",
   "qiblaAngle": "Qibla burchagi",
-  "qiblaYourDirection": "Siz qaragan yo‘nalish",
   "qiblaLocation": "Joylashuv",
   "qiblaToMakkah": "Makkagacha",
   "qiblaSignal": "Kompas signali",
@@ -421,7 +420,6 @@
       }
     }
   },
-  "qiblaRecalibrate": "Qayta kalibratsiya",
   "qiblaTipsTitle": "Aniqroq natija uchun",
   "qiblaTip1": "Telefonni gorizontal (tekis) ushlang",
   "qiblaTip2": "Metall buyumlardan uzoqroq turing",
@@ -433,30 +431,6 @@
   "qiblaSlightlyLeft": "Biroz chapga buriling",
   "qiblaTurnRight": "O‘ngga buriling",
   "qiblaTurnLeft": "Chapga buriling",
-  "qiblaTurnRightBy": "{degrees}° o‘ngga buriling",
-  "@qiblaTurnRightBy": {
-    "placeholders": {
-      "degrees": {
-        "type": "int"
-      }
-    }
-  },
-  "qiblaTurnLeftBy": "{degrees}° chapga buriling",
-  "@qiblaTurnLeftBy": {
-    "placeholders": {
-      "degrees": {
-        "type": "int"
-      }
-    }
-  },
-  "qiblaDegreesLeft": "{degrees}° qoldi",
-  "@qiblaDegreesLeft": {
-    "placeholders": {
-      "degrees": {
-        "type": "int"
-      }
-    }
-  },
   "qiblaModeCompass": "Kompas",
   "qiblaModeCamera": "Kamera",
   "qiblaHoldUpright": "Telefonni tik ushlang",
@@ -522,6 +496,21 @@
   "qiblaCalHoldStill": "Endi telefonni tekis ushlab, qimirlatmang...",
   "qiblaCalChecking": "Barqarorlik tekshirilmoqda...",
   "qiblaCalDone": "✓ Kalibratsiya tayyor!",
+  "qiblaCalibrateShort": "Kalibrlash",
+  "qiblaSkip": "O‘tkazib yuborish",
+  "qiblaUndo": "Bekor qilish",
+  "qiblaSunMarker": "Quyosh",
+  "qiblaSunTapHint": "Quyosh doirada emasmi? Haqiqiy quyoshga bosing",
+  "qiblaSunNotThere": "Quyoshning o‘ziga bosing: u punktir chiziqda turadi",
+  "qiblaSunCorrected": "Quyosh bo‘yicha tuzatildi: {degrees}°",
+  "@qiblaSunCorrected": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaSunCheckCamera": "Kamerada tekshirish",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

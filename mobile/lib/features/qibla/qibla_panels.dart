@@ -7,21 +7,19 @@ import '../../l10n/app_localizations.dart';
 import 'qibla_controller.dart';
 import 'qibla_math.dart';
 
-/// "12° o‘ngga buriling", in the web page's steps.
+/// "Biroz o‘ngga buriling", in the web page's steps. How far is shown
+/// beside it, as a number, never in the sentence too.
 String turnInstruction(AppLocalizations s, QiblaController c) {
-  final d = c.difference;
-  final degrees = d.abs().round();
-  final right = d > 0;
+  final right = c.difference > 0;
   return switch (c.facing) {
     Facing.aligned => s.qiblaAligned,
     Facing.close => right ? s.qiblaSlightlyRight : s.qiblaSlightlyLeft,
-    Facing.turn => right ? s.qiblaTurnRight : s.qiblaTurnLeft,
-    Facing.far => right ? s.qiblaTurnRightBy(degrees) : s.qiblaTurnLeftBy(degrees),
+    Facing.turn || Facing.far => right ? s.qiblaTurnRight : s.qiblaTurnLeft,
   };
 }
 
-/// The most important line: which way to turn and how far, coloured by how
-/// close the phone is.
+/// The most important line: which way to turn and, set off at the end, how
+/// far; coloured by how close the phone is.
 class TurnBanner extends StatelessWidget {
   const TurnBanner({super.key, required this.controller});
 
@@ -67,59 +65,37 @@ class TurnBanner extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  turnInstruction(s, c),
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: tone),
-                ),
-                if (!aligned)
-                  Text(
-                    s.qiblaDegreesLeft(c.difference.abs().round()),
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: p.inkMuted,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-              ],
+            child: Text(
+              turnInstruction(s, c),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: tone),
             ),
           ),
+          if (!aligned) ...[
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(color: p.page, borderRadius: BorderRadius.circular(999)),
+              child: Text(
+                '${c.difference.abs().round()}°',
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w800,
+                  color: tone,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-/// The Qibla's bearing and the phone's, side by side.
-class AnglesCard extends StatelessWidget {
-  const AnglesCard({super.key, required this.controller});
-
-  final QiblaController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final c = controller;
-    return _Pair(
-      left: _Figure(
-        icon: Icons.mosque_rounded,
-        label: s.qiblaAngle,
-        value: c.qibla == null ? '--°' : '${c.qibla!.bearing.toStringAsFixed(1)}°',
-      ),
-      right: _Figure(
-        icon: Icons.explore_outlined,
-        label: s.qiblaYourDirection,
-        value: '${c.heading.round() % 360}°',
-      ),
-    );
-  }
-}
-
-/// Where the page computed from, and how far Makkah is.
-class PlaceCard extends StatelessWidget {
-  const PlaceCard({super.key, required this.controller, required this.language});
+/// The Qibla's bearing, where the page computed from, and how far Makkah
+/// is: one row under the compass.
+class FiguresCard extends StatelessWidget {
+  const FiguresCard({super.key, required this.controller, required this.language});
 
   final QiblaController controller;
   final AppLanguage language;
@@ -127,26 +103,12 @@ class PlaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
     final c = controller;
     final km = c.qibla == null ? '--' : NumberFormat.decimalPattern(language.code).format(c.qibla!.distanceKm.round());
-    return _Pair(
-      left: _Figure(icon: Icons.location_on_outlined, label: s.qiblaLocation, value: c.city ?? s.locationPlaceholder),
-      right: _Figure(icon: Icons.flight_takeoff_rounded, label: s.qiblaToMakkah, value: '$km km'),
-    );
-  }
-}
-
-class _Pair extends StatelessWidget {
-  const _Pair({required this.left, required this.right});
-
-  final Widget left;
-  final Widget right;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
+    final divider = VerticalDivider(color: p.hairline, width: 1);
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 2),
       decoration: BoxDecoration(
         color: p.card,
         borderRadius: BorderRadius.circular(18),
@@ -155,9 +117,19 @@ class _Pair extends StatelessWidget {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            Expanded(child: left),
-            VerticalDivider(color: p.hairline, width: 1),
-            Expanded(child: right),
+            Expanded(
+              child: _Figure(
+                icon: Icons.mosque_rounded,
+                label: s.qiblaAngle,
+                value: c.qibla == null ? '--°' : '${c.qibla!.bearing.toStringAsFixed(1)}°',
+              ),
+            ),
+            divider,
+            Expanded(
+              child: _Figure(icon: Icons.location_on_outlined, label: s.qiblaLocation, value: c.city ?? s.locationPlaceholder),
+            ),
+            divider,
+            Expanded(child: _Figure(icon: Icons.flight_takeoff_rounded, label: s.qiblaToMakkah, value: '$km km')),
           ],
         ),
       ),
@@ -176,28 +148,35 @@ class _Figure extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 22, color: p.gold),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: p.inkMuted)),
-                Text(
-                  value,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 15, color: p.gold),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: p.ink,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
+                  style: TextStyle(fontSize: 11.5, color: p.inkMuted),
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 16.5,
+              fontWeight: FontWeight.w700,
+              color: p.ink,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ],
@@ -206,11 +185,13 @@ class _Figure extends StatelessWidget {
   }
 }
 
-/// How far the compass can be trusted right now, and why not when it can't.
+/// How far the compass can be trusted right now, and why not when it can't;
+/// with calibration a tap away, and the sun's correction when one is made.
 class SignalCard extends StatelessWidget {
-  const SignalCard({super.key, required this.controller});
+  const SignalCard({super.key, required this.controller, required this.onCalibrate});
 
   final QiblaController controller;
+  final VoidCallback onCalibrate;
 
   @override
   Widget build(BuildContext context) {
@@ -230,50 +211,97 @@ class SignalCard extends StatelessWidget {
         },
     };
     final colour = q >= 3 ? p.accent : (q == 2 ? Brand.gold500 : const Color(0xFFDC5B2E));
+    final needsCalibration = c.issue == SignalIssue.needsCalibration;
     final accuracy = c.reading?.accuracy ?? -1;
     final decl = c.magnet?.declination ?? 0;
+    final corrected = c.correction.abs().round();
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
       decoration: BoxDecoration(
         color: p.card,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: c.issue == SignalIssue.interference ? colour : p.hairline),
+        border: Border.all(color: c.issue == SignalIssue.none ? p.hairline : colour),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(s.qiblaSignal, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: p.inkSoft)),
-              const SizedBox(width: 10),
-              for (var i = 0; i < 4; i++)
-                Container(
-                  margin: const EdgeInsets.only(right: 4),
-                  width: 9,
-                  height: 9,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: i < q ? colour : p.hairline,
-                  ),
-                ),
-              const SizedBox(width: 6),
               Expanded(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.end,
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: colour),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(s.qiblaSignal, style: TextStyle(fontSize: 11.5, color: p.inkMuted)),
+                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        for (var i = 0; i < 4; i++)
+                          Container(
+                            margin: const EdgeInsets.only(right: 4),
+                            width: 9,
+                            height: 9,
+                            decoration: BoxDecoration(shape: BoxShape.circle, color: i < q ? colour : p.hairline),
+                          ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            label,
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: colour),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(width: 8),
+              if (needsCalibration)
+                FilledButton.icon(
+                  onPressed: onCalibrate,
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(s.qiblaCalibrateShort),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colour,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                  ),
+                )
+              else
+                TextButton.icon(
+                  onPressed: onCalibrate,
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(s.qiblaCalibrateShort),
+                  style: TextButton.styleFrom(foregroundColor: p.accent, minimumSize: const Size(0, 40)),
+                ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
             [
               if (accuracy >= 0) s.qiblaAccuracy(accuracy.round()),
               s.qiblaDeclination('${decl >= 0 ? '+' : '−'}${decl.abs().toStringAsFixed(1)}'),
             ].join('  ·  '),
-            style: TextStyle(fontSize: 12, color: p.inkMuted),
+            style: TextStyle(fontSize: 11.5, color: p.inkMuted),
           ),
+          if (corrected > 0)
+            Row(
+              children: [
+                const Icon(Icons.wb_sunny_rounded, size: 15, color: Brand.gold400),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    s.qiblaSunCorrected('${c.correction >= 0 ? '+' : '−'}$corrected'),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.inkSoft),
+                  ),
+                ),
+                TextButton(
+                  onPressed: c.clearCorrection,
+                  style: TextButton.styleFrom(foregroundColor: p.accent, minimumSize: const Size(0, 36)),
+                  child: Text(s.qiblaUndo),
+                ),
+              ],
+            ),
         ],
       ),
     );
@@ -281,12 +309,14 @@ class SignalCard extends StatelessWidget {
 }
 
 /// A check no magnet can disturb: where the sun stands relative to the
-/// Qibla, and when it next stands right over the Kaaba.
+/// Qibla, and when it next stands right over the Kaaba. By day, a way into
+/// the camera, where the sun can correct the compass.
 class SunCard extends StatelessWidget {
-  const SunCard({super.key, required this.controller, required this.language});
+  const SunCard({super.key, required this.controller, required this.language, required this.onCheckCamera});
 
   final QiblaController controller;
   final AppLanguage language;
+  final VoidCallback onCheckCamera;
 
   @override
   Widget build(BuildContext context) {
@@ -295,8 +325,9 @@ class SunCard extends StatelessWidget {
     final c = controller;
     final sun = c.sun;
     final qibla = c.qibla?.bearing;
+    final up = sun != null && qibla != null && sun.up;
     String line;
-    if (sun == null || qibla == null || !sun.up) {
+    if (!up) {
       line = s.qiblaSunDown;
     } else {
       final rel = signedDifference(sun.azimuth, qibla);
@@ -331,52 +362,106 @@ class SunCard extends StatelessWidget {
           Text(line, style: TextStyle(fontSize: 13.5, height: 1.45, color: p.inkSoft)),
           const SizedBox(height: 6),
           Text(s.qiblaSunOverKaaba(when), style: TextStyle(fontSize: 12.5, height: 1.45, color: p.inkMuted)),
+          if (up) ...[
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: onCheckCamera,
+              icon: const Icon(Icons.photo_camera_rounded, size: 18),
+              label: Text(s.qiblaSunCheckCamera),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: p.accent,
+                minimumSize: const Size.fromHeight(44),
+                side: BorderSide(color: p.accent.withValues(alpha: 0.5)),
+                shape: const StadiumBorder(),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-/// The web page's four tips, plus the camera.
-class TipsCard extends StatelessWidget {
-  const TipsCard({super.key});
+/// The web page's four tips, plus the camera; folded until opened.
+class TipsCard extends StatefulWidget {
+  const TipsCard({super.key, this.open = false});
+
+  final bool open;
+
+  @override
+  State<TipsCard> createState() => _TipsCardState();
+}
+
+class _TipsCardState extends State<TipsCard> {
+  late bool _open = widget.open;
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: BoxDecoration(
-        color: p.gold.withValues(alpha: 0.08),
+    return Material(
+      color: p.gold.withValues(alpha: 0.08),
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: p.gold.withValues(alpha: 0.25)),
+        side: BorderSide(color: p.gold.withValues(alpha: 0.25)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Icon(Icons.lightbulb_outline_rounded, size: 19, color: p.gold),
-              const SizedBox(width: 8),
-              Text(s.qiblaTipsTitle, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink)),
-            ],
-          ),
-          const SizedBox(height: 6),
-          for (final tip in [s.qiblaTip1, s.qiblaTip2, s.qiblaTip3, s.qiblaTip4, s.qiblaTip5])
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
+          InkWell(
+            onTap: () => setState(() => _open = !_open),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 7, right: 9, left: 2),
-                    child: Container(width: 5, height: 5, decoration: BoxDecoration(color: p.gold, shape: BoxShape.circle)),
+                  Icon(Icons.lightbulb_outline_rounded, size: 19, color: p.gold),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(s.qiblaTipsTitle, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink)),
                   ),
-                  Expanded(child: Text(tip, style: TextStyle(fontSize: 13.5, height: 1.4, color: p.inkSoft))),
+                  AnimatedRotation(
+                    turns: _open ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(Icons.expand_more_rounded, color: p.inkMuted),
+                  ),
                 ],
               ),
             ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            alignment: Alignment.topCenter,
+            child: !_open
+                ? const SizedBox(width: double.infinity)
+                : Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+                    child: Column(
+                      children: [
+                        for (final tip in [s.qiblaTip1, s.qiblaTip2, s.qiblaTip3, s.qiblaTip4, s.qiblaTip5])
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 7, right: 9, left: 2),
+                                  child: Container(
+                                    width: 5,
+                                    height: 5,
+                                    decoration: BoxDecoration(color: p.gold, shape: BoxShape.circle),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(tip, style: TextStyle(fontSize: 13.5, height: 1.4, color: p.inkSoft)),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+          ),
         ],
       ),
     );
@@ -409,7 +494,7 @@ Future<void> showDiagnostics(BuildContext context, QiblaController controller) {
               children: [
                 Text(
                   'source: ${r?.source ?? '--'} | status: ${r?.status ?? '--'} | accuracy: ${f(r?.accuracy)}°\n'
-                  'raw (magnetic): ${f(c.rawMagnetic)}° → true: ${f(normalizeDegrees(c.rawMagnetic + (c.magnet?.declination ?? 0)))}° → smoothed: ${f(c.heading)}°\n'
+                  'raw (magnetic): ${f(c.rawMagnetic)}° → true: ${f(normalizeDegrees(c.rawMagnetic + (c.magnet?.declination ?? 0) + c.correction))}° (sun fix ${f(c.correction)}°) → smoothed: ${f(c.heading)}°\n'
                   'declination: ${f(c.magnet?.declination, 2)}° (WMM-2025) | tilt: ${f(r?.tilt, 0)}° | camera up: ${f(r?.cameraUp, 0)}°\n'
                   'field: ${f(r?.field)} µT vs model ${f(c.expectedField)} µT | qibla: ${f(c.qibla?.bearing, 3)}°',
                   style: style,

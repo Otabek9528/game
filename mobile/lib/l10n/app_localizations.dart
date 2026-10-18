@@ -1144,12 +1144,6 @@ abstract class AppLocalizations {
   /// **'Qibla burchagi'**
   String get qiblaAngle;
 
-  /// No description provided for @qiblaYourDirection.
-  ///
-  /// In uz, this message translates to:
-  /// **'Siz qaragan yo‘nalish'**
-  String get qiblaYourDirection;
-
   /// No description provided for @qiblaLocation.
   ///
   /// In uz, this message translates to:
@@ -1216,12 +1210,6 @@ abstract class AppLocalizations {
   /// **'Magnit og‘ishi {degrees}° hisobga olingan'**
   String qiblaDeclination(String degrees);
 
-  /// No description provided for @qiblaRecalibrate.
-  ///
-  /// In uz, this message translates to:
-  /// **'Qayta kalibratsiya'**
-  String get qiblaRecalibrate;
-
   /// No description provided for @qiblaTipsTitle.
   ///
   /// In uz, this message translates to:
@@ -1287,24 +1275,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Chapga buriling'**
   String get qiblaTurnLeft;
-
-  /// No description provided for @qiblaTurnRightBy.
-  ///
-  /// In uz, this message translates to:
-  /// **'{degrees}° o‘ngga buriling'**
-  String qiblaTurnRightBy(int degrees);
-
-  /// No description provided for @qiblaTurnLeftBy.
-  ///
-  /// In uz, this message translates to:
-  /// **'{degrees}° chapga buriling'**
-  String qiblaTurnLeftBy(int degrees);
-
-  /// No description provided for @qiblaDegreesLeft.
-  ///
-  /// In uz, this message translates to:
-  /// **'{degrees}° qoldi'**
-  String qiblaDegreesLeft(int degrees);
 
   /// No description provided for @qiblaModeCompass.
   ///
@@ -1431,6 +1401,54 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'✓ Kalibratsiya tayyor!'**
   String get qiblaCalDone;
+
+  /// No description provided for @qiblaCalibrateShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kalibrlash'**
+  String get qiblaCalibrateShort;
+
+  /// No description provided for @qiblaSkip.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘tkazib yuborish'**
+  String get qiblaSkip;
+
+  /// No description provided for @qiblaUndo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bekor qilish'**
+  String get qiblaUndo;
+
+  /// No description provided for @qiblaSunMarker.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh'**
+  String get qiblaSunMarker;
+
+  /// No description provided for @qiblaSunTapHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh doirada emasmi? Haqiqiy quyoshga bosing'**
+  String get qiblaSunTapHint;
+
+  /// No description provided for @qiblaSunNotThere.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyoshning o‘ziga bosing: u punktir chiziqda turadi'**
+  String get qiblaSunNotThere;
+
+  /// No description provided for @qiblaSunCorrected.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh bo‘yicha tuzatildi: {degrees}°'**
+  String qiblaSunCorrected(String degrees);
+
+  /// No description provided for @qiblaSunCheckCamera.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamerada tekshirish'**
+  String get qiblaSunCheckCamera;
 
   /// No description provided for @themeToDay.
   ///

@@ -627,10 +627,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get qiblaAngle => 'Угол Киблы';
 
   @override
-  String get qiblaYourDirection => 'Ваше направление';
-
-  @override
-  String get qiblaLocation => 'Местоположение';
+  String get qiblaLocation => 'Город';
 
   @override
   String get qiblaToMakkah => 'До Мекки';
@@ -667,9 +664,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get qiblaRecalibrate => 'Перекалибровать';
-
-  @override
   String get qiblaTipsTitle => 'Для точного результата';
 
   @override
@@ -702,21 +696,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get qiblaTurnLeft => 'Поверните влево';
-
-  @override
-  String qiblaTurnRightBy(int degrees) {
-    return 'Поверните вправо на $degrees°';
-  }
-
-  @override
-  String qiblaTurnLeftBy(int degrees) {
-    return 'Поверните влево на $degrees°';
-  }
-
-  @override
-  String qiblaDegreesLeft(int degrees) {
-    return 'осталось $degrees°';
-  }
 
   @override
   String get qiblaModeCompass => 'Компас';
@@ -793,6 +772,34 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get qiblaCalDone => '✓ Калибровка завершена!';
+
+  @override
+  String get qiblaCalibrateShort => 'Калибровать';
+
+  @override
+  String get qiblaSkip => 'Пропустить';
+
+  @override
+  String get qiblaUndo => 'Отменить';
+
+  @override
+  String get qiblaSunMarker => 'Солнце';
+
+  @override
+  String get qiblaSunTapHint =>
+      'Солнце не в кружке? Нажмите на настоящее солнце';
+
+  @override
+  String get qiblaSunNotThere =>
+      'Нажмите на само солнце: оно на пунктирной линии';
+
+  @override
+  String qiblaSunCorrected(String degrees) {
+    return 'Исправлено по солнцу: $degrees°';
+  }
+
+  @override
+  String get qiblaSunCheckCamera => 'Проверить камерой';
 
   @override
   String get themeToDay => 'Дневной режим';

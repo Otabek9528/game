@@ -230,24 +230,28 @@ class _DialPainter extends CustomPainter {
           Rect.fromPoints(qdir * r * 0.2, qdir * ring),
         ),
     );
-    _kaaba(canvas, qdir * (ring - r * 0.04), r * 0.1, heading * _rad);
+    // Reached, it grows and glows under the pointer rather than hiding.
+    _kaaba(canvas, qdir * (ring - r * 0.075), r * (aligned ? 0.125 : 0.1), heading * _rad,
+        halo: aligned ? p.accent : null);
     canvas.restore();
 
-    // The phone's own direction: fixed at the top.
-    final tip = Offset(c.dx, c.dy - r + r * 0.02);
+    // The phone's own direction: fixed at the top, outside the ring, so the
+    // Kaaba stays in sight under it.
+    final tip = Offset(c.dx, c.dy - r + r * 0.015);
     final marker = Path()
-      ..moveTo(tip.dx, tip.dy + r * 0.13)
-      ..lineTo(tip.dx - r * 0.06, tip.dy)
-      ..lineTo(tip.dx + r * 0.06, tip.dy)
+      ..moveTo(tip.dx, tip.dy + r * 0.09)
+      ..lineTo(tip.dx - r * 0.055, tip.dy)
+      ..lineTo(tip.dx + r * 0.055, tip.dy)
       ..close();
     canvas.drawPath(marker, Paint()..color = aligned ? p.accent : p.ink);
   }
 
   /// A small Kaaba: a black cube with its gold band, kept upright.
-  void _kaaba(Canvas canvas, Offset at, double s, double rotation) {
+  void _kaaba(Canvas canvas, Offset at, double s, double rotation, {Color? halo}) {
     canvas.save();
     canvas.translate(at.dx, at.dy);
     canvas.rotate(rotation);
+    if (halo != null) canvas.drawCircle(Offset.zero, s * 0.95, Paint()..color = halo.withValues(alpha: 0.28));
     final body = RRect.fromRectAndRadius(Rect.fromCenter(center: Offset.zero, width: s, height: s), Radius.circular(s * 0.12));
     canvas.drawRRect(body.shift(Offset(0, s * 0.06)), Paint()..color = Colors.black26);
     canvas.drawRRect(body, Paint()..color = const Color(0xFF16130F));
