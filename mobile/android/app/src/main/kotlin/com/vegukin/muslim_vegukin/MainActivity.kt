@@ -5,13 +5,19 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.WindowManager
+import com.vegukin.muslim_vegukin.qibla.QiblaCamera
+import com.vegukin.muslim_vegukin.qibla.QiblaCompass
 import com.vegukin.muslim_vegukin.reminders.PrayerReminders
 import com.vegukin.muslim_vegukin.widget.PrayerWidgets
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private var camera: QiblaCamera? = null
+
     /** Set when a widget or a reminder opened the app; Flutter takes it once. */
     private var launchAction: String? = null
 
@@ -59,6 +65,30 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+        // The Qibla page: lib/features/qibla/qibla_sensors.dart.
+        val compass = QiblaCompass(this)
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/compass").setStreamHandler(compass)
+        val qiblaCamera = QiblaCamera(this, flutterEngine.renderer).also { camera = it }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/qibla").setMethodCallHandler { call, result ->
+            when (call.method) {
+                "hasCompass" -> result.success(compass.hasCompass())
+                "keepScreenOn" -> {
+                    if (call.arguments == true) {
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    } else {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
+                    result.success(null)
+                }
+                "startCamera" -> qiblaCamera.start(result)
+                "stopCamera" -> {
+                    qiblaCamera.stop()
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
         /** "vegukin/reminders": see lib/features/reminders/reminder_controller.dart. */
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/reminders").setMethodCallHandler { call, result ->
             when (call.method) {
@@ -85,5 +115,10 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+    }
+
+    override fun onDestroy() {
+        camera?.stop()
+        super.onDestroy()
     }
 }

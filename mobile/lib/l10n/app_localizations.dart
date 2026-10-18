@@ -1065,6 +1065,372 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Saharlik'**
   String get suhoorShort;
+
+  /// No description provided for @qiblaTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qibla yo‘nalishi'**
+  String get qiblaTitle;
+
+  /// No description provided for @qiblaPreparing.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kompas tayyorlanmoqda...'**
+  String get qiblaPreparing;
+
+  /// No description provided for @qiblaHoldFlat.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qurilmangizni tekis ushlang'**
+  String get qiblaHoldFlat;
+
+  /// No description provided for @qiblaHoldFlatShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni tekis ushlang'**
+  String get qiblaHoldFlatShort;
+
+  /// No description provided for @qiblaNoLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qibla yo‘nalishini hisoblash uchun joylashuvingiz kerak.'**
+  String get qiblaNoLocation;
+
+  /// No description provided for @qiblaNoCompassTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kompas topilmadi'**
+  String get qiblaNoCompassTitle;
+
+  /// No description provided for @qiblaNoCompass.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu qurilmada kompas sensori mavjud emas.'**
+  String get qiblaNoCompass;
+
+  /// No description provided for @qiblaNorth.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shimol'**
+  String get qiblaNorth;
+
+  /// No description provided for @qiblaEast.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sharq'**
+  String get qiblaEast;
+
+  /// No description provided for @qiblaSouth.
+  ///
+  /// In uz, this message translates to:
+  /// **'Janub'**
+  String get qiblaSouth;
+
+  /// No description provided for @qiblaWest.
+  ///
+  /// In uz, this message translates to:
+  /// **'G‘arb'**
+  String get qiblaWest;
+
+  /// No description provided for @qiblaDirection.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yo‘nalish'**
+  String get qiblaDirection;
+
+  /// No description provided for @qiblaAngle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qibla burchagi'**
+  String get qiblaAngle;
+
+  /// No description provided for @qiblaYourDirection.
+  ///
+  /// In uz, this message translates to:
+  /// **'Siz qaragan yo‘nalish'**
+  String get qiblaYourDirection;
+
+  /// No description provided for @qiblaLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuv'**
+  String get qiblaLocation;
+
+  /// No description provided for @qiblaToMakkah.
+  ///
+  /// In uz, this message translates to:
+  /// **'Makkagacha'**
+  String get qiblaToMakkah;
+
+  /// No description provided for @qiblaSignal.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kompas signali'**
+  String get qiblaSignal;
+
+  /// No description provided for @qiblaQualityExcellent.
+  ///
+  /// In uz, this message translates to:
+  /// **'A’lo'**
+  String get qiblaQualityExcellent;
+
+  /// No description provided for @qiblaQualityGood.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaxshi'**
+  String get qiblaQualityGood;
+
+  /// No description provided for @qiblaQualityMedium.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘rtacha'**
+  String get qiblaQualityMedium;
+
+  /// No description provided for @qiblaQualityPoor.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yomon'**
+  String get qiblaQualityPoor;
+
+  /// No description provided for @qiblaNeedsCalibration.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kalibratsiya kerak'**
+  String get qiblaNeedsCalibration;
+
+  /// No description provided for @qiblaInterference.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaqinda metall yoki elektronika bor'**
+  String get qiblaInterference;
+
+  /// No description provided for @qiblaAccuracy.
+  ///
+  /// In uz, this message translates to:
+  /// **'±{degrees}°'**
+  String qiblaAccuracy(int degrees);
+
+  /// No description provided for @qiblaDeclination.
+  ///
+  /// In uz, this message translates to:
+  /// **'Magnit og‘ishi {degrees}° hisobga olingan'**
+  String qiblaDeclination(String degrees);
+
+  /// No description provided for @qiblaRecalibrate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta kalibratsiya'**
+  String get qiblaRecalibrate;
+
+  /// No description provided for @qiblaTipsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aniqroq natija uchun'**
+  String get qiblaTipsTitle;
+
+  /// No description provided for @qiblaTip1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni gorizontal (tekis) ushlang'**
+  String get qiblaTip1;
+
+  /// No description provided for @qiblaTip2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Metall buyumlardan uzoqroq turing'**
+  String get qiblaTip2;
+
+  /// No description provided for @qiblaTip3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Elektron qurilmalardan uzoqlashing'**
+  String get qiblaTip3;
+
+  /// No description provided for @qiblaTip4.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ochiq maydonlarda ishlating'**
+  String get qiblaTip4;
+
+  /// No description provided for @qiblaTip5.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamera rejimida telefonni tik ushlang va Ka’ba belgisini markazga keltiring'**
+  String get qiblaTip5;
+
+  /// No description provided for @qiblaAligned.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qiblaga to‘g‘ri yuzlangansiz!'**
+  String get qiblaAligned;
+
+  /// No description provided for @qiblaSlightlyRight.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biroz o‘ngga buriling'**
+  String get qiblaSlightlyRight;
+
+  /// No description provided for @qiblaSlightlyLeft.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biroz chapga buriling'**
+  String get qiblaSlightlyLeft;
+
+  /// No description provided for @qiblaTurnRight.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘ngga buriling'**
+  String get qiblaTurnRight;
+
+  /// No description provided for @qiblaTurnLeft.
+  ///
+  /// In uz, this message translates to:
+  /// **'Chapga buriling'**
+  String get qiblaTurnLeft;
+
+  /// No description provided for @qiblaTurnRightBy.
+  ///
+  /// In uz, this message translates to:
+  /// **'{degrees}° o‘ngga buriling'**
+  String qiblaTurnRightBy(int degrees);
+
+  /// No description provided for @qiblaTurnLeftBy.
+  ///
+  /// In uz, this message translates to:
+  /// **'{degrees}° chapga buriling'**
+  String qiblaTurnLeftBy(int degrees);
+
+  /// No description provided for @qiblaDegreesLeft.
+  ///
+  /// In uz, this message translates to:
+  /// **'{degrees}° qoldi'**
+  String qiblaDegreesLeft(int degrees);
+
+  /// No description provided for @qiblaModeCompass.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kompas'**
+  String get qiblaModeCompass;
+
+  /// No description provided for @qiblaModeCamera.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamera'**
+  String get qiblaModeCamera;
+
+  /// No description provided for @qiblaHoldUpright.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni tik ushlang'**
+  String get qiblaHoldUpright;
+
+  /// No description provided for @qiblaCameraFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamerani ochib bo‘lmadi'**
+  String get qiblaCameraFailed;
+
+  /// No description provided for @qiblaSunTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh bo‘yicha tekshirish'**
+  String get qiblaSunTitle;
+
+  /// No description provided for @qiblaSunRight.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh hozir {sun}° da. Quyoshga yuzlanib, {angle}° o‘ngga burilsangiz — Qibla.'**
+  String qiblaSunRight(int sun, int angle);
+
+  /// No description provided for @qiblaSunLeft.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh hozir {sun}° da. Quyoshga yuzlanib, {angle}° chapga burilsangiz — Qibla.'**
+  String qiblaSunLeft(int sun, int angle);
+
+  /// No description provided for @qiblaSunAhead.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh hozir {sun}° da — aynan Qibla tomonda.'**
+  String qiblaSunAhead(int sun);
+
+  /// No description provided for @qiblaSunDown.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh ufqdan pastda. Kunduzi Qiblani quyosh bo‘yicha ham tekshirish mumkin — magnitlar unga ta’sir qilmaydi.'**
+  String get qiblaSunDown;
+
+  /// No description provided for @qiblaSunOverKaaba.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh Ka’ba ustida bo‘ladi: {when}. O‘sha daqiqada soyalar Qibladan teskari tomonga tushadi.'**
+  String qiblaSunOverKaaba(String when);
+
+  /// No description provided for @qiblaPhaseMove.
+  ///
+  /// In uz, this message translates to:
+  /// **'Harakat'**
+  String get qiblaPhaseMove;
+
+  /// No description provided for @qiblaPhaseHold.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barqarorlik'**
+  String get qiblaPhaseHold;
+
+  /// No description provided for @qiblaCalibrateTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kompasni kalibratsiya qiling'**
+  String get qiblaCalibrateTitle;
+
+  /// No description provided for @qiblaCalibrateMove.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni bilakni burab ∞ shaklida aylantiring — faqat surmang.'**
+  String get qiblaCalibrateMove;
+
+  /// No description provided for @qiblaCalibrateHold.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pufakchani markazda ushlab, qimirlamay turing.'**
+  String get qiblaCalibrateHold;
+
+  /// No description provided for @qiblaMovements.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count}/{total} harakat'**
+  String qiblaMovements(int count, int total);
+
+  /// No description provided for @qiblaCalMoving.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonni ∞ shaklida harakatlantiring...'**
+  String get qiblaCalMoving;
+
+  /// No description provided for @qiblaCalGood.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaxshi! Davom eting...'**
+  String get qiblaCalGood;
+
+  /// No description provided for @qiblaCalHoldStill.
+  ///
+  /// In uz, this message translates to:
+  /// **'Endi telefonni tekis ushlab, qimirlatmang...'**
+  String get qiblaCalHoldStill;
+
+  /// No description provided for @qiblaCalChecking.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barqarorlik tekshirilmoqda...'**
+  String get qiblaCalChecking;
+
+  /// No description provided for @qiblaCalDone.
+  ///
+  /// In uz, this message translates to:
+  /// **'✓ Kalibratsiya tayyor!'**
+  String get qiblaCalDone;
 }
 
 class _AppLocalizationsDelegate

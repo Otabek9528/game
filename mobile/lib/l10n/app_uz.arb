@@ -381,5 +381,145 @@
       }
     }
   },
-  "suhoorShort": "Saharlik"
+  "suhoorShort": "Saharlik",
+  "qiblaTitle": "Qibla yo‘nalishi",
+  "qiblaPreparing": "Kompas tayyorlanmoqda...",
+  "qiblaHoldFlat": "Qurilmangizni tekis ushlang",
+  "qiblaHoldFlatShort": "Telefonni tekis ushlang",
+  "qiblaNoLocation": "Qibla yo‘nalishini hisoblash uchun joylashuvingiz kerak.",
+  "qiblaNoCompassTitle": "Kompas topilmadi",
+  "qiblaNoCompass": "Bu qurilmada kompas sensori mavjud emas.",
+  "qiblaNorth": "Shimol",
+  "qiblaEast": "Sharq",
+  "qiblaSouth": "Janub",
+  "qiblaWest": "G‘arb",
+  "qiblaDirection": "Yo‘nalish",
+  "qiblaAngle": "Qibla burchagi",
+  "qiblaYourDirection": "Siz qaragan yo‘nalish",
+  "qiblaLocation": "Joylashuv",
+  "qiblaToMakkah": "Makkagacha",
+  "qiblaSignal": "Kompas signali",
+  "qiblaQualityExcellent": "A’lo",
+  "qiblaQualityGood": "Yaxshi",
+  "qiblaQualityMedium": "O‘rtacha",
+  "qiblaQualityPoor": "Yomon",
+  "qiblaNeedsCalibration": "Kalibratsiya kerak",
+  "qiblaInterference": "Yaqinda metall yoki elektronika bor",
+  "qiblaAccuracy": "±{degrees}°",
+  "@qiblaAccuracy": {
+    "placeholders": {
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaDeclination": "Magnit og‘ishi {degrees}° hisobga olingan",
+  "@qiblaDeclination": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaRecalibrate": "Qayta kalibratsiya",
+  "qiblaTipsTitle": "Aniqroq natija uchun",
+  "qiblaTip1": "Telefonni gorizontal (tekis) ushlang",
+  "qiblaTip2": "Metall buyumlardan uzoqroq turing",
+  "qiblaTip3": "Elektron qurilmalardan uzoqlashing",
+  "qiblaTip4": "Ochiq maydonlarda ishlating",
+  "qiblaTip5": "Kamera rejimida telefonni tik ushlang va Ka’ba belgisini markazga keltiring",
+  "qiblaAligned": "Qiblaga to‘g‘ri yuzlangansiz!",
+  "qiblaSlightlyRight": "Biroz o‘ngga buriling",
+  "qiblaSlightlyLeft": "Biroz chapga buriling",
+  "qiblaTurnRight": "O‘ngga buriling",
+  "qiblaTurnLeft": "Chapga buriling",
+  "qiblaTurnRightBy": "{degrees}° o‘ngga buriling",
+  "@qiblaTurnRightBy": {
+    "placeholders": {
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaTurnLeftBy": "{degrees}° chapga buriling",
+  "@qiblaTurnLeftBy": {
+    "placeholders": {
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaDegreesLeft": "{degrees}° qoldi",
+  "@qiblaDegreesLeft": {
+    "placeholders": {
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaModeCompass": "Kompas",
+  "qiblaModeCamera": "Kamera",
+  "qiblaHoldUpright": "Telefonni tik ushlang",
+  "qiblaCameraFailed": "Kamerani ochib bo‘lmadi",
+  "qiblaSunTitle": "Quyosh bo‘yicha tekshirish",
+  "qiblaSunRight": "Quyosh hozir {sun}° da. Quyoshga yuzlanib, {angle}° o‘ngga burilsangiz — Qibla.",
+  "@qiblaSunRight": {
+    "placeholders": {
+      "sun": {
+        "type": "int"
+      },
+      "angle": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaSunLeft": "Quyosh hozir {sun}° da. Quyoshga yuzlanib, {angle}° chapga burilsangiz — Qibla.",
+  "@qiblaSunLeft": {
+    "placeholders": {
+      "sun": {
+        "type": "int"
+      },
+      "angle": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaSunAhead": "Quyosh hozir {sun}° da — aynan Qibla tomonda.",
+  "@qiblaSunAhead": {
+    "placeholders": {
+      "sun": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaSunDown": "Quyosh ufqdan pastda. Kunduzi Qiblani quyosh bo‘yicha ham tekshirish mumkin — magnitlar unga ta’sir qilmaydi.",
+  "qiblaSunOverKaaba": "Quyosh Ka’ba ustida bo‘ladi: {when}. O‘sha daqiqada soyalar Qibladan teskari tomonga tushadi.",
+  "@qiblaSunOverKaaba": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaPhaseMove": "Harakat",
+  "qiblaPhaseHold": "Barqarorlik",
+  "qiblaCalibrateTitle": "Kompasni kalibratsiya qiling",
+  "qiblaCalibrateMove": "Telefonni bilakni burab ∞ shaklida aylantiring — faqat surmang.",
+  "qiblaCalibrateHold": "Pufakchani markazda ushlab, qimirlamay turing.",
+  "qiblaMovements": "{count}/{total} harakat",
+  "@qiblaMovements": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaCalMoving": "Telefonni ∞ shaklida harakatlantiring...",
+  "qiblaCalGood": "Yaxshi! Davom eting...",
+  "qiblaCalHoldStill": "Endi telefonni tekis ushlab, qimirlatmang...",
+  "qiblaCalChecking": "Barqarorlik tekshirilmoqda...",
+  "qiblaCalDone": "✓ Kalibratsiya tayyor!"
 }

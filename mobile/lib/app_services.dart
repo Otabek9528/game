@@ -9,6 +9,7 @@ import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/prayer/prayer_controller.dart';
+import 'features/qibla/qibla_sensors.dart';
 import 'features/reminders/reminder_controller.dart';
 import 'features/widget/home_widget_bridge.dart';
 
@@ -125,6 +126,7 @@ class AppServices {
     required this.openFeature,
     required this.homeWidget,
     required this.reminders,
+    this.qiblaDevice = const AndroidQiblaDevice(),
     this.businessStats = BusinessStats.fetch,
   });
 
@@ -134,5 +136,6 @@ class AppServices {
   final FeatureOpener openFeature;
   final HomeWidgetBridge homeWidget;
   final ReminderController reminders;
+  final QiblaDevice qiblaDevice;
   final Future<BusinessStats?> Function() businessStats;
 }

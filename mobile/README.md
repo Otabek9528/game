@@ -100,6 +100,7 @@ mobile/
 │   │   ├── home/                 ← home screen, prayer card, list of sections
 │   │   ├── prayer/               ← location, prayer times, countdown logic
 │   │   ├── prayers/              ← the prayer times page (from pages/prayers.html)
+│   │   ├── qibla/                ← Qibla compass and camera view (from pages/qibla/)
 │   │   ├── reminders/            ← per-prayer reminders: choices, sheet, schedule
 │   │   ├── widget/               ← hands data to the home-screen widgets
 │   │   └── web/web_feature_screen.dart ← shows a web page, plays Telegram's part

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,6 +11,7 @@ import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
+import 'package:muslim_vegukin/features/qibla/qibla_sensors.dart';
 import 'package:muslim_vegukin/features/reminders/reminder_controller.dart';
 import 'package:muslim_vegukin/features/widget/home_widget_bridge.dart';
 
@@ -200,6 +203,7 @@ class TestApp {
       openFeature: opened.call,
       homeWidget: HomeWidgetBridge(),
       reminders: reminders,
+      qiblaDevice: qibla,
       businessStats: () async => stats,
     );
   }
@@ -209,6 +213,7 @@ class TestApp {
   final FakeTimes times;
   final MemoryStore store;
   final opened = OpenedFeatures();
+  final qibla = FakeQiblaDevice();
   late final PrayerController prayer;
   late final FakePermissions permissions;
   late final ReminderController reminders;
@@ -238,4 +243,61 @@ class TestApp {
     await tester.pumpWidget(VegukinApp(services: services, deviceLocales: device));
     await tester.pumpAndSettle();
   }
+}
+
+/// The compass and camera, played by the test: [send] a reading.
+class FakeQiblaDevice implements QiblaDevice {
+  FakeQiblaDevice({this.compass = true});
+
+  final bool compass;
+  final controller = StreamController<CompassReading>.broadcast();
+  bool screenOn = false;
+  CameraProblem? cameraProblem;
+
+  void send({
+    double top = 0,
+    double camera = 0,
+    double tilt = 5,
+    double accuracy = 5,
+    int status = 3,
+    double field = 51.3,
+  }) =>
+      controller.add(CompassReading(
+        top: top,
+        camera: camera,
+        cameraUp: tilt - 90,
+        tilt: tilt,
+        levelX: 0,
+        levelY: 0,
+        accuracy: accuracy,
+        status: status,
+        field: field,
+        source: 'rotation',
+      ));
+
+  @override
+  Stream<CompassReading> readings() => controller.stream;
+
+  @override
+  Future<bool> hasCompass() async => compass;
+
+  @override
+  Future<void> keepScreenOn(bool on) async => screenOn = on;
+
+  @override
+  Future<CameraFeed> startCamera() async {
+    if (cameraProblem != null) throw CameraException(cameraProblem!);
+    return const CameraFeed(
+      textureId: 1,
+      width: 1280,
+      height: 960,
+      sensorOrientation: 90,
+      fovLong: 66,
+      fovShort: 51,
+      rotateInApp: false,
+    );
+  }
+
+  @override
+  Future<void> stopCamera() async {}
 }

@@ -585,4 +585,212 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get suhoorShort => 'Сухур';
+
+  @override
+  String get qiblaTitle => 'Направление Киблы';
+
+  @override
+  String get qiblaPreparing => 'Подготовка компаса...';
+
+  @override
+  String get qiblaHoldFlat => 'Держите устройство горизонтально';
+
+  @override
+  String get qiblaHoldFlatShort => 'Держите телефон ровно';
+
+  @override
+  String get qiblaNoLocation =>
+      'Чтобы рассчитать направление Киблы, нужно ваше местоположение.';
+
+  @override
+  String get qiblaNoCompassTitle => 'Компас не найден';
+
+  @override
+  String get qiblaNoCompass => 'На этом устройстве нет датчика компаса.';
+
+  @override
+  String get qiblaNorth => 'Север';
+
+  @override
+  String get qiblaEast => 'Восток';
+
+  @override
+  String get qiblaSouth => 'Юг';
+
+  @override
+  String get qiblaWest => 'Запад';
+
+  @override
+  String get qiblaDirection => 'Направление';
+
+  @override
+  String get qiblaAngle => 'Угол Киблы';
+
+  @override
+  String get qiblaYourDirection => 'Ваше направление';
+
+  @override
+  String get qiblaLocation => 'Местоположение';
+
+  @override
+  String get qiblaToMakkah => 'До Мекки';
+
+  @override
+  String get qiblaSignal => 'Сигнал компаса';
+
+  @override
+  String get qiblaQualityExcellent => 'Отлично';
+
+  @override
+  String get qiblaQualityGood => 'Хорошо';
+
+  @override
+  String get qiblaQualityMedium => 'Средне';
+
+  @override
+  String get qiblaQualityPoor => 'Плохо';
+
+  @override
+  String get qiblaNeedsCalibration => 'Нужна калибровка';
+
+  @override
+  String get qiblaInterference => 'Рядом металл или электроника';
+
+  @override
+  String qiblaAccuracy(int degrees) {
+    return '±$degrees°';
+  }
+
+  @override
+  String qiblaDeclination(String degrees) {
+    return 'Учтено магнитное склонение $degrees°';
+  }
+
+  @override
+  String get qiblaRecalibrate => 'Перекалибровать';
+
+  @override
+  String get qiblaTipsTitle => 'Для точного результата';
+
+  @override
+  String get qiblaTip1 => 'Держите телефон горизонтально';
+
+  @override
+  String get qiblaTip2 => 'Держитесь подальше от металла';
+
+  @override
+  String get qiblaTip3 => 'Отойдите от электроники';
+
+  @override
+  String get qiblaTip4 => 'Используйте на открытом воздухе';
+
+  @override
+  String get qiblaTip5 =>
+      'В режиме камеры держите телефон вертикально и совместите метку Каабы с центром';
+
+  @override
+  String get qiblaAligned => 'Вы направлены на Киблу!';
+
+  @override
+  String get qiblaSlightlyRight => 'Немного поверните вправо';
+
+  @override
+  String get qiblaSlightlyLeft => 'Немного поверните влево';
+
+  @override
+  String get qiblaTurnRight => 'Поверните вправо';
+
+  @override
+  String get qiblaTurnLeft => 'Поверните влево';
+
+  @override
+  String qiblaTurnRightBy(int degrees) {
+    return 'Поверните вправо на $degrees°';
+  }
+
+  @override
+  String qiblaTurnLeftBy(int degrees) {
+    return 'Поверните влево на $degrees°';
+  }
+
+  @override
+  String qiblaDegreesLeft(int degrees) {
+    return 'осталось $degrees°';
+  }
+
+  @override
+  String get qiblaModeCompass => 'Компас';
+
+  @override
+  String get qiblaModeCamera => 'Камера';
+
+  @override
+  String get qiblaHoldUpright => 'Держите телефон вертикально';
+
+  @override
+  String get qiblaCameraFailed => 'Не удалось открыть камеру';
+
+  @override
+  String get qiblaSunTitle => 'Проверка по солнцу';
+
+  @override
+  String qiblaSunRight(int sun, int angle) {
+    return 'Солнце сейчас на $sun°. Встаньте лицом к солнцу и повернитесь на $angle° вправо — это Кибла.';
+  }
+
+  @override
+  String qiblaSunLeft(int sun, int angle) {
+    return 'Солнце сейчас на $sun°. Встаньте лицом к солнцу и повернитесь на $angle° влево — это Кибла.';
+  }
+
+  @override
+  String qiblaSunAhead(int sun) {
+    return 'Солнце сейчас на $sun° — прямо в сторону Киблы.';
+  }
+
+  @override
+  String get qiblaSunDown =>
+      'Солнце за горизонтом. Днём Киблу можно проверить по солнцу — на него не влияют магниты.';
+
+  @override
+  String qiblaSunOverKaaba(String when) {
+    return 'Солнце будет прямо над Каабой: $when. В эту минуту тени указывают в сторону, противоположную Кибле.';
+  }
+
+  @override
+  String get qiblaPhaseMove => 'Движение';
+
+  @override
+  String get qiblaPhaseHold => 'Стабильность';
+
+  @override
+  String get qiblaCalibrateTitle => 'Откалибруйте компас';
+
+  @override
+  String get qiblaCalibrateMove =>
+      'Вращайте телефон в форме ∞, поворачивая запястье, — не просто двигайте.';
+
+  @override
+  String get qiblaCalibrateHold => 'Держите пузырёк в центре и не двигайтесь.';
+
+  @override
+  String qiblaMovements(int count, int total) {
+    return '$count/$total движений';
+  }
+
+  @override
+  String get qiblaCalMoving => 'Двигайте телефон в форме ∞...';
+
+  @override
+  String get qiblaCalGood => 'Хорошо! Продолжайте...';
+
+  @override
+  String get qiblaCalHoldStill =>
+      'Теперь держите телефон ровно и неподвижно...';
+
+  @override
+  String get qiblaCalChecking => 'Проверка стабильности...';
+
+  @override
+  String get qiblaCalDone => '✓ Калибровка завершена!';
 }

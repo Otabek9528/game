@@ -545,4 +545,213 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get suhoorShort => 'Saharlik';
+
+  @override
+  String get qiblaTitle => 'Qibla yo‘nalishi';
+
+  @override
+  String get qiblaPreparing => 'Kompas tayyorlanmoqda...';
+
+  @override
+  String get qiblaHoldFlat => 'Qurilmangizni tekis ushlang';
+
+  @override
+  String get qiblaHoldFlatShort => 'Telefonni tekis ushlang';
+
+  @override
+  String get qiblaNoLocation =>
+      'Qibla yo‘nalishini hisoblash uchun joylashuvingiz kerak.';
+
+  @override
+  String get qiblaNoCompassTitle => 'Kompas topilmadi';
+
+  @override
+  String get qiblaNoCompass => 'Bu qurilmada kompas sensori mavjud emas.';
+
+  @override
+  String get qiblaNorth => 'Shimol';
+
+  @override
+  String get qiblaEast => 'Sharq';
+
+  @override
+  String get qiblaSouth => 'Janub';
+
+  @override
+  String get qiblaWest => 'G‘arb';
+
+  @override
+  String get qiblaDirection => 'Yo‘nalish';
+
+  @override
+  String get qiblaAngle => 'Qibla burchagi';
+
+  @override
+  String get qiblaYourDirection => 'Siz qaragan yo‘nalish';
+
+  @override
+  String get qiblaLocation => 'Joylashuv';
+
+  @override
+  String get qiblaToMakkah => 'Makkagacha';
+
+  @override
+  String get qiblaSignal => 'Kompas signali';
+
+  @override
+  String get qiblaQualityExcellent => 'A’lo';
+
+  @override
+  String get qiblaQualityGood => 'Yaxshi';
+
+  @override
+  String get qiblaQualityMedium => 'O‘rtacha';
+
+  @override
+  String get qiblaQualityPoor => 'Yomon';
+
+  @override
+  String get qiblaNeedsCalibration => 'Kalibratsiya kerak';
+
+  @override
+  String get qiblaInterference => 'Yaqinda metall yoki elektronika bor';
+
+  @override
+  String qiblaAccuracy(int degrees) {
+    return '±$degrees°';
+  }
+
+  @override
+  String qiblaDeclination(String degrees) {
+    return 'Magnit og‘ishi $degrees° hisobga olingan';
+  }
+
+  @override
+  String get qiblaRecalibrate => 'Qayta kalibratsiya';
+
+  @override
+  String get qiblaTipsTitle => 'Aniqroq natija uchun';
+
+  @override
+  String get qiblaTip1 => 'Telefonni gorizontal (tekis) ushlang';
+
+  @override
+  String get qiblaTip2 => 'Metall buyumlardan uzoqroq turing';
+
+  @override
+  String get qiblaTip3 => 'Elektron qurilmalardan uzoqlashing';
+
+  @override
+  String get qiblaTip4 => 'Ochiq maydonlarda ishlating';
+
+  @override
+  String get qiblaTip5 =>
+      'Kamera rejimida telefonni tik ushlang va Ka’ba belgisini markazga keltiring';
+
+  @override
+  String get qiblaAligned => 'Qiblaga to‘g‘ri yuzlangansiz!';
+
+  @override
+  String get qiblaSlightlyRight => 'Biroz o‘ngga buriling';
+
+  @override
+  String get qiblaSlightlyLeft => 'Biroz chapga buriling';
+
+  @override
+  String get qiblaTurnRight => 'O‘ngga buriling';
+
+  @override
+  String get qiblaTurnLeft => 'Chapga buriling';
+
+  @override
+  String qiblaTurnRightBy(int degrees) {
+    return '$degrees° o‘ngga buriling';
+  }
+
+  @override
+  String qiblaTurnLeftBy(int degrees) {
+    return '$degrees° chapga buriling';
+  }
+
+  @override
+  String qiblaDegreesLeft(int degrees) {
+    return '$degrees° qoldi';
+  }
+
+  @override
+  String get qiblaModeCompass => 'Kompas';
+
+  @override
+  String get qiblaModeCamera => 'Kamera';
+
+  @override
+  String get qiblaHoldUpright => 'Telefonni tik ushlang';
+
+  @override
+  String get qiblaCameraFailed => 'Kamerani ochib bo‘lmadi';
+
+  @override
+  String get qiblaSunTitle => 'Quyosh bo‘yicha tekshirish';
+
+  @override
+  String qiblaSunRight(int sun, int angle) {
+    return 'Quyosh hozir $sun° da. Quyoshga yuzlanib, $angle° o‘ngga burilsangiz — Qibla.';
+  }
+
+  @override
+  String qiblaSunLeft(int sun, int angle) {
+    return 'Quyosh hozir $sun° da. Quyoshga yuzlanib, $angle° chapga burilsangiz — Qibla.';
+  }
+
+  @override
+  String qiblaSunAhead(int sun) {
+    return 'Quyosh hozir $sun° da — aynan Qibla tomonda.';
+  }
+
+  @override
+  String get qiblaSunDown =>
+      'Quyosh ufqdan pastda. Kunduzi Qiblani quyosh bo‘yicha ham tekshirish mumkin — magnitlar unga ta’sir qilmaydi.';
+
+  @override
+  String qiblaSunOverKaaba(String when) {
+    return 'Quyosh Ka’ba ustida bo‘ladi: $when. O‘sha daqiqada soyalar Qibladan teskari tomonga tushadi.';
+  }
+
+  @override
+  String get qiblaPhaseMove => 'Harakat';
+
+  @override
+  String get qiblaPhaseHold => 'Barqarorlik';
+
+  @override
+  String get qiblaCalibrateTitle => 'Kompasni kalibratsiya qiling';
+
+  @override
+  String get qiblaCalibrateMove =>
+      'Telefonni bilakni burab ∞ shaklida aylantiring — faqat surmang.';
+
+  @override
+  String get qiblaCalibrateHold =>
+      'Pufakchani markazda ushlab, qimirlamay turing.';
+
+  @override
+  String qiblaMovements(int count, int total) {
+    return '$count/$total harakat';
+  }
+
+  @override
+  String get qiblaCalMoving => 'Telefonni ∞ shaklida harakatlantiring...';
+
+  @override
+  String get qiblaCalGood => 'Yaxshi! Davom eting...';
+
+  @override
+  String get qiblaCalHoldStill =>
+      'Endi telefonni tekis ushlab, qimirlatmang...';
+
+  @override
+  String get qiblaCalChecking => 'Barqarorlik tekshirilmoqda...';
+
+  @override
+  String get qiblaCalDone => '✓ Kalibratsiya tayyor!';
 }

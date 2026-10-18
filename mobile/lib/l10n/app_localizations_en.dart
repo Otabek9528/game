@@ -572,4 +572,211 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get suhoorShort => 'Suhoor';
+
+  @override
+  String get qiblaTitle => 'Qibla direction';
+
+  @override
+  String get qiblaPreparing => 'Preparing compass...';
+
+  @override
+  String get qiblaHoldFlat => 'Hold your device flat';
+
+  @override
+  String get qiblaHoldFlatShort => 'Hold your phone flat';
+
+  @override
+  String get qiblaNoLocation =>
+      'Your location is needed to work out the Qibla.';
+
+  @override
+  String get qiblaNoCompassTitle => 'No compass';
+
+  @override
+  String get qiblaNoCompass => 'This device does not have a compass sensor.';
+
+  @override
+  String get qiblaNorth => 'North';
+
+  @override
+  String get qiblaEast => 'East';
+
+  @override
+  String get qiblaSouth => 'South';
+
+  @override
+  String get qiblaWest => 'West';
+
+  @override
+  String get qiblaDirection => 'Direction';
+
+  @override
+  String get qiblaAngle => 'Qibla angle';
+
+  @override
+  String get qiblaYourDirection => 'Your direction';
+
+  @override
+  String get qiblaLocation => 'Location';
+
+  @override
+  String get qiblaToMakkah => 'To Makkah';
+
+  @override
+  String get qiblaSignal => 'Compass signal';
+
+  @override
+  String get qiblaQualityExcellent => 'Excellent';
+
+  @override
+  String get qiblaQualityGood => 'Good';
+
+  @override
+  String get qiblaQualityMedium => 'Medium';
+
+  @override
+  String get qiblaQualityPoor => 'Poor';
+
+  @override
+  String get qiblaNeedsCalibration => 'Needs calibration';
+
+  @override
+  String get qiblaInterference => 'Metal or electronics nearby';
+
+  @override
+  String qiblaAccuracy(int degrees) {
+    return '±$degrees°';
+  }
+
+  @override
+  String qiblaDeclination(String degrees) {
+    return 'Magnetic declination $degrees° applied';
+  }
+
+  @override
+  String get qiblaRecalibrate => 'Recalibrate';
+
+  @override
+  String get qiblaTipsTitle => 'For better accuracy';
+
+  @override
+  String get qiblaTip1 => 'Hold the phone horizontally (flat)';
+
+  @override
+  String get qiblaTip2 => 'Stay away from metal objects';
+
+  @override
+  String get qiblaTip3 => 'Move away from electronics';
+
+  @override
+  String get qiblaTip4 => 'Use it in open areas';
+
+  @override
+  String get qiblaTip5 =>
+      'In camera mode, hold the phone upright and bring the Kaaba mark to the centre';
+
+  @override
+  String get qiblaAligned => 'You are facing the Qibla!';
+
+  @override
+  String get qiblaSlightlyRight => 'Turn slightly right';
+
+  @override
+  String get qiblaSlightlyLeft => 'Turn slightly left';
+
+  @override
+  String get qiblaTurnRight => 'Turn right';
+
+  @override
+  String get qiblaTurnLeft => 'Turn left';
+
+  @override
+  String qiblaTurnRightBy(int degrees) {
+    return 'Turn right $degrees°';
+  }
+
+  @override
+  String qiblaTurnLeftBy(int degrees) {
+    return 'Turn left $degrees°';
+  }
+
+  @override
+  String qiblaDegreesLeft(int degrees) {
+    return '$degrees° to go';
+  }
+
+  @override
+  String get qiblaModeCompass => 'Compass';
+
+  @override
+  String get qiblaModeCamera => 'Camera';
+
+  @override
+  String get qiblaHoldUpright => 'Hold the phone upright';
+
+  @override
+  String get qiblaCameraFailed => 'Couldn’t open the camera';
+
+  @override
+  String get qiblaSunTitle => 'Check with the sun';
+
+  @override
+  String qiblaSunRight(int sun, int angle) {
+    return 'The sun is at $sun° now. Face the sun and turn $angle° right: that is the Qibla.';
+  }
+
+  @override
+  String qiblaSunLeft(int sun, int angle) {
+    return 'The sun is at $sun° now. Face the sun and turn $angle° left: that is the Qibla.';
+  }
+
+  @override
+  String qiblaSunAhead(int sun) {
+    return 'The sun is at $sun° now, right in the direction of the Qibla.';
+  }
+
+  @override
+  String get qiblaSunDown =>
+      'The sun is below the horizon. In daytime you can check the Qibla by the sun, which no magnet can disturb.';
+
+  @override
+  String qiblaSunOverKaaba(String when) {
+    return 'The sun will stand right over the Kaaba on $when. At that minute, shadows point directly away from the Qibla.';
+  }
+
+  @override
+  String get qiblaPhaseMove => 'Movement';
+
+  @override
+  String get qiblaPhaseHold => 'Stability';
+
+  @override
+  String get qiblaCalibrateTitle => 'Calibrate the compass';
+
+  @override
+  String get qiblaCalibrateMove =>
+      'Turn the phone in a ∞ shape by twisting your wrist, not just sliding it.';
+
+  @override
+  String get qiblaCalibrateHold => 'Keep the bubble centred and hold still.';
+
+  @override
+  String qiblaMovements(int count, int total) {
+    return '$count/$total movements';
+  }
+
+  @override
+  String get qiblaCalMoving => 'Move the phone in a ∞ pattern...';
+
+  @override
+  String get qiblaCalGood => 'Good! Keep going...';
+
+  @override
+  String get qiblaCalHoldStill => 'Now hold your phone flat and still...';
+
+  @override
+  String get qiblaCalChecking => 'Checking stability...';
+
+  @override
+  String get qiblaCalDone => '✓ Calibration complete!';
 }
