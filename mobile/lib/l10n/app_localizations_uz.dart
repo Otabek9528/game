@@ -1665,6 +1665,268 @@ class AppLocalizationsUz extends AppLocalizations {
       'Qidiruv uchun internet kerak. Saqlangan javoblar internetsiz ham ochiladi.';
 
   @override
+  String get bizTitle => 'Biznes katalogi';
+
+  @override
+  String get bizTagline => 'Koreyadagi o‘zbek bizneslari — bir joyda';
+
+  @override
+  String get bizSearchTitle => 'Qidiruv';
+
+  @override
+  String get bizSearchHint => 'Biznes yoki xizmatni qidiring';
+
+  @override
+  String bizCountAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta biznes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bizCountFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta topildi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bizTileEmpty => 'Hozircha bo‘sh';
+
+  @override
+  String get bizDirectoryEmpty => 'Katalog hozircha bo‘sh';
+
+  @override
+  String get bizDirectoryEmptyBody =>
+      'Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi.';
+
+  @override
+  String get bizSaved => 'Saqlanganlar';
+
+  @override
+  String get bizCategories => 'Yo‘nalishlar';
+
+  @override
+  String get bizOrderNote => 'Mijozlar eng ko‘p yoqtirgan bizneslar yuqorida';
+
+  @override
+  String get bizCategoryEmpty => 'Bu yo‘nalishda hali biznes yo‘q';
+
+  @override
+  String get bizCategoryEmptyBody =>
+      'Yangi bizneslar qo‘shilgach shu yerda ko‘rinadi. Boshqa yo‘nalishlarga ham qarab ko‘ring.';
+
+  @override
+  String get bizSeeAll => 'Barchasi';
+
+  @override
+  String get bizNothingFound => 'Hech narsa topilmadi';
+
+  @override
+  String bizNothingFoundBody(String query) {
+    return '“$query” bo‘yicha biznes topilmadi. Boshqacha yozib ko‘ring yoki yo‘nalishlardan qidiring.';
+  }
+
+  @override
+  String get bizLoadError => 'Yuklab bo‘lmadi';
+
+  @override
+  String get bizCheckConnection =>
+      'Internet aloqasini tekshirib, qayta urinib ko‘ring.';
+
+  @override
+  String get bizRetry => 'Qayta urinish';
+
+  @override
+  String get bizUzbekNote => 'Bizneslar haqidagi ma’lumotlar o‘zbek tilida.';
+
+  @override
+  String get bizSave => 'Saqlash';
+
+  @override
+  String get bizUnsave => 'Saqlanganlardan olib tashlash';
+
+  @override
+  String get bizSavedNote =>
+      'Saqlandi — aloqa ma’lumotlari internetsiz ham ochiladi';
+
+  @override
+  String get bizRemovedNote => 'Saqlanganlardan olib tashlandi';
+
+  @override
+  String get bizShare => 'Ulashish';
+
+  @override
+  String get bizShareFooter => 'Muslim Vegukin biznes katalogidan';
+
+  @override
+  String bizViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count marta ko‘rilgan',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bizLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kishiga yoqdi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bizLoadFailed => 'Ma’lumotni yuklab bo‘lmadi.';
+
+  @override
+  String get bizLinks => 'Boshqa havolalar';
+
+  @override
+  String get bizAbout => 'Biznes haqida';
+
+  @override
+  String get bizNoInfo => 'Bu biznes hali to‘liq ma’lumot kiritmagan.';
+
+  @override
+  String get bizNoContact => 'Aloqa ma’lumotlari ko‘rsatilmagan.';
+
+  @override
+  String get bizNoContactAsk => 'Admin orqali so‘rash';
+
+  @override
+  String get bizReport => 'Ma’lumot noto‘g‘rimi? Adminga xabar bering';
+
+  @override
+  String get bizCopyAddress => 'Nusxalash';
+
+  @override
+  String get bizAddressCopied => 'Manzil nusxalandi';
+
+  @override
+  String get bizPhoneCopied => 'Raqam nusxalandi';
+
+  @override
+  String get bizActCall => 'Qo‘ng‘iroq qilish';
+
+  @override
+  String get bizActTelegram => 'Telegramda yozish';
+
+  @override
+  String get bizActChannel => 'Telegramda ochish';
+
+  @override
+  String get bizActKakao => 'KakaoTalkda yozish';
+
+  @override
+  String get bizActWebsite => 'Saytni ochish';
+
+  @override
+  String get bizActInstagram => 'Instagramda ko‘rish';
+
+  @override
+  String get bizActTiktok => 'TikTokda ko‘rish';
+
+  @override
+  String get bizActYoutube => 'YouTube’da ko‘rish';
+
+  @override
+  String get bizActFacebook => 'Facebookda ochish';
+
+  @override
+  String get bizActPlay => 'Google Play’da ochish';
+
+  @override
+  String get bizActAppStore => 'App Store’da ochish';
+
+  @override
+  String get bizActOpen => 'Ochish';
+
+  @override
+  String get bizChannelPhone => 'Telefon';
+
+  @override
+  String get bizChannelGroup => 'Telegram kanal / guruh';
+
+  @override
+  String get bizChannelWebsite => 'Veb-sayt';
+
+  @override
+  String get bizPrivateGroup => 'Yopiq guruh';
+
+  @override
+  String get bizMapNaver => 'Naver xarita';
+
+  @override
+  String get bizMapKakao => 'Kakao xarita';
+
+  @override
+  String get bizMapGoogle => 'Google xarita';
+
+  @override
+  String get bizOwnerTitle => 'Biznes egasimisiz?';
+
+  @override
+  String get bizOwnerBody =>
+      'Biznesingizni katalogga qo‘shing — mijozlar sizni shu yerdan topadi.';
+
+  @override
+  String get bizOwnerBodyEmpty => 'Bu yo‘nalishga birinchi bo‘lib qo‘shiling.';
+
+  @override
+  String get bizOwnerEyebrow => 'Biznes egalari uchun';
+
+  @override
+  String get bizOwnerSheetTitle => 'Katalogga qo‘shilish';
+
+  @override
+  String get bizStep1Title => 'Ariza yuborish';
+
+  @override
+  String get bizStep1Body =>
+      'Biznes logosi, nomi, yo‘nalishi va aloqa ma’lumotlarini kiriting.';
+
+  @override
+  String get bizStep2Title => 'To‘lov';
+
+  @override
+  String bizStep2Body(String amount) {
+    return 'Bir martalik to‘lov — $amount. Adminga to‘lov skrinshotini yuborasiz.';
+  }
+
+  @override
+  String get bizStep3Title => 'Katalogda';
+
+  @override
+  String get bizStep3Body =>
+      'To‘lov tasdiqlangach biznesingiz katalogda ko‘rina boshlaydi.';
+
+  @override
+  String get bizOwnerFine =>
+      'Katalogda ko‘rinish tartibi biznesga bosilgan klass soniga qarab belgilanadi: eng ko‘p yoqtirilgan biznes yuqorida turadi.';
+
+  @override
+  String get bizOwnerHow =>
+      'Ariza Telegram orqali yuboriladi: adminga yozing, u biznesingizni qo‘shishda yordam beradi.';
+
+  @override
+  String get bizOwnerContact => 'Admin bilan bog‘lanish';
+
+  @override
+  String bizCurrency(String amount) {
+    return '$amount won';
+  }
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

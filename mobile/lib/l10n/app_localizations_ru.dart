@@ -1704,6 +1704,271 @@ class AppLocalizationsRu extends AppLocalizations {
       'Для поиска нужен интернет. Сохранённые ответы открываются и без него.';
 
   @override
+  String get bizTitle => 'Бизнес-каталог';
+
+  @override
+  String get bizTagline => 'Узбекский бизнес в Корее — в одном месте';
+
+  @override
+  String get bizSearchTitle => 'Поиск';
+
+  @override
+  String get bizSearchHint => 'Найти бизнес или услугу';
+
+  @override
+  String bizCountAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count бизнесов',
+      few: '$count бизнеса',
+      one: '$count бизнес',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bizCountFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Найдено: $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bizTileEmpty => 'Пока пусто';
+
+  @override
+  String get bizDirectoryEmpty => 'Каталог пока пуст';
+
+  @override
+  String get bizDirectoryEmptyBody =>
+      'Здесь будут собраны узбекские бизнесы в Корее.';
+
+  @override
+  String get bizSaved => 'Сохранённые';
+
+  @override
+  String get bizCategories => 'Разделы';
+
+  @override
+  String get bizOrderNote => 'Выше — те, что больше всего нравятся клиентам';
+
+  @override
+  String get bizCategoryEmpty => 'В этом разделе пока нет бизнесов';
+
+  @override
+  String get bizCategoryEmptyBody =>
+      'Новые бизнесы появятся здесь после добавления. Загляните и в другие разделы.';
+
+  @override
+  String get bizSeeAll => 'Все';
+
+  @override
+  String get bizNothingFound => 'Ничего не найдено';
+
+  @override
+  String bizNothingFoundBody(String query) {
+    return 'По запросу «$query» ничего не найдено. Попробуйте написать иначе или поищите по разделам.';
+  }
+
+  @override
+  String get bizLoadError => 'Не удалось загрузить';
+
+  @override
+  String get bizCheckConnection => 'Проверьте подключение и попробуйте снова.';
+
+  @override
+  String get bizRetry => 'Повторить';
+
+  @override
+  String get bizUzbekNote => 'Описания бизнесов — на узбекском языке.';
+
+  @override
+  String get bizSave => 'Сохранить';
+
+  @override
+  String get bizUnsave => 'Убрать из сохранённых';
+
+  @override
+  String get bizSavedNote => 'Сохранено — контакты откроются и без интернета';
+
+  @override
+  String get bizRemovedNote => 'Убрано из сохранённых';
+
+  @override
+  String get bizShare => 'Поделиться';
+
+  @override
+  String get bizShareFooter => 'Из бизнес-каталога Muslim Vegukin';
+
+  @override
+  String bizViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count просмотров',
+      few: '$count просмотра',
+      one: '$count просмотр',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bizLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Понравилось $count людям',
+      one: 'Понравилось $count человеку',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bizLoadFailed => 'Не удалось загрузить данные.';
+
+  @override
+  String get bizLinks => 'Другие ссылки';
+
+  @override
+  String get bizAbout => 'О бизнесе';
+
+  @override
+  String get bizNoInfo => 'Этот бизнес пока не заполнил описание.';
+
+  @override
+  String get bizNoContact => 'Контакты не указаны.';
+
+  @override
+  String get bizNoContactAsk => 'Спросить у админа';
+
+  @override
+  String get bizReport => 'Неверные данные? Сообщите админу';
+
+  @override
+  String get bizCopyAddress => 'Копировать';
+
+  @override
+  String get bizAddressCopied => 'Адрес скопирован';
+
+  @override
+  String get bizPhoneCopied => 'Номер скопирован';
+
+  @override
+  String get bizActCall => 'Позвонить';
+
+  @override
+  String get bizActTelegram => 'Написать';
+
+  @override
+  String get bizActChannel => 'Открыть';
+
+  @override
+  String get bizActKakao => 'Написать';
+
+  @override
+  String get bizActWebsite => 'Открыть сайт';
+
+  @override
+  String get bizActInstagram => 'Открыть профиль';
+
+  @override
+  String get bizActTiktok => 'Открыть профиль';
+
+  @override
+  String get bizActYoutube => 'Смотреть';
+
+  @override
+  String get bizActFacebook => 'Открыть страницу';
+
+  @override
+  String get bizActPlay => 'Скачать';
+
+  @override
+  String get bizActAppStore => 'Скачать';
+
+  @override
+  String get bizActOpen => 'Открыть';
+
+  @override
+  String get bizChannelPhone => 'Телефон';
+
+  @override
+  String get bizChannelGroup => 'Telegram-канал / группа';
+
+  @override
+  String get bizChannelWebsite => 'Сайт';
+
+  @override
+  String get bizPrivateGroup => 'Закрытая группа';
+
+  @override
+  String get bizMapNaver => 'Naver Карты';
+
+  @override
+  String get bizMapKakao => 'Kakao Карты';
+
+  @override
+  String get bizMapGoogle => 'Google Карты';
+
+  @override
+  String get bizOwnerTitle => 'Вы владелец бизнеса?';
+
+  @override
+  String get bizOwnerBody =>
+      'Добавьте свой бизнес в каталог — клиенты найдут вас здесь.';
+
+  @override
+  String get bizOwnerBodyEmpty => 'Станьте первым в этом разделе.';
+
+  @override
+  String get bizOwnerEyebrow => 'Для владельцев бизнеса';
+
+  @override
+  String get bizOwnerSheetTitle => 'Как попасть в каталог';
+
+  @override
+  String get bizStep1Title => 'Заявка';
+
+  @override
+  String get bizStep1Body =>
+      'Укажите логотип, название, раздел и контакты бизнеса.';
+
+  @override
+  String get bizStep2Title => 'Оплата';
+
+  @override
+  String bizStep2Body(String amount) {
+    return 'Разовый платёж — $amount. Скриншот оплаты отправляется админу.';
+  }
+
+  @override
+  String get bizStep3Title => 'В каталоге';
+
+  @override
+  String get bizStep3Body =>
+      'После подтверждения оплаты бизнес появится в каталоге.';
+
+  @override
+  String get bizOwnerFine =>
+      'Порядок в каталоге зависит от числа лайков: самый любимый бизнес стоит выше всех.';
+
+  @override
+  String get bizOwnerHow =>
+      'Заявка подаётся через Telegram: напишите админу, он поможет добавить бизнес.';
+
+  @override
+  String get bizOwnerContact => 'Написать админу';
+
+  @override
+  String bizCurrency(String amount) {
+    return '$amount вон';
+  }
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

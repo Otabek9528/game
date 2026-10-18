@@ -872,6 +872,133 @@
   "qnaNoResultsHint": "Savolni boshqacharoq, to‘liqroq yozib ko‘ring.",
   "qnaOfflineTitle": "Internet yo‘q",
   "qnaOfflineBody": "Qidiruv uchun internet kerak. Saqlangan javoblar internetsiz ham ochiladi.",
+  "bizTitle": "Biznes katalogi",
+  "bizTagline": "Koreyadagi o‘zbek bizneslari — bir joyda",
+  "bizSearchTitle": "Qidiruv",
+  "bizSearchHint": "Biznes yoki xizmatni qidiring",
+  "bizCountAll": "{count, plural, other{{count} ta biznes}}",
+  "@bizCountAll": {
+    "description": "How many businesses are listed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizCountFound": "{count, plural, other{{count} ta topildi}}",
+  "@bizCountFound": {
+    "description": "How many businesses a search found.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizTileEmpty": "Hozircha bo‘sh",
+  "bizDirectoryEmpty": "Katalog hozircha bo‘sh",
+  "bizDirectoryEmptyBody": "Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi.",
+  "bizSaved": "Saqlanganlar",
+  "bizCategories": "Yo‘nalishlar",
+  "bizOrderNote": "Mijozlar eng ko‘p yoqtirgan bizneslar yuqorida",
+  "bizCategoryEmpty": "Bu yo‘nalishda hali biznes yo‘q",
+  "bizCategoryEmptyBody": "Yangi bizneslar qo‘shilgach shu yerda ko‘rinadi. Boshqa yo‘nalishlarga ham qarab ko‘ring.",
+  "bizSeeAll": "Barchasi",
+  "bizNothingFound": "Hech narsa topilmadi",
+  "bizNothingFoundBody": "“{query}” bo‘yicha biznes topilmadi. Boshqacha yozib ko‘ring yoki yo‘nalishlardan qidiring.",
+  "@bizNothingFoundBody": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "bizLoadError": "Yuklab bo‘lmadi",
+  "bizCheckConnection": "Internet aloqasini tekshirib, qayta urinib ko‘ring.",
+  "bizRetry": "Qayta urinish",
+  "bizUzbekNote": "Bizneslar haqidagi ma’lumotlar o‘zbek tilida.",
+  "bizSave": "Saqlash",
+  "bizUnsave": "Saqlanganlardan olib tashlash",
+  "bizSavedNote": "Saqlandi — aloqa ma’lumotlari internetsiz ham ochiladi",
+  "bizRemovedNote": "Saqlanganlardan olib tashlandi",
+  "bizShare": "Ulashish",
+  "bizShareFooter": "Muslim Vegukin biznes katalogidan",
+  "bizViews": "{count, plural, other{{count} marta ko‘rilgan}}",
+  "@bizViews": {
+    "description": "How many times a listing was opened.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizLikes": "{count, plural, other{{count} kishiga yoqdi}}",
+  "@bizLikes": {
+    "description": "How many people liked a business.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizLoadFailed": "Ma’lumotni yuklab bo‘lmadi.",
+  "bizLinks": "Boshqa havolalar",
+  "bizAbout": "Biznes haqida",
+  "bizNoInfo": "Bu biznes hali to‘liq ma’lumot kiritmagan.",
+  "bizNoContact": "Aloqa ma’lumotlari ko‘rsatilmagan.",
+  "bizNoContactAsk": "Admin orqali so‘rash",
+  "bizReport": "Ma’lumot noto‘g‘rimi? Adminga xabar bering",
+  "bizCopyAddress": "Nusxalash",
+  "bizAddressCopied": "Manzil nusxalandi",
+  "bizPhoneCopied": "Raqam nusxalandi",
+  "bizActCall": "Qo‘ng‘iroq qilish",
+  "bizActTelegram": "Telegramda yozish",
+  "bizActChannel": "Telegramda ochish",
+  "bizActKakao": "KakaoTalkda yozish",
+  "bizActWebsite": "Saytni ochish",
+  "bizActInstagram": "Instagramda ko‘rish",
+  "bizActTiktok": "TikTokda ko‘rish",
+  "bizActYoutube": "YouTube’da ko‘rish",
+  "bizActFacebook": "Facebookda ochish",
+  "bizActPlay": "Google Play’da ochish",
+  "bizActAppStore": "App Store’da ochish",
+  "bizActOpen": "Ochish",
+  "bizChannelPhone": "Telefon",
+  "bizChannelGroup": "Telegram kanal / guruh",
+  "bizChannelWebsite": "Veb-sayt",
+  "bizPrivateGroup": "Yopiq guruh",
+  "bizMapNaver": "Naver xarita",
+  "bizMapKakao": "Kakao xarita",
+  "bizMapGoogle": "Google xarita",
+  "bizOwnerTitle": "Biznes egasimisiz?",
+  "bizOwnerBody": "Biznesingizni katalogga qo‘shing — mijozlar sizni shu yerdan topadi.",
+  "bizOwnerBodyEmpty": "Bu yo‘nalishga birinchi bo‘lib qo‘shiling.",
+  "bizOwnerEyebrow": "Biznes egalari uchun",
+  "bizOwnerSheetTitle": "Katalogga qo‘shilish",
+  "bizStep1Title": "Ariza yuborish",
+  "bizStep1Body": "Biznes logosi, nomi, yo‘nalishi va aloqa ma’lumotlarini kiriting.",
+  "bizStep2Title": "To‘lov",
+  "bizStep2Body": "Bir martalik to‘lov — {amount}. Adminga to‘lov skrinshotini yuborasiz.",
+  "@bizStep2Body": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "bizStep3Title": "Katalogda",
+  "bizStep3Body": "To‘lov tasdiqlangach biznesingiz katalogda ko‘rina boshlaydi.",
+  "bizOwnerFine": "Katalogda ko‘rinish tartibi biznesga bosilgan klass soniga qarab belgilanadi: eng ko‘p yoqtirilgan biznes yuqorida turadi.",
+  "bizOwnerHow": "Ariza Telegram orqali yuboriladi: adminga yozing, u biznesingizni qo‘shishda yordam beradi.",
+  "bizOwnerContact": "Admin bilan bog‘lanish",
+  "bizCurrency": "{amount} won",
+  "@bizCurrency": {
+    "description": "A sum in Korean won, already formatted.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

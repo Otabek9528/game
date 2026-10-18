@@ -12,6 +12,8 @@ import 'package:muslim_vegukin/core/system.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_camera.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_models.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_source.dart';
+import 'package:muslim_vegukin/features/business/business_models.dart';
+import 'package:muslim_vegukin/features/business/business_source.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/parcel/parcel_models.dart';
@@ -207,8 +209,10 @@ class TestApp {
     DateTime? now,
     BusinessStats? stats = const BusinessStats(businesses: 5, categories: 10),
     FakeParcels? parcels,
+    FakeBusinesses? businesses,
   })  : languageStore = MemoryLanguageStore(language),
         parcels = parcels ?? FakeParcels(),
+        businesses = businesses ?? FakeBusinesses(),
         location = location ?? FakeLocation(),
         times = times ?? FakeTimes(),
         store = store ?? MemoryStore() {
@@ -240,6 +244,7 @@ class TestApp {
       system: system,
       barcodes: barcodes,
       qna: qna,
+      businesses: this.businesses,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
         cameras.add(camera);
@@ -268,6 +273,7 @@ class TestApp {
   final system = FakeSystem();
   final barcodes = FakeBarcodes();
   final qna = FakeQna();
+  final FakeBusinesses businesses;
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];
@@ -689,4 +695,120 @@ class FakeQna implements QnaSource {
       ],
     );
   }
+}
+
+/// The business directory: four kinds (one empty), three halal markets of
+/// which two share first place, a bakery, two post offices. [fail]: no
+/// connection.
+class FakeBusinesses implements BusinessSource {
+  bool fail = false;
+  int directories = 0;
+  final searches = <String>[];
+  final opened = <String>[];
+  final counted = <String>[];
+
+  /// A logo's bytes, by its address; none, by default: the monogram.
+  final logos = <String, Uint8List>{};
+
+  static const halal = BizCategory(id: '1', slug: 'halal-market', name: 'Halol market', icon: '🥩', count: 3);
+  static const bakery = BizCategory(id: '2', slug: 'pishiriqlar', name: 'Pishiriqlar', icon: '🥐', count: 1);
+  static const translation = BizCategory(id: '3', slug: 'tarjima', name: 'Tarjima va apostil', icon: '📄', count: 0);
+  static const post = BizCategory(id: '4', slug: 'pochta', name: 'Pochta', icon: '📦', count: 2);
+
+  static const baraka = Business(
+    id: '11',
+    name: 'Baraka Halal Mart',
+    logo: '/uploads/baraka.png',
+    description: 'Eng yangi halol go‘sht har kuni\n\nManzil: Seoul, Itaewon-ro 12\nIsh vaqti: 09:00–21:00\n'
+        'Buyurtma: 010-9876-5432\nInstagram: https://instagram.com/baraka.mart',
+    likes: 12,
+    views: 340,
+    categoryId: '1',
+    categoryName: 'Halol market',
+    links: [
+      BizLink('instagram', 'https://instagram.com/baraka.mart'),
+      BizLink('phone', '010-1234-5678'),
+      BizLink('telegram', 'https://t.me/baraka_halal'),
+      BizLink('tgchannel', 'https://t.me/+AbCdEf123'),
+    ],
+  );
+  static const ansan = Business(
+    id: '12',
+    name: 'Ansan Halol Go‘sht',
+    description: 'Mol, qo‘y va tovuq go‘shti.',
+    likes: 12,
+    views: 120,
+    categoryId: '1',
+    categoryName: 'Halol market',
+    links: [BizLink('kakao', 'https://open.kakao.com/o/ansan')],
+  );
+  static const samarqand = Business(id: '13', name: 'Samarqand Market', categoryId: '1', categoryName: 'Halol market');
+  static const nonvoy = Business(
+    id: '21',
+    name: 'Nonvoyxona Toshkent',
+    logo: '/uploads/nonvoy.jpg',
+    description: 'Tandir non va somsa',
+    likes: 3,
+    categoryId: '2',
+    categoryName: 'Pishiriqlar',
+    links: [BizLink('phone', '010-2222-3333')],
+  );
+  static const cargo = Business(id: '41', name: 'Asia Cargo', logo: '/uploads/cargo.png', likes: 5, categoryId: '4',
+      categoryName: 'Pochta', links: [BizLink('telegram', 'https://t.me/asiacargo')]);
+  static const express = Business(id: '42', name: 'Express Pochta', likes: 0, categoryId: '4', categoryName: 'Pochta',
+      links: [BizLink('phone', '010-4444-5555')]);
+
+  static const lists = {
+    '1': [baraka, ansan, samarqand],
+    '2': [nonvoy],
+    '3': <Business>[],
+    '4': [cargo, express],
+  };
+
+  static Business _row(Business b) => Business(
+        id: b.id,
+        name: b.name,
+        logo: b.logo,
+        description: b.description,
+        likes: b.likes,
+        categoryId: b.categoryId,
+      );
+
+  @override
+  Future<BizDirectory> directory() async {
+    directories++;
+    if (fail) throw const BizException('offline');
+    return const BizDirectory(categories: [halal, bakery, post, translation], listingFee: 15000);
+  }
+
+  @override
+  Future<List<Business>> category(String id) async {
+    if (fail) throw const BizException('offline');
+    return [for (final b in lists[id] ?? const <Business>[]) _row(b)];
+  }
+
+  @override
+  Future<List<BizGroup>> search(String query) async {
+    searches.add(query);
+    if (fail) throw const BizException('offline');
+    final q = query.toLowerCase();
+    return [
+      for (final c in const [halal, bakery, post])
+        if ([for (final b in lists[c.id]!) if (b.name.toLowerCase().contains(q)) _row(b)] case final found when found.isNotEmpty)
+          BizGroup(category: c, total: found.length, businesses: found),
+    ];
+  }
+
+  @override
+  Future<Business> business(String id) async {
+    opened.add(id);
+    if (fail) throw const BizException('offline');
+    return lists.values.expand((l) => l).firstWhere((b) => b.id == id);
+  }
+
+  @override
+  void countView(String id) => counted.add(id);
+
+  @override
+  Future<Uint8List?> logo(Uri url) async => logos[url.path];
 }

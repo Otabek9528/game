@@ -3088,6 +3088,444 @@ abstract class AppLocalizations {
   /// **'Qidiruv uchun internet kerak. Saqlangan javoblar internetsiz ham ochiladi.'**
   String get qnaOfflineBody;
 
+  /// No description provided for @bizTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznes katalogi'**
+  String get bizTitle;
+
+  /// No description provided for @bizTagline.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreyadagi o‘zbek bizneslari — bir joyda'**
+  String get bizTagline;
+
+  /// No description provided for @bizSearchTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidiruv'**
+  String get bizSearchTitle;
+
+  /// No description provided for @bizSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznes yoki xizmatni qidiring'**
+  String get bizSearchHint;
+
+  /// How many businesses are listed.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} ta biznes}}'**
+  String bizCountAll(int count);
+
+  /// How many businesses a search found.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} ta topildi}}'**
+  String bizCountFound(int count);
+
+  /// No description provided for @bizTileEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha bo‘sh'**
+  String get bizTileEmpty;
+
+  /// No description provided for @bizDirectoryEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Katalog hozircha bo‘sh'**
+  String get bizDirectoryEmpty;
+
+  /// No description provided for @bizDirectoryEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi.'**
+  String get bizDirectoryEmptyBody;
+
+  /// No description provided for @bizSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlanganlar'**
+  String get bizSaved;
+
+  /// No description provided for @bizCategories.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yo‘nalishlar'**
+  String get bizCategories;
+
+  /// No description provided for @bizOrderNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mijozlar eng ko‘p yoqtirgan bizneslar yuqorida'**
+  String get bizOrderNote;
+
+  /// No description provided for @bizCategoryEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yo‘nalishda hali biznes yo‘q'**
+  String get bizCategoryEmpty;
+
+  /// No description provided for @bizCategoryEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi bizneslar qo‘shilgach shu yerda ko‘rinadi. Boshqa yo‘nalishlarga ham qarab ko‘ring.'**
+  String get bizCategoryEmptyBody;
+
+  /// No description provided for @bizSeeAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barchasi'**
+  String get bizSeeAll;
+
+  /// No description provided for @bizNothingFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsa topilmadi'**
+  String get bizNothingFound;
+
+  /// No description provided for @bizNothingFoundBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'“{query}” bo‘yicha biznes topilmadi. Boshqacha yozib ko‘ring yoki yo‘nalishlardan qidiring.'**
+  String bizNothingFoundBody(String query);
+
+  /// No description provided for @bizLoadError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklab bo‘lmadi'**
+  String get bizLoadError;
+
+  /// No description provided for @bizCheckConnection.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet aloqasini tekshirib, qayta urinib ko‘ring.'**
+  String get bizCheckConnection;
+
+  /// No description provided for @bizRetry.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinish'**
+  String get bizRetry;
+
+  /// No description provided for @bizUzbekNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bizneslar haqidagi ma’lumotlar o‘zbek tilida.'**
+  String get bizUzbekNote;
+
+  /// No description provided for @bizSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get bizSave;
+
+  /// No description provided for @bizUnsave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlanganlardan olib tashlash'**
+  String get bizUnsave;
+
+  /// No description provided for @bizSavedNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlandi — aloqa ma’lumotlari internetsiz ham ochiladi'**
+  String get bizSavedNote;
+
+  /// No description provided for @bizRemovedNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlanganlardan olib tashlandi'**
+  String get bizRemovedNote;
+
+  /// No description provided for @bizShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get bizShare;
+
+  /// No description provided for @bizShareFooter.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin biznes katalogidan'**
+  String get bizShareFooter;
+
+  /// How many times a listing was opened.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} marta ko‘rilgan}}'**
+  String bizViews(int count);
+
+  /// How many people liked a business.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} kishiga yoqdi}}'**
+  String bizLikes(int count);
+
+  /// No description provided for @bizLoadFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumotni yuklab bo‘lmadi.'**
+  String get bizLoadFailed;
+
+  /// No description provided for @bizLinks.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa havolalar'**
+  String get bizLinks;
+
+  /// No description provided for @bizAbout.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznes haqida'**
+  String get bizAbout;
+
+  /// No description provided for @bizNoInfo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu biznes hali to‘liq ma’lumot kiritmagan.'**
+  String get bizNoInfo;
+
+  /// No description provided for @bizNoContact.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aloqa ma’lumotlari ko‘rsatilmagan.'**
+  String get bizNoContact;
+
+  /// No description provided for @bizNoContactAsk.
+  ///
+  /// In uz, this message translates to:
+  /// **'Admin orqali so‘rash'**
+  String get bizNoContactAsk;
+
+  /// No description provided for @bizReport.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumot noto‘g‘rimi? Adminga xabar bering'**
+  String get bizReport;
+
+  /// No description provided for @bizCopyAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxalash'**
+  String get bizCopyAddress;
+
+  /// No description provided for @bizAddressCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil nusxalandi'**
+  String get bizAddressCopied;
+
+  /// No description provided for @bizPhoneCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Raqam nusxalandi'**
+  String get bizPhoneCopied;
+
+  /// No description provided for @bizActCall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘ng‘iroq qilish'**
+  String get bizActCall;
+
+  /// No description provided for @bizActTelegram.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegramda yozish'**
+  String get bizActTelegram;
+
+  /// No description provided for @bizActChannel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegramda ochish'**
+  String get bizActChannel;
+
+  /// No description provided for @bizActKakao.
+  ///
+  /// In uz, this message translates to:
+  /// **'KakaoTalkda yozish'**
+  String get bizActKakao;
+
+  /// No description provided for @bizActWebsite.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saytni ochish'**
+  String get bizActWebsite;
+
+  /// No description provided for @bizActInstagram.
+  ///
+  /// In uz, this message translates to:
+  /// **'Instagramda ko‘rish'**
+  String get bizActInstagram;
+
+  /// No description provided for @bizActTiktok.
+  ///
+  /// In uz, this message translates to:
+  /// **'TikTokda ko‘rish'**
+  String get bizActTiktok;
+
+  /// No description provided for @bizActYoutube.
+  ///
+  /// In uz, this message translates to:
+  /// **'YouTube’da ko‘rish'**
+  String get bizActYoutube;
+
+  /// No description provided for @bizActFacebook.
+  ///
+  /// In uz, this message translates to:
+  /// **'Facebookda ochish'**
+  String get bizActFacebook;
+
+  /// No description provided for @bizActPlay.
+  ///
+  /// In uz, this message translates to:
+  /// **'Google Play’da ochish'**
+  String get bizActPlay;
+
+  /// No description provided for @bizActAppStore.
+  ///
+  /// In uz, this message translates to:
+  /// **'App Store’da ochish'**
+  String get bizActAppStore;
+
+  /// No description provided for @bizActOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ochish'**
+  String get bizActOpen;
+
+  /// No description provided for @bizChannelPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon'**
+  String get bizChannelPhone;
+
+  /// No description provided for @bizChannelGroup.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram kanal / guruh'**
+  String get bizChannelGroup;
+
+  /// No description provided for @bizChannelWebsite.
+  ///
+  /// In uz, this message translates to:
+  /// **'Veb-sayt'**
+  String get bizChannelWebsite;
+
+  /// No description provided for @bizPrivateGroup.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yopiq guruh'**
+  String get bizPrivateGroup;
+
+  /// No description provided for @bizMapNaver.
+  ///
+  /// In uz, this message translates to:
+  /// **'Naver xarita'**
+  String get bizMapNaver;
+
+  /// No description provided for @bizMapKakao.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kakao xarita'**
+  String get bizMapKakao;
+
+  /// No description provided for @bizMapGoogle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Google xarita'**
+  String get bizMapGoogle;
+
+  /// No description provided for @bizOwnerTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznes egasimisiz?'**
+  String get bizOwnerTitle;
+
+  /// No description provided for @bizOwnerBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznesingizni katalogga qo‘shing — mijozlar sizni shu yerdan topadi.'**
+  String get bizOwnerBody;
+
+  /// No description provided for @bizOwnerBodyEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yo‘nalishga birinchi bo‘lib qo‘shiling.'**
+  String get bizOwnerBodyEmpty;
+
+  /// No description provided for @bizOwnerEyebrow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznes egalari uchun'**
+  String get bizOwnerEyebrow;
+
+  /// No description provided for @bizOwnerSheetTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Katalogga qo‘shilish'**
+  String get bizOwnerSheetTitle;
+
+  /// No description provided for @bizStep1Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ariza yuborish'**
+  String get bizStep1Title;
+
+  /// No description provided for @bizStep1Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Biznes logosi, nomi, yo‘nalishi va aloqa ma’lumotlarini kiriting.'**
+  String get bizStep1Body;
+
+  /// No description provided for @bizStep2Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘lov'**
+  String get bizStep2Title;
+
+  /// No description provided for @bizStep2Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bir martalik to‘lov — {amount}. Adminga to‘lov skrinshotini yuborasiz.'**
+  String bizStep2Body(String amount);
+
+  /// No description provided for @bizStep3Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Katalogda'**
+  String get bizStep3Title;
+
+  /// No description provided for @bizStep3Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘lov tasdiqlangach biznesingiz katalogda ko‘rina boshlaydi.'**
+  String get bizStep3Body;
+
+  /// No description provided for @bizOwnerFine.
+  ///
+  /// In uz, this message translates to:
+  /// **'Katalogda ko‘rinish tartibi biznesga bosilgan klass soniga qarab belgilanadi: eng ko‘p yoqtirilgan biznes yuqorida turadi.'**
+  String get bizOwnerFine;
+
+  /// No description provided for @bizOwnerHow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ariza Telegram orqali yuboriladi: adminga yozing, u biznesingizni qo‘shishda yordam beradi.'**
+  String get bizOwnerHow;
+
+  /// No description provided for @bizOwnerContact.
+  ///
+  /// In uz, this message translates to:
+  /// **'Admin bilan bog‘lanish'**
+  String get bizOwnerContact;
+
+  /// A sum in Korean won, already formatted.
+  ///
+  /// In uz, this message translates to:
+  /// **'{amount} won'**
+  String bizCurrency(String amount);
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

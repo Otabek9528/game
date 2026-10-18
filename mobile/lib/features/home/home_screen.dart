@@ -12,6 +12,7 @@ import '../../l10n/app_localizations.dart';
 import '../barcode/barcode_screen.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
+import '../business/business_screen.dart';
 import '../links/links_screen.dart';
 import '../parcel/parcel_controller.dart';
 import '../parcel/parcel_screen.dart';
@@ -123,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       'qibla' => (BuildContext _) => QiblaScreen(services: _services),
       'barcode' => (BuildContext _) => BarcodeScreen(services: _services),
       'qna' => (BuildContext _) => QnaScreen(services: _services),
+      'business' => (BuildContext _) => BusinessScreen(services: _services),
       'parcel' => (BuildContext _) => ParcelScreen(services: _services),
       'links' => (BuildContext _) => LinksScreen(services: _services),
       'donation' => (BuildContext _) => DonationScreen(services: _services),

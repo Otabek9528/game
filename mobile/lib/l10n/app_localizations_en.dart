@@ -1684,6 +1684,268 @@ class AppLocalizationsEn extends AppLocalizations {
       'Searching needs the internet. Saved answers open without it.';
 
   @override
+  String get bizTitle => 'Business directory';
+
+  @override
+  String get bizTagline => 'Uzbek businesses in Korea, in one place';
+
+  @override
+  String get bizSearchTitle => 'Search';
+
+  @override
+  String get bizSearchHint => 'Find a business or service';
+
+  @override
+  String bizCountAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count businesses',
+      one: '$count business',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bizCountFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bizTileEmpty => 'Empty for now';
+
+  @override
+  String get bizDirectoryEmpty => 'The directory is empty for now';
+
+  @override
+  String get bizDirectoryEmptyBody =>
+      'Uzbek businesses in Korea will gather here.';
+
+  @override
+  String get bizSaved => 'Saved';
+
+  @override
+  String get bizCategories => 'Categories';
+
+  @override
+  String get bizOrderNote => 'Customers’ favourites come first';
+
+  @override
+  String get bizCategoryEmpty => 'No businesses here yet';
+
+  @override
+  String get bizCategoryEmptyBody =>
+      'New businesses will show here once they’re added. Have a look at the other categories too.';
+
+  @override
+  String get bizSeeAll => 'See all';
+
+  @override
+  String get bizNothingFound => 'Nothing found';
+
+  @override
+  String bizNothingFoundBody(String query) {
+    return 'No business matches “$query”. Try other words, or browse the categories.';
+  }
+
+  @override
+  String get bizLoadError => 'Couldn’t load';
+
+  @override
+  String get bizCheckConnection => 'Check your connection and try again.';
+
+  @override
+  String get bizRetry => 'Retry';
+
+  @override
+  String get bizUzbekNote => 'Business listings are written in Uzbek.';
+
+  @override
+  String get bizSave => 'Save';
+
+  @override
+  String get bizUnsave => 'Remove from saved';
+
+  @override
+  String get bizSavedNote => 'Saved — its contacts open even offline';
+
+  @override
+  String get bizRemovedNote => 'Removed from saved';
+
+  @override
+  String get bizShare => 'Share';
+
+  @override
+  String get bizShareFooter => 'From the Muslim Vegukin business directory';
+
+  @override
+  String bizViews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Viewed $count times',
+      one: 'Viewed once',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bizLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Liked by $count people',
+      one: 'Liked by $count person',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bizLoadFailed => 'Couldn’t load the details.';
+
+  @override
+  String get bizLinks => 'More links';
+
+  @override
+  String get bizAbout => 'About';
+
+  @override
+  String get bizNoInfo => 'This business hasn’t filled in its details yet.';
+
+  @override
+  String get bizNoContact => 'No contacts given.';
+
+  @override
+  String get bizNoContactAsk => 'Ask the admin';
+
+  @override
+  String get bizReport => 'Wrong details? Tell the admin';
+
+  @override
+  String get bizCopyAddress => 'Copy';
+
+  @override
+  String get bizAddressCopied => 'Address copied';
+
+  @override
+  String get bizPhoneCopied => 'Number copied';
+
+  @override
+  String get bizActCall => 'Call';
+
+  @override
+  String get bizActTelegram => 'Send a message';
+
+  @override
+  String get bizActChannel => 'Open';
+
+  @override
+  String get bizActKakao => 'Send a message';
+
+  @override
+  String get bizActWebsite => 'Open website';
+
+  @override
+  String get bizActInstagram => 'View profile';
+
+  @override
+  String get bizActTiktok => 'View profile';
+
+  @override
+  String get bizActYoutube => 'Watch';
+
+  @override
+  String get bizActFacebook => 'View page';
+
+  @override
+  String get bizActPlay => 'Get the app';
+
+  @override
+  String get bizActAppStore => 'Get the app';
+
+  @override
+  String get bizActOpen => 'Open';
+
+  @override
+  String get bizChannelPhone => 'Phone';
+
+  @override
+  String get bizChannelGroup => 'Telegram channel / group';
+
+  @override
+  String get bizChannelWebsite => 'Website';
+
+  @override
+  String get bizPrivateGroup => 'Private group';
+
+  @override
+  String get bizMapNaver => 'Naver Map';
+
+  @override
+  String get bizMapKakao => 'Kakao Map';
+
+  @override
+  String get bizMapGoogle => 'Google Maps';
+
+  @override
+  String get bizOwnerTitle => 'Own a business?';
+
+  @override
+  String get bizOwnerBody =>
+      'Add it to the directory — customers will find you here.';
+
+  @override
+  String get bizOwnerBodyEmpty => 'Be the first in this category.';
+
+  @override
+  String get bizOwnerEyebrow => 'For business owners';
+
+  @override
+  String get bizOwnerSheetTitle => 'Joining the directory';
+
+  @override
+  String get bizStep1Title => 'Apply';
+
+  @override
+  String get bizStep1Body => 'Give your logo, name, category and contacts.';
+
+  @override
+  String get bizStep2Title => 'Payment';
+
+  @override
+  String bizStep2Body(String amount) {
+    return 'A one-off fee of $amount. You send the admin a screenshot of the payment.';
+  }
+
+  @override
+  String get bizStep3Title => 'Listed';
+
+  @override
+  String get bizStep3Body =>
+      'Once the payment is confirmed, your business appears in the directory.';
+
+  @override
+  String get bizOwnerFine =>
+      'Order in the directory follows likes: the best-liked business stands at the top.';
+
+  @override
+  String get bizOwnerHow =>
+      'Applications go through Telegram: write to the admin, who will help you add your business.';
+
+  @override
+  String get bizOwnerContact => 'Contact the admin';
+
+  @override
+  String bizCurrency(String amount) {
+    return '$amount won';
+  }
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

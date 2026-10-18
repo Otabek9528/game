@@ -112,8 +112,7 @@ void main() {
     await app.launch(tester);
 
     await tester.tap(find.text('Masjidlar'));
-    await tester.tap(find.text('Biznes Katalogi'));
-    expect(app.opened.ids, ['mosque', 'business']);
+    expect(app.opened.ids, ['mosque']);
 
     await tester.tap(find.text('PESHINGACHA'));
     await tester.pumpAndSettle();

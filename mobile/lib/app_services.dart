@@ -14,6 +14,7 @@ import 'core/locale_controller.dart';
 import 'core/theme_controller.dart';
 import 'features/barcode/barcode_camera.dart';
 import 'features/barcode/barcode_source.dart';
+import 'features/business/business_source.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/links/links_controller.dart';
 import 'features/parcel/parcel_source.dart';
@@ -149,6 +150,7 @@ class AppServices {
     this.barcodes = const HttpBarcodeSource(),
     this.barcodeCamera = MobileScannerCamera.new,
     this.qna = const HttpQnaSource(),
+    this.businesses = const HttpBusinessSource(),
   });
 
   final KeyValueStore store;
@@ -187,4 +189,7 @@ class AppServices {
 
   /// The questions-and-answers archive.
   final QnaSource qna;
+
+  /// The business directory.
+  final BusinessSource businesses;
 }
