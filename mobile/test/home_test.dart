@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
+import 'package:muslim_vegukin/features/prayers/prayers_screen.dart';
 
 import 'support/fakes.dart';
 
@@ -63,7 +64,7 @@ void main() {
     await app.launch(tester);
     await tester.pumpAndSettle();
 
-    expect(find.text('Keep the widget on time'), findsOneWidget);
+    expect(find.text('Exact timing'), findsOneWidget);
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
     expect(app.permissions.exactAlarmSettingsOpened, 1);
@@ -72,7 +73,7 @@ void main() {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpAndSettle();
-    expect(find.text('Keep the widget on time'), findsNothing);
+    expect(find.text('Exact timing'), findsNothing);
     expect(app.permissions.asks, 1);
   });
 
@@ -106,14 +107,17 @@ void main() {
     expect(uzTags, findsNothing);
   });
 
-  testWidgets('tapping a section or the prayer card opens it', (tester) async {
+  testWidgets('a section opens its page; the prayer card opens the prayers page', (tester) async {
     final app = TestApp(language: 'uz');
     await app.launch(tester);
 
     await tester.tap(find.text('Masjidlar'));
     await tester.tap(find.text('Biznes Katalogi'));
+    expect(app.opened.ids, ['mosque', 'business']);
+
     await tester.tap(find.text('PESHINGACHA'));
-    expect(app.opened.ids, ['mosque', 'business', 'prayers']);
+    await tester.pumpAndSettle();
+    expect(find.byType(PrayersScreen), findsOneWidget);
   });
 
   testWidgets('home fits a small phone with very large text', (tester) async {

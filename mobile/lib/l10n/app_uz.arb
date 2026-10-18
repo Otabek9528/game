@@ -160,11 +160,226 @@
   "@widgetOpenApp": {
     "description": "Home-screen widget, before the app has a location and prayer times."
   },
-  "exactAlarmsTitle": "Vidjet aniq ishlashi uchun",
-  "exactAlarmsBody": "Bosh ekrandagi vidjet namoz vaqti kirishi bilan keyingi namozga o‘tishi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.",
+  "exactAlarmsTitle": "Aniq vaqt uchun ruxsat",
+  "exactAlarmsBody": "Namoz eslatmalari va bosh ekrandagi vidjet aynan o‘z vaqtida ishlashi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.",
   "exactAlarmsAllow": "Davom etish",
   "exactAlarmsLater": "Keyinroq",
   "@exactAlarmsBody": {
     "description": "Asked once at first launch, after location and camera, when Android 14+ keeps the exact-alarm permission off."
-  }
+  },
+  "prayersTitle": "Namoz vaqtlari",
+  "nextPrayer": "Keyingi namoz",
+  "remaining": "qoldi",
+  "suhoorLabel": "Saharlik (oxiri)",
+  "iftarLabel": "Iftorlik",
+  "chipNow": "hozir",
+  "chipNext": "keyingi",
+  "fastWindow": "Ro‘za vaqti · Saharlikdan Iftorlikkacha",
+  "dayToday": "Bugun",
+  "dayTomorrow": "Ertaga",
+  "dayYesterday": "Kecha",
+  "previousDay": "Oldingi kun",
+  "nextDay": "Keyingi kun",
+  "backToToday": "Bugunga qaytish",
+  "dayLoading": "Yuklanmoqda...",
+  "dayLoadFailed": "Yuklab bo‘lmadi",
+  "commentFajr": "Xufton vaqti tugaydi",
+  "commentSunrise": "Bomdod vaqti tugaydi",
+  "commentAsr": "Peshin vaqti tugaydi",
+  "commentMaghrib": "Asr vaqti tugaydi",
+  "commentIsha": "Shom vaqti tugaydi",
+  "settingsShort": "Sozlamalar",
+  "settingsTitle": "Namoz sozlamalari",
+  "settingsSubtitle": "Hisoblash usuli va mazhabingizni tanlang",
+  "methodLabel": "Hisoblash usuli",
+  "madhabLabel": "Mazhab (Asr vaqti uchun)",
+  "schoolHanafi": "Hanafiy",
+  "schoolShafii": "Shofe’iy / Molikiy / Hanbaliy",
+  "schoolShafiiShort": "Shofe’iy",
+  "hanafiNote": "Soya = 2x uzunlik",
+  "shafiiNote": "Soya = 1x uzunlik",
+  "methodMwl": "Muslim World League",
+  "methodKarachi": "Karachi",
+  "methodMakkah": "Makka",
+  "methodEgypt": "Misr",
+  "methodIsna": "ISNA",
+  "methodMwlHint": "Bomdod 18°, Xufton 17°",
+  "methodKarachiHint": "Bomdod 18°, Xufton 18°",
+  "methodMakkahHint": "Bomdod 18.5°, Xufton - Shomdan 90 daqiqa keyin",
+  "methodEgyptHint": "Bomdod 19.5°, Xufton 17.5°",
+  "methodIsnaHint": "Bomdod 15°, Xufton 15°",
+  "naflTitle": "Nafl namoz vaqtlari",
+  "tahajjudName": "Tahajjud namozi",
+  "tahajjudText": "Xuftondan keyin, uyqudan so‘ng o‘qiladigan nafl namoz. Ozi 2 rakat, ko‘pi 8 rakat. Eng afzal vaqti - kechaning oxirgi uchdan biri. Duolar qabul bo‘ladigan vaqt.",
+  "tahajjudQuote": "U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.",
+  "tahajjudSource": "Manba: Termiziy - Abu Umoma (r.a.)",
+  "ishraqName": "Shuruq (Ishroq) namozi",
+  "ishraqQuote": "Kim bomdodni jamoat bilan o‘qisa, so‘ngra quyosh chiqquncha Allohni zikr qilib o‘tirsa, keyin ikki rakat namoz o‘qisa, uning uchun haj va umraning ajridek bo‘lur.",
+  "ishraqSource": "Manba: Termiziy - Muoz ibn Anas al-Juhaniy (r.a.)",
+  "duhaName": "Zuho (Choshgoh) namozi",
+  "duhaText": "Quyosh bir nayza bo‘yi ko‘tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o‘qish. Eng afzal vaqti - nahorning to‘rtdan biri o‘tgandan keyin.",
+  "duhaQuote": "Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi.",
+  "duhaSource": "Manba: Termiziy - Abu Hurayra (r.a.)",
+  "statusNow": "Ayni vaqti",
+  "statusUpcoming": "Kutilmoqda",
+  "statusPassed": "Vaqti o‘tdi",
+  "statusOtherDay": "Boshqa kun",
+  "reminderHint": "Har bir namoz uchun eslatmani qo‘ng‘iroqcha orqali sozlang",
+  "reminderFor": "{name}: eslatma",
+  "@reminderFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderToday": "Bugun: {range}",
+  "@reminderToday": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderHow": "Qanday eslatilsin",
+  "reminderWhen": "Qachon",
+  "reminderOff": "O‘chiq",
+  "reminderOffHint": "Eslatmasin",
+  "reminderSilent": "Jim",
+  "reminderSilentHint": "Faqat bildirishnoma",
+  "reminderVibrate": "Tebranish",
+  "reminderVibrateHint": "Ovozsiz, tebranadi",
+  "reminderSound": "Ovoz",
+  "reminderSoundHint": "Qisqa, yoqimli ohang",
+  "reminderPlay": "Eshitib ko‘rish",
+  "reminderAt": "Eslatma vaqti",
+  "reminderDone": "Tayyor",
+  "offsetOnTime": "Vaqtida",
+  "offsetBefore": "{duration} oldin",
+  "@offsetBefore": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "offsetAfter": "{duration} keyin",
+  "@offsetAfter": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "{minutes} daq",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{hours} soat",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} soat {minutes} daq",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsOff": "Bildirishnomalar o‘chiq — eslatmalar kelmaydi",
+  "notificationsTurnOn": "Yoqish",
+  "notifyAt": "{name} vaqti kirdi",
+  "@notifyAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyBefore": "{name} vaqtiga {duration} qoldi",
+  "@notifyBefore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyAfter": "{name} vaqti kirganiga {duration} bo‘ldi",
+  "@notifyAfter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifySunriseAt": "Quyosh chiqdi — Bomdod vaqti tugadi",
+  "notifySunriseBefore": "Bomdod vaqti tugashiga {duration} qoldi",
+  "@notifySunriseBefore": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifySunriseAfter": "Quyosh chiqqaniga {duration} bo‘ldi",
+  "@notifySunriseAfter": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyImsakAt": "Saharlik vaqti tugadi",
+  "notifyImsakBefore": "Saharlik tugashiga {duration} qoldi",
+  "@notifyImsakBefore": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyImsakAfter": "Saharlik tugaganiga {duration} bo‘ldi",
+  "@notifyImsakAfter": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyBody": "{name}: {start} – {end} · {city}",
+  "@notifyBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      },
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "suhoorShort": "Saharlik"
 }

@@ -9,6 +9,7 @@ import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../onboarding/language_screen.dart';
+import '../prayers/prayers_screen.dart';
 import 'feature_catalog.dart';
 import 'prayer_card.dart';
 
@@ -60,11 +61,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (allow ?? false) await _services.permissions.openExactAlarmSettings();
   }
 
-  /// Opened by tapping the city on a home-screen widget: refresh it.
+  /// Opened from a widget's city (refresh it) or a prayer reminder (show
+  /// the prayers page).
   Future<void> _takeWidgetAction() async {
-    if (await _services.homeWidget.takeLaunchAction() == 'refresh_location') {
-      await _services.prayer.locate(userAsked: true);
+    switch (await _services.homeWidget.takeLaunchAction()) {
+      case 'refresh_location':
+        await _services.prayer.locate(userAsked: true);
+      case 'open_prayers':
+        if (mounted) _openPrayers();
     }
+  }
+
+  void _openPrayers() {
+    HapticFeedback.lightImpact();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => PrayersScreen(services: _services)),
+    );
   }
 
   @override
@@ -79,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // location): pick up a new day, a stale location or a new permission.
     if (state == AppLifecycleState.resumed) {
       _services.prayer.refresh();
+      _services.reminders.checkNotifications();
       _takeWidgetAction();
     }
   }
@@ -135,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           PrayerCard(
                             controller: _services.prayer,
                             language: language,
-                            onOpen: () => _open(prayersFeature),
+                            onOpen: _openPrayers,
                           ),
                           const SizedBox(height: 14),
                           FutureBuilder(

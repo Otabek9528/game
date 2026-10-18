@@ -5,4 +5,7 @@
     <string name="widget_large_description">Bugungi namoz vaqtlari, keyingi namozgacha qolgan vaqt, milodiy va hijriy sana.</string>
     <string name="widget_small_label">Keyingi namoz</string>
     <string name="widget_small_description">Keyingi namozgacha qolgan vaqt, shahar va sana.</string>
+    <string name="reminders_channel_sound">Namoz eslatmalari: ovoz</string>
+    <string name="reminders_channel_vibrate">Namoz eslatmalari: tebranish</string>
+    <string name="reminders_channel_silent">Namoz eslatmalari: jim</string>
 </resources>

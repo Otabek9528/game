@@ -98,11 +98,21 @@ class PrayerDay {
     required this.hijriMonth,
     required this.hijriYear,
     required this.key,
+    this.imsak,
+    this.lastThird,
   });
 
   /// Midnight of the day these times are for.
   final DateTime date;
   final Map<Prayer, DateTime> times;
+
+  /// End of suhoor, a few minutes before Fajr. Null in days saved by older
+  /// versions.
+  final DateTime? imsak;
+
+  /// Start of the night's last third (Tahajjud), as a clock time on [date];
+  /// it usually falls after midnight, so read it as a time of day.
+  final DateTime? lastThird;
   final int hijriDay;
 
   /// 1 = Muharram … 12 = Dhu al-Hijjah.
@@ -132,12 +142,16 @@ class PrayerDay {
     final timings = data['timings'] as Map<String, dynamic>;
     final hijri = (data['date'] as Map<String, dynamic>)['hijri'] as Map<String, dynamic>;
     final day = DateTime(date.year, date.month, date.day);
+    DateTime? optional(String name) =>
+        timings[name] is String ? _atTime(day, timings[name] as String) : null;
     return PrayerDay(
       date: day,
       times: {
         for (final entry in _apiNames.entries)
           entry.key: _atTime(day, timings[entry.value] as String),
       },
+      imsak: optional('Imsak'),
+      lastThird: optional('Lastthird'),
       hijriDay: int.parse('${hijri['day']}'),
       hijriMonth: int.parse('${(hijri['month'] as Map<String, dynamic>)['number']}'),
       hijriYear: int.parse('${hijri['year']}'),
@@ -163,6 +177,8 @@ class PrayerDay {
       hijriMonth: json['hijriMonth'] as int,
       hijriYear: json['hijriYear'] as int,
       key: json['key'] as String,
+      imsak: json['imsak'] == null ? null : DateTime.parse(json['imsak'] as String),
+      lastThird: json['lastThird'] == null ? null : DateTime.parse(json['lastThird'] as String),
     );
   }
 
@@ -173,13 +189,16 @@ class PrayerDay {
         'hijriMonth': hijriMonth,
         'hijriYear': hijriYear,
         'key': key,
+        if (imsak != null) 'imsak': imsak!.toIso8601String(),
+        if (lastThird != null) 'lastThird': lastThird!.toIso8601String(),
       };
 
   /// The key for [day]'s times with [settings] at [place]. Coordinates are
-  /// rounded to ~100 m, which never changes a prayer time.
+  /// rounded to ~100 m, which never changes a prayer time. The trailing
+  /// version makes days saved without Imsak and the last third load again.
   static String keyFor(DateTime day, PrayerSettings settings, SavedLocation place) =>
       '${day.year}-${day.month}-${day.day}|${settings.method}|${settings.madhab}'
-      '|${place.lat.toStringAsFixed(3)}|${place.lon.toStringAsFixed(3)}';
+      '|${place.lat.toStringAsFixed(3)}|${place.lon.toStringAsFixed(3)}|2';
 }
 
 /// Where [now] falls in the day.

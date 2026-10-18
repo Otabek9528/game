@@ -10,6 +10,7 @@ import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/prayer/prayer_sources.dart';
+import 'features/reminders/reminder_controller.dart';
 import 'features/web/web_feature_screen.dart';
 import 'features/widget/home_widget_bridge.dart';
 
@@ -36,19 +37,27 @@ Future<void> main() async {
   );
   final locale = LocaleController(await PrefsLanguageStore.open());
   final homeWidget = HomeWidgetBridge();
+  final reminders = ReminderController(store);
   final services = AppServices(
     locale: locale,
     prayer: prayer,
     permissions: DevicePermissions(store, prayer, homeWidget),
     openFeature: openWebFeature,
     homeWidget: homeWidget,
+    reminders: reminders,
   );
 
-  // The home-screen widgets show what the prayer card shows, in the app's
-  // language; they are refreshed whenever either changes.
-  void publish() => homeWidget.publish(prayer, locale.language ?? AppLanguage.uz);
+  // The home-screen widgets and the prayer reminders follow the prayer
+  // times, in the app's language; both are refreshed whenever the times,
+  // the language or the reminder choices change.
+  void publish() {
+    final language = locale.language ?? AppLanguage.uz;
+    homeWidget.publish(prayer, language);
+    reminders.publish(prayer, language);
+  }
   prayer.addListener(publish);
   locale.addListener(publish);
+  reminders.addListener(publish);
 
   // Fills the prayer card from the saved days straight away. Permissions are
   // asked once, from the home screen, after the language is chosen.

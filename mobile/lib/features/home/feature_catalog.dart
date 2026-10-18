@@ -38,13 +38,9 @@ class Feature {
         'donation' => s.featureDonation,
         'community' => s.featureCommunity,
         'business' => s.featureBusiness,
-        'prayers' => s.featurePrayers,
         _ => id,
       };
 }
-
-/// The prayer times page, opened from the prayer card.
-const prayersFeature = Feature(id: 'prayers', emoji: '🕌', path: 'pages/prayers.html');
 
 /// The business directory, shown as the gold band above the grid.
 const businessFeature = Feature(

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status-bar icon of prayer reminders: a crescent and a star. Android
+     draws it white, so only its shape counts. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M13.2,2.6A9.6,9.6 0,1 0,21.4 15.4A7.6,7.6 0,1 1,13.2 2.6Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M18,4.2L18.9,6.1L20.8,7L18.9,7.9L18,9.8L17.1,7.9L15.2,7L17.1,6.1Z" />
+</vector>

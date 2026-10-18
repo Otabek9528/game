@@ -99,6 +99,9 @@ mobile/
 │   │   ├── onboarding/language_screen.dart
 │   │   ├── home/                 ← home screen, prayer card, list of sections
 │   │   ├── prayer/               ← location, prayer times, countdown logic
+│   │   ├── prayers/              ← the prayer times page (from pages/prayers.html)
+│   │   ├── reminders/            ← per-prayer reminders: choices, sheet, schedule
+│   │   ├── widget/               ← hands data to the home-screen widgets
 │   │   └── web/web_feature_screen.dart ← shows a web page, plays Telegram's part
 │   └── l10n/                     ← translations
 │       ├── app_uz.arb            ← Uzbek (main file, with notes for translators)
@@ -106,7 +109,9 @@ mobile/
 │       └── app_en.arb
 ├── assets/fonts/                 ← Playfair Display, Amiri (+ their licence)
 ├── test/                         ← automatic tests
-├── android/                      ← Android-only settings (icon, splash, permissions)
+├── android/                      ← Android-only settings (icon, splash, permissions),
+│                                   home-screen widgets and reminder notifications
+├── tool/                         ← scripts that made the widget wordmark and the chime
 └── ios/                          ← iOS-only settings (later)
 ```
 

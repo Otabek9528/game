@@ -493,13 +493,13 @@ abstract class AppLocalizations {
   /// No description provided for @exactAlarmsTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Vidjet aniq ishlashi uchun'**
+  /// **'Aniq vaqt uchun ruxsat'**
   String get exactAlarmsTitle;
 
   /// Asked once at first launch, after location and camera, when Android 14+ keeps the exact-alarm permission off.
   ///
   /// In uz, this message translates to:
-  /// **'Bosh ekrandagi vidjet namoz vaqti kirishi bilan keyingi namozga o‘tishi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.'**
+  /// **'Namoz eslatmalari va bosh ekrandagi vidjet aynan o‘z vaqtida ishlashi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.'**
   String get exactAlarmsBody;
 
   /// No description provided for @exactAlarmsAllow.
@@ -513,6 +513,558 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Keyinroq'**
   String get exactAlarmsLater;
+
+  /// No description provided for @prayersTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz vaqtlari'**
+  String get prayersTitle;
+
+  /// No description provided for @nextPrayer.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyingi namoz'**
+  String get nextPrayer;
+
+  /// No description provided for @remaining.
+  ///
+  /// In uz, this message translates to:
+  /// **'qoldi'**
+  String get remaining;
+
+  /// No description provided for @suhoorLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saharlik (oxiri)'**
+  String get suhoorLabel;
+
+  /// No description provided for @iftarLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Iftorlik'**
+  String get iftarLabel;
+
+  /// No description provided for @chipNow.
+  ///
+  /// In uz, this message translates to:
+  /// **'hozir'**
+  String get chipNow;
+
+  /// No description provided for @chipNext.
+  ///
+  /// In uz, this message translates to:
+  /// **'keyingi'**
+  String get chipNext;
+
+  /// No description provided for @fastWindow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro‘za vaqti · Saharlikdan Iftorlikkacha'**
+  String get fastWindow;
+
+  /// No description provided for @dayToday.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugun'**
+  String get dayToday;
+
+  /// No description provided for @dayTomorrow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ertaga'**
+  String get dayTomorrow;
+
+  /// No description provided for @dayYesterday.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kecha'**
+  String get dayYesterday;
+
+  /// No description provided for @previousDay.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oldingi kun'**
+  String get previousDay;
+
+  /// No description provided for @nextDay.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyingi kun'**
+  String get nextDay;
+
+  /// No description provided for @backToToday.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugunga qaytish'**
+  String get backToToday;
+
+  /// No description provided for @dayLoading.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklanmoqda...'**
+  String get dayLoading;
+
+  /// No description provided for @dayLoadFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklab bo‘lmadi'**
+  String get dayLoadFailed;
+
+  /// No description provided for @commentFajr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xufton vaqti tugaydi'**
+  String get commentFajr;
+
+  /// No description provided for @commentSunrise.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod vaqti tugaydi'**
+  String get commentSunrise;
+
+  /// No description provided for @commentAsr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Peshin vaqti tugaydi'**
+  String get commentAsr;
+
+  /// No description provided for @commentMaghrib.
+  ///
+  /// In uz, this message translates to:
+  /// **'Asr vaqti tugaydi'**
+  String get commentMaghrib;
+
+  /// No description provided for @commentIsha.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shom vaqti tugaydi'**
+  String get commentIsha;
+
+  /// No description provided for @settingsShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sozlamalar'**
+  String get settingsShort;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz sozlamalari'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsSubtitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisoblash usuli va mazhabingizni tanlang'**
+  String get settingsSubtitle;
+
+  /// No description provided for @methodLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisoblash usuli'**
+  String get methodLabel;
+
+  /// No description provided for @madhabLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mazhab (Asr vaqti uchun)'**
+  String get madhabLabel;
+
+  /// No description provided for @schoolHanafi.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hanafiy'**
+  String get schoolHanafi;
+
+  /// No description provided for @schoolShafii.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shofe’iy / Molikiy / Hanbaliy'**
+  String get schoolShafii;
+
+  /// No description provided for @schoolShafiiShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shofe’iy'**
+  String get schoolShafiiShort;
+
+  /// No description provided for @hanafiNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Soya = 2x uzunlik'**
+  String get hanafiNote;
+
+  /// No description provided for @shafiiNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Soya = 1x uzunlik'**
+  String get shafiiNote;
+
+  /// No description provided for @methodMwl.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim World League'**
+  String get methodMwl;
+
+  /// No description provided for @methodKarachi.
+  ///
+  /// In uz, this message translates to:
+  /// **'Karachi'**
+  String get methodKarachi;
+
+  /// No description provided for @methodMakkah.
+  ///
+  /// In uz, this message translates to:
+  /// **'Makka'**
+  String get methodMakkah;
+
+  /// No description provided for @methodEgypt.
+  ///
+  /// In uz, this message translates to:
+  /// **'Misr'**
+  String get methodEgypt;
+
+  /// No description provided for @methodIsna.
+  ///
+  /// In uz, this message translates to:
+  /// **'ISNA'**
+  String get methodIsna;
+
+  /// No description provided for @methodMwlHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod 18°, Xufton 17°'**
+  String get methodMwlHint;
+
+  /// No description provided for @methodKarachiHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod 18°, Xufton 18°'**
+  String get methodKarachiHint;
+
+  /// No description provided for @methodMakkahHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod 18.5°, Xufton - Shomdan 90 daqiqa keyin'**
+  String get methodMakkahHint;
+
+  /// No description provided for @methodEgyptHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod 19.5°, Xufton 17.5°'**
+  String get methodEgyptHint;
+
+  /// No description provided for @methodIsnaHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod 15°, Xufton 15°'**
+  String get methodIsnaHint;
+
+  /// No description provided for @naflTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nafl namoz vaqtlari'**
+  String get naflTitle;
+
+  /// No description provided for @tahajjudName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tahajjud namozi'**
+  String get tahajjudName;
+
+  /// No description provided for @tahajjudText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xuftondan keyin, uyqudan so‘ng o‘qiladigan nafl namoz. Ozi 2 rakat, ko‘pi 8 rakat. Eng afzal vaqti - kechaning oxirgi uchdan biri. Duolar qabul bo‘ladigan vaqt.'**
+  String get tahajjudText;
+
+  /// No description provided for @tahajjudQuote.
+  ///
+  /// In uz, this message translates to:
+  /// **'U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.'**
+  String get tahajjudQuote;
+
+  /// No description provided for @tahajjudSource.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manba: Termiziy - Abu Umoma (r.a.)'**
+  String get tahajjudSource;
+
+  /// No description provided for @ishraqName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shuruq (Ishroq) namozi'**
+  String get ishraqName;
+
+  /// No description provided for @ishraqQuote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kim bomdodni jamoat bilan o‘qisa, so‘ngra quyosh chiqquncha Allohni zikr qilib o‘tirsa, keyin ikki rakat namoz o‘qisa, uning uchun haj va umraning ajridek bo‘lur.'**
+  String get ishraqQuote;
+
+  /// No description provided for @ishraqSource.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manba: Termiziy - Muoz ibn Anas al-Juhaniy (r.a.)'**
+  String get ishraqSource;
+
+  /// No description provided for @duhaName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Zuho (Choshgoh) namozi'**
+  String get duhaName;
+
+  /// No description provided for @duhaText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh bir nayza bo‘yi ko‘tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o‘qish. Eng afzal vaqti - nahorning to‘rtdan biri o‘tgandan keyin.'**
+  String get duhaText;
+
+  /// No description provided for @duhaQuote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi.'**
+  String get duhaQuote;
+
+  /// No description provided for @duhaSource.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manba: Termiziy - Abu Hurayra (r.a.)'**
+  String get duhaSource;
+
+  /// No description provided for @statusNow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ayni vaqti'**
+  String get statusNow;
+
+  /// No description provided for @statusUpcoming.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kutilmoqda'**
+  String get statusUpcoming;
+
+  /// No description provided for @statusPassed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vaqti o‘tdi'**
+  String get statusPassed;
+
+  /// No description provided for @statusOtherDay.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa kun'**
+  String get statusOtherDay;
+
+  /// No description provided for @reminderHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Har bir namoz uchun eslatmani qo‘ng‘iroqcha orqali sozlang'**
+  String get reminderHint;
+
+  /// No description provided for @reminderFor.
+  ///
+  /// In uz, this message translates to:
+  /// **'{name}: eslatma'**
+  String reminderFor(String name);
+
+  /// No description provided for @reminderToday.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugun: {range}'**
+  String reminderToday(String range);
+
+  /// No description provided for @reminderHow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday eslatilsin'**
+  String get reminderHow;
+
+  /// No description provided for @reminderWhen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qachon'**
+  String get reminderWhen;
+
+  /// No description provided for @reminderOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chiq'**
+  String get reminderOff;
+
+  /// No description provided for @reminderOffHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eslatmasin'**
+  String get reminderOffHint;
+
+  /// No description provided for @reminderSilent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jim'**
+  String get reminderSilent;
+
+  /// No description provided for @reminderSilentHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faqat bildirishnoma'**
+  String get reminderSilentHint;
+
+  /// No description provided for @reminderVibrate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tebranish'**
+  String get reminderVibrate;
+
+  /// No description provided for @reminderVibrateHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ovozsiz, tebranadi'**
+  String get reminderVibrateHint;
+
+  /// No description provided for @reminderSound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ovoz'**
+  String get reminderSound;
+
+  /// No description provided for @reminderSoundHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qisqa, yoqimli ohang'**
+  String get reminderSoundHint;
+
+  /// No description provided for @reminderPlay.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eshitib ko‘rish'**
+  String get reminderPlay;
+
+  /// No description provided for @reminderAt.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eslatma vaqti'**
+  String get reminderAt;
+
+  /// No description provided for @reminderDone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tayyor'**
+  String get reminderDone;
+
+  /// No description provided for @offsetOnTime.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vaqtida'**
+  String get offsetOnTime;
+
+  /// No description provided for @offsetBefore.
+  ///
+  /// In uz, this message translates to:
+  /// **'{duration} oldin'**
+  String offsetBefore(String duration);
+
+  /// No description provided for @offsetAfter.
+  ///
+  /// In uz, this message translates to:
+  /// **'{duration} keyin'**
+  String offsetAfter(String duration);
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In uz, this message translates to:
+  /// **'{minutes} daq'**
+  String durationMinutes(int minutes);
+
+  /// No description provided for @durationHours.
+  ///
+  /// In uz, this message translates to:
+  /// **'{hours} soat'**
+  String durationHours(int hours);
+
+  /// No description provided for @durationHoursMinutes.
+  ///
+  /// In uz, this message translates to:
+  /// **'{hours} soat {minutes} daq'**
+  String durationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @notificationsOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar o‘chiq — eslatmalar kelmaydi'**
+  String get notificationsOff;
+
+  /// No description provided for @notificationsTurnOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get notificationsTurnOn;
+
+  /// No description provided for @notifyAt.
+  ///
+  /// In uz, this message translates to:
+  /// **'{name} vaqti kirdi'**
+  String notifyAt(String name);
+
+  /// No description provided for @notifyBefore.
+  ///
+  /// In uz, this message translates to:
+  /// **'{name} vaqtiga {duration} qoldi'**
+  String notifyBefore(String name, String duration);
+
+  /// No description provided for @notifyAfter.
+  ///
+  /// In uz, this message translates to:
+  /// **'{name} vaqti kirganiga {duration} bo‘ldi'**
+  String notifyAfter(String name, String duration);
+
+  /// No description provided for @notifySunriseAt.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh chiqdi — Bomdod vaqti tugadi'**
+  String get notifySunriseAt;
+
+  /// No description provided for @notifySunriseBefore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod vaqti tugashiga {duration} qoldi'**
+  String notifySunriseBefore(String duration);
+
+  /// No description provided for @notifySunriseAfter.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyosh chiqqaniga {duration} bo‘ldi'**
+  String notifySunriseAfter(String duration);
+
+  /// No description provided for @notifyImsakAt.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saharlik vaqti tugadi'**
+  String get notifyImsakAt;
+
+  /// No description provided for @notifyImsakBefore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saharlik tugashiga {duration} qoldi'**
+  String notifyImsakBefore(String duration);
+
+  /// No description provided for @notifyImsakAfter.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saharlik tugaganiga {duration} bo‘ldi'**
+  String notifyImsakAfter(String duration);
+
+  /// No description provided for @notifyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'{name}: {start} – {end} · {city}'**
+  String notifyBody(String name, String start, String end, String city);
+
+  /// No description provided for @suhoorShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saharlik'**
+  String get suhoorShort;
 }
 
 class _AppLocalizationsDelegate

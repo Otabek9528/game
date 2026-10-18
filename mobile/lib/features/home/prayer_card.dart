@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
+import '../../core/widgets/spinning_refresh.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayer/calendar_text.dart';
 import '../prayer/prayer_controller.dart';
@@ -191,7 +192,7 @@ class _TopRow extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          _SpinningRefresh(spinning: c.locating, color: p.accent),
+                          SpinningRefresh(spinning: c.locating, color: p.accent),
                         ],
                       ),
                     ),
@@ -213,59 +214,6 @@ class _TopRow extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _SpinningRefresh extends StatefulWidget {
-  const _SpinningRefresh({required this.spinning, required this.color});
-
-  final bool spinning;
-  final Color color;
-
-  @override
-  State<_SpinningRefresh> createState() => _SpinningRefreshState();
-}
-
-class _SpinningRefreshState extends State<_SpinningRefresh>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _spin = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  );
-
-  @override
-  void didUpdateWidget(_SpinningRefresh old) {
-    super.didUpdateWidget(old);
-    _sync();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _sync();
-  }
-
-  void _sync() {
-    if (widget.spinning && !_spin.isAnimating) {
-      _spin.repeat();
-    } else if (!widget.spinning && _spin.isAnimating) {
-      _spin.stop();
-      _spin.value = 0;
-    }
-  }
-
-  @override
-  void dispose() {
-    _spin.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RotationTransition(
-      turns: _spin,
-      child: Icon(Icons.refresh_rounded, size: 15, color: widget.color),
     );
   }
 }

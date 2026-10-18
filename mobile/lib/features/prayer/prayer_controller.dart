@@ -219,7 +219,32 @@ class PrayerController extends ChangeNotifier {
     }
   }
 
-  /// The calculation method or Asr school changed (on the web prayers page).
+  /// The times for any [date] (the prayers page steps through days): from
+  /// the saved week when it has them, otherwise fetched once and kept for
+  /// this run. Null when they can't be loaded.
+  Future<PrayerDay?> dayAt(DateTime date) async {
+    final place = this.place;
+    if (place == null) return null;
+    final midnight = DateTime(date.year, date.month, date.day);
+    final key = PrayerDay.keyFor(midnight, settings, place);
+    for (final d in days) {
+      if (d.key == key) return d;
+    }
+    final cached = _otherDays[key];
+    if (cached != null) return cached;
+    try {
+      final fetched = await _times.fetchDays(midnight, 1, place, settings);
+      for (final d in fetched) {
+        if (d.key == key) return _otherDays[key] = d;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  final _otherDays = <String, PrayerDay>{};
+
+  /// The calculation method or Asr school changed (on the prayers page or
+  /// the web one).
   Future<void> applySettings(PrayerSettings value) async {
     if (value == settings) return;
     settings = value;

@@ -259,15 +259,330 @@ class AppLocalizationsRu extends AppLocalizations {
   String get widgetOpenApp => 'Откройте приложение, чтобы увидеть время намаза';
 
   @override
-  String get exactAlarmsTitle => 'Точное время для виджета';
+  String get exactAlarmsTitle => 'Точное время';
 
   @override
   String get exactAlarmsBody =>
-      'Чтобы виджет на главном экране переключался на следующий намаз точно в срок, включите «Будильники и напоминания» на следующей странице.';
+      'Чтобы напоминания о намазе и виджет срабатывали точно вовремя, включите «Будильники и напоминания» на следующей странице.';
 
   @override
   String get exactAlarmsAllow => 'Продолжить';
 
   @override
   String get exactAlarmsLater => 'Позже';
+
+  @override
+  String get prayersTitle => 'Время намаза';
+
+  @override
+  String get nextPrayer => 'Следующий намаз';
+
+  @override
+  String get remaining => 'осталось';
+
+  @override
+  String get suhoorLabel => 'Сухур (конец)';
+
+  @override
+  String get iftarLabel => 'Ифтар';
+
+  @override
+  String get chipNow => 'сейчас';
+
+  @override
+  String get chipNext => 'следующий';
+
+  @override
+  String get fastWindow => 'Время поста · от сухура до ифтара';
+
+  @override
+  String get dayToday => 'Сегодня';
+
+  @override
+  String get dayTomorrow => 'Завтра';
+
+  @override
+  String get dayYesterday => 'Вчера';
+
+  @override
+  String get previousDay => 'Предыдущий день';
+
+  @override
+  String get nextDay => 'Следующий день';
+
+  @override
+  String get backToToday => 'Вернуться к сегодня';
+
+  @override
+  String get dayLoading => 'Загрузка...';
+
+  @override
+  String get dayLoadFailed => 'Не удалось загрузить';
+
+  @override
+  String get commentFajr => 'Время Иша заканчивается';
+
+  @override
+  String get commentSunrise => 'Время Фаджр заканчивается';
+
+  @override
+  String get commentAsr => 'Время Зухр заканчивается';
+
+  @override
+  String get commentMaghrib => 'Время Аср заканчивается';
+
+  @override
+  String get commentIsha => 'Время Магриб заканчивается';
+
+  @override
+  String get settingsShort => 'Настройки';
+
+  @override
+  String get settingsTitle => 'Настройки намаза';
+
+  @override
+  String get settingsSubtitle => 'Выберите метод расчёта и мазхаб';
+
+  @override
+  String get methodLabel => 'Метод расчёта';
+
+  @override
+  String get madhabLabel => 'Мазхаб (для времени Аср)';
+
+  @override
+  String get schoolHanafi => 'Ханафи';
+
+  @override
+  String get schoolShafii => 'Шафии / Малики / Ханбали';
+
+  @override
+  String get schoolShafiiShort => 'Шафии';
+
+  @override
+  String get hanafiNote => 'Тень = 2× длина';
+
+  @override
+  String get shafiiNote => 'Тень = 1× длина';
+
+  @override
+  String get methodMwl => 'Muslim World League';
+
+  @override
+  String get methodKarachi => 'Карачи';
+
+  @override
+  String get methodMakkah => 'Мекка';
+
+  @override
+  String get methodEgypt => 'Египет';
+
+  @override
+  String get methodIsna => 'ISNA';
+
+  @override
+  String get methodMwlHint => 'Фаджр 18°, Иша 17°';
+
+  @override
+  String get methodKarachiHint => 'Фаджр 18°, Иша 18°';
+
+  @override
+  String get methodMakkahHint =>
+      'Фаджр 18.5°, Иша - через 90 мин после Магриба';
+
+  @override
+  String get methodEgyptHint => 'Фаджр 19.5°, Иша 17.5°';
+
+  @override
+  String get methodIsnaHint => 'Фаджр 15°, Иша 15°';
+
+  @override
+  String get naflTitle => 'Время добровольных (нафль) молитв';
+
+  @override
+  String get tahajjudName => 'Тахаджуд намаз';
+
+  @override
+  String get tahajjudText =>
+      'Совершаемая после молитвы Иша, после сна. Минимум - 2 ракаата, максимум - 8 ракаатов. Наилучшее время - последняя треть ночи - время, когда принимаются мольбы.';
+
+  @override
+  String get tahajjudQuote =>
+      'Она приближает к вашему Господу, искупает дурные поступки и удерживает от грехов.';
+
+  @override
+  String get tahajjudSource => 'Источник: Ат-Тирмизи - Абу Умома (р.а.)';
+
+  @override
+  String get ishraqName => 'Шурук (Ишрак) намаз';
+
+  @override
+  String get ishraqQuote =>
+      'Тому, кто прочитал фаджр в джамаате, сидел в зикре до восхода солнца и затем совершил два ракаата намаза - даётся полная награда хаджа и умры.';
+
+  @override
+  String get ishraqSource =>
+      'Источник: Ат-Тирмизи - Муаз ибн Анас аль-Джухани (р.а.)';
+
+  @override
+  String get duhaName => 'Духа намаз';
+
+  @override
+  String get duhaText =>
+      'Когда солнце поднимается на высоту копья, (время молитвы) начинается и продолжается до того, как до полудня остаётся один час. Предпочтительно совершить 4 ракаата. Наилучшее время - после того, как пройдет четверть утра.';
+
+  @override
+  String get duhaQuote =>
+      'Кто постоянно совершает молитву духа (чошгох), тому будут прощены грехи, даже если они подобны морской пене.';
+
+  @override
+  String get duhaSource => 'Источник: Ат-Тирмизи - Абу Хурайра (р.а.)';
+
+  @override
+  String get statusNow => 'Сейчас';
+
+  @override
+  String get statusUpcoming => 'Ожидается';
+
+  @override
+  String get statusPassed => 'Прошло';
+
+  @override
+  String get statusOtherDay => 'Другой день';
+
+  @override
+  String get reminderHint =>
+      'Нажмите на колокольчик, чтобы настроить напоминание для намаза';
+
+  @override
+  String reminderFor(String name) {
+    return '$name: напоминание';
+  }
+
+  @override
+  String reminderToday(String range) {
+    return 'Сегодня: $range';
+  }
+
+  @override
+  String get reminderHow => 'Как напомнить';
+
+  @override
+  String get reminderWhen => 'Когда';
+
+  @override
+  String get reminderOff => 'Выкл.';
+
+  @override
+  String get reminderOffHint => 'Без напоминания';
+
+  @override
+  String get reminderSilent => 'Тихо';
+
+  @override
+  String get reminderSilentHint => 'Только уведомление';
+
+  @override
+  String get reminderVibrate => 'Вибрация';
+
+  @override
+  String get reminderVibrateHint => 'Без звука';
+
+  @override
+  String get reminderSound => 'Звук';
+
+  @override
+  String get reminderSoundHint => 'Короткая мягкая мелодия';
+
+  @override
+  String get reminderPlay => 'Прослушать';
+
+  @override
+  String get reminderAt => 'Время напоминания';
+
+  @override
+  String get reminderDone => 'Готово';
+
+  @override
+  String get offsetOnTime => 'Вовремя';
+
+  @override
+  String offsetBefore(String duration) {
+    return 'за $duration';
+  }
+
+  @override
+  String offsetAfter(String duration) {
+    return 'через $duration';
+  }
+
+  @override
+  String durationMinutes(int minutes) {
+    return '$minutes мин';
+  }
+
+  @override
+  String durationHours(int hours) {
+    return '$hours ч';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '$hours ч $minutes мин';
+  }
+
+  @override
+  String get notificationsOff =>
+      'Уведомления выключены — напоминания не придут';
+
+  @override
+  String get notificationsTurnOn => 'Включить';
+
+  @override
+  String notifyAt(String name) {
+    return 'Время намаза $name';
+  }
+
+  @override
+  String notifyBefore(String name, String duration) {
+    return 'До намаза $name $duration';
+  }
+
+  @override
+  String notifyAfter(String name, String duration) {
+    return 'Намаз $name начался $duration назад';
+  }
+
+  @override
+  String get notifySunriseAt => 'Восход — время Фаджра закончилось';
+
+  @override
+  String notifySunriseBefore(String duration) {
+    return 'До конца Фаджра $duration';
+  }
+
+  @override
+  String notifySunriseAfter(String duration) {
+    return 'Солнце взошло $duration назад';
+  }
+
+  @override
+  String get notifyImsakAt => 'Время сухура закончилось';
+
+  @override
+  String notifyImsakBefore(String duration) {
+    return 'До конца сухура $duration';
+  }
+
+  @override
+  String notifyImsakAfter(String duration) {
+    return 'Сухур закончился $duration назад';
+  }
+
+  @override
+  String notifyBody(String name, String start, String end, String city) {
+    return '$name: $start – $end · $city';
+  }
+
+  @override
+  String get suhoorShort => 'Сухур';
 }

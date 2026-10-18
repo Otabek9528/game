@@ -9,6 +9,7 @@ import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/prayer/prayer_controller.dart';
+import 'features/reminders/reminder_controller.dart';
 import 'features/widget/home_widget_bridge.dart';
 
 /// Opens a section: for now, its web page inside the app.
@@ -49,8 +50,8 @@ class BusinessStats {
 /// on its own. Afterwards only the user's own taps (e.g. the prayer card's
 /// "use my location" button) can bring a permission dialog back.
 abstract interface class PermissionsGate {
-  /// Location, then camera — only the first time it is called. "Alarms &
-  /// reminders" follows: see [shouldOfferExactAlarms].
+  /// Location, camera, then notifications — each only the first time.
+  /// "Alarms & reminders" follows: see [shouldOfferExactAlarms].
   Future<void> askOnce();
 
   /// True once, at first launch, when "Alarms & reminders" is off; the caller
@@ -74,12 +75,21 @@ class DevicePermissions implements PermissionsGate {
 
   @override
   Future<void> askOnce() async {
-    if (_store.read('permissions_asked') != null) return;
-    await _store.write('permissions_asked', '1');
-    await _prayer.locate(userAsked: true);
-    try {
-      await ph.Permission.camera.request();
-    } catch (_) {}
+    if (_store.read('permissions_asked') == null) {
+      await _store.write('permissions_asked', '1');
+      await _prayer.locate(userAsked: true);
+      try {
+        await ph.Permission.camera.request();
+      } catch (_) {}
+    }
+    // Prayer reminders came later: installs that answered the first two
+    // are asked this one once too.
+    if (_store.read('notifications_asked') == null) {
+      await _store.write('notifications_asked', '1');
+      try {
+        await ph.Permission.notification.request();
+      } catch (_) {}
+    }
   }
 
   @override
@@ -114,6 +124,7 @@ class AppServices {
     required this.permissions,
     required this.openFeature,
     required this.homeWidget,
+    required this.reminders,
     this.businessStats = BusinessStats.fetch,
   });
 
@@ -122,5 +133,6 @@ class AppServices {
   final PermissionsGate permissions;
   final FeatureOpener openFeature;
   final HomeWidgetBridge homeWidget;
+  final ReminderController reminders;
   final Future<BusinessStats?> Function() businessStats;
 }

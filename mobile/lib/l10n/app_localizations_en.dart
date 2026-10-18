@@ -248,15 +248,328 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetOpenApp => 'Open the app to see prayer times';
 
   @override
-  String get exactAlarmsTitle => 'Keep the widget on time';
+  String get exactAlarmsTitle => 'Exact timing';
 
   @override
   String get exactAlarmsBody =>
-      'So the home-screen widget switches to the next prayer right on time, turn on “Alarms & reminders” on the next page.';
+      'So prayer reminders and the home-screen widget fire right on time, turn on “Alarms & reminders” on the next page.';
 
   @override
   String get exactAlarmsAllow => 'Continue';
 
   @override
   String get exactAlarmsLater => 'Not now';
+
+  @override
+  String get prayersTitle => 'Prayer times';
+
+  @override
+  String get nextPrayer => 'Next prayer';
+
+  @override
+  String get remaining => 'remaining';
+
+  @override
+  String get suhoorLabel => 'Suhoor (ends)';
+
+  @override
+  String get iftarLabel => 'Iftar';
+
+  @override
+  String get chipNow => 'now';
+
+  @override
+  String get chipNext => 'next';
+
+  @override
+  String get fastWindow => 'Fasting window · suhoor to iftar';
+
+  @override
+  String get dayToday => 'Today';
+
+  @override
+  String get dayTomorrow => 'Tomorrow';
+
+  @override
+  String get dayYesterday => 'Yesterday';
+
+  @override
+  String get previousDay => 'Previous day';
+
+  @override
+  String get nextDay => 'Next day';
+
+  @override
+  String get backToToday => 'Back to today';
+
+  @override
+  String get dayLoading => 'Loading...';
+
+  @override
+  String get dayLoadFailed => 'Could not load';
+
+  @override
+  String get commentFajr => 'Isha time ends';
+
+  @override
+  String get commentSunrise => 'Fajr time ends';
+
+  @override
+  String get commentAsr => 'Dhuhr time ends';
+
+  @override
+  String get commentMaghrib => 'Asr time ends';
+
+  @override
+  String get commentIsha => 'Maghrib time ends';
+
+  @override
+  String get settingsShort => 'Settings';
+
+  @override
+  String get settingsTitle => 'Prayer settings';
+
+  @override
+  String get settingsSubtitle => 'Choose your calculation method and madhab';
+
+  @override
+  String get methodLabel => 'Calculation method';
+
+  @override
+  String get madhabLabel => 'Madhab (for Asr time)';
+
+  @override
+  String get schoolHanafi => 'Hanafi';
+
+  @override
+  String get schoolShafii => 'Shafi’i / Maliki / Hanbali';
+
+  @override
+  String get schoolShafiiShort => 'Shafi’i';
+
+  @override
+  String get hanafiNote => 'Shadow = 2x length';
+
+  @override
+  String get shafiiNote => 'Shadow = 1x length';
+
+  @override
+  String get methodMwl => 'Muslim World League';
+
+  @override
+  String get methodKarachi => 'Karachi';
+
+  @override
+  String get methodMakkah => 'Makkah';
+
+  @override
+  String get methodEgypt => 'Egypt';
+
+  @override
+  String get methodIsna => 'ISNA';
+
+  @override
+  String get methodMwlHint => 'Fajr 18°, Isha 17°';
+
+  @override
+  String get methodKarachiHint => 'Fajr 18°, Isha 18°';
+
+  @override
+  String get methodMakkahHint => 'Fajr 18.5°, Isha - 90 min after Maghrib';
+
+  @override
+  String get methodEgyptHint => 'Fajr 19.5°, Isha 17.5°';
+
+  @override
+  String get methodIsnaHint => 'Fajr 15°, Isha 15°';
+
+  @override
+  String get naflTitle => 'Times of voluntary (nafl) prayers';
+
+  @override
+  String get tahajjudName => 'Tahajjud prayer';
+
+  @override
+  String get tahajjudText =>
+      'Performed after the Isha prayer, following sleep. Its minimum is 2 rak‘ahs and its maximum is 8 rak‘ahs. The most virtuous time is the last third of the night - a time when supplications are accepted.';
+
+  @override
+  String get tahajjudQuote =>
+      'It brings one closer to your Lord, expiates bad deeds, and prevents sins.';
+
+  @override
+  String get tahajjudSource => 'Source: Tirmidhi - from Abu Umoma (r.a.)';
+
+  @override
+  String get ishraqName => 'Shuruq (Ishraq) prayer';
+
+  @override
+  String get ishraqQuote =>
+      'Whoever prays Fajr in congregation, remains in remembrance of Allah until sunrise, then prays two rak‘ahs - receives the full reward of Hajj and Umrah.';
+
+  @override
+  String get ishraqSource =>
+      'Source: Tirmidhi - from Mu‘adh ibn Anas al-Juhani (r.a.)';
+
+  @override
+  String get duhaName => 'Duha prayer';
+
+  @override
+  String get duhaText =>
+      'When the sun rises to the height of a spear, it begins and continues until one hour remains before noon. It is most virtuous to pray 4 rak‘ahs. The most preferable time is after one quarter of the morning has passed.';
+
+  @override
+  String get duhaQuote =>
+      'Whoever consistently performs the Duha (forenoon) prayer, his sins will be forgiven even if they are as abundant as the foam of the sea.';
+
+  @override
+  String get duhaSource => 'Source: Tirmidhi - from Abu Hurayra (r.a.)';
+
+  @override
+  String get statusNow => 'Now';
+
+  @override
+  String get statusUpcoming => 'Upcoming';
+
+  @override
+  String get statusPassed => 'Passed';
+
+  @override
+  String get statusOtherDay => 'Other day';
+
+  @override
+  String get reminderHint => 'Tap a bell to set that prayer’s reminder';
+
+  @override
+  String reminderFor(String name) {
+    return '$name reminder';
+  }
+
+  @override
+  String reminderToday(String range) {
+    return 'Today: $range';
+  }
+
+  @override
+  String get reminderHow => 'How to remind';
+
+  @override
+  String get reminderWhen => 'When';
+
+  @override
+  String get reminderOff => 'Off';
+
+  @override
+  String get reminderOffHint => 'No reminder';
+
+  @override
+  String get reminderSilent => 'Silent';
+
+  @override
+  String get reminderSilentHint => 'Notification only';
+
+  @override
+  String get reminderVibrate => 'Vibrate';
+
+  @override
+  String get reminderVibrateHint => 'No sound';
+
+  @override
+  String get reminderSound => 'Sound';
+
+  @override
+  String get reminderSoundHint => 'A short, soft chime';
+
+  @override
+  String get reminderPlay => 'Play';
+
+  @override
+  String get reminderAt => 'Reminder at';
+
+  @override
+  String get reminderDone => 'Done';
+
+  @override
+  String get offsetOnTime => 'On time';
+
+  @override
+  String offsetBefore(String duration) {
+    return '$duration before';
+  }
+
+  @override
+  String offsetAfter(String duration) {
+    return '$duration after';
+  }
+
+  @override
+  String durationMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String durationHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String get notificationsOff =>
+      'Notifications are off, so reminders won’t arrive';
+
+  @override
+  String get notificationsTurnOn => 'Turn on';
+
+  @override
+  String notifyAt(String name) {
+    return 'It’s time for $name';
+  }
+
+  @override
+  String notifyBefore(String name, String duration) {
+    return '$name in $duration';
+  }
+
+  @override
+  String notifyAfter(String name, String duration) {
+    return '$name began $duration ago';
+  }
+
+  @override
+  String get notifySunriseAt => 'Sunrise: Fajr time has ended';
+
+  @override
+  String notifySunriseBefore(String duration) {
+    return 'Fajr ends in $duration';
+  }
+
+  @override
+  String notifySunriseAfter(String duration) {
+    return 'Sunrise was $duration ago';
+  }
+
+  @override
+  String get notifyImsakAt => 'Suhoor time has ended';
+
+  @override
+  String notifyImsakBefore(String duration) {
+    return 'Suhoor ends in $duration';
+  }
+
+  @override
+  String notifyImsakAfter(String duration) {
+    return 'Suhoor ended $duration ago';
+  }
+
+  @override
+  String notifyBody(String name, String start, String end, String city) {
+    return '$name: $start – $end · $city';
+  }
+
+  @override
+  String get suhoorShort => 'Suhoor';
 }

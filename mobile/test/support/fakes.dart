@@ -9,6 +9,7 @@ import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
+import 'package:muslim_vegukin/features/reminders/reminder_controller.dart';
 import 'package:muslim_vegukin/features/widget/home_widget_bridge.dart';
 
 class MemoryLanguageStore implements LanguageStore {
@@ -158,6 +159,8 @@ PrayerDay dayAt(DateTime day, {String key = 'k'}) {
     hijriMonth: 5,
     hijriYear: 1448,
     key: key,
+    imsak: at(4, 50),
+    lastThird: at(2, 10),
   );
 }
 
@@ -189,12 +192,14 @@ class TestApp {
       clock: () => clockNow,
     );
     permissions = FakePermissions(prayer);
+    reminders = ReminderController(this.store);
     services = AppServices(
       locale: LocaleController(languageStore),
       prayer: prayer,
       permissions: permissions,
       openFeature: opened.call,
       homeWidget: HomeWidgetBridge(),
+      reminders: reminders,
       businessStats: () async => stats,
     );
   }
@@ -206,6 +211,7 @@ class TestApp {
   final opened = OpenedFeatures();
   late final PrayerController prayer;
   late final FakePermissions permissions;
+  late final ReminderController reminders;
   late final AppServices services;
 
   /// Starts the app on a phone-sized screen (by default 411×891, a Pixel 7).
@@ -221,10 +227,12 @@ class TestApp {
     tester.platformDispatcher.textScaleFactorTestValue = textScale;
     addTearDown(tester.view.reset);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    // No Android widgets here: their channel answers "nothing" straight away.
-    const widgetChannel = MethodChannel('vegukin/widget');
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(widgetChannel, (call) async => null);
-    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(widgetChannel, null));
+    // No Android here: the widget and reminder channels answer "nothing"
+    // straight away.
+    for (final channel in const [MethodChannel('vegukin/widget'), MethodChannel('vegukin/reminders')]) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async => null);
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, null));
+    }
 
     await prayer.start();
     await tester.pumpWidget(VegukinApp(services: services, deviceLocales: device));
