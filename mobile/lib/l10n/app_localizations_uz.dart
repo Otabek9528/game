@@ -1048,6 +1048,228 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
+  String get donationTitle => 'Xayriya';
+
+  @override
+  String get donationHeroTitle => 'Loyiha faoliyatini qo‘llab-quvvatlang';
+
+  @override
+  String get donationHeroSubtitle =>
+      'Yordamingiz bilan loyiha yanada rivojlanadi';
+
+  @override
+  String get donationMessage =>
+      'Agar ushbu bot sizga foydali bo‘layotgan bo‘lsa va uning ishlashi hamda rivojlanishiga o‘z hissangizni qo‘shmoqchi bo‘lsangiz, quyidagi hisob raqamga istalgan miqdorda moddiy mablag‘laringizni yuborishingiz mumkin.';
+
+  @override
+  String get donationName => 'Ism';
+
+  @override
+  String get donationAccount => 'Hisob raqam';
+
+  @override
+  String get donationCopied => 'Nusxa olindi!';
+
+  @override
+  String get donationUsageTitle =>
+      'Yig‘ilgan mablag‘lar quyidagilar uchun ishlatiladi';
+
+  @override
+  String get donationUsage1 => 'Server va hosting xarajatlari';
+
+  @override
+  String get donationUsage2 => 'Texnik xizmat va muntazam yangilanishlar';
+
+  @override
+  String get donationUsage3 =>
+      'Dasturchilar mehnati va loyihani rivojlantirish';
+
+  @override
+  String get donationThanksText =>
+      'Sizning har qanday hissangiz biz uchun katta ahamiyatga ega!';
+
+  @override
+  String get donationThanks => 'Rahmat!';
+
+  @override
+  String get communityTitle => 'Jamoa';
+
+  @override
+  String get communityHeroTitle => 'Rasmiy Telegram Guruhi';
+
+  @override
+  String get communityHeroSubtitle => 'Bot foydalanuvchilari jamiyati';
+
+  @override
+  String get communityJoinNow => 'Hoziroq qo‘shiling';
+
+  @override
+  String get communityPurposeTitle => 'Guruh maqsadi';
+
+  @override
+  String get communityPurposeText =>
+      'Ushbu guruh Muslim Vegukin Bot foydalanuvchilari uchun rasmiy muhokama maydonidir. Bu yerda bot bilan bog‘liq barcha masalalarni muhokama qilishingiz mumkin.';
+
+  @override
+  String get communityAllowedTitle => 'Guruh muhokama mavzulari';
+
+  @override
+  String get communityTopicPlaceTitle => 'Yangi manzillar haqida xabar berish';
+
+  @override
+  String get communityTopicPlaceBody =>
+      'Yangi masjid, restoran yoki do‘kon qo‘shilishi kerak bo‘lsa';
+
+  @override
+  String get communityTopicIdeaTitle => 'Takliflar va g‘oyalar';
+
+  @override
+  String get communityTopicIdeaBody => 'Botni yaxshilash uchun fikrlaringiz';
+
+  @override
+  String get communityTopicBugTitle => 'Xatolar haqida xabar berish';
+
+  @override
+  String get communityTopicBugBody => 'Agar botda muammo topsangiz';
+
+  @override
+  String get communityTopicNewsTitle => 'Bot yangiliklari';
+
+  @override
+  String get communityTopicNewsBody =>
+      'Yangi funksiyalar va o‘zgarishlar haqida e’lonlar';
+
+  @override
+  String get communityTopicBetaTitle => 'Beta versiyalar muhokamasi';
+
+  @override
+  String get communityTopicBetaBody =>
+      'Yangi funksiyalarni ommaga chiqarishdan oldin sinab ko‘rish';
+
+  @override
+  String get communityTopicQuestionTitle => 'Bot haqida savollar';
+
+  @override
+  String get communityTopicQuestionBody =>
+      'Qanday ishlatish, funksiyalar haqida';
+
+  @override
+  String get communityTopicPeopleTitle => 'Jamiyat bilan muloqot';
+
+  @override
+  String get communityTopicPeopleBody =>
+      'Boshqa foydalanuvchilar bilan tajriba almashish';
+
+  @override
+  String get communityRulesTitle => 'Guruh qoidalari';
+
+  @override
+  String get communityRulesWarning =>
+      'Quyidagi turdagi xabarlar o‘chirib tashlanadi';
+
+  @override
+  String get communityBanned1Title => 'Reklama va savdo e’lonlari';
+
+  @override
+  String get communityBanned1Body =>
+      'Har qanday turdagi sotish yoki xarid e’lonlari';
+
+  @override
+  String get communityBanned2Title => 'O‘quv kurslari reklamasi';
+
+  @override
+  String get communityBanned2Body =>
+      'Til kurslari, o‘quv markazlari va boshqalar';
+
+  @override
+  String get communityBanned3Title => 'Bot bilan bog‘liq bo‘lmagan savollar';
+
+  @override
+  String get communityBanned3Body =>
+      'Umumiy savollar uchun boshqa guruhlardan foydalaning';
+
+  @override
+  String get communityBanned4Title => 'Spam va takroriy xabarlar';
+
+  @override
+  String get communityBanned4Body => 'Bir xil xabarlarni qayta-qayta yozish';
+
+  @override
+  String get communityBanned5Title => 'Mavzudan tashqari munozaralar';
+
+  @override
+  String get communityBanned5Body => 'Bot bilan aloqasi bo‘lmagan suhbatlar';
+
+  @override
+  String get communityPenaltyTitle => 'Ogohlantirish';
+
+  @override
+  String get communityPenaltyText =>
+      'Qoidalarga zid xabarlar o‘chiriladi. Agar o‘chirilgan xabar qayta yozilsa, foydalanuvchi guruhda yozish huquqidan cheklanadi (restrict).';
+
+  @override
+  String get communityCta =>
+      'Qoidalarga rioya qilgan holda guruhga qo‘shilishingizni so‘rab qolamiz!';
+
+  @override
+  String get donationTransfer => 'Pul o‘tkazish';
+
+  @override
+  String get donationBank => 'Bank';
+
+  @override
+  String get donationCopyAccount => 'Hisob raqamni nusxalash';
+
+  @override
+  String get donationCopyName => 'Ismni nusxalash';
+
+  @override
+  String get donationOpenApp => 'Bank ilovasida o‘tkazish';
+
+  @override
+  String get donationOpenAppHint => 'Hisob raqam nusxalanadi — ilovada joylang';
+
+  @override
+  String get donationPasteHint => 'Hisob raqam nusxalandi — ilovada joylang';
+
+  @override
+  String get donationShare => 'Rekvizitlarni ulashish';
+
+  @override
+  String get donationAsk => 'Savol va takliflar uchun — guruhimiz';
+
+  @override
+  String get communityCopyLink => 'Havolani nusxalash';
+
+  @override
+  String get communityLinkCopied => 'Havola nusxalandi';
+
+  @override
+  String get communityShare => 'Ulashish';
+
+  @override
+  String get communityMore => 'Guruhda yana';
+
+  @override
+  String get communityTemplateHint =>
+      'Shablon nusxalanadi. Guruhda joylab, bo‘sh joylarni to‘ldiring.';
+
+  @override
+  String get communityTemplateGo => 'Nusxalash va guruhni ochish';
+
+  @override
+  String get communityTemplateCopied => 'Shablon nusxalandi — guruhda joylang';
+
+  @override
+  String get communityTemplatePlace =>
+      '📍 Yangi joy\nNomi: \nTuri: masjid / oshxona / do‘kon\nManzil: \nXaritadagi havola: \nQo‘shimcha: ';
+
+  @override
+  String communityTemplateBug(String phone, String version) {
+    return '🐛 Xato\nQaysi bo‘limda: \nNima bo‘ldi: \nNima bo‘lishi kerak edi: \n\nTelefon: $phone\nIlova: $version';
+  }
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

@@ -112,5 +112,14 @@
             <action android:name="android.intent.action.DIAL" />
             <data android:scheme="tel" />
         </intent>
+        <!-- Banking apps the donation page can open (lib/features/support/support_data.dart). -->
+        <package android:name="viva.republica.toss" />
+        <package android:name="com.kakaobank.channel" />
+        <package android:name="com.kebhana.hanapush" />
+        <package android:name="com.kbstar.kbbank" />
+        <package android:name="com.shinhan.sbanking" />
+        <package android:name="com.wooribank.smart.npib" />
+        <package android:name="nh.smart.banking" />
+        <package android:name="com.ibk.android.ionebank" />
     </queries>
 </manifest>

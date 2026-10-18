@@ -1090,6 +1090,225 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get donationTitle => 'Пожертвование';
+
+  @override
+  String get donationHeroTitle => 'Поддержите работу проекта';
+
+  @override
+  String get donationHeroSubtitle => 'С вашей помощью проект будет развиваться';
+
+  @override
+  String get donationMessage =>
+      'Если этот бот оказался вам полезен и вы хотите внести свой вклад в его работу и развитие, вы можете отправить любую сумму на указанный ниже счёт.';
+
+  @override
+  String get donationName => 'Имя';
+
+  @override
+  String get donationAccount => 'Номер счёта';
+
+  @override
+  String get donationCopied => 'Скопировано!';
+
+  @override
+  String get donationUsageTitle => 'Собранные средства будут использованы для';
+
+  @override
+  String get donationUsage1 => 'Расходы на сервер и хостинг';
+
+  @override
+  String get donationUsage2 =>
+      'Техническое обслуживание и регулярные обновления';
+
+  @override
+  String get donationUsage3 => 'Работа разработчиков и развитие проекта';
+
+  @override
+  String get donationThanksText => 'Любой ваш вклад очень важен для нас!';
+
+  @override
+  String get donationThanks => 'Спасибо!';
+
+  @override
+  String get communityTitle => 'Сообщество';
+
+  @override
+  String get communityHeroTitle => 'Официальная Telegram группа';
+
+  @override
+  String get communityHeroSubtitle => 'Сообщество пользователей бота';
+
+  @override
+  String get communityJoinNow => 'Присоединиться сейчас';
+
+  @override
+  String get communityPurposeTitle => 'Цель группы';
+
+  @override
+  String get communityPurposeText =>
+      'Эта группа является официальной площадкой для обсуждения пользователями Muslim Vegukin Bot. Здесь вы можете обсудить все вопросы, связанные с ботом.';
+
+  @override
+  String get communityAllowedTitle => 'Темы для обсуждения в группе';
+
+  @override
+  String get communityTopicPlaceTitle => 'Сообщения о новых адресах';
+
+  @override
+  String get communityTopicPlaceBody =>
+      'Если нужно добавить новую мечеть, ресторан или магазин';
+
+  @override
+  String get communityTopicIdeaTitle => 'Предложения и идеи';
+
+  @override
+  String get communityTopicIdeaBody => 'Ваши мысли по улучшению бота';
+
+  @override
+  String get communityTopicBugTitle => 'Сообщения об ошибках';
+
+  @override
+  String get communityTopicBugBody => 'Если вы нашли проблему в боте';
+
+  @override
+  String get communityTopicNewsTitle => 'Новости бота';
+
+  @override
+  String get communityTopicNewsBody =>
+      'Объявления о новых функциях и изменениях';
+
+  @override
+  String get communityTopicBetaTitle => 'Обсуждение бета-версий';
+
+  @override
+  String get communityTopicBetaBody =>
+      'Тестирование новых функций перед публичным релизом';
+
+  @override
+  String get communityTopicQuestionTitle => 'Вопросы о боте';
+
+  @override
+  String get communityTopicQuestionBody => 'Как использовать, о функциях';
+
+  @override
+  String get communityTopicPeopleTitle => 'Общение с сообществом';
+
+  @override
+  String get communityTopicPeopleBody =>
+      'Обмен опытом с другими пользователями';
+
+  @override
+  String get communityRulesTitle => 'Правила группы';
+
+  @override
+  String get communityRulesWarning => 'Следующие типы сообщений будут удалены';
+
+  @override
+  String get communityBanned1Title => 'Реклама и торговые объявления';
+
+  @override
+  String get communityBanned1Body => 'Любые объявления о продаже или покупке';
+
+  @override
+  String get communityBanned2Title => 'Реклама курсов';
+
+  @override
+  String get communityBanned2Body => 'Языковые курсы, учебные центры и прочее';
+
+  @override
+  String get communityBanned3Title => 'Вопросы не о боте';
+
+  @override
+  String get communityBanned3Body =>
+      'Для общих вопросов используйте другие группы';
+
+  @override
+  String get communityBanned4Title => 'Спам и повторяющиеся сообщения';
+
+  @override
+  String get communityBanned4Body =>
+      'Многократная отправка одинаковых сообщений';
+
+  @override
+  String get communityBanned5Title => 'Оффтопик дискуссии';
+
+  @override
+  String get communityBanned5Body => 'Разговоры не связанные с ботом';
+
+  @override
+  String get communityPenaltyTitle => 'Предупреждение';
+
+  @override
+  String get communityPenaltyText =>
+      'Сообщения, нарушающие правила, будут удалены. При повторном нарушении пользователь будет ограничен в правах на отправку сообщений.';
+
+  @override
+  String get communityCta =>
+      'Приглашаем вас присоединиться к группе, соблюдая правила!';
+
+  @override
+  String get donationTransfer => 'Перевод';
+
+  @override
+  String get donationBank => 'Банк';
+
+  @override
+  String get donationCopyAccount => 'Скопировать номер счёта';
+
+  @override
+  String get donationCopyName => 'Скопировать имя';
+
+  @override
+  String get donationOpenApp => 'Перевести в приложении банка';
+
+  @override
+  String get donationOpenAppHint =>
+      'Номер счёта скопируется — вставьте его в приложении';
+
+  @override
+  String get donationPasteHint =>
+      'Номер счёта скопирован — вставьте его в приложении';
+
+  @override
+  String get donationShare => 'Поделиться реквизитами';
+
+  @override
+  String get donationAsk => 'Вопросы и предложения — в нашей группе';
+
+  @override
+  String get communityCopyLink => 'Скопировать ссылку';
+
+  @override
+  String get communityLinkCopied => 'Ссылка скопирована';
+
+  @override
+  String get communityShare => 'Поделиться';
+
+  @override
+  String get communityMore => 'Ещё в группе';
+
+  @override
+  String get communityTemplateHint =>
+      'Шаблон скопируется. Вставьте его в группе и заполните.';
+
+  @override
+  String get communityTemplateGo => 'Скопировать и открыть группу';
+
+  @override
+  String get communityTemplateCopied =>
+      'Шаблон скопирован — вставьте его в группе';
+
+  @override
+  String get communityTemplatePlace =>
+      '📍 Новое место\nНазвание: \nТип: мечеть / ресторан / магазин\nАдрес: \nСсылка на карте: \nДополнительно: ';
+
+  @override
+  String communityTemplateBug(String phone, String version) {
+    return '🐛 Ошибка\nВ каком разделе: \nЧто случилось: \nЧто должно было быть: \n\nТелефон: $phone\nПриложение: $version';
+  }
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

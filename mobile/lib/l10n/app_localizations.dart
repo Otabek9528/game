@@ -1966,6 +1966,408 @@ abstract class AppLocalizations {
   /// **'{count} ta natija'**
   String linksResults(int count);
 
+  /// No description provided for @donationTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xayriya'**
+  String get donationTitle;
+
+  /// No description provided for @donationHeroTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Loyiha faoliyatini qo‘llab-quvvatlang'**
+  String get donationHeroTitle;
+
+  /// No description provided for @donationHeroSubtitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yordamingiz bilan loyiha yanada rivojlanadi'**
+  String get donationHeroSubtitle;
+
+  /// No description provided for @donationMessage.
+  ///
+  /// In uz, this message translates to:
+  /// **'Agar ushbu bot sizga foydali bo‘layotgan bo‘lsa va uning ishlashi hamda rivojlanishiga o‘z hissangizni qo‘shmoqchi bo‘lsangiz, quyidagi hisob raqamga istalgan miqdorda moddiy mablag‘laringizni yuborishingiz mumkin.'**
+  String get donationMessage;
+
+  /// No description provided for @donationName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ism'**
+  String get donationName;
+
+  /// No description provided for @donationAccount.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisob raqam'**
+  String get donationAccount;
+
+  /// No description provided for @donationCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxa olindi!'**
+  String get donationCopied;
+
+  /// No description provided for @donationUsageTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yig‘ilgan mablag‘lar quyidagilar uchun ishlatiladi'**
+  String get donationUsageTitle;
+
+  /// No description provided for @donationUsage1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Server va hosting xarajatlari'**
+  String get donationUsage1;
+
+  /// No description provided for @donationUsage2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Texnik xizmat va muntazam yangilanishlar'**
+  String get donationUsage2;
+
+  /// No description provided for @donationUsage3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Dasturchilar mehnati va loyihani rivojlantirish'**
+  String get donationUsage3;
+
+  /// No description provided for @donationThanksText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizning har qanday hissangiz biz uchun katta ahamiyatga ega!'**
+  String get donationThanksText;
+
+  /// No description provided for @donationThanks.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rahmat!'**
+  String get donationThanks;
+
+  /// No description provided for @communityTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jamoa'**
+  String get communityTitle;
+
+  /// No description provided for @communityHeroTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rasmiy Telegram Guruhi'**
+  String get communityHeroTitle;
+
+  /// No description provided for @communityHeroSubtitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot foydalanuvchilari jamiyati'**
+  String get communityHeroSubtitle;
+
+  /// No description provided for @communityJoinNow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hoziroq qo‘shiling'**
+  String get communityJoinNow;
+
+  /// No description provided for @communityPurposeTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruh maqsadi'**
+  String get communityPurposeTitle;
+
+  /// No description provided for @communityPurposeText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ushbu guruh Muslim Vegukin Bot foydalanuvchilari uchun rasmiy muhokama maydonidir. Bu yerda bot bilan bog‘liq barcha masalalarni muhokama qilishingiz mumkin.'**
+  String get communityPurposeText;
+
+  /// No description provided for @communityAllowedTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruh muhokama mavzulari'**
+  String get communityAllowedTitle;
+
+  /// No description provided for @communityTopicPlaceTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi manzillar haqida xabar berish'**
+  String get communityTopicPlaceTitle;
+
+  /// No description provided for @communityTopicPlaceBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi masjid, restoran yoki do‘kon qo‘shilishi kerak bo‘lsa'**
+  String get communityTopicPlaceBody;
+
+  /// No description provided for @communityTopicIdeaTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Takliflar va g‘oyalar'**
+  String get communityTopicIdeaTitle;
+
+  /// No description provided for @communityTopicIdeaBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Botni yaxshilash uchun fikrlaringiz'**
+  String get communityTopicIdeaBody;
+
+  /// No description provided for @communityTopicBugTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolar haqida xabar berish'**
+  String get communityTopicBugTitle;
+
+  /// No description provided for @communityTopicBugBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Agar botda muammo topsangiz'**
+  String get communityTopicBugBody;
+
+  /// No description provided for @communityTopicNewsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot yangiliklari'**
+  String get communityTopicNewsTitle;
+
+  /// No description provided for @communityTopicNewsBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi funksiyalar va o‘zgarishlar haqida e’lonlar'**
+  String get communityTopicNewsBody;
+
+  /// No description provided for @communityTopicBetaTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Beta versiyalar muhokamasi'**
+  String get communityTopicBetaTitle;
+
+  /// No description provided for @communityTopicBetaBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi funksiyalarni ommaga chiqarishdan oldin sinab ko‘rish'**
+  String get communityTopicBetaBody;
+
+  /// No description provided for @communityTopicQuestionTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot haqida savollar'**
+  String get communityTopicQuestionTitle;
+
+  /// No description provided for @communityTopicQuestionBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday ishlatish, funksiyalar haqida'**
+  String get communityTopicQuestionBody;
+
+  /// No description provided for @communityTopicPeopleTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jamiyat bilan muloqot'**
+  String get communityTopicPeopleTitle;
+
+  /// No description provided for @communityTopicPeopleBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa foydalanuvchilar bilan tajriba almashish'**
+  String get communityTopicPeopleBody;
+
+  /// No description provided for @communityRulesTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruh qoidalari'**
+  String get communityRulesTitle;
+
+  /// No description provided for @communityRulesWarning.
+  ///
+  /// In uz, this message translates to:
+  /// **'Quyidagi turdagi xabarlar o‘chirib tashlanadi'**
+  String get communityRulesWarning;
+
+  /// No description provided for @communityBanned1Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Reklama va savdo e’lonlari'**
+  String get communityBanned1Title;
+
+  /// No description provided for @communityBanned1Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Har qanday turdagi sotish yoki xarid e’lonlari'**
+  String get communityBanned1Body;
+
+  /// No description provided for @communityBanned2Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘quv kurslari reklamasi'**
+  String get communityBanned2Title;
+
+  /// No description provided for @communityBanned2Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Til kurslari, o‘quv markazlari va boshqalar'**
+  String get communityBanned2Body;
+
+  /// No description provided for @communityBanned3Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot bilan bog‘liq bo‘lmagan savollar'**
+  String get communityBanned3Title;
+
+  /// No description provided for @communityBanned3Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Umumiy savollar uchun boshqa guruhlardan foydalaning'**
+  String get communityBanned3Body;
+
+  /// No description provided for @communityBanned4Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Spam va takroriy xabarlar'**
+  String get communityBanned4Title;
+
+  /// No description provided for @communityBanned4Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bir xil xabarlarni qayta-qayta yozish'**
+  String get communityBanned4Body;
+
+  /// No description provided for @communityBanned5Title.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mavzudan tashqari munozaralar'**
+  String get communityBanned5Title;
+
+  /// No description provided for @communityBanned5Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot bilan aloqasi bo‘lmagan suhbatlar'**
+  String get communityBanned5Body;
+
+  /// No description provided for @communityPenaltyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ogohlantirish'**
+  String get communityPenaltyTitle;
+
+  /// No description provided for @communityPenaltyText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qoidalarga zid xabarlar o‘chiriladi. Agar o‘chirilgan xabar qayta yozilsa, foydalanuvchi guruhda yozish huquqidan cheklanadi (restrict).'**
+  String get communityPenaltyText;
+
+  /// No description provided for @communityCta.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qoidalarga rioya qilgan holda guruhga qo‘shilishingizni so‘rab qolamiz!'**
+  String get communityCta;
+
+  /// No description provided for @donationTransfer.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pul o‘tkazish'**
+  String get donationTransfer;
+
+  /// No description provided for @donationBank.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bank'**
+  String get donationBank;
+
+  /// No description provided for @donationCopyAccount.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisob raqamni nusxalash'**
+  String get donationCopyAccount;
+
+  /// No description provided for @donationCopyName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ismni nusxalash'**
+  String get donationCopyName;
+
+  /// No description provided for @donationOpenApp.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bank ilovasida o‘tkazish'**
+  String get donationOpenApp;
+
+  /// No description provided for @donationOpenAppHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisob raqam nusxalanadi — ilovada joylang'**
+  String get donationOpenAppHint;
+
+  /// No description provided for @donationPasteHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisob raqam nusxalandi — ilovada joylang'**
+  String get donationPasteHint;
+
+  /// No description provided for @donationShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rekvizitlarni ulashish'**
+  String get donationShare;
+
+  /// No description provided for @donationAsk.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savol va takliflar uchun — guruhimiz'**
+  String get donationAsk;
+
+  /// No description provided for @communityCopyLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havolani nusxalash'**
+  String get communityCopyLink;
+
+  /// No description provided for @communityLinkCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havola nusxalandi'**
+  String get communityLinkCopied;
+
+  /// No description provided for @communityShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get communityShare;
+
+  /// No description provided for @communityMore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruhda yana'**
+  String get communityMore;
+
+  /// No description provided for @communityTemplateHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shablon nusxalanadi. Guruhda joylab, bo‘sh joylarni to‘ldiring.'**
+  String get communityTemplateHint;
+
+  /// No description provided for @communityTemplateGo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxalash va guruhni ochish'**
+  String get communityTemplateGo;
+
+  /// No description provided for @communityTemplateCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shablon nusxalandi — guruhda joylang'**
+  String get communityTemplateCopied;
+
+  /// No description provided for @communityTemplatePlace.
+  ///
+  /// In uz, this message translates to:
+  /// **'📍 Yangi joy\nNomi: \nTuri: masjid / oshxona / do‘kon\nManzil: \nXaritadagi havola: \nQo‘shimcha: '**
+  String get communityTemplatePlace;
+
+  /// No description provided for @communityTemplateBug.
+  ///
+  /// In uz, this message translates to:
+  /// **'🐛 Xato\nQaysi bo‘limda: \nNima bo‘ldi: \nNima bo‘lishi kerak edi: \n\nTelefon: {phone}\nIlova: {version}'**
+  String communityTemplateBug(String phone, String version);
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

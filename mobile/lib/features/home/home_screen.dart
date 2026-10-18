@@ -14,6 +14,8 @@ import '../prayers/prayers_screen.dart';
 import '../links/links_screen.dart';
 import '../parcel/parcel_controller.dart';
 import '../parcel/parcel_screen.dart';
+import '../support/community_screen.dart';
+import '../support/donation_screen.dart';
 import '../qibla/qibla_screen.dart';
 import 'feature_catalog.dart';
 import 'prayer_card.dart';
@@ -116,6 +118,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       'qibla' => (BuildContext _) => QiblaScreen(services: _services),
       'parcel' => (BuildContext _) => ParcelScreen(services: _services),
       'links' => (BuildContext _) => LinksScreen(services: _services),
+      'donation' => (BuildContext _) => DonationScreen(services: _services),
+      'community' => (BuildContext _) => CommunityScreen(services: _services),
       _ => null,
     };
     if (native != null) {

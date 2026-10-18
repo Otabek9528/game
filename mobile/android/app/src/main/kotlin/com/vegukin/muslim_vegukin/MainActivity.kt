@@ -1,6 +1,8 @@
 package com.vegukin.muslim_vegukin
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +16,7 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
+import java.io.ByteArrayOutputStream
 
 class MainActivity : FlutterActivity() {
     private var camera: QiblaCamera? = null
@@ -116,6 +119,36 @@ class MainActivity : FlutterActivity() {
             }
         }
 
+        /** "vegukin/system": other apps and this phone, see lib/core/system.dart. */
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/system").setMethodCallHandler { call, result ->
+            when (call.method) {
+                // Of the apps asked about, the ones installed, with their icons.
+                "installed" -> result.success(
+                    (call.arguments as List<*>).filterIsInstance<String>()
+                        .filter { packageManager.getLaunchIntentForPackage(it) != null }
+                        .map { mapOf("package" to it, "icon" to iconPng(it)) },
+                )
+                "open" -> {
+                    val launch = packageManager.getLaunchIntentForPackage(call.arguments as String)
+                    if (launch != null) startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    result.success(launch != null)
+                }
+                "device" -> {
+                    val info = packageManager.getPackageInfo(packageName, 0)
+                    val code = if (Build.VERSION.SDK_INT >= 28) info.longVersionCode else @Suppress("DEPRECATION") info.versionCode.toLong()
+                    result.success(
+                        mapOf(
+                            "manufacturer" to Build.MANUFACTURER,
+                            "model" to Build.MODEL,
+                            "android" to Build.VERSION.RELEASE,
+                            "version" to "${info.versionName} ($code)",
+                        ),
+                    )
+                }
+                else -> result.notImplemented()
+            }
+        }
+
         /** "vegukin/share": Android's share sheet, see lib/core/share.dart. */
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/share").setMethodCallHandler { call, result ->
             when (call.method) {
@@ -129,6 +162,17 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+    }
+
+    /** An app's launcher icon as a PNG, 96 px square. */
+    private fun iconPng(pkg: String): ByteArray? = try {
+        val drawable = packageManager.getApplicationIcon(pkg)
+        val bitmap = Bitmap.createBitmap(96, 96, Bitmap.Config.ARGB_8888)
+        drawable.setBounds(0, 0, 96, 96)
+        drawable.draw(Canvas(bitmap))
+        ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }.toByteArray()
+    } catch (e: Exception) {
+        null
     }
 
     override fun onDestroy() {

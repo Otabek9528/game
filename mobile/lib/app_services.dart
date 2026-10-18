@@ -8,6 +8,7 @@ import 'core/config.dart';
 import 'core/key_value_store.dart';
 import 'core/links.dart';
 import 'core/share.dart' as share;
+import 'core/system.dart';
 import 'core/locale_controller.dart';
 import 'core/theme_controller.dart';
 import 'features/home/feature_catalog.dart';
@@ -139,6 +140,7 @@ class AppServices {
     this.openLink = openExternalLink,
     this.shareText = share.shareText,
     this.linksScript = fetchLinksScript,
+    this.system = const AndroidSystem(),
   });
 
   final KeyValueStore store;
@@ -162,4 +164,7 @@ class AppServices {
 
   /// The web page's links script, to keep the links page up to date.
   final LinksScriptSource linksScript;
+
+  /// Other apps on the phone (banking apps), and the phone itself.
+  final SystemBridge system;
 }

@@ -1078,6 +1078,222 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get donationTitle => 'Donation';
+
+  @override
+  String get donationHeroTitle => 'Support the project';
+
+  @override
+  String get donationHeroSubtitle => 'With your help the project will grow';
+
+  @override
+  String get donationMessage =>
+      'If this bot has been useful to you and you would like to contribute to its operation and development, you can send any amount to the account below.';
+
+  @override
+  String get donationName => 'Name';
+
+  @override
+  String get donationAccount => 'Account number';
+
+  @override
+  String get donationCopied => 'Copied!';
+
+  @override
+  String get donationUsageTitle => 'Collected funds will be used for';
+
+  @override
+  String get donationUsage1 => 'Server and hosting costs';
+
+  @override
+  String get donationUsage2 => 'Technical maintenance and regular updates';
+
+  @override
+  String get donationUsage3 => 'Developer work and project development';
+
+  @override
+  String get donationThanksText =>
+      'Any contribution from you is very important to us!';
+
+  @override
+  String get donationThanks => 'Thank you!';
+
+  @override
+  String get communityTitle => 'Community';
+
+  @override
+  String get communityHeroTitle => 'Official Telegram Group';
+
+  @override
+  String get communityHeroSubtitle => 'Bot users community';
+
+  @override
+  String get communityJoinNow => 'Join now';
+
+  @override
+  String get communityPurposeTitle => 'Group purpose';
+
+  @override
+  String get communityPurposeText =>
+      'This group is the official discussion platform for Muslim Vegukin Bot users. Here you can discuss all bot-related topics.';
+
+  @override
+  String get communityAllowedTitle => 'Group discussion topics';
+
+  @override
+  String get communityTopicPlaceTitle => 'Report new locations';
+
+  @override
+  String get communityTopicPlaceBody =>
+      'If a new mosque, restaurant or shop needs to be added';
+
+  @override
+  String get communityTopicIdeaTitle => 'Suggestions and ideas';
+
+  @override
+  String get communityTopicIdeaBody => 'Your thoughts on improving the bot';
+
+  @override
+  String get communityTopicBugTitle => 'Bug reports';
+
+  @override
+  String get communityTopicBugBody => 'If you find a problem in the bot';
+
+  @override
+  String get communityTopicNewsTitle => 'Bot news';
+
+  @override
+  String get communityTopicNewsBody =>
+      'Announcements about new features and changes';
+
+  @override
+  String get communityTopicBetaTitle => 'Beta version discussions';
+
+  @override
+  String get communityTopicBetaBody =>
+      'Testing new features before public release';
+
+  @override
+  String get communityTopicQuestionTitle => 'Questions about the bot';
+
+  @override
+  String get communityTopicQuestionBody => 'How to use, about features';
+
+  @override
+  String get communityTopicPeopleTitle => 'Community interaction';
+
+  @override
+  String get communityTopicPeopleBody => 'Sharing experiences with other users';
+
+  @override
+  String get communityRulesTitle => 'Group rules';
+
+  @override
+  String get communityRulesWarning =>
+      'The following types of messages will be deleted';
+
+  @override
+  String get communityBanned1Title => 'Ads and sales announcements';
+
+  @override
+  String get communityBanned1Body => 'Any buy or sell advertisements';
+
+  @override
+  String get communityBanned2Title => 'Course advertisements';
+
+  @override
+  String get communityBanned2Body => 'Language courses, learning centers, etc.';
+
+  @override
+  String get communityBanned3Title => 'Non-bot related questions';
+
+  @override
+  String get communityBanned3Body => 'Use other groups for general questions';
+
+  @override
+  String get communityBanned4Title => 'Spam and repetitive messages';
+
+  @override
+  String get communityBanned4Body => 'Sending the same messages repeatedly';
+
+  @override
+  String get communityBanned5Title => 'Off-topic discussions';
+
+  @override
+  String get communityBanned5Body => 'Conversations unrelated to the bot';
+
+  @override
+  String get communityPenaltyTitle => 'Warning';
+
+  @override
+  String get communityPenaltyText =>
+      'Messages violating rules will be deleted. If repeated, the user will be restricted from sending messages.';
+
+  @override
+  String get communityCta =>
+      'We invite you to join the group while following the rules!';
+
+  @override
+  String get donationTransfer => 'Bank transfer';
+
+  @override
+  String get donationBank => 'Bank';
+
+  @override
+  String get donationCopyAccount => 'Copy account number';
+
+  @override
+  String get donationCopyName => 'Copy name';
+
+  @override
+  String get donationOpenApp => 'Transfer in your bank app';
+
+  @override
+  String get donationOpenAppHint =>
+      'The account number is copied — paste it in the app';
+
+  @override
+  String get donationPasteHint => 'Account number copied — paste it in the app';
+
+  @override
+  String get donationShare => 'Share the details';
+
+  @override
+  String get donationAsk => 'Questions and ideas: our group';
+
+  @override
+  String get communityCopyLink => 'Copy link';
+
+  @override
+  String get communityLinkCopied => 'Link copied';
+
+  @override
+  String get communityShare => 'Share';
+
+  @override
+  String get communityMore => 'Also in the group';
+
+  @override
+  String get communityTemplateHint =>
+      'The template will be copied. Paste it in the group and fill it in.';
+
+  @override
+  String get communityTemplateGo => 'Copy and open the group';
+
+  @override
+  String get communityTemplateCopied =>
+      'Template copied — paste it in the group';
+
+  @override
+  String get communityTemplatePlace =>
+      '📍 New place\nName: \nType: mosque / restaurant / shop\nAddress: \nMap link: \nNotes: ';
+
+  @override
+  String communityTemplateBug(String phone, String version) {
+    return '🐛 Bug\nWhere: \nWhat happened: \nWhat should have happened: \n\nPhone: $phone\nApp: $version';
+  }
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

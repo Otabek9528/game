@@ -7,6 +7,7 @@ import 'package:muslim_vegukin/app.dart';
 import 'package:muslim_vegukin/app_services.dart';
 import 'package:muslim_vegukin/core/key_value_store.dart';
 import 'package:muslim_vegukin/core/locale_controller.dart';
+import 'package:muslim_vegukin/core/system.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/parcel/parcel_models.dart';
@@ -216,6 +217,7 @@ class TestApp {
       openLink: (uri) async => links.add(uri),
       shareText: (text) async => shared.add(text),
       linksScript: () async => linksScript,
+      system: system,
     );
   }
 
@@ -235,6 +237,7 @@ class TestApp {
 
   /// The web page's links script; null: not reachable.
   String? linksScript;
+  final system = FakeSystem();
   late final PrayerController prayer;
   late final FakePermissions permissions;
   late final ReminderController reminders;
@@ -376,4 +379,24 @@ class FakeParcels implements ParcelSource {
   @override
   Future<List<ParcelPost>> postsByCity(String city, ParcelCountry country, ParcelDirection direction) =>
       _answer('by-city $city ${country.api} ${direction.api}', [...posts['18.10.2026']!]);
+}
+
+/// Two banking apps installed, a Galaxy S22+ on Android 14.
+class FakeSystem implements SystemBridge {
+  List<String> installed = ['viva.republica.toss', 'com.kebhana.hanapush'];
+  final opened = <String>[];
+
+  @override
+  Future<List<InstalledApp>> installedApps(List<String> packages) async =>
+      [for (final p in packages) if (installed.contains(p)) InstalledApp(p, null)];
+
+  @override
+  Future<bool> openApp(String package) async {
+    opened.add(package);
+    return installed.contains(package);
+  }
+
+  @override
+  Future<DeviceInfo?> device() async =>
+      const DeviceInfo(phone: 'samsung SM-S906N', android: '14', version: '1.0.0 (1)');
 }
