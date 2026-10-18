@@ -489,6 +489,30 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Namoz vaqtlari uchun ilovani oching'**
   String get widgetOpenApp;
+
+  /// No description provided for @exactAlarmsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vidjet aniq ishlashi uchun'**
+  String get exactAlarmsTitle;
+
+  /// Offered once when a home-screen widget exists and Android 14+ keeps the exact-alarm permission off.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz vaqti kirishi bilan vidjet keyingi namozga o‘tishi uchun «Signal va eslatmalar» ruxsatini yoqing.'**
+  String get exactAlarmsBody;
+
+  /// No description provided for @exactAlarmsAllow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get exactAlarmsAllow;
+
+  /// No description provided for @exactAlarmsLater.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyinroq'**
+  String get exactAlarmsLater;
 }
 
 class _AppLocalizationsDelegate

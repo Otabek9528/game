@@ -58,6 +58,23 @@ void main() {
     expect(find.text('UNTIL DHUHR'), findsOneWidget);
   });
 
+  testWidgets('a widget without exact alarms: explained and offered once', (tester) async {
+    final app = TestApp(language: 'en')..permissions.exactAlarmsMissing = true;
+    await app.launch(tester);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Keep the widget on time'), findsOneWidget);
+    await tester.tap(find.text('Turn on'));
+    await tester.pumpAndSettle();
+    expect(app.permissions.exactAlarmSettingsOpened, 1);
+
+    // Back from the settings page: not asked again.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(find.text('Keep the widget on time'), findsNothing);
+  });
+
   testWidgets('blocked location points to the app settings', (tester) async {
     await TestApp(
       language: 'en',

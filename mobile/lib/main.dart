@@ -39,7 +39,7 @@ Future<void> main() async {
   final services = AppServices(
     locale: locale,
     prayer: prayer,
-    permissions: DevicePermissions(store, prayer),
+    permissions: DevicePermissions(store, prayer, homeWidget),
     openFeature: openWebFeature,
     homeWidget: homeWidget,
   );

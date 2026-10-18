@@ -7,6 +7,10 @@
     <!-- The ingredient scanner reads barcodes with the camera. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- The home-screen widget switches to the next prayer on the dot. Android
+         14+ keeps this off until the user allows "Alarms & reminders"; the app
+         offers that once, when a widget is on the home screen. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:label="Muslim Vegukin"
@@ -35,7 +39,8 @@
             </intent-filter>
         </activity>
         <!-- Home-screen widgets: widget/PrayerWidgets.kt. The large one also
-             hears clock, time zone and language changes, and redraws both. -->
+             hears clock, time zone, language and alarm-permission changes, and
+             redraws both. -->
         <receiver
             android:name=".widget.LargePrayerWidget"
             android:exported="false"
@@ -45,6 +50,7 @@
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

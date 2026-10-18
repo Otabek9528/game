@@ -34,9 +34,9 @@ class SmallPrayerWidget : PrayerWidgetProvider()
 /**
  * Both widgets. They redraw when Android asks (every 30 minutes, see
  * res/xml/widget_prayer_*_info.xml), when the app sends new data, at each
- * prayer time and at midnight (an alarm set by [PrayerWidgets.scheduleNext]),
- * and when the clock or time zone changes. The countdown itself is a
- * Chronometer, which ticks every second by itself.
+ * prayer time, an hour before it and at midnight (alarms set by
+ * [PrayerWidgets.scheduleNext]), and when the clock or time zone changes.
+ * The countdown itself is a Chronometer, which ticks every second by itself.
  */
 abstract class PrayerWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
@@ -59,7 +59,8 @@ abstract class PrayerWidgetProvider : AppWidgetProvider() {
             PrayerWidgets.ACTION_TICK,
             Intent.ACTION_TIME_CHANGED,
             Intent.ACTION_TIMEZONE_CHANGED,
-            Intent.ACTION_LOCALE_CHANGED -> PrayerWidgets.updateAll(context)
+            Intent.ACTION_LOCALE_CHANGED,
+            AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> PrayerWidgets.updateAll(context)
         }
     }
 }
@@ -115,32 +116,35 @@ object PrayerWidgets {
 
         views.setViewVisibility(R.id.widget_content, View.VISIBLE)
         views.setViewVisibility(R.id.widget_empty, View.GONE)
-        views.setTextViewText(R.id.brand, data.brand)
         views.setTextViewText(R.id.city, data.city ?: "")
         views.setOnClickPendingIntent(R.id.city_chip, openApp(context, ACTION_REFRESH_LOCATION))
 
         views.setTextViewText(R.id.until, data.until[moment.next])
         // Chronometer counts down to the next prayer by itself, every second.
-        val base = SystemClock.elapsedRealtime() + (moment.nextAt - now)
-        views.setChronometer(R.id.countdown, base, null, true)
+        val remaining = moment.nextAt - now
+        val base = SystemClock.elapsedRealtime() + remaining
+        views.setChronometer(R.id.countdown, base, countdownFormat(context, remaining), true)
         views.setChronometerCountDown(R.id.countdown, true)
 
         val day = moment.day
         if (large) {
             views.setTextViewText(R.id.date_line1, day.line1)
             views.setTextViewText(R.id.date_line2, day.line2)
+            // As in the app: the window we are in is filled, the next one is
+            // coloured.
             for (i in 0 until 6) {
                 val current = i == moment.current
+                val marked = current || i == moment.next
                 views.setTextViewText(names[i], data.names[i])
                 views.setTextViewText(times[i], hhmm(day.times[i]))
                 views.setInt(cells[i], "setBackgroundResource", if (current) R.drawable.widget_cell_current else 0)
-                tint(context, views, names[i], if (current) R.color.widget_accent else R.color.widget_faint)
+                tint(context, views, names[i], if (marked) R.color.widget_accent else R.color.widget_faint)
                 tint(
                     context,
                     views,
                     times[i],
                     when {
-                        current -> R.color.widget_accent
+                        marked -> R.color.widget_accent
                         i == 1 -> R.color.widget_soft // sunrise ends a window, it starts no prayer
                         else -> R.color.widget_ink
                     },
@@ -156,6 +160,22 @@ object PrayerWidgets {
 
         views.setImageViewBitmap(R.id.rail, rail(context, manager, id, large, moment.dayFraction))
         manager.updateAppWidget(id, views)
+    }
+
+    /**
+     * HH:MM:SS, as in the app. Chronometer drops leading zeros (7:41:58,
+     * 41:58), so they are added back for the hour range we are in; the alarm
+     * an hour before each prayer moves to the next range. Without exact
+     * alarms that move could come late, so Android's own format stays.
+     */
+    private fun countdownFormat(context: Context, remaining: Long): String? {
+        if (!canAlarmExactly(context)) return null
+        val hours = remaining / HOUR_MS
+        return when {
+            hours >= 10 -> null
+            hours >= 1 -> "0%s"
+            else -> "00:%s"
+        }
     }
 
     /** Text colour from a day/night colour resource; follows the theme on Android 12+. */
@@ -188,25 +208,51 @@ object PrayerWidgets {
     // ------------------------------------------------------------- schedule
 
     /**
-     * Wakes the widgets at the next prayer time or midnight, whichever comes
-     * first. A non-waking alarm with a one-minute window: it needs no special
-     * permission and, while the screen is off (nobody looking), waits until the
-     * phone wakes, then fires straight away.
+     * Redraws the widgets at the next moment their content changes: a prayer
+     * time (the countdown moves on to the next prayer), an hour or ten hours
+     * before it (the countdown's format), or midnight (a new day). Exact when
+     * Android allows it ("Alarms & reminders", asked once by the app); it
+     * then also wakes the phone, so the widget is right the moment the screen
+     * turns on. Otherwise Android may run it up to ten minutes late.
      */
     private fun scheduleNext(context: Context) {
         val now = System.currentTimeMillis()
-        val nextPrayer = load(context)?.momentAt(now)?.nextAt
         val midnight = Calendar.getInstance().apply {
             timeInMillis = now
             add(Calendar.DAY_OF_YEAR, 1)
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 1)
+            set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
-        val at = minOf(nextPrayer ?: midnight, midnight) + 1000
+        val exact = canAlarmExactly(context)
+        val marks = mutableListOf(midnight)
+        load(context)?.momentAt(now)?.nextAt?.let { next ->
+            marks += next
+            if (exact) marks += listOf(next - HOUR_MS, next - 10 * HOUR_MS)
+        }
+        // A moment after the mark, so the redraw lands on the new side of it.
+        val at = marks.filter { it > now }.min() + 200
         val alarms = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarms.setWindow(AlarmManager.RTC, at, 60_000L, tickIntent(context))
+        if (exact) {
+            alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, tickIntent(context))
+        } else {
+            alarms.setWindow(AlarmManager.RTC, at, 60_000L, tickIntent(context))
+        }
+    }
+
+    /** Android 12+ needs "Alarms & reminders" for exact alarms. */
+    fun canAlarmExactly(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < 31) return true
+        return (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).canScheduleExactAlarms()
+    }
+
+    /** A widget is on the home screen, but its alarms can't be exact. */
+    fun exactAlarmsMissing(context: Context): Boolean {
+        if (canAlarmExactly(context)) return false
+        val manager = AppWidgetManager.getInstance(context)
+        return listOf(LargePrayerWidget::class.java, SmallPrayerWidget::class.java)
+            .any { manager.getAppWidgetIds(ComponentName(context, it)).isNotEmpty() }
     }
 
     private fun cancelSchedule(context: Context) {
@@ -269,6 +315,7 @@ object PrayerWidgets {
         return bitmap
     }
 
+    private const val HOUR_MS = 60 * 60 * 1000L
     private const val GOLD = 0xFFEAB932.toInt()
     private const val GOLD_DEEP = 0xFFB5860A.toInt()
 

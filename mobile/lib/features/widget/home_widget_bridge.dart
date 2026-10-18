@@ -37,6 +37,29 @@ class HomeWidgetBridge {
     }
   }
 
+  /// True when a widget is on the home screen but Android won't let it
+  /// switch to the next prayer on the dot ("Alarms & reminders" is off).
+  Future<bool> exactAlarmsMissing() async {
+    try {
+      return await _channel.invokeMethod<bool>('exactAlarmsMissing') ?? false;
+    } on MissingPluginException {
+      return false;
+    } on PlatformException {
+      return false;
+    }
+  }
+
+  /// The system page where "Alarms & reminders" is allowed for this app.
+  Future<void> openExactAlarmSettings() async {
+    try {
+      await _channel.invokeMethod<void>('openExactAlarmSettings');
+    } on MissingPluginException {
+      // Not on Android.
+    } on PlatformException catch (e) {
+      debugPrint('Opening alarm settings failed: $e');
+    }
+  }
+
   /// What the user tapped on a widget to open the app, once:
   /// `refresh_location` (the city) or null.
   Future<String?> takeLaunchAction() async {

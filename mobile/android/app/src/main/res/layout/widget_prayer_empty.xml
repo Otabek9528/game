@@ -15,14 +15,13 @@
         android:importantForAccessibility="no"
         android:src="@drawable/ic_widget_bot" />
 
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:fontFamily="@font/playfair_display_bold"
-        android:text="@string/widget_brand"
-        android:textColor="@color/widget_ink"
-        android:textSize="14sp" />
+        android:layout_height="15dp"
+        android:layout_marginTop="8dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/widget_brand"
+        android:src="@drawable/ic_widget_wordmark" />
 
     <TextView
         android:id="@+id/empty_message"

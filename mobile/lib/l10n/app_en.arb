@@ -64,5 +64,9 @@
   "webReload": "Reload",
   "webOpenInBrowser": "Open in browser",
   "cameraDenied": "Camera access is off for this app",
-  "widgetOpenApp": "Open the app to see prayer times"
+  "widgetOpenApp": "Open the app to see prayer times",
+  "exactAlarmsTitle": "Keep the widget on time",
+  "exactAlarmsBody": "To let the widget switch to the next prayer right on time, turn on “Alarms & reminders”.",
+  "exactAlarmsAllow": "Turn on",
+  "exactAlarmsLater": "Not now"
 }

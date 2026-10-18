@@ -246,4 +246,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetOpenApp => 'Open the app to see prayer times';
+
+  @override
+  String get exactAlarmsTitle => 'Keep the widget on time';
+
+  @override
+  String get exactAlarmsBody =>
+      'To let the widget switch to the next prayer right on time, turn on “Alarms & reminders”.';
+
+  @override
+  String get exactAlarmsAllow => 'Turn on';
+
+  @override
+  String get exactAlarmsLater => 'Not now';
 }

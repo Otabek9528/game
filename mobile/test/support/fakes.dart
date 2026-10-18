@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/app.dart';
 import 'package:muslim_vegukin/app_services.dart';
@@ -120,6 +121,20 @@ class FakePermissions implements PermissionsGate {
     await prayer.locate(userAsked: true);
   }
 
+  /// A widget is on the home screen without "Alarms & reminders".
+  bool exactAlarmsMissing = false;
+  bool _exactAlarmsOffered = false;
+  int exactAlarmSettingsOpened = 0;
+
+  @override
+  Future<bool> shouldOfferExactAlarms() async {
+    if (!exactAlarmsMissing || _exactAlarmsOffered) return false;
+    return _exactAlarmsOffered = true;
+  }
+
+  @override
+  Future<void> openExactAlarmSettings() async => exactAlarmSettingsOpened++;
+
   @override
   Future<bool> cameraGranted() async => camera;
 
@@ -206,6 +221,10 @@ class TestApp {
     tester.platformDispatcher.textScaleFactorTestValue = textScale;
     addTearDown(tester.view.reset);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    // No Android widgets here: their channel answers "nothing" straight away.
+    const widgetChannel = MethodChannel('vegukin/widget');
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(widgetChannel, (call) async => null);
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(widgetChannel, null));
 
     await prayer.start();
     await tester.pumpWidget(VegukinApp(services: services, deviceLocales: device));

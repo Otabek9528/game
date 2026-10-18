@@ -2,5 +2,5 @@
 <!-- Behind the time of the window we are in. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <solid android:color="@color/widget_current_bg" />
-    <corners android:radius="9dp" />
+    <corners android:radius="12dp" />
 </shape>

@@ -257,4 +257,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get widgetOpenApp => 'Откройте приложение, чтобы увидеть время намаза';
+
+  @override
+  String get exactAlarmsTitle => 'Точное время для виджета';
+
+  @override
+  String get exactAlarmsBody =>
+      'Чтобы виджет переключался на следующий намаз ровно в его время, включите разрешение «Будильники и напоминания».';
+
+  @override
+  String get exactAlarmsAllow => 'Включить';
+
+  @override
+  String get exactAlarmsLater => 'Позже';
 }

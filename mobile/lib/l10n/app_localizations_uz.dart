@@ -217,4 +217,17 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get widgetOpenApp => 'Namoz vaqtlari uchun ilovani oching';
+
+  @override
+  String get exactAlarmsTitle => 'Vidjet aniq ishlashi uchun';
+
+  @override
+  String get exactAlarmsBody =>
+      'Namoz vaqti kirishi bilan vidjet keyingi namozga o‘tishi uchun «Signal va eslatmalar» ruxsatini yoqing.';
+
+  @override
+  String get exactAlarmsAllow => 'Yoqish';
+
+  @override
+  String get exactAlarmsLater => 'Keyinroq';
 }

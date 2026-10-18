@@ -52,6 +52,12 @@ abstract interface class PermissionsGate {
   /// Location, then camera — only the first time it is called.
   Future<void> askOnce();
 
+  /// True once, the first time a home-screen widget needs "Alarms &
+  /// reminders" to switch prayers on time; the caller explains and offers it.
+  Future<bool> shouldOfferExactAlarms();
+
+  Future<void> openExactAlarmSettings();
+
   /// Whether the camera may be used, without asking.
   Future<bool> cameraGranted();
 
@@ -59,10 +65,11 @@ abstract interface class PermissionsGate {
 }
 
 class DevicePermissions implements PermissionsGate {
-  DevicePermissions(this._store, this._prayer);
+  DevicePermissions(this._store, this._prayer, this._widget);
 
   final KeyValueStore _store;
   final PrayerController _prayer;
+  final HomeWidgetBridge _widget;
 
   @override
   Future<void> askOnce() async {
@@ -73,6 +80,17 @@ class DevicePermissions implements PermissionsGate {
       await ph.Permission.camera.request();
     } catch (_) {}
   }
+
+  @override
+  Future<bool> shouldOfferExactAlarms() async {
+    if (_store.read('exact_alarms_asked') != null) return false;
+    if (!await _widget.exactAlarmsMissing()) return false;
+    await _store.write('exact_alarms_asked', '1');
+    return true;
+  }
+
+  @override
+  Future<void> openExactAlarmSettings() => _widget.openExactAlarmSettings();
 
   @override
   Future<bool> cameraGranted() async {

@@ -36,7 +36,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _services.permissions.askOnce();
       await _takeWidgetAction();
+      await _offerExactAlarms();
     });
+  }
+
+  /// A widget was added and Android 14+ keeps "Alarms & reminders" off:
+  /// without it the widget's countdown can't switch on the dot. Asked once.
+  Future<void> _offerExactAlarms() async {
+    if (!await _services.permissions.shouldOfferExactAlarms() || !mounted) return;
+    final s = AppLocalizations.of(context);
+    final allow = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(s.exactAlarmsTitle),
+        content: Text(s.exactAlarmsBody),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(s.exactAlarmsLater)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(s.exactAlarmsAllow)),
+        ],
+      ),
+    );
+    if (allow ?? false) await _services.permissions.openExactAlarmSettings();
   }
 
   /// Opened by tapping the city on a home-screen widget: refresh it.
@@ -58,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // location): pick up a new day, a stale location or a new permission.
     if (state == AppLifecycleState.resumed) {
       _services.prayer.refresh();
-      _takeWidgetAction();
+      _takeWidgetAction().then((_) => _offerExactAlarms());
     }
   }
 
