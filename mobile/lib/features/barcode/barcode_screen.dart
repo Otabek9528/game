@@ -754,11 +754,14 @@ class _StoreTile extends StatelessWidget {
         child: SizedBox(
           height: 124,
           child: store == null
-              ? Center(
-                  child: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(15)),
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(12)),
+                    ),
                   ),
                 )
               : Opacity(
@@ -767,11 +770,12 @@ class _StoreTile extends StatelessWidget {
                     children: [
                       Positioned.fill(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(6, 14, 6, 10),
+                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
                           child: Column(
                             children: [
-                              StoreEmblem(store.store, size: 52, padding: 7),
-                              const SizedBox(height: 8),
+                              // The tile's full width: wide logos as large as square ones.
+                              StoreEmblem(store.store, height: 52, width: double.infinity),
+                              const SizedBox(height: 10),
                               Text(
                                 store.store,
                                 maxLines: 1,
@@ -790,8 +794,8 @@ class _StoreTile extends StatelessWidget {
                       ),
                       if (store.isSoon)
                         Positioned(
-                          top: 6,
-                          right: 6,
+                          top: 3,
+                          right: 3,
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(color: p.gold, borderRadius: BorderRadius.circular(8)),

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_camera.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_models.dart';
+import 'package:muslim_vegukin/features/barcode/barcode_parts.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_screen.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_source.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_store_screen.dart';
@@ -55,6 +58,50 @@ Future<void> tapInSheet(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
   await tester.tap(inSheet(finder));
   await tester.pumpAndSettle();
+}
+
+/// Image downloads: each address asked for is kept, and every one fails.
+class FailingImages implements HttpClient {
+  FailingImages(this.asked);
+
+  final List<Uri> asked;
+
+  @override
+  bool autoUncompress = true;
+
+  @override
+  Future<HttpClientRequest> getUrl(Uri url) async {
+    asked.add(url);
+    return _NotFoundRequest();
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+class _NotFoundRequest implements HttpClientRequest {
+  @override
+  Future<HttpClientResponse> close() async => _NotFound();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+class _NotFound extends Stream<List<int>> implements HttpClientResponse {
+  @override
+  int get statusCode => 404;
+
+  @override
+  StreamSubscription<List<int>> listen(
+    void Function(List<int>)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) =>
+      const Stream<List<int>>.empty().listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }
 
 const cola = '8801043014809';
@@ -127,6 +174,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(InteractiveViewer), findsNothing);
       expect(inSheet(find.text('Permissible')), findsOneWidget);
+    });
+
+    testWidgets('a photo comes shrunk from the image service; the original if that fails', (tester) async {
+      final asked = <Uri>[];
+      debugNetworkImageHttpClientProvider = () => FailingImages(asked);
+      try {
+        final app = await openScanner(tester);
+        app.cameras.single.read(cola);
+        await tester.pumpAndSettle();
+      } finally {
+        // Flutter checks it is back to null before the test ends.
+        debugNetworkImageHttpClientProvider = null;
+      }
+
+      final original = 'https://vegukin-api.duckdns.org/api/v2/image/$cola.jpg';
+      expect(asked.first.host, 'wsrv.nl');
+      expect(asked.first.queryParameters, containsPair('url', original));
+      expect(asked.first.queryParameters, containsPair('w', '600'));
+      expect(asked.first.queryParameters, containsPair('output', 'webp'));
+      expect(asked.last.toString(), original);
+      expect(inSheet(find.byIcon(Icons.inventory_2_outlined)), findsOneWidget, reason: 'neither could give it');
     });
 
     testWidgets('not in the database: said so, as on the web page', (tester) async {
@@ -303,6 +371,25 @@ void main() {
       expect(Product.fromJson({'barcode': '1', 'image': ''}).imageUrl, isNull);
       expect(Product.fromJson({'barcode': '1', 'verdict': 'NOJOIZ'}).verdict, Verdict.nojoiz);
     });
+  });
+
+  test('photo addresses: a card size and a full size, or the original', () {
+    final original = Uri.parse('https://vegukin-api.duckdns.org/api/v2/image/1.jpg');
+    final card = Uri.parse((productImage(original, PhotoSize.card) as NetworkImage).url);
+    expect(card.queryParameters, {
+      'url': '$original',
+      'w': '600',
+      'h': '600',
+      'fit': 'outside',
+      'q': '72',
+      'we': '',
+      'output': 'webp',
+    });
+    final full = Uri.parse((productImage(original, PhotoSize.full) as NetworkImage).url);
+    expect(full.queryParameters, containsPair('w', '1600'));
+    final direct = productImage(original, PhotoSize.card, direct: true) as ResizeImage;
+    expect((direct.imageProvider as NetworkImage).url, '$original');
+    expect((productImage(original, PhotoSize.full, direct: true) as NetworkImage).url, '$original');
   });
 
   group('API', () {

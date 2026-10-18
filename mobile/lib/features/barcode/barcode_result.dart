@@ -334,7 +334,7 @@ class _WhereFound extends StatelessWidget {
           if (inStore)
             Row(
               children: [
-                StoreEmblem(store, size: 32, padding: 4),
+                StoreEmblem(store, height: 32, maxWidth: 84),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text.rich(
@@ -379,7 +379,7 @@ class _WhereFound extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        StoreEmblem(other, size: 24, padding: 3),
+                        StoreEmblem(other, height: 24, maxWidth: 62),
                         const SizedBox(width: 6),
                         Text(other, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink)),
                       ],
@@ -707,19 +707,31 @@ class _PhotoScreen extends StatelessWidget {
                 maxScale: 5,
                 child: Hero(
                   tag: '$url',
-                  child: Image.network(
-                    url.toString(),
+                  child: NetworkPhoto(
+                    url,
+                    size: PhotoSize.full,
                     fit: BoxFit.contain,
-                    loadingBuilder: (context, child, progress) => progress == null
-                        ? child
-                        : const Center(
-                            child: SizedBox.square(
-                              dimension: 34,
-                              child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
-                            ),
+                    // The card's photo, already loaded: shown at once, and
+                    // sharpened when the full one arrives.
+                    loading: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        NetworkPhoto(
+                          url,
+                          size: PhotoSize.card,
+                          fit: BoxFit.contain,
+                          placeholder: const SizedBox.expand(),
+                        ),
+                        const Align(
+                          alignment: Alignment(0, 0.9),
+                          child: SizedBox.square(
+                            dimension: 26,
+                            child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white70),
                           ),
-                    errorBuilder: (_, _, _) =>
-                        const Center(child: Icon(Icons.broken_image_outlined, size: 48, color: Colors.white54)),
+                        ),
+                      ],
+                    ),
+                    placeholder: const Center(child: Icon(Icons.broken_image_outlined, size: 48, color: Colors.white54)),
                   ),
                 ),
               ),

@@ -159,7 +159,7 @@ class _StoreScreenState extends State<StoreScreen> {
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
                     child: Row(
                       children: [
-                        StoreEmblem(widget.store.store, size: 64, padding: 8),
+                        StoreEmblem(widget.store.store, height: 64, maxWidth: 170),
                         const SizedBox(width: 14),
                         Expanded(
                           child: Column(

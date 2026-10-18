@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/config.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 import 'barcode_models.dart';
@@ -41,44 +42,175 @@ class VerdictStyle {
       };
 }
 
-/// The stores' logos, bundled as on the web page.
-const _emblems = {
-  'No Brand': 'nobrand.png',
-  'Emart24': 'emart24.png',
-  '7-Eleven': '7_11.png',
-  'GS25': 'gs25.png',
-  'CU': 'cu.png',
-  'Daiso': 'daiso.png',
+/// A store's logo file, its shape (width over height), and its own
+/// background colour when it has one.
+class _Logo {
+  const _Logo(this.file, this.aspect, [this.background]);
+
+  final String file;
+  final double aspect;
+  final Color? background;
+}
+
+/// The stores' logos, bundled as on the web page; trimmed of their margins
+/// (and 7-Eleven of the checkerboard drawn into it).
+const _logos = {
+  'No Brand': _Logo('nobrand.png', 1, Color(0xFFFDB316)),
+  'Emart24': _Logo('emart24.png', 5.04),
+  '7-Eleven': _Logo('7_11.png', 5.58),
+  'GS25': _Logo('gs25.png', 3.16),
+  'CU': _Logo('cu.png', 1.61, Color(0xFF652D8E)),
+  'Daiso': _Logo('daiso.png', 0.9),
 };
 
-/// A store's logo on a white tile; its initials when there is none.
+/// A store's logo in a frame shaped to it: [height] tall and as wide as the
+/// logo wants, up to [maxWidth]; or exactly [width]. A logo with a colour of
+/// its own fills the frame in that colour, edge to edge; the others sit on
+/// white. Initials when there is no logo.
 class StoreEmblem extends StatelessWidget {
-  const StoreEmblem(this.store, {super.key, this.size = 44, this.padding = 6});
+  const StoreEmblem(this.store, {super.key, this.height = 44, this.width, this.maxWidth});
 
   final String store;
-  final double size;
-  final double padding;
+  final double height;
+  final double? width;
+  final double? maxWidth;
 
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    final file = _emblems[store];
+    final logo = _logos[store];
+    final background = logo?.background;
     return Container(
-      width: size,
-      height: size,
-      padding: EdgeInsets.all(padding),
+      width: width ?? (height * (logo?.aspect ?? 1)).clamp(height, maxWidth ?? height * 2.6),
+      height: height,
+      padding: background == null
+          ? EdgeInsets.symmetric(horizontal: height * 0.16, vertical: height * 0.18)
+          : EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(size * 0.28),
-        border: Border.all(color: p.hairline),
+        color: background ?? Colors.white,
+        borderRadius: BorderRadius.circular(height * 0.24),
+        border: background == null ? Border.all(color: p.hairline) : null,
       ),
       alignment: Alignment.center,
-      child: file == null
+      child: logo == null
           ? Text(
               store.characters.take(2).toString().toUpperCase(),
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: size * 0.3, color: Brand.emerald700),
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: height * 0.32, color: Brand.emerald700),
             )
-          : Image.asset('assets/stores/$file', fit: BoxFit.contain),
+          : Image.asset('assets/stores/${logo.file}', fit: BoxFit.contain),
+    );
+  }
+}
+
+/// How big a product photo is fetched.
+enum PhotoSize {
+  /// Cards and thumbnails: 600 px on the short side, sharp across a card.
+  card,
+
+  /// Full screen: 1600 px wide, room to zoom.
+  full,
+}
+
+/// Where [original] is fetched at [size]: through [AppConfig.photoService],
+/// tens of kilobytes for a card instead of the original's hundreds or
+/// thousands; or, [direct], from the API itself, decoded near the size
+/// shown so a long list doesn't fill the memory.
+ImageProvider productImage(Uri original, PhotoSize size, {bool direct = false}) {
+  if (direct) {
+    final image = NetworkImage('$original');
+    return size == PhotoSize.full
+        ? image
+        : ResizeImage(image, width: 1000, height: 1000, policy: ResizeImagePolicy.fit);
+  }
+  final shape = switch (size) {
+    PhotoSize.card => 'w=600&h=600&fit=outside&q=72',
+    PhotoSize.full => 'w=1600&q=82',
+  };
+  // `we`: never enlarged past the original.
+  return NetworkImage('${AppConfig.photoService}?url=${Uri.encodeComponent('$original')}&$shape&we&output=webp');
+}
+
+/// A product photo at [size], from [AppConfig.photoService] or else from
+/// the API: [loading] until it arrives (then it fades in), [placeholder] if
+/// neither can give it.
+class NetworkPhoto extends StatefulWidget {
+  const NetworkPhoto(
+    this.url, {
+    super.key,
+    required this.size,
+    required this.placeholder,
+    this.loading,
+    this.fit = BoxFit.cover,
+  });
+
+  final Uri url;
+  final PhotoSize size;
+  final Widget placeholder;
+  final Widget? loading;
+  final BoxFit fit;
+
+  @override
+  State<NetworkPhoto> createState() => _NetworkPhotoState();
+}
+
+class _NetworkPhotoState extends State<NetworkPhoto> {
+  /// Photos the service failed and the API then gave. After two, the
+  /// service is skipped for the rest of the session: it is the service, not
+  /// the photos.
+  static int _serviceMisses = 0;
+
+  late bool _direct = _serviceMisses >= 2;
+  bool _fellBack = false;
+
+  @override
+  void didUpdateWidget(NetworkPhoto old) {
+    super.didUpdateWidget(old);
+    if (old.url != widget.url || old.size != widget.size) {
+      _direct = _serviceMisses >= 2;
+      _fellBack = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loading = widget.loading ?? const SizedBox.expand();
+    return Image(
+      image: productImage(widget.url, widget.size, direct: _direct),
+      fit: widget.fit,
+      width: double.infinity,
+      height: double.infinity,
+      gaplessPlayback: true,
+      frameBuilder: (context, child, frame, sync) {
+        if (sync) return child;
+        if (frame != null && _fellBack) {
+          _fellBack = false;
+          _serviceMisses++;
+        }
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            loading,
+            AnimatedOpacity(
+              opacity: frame == null ? 0 : 1,
+              duration: const Duration(milliseconds: 220),
+              child: child,
+            ),
+          ],
+        );
+      },
+      errorBuilder: (context, _, _) {
+        if (_direct) return widget.placeholder;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _direct = true;
+              _fellBack = true;
+            });
+          }
+        });
+        return loading;
+      },
     );
   }
 }
@@ -100,27 +232,11 @@ class ProductPhoto extends StatelessWidget {
       child: Center(child: Icon(Icons.inventory_2_outlined, size: iconSize, color: p.inkMuted)),
     );
     if (url == null) return placeholder;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        ImageProvider image = NetworkImage(url.toString());
-        // Decoded near the size shown, not at the photo's own: a phone photo
-        // is 1080×1920, and a store's list of them at full size scrolls
-        // slowly and fills the memory. Twice the frame's long side, so a
-        // photo of any shape still covers the frame sharply.
-        if (constraints.biggest.isFinite) {
-          final side = (constraints.biggest.longestSide * MediaQuery.devicePixelRatioOf(context) * 2).round();
-          image = ResizeImage(image, width: side, height: side, policy: ResizeImagePolicy.fit);
-        }
-        return Image(
-          image: image,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-          errorBuilder: (_, _, _) => placeholder,
-          frameBuilder: (context, child, frame, sync) =>
-              frame == null && !sync ? ColoredBox(color: p.cardSelected) : child,
-        );
-      },
+    return NetworkPhoto(
+      url,
+      size: PhotoSize.card,
+      placeholder: placeholder,
+      loading: ColoredBox(color: p.cardSelected),
     );
   }
 }

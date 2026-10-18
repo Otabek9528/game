@@ -10,6 +10,12 @@ abstract final class AppConfig {
   /// The Muslim Vegukin API (places, business directory, …).
   static final apiBase = Uri.parse('https://vegukin-api.duckdns.org/');
 
+  /// Shrinks the ingredient check's product photos for the phone: resized,
+  /// sent as WebP, cached on Cloudflare (wsrv.nl, free). The originals on
+  /// the API stay as they are, and are fetched directly when this can't
+  /// help.
+  static final photoService = Uri.parse('https://wsrv.nl/');
+
   /// Prayer times, same source and parameters as the web app.
   static final prayerApiBase = Uri.parse('https://api.aladhan.com/v1/');
 
