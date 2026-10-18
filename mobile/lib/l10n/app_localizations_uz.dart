@@ -763,6 +763,103 @@ class AppLocalizationsUz extends AppLocalizations {
   String get qiblaSunCheckCamera => 'Kamerada tekshirish';
 
   @override
+  String get parcelTitle => 'Pochta yuborish';
+
+  @override
+  String get parcelTagline => 'Kuryer topib, pochtangizni yetkazing';
+
+  @override
+  String get parcelFrom => 'Qayerdan';
+
+  @override
+  String get parcelTo => 'Qayerga';
+
+  @override
+  String get parcelSwap => 'Yo‘nalishni almashtirish';
+
+  @override
+  String get parcelUzbekistan => 'O‘zbekiston';
+
+  @override
+  String get parcelKorea => 'Koreya';
+
+  @override
+  String get parcelUzbToKor => 'O‘zbekistondan Koreyaga';
+
+  @override
+  String get parcelKorToUzb => 'Koreyadan O‘zbekistonga';
+
+  @override
+  String get parcelByDate => 'Sana bo‘yicha';
+
+  @override
+  String get parcelByCity => 'Shahar bo‘yicha';
+
+  @override
+  String parcelPostCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta e’lon',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get parcelNoDates => 'Bu yo‘nalishda hozircha e’lonlar yo‘q';
+
+  @override
+  String get parcelNoPosts => 'E’lonlar topilmadi';
+
+  @override
+  String get parcelNoCities => 'Shaharlar topilmadi';
+
+  @override
+  String parcelSeeOther(String route) {
+    return 'Boshqa yo‘nalish: $route';
+  }
+
+  @override
+  String get parcelError =>
+      'Ma’lumotni yuklab bo‘lmadi. Internetni tekshirib, qaytadan urinib ko‘ring.';
+
+  @override
+  String get parcelHowTitle => 'Qanday ishlaydi?';
+
+  @override
+  String get parcelHow1 => 'Yo‘nalish va qidiruv usulini tanlang';
+
+  @override
+  String get parcelHow2 => 'E’lonni ko‘rib chiqing va kuryer bilan bog‘laning';
+
+  @override
+  String get parcelHow3 => 'Pochtangizni xavfsiz yetkazing!';
+
+  @override
+  String get parcelWriteTelegram => 'Telegramda yozish';
+
+  @override
+  String get parcelCall => 'Qo‘ng‘iroq qilish';
+
+  @override
+  String get parcelCopy => 'Nusxa olish';
+
+  @override
+  String get parcelCopied => 'Nusxa olindi';
+
+  @override
+  String get parcelContactInText => 'Kuryer kontakti xabarda ko‘rsatilgan';
+
+  @override
+  String get parcelShowMore => 'Ko‘proq';
+
+  @override
+  String get parcelShowLess => 'Yig‘ish';
+
+  @override
+  String get parcelSearchCity => 'Shaharni qidirish';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

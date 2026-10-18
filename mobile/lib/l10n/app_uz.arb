@@ -511,6 +511,49 @@
     }
   },
   "qiblaSunCheckCamera": "Kamerada tekshirish",
+  "parcelTitle": "Pochta yuborish",
+  "parcelTagline": "Kuryer topib, pochtangizni yetkazing",
+  "parcelFrom": "Qayerdan",
+  "parcelTo": "Qayerga",
+  "parcelSwap": "Yo‘nalishni almashtirish",
+  "parcelUzbekistan": "O‘zbekiston",
+  "parcelKorea": "Koreya",
+  "parcelUzbToKor": "O‘zbekistondan Koreyaga",
+  "parcelKorToUzb": "Koreyadan O‘zbekistonga",
+  "parcelByDate": "Sana bo‘yicha",
+  "parcelByCity": "Shahar bo‘yicha",
+  "parcelPostCount": "{count, plural, other{{count} ta e’lon}}",
+  "@parcelPostCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "parcelNoDates": "Bu yo‘nalishda hozircha e’lonlar yo‘q",
+  "parcelNoPosts": "E’lonlar topilmadi",
+  "parcelNoCities": "Shaharlar topilmadi",
+  "parcelSeeOther": "Boshqa yo‘nalish: {route}",
+  "@parcelSeeOther": {
+    "placeholders": {
+      "route": {
+        "type": "String"
+      }
+    }
+  },
+  "parcelError": "Ma’lumotni yuklab bo‘lmadi. Internetni tekshirib, qaytadan urinib ko‘ring.",
+  "parcelHowTitle": "Qanday ishlaydi?",
+  "parcelHow1": "Yo‘nalish va qidiruv usulini tanlang",
+  "parcelHow2": "E’lonni ko‘rib chiqing va kuryer bilan bog‘laning",
+  "parcelHow3": "Pochtangizni xavfsiz yetkazing!",
+  "parcelWriteTelegram": "Telegramda yozish",
+  "parcelCall": "Qo‘ng‘iroq qilish",
+  "parcelCopy": "Nusxa olish",
+  "parcelCopied": "Nusxa olindi",
+  "parcelContactInText": "Kuryer kontakti xabarda ko‘rsatilgan",
+  "parcelShowMore": "Ko‘proq",
+  "parcelShowLess": "Yig‘ish",
+  "parcelSearchCity": "Shaharni qidirish",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

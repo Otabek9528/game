@@ -64,7 +64,7 @@ const featureGrid = [
   Feature(id: 'cars', emoji: '🚘', path: 'pages/cars/cars.html', isNew: true, uzbekOnly: true),
   Feature(id: 'hikorea', emoji: '🛂', path: 'pages/hikorea/hikorea.html', isNew: true),
   Feature(id: 'jobs', emoji: '💼', path: 'pages/job-group/job-group.html', uzbekOnly: true),
-  Feature(id: 'parcel', emoji: '📦', path: 'pages/parcel/parcel.html', uzbekOnly: true),
+  Feature(id: 'parcel', emoji: '📦', path: 'pages/parcel/parcel.html'),
   Feature(id: 'links', emoji: '🔗', path: 'pages/links/links.html', uzbekOnly: true),
   Feature(id: 'donation', emoji: '🤝', path: 'pages/donation/donation.html'),
   Feature(id: 'community', emoji: '👥', path: 'pages/community/community.html'),

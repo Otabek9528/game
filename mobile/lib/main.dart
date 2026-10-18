@@ -40,6 +40,7 @@ Future<void> main() async {
   final homeWidget = HomeWidgetBridge();
   final reminders = ReminderController(store);
   final services = AppServices(
+    store: store,
     locale: locale,
     theme: ThemeController(store),
     prayer: prayer,

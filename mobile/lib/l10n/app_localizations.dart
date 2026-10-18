@@ -1450,6 +1450,180 @@ abstract class AppLocalizations {
   /// **'Kamerada tekshirish'**
   String get qiblaSunCheckCamera;
 
+  /// No description provided for @parcelTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pochta yuborish'**
+  String get parcelTitle;
+
+  /// No description provided for @parcelTagline.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuryer topib, pochtangizni yetkazing'**
+  String get parcelTagline;
+
+  /// No description provided for @parcelFrom.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayerdan'**
+  String get parcelFrom;
+
+  /// No description provided for @parcelTo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayerga'**
+  String get parcelTo;
+
+  /// No description provided for @parcelSwap.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yo‘nalishni almashtirish'**
+  String get parcelSwap;
+
+  /// No description provided for @parcelUzbekistan.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zbekiston'**
+  String get parcelUzbekistan;
+
+  /// No description provided for @parcelKorea.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreya'**
+  String get parcelKorea;
+
+  /// No description provided for @parcelUzbToKor.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zbekistondan Koreyaga'**
+  String get parcelUzbToKor;
+
+  /// No description provided for @parcelKorToUzb.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreyadan O‘zbekistonga'**
+  String get parcelKorToUzb;
+
+  /// No description provided for @parcelByDate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sana bo‘yicha'**
+  String get parcelByDate;
+
+  /// No description provided for @parcelByCity.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shahar bo‘yicha'**
+  String get parcelByCity;
+
+  /// No description provided for @parcelPostCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} ta e’lon}}'**
+  String parcelPostCount(int count);
+
+  /// No description provided for @parcelNoDates.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yo‘nalishda hozircha e’lonlar yo‘q'**
+  String get parcelNoDates;
+
+  /// No description provided for @parcelNoPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlar topilmadi'**
+  String get parcelNoPosts;
+
+  /// No description provided for @parcelNoCities.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shaharlar topilmadi'**
+  String get parcelNoCities;
+
+  /// No description provided for @parcelSeeOther.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa yo‘nalish: {route}'**
+  String parcelSeeOther(String route);
+
+  /// No description provided for @parcelError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumotni yuklab bo‘lmadi. Internetni tekshirib, qaytadan urinib ko‘ring.'**
+  String get parcelError;
+
+  /// No description provided for @parcelHowTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday ishlaydi?'**
+  String get parcelHowTitle;
+
+  /// No description provided for @parcelHow1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yo‘nalish va qidiruv usulini tanlang'**
+  String get parcelHow1;
+
+  /// No description provided for @parcelHow2.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni ko‘rib chiqing va kuryer bilan bog‘laning'**
+  String get parcelHow2;
+
+  /// No description provided for @parcelHow3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Pochtangizni xavfsiz yetkazing!'**
+  String get parcelHow3;
+
+  /// No description provided for @parcelWriteTelegram.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegramda yozish'**
+  String get parcelWriteTelegram;
+
+  /// No description provided for @parcelCall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘ng‘iroq qilish'**
+  String get parcelCall;
+
+  /// No description provided for @parcelCopy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxa olish'**
+  String get parcelCopy;
+
+  /// No description provided for @parcelCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxa olindi'**
+  String get parcelCopied;
+
+  /// No description provided for @parcelContactInText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuryer kontakti xabarda ko‘rsatilgan'**
+  String get parcelContactInText;
+
+  /// No description provided for @parcelShowMore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘proq'**
+  String get parcelShowMore;
+
+  /// No description provided for @parcelShowLess.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yig‘ish'**
+  String get parcelShowLess;
+
+  /// No description provided for @parcelSearchCity.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shaharni qidirish'**
+  String get parcelSearchCity;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

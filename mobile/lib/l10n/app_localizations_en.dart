@@ -787,6 +787,103 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaSunCheckCamera => 'Check with the camera';
 
   @override
+  String get parcelTitle => 'Send a parcel';
+
+  @override
+  String get parcelTagline => 'Find a courier to carry your parcel';
+
+  @override
+  String get parcelFrom => 'From';
+
+  @override
+  String get parcelTo => 'To';
+
+  @override
+  String get parcelSwap => 'Swap direction';
+
+  @override
+  String get parcelUzbekistan => 'Uzbekistan';
+
+  @override
+  String get parcelKorea => 'Korea';
+
+  @override
+  String get parcelUzbToKor => 'Uzbekistan to Korea';
+
+  @override
+  String get parcelKorToUzb => 'Korea to Uzbekistan';
+
+  @override
+  String get parcelByDate => 'By date';
+
+  @override
+  String get parcelByCity => 'By city';
+
+  @override
+  String parcelPostCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count posts',
+      one: '1 post',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get parcelNoDates => 'No posts in this direction yet';
+
+  @override
+  String get parcelNoPosts => 'No posts found';
+
+  @override
+  String get parcelNoCities => 'No cities found';
+
+  @override
+  String parcelSeeOther(String route) {
+    return 'Other direction: $route';
+  }
+
+  @override
+  String get parcelError => 'Couldn’t load. Check your internet and try again.';
+
+  @override
+  String get parcelHowTitle => 'How it works';
+
+  @override
+  String get parcelHow1 => 'Choose a direction and how to search';
+
+  @override
+  String get parcelHow2 => 'Read a post and contact the courier';
+
+  @override
+  String get parcelHow3 => 'Send your parcel safely!';
+
+  @override
+  String get parcelWriteTelegram => 'Message on Telegram';
+
+  @override
+  String get parcelCall => 'Call';
+
+  @override
+  String get parcelCopy => 'Copy';
+
+  @override
+  String get parcelCopied => 'Copied';
+
+  @override
+  String get parcelContactInText => 'The courier’s contact is in the message';
+
+  @override
+  String get parcelShowMore => 'More';
+
+  @override
+  String get parcelShowLess => 'Less';
+
+  @override
+  String get parcelSearchCity => 'Search a city';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

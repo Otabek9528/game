@@ -10,6 +10,7 @@ import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
+import '../parcel/parcel_screen.dart';
 import '../qibla/qibla_screen.dart';
 import 'feature_catalog.dart';
 import 'prayer_card.dart';
@@ -104,11 +105,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _open(Feature feature) {
     HapticFeedback.lightImpact();
-    if (feature.id == 'qibla') {
-      // Native: the phone's full sensors and camera.
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => QiblaScreen(services: _services)),
-      );
+    final native = switch (feature.id) {
+      // The phone's full sensors and camera.
+      'qibla' => (BuildContext _) => QiblaScreen(services: _services),
+      'parcel' => (BuildContext _) => ParcelScreen(services: _services),
+      _ => null,
+    };
+    if (native != null) {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: native));
       return;
     }
     _services.openFeature(context, feature, _services);

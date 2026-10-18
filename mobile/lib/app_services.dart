@@ -6,9 +6,11 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 
 import 'core/config.dart';
 import 'core/key_value_store.dart';
+import 'core/links.dart';
 import 'core/locale_controller.dart';
 import 'core/theme_controller.dart';
 import 'features/home/feature_catalog.dart';
+import 'features/parcel/parcel_source.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/qibla/qibla_sensors.dart';
 import 'features/reminders/reminder_controller.dart';
@@ -121,6 +123,7 @@ class DevicePermissions implements PermissionsGate {
 /// Everything the screens need, created once in main().
 class AppServices {
   const AppServices({
+    required this.store,
     required this.locale,
     required this.theme,
     required this.prayer,
@@ -130,7 +133,11 @@ class AppServices {
     required this.reminders,
     this.qiblaDevice = const AndroidQiblaDevice(),
     this.businessStats = BusinessStats.fetch,
+    this.parcels = const HttpParcelSource(),
+    this.openLink = openExternalLink,
   });
+
+  final KeyValueStore store;
 
   final LocaleController locale;
   final ThemeController theme;
@@ -141,4 +148,8 @@ class AppServices {
   final ReminderController reminders;
   final QiblaDevice qiblaDevice;
   final Future<BusinessStats?> Function() businessStats;
+  final ParcelSource parcels;
+
+  /// Telegram, the dialer, the browser.
+  final Future<void> Function(Uri) openLink;
 }

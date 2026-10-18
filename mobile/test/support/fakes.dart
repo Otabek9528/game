@@ -9,6 +9,8 @@ import 'package:muslim_vegukin/core/key_value_store.dart';
 import 'package:muslim_vegukin/core/locale_controller.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
+import 'package:muslim_vegukin/features/parcel/parcel_models.dart';
+import 'package:muslim_vegukin/features/parcel/parcel_source.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
@@ -184,7 +186,9 @@ class TestApp {
     MemoryStore? store,
     DateTime? now,
     BusinessStats? stats = const BusinessStats(businesses: 5, categories: 10),
+    FakeParcels? parcels,
   })  : languageStore = MemoryLanguageStore(language),
+        parcels = parcels ?? FakeParcels(),
         location = location ?? FakeLocation(),
         times = times ?? FakeTimes(),
         store = store ?? MemoryStore() {
@@ -198,6 +202,7 @@ class TestApp {
     permissions = FakePermissions(prayer);
     reminders = ReminderController(this.store);
     services = AppServices(
+      store: this.store,
       locale: LocaleController(languageStore),
       theme: ThemeController(this.store),
       prayer: prayer,
@@ -207,6 +212,8 @@ class TestApp {
       reminders: reminders,
       qiblaDevice: qibla,
       businessStats: () async => stats,
+      parcels: this.parcels,
+      openLink: (uri) async => links.add(uri),
     );
   }
 
@@ -216,6 +223,10 @@ class TestApp {
   final MemoryStore store;
   final opened = OpenedFeatures();
   final qibla = FakeQiblaDevice();
+  final FakeParcels parcels;
+
+  /// What the app opened outside itself: Telegram, the dialer, the browser.
+  final links = <Uri>[];
   late final PrayerController prayer;
   late final FakePermissions permissions;
   late final ReminderController reminders;
@@ -302,4 +313,59 @@ class FakeQiblaDevice implements QiblaDevice {
 
   @override
   Future<void> stopCamera() async {}
+}
+
+/// Parcel posts: two days and two cities from Korea to Uzbekistan, one day
+/// the other way. [fail] makes every request fail.
+class FakeParcels implements ParcelSource {
+  bool fail = false;
+  final requests = <String>[];
+
+  static final korToUzbDates = [
+    ParcelDate(date: DateTime(2026, 10, 18), key: '18.10.2026', count: 2),
+    ParcelDate(date: DateTime(2026, 10, 21), key: '21.10.2026', count: 1),
+  ];
+
+  static final uzbToKorDates = [ParcelDate(date: DateTime(2026, 10, 25), key: '25.10.2026', count: 1)];
+
+  static final posts = {
+    '18.10.2026': [
+      const ParcelPost(
+        text: 'Toshkentga uchaman. 1 kg — 15 000 won. Tel: 010-1234-5678',
+        username: 'akmal_kuryer',
+        flightTime: '18.10.2026 14:30',
+      ),
+      const ParcelPost(text: 'Samarqandga pochta olaman, +998 90 123 45 67', flightTime: '18.10.2026'),
+    ],
+    '21.10.2026': [const ParcelPost(text: 'Buxoroga. @bobur_cargo ga yozing', flightTime: '21.10.2026')],
+    '25.10.2026': [const ParcelPost(text: 'Seulga olib boraman', username: 'dilshod')],
+  };
+
+  Future<T> _answer<T>(String request, T value) async {
+    requests.add(request);
+    if (fail) throw const ParcelException('offline');
+    return value;
+  }
+
+  @override
+  Future<List<ParcelDate>> dates(ParcelDirection direction) => _answer(
+        'dates ${direction.api}',
+        direction == ParcelDirection.korToUzb ? korToUzbDates : uzbToKorDates,
+      );
+
+  @override
+  Future<List<ParcelPost>> postsByDate(String date, ParcelDirection direction) =>
+      _answer('by-date $date ${direction.api}', posts[date] ?? const []);
+
+  @override
+  Future<List<ParcelCity>> cities(ParcelCountry country, ParcelDirection direction) => _answer(
+        'cities ${country.api} ${direction.api}',
+        country == ParcelCountry.kor
+            ? const [ParcelCity(name: 'Ansan', count: 2), ParcelCity(name: 'Seul', count: 1)]
+            : const [ParcelCity(name: 'Toshkent', count: 3)],
+      );
+
+  @override
+  Future<List<ParcelPost>> postsByCity(String city, ParcelCountry country, ParcelDirection direction) =>
+      _answer('by-city $city ${country.api} ${direction.api}', [...posts['18.10.2026']!]);
 }

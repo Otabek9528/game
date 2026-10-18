@@ -802,6 +802,106 @@ class AppLocalizationsRu extends AppLocalizations {
   String get qiblaSunCheckCamera => 'Проверить камерой';
 
   @override
+  String get parcelTitle => 'Отправка посылок';
+
+  @override
+  String get parcelTagline => 'Найдите курьера и передайте посылку';
+
+  @override
+  String get parcelFrom => 'Откуда';
+
+  @override
+  String get parcelTo => 'Куда';
+
+  @override
+  String get parcelSwap => 'Поменять направление';
+
+  @override
+  String get parcelUzbekistan => 'Узбекистан';
+
+  @override
+  String get parcelKorea => 'Корея';
+
+  @override
+  String get parcelUzbToKor => 'Из Узбекистана в Корею';
+
+  @override
+  String get parcelKorToUzb => 'Из Кореи в Узбекистан';
+
+  @override
+  String get parcelByDate => 'По дате';
+
+  @override
+  String get parcelByCity => 'По городу';
+
+  @override
+  String parcelPostCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count объявления',
+      many: '$count объявлений',
+      few: '$count объявления',
+      one: '$count объявление',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get parcelNoDates => 'В этом направлении пока нет объявлений';
+
+  @override
+  String get parcelNoPosts => 'Объявления не найдены';
+
+  @override
+  String get parcelNoCities => 'Города не найдены';
+
+  @override
+  String parcelSeeOther(String route) {
+    return 'Другое направление: $route';
+  }
+
+  @override
+  String get parcelError =>
+      'Не удалось загрузить. Проверьте интернет и попробуйте ещё раз.';
+
+  @override
+  String get parcelHowTitle => 'Как это работает?';
+
+  @override
+  String get parcelHow1 => 'Выберите направление и способ поиска';
+
+  @override
+  String get parcelHow2 => 'Прочитайте объявление и свяжитесь с курьером';
+
+  @override
+  String get parcelHow3 => 'Передайте посылку безопасно!';
+
+  @override
+  String get parcelWriteTelegram => 'Написать в Telegram';
+
+  @override
+  String get parcelCall => 'Позвонить';
+
+  @override
+  String get parcelCopy => 'Копировать';
+
+  @override
+  String get parcelCopied => 'Скопировано';
+
+  @override
+  String get parcelContactInText => 'Контакт курьера указан в сообщении';
+
+  @override
+  String get parcelShowMore => 'Ещё';
+
+  @override
+  String get parcelShowLess => 'Свернуть';
+
+  @override
+  String get parcelSearchCity => 'Поиск города';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override
