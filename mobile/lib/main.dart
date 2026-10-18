@@ -8,6 +8,7 @@ import 'app_services.dart';
 import 'core/app_language.dart';
 import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
+import 'core/theme_controller.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/prayer/prayer_sources.dart';
 import 'features/reminders/reminder_controller.dart';
@@ -40,6 +41,7 @@ Future<void> main() async {
   final reminders = ReminderController(store);
   final services = AppServices(
     locale: locale,
+    theme: ThemeController(store),
     prayer: prayer,
     permissions: DevicePermissions(store, prayer, homeWidget),
     openFeature: openWebFeature,

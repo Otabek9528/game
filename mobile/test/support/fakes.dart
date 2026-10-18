@@ -7,6 +7,7 @@ import 'package:muslim_vegukin/app.dart';
 import 'package:muslim_vegukin/app_services.dart';
 import 'package:muslim_vegukin/core/key_value_store.dart';
 import 'package:muslim_vegukin/core/locale_controller.dart';
+import 'package:muslim_vegukin/core/theme_controller.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
@@ -198,6 +199,7 @@ class TestApp {
     reminders = ReminderController(this.store);
     services = AppServices(
       locale: LocaleController(languageStore),
+      theme: ThemeController(this.store),
       prayer: prayer,
       permissions: permissions,
       openFeature: opened.call,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../app_services.dart';
 import '../../core/app_language.dart';
@@ -215,6 +216,9 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
                 problem: _cameraProblem,
                 onOpenSettings: widget.services.permissions.openAppSettings,
                 instruction: turnInstruction(s, _c),
+                markerLabel: _c.qibla == null
+                    ? s.featureQibla
+                    : '${s.featureQibla} · ${NumberFormat.decimalPattern(language.code).format(_c.qibla!.distanceKm.round())} km',
               ),
             ),
           ),

@@ -521,5 +521,7 @@
   "qiblaCalGood": "Yaxshi! Davom eting...",
   "qiblaCalHoldStill": "Endi telefonni tekis ushlab, qimirlatmang...",
   "qiblaCalChecking": "Barqarorlik tekshirilmoqda...",
-  "qiblaCalDone": "✓ Kalibratsiya tayyor!"
+  "qiblaCalDone": "✓ Kalibratsiya tayyor!",
+  "themeToDay": "Kunduzgi rejim",
+  "themeToNight": "Tungi rejim"
 }

@@ -221,5 +221,7 @@
   "qiblaCalGood": "Good! Keep going...",
   "qiblaCalHoldStill": "Now hold your phone flat and still...",
   "qiblaCalChecking": "Checking stability...",
-  "qiblaCalDone": "✓ Calibration complete!"
+  "qiblaCalDone": "✓ Calibration complete!",
+  "themeToDay": "Day mode",
+  "themeToNight": "Night mode"
 }

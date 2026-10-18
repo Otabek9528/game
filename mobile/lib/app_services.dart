@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 import 'core/config.dart';
 import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
+import 'core/theme_controller.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/qibla/qibla_sensors.dart';
@@ -121,6 +122,7 @@ class DevicePermissions implements PermissionsGate {
 class AppServices {
   const AppServices({
     required this.locale,
+    required this.theme,
     required this.prayer,
     required this.permissions,
     required this.openFeature,
@@ -131,6 +133,7 @@ class AppServices {
   });
 
   final LocaleController locale;
+  final ThemeController theme;
   final PrayerController prayer;
   final PermissionsGate permissions;
   final FeatureOpener openFeature;

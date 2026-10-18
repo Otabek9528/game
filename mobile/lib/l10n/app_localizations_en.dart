@@ -779,4 +779,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiblaCalDone => '✓ Calibration complete!';
+
+  @override
+  String get themeToDay => 'Day mode';
+
+  @override
+  String get themeToNight => 'Night mode';
 }

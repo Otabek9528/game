@@ -221,5 +221,7 @@
   "qiblaCalGood": "Хорошо! Продолжайте...",
   "qiblaCalHoldStill": "Теперь держите телефон ровно и неподвижно...",
   "qiblaCalChecking": "Проверка стабильности...",
-  "qiblaCalDone": "✓ Калибровка завершена!"
+  "qiblaCalDone": "✓ Калибровка завершена!",
+  "themeToDay": "Дневной режим",
+  "themeToNight": "Ночной режим"
 }

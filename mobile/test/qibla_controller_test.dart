@@ -89,7 +89,28 @@ void main() {
     expect(c.expectedField, closeTo(51.34, 0.1));
     await feed(tester, d, 10, top: 300, field: 90);
     expect(c.issue, SignalIssue.interference);
-    expect(c.quality, 1);
+    // A warning, not a failing grade: the heading may still be right.
+    expect(c.quality, 2);
+    c.dispose();
+  });
+
+  testWidgets('the signal doesn\'t flicker when readings waver at an edge', (tester) async {
+    final (c, d) = await started(tester);
+    // No accuracy from the phone (as on a Galaxy S22): the rating comes from
+    // the heading's waver; the field wanders around the warning threshold.
+    final changes = <int>[];
+    var last = -1;
+    for (var i = 0; i < 150; i++) {
+      final noise = const [0.0, 2.6, -1.8, 3.1, -2.9, 0.4][i % 6];
+      now = now.add(const Duration(milliseconds: 33));
+      d.send(top: 300 + noise, accuracy: -1, status: 3, field: i.isEven ? 70 : 72);
+      await tester.pump(const Duration(milliseconds: 33));
+      if (c.quality != last) {
+        changes.add(c.quality);
+        last = c.quality;
+      }
+    }
+    expect(changes.length, lessThanOrEqualTo(3));
     c.dispose();
   });
 

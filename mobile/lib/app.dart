@@ -33,14 +33,15 @@ class _VegukinAppState extends State<VegukinApp> {
   @override
   Widget build(BuildContext context) {
     final locale = widget.services.locale;
+    final theme = widget.services.theme;
     return ListenableBuilder(
-      listenable: locale,
+      listenable: Listenable.merge([locale, theme]),
       builder: (context, _) => MaterialApp(
         title: 'Muslim Vegukin',
         debugShowCheckedModeBanner: false,
         theme: VegukinTheme.light,
         darkTheme: VegukinTheme.dark,
-        themeMode: ThemeMode.system,
+        themeMode: theme.mode,
         locale: (locale.language ?? _guess).locale,
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,

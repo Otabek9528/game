@@ -793,4 +793,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get qiblaCalDone => '✓ Калибровка завершена!';
+
+  @override
+  String get themeToDay => 'Дневной режим';
+
+  @override
+  String get themeToNight => 'Ночной режим';
 }

@@ -141,7 +141,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _Header(language: language, onLanguage: _openLanguage),
+            _Header(
+              language: language,
+              onLanguage: _openLanguage,
+              onTheme: () {
+                HapticFeedback.selectionClick();
+                _services.theme.toggle(Theme.of(context).brightness);
+              },
+            ),
             Expanded(
               child: RefreshIndicator(
                 onRefresh: _refresh,
@@ -212,10 +219,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.language, required this.onLanguage});
+  const _Header({required this.language, required this.onLanguage, required this.onTheme});
 
   final AppLanguage language;
   final VoidCallback onLanguage;
+
+  /// Day ↔ night.
+  final VoidCallback onTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -249,6 +259,8 @@ class _Header extends StatelessWidget {
                   ),
                 ),
               ),
+              _ThemeButton(onTap: onTheme),
+              const SizedBox(width: 8),
               Tooltip(
                 message: s.changeLanguage,
                 child: TextButton.icon(
@@ -493,6 +505,46 @@ class _UzTag extends StatelessWidget {
             fontWeight: FontWeight.w800,
             letterSpacing: 0.4,
             color: Brand.gold500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The sun at night, the moon by day: what a tap switches to.
+class _ThemeButton extends StatelessWidget {
+  const _ThemeButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Tooltip(
+      message: dark ? s.themeToDay : s.themeToNight,
+      child: Material(
+        color: Colors.white.withValues(alpha: 0.12),
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox.square(
+            dimension: 40,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => RotationTransition(
+                turns: Tween(begin: 0.6, end: 1.0).animate(animation),
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: Icon(
+                dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                key: ValueKey(dark),
+                size: 20,
+                color: dark ? Brand.gold300 : Colors.white,
+              ),
+            ),
           ),
         ),
       ),

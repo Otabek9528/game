@@ -120,6 +120,23 @@ void main() {
     expect(find.byType(PrayersScreen), findsOneWidget);
   });
 
+  testWidgets('the sun/moon button switches day and night, and remembers it', (tester) async {
+    final app = TestApp(language: 'en');
+    await app.launch(tester);
+    BuildContext home() => tester.element(find.byType(CustomScrollView));
+    expect(Theme.of(home()).brightness, Brightness.light);
+
+    await tester.tap(find.byTooltip('Night mode'));
+    await tester.pumpAndSettle();
+    expect(Theme.of(home()).brightness, Brightness.dark);
+    expect(app.store.read('theme_mode'), 'night');
+
+    await tester.tap(find.byTooltip('Day mode'));
+    await tester.pumpAndSettle();
+    expect(Theme.of(home()).brightness, Brightness.light);
+    expect(app.store.read('theme_mode'), 'day');
+  });
+
   testWidgets('home fits a small phone with very large text', (tester) async {
     await TestApp(language: 'ru').launch(tester, screen: const Size(320, 568), textScale: 1.8);
     // A layout overflow would already have failed the test.

@@ -754,4 +754,10 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get qiblaCalDone => '✓ Kalibratsiya tayyor!';
+
+  @override
+  String get themeToDay => 'Kunduzgi rejim';
+
+  @override
+  String get themeToNight => 'Tungi rejim';
 }

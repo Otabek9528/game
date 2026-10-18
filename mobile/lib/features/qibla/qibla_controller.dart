@@ -78,6 +78,20 @@ class QiblaController extends ChangeNotifier {
   bool _quickChecking = false;
   final _quickSamples = <double>[];
   final _history = <double>[];
+
+  /// The last second of headings: how much the compass wavers.
+  final _jitter = <double>[];
+
+  /// The field strength, averaged over about a second, and whether it is
+  /// far enough from the model's to call it disturbed. Separate thresholds
+  /// in and out, so it doesn't flip at the edge.
+  double? _field;
+  bool _disturbed = false;
+
+  /// The signal shown changes only once a new rating has held this long.
+  static const _settle = Duration(milliseconds: 1500);
+  (int, SignalIssue)? _pending;
+  DateTime _pendingSince = DateTime(0);
   bool _seeded = false;
   DateTime _calibrationStart = DateTime(0);
   double _lastMove = 0;
@@ -137,6 +151,7 @@ class QiblaController extends ChangeNotifier {
   void resume() {
     if (phase == QiblaPhase.noLocation || phase == QiblaPhase.noCompass) return;
     _history.clear();
+    _jitter.clear();
     _seeded = false;
     unawaited(_device.keepScreenOn(true));
     _listen();
@@ -161,6 +176,7 @@ class QiblaController extends ChangeNotifier {
     if (cameraMode == on) return;
     cameraMode = on;
     _history.clear();
+    _jitter.clear();
     _seeded = false;
     notifyListeners();
   }
@@ -197,33 +213,42 @@ class QiblaController extends ChangeNotifier {
 
     _history.add(trueHeading);
     if (_history.length > 5) _history.removeAt(0);
+    _jitter.add(trueHeading);
+    if (_jitter.length > 30) _jitter.removeAt(0);
     final filtered = _history.length < 3 ? trueHeading : circularStats(_history).mean;
-    heading = _seeded ? normalizeDegrees(heading + signedDifference(heading, filtered) * 0.35) : filtered;
+    // A little steadier through the camera, where a jumping marker shows.
+    final follow = cameraMode ? 0.25 : 0.35;
+    heading = _seeded ? normalizeDegrees(heading + signedDifference(heading, filtered) * follow) : filtered;
     _seeded = true;
 
+    _watchField(r);
     _rate(r);
     if (_quickChecking) _quickEvaluate(trueHeading, r);
     if (phase == QiblaPhase.calibrating) _calibrate(trueHeading, r);
     notifyListeners();
   }
 
-  bool _interference(CompassReading r) {
+  void _watchField(CompassReading r) {
     final expected = expectedField;
-    if (expected == null || r.field <= 0) return false;
-    return (r.field - expected).abs() / expected > 0.25;
+    if (expected == null || r.field <= 0) return;
+    _field = _field == null ? r.field : _field! * 0.95 + r.field * 0.05;
+    final off = (_field! - expected).abs() / expected;
+    if (!_disturbed && off > 0.35) _disturbed = true;
+    if (_disturbed && off < 0.25) _disturbed = false;
   }
 
-  /// 1–4 dots: Android's own accuracy estimate when it gives one, else the
-  /// heading's jitter; capped by the calibration state, tilt and
-  /// interference.
+  /// 1–4 dots: Android's own accuracy estimate when it gives one, else how
+  /// much the heading wavered over the last second; capped by the
+  /// calibration state, tilt and a disturbed field. Shown only once it has
+  /// held for a moment, so it doesn't flicker.
   void _rate(CompassReading r) {
     final int fromHeading;
     if (r.accuracy >= 0) {
       fromHeading = r.accuracy < 8 ? 4 : r.accuracy < 15 ? 3 : r.accuracy < 25 ? 2 : 1;
-    } else if (_history.length < 5) {
+    } else if (_jitter.length < 10) {
       fromHeading = 2;
     } else {
-      final std = circularStats(_history).std;
+      final std = circularStats(_jitter).std;
       fromHeading = std < 1.5 ? 4 : std < 4 ? 3 : std < 10 ? 2 : 1;
     }
     final fromStatus = switch (r.status) { 0 => 1, 1 => 2, 2 => 3, _ => 4 };
@@ -235,12 +260,31 @@ class QiblaController extends ChangeNotifier {
       q = 2;
       problem = SignalIssue.tilted;
     }
-    if (_interference(r)) {
-      q = 1;
+    // A field off from the model's often means metal nearby, but not always
+    // a wrong heading: a warning, not a failing grade.
+    if (_disturbed) {
+      q = math.min(q, 2);
       problem = SignalIssue.interference;
     }
-    quality = q;
-    issue = problem;
+    _show((q, problem));
+  }
+
+  void _show((int, SignalIssue) rating) {
+    final now = _clock();
+    if (quality == 0 || rating == (quality, issue)) {
+      quality = rating.$1;
+      issue = rating.$2;
+      _pending = null;
+      return;
+    }
+    if (rating != _pending) {
+      _pending = rating;
+      _pendingSince = now;
+    } else if (now.difference(_pendingSince) >= _settle) {
+      quality = rating.$1;
+      issue = rating.$2;
+      _pending = null;
+    }
   }
 
   // ---------------------------------------------------------------- quick check
@@ -265,7 +309,7 @@ class QiblaController extends ChangeNotifier {
     final recent = _quickSamples.sublist(_quickSamples.length - 8);
     final steady = circularStats(recent).std <= _stableStd;
     final calibrated = r.status >= 2 && (r.accuracy < 0 || r.accuracy < _accuracyGate);
-    if (steady && calibrated && r.tilt < _tiltWarn && !_interference(r)) {
+    if (steady && calibrated && r.tilt < _tiltWarn && !_disturbed) {
       _quickChecking = false;
       _quickTimer?.cancel();
       calibrationDone = true;
@@ -344,6 +388,7 @@ class QiblaController extends ChangeNotifier {
       Timer(const Duration(milliseconds: 500), () {
         if (phase == QiblaPhase.calibrating && calibrationDone) {
           _history.clear();
+          _jitter.clear();
           _seeded = false;
           _set(QiblaPhase.compass);
         }

@@ -1431,6 +1431,18 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'✓ Kalibratsiya tayyor!'**
   String get qiblaCalDone;
+
+  /// No description provided for @themeToDay.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kunduzgi rejim'**
+  String get themeToDay;
+
+  /// No description provided for @themeToNight.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tungi rejim'**
+  String get themeToNight;
 }
 
 class _AppLocalizationsDelegate
