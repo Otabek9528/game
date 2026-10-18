@@ -966,6 +966,130 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get linksTitle => 'Полезные ссылки';
+
+  @override
+  String linksSubtitle(int count) {
+    return 'Telegram-группы и каналы: $count';
+  }
+
+  @override
+  String get linksSearch => 'Группа, город или тема';
+
+  @override
+  String get linksJobs => 'Работа';
+
+  @override
+  String get linksLife => 'Жизнь в Корее';
+
+  @override
+  String get linksGroups => 'Группы';
+
+  @override
+  String get linksFavorites => 'Избранное';
+
+  @override
+  String get linksNearest => 'Рядом';
+
+  @override
+  String get linksByRegion => 'Регионы';
+
+  @override
+  String linksYourPlace(String city) {
+    return 'Вы здесь: $city';
+  }
+
+  @override
+  String get linksLocate =>
+      'Определите местоположение — ближайшие группы будут первыми';
+
+  @override
+  String get linksLocateButton => 'Определить';
+
+  @override
+  String get linksNationwide => 'Вся Корея';
+
+  @override
+  String get linksNearby => 'Поблизости';
+
+  @override
+  String get linksFarther => 'Другие города';
+
+  @override
+  String get linksRegionCapital => 'Сеул и Кёнгидо';
+
+  @override
+  String get linksRegionChungcheong => 'Чхунчхон';
+
+  @override
+  String get linksRegionJeolla => 'Чолла';
+
+  @override
+  String get linksRegionGyeongsang => 'Кёнсан';
+
+  @override
+  String get linksOther => 'Другие';
+
+  @override
+  String get linksTopicOfficial => 'Официальные';
+
+  @override
+  String get linksTopicNews => 'Новости и информация';
+
+  @override
+  String get linksTopicLegal => 'Право и визы';
+
+  @override
+  String get linksTopicInsurance => 'Страхование';
+
+  @override
+  String get linksTopicWork => 'Работа и карьера';
+
+  @override
+  String get linksTopicEveryday => 'Повседневная жизнь';
+
+  @override
+  String get linksForEveryone => 'Общая';
+
+  @override
+  String get linksForWomen => 'Для женщин';
+
+  @override
+  String get linksOurs => 'Наша группа: для предложений и вопросов';
+
+  @override
+  String get linksSuggestTitle => 'Вашей группы нет в списке?';
+
+  @override
+  String get linksSuggestBody => 'Напишите в группу Muslim Vegukin — добавим.';
+
+  @override
+  String get linksOpen => 'Открыть в Telegram';
+
+  @override
+  String get linksCopy => 'Скопировать ссылку';
+
+  @override
+  String get linksCopied => 'Ссылка скопирована';
+
+  @override
+  String get linksShare => 'Поделиться';
+
+  @override
+  String get linksFavorite => 'В избранное';
+
+  @override
+  String get linksUnfavorite => 'Убрать из избранного';
+
+  @override
+  String get linksNothing => 'Ничего не найдено';
+
+  @override
+  String linksResults(int count) {
+    return 'Найдено: $count';
+  }
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

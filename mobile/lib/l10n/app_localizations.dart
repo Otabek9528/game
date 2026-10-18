@@ -1732,6 +1732,240 @@ abstract class AppLocalizations {
   /// **'Assalomu alaykum! {route} reysingiz bo‘yicha pochta haqida yozyapman.'**
   String parcelDraftNoDate(String route);
 
+  /// No description provided for @linksTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Foydali linklar'**
+  String get linksTitle;
+
+  /// No description provided for @linksSubtitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta Telegram guruh va kanal'**
+  String linksSubtitle(int count);
+
+  /// No description provided for @linksSearch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruh, shahar yoki mavzu'**
+  String get linksSearch;
+
+  /// No description provided for @linksJobs.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish'**
+  String get linksJobs;
+
+  /// No description provided for @linksLife.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreya hayoti'**
+  String get linksLife;
+
+  /// No description provided for @linksGroups.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruhlar'**
+  String get linksGroups;
+
+  /// No description provided for @linksFavorites.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sevimlilar'**
+  String get linksFavorites;
+
+  /// No description provided for @linksNearest.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaqinlik'**
+  String get linksNearest;
+
+  /// No description provided for @linksByRegion.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hududlar'**
+  String get linksByRegion;
+
+  /// No description provided for @linksYourPlace.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvingiz: {city}'**
+  String linksYourPlace(String city);
+
+  /// No description provided for @linksLocate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvni aniqlang — yaqin guruhlar birinchi chiqadi'**
+  String get linksLocate;
+
+  /// No description provided for @linksLocateButton.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aniqlash'**
+  String get linksLocateButton;
+
+  /// No description provided for @linksNationwide.
+  ///
+  /// In uz, this message translates to:
+  /// **'Butun Koreya'**
+  String get linksNationwide;
+
+  /// No description provided for @linksNearby.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaqin atrofda'**
+  String get linksNearby;
+
+  /// No description provided for @linksFarther.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa shaharlar'**
+  String get linksFarther;
+
+  /// No description provided for @linksRegionCapital.
+  ///
+  /// In uz, this message translates to:
+  /// **'Seul va Gyeonggi'**
+  String get linksRegionCapital;
+
+  /// No description provided for @linksRegionChungcheong.
+  ///
+  /// In uz, this message translates to:
+  /// **'Chungcheong'**
+  String get linksRegionChungcheong;
+
+  /// No description provided for @linksRegionJeolla.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jeolla'**
+  String get linksRegionJeolla;
+
+  /// No description provided for @linksRegionGyeongsang.
+  ///
+  /// In uz, this message translates to:
+  /// **'Gyeongsang'**
+  String get linksRegionGyeongsang;
+
+  /// No description provided for @linksOther.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqalar'**
+  String get linksOther;
+
+  /// No description provided for @linksTopicOfficial.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rasmiy'**
+  String get linksTopicOfficial;
+
+  /// No description provided for @linksTopicNews.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangiliklar va ma’lumot'**
+  String get linksTopicNews;
+
+  /// No description provided for @linksTopicLegal.
+  ///
+  /// In uz, this message translates to:
+  /// **'Huquq va vizalar'**
+  String get linksTopicLegal;
+
+  /// No description provided for @linksTopicInsurance.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sug‘urta'**
+  String get linksTopicInsurance;
+
+  /// No description provided for @linksTopicWork.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish va karyera'**
+  String get linksTopicWork;
+
+  /// No description provided for @linksTopicEveryday.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kundalik hayot'**
+  String get linksTopicEveryday;
+
+  /// No description provided for @linksForEveryone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Umumiy'**
+  String get linksForEveryone;
+
+  /// No description provided for @linksForWomen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ayollar uchun'**
+  String get linksForWomen;
+
+  /// No description provided for @linksOurs.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bizning guruh: taklif va savollar uchun'**
+  String get linksOurs;
+
+  /// No description provided for @linksSuggestTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruhingiz ro‘yxatda yo‘qmi?'**
+  String get linksSuggestTitle;
+
+  /// No description provided for @linksSuggestBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin guruhiga yozing, qo‘shamiz.'**
+  String get linksSuggestBody;
+
+  /// No description provided for @linksOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegramda ochish'**
+  String get linksOpen;
+
+  /// No description provided for @linksCopy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havolani nusxalash'**
+  String get linksCopy;
+
+  /// No description provided for @linksCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havola nusxalandi'**
+  String get linksCopied;
+
+  /// No description provided for @linksShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get linksShare;
+
+  /// No description provided for @linksFavorite.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sevimlilarga qo‘shish'**
+  String get linksFavorite;
+
+  /// No description provided for @linksUnfavorite.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sevimlilardan olib tashlash'**
+  String get linksUnfavorite;
+
+  /// No description provided for @linksNothing.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsa topilmadi'**
+  String get linksNothing;
+
+  /// No description provided for @linksResults.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta natija'**
+  String linksResults(int count);
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

@@ -11,6 +11,7 @@ import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
+import '../links/links_screen.dart';
 import '../parcel/parcel_controller.dart';
 import '../parcel/parcel_screen.dart';
 import '../qibla/qibla_screen.dart';
@@ -114,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // The phone's full sensors and camera.
       'qibla' => (BuildContext _) => QiblaScreen(services: _services),
       'parcel' => (BuildContext _) => ParcelScreen(services: _services),
+      'links' => (BuildContext _) => LinksScreen(services: _services),
       _ => null,
     };
     if (native != null) {

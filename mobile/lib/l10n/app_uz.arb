@@ -599,6 +599,66 @@
       }
     }
   },
+  "linksTitle": "Foydali linklar",
+  "linksSubtitle": "{count} ta Telegram guruh va kanal",
+  "@linksSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "linksSearch": "Guruh, shahar yoki mavzu",
+  "linksJobs": "Ish",
+  "linksLife": "Koreya hayoti",
+  "linksGroups": "Guruhlar",
+  "linksFavorites": "Sevimlilar",
+  "linksNearest": "Yaqinlik",
+  "linksByRegion": "Hududlar",
+  "linksYourPlace": "Joylashuvingiz: {city}",
+  "@linksYourPlace": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "linksLocate": "Joylashuvni aniqlang — yaqin guruhlar birinchi chiqadi",
+  "linksLocateButton": "Aniqlash",
+  "linksNationwide": "Butun Koreya",
+  "linksNearby": "Yaqin atrofda",
+  "linksFarther": "Boshqa shaharlar",
+  "linksRegionCapital": "Seul va Gyeonggi",
+  "linksRegionChungcheong": "Chungcheong",
+  "linksRegionJeolla": "Jeolla",
+  "linksRegionGyeongsang": "Gyeongsang",
+  "linksOther": "Boshqalar",
+  "linksTopicOfficial": "Rasmiy",
+  "linksTopicNews": "Yangiliklar va ma’lumot",
+  "linksTopicLegal": "Huquq va vizalar",
+  "linksTopicInsurance": "Sug‘urta",
+  "linksTopicWork": "Ish va karyera",
+  "linksTopicEveryday": "Kundalik hayot",
+  "linksForEveryone": "Umumiy",
+  "linksForWomen": "Ayollar uchun",
+  "linksOurs": "Bizning guruh: taklif va savollar uchun",
+  "linksSuggestTitle": "Guruhingiz ro‘yxatda yo‘qmi?",
+  "linksSuggestBody": "Muslim Vegukin guruhiga yozing, qo‘shamiz.",
+  "linksOpen": "Telegramda ochish",
+  "linksCopy": "Havolani nusxalash",
+  "linksCopied": "Havola nusxalandi",
+  "linksShare": "Ulashish",
+  "linksFavorite": "Sevimlilarga qo‘shish",
+  "linksUnfavorite": "Sevimlilardan olib tashlash",
+  "linksNothing": "Hech narsa topilmadi",
+  "linksResults": "{count} ta natija",
+  "@linksResults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

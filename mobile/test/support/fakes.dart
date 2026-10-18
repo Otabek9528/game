@@ -215,6 +215,7 @@ class TestApp {
       parcels: this.parcels,
       openLink: (uri) async => links.add(uri),
       shareText: (text) async => shared.add(text),
+      linksScript: () async => linksScript,
     );
   }
 
@@ -231,6 +232,9 @@ class TestApp {
 
   /// What the app handed to the share sheet.
   final shared = <String>[];
+
+  /// The web page's links script; null: not reachable.
+  String? linksScript;
   late final PrayerController prayer;
   late final FakePermissions permissions;
   late final ReminderController reminders;

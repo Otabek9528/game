@@ -924,6 +924,130 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
+  String get linksTitle => 'Foydali linklar';
+
+  @override
+  String linksSubtitle(int count) {
+    return '$count ta Telegram guruh va kanal';
+  }
+
+  @override
+  String get linksSearch => 'Guruh, shahar yoki mavzu';
+
+  @override
+  String get linksJobs => 'Ish';
+
+  @override
+  String get linksLife => 'Koreya hayoti';
+
+  @override
+  String get linksGroups => 'Guruhlar';
+
+  @override
+  String get linksFavorites => 'Sevimlilar';
+
+  @override
+  String get linksNearest => 'Yaqinlik';
+
+  @override
+  String get linksByRegion => 'Hududlar';
+
+  @override
+  String linksYourPlace(String city) {
+    return 'Joylashuvingiz: $city';
+  }
+
+  @override
+  String get linksLocate =>
+      'Joylashuvni aniqlang — yaqin guruhlar birinchi chiqadi';
+
+  @override
+  String get linksLocateButton => 'Aniqlash';
+
+  @override
+  String get linksNationwide => 'Butun Koreya';
+
+  @override
+  String get linksNearby => 'Yaqin atrofda';
+
+  @override
+  String get linksFarther => 'Boshqa shaharlar';
+
+  @override
+  String get linksRegionCapital => 'Seul va Gyeonggi';
+
+  @override
+  String get linksRegionChungcheong => 'Chungcheong';
+
+  @override
+  String get linksRegionJeolla => 'Jeolla';
+
+  @override
+  String get linksRegionGyeongsang => 'Gyeongsang';
+
+  @override
+  String get linksOther => 'Boshqalar';
+
+  @override
+  String get linksTopicOfficial => 'Rasmiy';
+
+  @override
+  String get linksTopicNews => 'Yangiliklar va ma’lumot';
+
+  @override
+  String get linksTopicLegal => 'Huquq va vizalar';
+
+  @override
+  String get linksTopicInsurance => 'Sug‘urta';
+
+  @override
+  String get linksTopicWork => 'Ish va karyera';
+
+  @override
+  String get linksTopicEveryday => 'Kundalik hayot';
+
+  @override
+  String get linksForEveryone => 'Umumiy';
+
+  @override
+  String get linksForWomen => 'Ayollar uchun';
+
+  @override
+  String get linksOurs => 'Bizning guruh: taklif va savollar uchun';
+
+  @override
+  String get linksSuggestTitle => 'Guruhingiz ro‘yxatda yo‘qmi?';
+
+  @override
+  String get linksSuggestBody => 'Muslim Vegukin guruhiga yozing, qo‘shamiz.';
+
+  @override
+  String get linksOpen => 'Telegramda ochish';
+
+  @override
+  String get linksCopy => 'Havolani nusxalash';
+
+  @override
+  String get linksCopied => 'Havola nusxalandi';
+
+  @override
+  String get linksShare => 'Ulashish';
+
+  @override
+  String get linksFavorite => 'Sevimlilarga qo‘shish';
+
+  @override
+  String get linksUnfavorite => 'Sevimlilardan olib tashlash';
+
+  @override
+  String get linksNothing => 'Hech narsa topilmadi';
+
+  @override
+  String linksResults(int count) {
+    return '$count ta natija';
+  }
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

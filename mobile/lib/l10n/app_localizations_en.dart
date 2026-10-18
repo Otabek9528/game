@@ -948,6 +948,136 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get linksTitle => 'Useful links';
+
+  @override
+  String linksSubtitle(int count) {
+    return '$count Telegram groups and channels';
+  }
+
+  @override
+  String get linksSearch => 'Group, city or topic';
+
+  @override
+  String get linksJobs => 'Jobs';
+
+  @override
+  String get linksLife => 'Life in Korea';
+
+  @override
+  String get linksGroups => 'Groups';
+
+  @override
+  String get linksFavorites => 'Favourites';
+
+  @override
+  String get linksNearest => 'Nearest';
+
+  @override
+  String get linksByRegion => 'Regions';
+
+  @override
+  String linksYourPlace(String city) {
+    return 'You are in $city';
+  }
+
+  @override
+  String get linksLocate => 'Use your location to see the nearest groups first';
+
+  @override
+  String get linksLocateButton => 'Locate';
+
+  @override
+  String get linksNationwide => 'All of Korea';
+
+  @override
+  String get linksNearby => 'Nearby';
+
+  @override
+  String get linksFarther => 'Other cities';
+
+  @override
+  String get linksRegionCapital => 'Seoul & Gyeonggi';
+
+  @override
+  String get linksRegionChungcheong => 'Chungcheong';
+
+  @override
+  String get linksRegionJeolla => 'Jeolla';
+
+  @override
+  String get linksRegionGyeongsang => 'Gyeongsang';
+
+  @override
+  String get linksOther => 'Others';
+
+  @override
+  String get linksTopicOfficial => 'Official';
+
+  @override
+  String get linksTopicNews => 'News and information';
+
+  @override
+  String get linksTopicLegal => 'Law and visas';
+
+  @override
+  String get linksTopicInsurance => 'Insurance';
+
+  @override
+  String get linksTopicWork => 'Work and career';
+
+  @override
+  String get linksTopicEveryday => 'Everyday life';
+
+  @override
+  String get linksForEveryone => 'General';
+
+  @override
+  String get linksForWomen => 'For women';
+
+  @override
+  String get linksOurs => 'Our group, for suggestions and questions';
+
+  @override
+  String get linksSuggestTitle => 'Your group isn’t listed?';
+
+  @override
+  String get linksSuggestBody =>
+      'Write to the Muslim Vegukin group and we’ll add it.';
+
+  @override
+  String get linksOpen => 'Open in Telegram';
+
+  @override
+  String get linksCopy => 'Copy link';
+
+  @override
+  String get linksCopied => 'Link copied';
+
+  @override
+  String get linksShare => 'Share';
+
+  @override
+  String get linksFavorite => 'Add to favourites';
+
+  @override
+  String get linksUnfavorite => 'Remove from favourites';
+
+  @override
+  String get linksNothing => 'Nothing found';
+
+  @override
+  String linksResults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count results',
+      one: '1 result',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

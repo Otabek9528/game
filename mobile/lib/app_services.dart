@@ -11,6 +11,7 @@ import 'core/share.dart' as share;
 import 'core/locale_controller.dart';
 import 'core/theme_controller.dart';
 import 'features/home/feature_catalog.dart';
+import 'features/links/links_controller.dart';
 import 'features/parcel/parcel_source.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/qibla/qibla_sensors.dart';
@@ -137,6 +138,7 @@ class AppServices {
     this.parcels = const HttpParcelSource(),
     this.openLink = openExternalLink,
     this.shareText = share.shareText,
+    this.linksScript = fetchLinksScript,
   });
 
   final KeyValueStore store;
@@ -157,4 +159,7 @@ class AppServices {
 
   /// Android's share sheet.
   final Future<void> Function(String) shareText;
+
+  /// The web page's links script, to keep the links page up to date.
+  final LinksScriptSource linksScript;
 }
