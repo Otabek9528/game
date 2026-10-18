@@ -1520,6 +1520,151 @@ class AppLocalizationsUz extends AppLocalizations {
   String get barcodeCatDried => 'Quritilgan';
 
   @override
+  String get qnaLabel => 'Savol-javob markazi';
+
+  @override
+  String get qnaVerseRef => 'Nahl surasi, 43-oyat';
+
+  @override
+  String get qnaSource =>
+      'Shayx Muhammad Sodiq Muhammad Yusuf va boshqa ustozlarning javoblari';
+
+  @override
+  String get qnaCount => '100 000+ savol';
+
+  @override
+  String get qnaAi => 'Sun’iy intellekt qidiruvi';
+
+  @override
+  String get qnaSearchHint => 'Savolingizni o‘z so‘zlaringiz bilan yozing…';
+
+  @override
+  String get qnaUzbekNote => 'Savollar va javoblar o‘zbek tilida.';
+
+  @override
+  String get qnaDaily => 'Kunlik tanlov';
+
+  @override
+  String get qnaDailySub => 'Har kuni yangi savollar';
+
+  @override
+  String get qnaNewSet => 'Yangi savollar';
+
+  @override
+  String get qnaLoadError => 'Savollar yuklanmadi';
+
+  @override
+  String get qnaCheckConnection =>
+      'Internetni tekshirib, qayta urinib ko‘ring.';
+
+  @override
+  String get qnaRetry => 'Qayta urinish';
+
+  @override
+  String get qnaSaved => 'Saqlangan javoblar';
+
+  @override
+  String get qnaSavedEmpty => 'Hali hech narsa saqlanmagan';
+
+  @override
+  String get qnaSavedHint =>
+      'Javobni belgi tugmasi bilan saqlang — internet bo‘lmasa ham o‘qiysiz.';
+
+  @override
+  String get qnaSave => 'Saqlash';
+
+  @override
+  String get qnaUnsave => 'Saqlanganlardan olib tashlash';
+
+  @override
+  String get qnaSavedNote => 'Saqlandi';
+
+  @override
+  String get qnaRemovedNote => 'Saqlanganlardan olib tashlandi';
+
+  @override
+  String get qnaShare => 'Ulashish';
+
+  @override
+  String get qnaTextSize => 'Matn o‘lchami';
+
+  @override
+  String get qnaQuestion => 'Savol';
+
+  @override
+  String get qnaAnswer => 'Javob';
+
+  @override
+  String get qnaOpenSource => 'Manbaga o‘tish';
+
+  @override
+  String get qnaCopy => 'Nusxalash';
+
+  @override
+  String get qnaCopied => 'Savol va javob nusxalandi';
+
+  @override
+  String get qnaRelated => 'O‘xshash savollar';
+
+  @override
+  String get qnaAnswerError => 'Javob yuklanmadi';
+
+  @override
+  String get qnaOther => 'Boshqa';
+
+  @override
+  String get qnaSearchTitle => 'Savol qidirish';
+
+  @override
+  String get qnaSearchButton => 'Qidirish';
+
+  @override
+  String get qnaMinLetters => 'Kamida 3 ta harf yozing';
+
+  @override
+  String get qnaHowTitle => 'Qanday ishlaydi?';
+
+  @override
+  String get qnaHowBody =>
+      'Sun’iy intellekt o‘zbek til modeli savolingizning ma’nosini tushunib, minglab savol-javoblar ichidan eng o‘xshashlarini topadi. So‘zma-so‘z mos kelishi shart emas: savolingizni to‘liq va grammatik to‘g‘ri yozsangiz, javob aniqroq bo‘ladi. Lotin yoki kirill yozuvida yozishingiz mumkin.';
+
+  @override
+  String get qnaRecent => 'So‘nggi qidiruvlar';
+
+  @override
+  String get qnaClear => 'Tozalash';
+
+  @override
+  String get qnaRemove => 'O‘chirish';
+
+  @override
+  String get qnaExamples => 'Masalan';
+
+  @override
+  String qnaResults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ta natija',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get qnaNoResults => 'Hech narsa topilmadi';
+
+  @override
+  String get qnaNoResultsHint =>
+      'Savolni boshqacharoq, to‘liqroq yozib ko‘ring.';
+
+  @override
+  String get qnaOfflineTitle => 'Internet yo‘q';
+
+  @override
+  String get qnaOfflineBody =>
+      'Qidiruv uchun internet kerak. Saqlangan javoblar internetsiz ham ochiladi.';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

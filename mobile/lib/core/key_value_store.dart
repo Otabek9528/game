@@ -13,7 +13,7 @@ class PrefsKeyValueStore implements KeyValueStore {
   final SharedPreferencesWithCache _prefs;
 
   /// Every key the app stores must be listed here.
-  static const keys = {'location', 'prayer_days', 'prayer_settings', 'permissions_asked', 'exact_alarms_asked', 'city_lookup', 'notifications_asked', 'reminders', 'theme_mode', 'parcel_direction', 'parcel_cache', 'parcel_saved', 'parcel_notice', 'links_remote', 'links_favorites', 'links_view', 'install_id', 'barcode_history'};
+  static const keys = {'location', 'prayer_days', 'prayer_settings', 'permissions_asked', 'exact_alarms_asked', 'city_lookup', 'notifications_asked', 'reminders', 'theme_mode', 'parcel_direction', 'parcel_cache', 'parcel_saved', 'parcel_notice', 'links_remote', 'links_favorites', 'links_view', 'install_id', 'barcode_history', 'qna_saved', 'qna_recent', 'qna_daily', 'qna_text'};
 
   static Future<PrefsKeyValueStore> open() async {
     final prefs = await SharedPreferencesWithCache.create(

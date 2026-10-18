@@ -13,6 +13,10 @@ abstract interface class ActivityLog {
   /// [action] is the web app's name for it (`qibla`, `scanner_found`, …);
   /// [detail] follows a colon, as on the web (`scanner_found:8801234567890`).
   void log(String action, [String? detail]);
+
+  /// Who is asking, for the APIs that take a user as the web pages send the
+  /// Telegram one: `user_id` and `username`.
+  Map<String, Object> get who;
 }
 
 /// Sends each action with the platform after it — `qibla_apk` on Android,
@@ -42,10 +46,15 @@ class HttpActivityLog implements ActivityLog {
     return id;
   }
 
-  /// What one action is sent as.
-  Map<String, Object> payload(String action, [String? detail]) => {
+  @override
+  Map<String, Object> get who => {
         'user_id': installId,
         'username': _platform == TargetPlatform.iOS ? 'iOS app' : 'Android app',
+      };
+
+  /// What one action is sent as.
+  Map<String, Object> payload(String action, [String? detail]) => {
+        ...who,
         'action': '${action}_$suffix${detail == null ? '' : ':$detail'}',
       };
 

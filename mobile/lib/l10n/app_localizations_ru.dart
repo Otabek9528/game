@@ -1557,6 +1557,153 @@ class AppLocalizationsRu extends AppLocalizations {
   String get barcodeCatDried => 'Сушёные';
 
   @override
+  String get qnaLabel => 'Центр вопросов и ответов';
+
+  @override
+  String get qnaVerseRef => 'Сура ан-Нахль, аят 43';
+
+  @override
+  String get qnaSource =>
+      'Ответы шейха Мухаммада Содика Мухаммада Юсуфа и других учёных';
+
+  @override
+  String get qnaCount => '100 000+ вопросов';
+
+  @override
+  String get qnaAi => 'Поиск с ИИ';
+
+  @override
+  String get qnaSearchHint => 'Напишите вопрос на узбекском…';
+
+  @override
+  String get qnaUzbekNote =>
+      'Вопросы и ответы — на узбекском языке (латиница или кириллица).';
+
+  @override
+  String get qnaDaily => 'Подборка дня';
+
+  @override
+  String get qnaDailySub => 'Каждый день — новые вопросы';
+
+  @override
+  String get qnaNewSet => 'Новые вопросы';
+
+  @override
+  String get qnaLoadError => 'Не удалось загрузить вопросы';
+
+  @override
+  String get qnaCheckConnection => 'Проверьте подключение и попробуйте снова.';
+
+  @override
+  String get qnaRetry => 'Повторить';
+
+  @override
+  String get qnaSaved => 'Сохранённые ответы';
+
+  @override
+  String get qnaSavedEmpty => 'Пока ничего не сохранено';
+
+  @override
+  String get qnaSavedHint =>
+      'Сохраняйте ответы кнопкой-закладкой — их можно читать без интернета.';
+
+  @override
+  String get qnaSave => 'Сохранить';
+
+  @override
+  String get qnaUnsave => 'Убрать из сохранённых';
+
+  @override
+  String get qnaSavedNote => 'Сохранено';
+
+  @override
+  String get qnaRemovedNote => 'Убрано из сохранённых';
+
+  @override
+  String get qnaShare => 'Поделиться';
+
+  @override
+  String get qnaTextSize => 'Размер текста';
+
+  @override
+  String get qnaQuestion => 'Вопрос';
+
+  @override
+  String get qnaAnswer => 'Ответ';
+
+  @override
+  String get qnaOpenSource => 'Источник';
+
+  @override
+  String get qnaCopy => 'Копировать';
+
+  @override
+  String get qnaCopied => 'Вопрос и ответ скопированы';
+
+  @override
+  String get qnaRelated => 'Похожие вопросы';
+
+  @override
+  String get qnaAnswerError => 'Не удалось загрузить ответ';
+
+  @override
+  String get qnaOther => 'Другое';
+
+  @override
+  String get qnaSearchTitle => 'Поиск вопроса';
+
+  @override
+  String get qnaSearchButton => 'Найти';
+
+  @override
+  String get qnaMinLetters => 'Напишите хотя бы 3 буквы';
+
+  @override
+  String get qnaHowTitle => 'Как это работает?';
+
+  @override
+  String get qnaHowBody =>
+      'Узбекская языковая модель понимает смысл вопроса и находит самые похожие среди тысяч вопросов и ответов. Слова не обязаны совпадать: чем полнее и грамотнее вопрос, тем точнее результат. Пишите на узбекском — латиницей или кириллицей.';
+
+  @override
+  String get qnaRecent => 'Недавние запросы';
+
+  @override
+  String get qnaClear => 'Очистить';
+
+  @override
+  String get qnaRemove => 'Удалить';
+
+  @override
+  String get qnaExamples => 'Например';
+
+  @override
+  String qnaResults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count результатов',
+      few: '$count результата',
+      one: '$count результат',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get qnaNoResults => 'Ничего не найдено';
+
+  @override
+  String get qnaNoResultsHint =>
+      'Попробуйте сформулировать вопрос иначе и полнее.';
+
+  @override
+  String get qnaOfflineTitle => 'Нет подключения';
+
+  @override
+  String get qnaOfflineBody =>
+      'Для поиска нужен интернет. Сохранённые ответы открываются и без него.';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

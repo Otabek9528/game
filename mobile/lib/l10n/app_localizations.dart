@@ -2824,6 +2824,270 @@ abstract class AppLocalizations {
   /// **'Quritilgan'**
   String get barcodeCatDried;
 
+  /// No description provided for @qnaLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savol-javob markazi'**
+  String get qnaLabel;
+
+  /// No description provided for @qnaVerseRef.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nahl surasi, 43-oyat'**
+  String get qnaVerseRef;
+
+  /// No description provided for @qnaSource.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shayx Muhammad Sodiq Muhammad Yusuf va boshqa ustozlarning javoblari'**
+  String get qnaSource;
+
+  /// No description provided for @qnaCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'100 000+ savol'**
+  String get qnaCount;
+
+  /// No description provided for @qnaAi.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sun’iy intellekt qidiruvi'**
+  String get qnaAi;
+
+  /// No description provided for @qnaSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savolingizni o‘z so‘zlaringiz bilan yozing…'**
+  String get qnaSearchHint;
+
+  /// No description provided for @qnaUzbekNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savollar va javoblar o‘zbek tilida.'**
+  String get qnaUzbekNote;
+
+  /// No description provided for @qnaDaily.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kunlik tanlov'**
+  String get qnaDaily;
+
+  /// No description provided for @qnaDailySub.
+  ///
+  /// In uz, this message translates to:
+  /// **'Har kuni yangi savollar'**
+  String get qnaDailySub;
+
+  /// No description provided for @qnaNewSet.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi savollar'**
+  String get qnaNewSet;
+
+  /// No description provided for @qnaLoadError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savollar yuklanmadi'**
+  String get qnaLoadError;
+
+  /// No description provided for @qnaCheckConnection.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internetni tekshirib, qayta urinib ko‘ring.'**
+  String get qnaCheckConnection;
+
+  /// No description provided for @qnaRetry.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinish'**
+  String get qnaRetry;
+
+  /// No description provided for @qnaSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlangan javoblar'**
+  String get qnaSaved;
+
+  /// No description provided for @qnaSavedEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali hech narsa saqlanmagan'**
+  String get qnaSavedEmpty;
+
+  /// No description provided for @qnaSavedHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Javobni belgi tugmasi bilan saqlang — internet bo‘lmasa ham o‘qiysiz.'**
+  String get qnaSavedHint;
+
+  /// No description provided for @qnaSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get qnaSave;
+
+  /// No description provided for @qnaUnsave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlanganlardan olib tashlash'**
+  String get qnaUnsave;
+
+  /// No description provided for @qnaSavedNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlandi'**
+  String get qnaSavedNote;
+
+  /// No description provided for @qnaRemovedNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlanganlardan olib tashlandi'**
+  String get qnaRemovedNote;
+
+  /// No description provided for @qnaShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get qnaShare;
+
+  /// No description provided for @qnaTextSize.
+  ///
+  /// In uz, this message translates to:
+  /// **'Matn o‘lchami'**
+  String get qnaTextSize;
+
+  /// No description provided for @qnaQuestion.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savol'**
+  String get qnaQuestion;
+
+  /// No description provided for @qnaAnswer.
+  ///
+  /// In uz, this message translates to:
+  /// **'Javob'**
+  String get qnaAnswer;
+
+  /// No description provided for @qnaOpenSource.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manbaga o‘tish'**
+  String get qnaOpenSource;
+
+  /// No description provided for @qnaCopy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxalash'**
+  String get qnaCopy;
+
+  /// No description provided for @qnaCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savol va javob nusxalandi'**
+  String get qnaCopied;
+
+  /// No description provided for @qnaRelated.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘xshash savollar'**
+  String get qnaRelated;
+
+  /// No description provided for @qnaAnswerError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Javob yuklanmadi'**
+  String get qnaAnswerError;
+
+  /// No description provided for @qnaOther.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa'**
+  String get qnaOther;
+
+  /// No description provided for @qnaSearchTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savol qidirish'**
+  String get qnaSearchTitle;
+
+  /// No description provided for @qnaSearchButton.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish'**
+  String get qnaSearchButton;
+
+  /// No description provided for @qnaMinLetters.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamida 3 ta harf yozing'**
+  String get qnaMinLetters;
+
+  /// No description provided for @qnaHowTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday ishlaydi?'**
+  String get qnaHowTitle;
+
+  /// No description provided for @qnaHowBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sun’iy intellekt o‘zbek til modeli savolingizning ma’nosini tushunib, minglab savol-javoblar ichidan eng o‘xshashlarini topadi. So‘zma-so‘z mos kelishi shart emas: savolingizni to‘liq va grammatik to‘g‘ri yozsangiz, javob aniqroq bo‘ladi. Lotin yoki kirill yozuvida yozishingiz mumkin.'**
+  String get qnaHowBody;
+
+  /// No description provided for @qnaRecent.
+  ///
+  /// In uz, this message translates to:
+  /// **'So‘nggi qidiruvlar'**
+  String get qnaRecent;
+
+  /// No description provided for @qnaClear.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tozalash'**
+  String get qnaClear;
+
+  /// No description provided for @qnaRemove.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirish'**
+  String get qnaRemove;
+
+  /// No description provided for @qnaExamples.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan'**
+  String get qnaExamples;
+
+  /// How many questions a search found.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, other{{count} ta natija}}'**
+  String qnaResults(int count);
+
+  /// No description provided for @qnaNoResults.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsa topilmadi'**
+  String get qnaNoResults;
+
+  /// No description provided for @qnaNoResultsHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Savolni boshqacharoq, to‘liqroq yozib ko‘ring.'**
+  String get qnaNoResultsHint;
+
+  /// No description provided for @qnaOfflineTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet yo‘q'**
+  String get qnaOfflineTitle;
+
+  /// No description provided for @qnaOfflineBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidiruv uchun internet kerak. Saqlangan javoblar internetsiz ham ochiladi.'**
+  String get qnaOfflineBody;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

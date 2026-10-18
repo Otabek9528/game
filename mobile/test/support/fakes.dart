@@ -20,6 +20,8 @@ import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
 import 'package:muslim_vegukin/features/qibla/qibla_sensors.dart';
+import 'package:muslim_vegukin/features/qna/qna_models.dart';
+import 'package:muslim_vegukin/features/qna/qna_source.dart';
 import 'package:muslim_vegukin/features/reminders/reminder_controller.dart';
 import 'package:muslim_vegukin/features/widget/home_widget_bridge.dart';
 
@@ -191,6 +193,9 @@ class FakeActivityLog implements ActivityLog {
 
   @override
   void log(String action, [String? detail]) => actions.add(detail == null ? action : '$action:$detail');
+
+  @override
+  Map<String, Object> get who => const {'user_id': -1234567890, 'username': 'Android app'};
 }
 
 class TestApp {
@@ -234,6 +239,7 @@ class TestApp {
       linksScript: () async => linksScript,
       system: system,
       barcodes: barcodes,
+      qna: qna,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
         cameras.add(camera);
@@ -261,6 +267,7 @@ class TestApp {
   String? linksScript;
   final system = FakeSystem();
   final barcodes = FakeBarcodes();
+  final qna = FakeQna();
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];
@@ -617,4 +624,69 @@ class _FakeScene extends CustomPainter {
 
   @override
   bool shouldRepaint(_FakeScene old) => old.window != window;
+}
+
+/// The questions-and-answers archive: each browse gives 15 new questions,
+/// a search 3 (none for "yo‘q"), and every question has two similar ones
+/// known only by their titles. [fail]: no connection.
+class FakeQna implements QnaSource {
+  bool fail = false;
+  int browses = 0;
+  final searches = <String>[];
+  Map<String, Object>? who;
+  final details = <String>[];
+
+  static const _titles = [
+    ('Safarda namozni qasr qilish qanday bo‘ladi?', '🕌 Namoz'),
+    ('Ro‘zador tish yuvsa, ro‘zasi buziladimi?', '🌙 Ro‘za'),
+    ('Qisqichbaqa yeyish joizmi?', '🍽 Taomlar'),
+    ('Bankdan kredit olishning hukmi qanday?', '💰 Muomalot'),
+    ('Juma namoziga ulgurmasam nima qilaman?', '🕌 Namoz'),
+  ];
+
+  static QnaQuestion question(int i) {
+    final (title, topic) = _titles[i % _titles.length];
+    return QnaQuestion(
+      id: '$i',
+      title: i < _titles.length ? title : '$title ($i)',
+      topic: topic,
+      views: 1200 + i * 37,
+      answerSource: 'Shayx Muhammad Sodiq Muhammad Yusuf',
+      questionBody: 'Assalomu alaykum. Koreyada ishlayman, shu haqda bilmoqchi edim.',
+      answerBody: 'Va alaykum assalom.\n\nUlamolarimiz bu masalada quyidagicha deganlar. Musofir kishi '
+          'to‘rt rakatli farz namozlarini ikki rakat qilib o‘qiydi. Bu Alloh taolo tomonidan berilgan '
+          'ruxsatdir, uni qabul qilish afzal.\n\nSafar masofasi va muddati haqida mazhabimizda batafsil '
+          'aytilgan. Batafsil: https://savollar.islom.uz/s/$i',
+      link: Uri.parse('https://savollar.islom.uz/s/$i'),
+    );
+  }
+
+  @override
+  Future<List<QnaQuestion>> browse({int limit = 15}) async {
+    if (fail) throw const QnaException('offline');
+    final first = browses++ * 100;
+    return [for (var i = first; i < first + limit; i++) question(i)];
+  }
+
+  @override
+  Future<List<QnaQuestion>> search(String query, {int limit = 20, Map<String, Object> who = const {}}) async {
+    searches.add(query);
+    this.who = who;
+    if (fail) throw const QnaException('offline');
+    if (query.contains('yo‘q')) return const [];
+    return [question(2), question(0), question(4)];
+  }
+
+  @override
+  Future<QnaDetail> detail(String id) async {
+    details.add(id);
+    if (fail) throw const QnaException('offline');
+    return QnaDetail(
+      question: question(int.parse(id)),
+      related: const [
+        QnaQuestion(id: '900', title: 'Dengiz mahsulotlarining hukmi'),
+        QnaQuestion(id: '901', title: 'Halol va harom taomlar'),
+      ],
+    );
+  }
 }

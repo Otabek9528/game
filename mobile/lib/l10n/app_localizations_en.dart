@@ -1539,6 +1539,151 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barcodeCatDried => 'Dried food';
 
   @override
+  String get qnaLabel => 'Questions & answers';
+
+  @override
+  String get qnaVerseRef => 'Surah An-Nahl, verse 43';
+
+  @override
+  String get qnaSource =>
+      'Answers by Shaykh Muhammad Sodiq Muhammad Yusuf and other scholars';
+
+  @override
+  String get qnaCount => '100,000+ questions';
+
+  @override
+  String get qnaAi => 'AI search';
+
+  @override
+  String get qnaSearchHint => 'Write your question in Uzbek…';
+
+  @override
+  String get qnaUzbekNote =>
+      'Questions and answers are in Uzbek (Latin or Cyrillic).';
+
+  @override
+  String get qnaDaily => 'Today’s selection';
+
+  @override
+  String get qnaDailySub => 'New questions every day';
+
+  @override
+  String get qnaNewSet => 'New questions';
+
+  @override
+  String get qnaLoadError => 'Couldn’t load the questions';
+
+  @override
+  String get qnaCheckConnection => 'Check your connection and try again.';
+
+  @override
+  String get qnaRetry => 'Retry';
+
+  @override
+  String get qnaSaved => 'Saved answers';
+
+  @override
+  String get qnaSavedEmpty => 'Nothing saved yet';
+
+  @override
+  String get qnaSavedHint =>
+      'Save answers with the bookmark button — they can be read offline.';
+
+  @override
+  String get qnaSave => 'Save';
+
+  @override
+  String get qnaUnsave => 'Remove from saved';
+
+  @override
+  String get qnaSavedNote => 'Saved';
+
+  @override
+  String get qnaRemovedNote => 'Removed from saved';
+
+  @override
+  String get qnaShare => 'Share';
+
+  @override
+  String get qnaTextSize => 'Text size';
+
+  @override
+  String get qnaQuestion => 'Question';
+
+  @override
+  String get qnaAnswer => 'Answer';
+
+  @override
+  String get qnaOpenSource => 'Open the source';
+
+  @override
+  String get qnaCopy => 'Copy';
+
+  @override
+  String get qnaCopied => 'Question and answer copied';
+
+  @override
+  String get qnaRelated => 'Similar questions';
+
+  @override
+  String get qnaAnswerError => 'Couldn’t load the answer';
+
+  @override
+  String get qnaOther => 'Other';
+
+  @override
+  String get qnaSearchTitle => 'Find a question';
+
+  @override
+  String get qnaSearchButton => 'Search';
+
+  @override
+  String get qnaMinLetters => 'Write at least 3 letters';
+
+  @override
+  String get qnaHowTitle => 'How it works';
+
+  @override
+  String get qnaHowBody =>
+      'An Uzbek language model understands what you ask and finds the closest of thousands of questions and answers. The words needn’t match: the fuller and more correct your question, the better the result. Write in Uzbek, in Latin or Cyrillic letters.';
+
+  @override
+  String get qnaRecent => 'Recent searches';
+
+  @override
+  String get qnaClear => 'Clear';
+
+  @override
+  String get qnaRemove => 'Remove';
+
+  @override
+  String get qnaExamples => 'For example';
+
+  @override
+  String qnaResults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count results',
+      one: '$count result',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get qnaNoResults => 'Nothing found';
+
+  @override
+  String get qnaNoResultsHint => 'Try asking it differently, in more words.';
+
+  @override
+  String get qnaOfflineTitle => 'No connection';
+
+  @override
+  String get qnaOfflineBody =>
+      'Searching needs the internet. Saved answers open without it.';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

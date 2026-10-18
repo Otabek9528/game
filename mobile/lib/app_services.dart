@@ -19,6 +19,7 @@ import 'features/links/links_controller.dart';
 import 'features/parcel/parcel_source.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/qibla/qibla_sensors.dart';
+import 'features/qna/qna_source.dart';
 import 'features/reminders/reminder_controller.dart';
 import 'features/widget/home_widget_bridge.dart';
 
@@ -147,6 +148,7 @@ class AppServices {
     this.system = const AndroidSystem(),
     this.barcodes = const HttpBarcodeSource(),
     this.barcodeCamera = MobileScannerCamera.new,
+    this.qna = const HttpQnaSource(),
   });
 
   final KeyValueStore store;
@@ -182,4 +184,7 @@ class AppServices {
 
   /// A new camera for the ingredient check's scanner.
   final ScannerCameraFactory barcodeCamera;
+
+  /// The questions-and-answers archive.
+  final QnaSource qna;
 }
