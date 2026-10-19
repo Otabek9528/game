@@ -35,6 +35,7 @@ class _ParcelScreenState extends State<ParcelScreen> with WidgetsBindingObserver
   late final ParcelController _c = ParcelController(
     source: widget.services.parcels,
     store: widget.services.store,
+    clock: widget.services.clock,
   );
   late final _actions = PostActions(controller: _c, services: widget.services);
   final _scroll = ScrollController();
@@ -391,6 +392,7 @@ class _ParcelScreenState extends State<ParcelScreen> with WidgetsBindingObserver
                         date: day,
                         selected: day.key == (_active ?? _c.feed.firstOrNull?.key),
                         past: _c.isPast(day),
+                        today: _c.now,
                         language: _language,
                         onTap: () => _jump(day),
                       );

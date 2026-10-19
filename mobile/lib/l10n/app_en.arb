@@ -39,7 +39,6 @@
   "timesFailedBody": "Couldn’t load prayer times. Check your connection.",
   "retry": "Try again",
   "newBadge": "New",
-  "uzOnlyHint": "Uzbek only",
   "featurePrayers": "Prayer times",
   "featureMosques": "Mosques",
   "featureRestaurants": "Restaurants",

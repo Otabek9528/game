@@ -334,12 +334,6 @@ abstract class AppLocalizations {
   /// **'Yangi'**
   String get newBadge;
 
-  /// Screen-reader text of the UZ tag on Uzbek-only sections.
-  ///
-  /// In uz, this message translates to:
-  /// **'Faqat o‘zbek tilida'**
-  String get uzOnlyHint;
-
   /// No description provided for @featurePrayers.
   ///
   /// In uz, this message translates to:

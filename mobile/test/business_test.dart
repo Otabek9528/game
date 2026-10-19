@@ -30,8 +30,12 @@ Future<TestApp> openDirectory(WidgetTester tester, {String language = 'uz', Test
   addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
   app ??= TestApp(language: language);
   await app.launch(tester);
-  final band = switch (language) { 'ru' => 'Бизнес-каталог', 'en' => 'Business Directory', _ => 'Biznes Katalogi' };
-  await tester.tap(find.text(band));
+  if (language != 'uz') {
+    // Offered on the home screen in Uzbek only.
+    await pushPage(tester, BusinessScreen(services: app.services));
+  } else {
+    await tester.tap(find.text('Biznes Katalogi'));
+  }
   await tester.pumpAndSettle();
   expect(find.byType(BusinessScreen), findsOneWidget);
   return app;

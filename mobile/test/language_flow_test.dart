@@ -58,14 +58,14 @@ void main() {
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
     expect(app.languageStore.value, 'en');
-    expect(find.text('Business Directory'), findsOneWidget);
+    expect(find.text('Mosques'), findsOneWidget);
   });
 
   testWidgets('a saved language skips the picker', (tester) async {
     await TestApp(language: 'ru').launch(tester);
 
     expect(find.text('Русский'), findsNothing);
-    expect(find.text('Бизнес-каталог'), findsOneWidget);
+    expect(find.text('Мечети'), findsOneWidget);
   });
 
   testWidgets('the language can be changed later from home', (tester) async {

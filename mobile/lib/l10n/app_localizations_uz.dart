@@ -137,9 +137,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get newBadge => 'Yangi';
 
   @override
-  String get uzOnlyHint => 'Faqat o‘zbek tilida';
-
-  @override
   String get featurePrayers => 'Namoz vaqtlari';
 
   @override

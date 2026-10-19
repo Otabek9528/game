@@ -25,7 +25,13 @@ Future<TestApp> openQna(WidgetTester tester, {String language = 'uz', TestApp? a
   addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
   app ??= TestApp(language: language);
   await app.launch(tester);
-  final tile = switch (language) { 'ru' => 'Спросите знающих', 'en' => 'Ask the scholars', _ => 'Zikr ahlidan so‘rang' };
+  if (language != 'uz') {
+    // Offered on the home screen in Uzbek only.
+    await pushPage(tester, QnaScreen(services: app.services));
+    await tester.pumpAndSettle();
+    return app;
+  }
+  const tile = 'Zikr ahlidan so‘rang';
   await tester.scrollUntilVisible(find.text(tile), 200);
   await tester.drag(find.byType(CustomScrollView), const Offset(0, -200));
   await tester.pumpAndSettle();

@@ -20,7 +20,13 @@ import 'support/fakes.dart';
 Future<TestApp> openParcels(WidgetTester tester, {String language = 'uz', TestApp? app}) async {
   app ??= TestApp(language: language);
   await app.launch(tester);
-  final tile = find.text(language == 'en' ? 'Parcels' : 'Pochta');
+  if (language != 'uz') {
+    // Offered on the home screen in Uzbek only.
+    await pushPage(tester, ParcelScreen(services: app.services));
+    await settle(tester);
+    return app;
+  }
+  final tile = find.text('Pochta');
   await tester.scrollUntilVisible(tile, 200);
   // The grid's last row: clear of the screen's bottom edge first.
   await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
@@ -436,7 +442,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.arrow_back_rounded));
       await settle(tester);
       app.parcels.fail = true;
-      await tester.tap(find.text('Parcels'));
+      await pushPage(tester, ParcelScreen(services: app.services));
       await settle(tester);
       expect(find.text('@akmal_kuryer'), findsOneWidget);
       expect(find.text('No connection. Showing the posts loaded last time.'), findsOneWidget);

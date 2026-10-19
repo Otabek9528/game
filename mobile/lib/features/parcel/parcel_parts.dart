@@ -109,6 +109,7 @@ class DayChip extends StatelessWidget {
     required this.date,
     required this.selected,
     required this.past,
+    required this.today,
     required this.language,
     required this.onTap,
   });
@@ -116,6 +117,7 @@ class DayChip extends StatelessWidget {
   final ParcelDate date;
   final bool selected;
   final bool past;
+  final DateTime today;
   final AppLanguage language;
   final VoidCallback onTap;
 
@@ -123,9 +125,8 @@ class DayChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final now = DateTime.now();
     final days = DateTime.utc(date.date.year, date.date.month, date.date.day)
-        .difference(DateTime.utc(now.year, now.month, now.day))
+        .difference(DateTime.utc(today.year, today.month, today.day))
         .inDays;
     final top = switch (days) {
       0 => s.dayToday,

@@ -151,6 +151,7 @@ class AppServices {
     this.barcodeCamera = MobileScannerCamera.new,
     this.qna = const HttpQnaSource(),
     this.businesses = const HttpBusinessSource(),
+    this.clock = DateTime.now,
   });
 
   final KeyValueStore store;
@@ -192,4 +193,8 @@ class AppServices {
 
   /// The business directory.
   final BusinessSource businesses;
+
+  /// What day it is, for the pages that list days: the phone's clock, or a
+  /// test's.
+  final DateTime Function() clock;
 }

@@ -16,7 +16,13 @@ final webScript = File('../pages/links/links.js').readAsStringSync();
 Future<TestApp> openLinks(WidgetTester tester, {String language = 'uz', TestApp? app}) async {
   app ??= TestApp(language: language);
   await app.launch(tester);
-  final tile = find.text(language == 'en' ? 'Useful links' : 'Foydali linklar');
+  if (language != 'uz') {
+    // Offered on the home screen in Uzbek only.
+    await pushPage(tester, LinksScreen(services: app.services));
+    await tester.pumpAndSettle();
+    return app;
+  }
+  final tile = find.text('Foydali linklar');
   await tester.scrollUntilVisible(tile, 200);
   await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
   await tester.pumpAndSettle();

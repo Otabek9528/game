@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Someone who uses the parcel page: its lists are fetched behind the
       // home screen, so the page opens fresh even on a slow line.
-      unawaited(warmParcels(_services.parcels, _services.store));
+      unawaited(warmParcels(_services.parcels, _services.store, clock: _services.clock));
       await _services.permissions.askOnce();
       await _takeWidgetAction();
       await _offerExactAlarms();
@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final language = _services.locale.language ?? AppLanguage.uz;
-    final showUzTag = language != AppLanguage.uz;
+    final features = featuresFor(language);
     final textScale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -190,15 +190,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             onOpen: _openPrayers,
                           ),
                           const SizedBox(height: 14),
-                          FutureBuilder(
-                            future: _stats,
-                            builder: (context, snapshot) => _BusinessBand(
-                              stats: snapshot.data,
-                              showUzTag: showUzTag,
-                              onTap: () => _open(businessFeature),
+                          if (showsBusiness(language)) ...[
+                            FutureBuilder(
+                              future: _stats,
+                              builder: (context, snapshot) => _BusinessBand(
+                                stats: snapshot.data,
+                                onTap: () => _open(businessFeature),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 14),
+                            const SizedBox(height: 14),
+                          ],
                         ],
                       ),
                     ),
@@ -210,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         20 + MediaQuery.paddingOf(context).bottom,
                       ),
                       sliver: SliverGrid.builder(
-                        itemCount: featureGrid.length,
+                        itemCount: features.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           mainAxisSpacing: 10,
@@ -220,12 +221,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           mainAxisExtent: math.max(112, 36 + 68 * textScale),
                         ),
                         itemBuilder: (context, i) {
-                          final feature = featureGrid[i];
+                          final feature = features[i];
                           return _FeatureTile(
                             emoji: feature.emoji,
                             label: feature.label(s),
                             isNew: feature.isNew,
-                            uzTag: showUzTag && feature.uzbekOnly,
                             onTap: () => _open(feature),
                           );
                         },
@@ -313,10 +313,9 @@ class _Header extends StatelessWidget {
 /// Full-width and gold, so it reads as its own section rather than one more
 /// tile in the grid — as on the web.
 class _BusinessBand extends StatelessWidget {
-  const _BusinessBand({required this.stats, required this.showUzTag, required this.onTap});
+  const _BusinessBand({required this.stats, required this.onTap});
 
   final BusinessStats? stats;
-  final bool showUzTag;
   final VoidCallback onTap;
 
   @override
@@ -391,24 +390,12 @@ class _BusinessBand extends StatelessWidget {
       ),
     );
 
-    // Badges sit on the band's top edge, so the title keeps the full width.
+    // The badge sits on the band's top edge, so the title keeps the full width.
     return Stack(
       clipBehavior: Clip.none,
       children: [
         band,
-        Positioned(
-          top: -8,
-          right: 16,
-          child: Row(
-            children: [
-              if (showUzTag) ...[
-                _UzTag(hint: s.uzOnlyHint, filled: true),
-                const SizedBox(width: 5),
-              ],
-              _NewBadge(label: s.newBadge),
-            ],
-          ),
-        ),
+        Positioned(top: -8, right: 16, child: _NewBadge(label: s.newBadge)),
       ],
     );
   }
@@ -419,14 +406,12 @@ class _FeatureTile extends StatelessWidget {
     required this.emoji,
     required this.label,
     required this.isNew,
-    required this.uzTag,
     required this.onTap,
   });
 
   final String emoji;
   final String label;
   final bool isNew;
-  final bool uzTag;
   final VoidCallback onTap;
 
   @override
@@ -468,7 +453,6 @@ class _FeatureTile extends StatelessWidget {
               ),
             ),
             if (isNew) Positioned(top: 6, right: 6, child: _NewBadge(label: s.newBadge)),
-            if (uzTag) Positioned(top: 6, left: 6, child: _UzTag(hint: s.uzOnlyHint)),
           ],
         ),
       ),
@@ -494,42 +478,6 @@ class _NewBadge extends StatelessWidget {
           fontWeight: FontWeight.w800,
           letterSpacing: 0.4,
           color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-/// Marks a section whose pages are only in Uzbek, for people using the app
-/// in another language.
-class _UzTag extends StatelessWidget {
-  const _UzTag({required this.hint, this.filled = false});
-
-  final String hint;
-
-  /// Backed with the card colour, for when it sits across a border.
-  final bool filled;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: hint,
-      excludeSemantics: true,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-        decoration: BoxDecoration(
-          color: filled ? VegukinPalette.of(context).card : null,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: Brand.gold500, width: 1.2),
-        ),
-        child: const Text(
-          'UZ',
-          style: TextStyle(
-            fontSize: 9,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.4,
-            color: Brand.gold500,
-          ),
         ),
       ),
     );

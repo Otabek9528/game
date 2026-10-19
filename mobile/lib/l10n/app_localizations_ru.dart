@@ -160,9 +160,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newBadge => 'Новое';
 
   @override
-  String get uzOnlyHint => 'Только на узбекском';
-
-  @override
   String get featurePrayers => 'Время намаза';
 
   @override

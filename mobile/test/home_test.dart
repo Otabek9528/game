@@ -5,11 +5,16 @@ import 'package:muslim_vegukin/features/prayers/prayers_screen.dart';
 
 import 'support/fakes.dart';
 
-/// UZ tags on the home content (the header's language button also reads UZ).
-final uzTags = find.descendant(
-  of: find.byType(CustomScrollView),
-  matching: find.text('UZ'),
-);
+/// The grid's section labels, top to bottom and left to right.
+List<String> tiles(WidgetTester tester, List<String> labels) {
+  final found = [for (final l in labels) if (find.text(l).evaluate().isNotEmpty) l];
+  int order(String l) {
+    final at = tester.getTopLeft(find.text(l));
+    return (at.dy ~/ 20) * 10000 + at.dx.round();
+  }
+
+  return found..sort((a, b) => order(a) - order(b));
+}
 
 void main() {
   testWidgets('shows today: date, city, countdown and the day strip', (tester) async {
@@ -87,24 +92,33 @@ void main() {
   });
 
   testWidgets('business band shows the live count', (tester) async {
-    await TestApp(language: 'ru').launch(tester);
-    expect(find.text('5 бизнесов · 10 направлений'), findsOneWidget);
+    await TestApp(language: 'uz').launch(tester);
+    expect(find.text('5 ta biznes · 10 ta yo‘nalish'), findsOneWidget);
   });
 
-  testWidgets('Uzbek-only sections are shown to everyone, tagged UZ', (tester) async {
+  testWidgets('in English and Russian: only what the web offers there, in its order', (tester) async {
     await TestApp(language: 'en').launch(tester);
-    expect(find.text('Jobs'), findsOneWidget);
-    expect(uzTags, findsWidgets);
-
-    // Scroll so every tile has been built, then count.
+    expect(find.text('Business Directory'), findsNothing);
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -600));
     await tester.pumpAndSettle();
-    expect(find.text('Parcels'), findsOneWidget);
+    const all = [
+      'Mosques', 'Restaurants', 'Shops', 'Notifications', 'Qibla', 'Ask the scholars', 'Ingredient check', 'Housing',
+      'Vegukin Cars', 'Immigration services', 'Jobs', 'Parcels', 'Useful links', 'Support us', 'Community',
+    ];
+    expect(tiles(tester, all), [
+      'Mosques', 'Restaurants', 'Shops', 'Notifications', 'Qibla', 'Ingredient check', 'Support us', 'Community',
+      'Immigration services',
+    ]);
   });
 
-  testWidgets('no UZ tags when the app is in Uzbek', (tester) async {
+  testWidgets('in Uzbek: every section, and the business directory', (tester) async {
     await TestApp(language: 'uz').launch(tester);
-    expect(uzTags, findsNothing);
+    expect(find.text('Biznes Katalogi'), findsOneWidget);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -900));
+    await tester.pumpAndSettle();
+    expect(find.text('Uy-joy e’lonlari'), findsOneWidget);
+    expect(find.text('Pochta'), findsOneWidget);
+    expect(find.text('Jamoa'), findsOneWidget);
   });
 
   testWidgets('a section opens its page; the prayer card opens the prayers page', (tester) async {

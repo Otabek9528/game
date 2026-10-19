@@ -39,7 +39,6 @@
   "timesFailedBody": "Не удалось загрузить время намаза. Проверьте интернет.",
   "retry": "Повторить",
   "newBadge": "Новое",
-  "uzOnlyHint": "Только на узбекском",
   "featurePrayers": "Время намаза",
   "featureMosques": "Мечети",
   "featureRestaurants": "Рестораны",

@@ -123,6 +123,9 @@ class ParcelController extends ChangeNotifier {
   /// When the lists on screen were loaded.
   DateTime? get loadedAt => _loadedAt;
 
+  /// The time by the page's clock.
+  DateTime get now => _clock();
+
   bool isPast(ParcelDate date) {
     final now = _clock();
     return date.date.isBefore(DateTime(now.year, now.month, now.day));
@@ -406,7 +409,7 @@ class ParcelController extends ChangeNotifier {
 /// lately: the days and the first coming day's posts are fetched in the
 /// background. The page then opens with fresh lists, and a sleeping server
 /// is woken before it is needed.
-Future<void> warmParcels(ParcelSource source, KeyValueStore store) async {
+Future<void> warmParcels(ParcelSource source, KeyValueStore store, {DateTime Function() clock = DateTime.now}) async {
   final cache = ParcelCache(store);
   final direction = ParcelController.rememberedDirection(store);
   final at = cache.loadedAt(direction);
@@ -414,7 +417,7 @@ Future<void> warmParcels(ParcelSource source, KeyValueStore store) async {
   try {
     final dates = await source.dates(direction);
     cache.putDates(direction, dates);
-    final now = DateTime.now();
+    final now = clock();
     final today = DateTime(now.year, now.month, now.day);
     final next = dates.where((d) => !d.date.isBefore(today)).firstOrNull;
     if (next != null) cache.putPosts(direction, next.key, await source.postsByDate(next.key, direction));

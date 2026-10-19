@@ -245,6 +245,7 @@ class TestApp {
       barcodes: barcodes,
       qna: qna,
       businesses: this.businesses,
+      clock: () => clockNow,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
         cameras.add(camera);
@@ -811,4 +812,11 @@ class FakeBusinesses implements BusinessSource {
 
   @override
   Future<Uint8List?> logo(Uri url) async => logos[url.path];
+}
+
+/// Opens [page] over the home screen directly: for a section the home screen
+/// doesn't offer in the app's language. Settling is left to the caller.
+Future<void> pushPage(WidgetTester tester, Widget page) async {
+  tester.state<NavigatorState>(find.byType(Navigator).first).push(MaterialPageRoute<void>(builder: (_) => page));
+  await tester.pump();
 }

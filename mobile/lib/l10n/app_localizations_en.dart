@@ -154,9 +154,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newBadge => 'New';
 
   @override
-  String get uzOnlyHint => 'Uzbek only';
-
-  @override
   String get featurePrayers => 'Prayer times';
 
   @override
