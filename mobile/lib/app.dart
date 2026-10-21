@@ -36,12 +36,14 @@ class _VegukinAppState extends State<VegukinApp> {
 
   final _navigator = GlobalKey<NavigatorState>();
   final _messenger = GlobalKey<ScaffoldMessengerState>();
-  late AppLanguage? _language = widget.services.locale.language;
+  AppLanguage? _language;
 
   @override
   void initState() {
     super.initState();
     final services = widget.services;
+    // Read now: a lazy read would first happen after the change, and miss it.
+    _language = services.locale.language;
     services.locale.addListener(_languageChanged);
     services.account.handlePush(onOpen: _openPush, onForeground: _showPush);
     // The account exists from the first launch, so watches need no sign-in.

@@ -58,7 +58,9 @@ Future<void> main() async {
       source: const HttpAccountSource(),
       push: FirebasePushService(),
       google: GoogleSignInAuth(),
-      language: () => locale.language ?? AppLanguage.uz,
+      // Before the language is chosen: the one the language screen offers.
+      language: () =>
+          locale.language ?? AppLanguage.guessFrom(WidgetsBinding.instance.platformDispatcher.locales),
     ),
   );
 

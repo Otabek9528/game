@@ -72,6 +72,20 @@ void main() {
       expect(accounts.users.keys, ['token-2']);
     });
 
+    test('a phone the server has the wrong language for is put right on launch', () async {
+      final store = MemoryStore();
+      final accounts = FakeAccounts();
+      await controller(store, accounts).ensure();
+      expect(accounts.devices.single, ('token-1', null, 'uz'));
+      store.write('app_session_lang', '');
+
+      await controller(store, accounts, language: AppLanguage.ru).ensure();
+      expect(accounts.devices.last, ('token-1', null, 'ru'));
+      final told = accounts.devices.length;
+      await controller(store, accounts, language: AppLanguage.ru).ensure();
+      expect(accounts.devices.length, told, reason: 'told once');
+    });
+
     test('the push token and the language reach the server', () async {
       var language = AppLanguage.uz;
       final accounts = FakeAccounts();
@@ -99,6 +113,14 @@ void main() {
       expect(app.accounts.users, hasLength(1));
       expect(app.push.starts, 1);
       expect(app.accounts.devices.last.$2, 'push-token');
+    });
+
+    testWidgets('the first language change after launch reaches the server (the bots ask in it)', (tester) async {
+      final app = TestApp(language: 'uz');
+      await app.launch(tester);
+      await app.services.locale.choose(AppLanguage.ru);
+      await tester.pumpAndSettle();
+      expect(app.accounts.devices.last.$3, 'ru');
     });
 
     testWidgets('a tapped notification opens its page; one arriving in the app shows, and opens', (tester) async {

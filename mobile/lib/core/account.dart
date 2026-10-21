@@ -248,6 +248,10 @@ class AccountController extends ChangeNotifier {
   static const _userKey = 'app_user';
   static const _seenKey = 'inbox_seen';
 
+  /// The language the server was last told: its alerts, and the bots' sign-in
+  /// questions, are written in it.
+  static const _langKey = 'app_session_lang';
+
   String? _token;
   AppUser? _user;
   String? _pushToken;
@@ -312,13 +316,16 @@ class AccountController extends ChangeNotifier {
   Future<void> _ensure() async {
     try {
       if (_token == null) {
-        final (token, user) = await _source.hello(lang: _lang, pushToken: _pushToken);
+        final lang = _lang;
+        final (token, user) = await _source.hello(lang: lang, pushToken: _pushToken);
         _token = token;
         _store.write(_tokenKey, token);
+        _store.write(_langKey, lang);
         _setUser(user);
         return;
       }
       _setUser(await _source.me(_token!));
+      await _syncLanguage();
     } on AccountException catch (e) {
       if (e.code == 'bad_session') {
         // Deleted, or the server lost it: start again as someone new.
@@ -361,7 +368,9 @@ class AccountController extends ChangeNotifier {
     final session = _token;
     if (session == null) return;
     try {
-      await _source.updateDevice(session, pushToken: token, lang: _lang);
+      final lang = _lang;
+      await _source.updateDevice(session, pushToken: token, lang: lang);
+      _store.write(_langKey, lang);
     } on AccountException {
       // Sent again with the next token refresh or launch.
     }
@@ -405,13 +414,21 @@ class AccountController extends ChangeNotifier {
 
   /// The app's language changed: notifications from now on come in it.
   Future<void> languageChanged() async {
-    final session = _token;
-    if (session == null) return;
     try {
-      await _source.updateDevice(session, lang: _lang);
+      await _syncLanguage();
     } on AccountException {
-      // Next launch.
+      // On the next launch, or before the next sign-in.
     }
+  }
+
+  /// Tells the server the app's language, unless it already knows it. Runs
+  /// with every [ensure], so it is right before a sign-in link is made.
+  Future<void> _syncLanguage() async {
+    final session = _token;
+    final lang = _lang;
+    if (session == null || _store.read(_langKey) == lang) return;
+    await _source.updateDevice(session, lang: lang);
+    _store.write(_langKey, lang);
   }
 
   Future<String> _session() async {
