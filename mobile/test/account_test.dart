@@ -6,6 +6,7 @@ import 'package:muslim_vegukin/core/app_language.dart';
 import 'package:muslim_vegukin/features/account/account_screen.dart';
 import 'package:muslim_vegukin/features/account/inbox_message.dart';
 import 'package:muslim_vegukin/features/account/inbox_screen.dart';
+import 'package:muslim_vegukin/features/hikorea/hikorea_screen.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 
 import 'support/fakes.dart';
@@ -141,9 +142,13 @@ void main() {
       final app = TestApp(language: 'en');
       await app.launch(tester);
       app.push.open({'url': 'https://vegukin-twa.pages.dev/pages/places/places-detail.html?id=8&type=restaurant'});
-      app.push.open({'kind': 'hikorea'});
       app.push.open({});
-      expect(app.opened.ids, ['restaurant', 'hikorea']);
+      expect(app.opened.ids, ['restaurant']);
+      app.push.open({'kind': 'hikorea'});
+      await tester.pumpAndSettle();
+      expect(find.byType(HikoreaScreen), findsOneWidget, reason: 'native, not the web page');
+      await tester.pageBack();
+      await tester.pumpAndSettle();
 
       app.push.arrive('Kebab House', 'Now open', {'url': 'https://x/pages/notifications/notifications.html'});
       await tester.pumpAndSettle();

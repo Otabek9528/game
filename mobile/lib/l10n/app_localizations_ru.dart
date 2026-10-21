@@ -2091,6 +2091,341 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get hkLede =>
+      'Каждые 5 минут проверяем HiKorea и сообщаем, как только в выбранные вами дни появится свободное место.';
+
+  @override
+  String get hkSearchHint => 'Поиск офиса';
+
+  @override
+  String get hkMyWatches => 'Мои слежения';
+
+  @override
+  String hkActiveWatches(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count активных слежений',
+      few: '$count активных слежения',
+      one: '$count активное слежение',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkLastViewed => 'Недавно смотрели';
+
+  @override
+  String get hkStep1 => 'Выберите офис';
+
+  @override
+  String get hkStep2 => 'Посмотрите свободные дни';
+
+  @override
+  String get hkStep3 => 'Узнайте, когда появится место';
+
+  @override
+  String get hkAddressCardTitle => 'Не знаете свой офис?';
+
+  @override
+  String get hkAddressCardBody => 'Найдём его по вашему адресу';
+
+  @override
+  String get hkOffices => 'Иммиграционные офисы';
+
+  @override
+  String hkCounters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count окон',
+      few: '$count окна',
+      one: '$count окно',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkNoMatch =>
+      'Офис не найден. Попробуйте другое слово или поиск по адресу.';
+
+  @override
+  String get hkLoadFailed => 'Не удалось загрузить. Проверьте интернет.';
+
+  @override
+  String get hkAddressTitle => 'Поиск по адресу';
+
+  @override
+  String get hkAddressLede =>
+      'Каждый офис обслуживает свои районы. Выберите провинцию и введите домашний адрес по-корейски.';
+
+  @override
+  String get hkProvince => '1. Провинция';
+
+  @override
+  String get hkAddress => '2. Домашний адрес (по-корейски)';
+
+  @override
+  String get hkAddressHint =>
+      'В адресе должен быть город или район (-시, -구, -군), например 안산시 단원구.';
+
+  @override
+  String get hkFindOffice => 'Найти офис';
+
+  @override
+  String get hkNeedProvince => 'Сначала выберите провинцию';
+
+  @override
+  String get hkNeedAddress => 'Введите адрес';
+
+  @override
+  String get hkYourOffice => 'Ваш офис:';
+
+  @override
+  String get hkPickOne => 'Выберите подходящий:';
+
+  @override
+  String get hkAddressNoMatch =>
+      'Для этого адреса офис не найден. Введите адрес полностью.';
+
+  @override
+  String get hkCountersTitle => 'Какое окно вам нужно?';
+
+  @override
+  String get hkCountersLede =>
+      'Окна выполняют одну работу, но могут отличаться местом, этажом или временем приёма. Прочитайте описание перед выбором.';
+
+  @override
+  String get hkFromAfternoon => 'Приём с 09:36';
+
+  @override
+  String get hkMore => 'Подробнее';
+
+  @override
+  String hkCounterN(int n) {
+    return 'Окно $n';
+  }
+
+  @override
+  String get hkCalendarHint =>
+      'Нажмите на день — проверим места на HiKorea прямо сейчас.';
+
+  @override
+  String get hkCheckedNow => 'Проверено только что';
+
+  @override
+  String hkCheckedMinutes(int n) {
+    return 'Проверено $n мин назад';
+  }
+
+  @override
+  String hkCheckedHours(int n) {
+    return 'Проверено $n ч назад';
+  }
+
+  @override
+  String hkCheckedDays(int n) {
+    return 'Проверено $n дн. назад';
+  }
+
+  @override
+  String get hkEarliest => 'Ближайший свободный день';
+
+  @override
+  String get hkAllFull => 'Сейчас все дни заняты';
+
+  @override
+  String get hkAllFullBody =>
+      'Поставьте слежение — сообщим, как только освободится место.';
+
+  @override
+  String get hkLegendOpen => 'Свободно';
+
+  @override
+  String get hkLegendSome => 'Есть брони';
+
+  @override
+  String get hkLegendFull => 'Занято';
+
+  @override
+  String get hkLegendClosed => 'Закрыто';
+
+  @override
+  String get hkNoDates =>
+      'Сейчас ни одного дня не видно. Поставьте слежение — сообщим, как только появится место.';
+
+  @override
+  String get hkNotifyMe => 'Сообщить, когда появится место';
+
+  @override
+  String get hkChecking => 'Проверяем HiKorea…';
+
+  @override
+  String get hkDayClosed => 'В этот день офис закрыт';
+
+  @override
+  String get hkFullyBooked => 'Всё занято';
+
+  @override
+  String get hkLastOne => 'Осталось одно место';
+
+  @override
+  String hkSlotsFree(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n свободных мест',
+      few: '$n свободных места',
+      one: '$n свободное место',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkBookCue => 'Записаться можно на сайте HiKorea.';
+
+  @override
+  String get hkFullCue =>
+      'Мест нет. Поставьте слежение — сообщим, когда появится место.';
+
+  @override
+  String hkBookedOf(int taken, int capacity) {
+    return 'Занято $taken из $capacity';
+  }
+
+  @override
+  String get hkMorning => 'Утро';
+
+  @override
+  String get hkAfternoon => 'После обеда';
+
+  @override
+  String hkLeft(int n) {
+    return 'ост. $n';
+  }
+
+  @override
+  String get hkSlotFull => 'Занято';
+
+  @override
+  String get hkBook => 'Записаться на HiKorea';
+
+  @override
+  String get hkFetchFailed =>
+      'Не удалось связаться с HiKorea. Попробуйте чуть позже.';
+
+  @override
+  String get hkSessionExpired =>
+      'Связь с HiKorea обновляется. Попробуйте чуть позже.';
+
+  @override
+  String get hkWatchTitle => 'За какими днями следить?';
+
+  @override
+  String get hkWatchLede =>
+      'Как только в эти дни появится место, пришлём уведомление.';
+
+  @override
+  String hkNextDays(int n) {
+    return '$n дней';
+  }
+
+  @override
+  String get hkPickDates => 'Выбрать даты';
+
+  @override
+  String hkDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n дней',
+      few: '$n дня',
+      one: '$n день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkStartWatching => 'Начать слежение';
+
+  @override
+  String get hkTooLong => 'Можно следить не больше 90 дней';
+
+  @override
+  String get hkDuplicate => 'Эти дни уже отслеживаются';
+
+  @override
+  String get hkMaxReached => 'Максимум 10 слежений. Сначала остановите одно.';
+
+  @override
+  String get hkCreateFailed =>
+      'Не удалось поставить слежение. Попробуйте ещё раз.';
+
+  @override
+  String get hkDoneTitle => 'Слежение поставлено';
+
+  @override
+  String get hkDoneBody =>
+      'Проверяем каждые 5 минут. Как только появится место, придёт уведомление.';
+
+  @override
+  String get hkPushOff =>
+      'Уведомления на этом телефоне выключены — сообщения будут только во «Входящих».';
+
+  @override
+  String get hkSendTest => 'Тестовое уведомление';
+
+  @override
+  String get hkTestSent => 'Отправлено';
+
+  @override
+  String get hkTestFailed =>
+      'Не удалось отправить. Проверьте, что уведомления включены.';
+
+  @override
+  String get hkSeeWatches => 'Мои слежения';
+
+  @override
+  String get hkWatchesEmpty => 'Пока нет слежений';
+
+  @override
+  String get hkWatchesEmptyBody =>
+      'Выберите офис, посмотрите календарь и поставьте слежение.';
+
+  @override
+  String get hkStatusActive => 'Активно';
+
+  @override
+  String get hkStatusExpired => 'Завершено';
+
+  @override
+  String get hkStatusCancelled => 'Остановлено';
+
+  @override
+  String get hkStatusUndeliverable => 'Не доставлено';
+
+  @override
+  String get hkStop => 'Остановить';
+
+  @override
+  String get hkStopTitle => 'Остановить слежение?';
+
+  @override
+  String get hkStopped => 'Слежение остановлено';
+
+  @override
+  String get hkStopFailed => 'Не удалось остановить. Попробуйте ещё раз.';
+
+  @override
+  String get hkCalendar => 'Календарь';
+
+  @override
+  String get hkPastWatches => 'Завершённые';
+
+  @override
+  String get hkPickOffice => 'Выбрать офис';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

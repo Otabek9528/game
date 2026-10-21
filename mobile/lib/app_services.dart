@@ -16,6 +16,7 @@ import 'core/theme_controller.dart';
 import 'features/barcode/barcode_camera.dart';
 import 'features/barcode/barcode_source.dart';
 import 'features/business/business_source.dart';
+import 'features/hikorea/hikorea_source.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/links/links_controller.dart';
 import 'features/parcel/parcel_source.dart';
@@ -153,6 +154,7 @@ class AppServices {
     this.barcodeCamera = MobileScannerCamera.new,
     this.qna = const HttpQnaSource(),
     this.businesses = const HttpBusinessSource(),
+    this.hikorea = const HttpHikoreaSource(),
     this.clock = DateTime.now,
   });
 
@@ -198,6 +200,9 @@ class AppServices {
 
   /// The business directory.
   final BusinessSource businesses;
+
+  /// HiKorea appointments and watches.
+  final HikoreaSource hikorea;
 
   /// What day it is, for the pages that list days: the phone's clock, or a
   /// test's.

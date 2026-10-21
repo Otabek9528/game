@@ -2050,6 +2050,314 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
+  String get hkLede =>
+      'HiKorea\'dagi bo‘sh joylarni har 5 daqiqada tekshiramiz. Siz tanlagan kunlarda joy ochilishi bilan xabar beramiz.';
+
+  @override
+  String get hkSearchHint => 'Ofis nomini izlang';
+
+  @override
+  String get hkMyWatches => 'Kuzatuvlarim';
+
+  @override
+  String hkActiveWatches(int count) {
+    return '$count ta faol kuzatuv';
+  }
+
+  @override
+  String get hkLastViewed => 'Oxirgi ko‘rilgan';
+
+  @override
+  String get hkStep1 => 'Ofisingizni tanlang';
+
+  @override
+  String get hkStep2 => 'Bo‘sh kunlarni ko‘ring';
+
+  @override
+  String get hkStep3 => 'Joy ochilganda xabar oling';
+
+  @override
+  String get hkAddressCardTitle => 'Ofisingizni bilmaysizmi?';
+
+  @override
+  String get hkAddressCardBody => 'Uy manzilingiz bo‘yicha topib beramiz';
+
+  @override
+  String get hkOffices => 'Immigratsiya ofislari';
+
+  @override
+  String hkCounters(int count) {
+    return '$count ta bo‘lim';
+  }
+
+  @override
+  String get hkNoMatch =>
+      'Bunday ofis topilmadi. Boshqa so‘z bilan izlang yoki manzil bo‘yicha toping.';
+
+  @override
+  String get hkLoadFailed => 'Yuklab bo‘lmadi. Internetni tekshiring.';
+
+  @override
+  String get hkAddressTitle => 'Manzil bo‘yicha topish';
+
+  @override
+  String get hkAddressLede =>
+      'Har bir ofis o‘z tumanlariga xizmat qiladi. Viloyatingizni tanlang va uy manzilingizni koreyscha yozing.';
+
+  @override
+  String get hkProvince => '1. Viloyat';
+
+  @override
+  String get hkAddress => '2. Uy manzili (koreyscha)';
+
+  @override
+  String get hkAddressHint =>
+      'Manzilda shahar yoki tuman nomi bo‘lsin (-시, -구, -군), masalan 안산시 단원구.';
+
+  @override
+  String get hkFindOffice => 'Ofisni topish';
+
+  @override
+  String get hkNeedProvince => 'Avval viloyatni tanlang';
+
+  @override
+  String get hkNeedAddress => 'Manzilni yozing';
+
+  @override
+  String get hkYourOffice => 'Sizning ofisingiz:';
+
+  @override
+  String get hkPickOne => 'Mosini tanlang:';
+
+  @override
+  String get hkAddressNoMatch =>
+      'Bu manzil uchun ofis topilmadi. Manzilni to‘liq yozing.';
+
+  @override
+  String get hkCountersTitle => 'Qaysi bo‘lim kerak?';
+
+  @override
+  String get hkCountersLede =>
+      'Bo‘limlar bir xil ishni bajaradi, lekin joyi, qavati yoki qabul vaqti farq qilishi mumkin. Tanlashdan oldin tavsifini o‘qing.';
+
+  @override
+  String get hkFromAfternoon => 'Qabul 09:36 dan';
+
+  @override
+  String get hkMore => 'Batafsil';
+
+  @override
+  String hkCounterN(int n) {
+    return '$n-bo‘lim';
+  }
+
+  @override
+  String get hkCalendarHint =>
+      'Kunni bosing — joylarni HiKorea\'dan hozir tekshiramiz.';
+
+  @override
+  String get hkCheckedNow => 'Hozirgina tekshirildi';
+
+  @override
+  String hkCheckedMinutes(int n) {
+    return '$n daqiqa oldin tekshirildi';
+  }
+
+  @override
+  String hkCheckedHours(int n) {
+    return '$n soat oldin tekshirildi';
+  }
+
+  @override
+  String hkCheckedDays(int n) {
+    return '$n kun oldin tekshirildi';
+  }
+
+  @override
+  String get hkEarliest => 'Eng yaqin bo‘sh kun';
+
+  @override
+  String get hkAllFull => 'Hozir hamma kunlar band';
+
+  @override
+  String get hkAllFullBody =>
+      'Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.';
+
+  @override
+  String get hkLegendOpen => 'Bo‘sh';
+
+  @override
+  String get hkLegendSome => 'Bandlik bor';
+
+  @override
+  String get hkLegendFull => 'To‘la band';
+
+  @override
+  String get hkLegendClosed => 'Yopiq';
+
+  @override
+  String get hkNoDates =>
+      'Hozir hech qanday kun ko‘rinmayapti. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.';
+
+  @override
+  String get hkNotifyMe => 'Joy ochilganda xabar berish';
+
+  @override
+  String get hkChecking => 'HiKorea tekshirilmoqda…';
+
+  @override
+  String get hkDayClosed => 'Bu kuni ofis ishlamaydi';
+
+  @override
+  String get hkFullyBooked => 'To‘la band';
+
+  @override
+  String get hkLastOne => 'Faqat 1 ta joy qoldi';
+
+  @override
+  String hkSlotsFree(int n) {
+    return '$n ta bo‘sh joy';
+  }
+
+  @override
+  String get hkBookCue => 'Bron qilish HiKorea saytida bo‘ladi.';
+
+  @override
+  String get hkFullCue =>
+      'Bo‘sh joy yo‘q. Kuzatuv o‘rnatsangiz, joy ochilishi bilan xabar beramiz.';
+
+  @override
+  String hkBookedOf(int taken, int capacity) {
+    return '$capacity tadan $taken tasi band';
+  }
+
+  @override
+  String get hkMorning => 'Ertalab';
+
+  @override
+  String get hkAfternoon => 'Tushdan keyin';
+
+  @override
+  String hkLeft(int n) {
+    return '$n ta qoldi';
+  }
+
+  @override
+  String get hkSlotFull => 'Band';
+
+  @override
+  String get hkBook => 'HiKorea\'da bron qilish';
+
+  @override
+  String get hkFetchFailed =>
+      'HiKorea\'ga ulanib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.';
+
+  @override
+  String get hkSessionExpired =>
+      'HiKorea bilan aloqamiz yangilanmoqda. Birozdan so‘ng urinib ko‘ring.';
+
+  @override
+  String get hkWatchTitle => 'Qaysi kunlarni kuzataylik?';
+
+  @override
+  String get hkWatchLede =>
+      'Shu kunlarda joy ochilishi bilan bildirishnoma yuboramiz.';
+
+  @override
+  String hkNextDays(int n) {
+    return 'Keyingi $n kun';
+  }
+
+  @override
+  String get hkPickDates => 'Aniq sanalarni tanlash';
+
+  @override
+  String hkDays(int n) {
+    return '$n kun';
+  }
+
+  @override
+  String get hkStartWatching => 'Kuzatishni boshlash';
+
+  @override
+  String get hkTooLong => 'Ko‘pi bilan 90 kun kuzatish mumkin';
+
+  @override
+  String get hkDuplicate => 'Bu kunlar allaqachon kuzatilmoqda';
+
+  @override
+  String get hkMaxReached =>
+      'Ko‘pi bilan 10 ta kuzatuv. Avval bittasini to‘xtating.';
+
+  @override
+  String get hkCreateFailed =>
+      'Kuzatuvni o‘rnatib bo‘lmadi. Qayta urinib ko‘ring.';
+
+  @override
+  String get hkDoneTitle => 'Kuzatuv o‘rnatildi';
+
+  @override
+  String get hkDoneBody =>
+      'Har 5 daqiqada tekshiramiz. Joy ochilishi bilan bildirishnoma keladi.';
+
+  @override
+  String get hkPushOff =>
+      'Bu telefonda bildirishnomalar o‘chiq — xabarlar faqat «Kelgan xabarlar»da ko‘rinadi.';
+
+  @override
+  String get hkSendTest => 'Sinov bildirishnomasi';
+
+  @override
+  String get hkTestSent => 'Yuborildi';
+
+  @override
+  String get hkTestFailed =>
+      'Yuborib bo‘lmadi. Bildirishnomalar yoqilganini tekshiring.';
+
+  @override
+  String get hkSeeWatches => 'Kuzatuvlarimni ko‘rish';
+
+  @override
+  String get hkWatchesEmpty => 'Hali kuzatuv yo‘q';
+
+  @override
+  String get hkWatchesEmptyBody =>
+      'Ofisni tanlang, kalendarini ko‘ring va kuzatuv o‘rnating.';
+
+  @override
+  String get hkStatusActive => 'Faol';
+
+  @override
+  String get hkStatusExpired => 'Muddati tugagan';
+
+  @override
+  String get hkStatusCancelled => 'To‘xtatilgan';
+
+  @override
+  String get hkStatusUndeliverable => 'Yetkazib bo‘lmadi';
+
+  @override
+  String get hkStop => 'To‘xtatish';
+
+  @override
+  String get hkStopTitle => 'Kuzatuv to‘xtatilsinmi?';
+
+  @override
+  String get hkStopped => 'Kuzatuv to‘xtatildi';
+
+  @override
+  String get hkStopFailed => 'To‘xtatib bo‘lmadi. Qayta urinib ko‘ring.';
+
+  @override
+  String get hkCalendar => 'Kalendar';
+
+  @override
+  String get hkPastWatches => 'Tugaganlar';
+
+  @override
+  String get hkPickOffice => 'Ofisni tanlash';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

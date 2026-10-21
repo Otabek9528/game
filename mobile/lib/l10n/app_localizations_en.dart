@@ -2070,6 +2070,334 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get hkLede =>
+      'We check HiKorea every 5 minutes and tell you the moment a slot opens on your dates.';
+
+  @override
+  String get hkSearchHint => 'Search for your office';
+
+  @override
+  String get hkMyWatches => 'My watches';
+
+  @override
+  String hkActiveWatches(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active watches',
+      one: '1 active watch',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkLastViewed => 'Last viewed';
+
+  @override
+  String get hkStep1 => 'Pick your office';
+
+  @override
+  String get hkStep2 => 'See the open days';
+
+  @override
+  String get hkStep3 => 'Hear when a slot opens';
+
+  @override
+  String get hkAddressCardTitle => 'Not sure which office?';
+
+  @override
+  String get hkAddressCardBody => 'We’ll find it from your home address';
+
+  @override
+  String get hkOffices => 'Immigration offices';
+
+  @override
+  String hkCounters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count counters',
+      one: '1 counter',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkNoMatch =>
+      'No office matches. Try another word, or find it by your address.';
+
+  @override
+  String get hkLoadFailed => 'Couldn’t load. Check your connection.';
+
+  @override
+  String get hkAddressTitle => 'Find by address';
+
+  @override
+  String get hkAddressLede =>
+      'Each office serves its own districts. Pick your province and type your home address in Korean.';
+
+  @override
+  String get hkProvince => '1. Province';
+
+  @override
+  String get hkAddress => '2. Home address (in Korean)';
+
+  @override
+  String get hkAddressHint =>
+      'Include the city or district (-시, -구, -군), e.g. 안산시 단원구.';
+
+  @override
+  String get hkFindOffice => 'Find my office';
+
+  @override
+  String get hkNeedProvince => 'Pick your province first';
+
+  @override
+  String get hkNeedAddress => 'Type your address';
+
+  @override
+  String get hkYourOffice => 'Your office:';
+
+  @override
+  String get hkPickOne => 'Pick the one that fits:';
+
+  @override
+  String get hkAddressNoMatch =>
+      'No office found for this address. Type it in full.';
+
+  @override
+  String get hkCountersTitle => 'Which counter do you need?';
+
+  @override
+  String get hkCountersLede =>
+      'Counters do the same job but can differ in place, floor or opening time. Read the description before you pick.';
+
+  @override
+  String get hkFromAfternoon => 'Opens at 09:36';
+
+  @override
+  String get hkMore => 'More';
+
+  @override
+  String hkCounterN(int n) {
+    return 'Counter $n';
+  }
+
+  @override
+  String get hkCalendarHint =>
+      'Tap a day to check its slots on HiKorea right now.';
+
+  @override
+  String get hkCheckedNow => 'Checked just now';
+
+  @override
+  String hkCheckedMinutes(int n) {
+    return 'Checked $n min ago';
+  }
+
+  @override
+  String hkCheckedHours(int n) {
+    return 'Checked $n h ago';
+  }
+
+  @override
+  String hkCheckedDays(int n) {
+    return 'Checked $n d ago';
+  }
+
+  @override
+  String get hkEarliest => 'Earliest open day';
+
+  @override
+  String get hkAllFull => 'Every day is booked right now';
+
+  @override
+  String get hkAllFullBody =>
+      'Set a watch and we’ll tell you the moment a slot opens.';
+
+  @override
+  String get hkLegendOpen => 'Open';
+
+  @override
+  String get hkLegendSome => 'Filling up';
+
+  @override
+  String get hkLegendFull => 'Fully booked';
+
+  @override
+  String get hkLegendClosed => 'Closed';
+
+  @override
+  String get hkNoDates =>
+      'No days are showing right now. Set a watch and we’ll tell you when one opens.';
+
+  @override
+  String get hkNotifyMe => 'Notify me when a slot opens';
+
+  @override
+  String get hkChecking => 'Checking HiKorea…';
+
+  @override
+  String get hkDayClosed => 'The office is closed this day';
+
+  @override
+  String get hkFullyBooked => 'Fully booked';
+
+  @override
+  String get hkLastOne => 'Just 1 slot left';
+
+  @override
+  String hkSlotsFree(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n slots open',
+      one: '1 slot open',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkBookCue => 'You book on the HiKorea website.';
+
+  @override
+  String get hkFullCue =>
+      'No slots now. Set a watch and we’ll tell you when one opens.';
+
+  @override
+  String hkBookedOf(int taken, int capacity) {
+    return '$taken of $capacity booked';
+  }
+
+  @override
+  String get hkMorning => 'Morning';
+
+  @override
+  String get hkAfternoon => 'Afternoon';
+
+  @override
+  String hkLeft(int n) {
+    return '$n left';
+  }
+
+  @override
+  String get hkSlotFull => 'Full';
+
+  @override
+  String get hkBook => 'Book on HiKorea';
+
+  @override
+  String get hkFetchFailed => 'Couldn’t reach HiKorea. Try again in a moment.';
+
+  @override
+  String get hkSessionExpired =>
+      'Our connection to HiKorea is being renewed. Try again shortly.';
+
+  @override
+  String get hkWatchTitle => 'Which days should we watch?';
+
+  @override
+  String get hkWatchLede =>
+      'When a slot opens on these days, we’ll send you a notification.';
+
+  @override
+  String hkNextDays(int n) {
+    return 'Next $n days';
+  }
+
+  @override
+  String get hkPickDates => 'Pick exact dates';
+
+  @override
+  String hkDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkStartWatching => 'Start watching';
+
+  @override
+  String get hkTooLong => 'You can watch at most 90 days';
+
+  @override
+  String get hkDuplicate => 'You’re already watching these days';
+
+  @override
+  String get hkMaxReached => 'You can have 10 watches. Stop one first.';
+
+  @override
+  String get hkCreateFailed => 'Couldn’t set the watch. Please try again.';
+
+  @override
+  String get hkDoneTitle => 'You’re watching';
+
+  @override
+  String get hkDoneBody =>
+      'We check every 5 minutes. When a slot opens, you’ll get a notification.';
+
+  @override
+  String get hkPushOff =>
+      'Notifications are off on this phone, so alerts will only show in your Inbox.';
+
+  @override
+  String get hkSendTest => 'Send a test notification';
+
+  @override
+  String get hkTestSent => 'Sent';
+
+  @override
+  String get hkTestFailed => 'Couldn’t send. Check that notifications are on.';
+
+  @override
+  String get hkSeeWatches => 'See my watches';
+
+  @override
+  String get hkWatchesEmpty => 'No watches yet';
+
+  @override
+  String get hkWatchesEmptyBody =>
+      'Pick an office, look at its calendar and set a watch.';
+
+  @override
+  String get hkStatusActive => 'Active';
+
+  @override
+  String get hkStatusExpired => 'Ended';
+
+  @override
+  String get hkStatusCancelled => 'Stopped';
+
+  @override
+  String get hkStatusUndeliverable => 'Couldn’t deliver';
+
+  @override
+  String get hkStop => 'Stop';
+
+  @override
+  String get hkStopTitle => 'Stop this watch?';
+
+  @override
+  String get hkStopped => 'Watch stopped';
+
+  @override
+  String get hkStopFailed => 'Couldn’t stop it. Please try again.';
+
+  @override
+  String get hkCalendar => 'Calendar';
+
+  @override
+  String get hkPastWatches => 'Past watches';
+
+  @override
+  String get hkPickOffice => 'Pick an office';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

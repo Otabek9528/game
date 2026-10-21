@@ -3730,6 +3730,540 @@ abstract class AppLocalizations {
   /// **'{total} ta rasmdan {index}-si'**
   String inboxPhoto(int index, int total);
 
+  /// No description provided for @hkLede.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea\'dagi bo‘sh joylarni har 5 daqiqada tekshiramiz. Siz tanlagan kunlarda joy ochilishi bilan xabar beramiz.'**
+  String get hkLede;
+
+  /// No description provided for @hkSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ofis nomini izlang'**
+  String get hkSearchHint;
+
+  /// No description provided for @hkMyWatches.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvlarim'**
+  String get hkMyWatches;
+
+  /// No description provided for @hkActiveWatches.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta faol kuzatuv'**
+  String hkActiveWatches(int count);
+
+  /// No description provided for @hkLastViewed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oxirgi ko‘rilgan'**
+  String get hkLastViewed;
+
+  /// No description provided for @hkStep1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ofisingizni tanlang'**
+  String get hkStep1;
+
+  /// No description provided for @hkStep2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo‘sh kunlarni ko‘ring'**
+  String get hkStep2;
+
+  /// No description provided for @hkStep3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joy ochilganda xabar oling'**
+  String get hkStep3;
+
+  /// No description provided for @hkAddressCardTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ofisingizni bilmaysizmi?'**
+  String get hkAddressCardTitle;
+
+  /// No description provided for @hkAddressCardBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Uy manzilingiz bo‘yicha topib beramiz'**
+  String get hkAddressCardBody;
+
+  /// No description provided for @hkOffices.
+  ///
+  /// In uz, this message translates to:
+  /// **'Immigratsiya ofislari'**
+  String get hkOffices;
+
+  /// No description provided for @hkCounters.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta bo‘lim'**
+  String hkCounters(int count);
+
+  /// No description provided for @hkNoMatch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bunday ofis topilmadi. Boshqa so‘z bilan izlang yoki manzil bo‘yicha toping.'**
+  String get hkNoMatch;
+
+  /// No description provided for @hkLoadFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklab bo‘lmadi. Internetni tekshiring.'**
+  String get hkLoadFailed;
+
+  /// No description provided for @hkAddressTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil bo‘yicha topish'**
+  String get hkAddressTitle;
+
+  /// No description provided for @hkAddressLede.
+  ///
+  /// In uz, this message translates to:
+  /// **'Har bir ofis o‘z tumanlariga xizmat qiladi. Viloyatingizni tanlang va uy manzilingizni koreyscha yozing.'**
+  String get hkAddressLede;
+
+  /// No description provided for @hkProvince.
+  ///
+  /// In uz, this message translates to:
+  /// **'1. Viloyat'**
+  String get hkProvince;
+
+  /// No description provided for @hkAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'2. Uy manzili (koreyscha)'**
+  String get hkAddress;
+
+  /// No description provided for @hkAddressHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilda shahar yoki tuman nomi bo‘lsin (-시, -구, -군), masalan 안산시 단원구.'**
+  String get hkAddressHint;
+
+  /// No description provided for @hkFindOffice.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ofisni topish'**
+  String get hkFindOffice;
+
+  /// No description provided for @hkNeedProvince.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avval viloyatni tanlang'**
+  String get hkNeedProvince;
+
+  /// No description provided for @hkNeedAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilni yozing'**
+  String get hkNeedAddress;
+
+  /// No description provided for @hkYourOffice.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizning ofisingiz:'**
+  String get hkYourOffice;
+
+  /// No description provided for @hkPickOne.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mosini tanlang:'**
+  String get hkPickOne;
+
+  /// No description provided for @hkAddressNoMatch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu manzil uchun ofis topilmadi. Manzilni to‘liq yozing.'**
+  String get hkAddressNoMatch;
+
+  /// No description provided for @hkCountersTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi bo‘lim kerak?'**
+  String get hkCountersTitle;
+
+  /// No description provided for @hkCountersLede.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo‘limlar bir xil ishni bajaradi, lekin joyi, qavati yoki qabul vaqti farq qilishi mumkin. Tanlashdan oldin tavsifini o‘qing.'**
+  String get hkCountersLede;
+
+  /// No description provided for @hkFromAfternoon.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qabul 09:36 dan'**
+  String get hkFromAfternoon;
+
+  /// No description provided for @hkMore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Batafsil'**
+  String get hkMore;
+
+  /// No description provided for @hkCounterN.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n}-bo‘lim'**
+  String hkCounterN(int n);
+
+  /// No description provided for @hkCalendarHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kunni bosing — joylarni HiKorea\'dan hozir tekshiramiz.'**
+  String get hkCalendarHint;
+
+  /// No description provided for @hkCheckedNow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozirgina tekshirildi'**
+  String get hkCheckedNow;
+
+  /// No description provided for @hkCheckedMinutes.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} daqiqa oldin tekshirildi'**
+  String hkCheckedMinutes(int n);
+
+  /// No description provided for @hkCheckedHours.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} soat oldin tekshirildi'**
+  String hkCheckedHours(int n);
+
+  /// No description provided for @hkCheckedDays.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} kun oldin tekshirildi'**
+  String hkCheckedDays(int n);
+
+  /// No description provided for @hkEarliest.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng yaqin bo‘sh kun'**
+  String get hkEarliest;
+
+  /// No description provided for @hkAllFull.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozir hamma kunlar band'**
+  String get hkAllFull;
+
+  /// No description provided for @hkAllFullBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.'**
+  String get hkAllFullBody;
+
+  /// No description provided for @hkLegendOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo‘sh'**
+  String get hkLegendOpen;
+
+  /// No description provided for @hkLegendSome.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bandlik bor'**
+  String get hkLegendSome;
+
+  /// No description provided for @hkLegendFull.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘la band'**
+  String get hkLegendFull;
+
+  /// No description provided for @hkLegendClosed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yopiq'**
+  String get hkLegendClosed;
+
+  /// No description provided for @hkNoDates.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozir hech qanday kun ko‘rinmayapti. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.'**
+  String get hkNoDates;
+
+  /// No description provided for @hkNotifyMe.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joy ochilganda xabar berish'**
+  String get hkNotifyMe;
+
+  /// No description provided for @hkChecking.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea tekshirilmoqda…'**
+  String get hkChecking;
+
+  /// No description provided for @hkDayClosed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu kuni ofis ishlamaydi'**
+  String get hkDayClosed;
+
+  /// No description provided for @hkFullyBooked.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘la band'**
+  String get hkFullyBooked;
+
+  /// No description provided for @hkLastOne.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faqat 1 ta joy qoldi'**
+  String get hkLastOne;
+
+  /// No description provided for @hkSlotsFree.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} ta bo‘sh joy'**
+  String hkSlotsFree(int n);
+
+  /// No description provided for @hkBookCue.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bron qilish HiKorea saytida bo‘ladi.'**
+  String get hkBookCue;
+
+  /// No description provided for @hkFullCue.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo‘sh joy yo‘q. Kuzatuv o‘rnatsangiz, joy ochilishi bilan xabar beramiz.'**
+  String get hkFullCue;
+
+  /// No description provided for @hkBookedOf.
+  ///
+  /// In uz, this message translates to:
+  /// **'{capacity} tadan {taken} tasi band'**
+  String hkBookedOf(int taken, int capacity);
+
+  /// No description provided for @hkMorning.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ertalab'**
+  String get hkMorning;
+
+  /// No description provided for @hkAfternoon.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tushdan keyin'**
+  String get hkAfternoon;
+
+  /// No description provided for @hkLeft.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} ta qoldi'**
+  String hkLeft(int n);
+
+  /// No description provided for @hkSlotFull.
+  ///
+  /// In uz, this message translates to:
+  /// **'Band'**
+  String get hkSlotFull;
+
+  /// No description provided for @hkBook.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea\'da bron qilish'**
+  String get hkBook;
+
+  /// No description provided for @hkFetchFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea\'ga ulanib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.'**
+  String get hkFetchFailed;
+
+  /// No description provided for @hkSessionExpired.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea bilan aloqamiz yangilanmoqda. Birozdan so‘ng urinib ko‘ring.'**
+  String get hkSessionExpired;
+
+  /// No description provided for @hkWatchTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi kunlarni kuzataylik?'**
+  String get hkWatchTitle;
+
+  /// No description provided for @hkWatchLede.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu kunlarda joy ochilishi bilan bildirishnoma yuboramiz.'**
+  String get hkWatchLede;
+
+  /// No description provided for @hkNextDays.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyingi {n} kun'**
+  String hkNextDays(int n);
+
+  /// No description provided for @hkPickDates.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aniq sanalarni tanlash'**
+  String get hkPickDates;
+
+  /// No description provided for @hkDays.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} kun'**
+  String hkDays(int n);
+
+  /// No description provided for @hkStartWatching.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatishni boshlash'**
+  String get hkStartWatching;
+
+  /// No description provided for @hkTooLong.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘pi bilan 90 kun kuzatish mumkin'**
+  String get hkTooLong;
+
+  /// No description provided for @hkDuplicate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu kunlar allaqachon kuzatilmoqda'**
+  String get hkDuplicate;
+
+  /// No description provided for @hkMaxReached.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘pi bilan 10 ta kuzatuv. Avval bittasini to‘xtating.'**
+  String get hkMaxReached;
+
+  /// No description provided for @hkCreateFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvni o‘rnatib bo‘lmadi. Qayta urinib ko‘ring.'**
+  String get hkCreateFailed;
+
+  /// No description provided for @hkDoneTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuv o‘rnatildi'**
+  String get hkDoneTitle;
+
+  /// No description provided for @hkDoneBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Har 5 daqiqada tekshiramiz. Joy ochilishi bilan bildirishnoma keladi.'**
+  String get hkDoneBody;
+
+  /// No description provided for @hkPushOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu telefonda bildirishnomalar o‘chiq — xabarlar faqat «Kelgan xabarlar»da ko‘rinadi.'**
+  String get hkPushOff;
+
+  /// No description provided for @hkSendTest.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sinov bildirishnomasi'**
+  String get hkSendTest;
+
+  /// No description provided for @hkTestSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborildi'**
+  String get hkTestSent;
+
+  /// No description provided for @hkTestFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborib bo‘lmadi. Bildirishnomalar yoqilganini tekshiring.'**
+  String get hkTestFailed;
+
+  /// No description provided for @hkSeeWatches.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvlarimni ko‘rish'**
+  String get hkSeeWatches;
+
+  /// No description provided for @hkWatchesEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali kuzatuv yo‘q'**
+  String get hkWatchesEmpty;
+
+  /// No description provided for @hkWatchesEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ofisni tanlang, kalendarini ko‘ring va kuzatuv o‘rnating.'**
+  String get hkWatchesEmptyBody;
+
+  /// No description provided for @hkStatusActive.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faol'**
+  String get hkStatusActive;
+
+  /// No description provided for @hkStatusExpired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muddati tugagan'**
+  String get hkStatusExpired;
+
+  /// No description provided for @hkStatusCancelled.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘xtatilgan'**
+  String get hkStatusCancelled;
+
+  /// No description provided for @hkStatusUndeliverable.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yetkazib bo‘lmadi'**
+  String get hkStatusUndeliverable;
+
+  /// No description provided for @hkStop.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘xtatish'**
+  String get hkStop;
+
+  /// No description provided for @hkStopTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuv to‘xtatilsinmi?'**
+  String get hkStopTitle;
+
+  /// No description provided for @hkStopped.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuv to‘xtatildi'**
+  String get hkStopped;
+
+  /// No description provided for @hkStopFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘xtatib bo‘lmadi. Qayta urinib ko‘ring.'**
+  String get hkStopFailed;
+
+  /// No description provided for @hkCalendar.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kalendar'**
+  String get hkCalendar;
+
+  /// No description provided for @hkPastWatches.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tugaganlar'**
+  String get hkPastWatches;
+
+  /// No description provided for @hkPickOffice.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ofisni tanlash'**
+  String get hkPickOffice;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

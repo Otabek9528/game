@@ -18,6 +18,8 @@ import 'package:muslim_vegukin/features/barcode/barcode_models.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_source.dart';
 import 'package:muslim_vegukin/features/business/business_models.dart';
 import 'package:muslim_vegukin/features/business/business_source.dart';
+import 'package:muslim_vegukin/features/hikorea/hikorea_models.dart';
+import 'package:muslim_vegukin/features/hikorea/hikorea_source.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/parcel/parcel_models.dart';
@@ -258,6 +260,7 @@ class TestApp {
       barcodes: barcodes,
       qna: qna,
       businesses: this.businesses,
+      hikorea: hikorea,
       clock: () => clockNow,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
@@ -292,6 +295,7 @@ class TestApp {
   final barcodes = FakeBarcodes();
   final qna = FakeQna();
   final FakeBusinesses businesses;
+  final hikorea = FakeHikorea();
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];
@@ -1002,4 +1006,153 @@ class FakeGoogle implements GoogleAuth {
 
   @override
   Future<void> signOut() async => signOuts++;
+}
+
+/// The HiKorea server, played by the test: three offices (Ansan with two
+/// counters), a calendar around [testNow], live days, and watches.
+class FakeHikorea implements HikoreaSource {
+  bool fail = false;
+
+  /// What a day's live check answers instead: 'session_expired' …
+  String? dayError;
+  final watchList = <HkWatch>[];
+  final tests = <String>[];
+  final asked = <String>[];
+  int _next = 0;
+
+  void _online() {
+    if (fail) throw const HkException('offline');
+  }
+
+  static final _offices = [
+    HkOffice(id: '1270667', nameEn: 'Ansan Immigration Office', nameKo: '안산출입국·외국인사무소', shortCode: 'AS', desks: const [
+      HkDesk(
+        seq: 101,
+        booth: {'en': "Ansan Center] Residence Control(location: Ansan Foreign Resident's Support Headquarters 1F)(2023.09.19.~, AFTER 09:36)"},
+        details: {'en': 'Registration, extension of stay and change of status for residents of Danwon-gu.'},
+      ),
+      HkDesk(seq: 102, booth: {'en': 'Siheung Center] Residence Control(location: Siheung migrant welfare Center 2F)(2023.09.19.~)'}),
+    ]),
+    HkOffice(id: '1270100', nameEn: 'Seoul Immigration Office', nameKo: '서울출입국·외국인청', shortCode: 'SU', desks: const [
+      HkDesk(seq: 201, booth: {'en': 'Foreigner Residence Control(1F, All countries)(2023.10.14.~)', 'uz': 'Chet ellik rezidentlar nazorati(1-qavat, Barcha mamlakatlar)(2023.10.14.~)'}),
+    ]),
+    HkOffice(id: 'GIMHAE BRANCH OFFICE', nameEn: 'GIMHAE BRANCH OFFICE', desks: const [HkDesk(seq: 301, booth: {'en': 'Others(2021.05.01 ~ )'})]),
+  ];
+
+  /// Instead of the three: the real list, for screenshots.
+  List<HkOffice>? officesOverride;
+
+  @override
+  Future<List<HkOffice>> offices() async {
+    _online();
+    return officesOverride ?? _offices;
+  }
+
+  @override
+  Future<List<String>> provinces() async {
+    _online();
+    return const ['경기', '경남', '서울'];
+  }
+
+  @override
+  Future<List<HkMatch>> resolve(String province, String address) async {
+    _online();
+    asked.add('$province|$address');
+    if (province == '경기' && address.contains('단원구')) {
+      return const [HkMatch(officeId: '1270667', nameEn: 'Ansan Immigration Office', nameKo: '안산출입국·외국인사무소', district: '안산시 단원구')];
+    }
+    return const [];
+  }
+
+  /// Mon 19 Oct: 5 booked, Tue 20: 40 (full), Mon 26: 10 (full), Tue 27: 20;
+  /// the other working days to the end of November nobody has booked yet;
+  /// Tue 3 Nov is a holiday.
+  @override
+  Future<HkCalendar> calendar(int desk) async {
+    _online();
+    asked.add('calendar $desk');
+    return HkCalendar(
+      deskSeq: desk,
+      listed: const {'20261019': 5, '20261020': 40, '20261026': 10, '20261027': 20},
+      schedule: const HkSchedule(first: '20261019', last: '20261130', holidays: {'20261103'}, weekdays: {0, 1, 2, 3, 4}),
+      checkedAt: testNow.subtract(const Duration(minutes: 5)),
+      status: 'ok',
+    );
+  }
+
+  @override
+  Future<HkDay> day(int desk, String ymd) async {
+    _online();
+    asked.add('day $desk $ymd');
+    if (dayError case final code?) throw HkException(code, 502);
+    if (ymd == '20261020') {
+      return const HkDay(
+        slots: [HkTimeSlot(time: '09:00', capacity: 20, available: 0), HkTimeSlot(time: '14:00', capacity: 20, available: 0)],
+        capacity: 40,
+        taken: 40,
+        available: 0,
+      );
+    }
+    return const HkDay(
+      slots: [
+        HkTimeSlot(time: '09:00', capacity: 4, available: 2),
+        HkTimeSlot(time: '10:00', capacity: 4, available: 0),
+        HkTimeSlot(time: '14:00', capacity: 4, available: 4),
+      ],
+      capacity: 12,
+      taken: 6,
+      available: 6,
+    );
+  }
+
+  @override
+  Future<List<HkWatch>> watches(Map<String, String> auth, {bool past = false}) async {
+    _online();
+    return [for (final w in watchList.reversed) if (past || w.active) w];
+  }
+
+  @override
+  Future<HkWatch> watch(Map<String, String> auth, {required int desk, required String start, required String end, required String lang}) async {
+    _online();
+    if (watchList.any((w) => w.active && w.deskSeq == desk && ymdOf(w.start) == start && ymdOf(w.end) == end)) {
+      throw const HkException('duplicate_watch', 409);
+    }
+    if (watchList.where((w) => w.active).length >= 10) throw const HkException('max_watches_reached', 409);
+    final office = (officesOverride ?? _offices).firstWhere((o) => o.desk(desk) != null);
+    final watch = HkWatch(
+      id: ++_next,
+      officeId: office.id,
+      officeNameEn: office.nameEn,
+      deskSeq: desk,
+      booth: office.desk(desk)!.booth,
+      start: parseYmd(start)!,
+      end: parseYmd(end)!,
+      status: 'active',
+    );
+    watchList.add(watch);
+    return watch;
+  }
+
+  @override
+  Future<void> stop(Map<String, String> auth, int id) async {
+    _online();
+    final i = watchList.indexWhere((w) => w.id == id);
+    final w = watchList[i];
+    watchList[i] = HkWatch(
+      id: w.id,
+      officeId: w.officeId,
+      officeNameEn: w.officeNameEn,
+      deskSeq: w.deskSeq,
+      booth: w.booth,
+      start: w.start,
+      end: w.end,
+      status: 'cancelled',
+    );
+  }
+
+  @override
+  Future<void> test(Map<String, String> auth, String lang) async {
+    _online();
+    tests.add(lang);
+  }
 }

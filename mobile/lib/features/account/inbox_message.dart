@@ -8,6 +8,7 @@ import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/feature_catalog.dart';
+import '../home/sections.dart';
 import '../qna/qna_parts.dart';
 
 void openInboxMessage(BuildContext context, AppServices services, InboxItem item) {
@@ -89,8 +90,7 @@ class InboxMessageScreen extends StatelessWidget {
             const SizedBox(height: 26),
             FilledButton.icon(
               onPressed: () {
-                HapticFeedback.lightImpact();
-                services.openFeature(context, target, services);
+                openSection(context, target, services);
               },
               icon: Text(target.emoji, style: const TextStyle(fontSize: 18)),
               label: Text(s.inboxOpenSection(target.label(s))),

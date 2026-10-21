@@ -1075,6 +1075,175 @@
       }
     }
   },
+  "hkLede": "HiKorea'dagi bo‘sh joylarni har 5 daqiqada tekshiramiz. Siz tanlagan kunlarda joy ochilishi bilan xabar beramiz.",
+  "hkSearchHint": "Ofis nomini izlang",
+  "hkMyWatches": "Kuzatuvlarim",
+  "hkActiveWatches": "{count} ta faol kuzatuv",
+  "@hkActiveWatches": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hkLastViewed": "Oxirgi ko‘rilgan",
+  "hkStep1": "Ofisingizni tanlang",
+  "hkStep2": "Bo‘sh kunlarni ko‘ring",
+  "hkStep3": "Joy ochilganda xabar oling",
+  "hkAddressCardTitle": "Ofisingizni bilmaysizmi?",
+  "hkAddressCardBody": "Uy manzilingiz bo‘yicha topib beramiz",
+  "hkOffices": "Immigratsiya ofislari",
+  "hkCounters": "{count} ta bo‘lim",
+  "@hkCounters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hkNoMatch": "Bunday ofis topilmadi. Boshqa so‘z bilan izlang yoki manzil bo‘yicha toping.",
+  "hkLoadFailed": "Yuklab bo‘lmadi. Internetni tekshiring.",
+  "hkAddressTitle": "Manzil bo‘yicha topish",
+  "hkAddressLede": "Har bir ofis o‘z tumanlariga xizmat qiladi. Viloyatingizni tanlang va uy manzilingizni koreyscha yozing.",
+  "hkProvince": "1. Viloyat",
+  "hkAddress": "2. Uy manzili (koreyscha)",
+  "hkAddressHint": "Manzilda shahar yoki tuman nomi bo‘lsin (-시, -구, -군), masalan 안산시 단원구.",
+  "hkFindOffice": "Ofisni topish",
+  "hkNeedProvince": "Avval viloyatni tanlang",
+  "hkNeedAddress": "Manzilni yozing",
+  "hkYourOffice": "Sizning ofisingiz:",
+  "hkPickOne": "Mosini tanlang:",
+  "hkAddressNoMatch": "Bu manzil uchun ofis topilmadi. Manzilni to‘liq yozing.",
+  "hkCountersTitle": "Qaysi bo‘lim kerak?",
+  "hkCountersLede": "Bo‘limlar bir xil ishni bajaradi, lekin joyi, qavati yoki qabul vaqti farq qilishi mumkin. Tanlashdan oldin tavsifini o‘qing.",
+  "hkFromAfternoon": "Qabul 09:36 dan",
+  "hkMore": "Batafsil",
+  "hkCounterN": "{n}-bo‘lim",
+  "@hkCounterN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkCalendarHint": "Kunni bosing — joylarni HiKorea'dan hozir tekshiramiz.",
+  "hkCheckedNow": "Hozirgina tekshirildi",
+  "hkCheckedMinutes": "{n} daqiqa oldin tekshirildi",
+  "@hkCheckedMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkCheckedHours": "{n} soat oldin tekshirildi",
+  "@hkCheckedHours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkCheckedDays": "{n} kun oldin tekshirildi",
+  "@hkCheckedDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkEarliest": "Eng yaqin bo‘sh kun",
+  "hkAllFull": "Hozir hamma kunlar band",
+  "hkAllFullBody": "Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.",
+  "hkLegendOpen": "Bo‘sh",
+  "hkLegendSome": "Bandlik bor",
+  "hkLegendFull": "To‘la band",
+  "hkLegendClosed": "Yopiq",
+  "hkNoDates": "Hozir hech qanday kun ko‘rinmayapti. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.",
+  "hkNotifyMe": "Joy ochilganda xabar berish",
+  "hkChecking": "HiKorea tekshirilmoqda…",
+  "hkDayClosed": "Bu kuni ofis ishlamaydi",
+  "hkFullyBooked": "To‘la band",
+  "hkLastOne": "Faqat 1 ta joy qoldi",
+  "hkSlotsFree": "{n} ta bo‘sh joy",
+  "@hkSlotsFree": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkBookCue": "Bron qilish HiKorea saytida bo‘ladi.",
+  "hkFullCue": "Bo‘sh joy yo‘q. Kuzatuv o‘rnatsangiz, joy ochilishi bilan xabar beramiz.",
+  "hkBookedOf": "{capacity} tadan {taken} tasi band",
+  "@hkBookedOf": {
+    "placeholders": {
+      "taken": {
+        "type": "int"
+      },
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "hkMorning": "Ertalab",
+  "hkAfternoon": "Tushdan keyin",
+  "hkLeft": "{n} ta qoldi",
+  "@hkLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkSlotFull": "Band",
+  "hkBook": "HiKorea'da bron qilish",
+  "hkFetchFailed": "HiKorea'ga ulanib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.",
+  "hkSessionExpired": "HiKorea bilan aloqamiz yangilanmoqda. Birozdan so‘ng urinib ko‘ring.",
+  "hkWatchTitle": "Qaysi kunlarni kuzataylik?",
+  "hkWatchLede": "Shu kunlarda joy ochilishi bilan bildirishnoma yuboramiz.",
+  "hkNextDays": "Keyingi {n} kun",
+  "@hkNextDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkPickDates": "Aniq sanalarni tanlash",
+  "hkDays": "{n} kun",
+  "@hkDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "hkStartWatching": "Kuzatishni boshlash",
+  "hkTooLong": "Ko‘pi bilan 90 kun kuzatish mumkin",
+  "hkDuplicate": "Bu kunlar allaqachon kuzatilmoqda",
+  "hkMaxReached": "Ko‘pi bilan 10 ta kuzatuv. Avval bittasini to‘xtating.",
+  "hkCreateFailed": "Kuzatuvni o‘rnatib bo‘lmadi. Qayta urinib ko‘ring.",
+  "hkDoneTitle": "Kuzatuv o‘rnatildi",
+  "hkDoneBody": "Har 5 daqiqada tekshiramiz. Joy ochilishi bilan bildirishnoma keladi.",
+  "hkPushOff": "Bu telefonda bildirishnomalar o‘chiq — xabarlar faqat «Kelgan xabarlar»da ko‘rinadi.",
+  "hkSendTest": "Sinov bildirishnomasi",
+  "hkTestSent": "Yuborildi",
+  "hkTestFailed": "Yuborib bo‘lmadi. Bildirishnomalar yoqilganini tekshiring.",
+  "hkSeeWatches": "Kuzatuvlarimni ko‘rish",
+  "hkWatchesEmpty": "Hali kuzatuv yo‘q",
+  "hkWatchesEmptyBody": "Ofisni tanlang, kalendarini ko‘ring va kuzatuv o‘rnating.",
+  "hkStatusActive": "Faol",
+  "hkStatusExpired": "Muddati tugagan",
+  "hkStatusCancelled": "To‘xtatilgan",
+  "hkStatusUndeliverable": "Yetkazib bo‘lmadi",
+  "hkStop": "To‘xtatish",
+  "hkStopTitle": "Kuzatuv to‘xtatilsinmi?",
+  "hkStopped": "Kuzatuv to‘xtatildi",
+  "hkStopFailed": "To‘xtatib bo‘lmadi. Qayta urinib ko‘ring.",
+  "hkCalendar": "Kalendar",
+  "hkPastWatches": "Tugaganlar",
+  "hkPickOffice": "Ofisni tanlash",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

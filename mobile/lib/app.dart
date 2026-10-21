@@ -10,6 +10,7 @@ import 'features/account/inbox_message.dart';
 import 'features/account/inbox_screen.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/home/home_screen.dart';
+import 'features/home/sections.dart';
 import 'features/onboarding/language_screen.dart';
 import 'features/opening/opening.dart';
 import 'l10n/app_localizations.dart';
@@ -79,7 +80,7 @@ class _VegukinAppState extends State<VegukinApp> {
     }
     unawaited(widget.services.account.refreshInbox());
     if (feature == null || context == null) return;
-    widget.services.openFeature(context, feature, widget.services);
+    openSection(context, feature, widget.services);
   }
 
   Future<void> _openMessage(int id) async {

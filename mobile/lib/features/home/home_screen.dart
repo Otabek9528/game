@@ -9,22 +9,15 @@ import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
-import '../barcode/barcode_screen.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
 import '../../core/account.dart';
 import '../account/account_screen.dart';
 import '../account/inbox_screen.dart';
-import '../business/business_screen.dart';
-import '../links/links_screen.dart';
 import '../parcel/parcel_controller.dart';
-import '../parcel/parcel_screen.dart';
-import '../support/community_screen.dart';
-import '../support/donation_screen.dart';
-import '../qibla/qibla_screen.dart';
-import '../qna/qna_screen.dart';
 import 'feature_catalog.dart';
 import 'prayer_card.dart';
+import 'sections.dart';
 
 /// The home screen: prayer card, business directory band, and every section
 /// of the app — the same layout as the web app's home page.
@@ -120,28 +113,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await Future.wait([_services.prayer.refresh(), _stats]);
   }
 
-  void _open(Feature feature) {
-    HapticFeedback.lightImpact();
-    // Each opening counted, as the web home page counts its cards.
-    _services.activity.log(feature.id);
-    final native = switch (feature.id) {
-      // The phone's full sensors and camera.
-      'qibla' => (BuildContext _) => QiblaScreen(services: _services),
-      'barcode' => (BuildContext _) => BarcodeScreen(services: _services),
-      'qna' => (BuildContext _) => QnaScreen(services: _services),
-      'business' => (BuildContext _) => BusinessScreen(services: _services),
-      'parcel' => (BuildContext _) => ParcelScreen(services: _services),
-      'links' => (BuildContext _) => LinksScreen(services: _services),
-      'donation' => (BuildContext _) => DonationScreen(services: _services),
-      'community' => (BuildContext _) => CommunityScreen(services: _services),
-      _ => null,
-    };
-    if (native != null) {
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: native));
-      return;
-    }
-    _services.openFeature(context, feature, _services);
-  }
+  void _open(Feature feature) => openSection(context, feature, _services);
 
   void _openLanguage() {
     Navigator.of(context).push(
