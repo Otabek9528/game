@@ -47,6 +47,35 @@ class AppUser {
       {'id': id, 'signedIn': signedIn, 'provider': provider, 'name': name, 'detail': detail};
 }
 
+/// An alert that was pushed to this person, as the inbox keeps it.
+@immutable
+class InboxItem {
+  const InboxItem({required this.id, required this.title, this.body = '', this.data = const {}, required this.at});
+
+  final int id;
+  final String title;
+  final String body;
+
+  /// What a tap opens: `url`, `kind` (as in a push).
+  final Map<String, String> data;
+  final DateTime at;
+
+  static InboxItem? fromJson(Object? json) {
+    if (json is! Map<String, dynamic>) return null;
+    final id = json['id'];
+    final at = DateTime.tryParse(json['at'] as String? ?? '');
+    if (id is! num || at == null) return null;
+    final data = json['data'];
+    return InboxItem(
+      id: id.toInt(),
+      title: json['title'] as String? ?? '',
+      body: json['body'] as String? ?? '',
+      data: data is Map ? {for (final e in data.entries) '${e.key}': '${e.value}'} : const {},
+      at: at.toLocal(),
+    );
+  }
+}
+
 /// A sign-in through a bot: the address to open, and the code to wait on.
 @immutable
 class LoginLink {
@@ -86,6 +115,9 @@ abstract interface class AccountSource {
   Future<AppUser> signOut(String token);
 
   Future<void> delete(String token);
+
+  /// Newest first, a page at a time; [before]: the last id of the page before.
+  Future<(List<InboxItem> items, bool more)> inbox(String token, {int? before});
 }
 
 class HttpAccountSource implements AccountSource {
@@ -173,6 +205,15 @@ class HttpAccountSource implements AccountSource {
 
   @override
   Future<void> delete(String token) => _call('DELETE', 'api/app/me', token: token);
+
+  @override
+  Future<(List<InboxItem>, bool)> inbox(String token, {int? before}) async {
+    final json = await _call('GET', before == null ? 'api/app/inbox' : 'api/app/inbox?before=$before', token: token);
+    return (
+      [for (final item in (json['items'] as List?) ?? const []) ?InboxItem.fromJson(item)],
+      json['more'] == true,
+    );
+  }
 }
 
 /// The app's account: made on the first launch without asking anything,
@@ -189,6 +230,7 @@ class AccountController extends ChangeNotifier {
   }) {
     final token = _store.read(_tokenKey);
     _token = token == null || token.isEmpty ? null : token;
+    _inboxSeen = int.tryParse(_store.read(_seenKey) ?? '') ?? 0;
     try {
       _user = AppUser.fromJson(jsonDecode(_store.read(_userKey) ?? 'null'));
     } on FormatException {
@@ -204,6 +246,7 @@ class AccountController extends ChangeNotifier {
 
   static const _tokenKey = 'app_session';
   static const _userKey = 'app_user';
+  static const _seenKey = 'inbox_seen';
 
   String? _token;
   AppUser? _user;
@@ -216,7 +259,22 @@ class AccountController extends ChangeNotifier {
 
   static void _ignore(PushMessage _) {}
 
+  List<InboxItem> _inbox = const [];
+  bool _inboxMore = false;
+  int _inboxSeen = 0;
+
   AppUser? get user => _user;
+
+  /// What was pushed to this person, newest first, as far as loaded.
+  List<InboxItem> get inbox => _inbox;
+  bool get inboxMore => _inboxMore;
+
+  /// The newest item already seen on the inbox page.
+  int get inboxSeen => _inboxSeen;
+
+  /// Arrived since the inbox was last opened.
+  int get unread => _inbox.where((i) => i.id > _inboxSeen).length;
+
   bool get signedIn => _user?.signedIn ?? false;
 
   /// Whether this phone lets the app show notifications.
@@ -272,8 +330,14 @@ class AccountController extends ChangeNotifier {
   }
 
   void _setUser(AppUser user) {
+    final switched = _user != null && _user!.id != user.id;
     _user = user;
     _store.write(_userKey, jsonEncode(user.toJson()));
+    if (switched) {
+      // Signed in or out: someone else's alerts.
+      _clearInbox();
+      unawaited(refreshInbox());
+    }
     notifyListeners();
   }
 
@@ -282,7 +346,13 @@ class AccountController extends ChangeNotifier {
     _user = null;
     _store.write(_tokenKey, '');
     _store.write(_userKey, 'null');
+    _clearInbox();
     notifyListeners();
+  }
+
+  void _clearInbox() {
+    _inbox = const [];
+    _inboxMore = false;
   }
 
   Future<void> _setPushToken(String token) async {
@@ -295,6 +365,42 @@ class AccountController extends ChangeNotifier {
     } on AccountException {
       // Sent again with the next token refresh or launch.
     }
+  }
+
+  /// The newest alerts (the first page). False when they couldn't be had;
+  /// the list loaded before stays.
+  Future<bool> refreshInbox() async {
+    await ensure();
+    final session = _token;
+    if (session == null) return false;
+    try {
+      final (items, more) = await _source.inbox(session);
+      _inbox = items;
+      _inboxMore = more;
+      notifyListeners();
+      return true;
+    } on AccountException {
+      return false;
+    }
+  }
+
+  /// The next page, older.
+  Future<void> loadMoreInbox() async {
+    final session = _token;
+    if (session == null || _inbox.isEmpty) return;
+    final (items, more) = await _source.inbox(session, before: _inbox.last.id);
+    _inbox = [..._inbox, ...items];
+    _inboxMore = more;
+    notifyListeners();
+  }
+
+  /// The inbox page was opened: everything in it is seen.
+  void markInboxSeen() {
+    final newest = _inbox.isEmpty ? 0 : _inbox.first.id;
+    if (newest <= _inboxSeen) return;
+    _inboxSeen = newest;
+    _store.write(_seenKey, '$newest');
+    notifyListeners();
   }
 
   /// The app's language changed: notifications from now on come in it.

@@ -932,6 +932,28 @@ class FakeAccounts implements AccountSource {
     deleted.add(token);
     users.remove(token);
   }
+
+  /// What was pushed to each user id, oldest first.
+  final inboxes = <int, List<InboxItem>>{};
+  int _alerts = 0;
+  int pageSize = 50;
+
+  /// An alert pushed to [userId], as the server keeps it.
+  InboxItem alert(int userId, String title, {String body = '', Map<String, String> data = const {}, DateTime? at}) {
+    final item = InboxItem(id: ++_alerts, title: title, body: body, data: data, at: at ?? testNow);
+    (inboxes[userId] ??= []).add(item);
+    return item;
+  }
+
+  @override
+  Future<(List<InboxItem>, bool)> inbox(String token, {int? before}) async {
+    _online();
+    final all = [
+      for (final item in (inboxes[_of(token).id] ?? const <InboxItem>[]).reversed)
+        if (before == null || item.id < before) item,
+    ];
+    return (all.take(pageSize).toList(), all.length > pageSize);
+  }
 }
 
 /// Notifications, played by the test: [allowed] or not, and [open] / [arrive].

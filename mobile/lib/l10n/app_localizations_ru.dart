@@ -2053,6 +2053,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pushOpen => 'Открыть';
 
   @override
+  String get inboxTitle => 'Входящие';
+
+  @override
+  String inboxUnread(int count) {
+    return 'Новых: $count';
+  }
+
+  @override
+  String get inboxEmptyTitle => 'Пока ничего нет';
+
+  @override
+  String get inboxEmptyBody =>
+      'Здесь сохраняются все уведомления для вас — даже пропущенные.';
+
+  @override
+  String get inboxFailed => 'Не удалось загрузить. Проверьте интернет.';
+
+  @override
+  String get inboxEarlier => 'Показать более ранние';
+
+  @override
+  String get inboxPushOff =>
+      'Уведомления на этом телефоне выключены. Новые сообщения всё равно появятся здесь.';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

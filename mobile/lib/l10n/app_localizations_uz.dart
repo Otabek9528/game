@@ -2012,6 +2012,31 @@ class AppLocalizationsUz extends AppLocalizations {
   String get pushOpen => 'Ochish';
 
   @override
+  String get inboxTitle => 'Kelgan xabarlar';
+
+  @override
+  String inboxUnread(int count) {
+    return '$count ta yangi';
+  }
+
+  @override
+  String get inboxEmptyTitle => 'Hozircha xabar yo‘q';
+
+  @override
+  String get inboxEmptyBody =>
+      'Sizga yuborilgan bildirishnomalar shu yerda saqlanadi — o‘tkazib yuborganlaringiz ham.';
+
+  @override
+  String get inboxFailed => 'Yuklab bo‘lmadi. Internetni tekshiring.';
+
+  @override
+  String get inboxEarlier => 'Avvalgilarini ko‘rsatish';
+
+  @override
+  String get inboxPushOff =>
+      'Bu telefonda bildirishnomalar o‘chiq. Yangi xabarlar baribir shu yerda chiqadi.';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

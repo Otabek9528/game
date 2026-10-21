@@ -595,6 +595,13 @@
   "accountPushOn": "Notifications come to this phone",
   "accountPushOff": "Notifications are off. Turn them on in settings.",
   "pushOpen": "Open",
+  "inboxTitle": "Inbox",
+  "inboxUnread": "{count} new",
+  "inboxEmptyTitle": "Nothing here yet",
+  "inboxEmptyBody": "Notifications sent to you are kept here, including the ones you missed.",
+  "inboxFailed": "Couldn’t load. Check your connection.",
+  "inboxEarlier": "Show earlier",
+  "inboxPushOff": "Notifications are off on this phone. New alerts still show up here.",
   "themeToDay": "Day mode",
   "themeToNight": "Night mode"
 }

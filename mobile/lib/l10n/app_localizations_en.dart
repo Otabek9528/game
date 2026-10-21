@@ -2032,6 +2032,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pushOpen => 'Open';
 
   @override
+  String get inboxTitle => 'Inbox';
+
+  @override
+  String inboxUnread(int count) {
+    return '$count new';
+  }
+
+  @override
+  String get inboxEmptyTitle => 'Nothing here yet';
+
+  @override
+  String get inboxEmptyBody =>
+      'Notifications sent to you are kept here, including the ones you missed.';
+
+  @override
+  String get inboxFailed => 'Couldn’t load. Check your connection.';
+
+  @override
+  String get inboxEarlier => 'Show earlier';
+
+  @override
+  String get inboxPushOff =>
+      'Notifications are off on this phone. New alerts still show up here.';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

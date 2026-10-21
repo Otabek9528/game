@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/core/account.dart';
 import 'package:muslim_vegukin/core/app_language.dart';
 import 'package:muslim_vegukin/features/account/account_screen.dart';
+import 'package:muslim_vegukin/features/account/inbox_screen.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 
 import 'support/fakes.dart';
@@ -256,6 +257,171 @@ void main() {
       expect(app.account.signedIn, isFalse);
       expect(app.account.authHeaders, {'Authorization': 'Bearer token-2'});
       expect(find.text('Account deleted'), findsOneWidget);
+    });
+  });
+
+  group('the inbox', () {
+    test('unread: what came since it was last opened, remembered between launches', () async {
+      final store = MemoryStore();
+      final accounts = FakeAccounts();
+      final c = controller(store, accounts);
+      await c.ensure();
+      final me = c.user!.id;
+      accounts
+        ..alert(me, 'One')
+        ..alert(me, 'Two');
+      expect(await c.refreshInbox(), isTrue);
+      expect(c.inbox.map((i) => i.title), ['Two', 'One']);
+      expect(c.unread, 2);
+      c.markInboxSeen();
+      expect(c.unread, 0);
+
+      accounts.alert(me, 'Three');
+      final again = controller(store, accounts);
+      await again.refreshInbox();
+      expect(again.unread, 1);
+    });
+
+    test('as the server sends it: UTC time, shown local; what a tap opens', () {
+      final item = InboxItem.fromJson({
+        'id': 7,
+        'title': 'HiKorea',
+        'body': 'Ready',
+        'data': {'kind': 'hikorea', 'n': 3},
+        'at': '2026-10-21T03:15:00Z',
+      })!;
+      expect(item.at, DateTime.utc(2026, 10, 21, 3, 15).toLocal());
+      expect(item.at.isUtc, isFalse);
+      expect(item.data, {'kind': 'hikorea', 'n': '3'});
+      expect(InboxItem.fromJson({'id': 8, 'title': 'x'}), isNull, reason: 'no time');
+    });
+
+    test('a page at a time, older after', () async {
+      final accounts = FakeAccounts()..pageSize = 2;
+      final c = controller(MemoryStore(), accounts);
+      await c.ensure();
+      for (final title in ['1', '2', '3', '4', '5']) {
+        accounts.alert(c.user!.id, title);
+      }
+      await c.refreshInbox();
+      expect(c.inbox.map((i) => i.title), ['5', '4']);
+      expect(c.inboxMore, isTrue);
+      await c.loadMoreInbox();
+      await c.loadMoreInbox();
+      expect(c.inbox.map((i) => i.title), ['5', '4', '3', '2', '1']);
+      expect(c.inboxMore, isFalse);
+    });
+
+    test('signed in as someone else: their alerts; offline: the list stays', () async {
+      final accounts = FakeAccounts();
+      final c = controller(MemoryStore(), accounts);
+      await c.ensure();
+      accounts
+        ..alert(c.user!.id, 'Before signing in')
+        ..alert(555000111, 'HiKorea: result');
+      await c.refreshInbox();
+      expect(c.inbox.map((i) => i.title), ['Before signing in']);
+
+      await c.startLink('telegram');
+      accounts.confirm('CODE1', const AppUser(id: 555000111, signedIn: true, provider: 'telegram', name: 'Aziz'));
+      await c.checkLink('CODE1');
+      await pumpEventQueue();
+      expect(c.inbox.map((i) => i.title), ['HiKorea: result']);
+
+      accounts.fail = true;
+      expect(await c.refreshInbox(), isFalse);
+      expect(c.inbox, hasLength(1));
+    });
+
+    Finder badge(String text) => find.descendant(of: find.byType(Badge), matching: find.text(text));
+
+    Future<TestApp> withAlerts(WidgetTester tester, {String language = 'en', void Function(TestApp app)? setUp}) async {
+      final app = TestApp(language: language);
+      setUp?.call(app);
+      await app.launch(tester);
+      final me = app.account.user!.id;
+      app.accounts
+        ..alert(me, 'Eid prayer times', body: 'Eid al-Adha prayer at 7:00', at: DateTime(2026, 10, 2, 8, 0))
+        ..alert(me, 'HiKorea', body: 'Your residence card is ready', data: {'kind': 'hikorea'}, at: DateTime(2026, 10, 16, 20, 15))
+        ..alert(me, 'Kebab House', body: 'A new restaurant near you',
+            data: {'url': 'https://x/pages/places/places-detail.html?id=8&type=restaurant'});
+      // Back to the app: looked at again.
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      return app;
+    }
+
+    testWidgets('the bell counts what is new; the inbox shows it by day, and opens each one', (tester) async {
+      final app = await withAlerts(tester);
+      expect(badge('3'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Inbox'));
+      await tester.pumpAndSettle();
+      expect(find.byType(InboxScreen), findsOneWidget);
+      expect(buttons(tester, ['Today', 'Kebab House', 'Yesterday', 'HiKorea', '2 October', 'Eid prayer times']),
+          ['Today', 'Kebab House', 'Yesterday', 'HiKorea', '2 October', 'Eid prayer times']);
+      expect(find.text('Your residence card is ready'), findsOneWidget);
+
+      await tester.tap(find.text('Kebab House'));
+      expect(app.opened.ids.last, 'restaurant');
+      await tester.tap(find.text('Your residence card is ready'));
+      expect(app.opened.ids.last, 'hikorea');
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.byType(Badge), findsOneWidget);
+      expect(badge('3'), findsNothing, reason: 'seen');
+    });
+
+    testWidgets('one arriving while the app is open is counted', (tester) async {
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      app.accounts.alert(app.account.user!.id, 'Kebab House');
+      app.push.arrive('Kebab House', 'Now open');
+      await tester.pumpAndSettle();
+      expect(badge('1'), findsOneWidget);
+    });
+
+    testWidgets('nothing yet: said so; offline: said so, and tried again', (tester) async {
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      await tester.tap(find.byTooltip('Inbox'));
+      await tester.pumpAndSettle();
+      expect(find.text('Nothing here yet'), findsOneWidget);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      app.accounts.fail = true;
+      await tester.tap(find.byTooltip('Inbox'));
+      await tester.pumpAndSettle();
+      expect(find.text('Couldn’t load. Check your connection.'), findsOneWidget);
+      app.accounts
+        ..fail = false
+        ..alert(app.account.user!.id, 'Kebab House');
+      await tester.tap(find.text('Try again'));
+      await tester.pumpAndSettle();
+      expect(find.text('Kebab House'), findsOneWidget);
+    });
+
+    testWidgets('notifications off on the phone: alerts still here, and the way to turn them on', (tester) async {
+      final app = await withAlerts(tester, setUp: (app) => app.push.allowed = false);
+      await tester.tap(find.byTooltip('Inbox'));
+      await tester.pumpAndSettle();
+      expect(find.text('Notifications are off on this phone. New alerts still show up here.'), findsOneWidget);
+      await tester.tap(find.text('Turn on'));
+      expect(app.permissions.settingsOpened, 1);
+    });
+
+    testWidgets('older ones on request; in Uzbek, by day too', (tester) async {
+      await withAlerts(tester, language: 'uz', setUp: (app) => app.accounts.pageSize = 2);
+      await tester.tap(find.byTooltip('Kelgan xabarlar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Bugun'), findsOneWidget);
+      expect(find.text('Eid prayer times'), findsNothing);
+      await tester.tap(find.text('Avvalgilarini ko‘rsatish'));
+      await tester.pumpAndSettle();
+      expect(find.text('Eid prayer times'), findsOneWidget);
+      expect(find.text('Avvalgilarini ko‘rsatish'), findsNothing);
     });
   });
 

@@ -45,7 +45,8 @@ class _VegukinAppState extends State<VegukinApp> {
     services.locale.addListener(_languageChanged);
     services.account.handlePush(onOpen: _openPush, onForeground: _showPush);
     // The account exists from the first launch, so watches need no sign-in.
-    unawaited(services.account.ensure());
+    // With it, what was pushed to it (the inbox's badge).
+    unawaited(services.account.refreshInbox());
   }
 
   @override
@@ -63,6 +64,7 @@ class _VegukinAppState extends State<VegukinApp> {
 
   /// A notification was tapped: its page.
   void _openPush(PushMessage message) {
+    unawaited(widget.services.account.refreshInbox());
     final feature = featureForPush(message.data);
     final context = _navigator.currentContext;
     if (feature == null || context == null) return;
@@ -71,6 +73,7 @@ class _VegukinAppState extends State<VegukinApp> {
 
   /// One arrived while the app was open: Android doesn't show it, so the app does.
   void _showPush(PushMessage message) {
+    unawaited(widget.services.account.refreshInbox());
     final text = [?message.title, ?message.body].join('\n');
     final context = _navigator.currentContext;
     if (text.isEmpty || context == null) return;

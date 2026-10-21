@@ -12,7 +12,9 @@ import '../../l10n/app_localizations.dart';
 import '../barcode/barcode_screen.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
+import '../../core/account.dart';
 import '../account/account_screen.dart';
+import '../account/inbox_screen.dart';
 import '../business/business_screen.dart';
 import '../links/links_screen.dart';
 import '../parcel/parcel_controller.dart';
@@ -108,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _services.prayer.refresh();
       _services.reminders.checkNotifications();
+      _services.account.refreshInbox();
       _takeWidgetAction();
     }
   }
@@ -169,6 +172,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           children: [
             _Header(
               language: language,
+              account: _services.account,
+              onInbox: () => openInbox(context, _services),
               onAccount: () => openAccount(context, _services),
               onLanguage: _openLanguage,
               onTheme: () {
@@ -246,9 +251,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.language, required this.onAccount, required this.onLanguage, required this.onTheme});
+  const _Header({
+    required this.language,
+    required this.account,
+    required this.onInbox,
+    required this.onAccount,
+    required this.onLanguage,
+    required this.onTheme,
+  });
 
   final AppLanguage language;
+  final AccountController account;
+  final VoidCallback onInbox;
   final VoidCallback onAccount;
   final VoidCallback onLanguage;
 
@@ -275,21 +289,27 @@ class _Header extends StatelessWidget {
             children: [
               const KhatamMark(size: 38, glow: false),
               const SizedBox(width: 11),
+              // On a narrow phone the name takes two lines rather than
+              // losing its end.
               const Expanded(
                 child: Text(
                   'Muslim Vegukin',
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: Brand.displayFont,
                     fontWeight: FontWeight.w700,
                     fontSize: 20,
+                    height: 1.05,
                     color: Colors.white,
                   ),
                 ),
               ),
+              _InboxButton(account: account, onTap: onInbox),
               IconButton(
                 onPressed: onAccount,
                 tooltip: s.accountTitle,
+                visualDensity: VisualDensity.compact,
                 icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
               ),
               _ThemeButton(onTap: onTheme),
@@ -494,6 +514,43 @@ class _NewBadge extends StatelessWidget {
 }
 
 /// The sun at night, the moon by day: what a tap switches to.
+/// The inbox, with how many alerts came since it was last opened.
+class _InboxButton extends StatelessWidget {
+  const _InboxButton({required this.account, required this.onTap});
+
+  final AccountController account;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: account,
+      builder: (context, _) {
+        final unread = account.unread;
+        return Semantics(
+          label: unread > 0 ? s.inboxUnread(unread) : null,
+          child: IconButton(
+            onPressed: onTap,
+            tooltip: s.inboxTitle,
+            visualDensity: VisualDensity.compact,
+            icon: Badge(
+              isLabelVisible: unread > 0,
+              label: Text(unread > 9 ? '9+' : '$unread'),
+              backgroundColor: Brand.gold300,
+              textColor: const Color(0xFF3D2C05),
+              child: Icon(
+                unread > 0 ? Icons.notifications_rounded : Icons.notifications_none_rounded,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ThemeButton extends StatelessWidget {
   const _ThemeButton({required this.onTap});
 

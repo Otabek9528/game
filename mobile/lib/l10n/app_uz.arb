@@ -1041,6 +1041,20 @@
   "accountPushOn": "Bildirishnomalar shu telefonga keladi",
   "accountPushOff": "Bildirishnomalar o‘chiq. Yoqish uchun sozlamalarni oching.",
   "pushOpen": "Ochish",
+  "inboxTitle": "Kelgan xabarlar",
+  "inboxUnread": "{count} ta yangi",
+  "@inboxUnread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inboxEmptyTitle": "Hozircha xabar yo‘q",
+  "inboxEmptyBody": "Sizga yuborilgan bildirishnomalar shu yerda saqlanadi — o‘tkazib yuborganlaringiz ham.",
+  "inboxFailed": "Yuklab bo‘lmadi. Internetni tekshiring.",
+  "inboxEarlier": "Avvalgilarini ko‘rsatish",
+  "inboxPushOff": "Bu telefonda bildirishnomalar o‘chiq. Yangi xabarlar baribir shu yerda chiqadi.",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

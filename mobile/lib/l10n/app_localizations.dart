@@ -3670,6 +3670,48 @@ abstract class AppLocalizations {
   /// **'Ochish'**
   String get pushOpen;
 
+  /// No description provided for @inboxTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kelgan xabarlar'**
+  String get inboxTitle;
+
+  /// No description provided for @inboxUnread.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta yangi'**
+  String inboxUnread(int count);
+
+  /// No description provided for @inboxEmptyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha xabar yo‘q'**
+  String get inboxEmptyTitle;
+
+  /// No description provided for @inboxEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizga yuborilgan bildirishnomalar shu yerda saqlanadi — o‘tkazib yuborganlaringiz ham.'**
+  String get inboxEmptyBody;
+
+  /// No description provided for @inboxFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklab bo‘lmadi. Internetni tekshiring.'**
+  String get inboxFailed;
+
+  /// No description provided for @inboxEarlier.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avvalgilarini ko‘rsatish'**
+  String get inboxEarlier;
+
+  /// No description provided for @inboxPushOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu telefonda bildirishnomalar o‘chiq. Yangi xabarlar baribir shu yerda chiqadi.'**
+  String get inboxPushOff;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:
