@@ -1,0 +1,416 @@
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/foundation.dart';
+
+import '../prayer/prayer_controller.dart';
+import 'qibla_math.dart';
+import 'qibla_sensors.dart';
+
+/// What the Qibla page is showing.
+enum QiblaPhase { loading, noLocation, noCompass, calibrating, compass }
+
+/// Calibration, as on the web page: wave the phone in a figure of eight,
+/// then hold it flat and still.
+enum CalibrationStep { move, hold }
+
+/// How far the phone is from facing the Qibla, in the web page's steps.
+enum Facing { far, turn, close, aligned }
+
+/// What weakens the compass right now, if anything.
+enum SignalIssue { none, needsCalibration, tilted, interference }
+
+/// The Qibla page's logic, apart from drawing: the place's Qibla and
+/// magnetic declination, a smoothed true heading, signal quality,
+/// calibration, and how far to turn.
+class QiblaController extends ChangeNotifier {
+  QiblaController({
+    required this._device,
+    required this._prayer,
+    DateTime Function()? clock,
+  }) : _clock = clock ?? DateTime.now;
+
+  final QiblaDevice _device;
+  final PrayerController _prayer;
+  final DateTime Function() _clock;
+
+  // Same thresholds as pages/qibla/qibla.js.
+  static const alignedWithin = 5.0;
+  static const closeWithin = 15.0;
+  static const turnWithin = 30.0;
+  static const movementsNeeded = 8;
+  static const _calibrationMinimum = Duration(seconds: 5);
+  static const _stabilityWindow = Duration(milliseconds: 1200);
+  static const _stableStd = 2.5;
+  static const _tiltWarn = 35.0;
+  static const _accuracyGate = 15.0;
+  static const _stuckRevert = Duration(milliseconds: 2500);
+
+  /// How far past a step's edge the phone must turn before the page steps
+  /// back out of it: a hand wavering at 5° shouldn't flash "aligned" on and
+  /// off.
+  static const releaseBeyond = 3.0;
+
+  QiblaPhase phase = QiblaPhase.loading;
+
+  /// The camera view: the heading is where the back camera looks.
+  bool cameraMode = false;
+
+  String? city;
+  QiblaBearing? qibla;
+  MagneticField? magnet;
+
+  CompassReading? reading;
+
+  /// Smoothed, from TRUE north.
+  double heading = 0;
+
+  /// Degrees added to the compass after the user showed it where the sun
+  /// really is, in the camera: undoes a magnet's pull for this visit.
+  double correction = 0;
+
+  /// Before smoothing and declination: the sensor's own number.
+  double rawMagnetic = 0;
+  int quality = 0;
+  SignalIssue issue = SignalIssue.none;
+
+  CalibrationStep step = CalibrationStep.move;
+  int movements = 0;
+
+  /// 0–1 while holding still.
+  double holdProgress = 0;
+  bool calibrationDone = false;
+
+  StreamSubscription<CompassReading>? _sub;
+  final _history = <double>[];
+
+  /// The last second of headings: how much the compass wavers.
+  final _jitter = <double>[];
+
+  /// The field strength, averaged over about a second, and whether it is
+  /// far enough from the model's to call it disturbed. Separate thresholds
+  /// in and out, so it doesn't flip at the edge.
+  double? _field;
+  bool _disturbed = false;
+
+  /// The signal shown changes only once a new rating has held this long.
+  static const _settle = Duration(milliseconds: 1500);
+  (int, SignalIssue)? _pending;
+  DateTime _pendingSince = DateTime(0);
+  bool _seeded = false;
+  DateTime _calibrationStart = DateTime(0);
+  double _lastMove = 0;
+  final _stability = <(DateTime, double)>[];
+  DateTime? _stuckSince;
+  List<double>? _recording;
+
+  /// −180…180: how far to turn, positive to the right.
+  double get difference => qibla == null ? 0 : signedDifference(heading, qibla!.bearing);
+
+  Facing get facing => _facing;
+  Facing _facing = Facing.far;
+
+  /// Closer steps are entered at their edge; farther ones only once the
+  /// phone is [releaseBeyond] past it.
+  Facing _classify(double d) {
+    final next = d <= alignedWithin
+        ? Facing.aligned
+        : d <= closeWithin
+            ? Facing.close
+            : d <= turnWithin
+                ? Facing.turn
+                : Facing.far;
+    if (next.index < _facing.index) {
+      final edge = switch (_facing) {
+        Facing.aligned => alignedWithin,
+        Facing.close => closeWithin,
+        _ => turnWithin,
+      };
+      if (d <= edge + releaseBeyond) return _facing;
+    }
+    return next;
+  }
+
+  /// The magnetic field's strength here per the model, µT: far from it the
+  /// phone is near metal or electronics.
+  double? get expectedField => magnet?.intensity;
+
+  SunPosition? get sun {
+    final place = _prayer.place;
+    return place == null ? null : sunPosition(place.lat, place.lon, _clock());
+  }
+
+  DateTime get now => _clock();
+
+  Future<void> start() async {
+    final place = _prayer.place;
+    if (place == null) {
+      _set(QiblaPhase.noLocation);
+      return;
+    }
+    city = place.city;
+    qibla = qiblaFrom(place.lat, place.lon);
+    magnet = magneticField(place.lat, place.lon, _clock().toUtc());
+    if (!await _device.hasCompass()) {
+      _set(QiblaPhase.noCompass);
+      return;
+    }
+    unawaited(_device.keepScreenOn(true));
+    _listen();
+  }
+
+  /// Leaving the page or the app.
+  void pause() {
+    _sub?.cancel();
+    _sub = null;
+    unawaited(_device.keepScreenOn(false));
+  }
+
+  /// Back to the page: readings resume, smoothing starts afresh.
+  void resume() {
+    if (phase == QiblaPhase.noLocation || phase == QiblaPhase.noCompass) return;
+    _history.clear();
+    _jitter.clear();
+    _seeded = false;
+    unawaited(_device.keepScreenOn(true));
+    _listen();
+  }
+
+  @override
+  void dispose() {
+    pause();
+    super.dispose();
+  }
+
+  /// The "Kalibrlash" button: the full two steps, whatever the signal says.
+  /// The page never sends the user here by itself; a poor signal says so
+  /// and offers this.
+  void recalibrate() => _startCalibration();
+
+  /// Back to the compass without finishing.
+  void skipCalibration() {
+    if (phase != QiblaPhase.calibrating) return;
+    calibrationDone = false;
+    _set(QiblaPhase.compass);
+  }
+
+  /// The user tapped the real sun in the camera, where the page put the
+  /// direction [seenAt]. The sun's true bearing is known, so the compass is
+  /// off by the difference.
+  void correctBySun(double seenAt) {
+    final sun = this.sun;
+    if (sun == null || !sun.up) return;
+    _shift(signedDifference(seenAt, sun.azimuth));
+  }
+
+  void clearCorrection() => _shift(-correction);
+
+  void _shift(double by) {
+    if (by == 0) return;
+    correction = signedDifference(0, correction + by);
+    heading = normalizeDegrees(heading + by);
+    for (final list in [_history, _jitter]) {
+      for (var i = 0; i < list.length; i++) {
+        list[i] = normalizeDegrees(list[i] + by);
+      }
+    }
+    _facing = _classify(difference.abs());
+    notifyListeners();
+  }
+
+  void setCameraMode(bool on) {
+    if (cameraMode == on) return;
+    cameraMode = on;
+    _history.clear();
+    _jitter.clear();
+    _seeded = false;
+    notifyListeners();
+  }
+
+  /// For the diagnostics panel: three seconds of true headings.
+  Future<({double mean, double std, int count})> record() async {
+    _recording = [];
+    await Future<void>.delayed(const Duration(seconds: 3));
+    final samples = _recording ?? [];
+    _recording = null;
+    final s = circularStats(samples);
+    return (mean: s.mean, std: s.std, count: samples.length);
+  }
+
+  void _listen() {
+    _sub?.cancel();
+    _sub = _device.readings().listen(_onReading, onError: (_) => _set(QiblaPhase.noCompass));
+  }
+
+  void _set(QiblaPhase value) {
+    phase = value;
+    notifyListeners();
+  }
+
+  // ---------------------------------------------------------------- readings
+
+  void _onReading(CompassReading r) {
+    reading = r;
+    // Lying flat the top edge shows the way; standing up, the back camera.
+    final facingMagnetic = cameraMode || r.tilt >= 45 ? r.camera : r.top;
+    rawMagnetic = normalizeDegrees(facingMagnetic);
+    final trueHeading = normalizeDegrees(facingMagnetic + (magnet?.declination ?? 0) + correction);
+    _recording?.add(trueHeading);
+
+    _history.add(trueHeading);
+    if (_history.length > 5) _history.removeAt(0);
+    _jitter.add(trueHeading);
+    if (_jitter.length > 30) _jitter.removeAt(0);
+    final filtered = _history.length < 3 ? trueHeading : circularStats(_history).mean;
+    // A little steadier through the camera, where a jumping marker shows.
+    final follow = cameraMode ? 0.25 : 0.35;
+    heading = _seeded ? normalizeDegrees(heading + signedDifference(heading, filtered) * follow) : filtered;
+    _seeded = true;
+    _facing = _classify(difference.abs());
+
+    _watchField(r);
+    _rate(r);
+    // Straight to the compass: calibration only when asked for.
+    if (phase == QiblaPhase.loading) phase = QiblaPhase.compass;
+    if (phase == QiblaPhase.calibrating) _calibrate(trueHeading, r);
+    notifyListeners();
+  }
+
+  void _watchField(CompassReading r) {
+    final expected = expectedField;
+    if (expected == null || r.field <= 0) return;
+    _field = _field == null ? r.field : _field! * 0.95 + r.field * 0.05;
+    final off = (_field! - expected).abs() / expected;
+    if (!_disturbed && off > 0.35) _disturbed = true;
+    if (_disturbed && off < 0.25) _disturbed = false;
+  }
+
+  /// 1–4 dots: Android's own accuracy estimate when it gives one, else how
+  /// much the heading wavered over the last second; capped by the
+  /// calibration state, tilt and a disturbed field. Shown only once it has
+  /// held for a moment, so it doesn't flicker.
+  void _rate(CompassReading r) {
+    final int fromHeading;
+    if (r.accuracy >= 0) {
+      fromHeading = r.accuracy < 8 ? 4 : r.accuracy < 15 ? 3 : r.accuracy < 25 ? 2 : 1;
+    } else if (_jitter.length < 10) {
+      fromHeading = 2;
+    } else {
+      final std = circularStats(_jitter).std;
+      fromHeading = std < 1.5 ? 4 : std < 4 ? 3 : std < 10 ? 2 : 1;
+    }
+    final fromStatus = switch (r.status) { 0 => 1, 1 => 2, 2 => 3, _ => 4 };
+    var q = math.min(fromHeading, fromStatus);
+    var problem = q <= 1 ? SignalIssue.needsCalibration : SignalIssue.none;
+    // Between flat and upright neither the top edge nor the camera points
+    // clearly anywhere.
+    if (!cameraMode && r.tilt > _tiltWarn && r.tilt < 60 && q > 2) {
+      q = 2;
+      problem = SignalIssue.tilted;
+    }
+    // A field off from the model's often means metal nearby, but not always
+    // a wrong heading: a warning, not a failing grade.
+    if (_disturbed) {
+      q = math.min(q, 2);
+      problem = SignalIssue.interference;
+    }
+    _show((q, problem));
+  }
+
+  void _show((int, SignalIssue) rating) {
+    final now = _clock();
+    if (quality == 0 || rating == (quality, issue)) {
+      quality = rating.$1;
+      issue = rating.$2;
+      _pending = null;
+      return;
+    }
+    if (rating != _pending) {
+      _pending = rating;
+      _pendingSince = now;
+    } else if (now.difference(_pendingSince) >= _settle) {
+      quality = rating.$1;
+      issue = rating.$2;
+      _pending = null;
+    }
+  }
+
+  // ---------------------------------------------------------------- calibration
+
+  void _startCalibration() {
+    step = CalibrationStep.move;
+    movements = 0;
+    holdProgress = 0;
+    calibrationDone = false;
+    // From 0°, as the web page counts.
+    _lastMove = 0;
+    _stability.clear();
+    _stuckSince = null;
+    _calibrationStart = _clock();
+    _set(QiblaPhase.calibrating);
+  }
+
+  void _calibrate(double h, CompassReading r) {
+    final now = _clock();
+    if (step == CalibrationStep.move) {
+      if (signedDifference(_lastMove, h).abs() > 30) {
+        movements = math.min(movementsNeeded, movements + 1);
+        _lastMove = h;
+      }
+      final time = now.difference(_calibrationStart).inMilliseconds / _calibrationMinimum.inMilliseconds;
+      final progress = math.min(1.0, time.clamp(0.0, 1.0) * 0.4 + movements / movementsNeeded * 0.6);
+      // A fully calibrated magnetometer needs fewer turns.
+      if (progress >= 1 || (r.status == 3 && movements >= movementsNeeded ~/ 2)) {
+        step = CalibrationStep.hold;
+        _stability.clear();
+        _stuckSince = null;
+      }
+      return;
+    }
+
+    _stability.add((now, h));
+    _stability.removeWhere((s) => now.difference(s.$1) > _stabilityWindow);
+    final tiltOk = r.tilt < _tiltWarn;
+    final accuracyOk = r.status != 0 && r.status != 1 && (r.accuracy < 0 || r.accuracy < _accuracyGate);
+    if (_stability.length < 5) {
+      holdProgress = 0;
+      return;
+    }
+    final span = now.difference(_stability.first.$1).inMilliseconds;
+    final stable = circularStats(_stability.map((s) => s.$2)).std <= _stableStd;
+    final window = _stabilityWindow.inMilliseconds - 150;
+    if (!stable || !tiltOk) {
+      holdProgress = math.min(0.4, span / window * 0.4);
+    } else if (!accuracyOk) {
+      holdProgress = 0.5;
+    } else {
+      holdProgress = math.min(1.0, span / window);
+    }
+
+    // Steady and flat, but the phone still says uncalibrated: holding still
+    // won't fix that; more turning might.
+    if (stable && tiltOk && !accuracyOk) {
+      _stuckSince ??= now;
+      if (now.difference(_stuckSince!) > _stuckRevert) {
+        step = CalibrationStep.move;
+        movements = movementsNeeded - 4;
+        holdProgress = 0;
+        _stuckSince = null;
+      }
+    } else {
+      _stuckSince = null;
+    }
+
+    if (holdProgress >= 1 && !calibrationDone) {
+      calibrationDone = true;
+      Timer(const Duration(milliseconds: 500), () {
+        if (phase == QiblaPhase.calibrating && calibrationDone) {
+          _history.clear();
+          _jitter.clear();
+          _seeded = false;
+          _set(QiblaPhase.compass);
+        }
+      });
+    }
+  }
+}

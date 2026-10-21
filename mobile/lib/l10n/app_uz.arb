@@ -1,0 +1,1046 @@
+{
+  "@@locale": "uz",
+  "tagline": "Koreyadagi musulmonlar uchun",
+  "@tagline": {
+    "description": "One-line description under the app name on the welcome screen."
+  },
+  "greetingLabel": "Assalomu alaykum",
+  "@greetingLabel": {
+    "description": "What screen readers say for the Arabic greeting السلام عليكم."
+  },
+  "languageQuestion": "Qaysi tilda davom etamiz?",
+  "@languageQuestion": {
+    "description": "Title above the language list."
+  },
+  "languageNote": "Barcha bo‘limlar mavjud",
+  "@languageNote": {
+    "description": "Shown under THIS language's own tile, always in this language, so a speaker knows what they get before choosing. Uzbek has every section; the others say which sections are Uzbek-only."
+  },
+  "continueAction": "Davom etish",
+  "@continueAction": {
+    "description": "Confirms the language on first launch."
+  },
+  "saveAction": "Saqlash",
+  "@saveAction": {
+    "description": "Confirms the language when changing it later."
+  },
+  "changeLaterHint": "Tilni keyinroq sozlamalardan o‘zgartirish mumkin",
+  "@changeLaterHint": {
+    "description": "Reassurance under the first-launch button."
+  },
+  "changeLanguage": "Tilni o‘zgartirish",
+  "@changeLanguage": {
+    "description": "Opens the language picker from inside the app."
+  },
+  "prayerFajr": "Bomdod",
+  "@prayerFajr": {
+    "description": "Short prayer name, fits a sixth of the screen width."
+  },
+  "prayerSunrise": "Quyosh",
+  "@prayerSunrise": {
+    "description": "Sunrise: the end of Fajr, not a prayer. Short form."
+  },
+  "prayerDhuhr": "Peshin",
+  "prayerAsr": "Asr",
+  "prayerMaghrib": "Shom",
+  "prayerIsha": "Xufton",
+  "untilFajr": "Bomdodgacha",
+  "@untilFajr": {
+    "description": "Label above the countdown to the next prayer."
+  },
+  "untilFajrEnds": "Bomdod tugashiga",
+  "@untilFajrEnds": {
+    "description": "Countdown label between Fajr and sunrise: time left for Fajr."
+  },
+  "untilDhuhr": "Peshingacha",
+  "untilAsr": "Asrgacha",
+  "untilMaghrib": "Shomgacha",
+  "untilIsha": "Xuftongacha",
+  "locationPlaceholder": "Joylashuv",
+  "@locationPlaceholder": {
+    "description": "Shown instead of a city name before the first location fix."
+  },
+  "locating": "Aniqlanmoqda…",
+  "locationJustNow": "Hozirgina",
+  "@locationJustNow": {
+    "description": "How old the saved location is: under a minute."
+  },
+  "locationMinutesAgo": "{count} daqiqa oldin",
+  "@locationMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationHoursAgo": "{count} soat oldin",
+  "@locationHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationDaysAgo": "{count} kun oldin",
+  "@locationDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationFailedShort": "Aniqlab bo‘lmadi",
+  "refreshLocation": "Joylashuvni yangilash",
+  "@refreshLocation": {
+    "description": "Screen-reader label of the city chip."
+  },
+  "locationNeededTitle": "Namoz vaqtlari uchun joylashuv kerak",
+  "locationNeededBody": "Vaqtlar shahringiz bo‘yicha hisoblanadi. Joylashuv faqat shu uchun ishlatiladi.",
+  "useMyLocation": "Joylashuvni aniqlash",
+  "locationDeniedBody": "Ilovaga joylashuvga ruxsat berilmagan. Uni ilova sozlamalarida yoqing.",
+  "openSettings": "Sozlamalarni ochish",
+  "locationOffBody": "Telefonda joylashuv (GPS) o‘chirilgan.",
+  "turnOnLocation": "Yoqish",
+  "locationFailedBody": "Joylashuvni aniqlab bo‘lmadi.",
+  "timesFailedBody": "Namoz vaqtlarini yuklab bo‘lmadi. Internetni tekshiring.",
+  "retry": "Qayta urinish",
+  "newBadge": "Yangi",
+  "@newBadge": {
+    "description": "Small tag on new sections. Keep it one short word."
+  },
+  "featurePrayers": "Namoz vaqtlari",
+  "featureMosques": "Masjidlar",
+  "featureRestaurants": "Oshxonalar",
+  "featureShops": "Do‘konlar",
+  "featureNotifications": "Bildirishnomalar",
+  "featureQibla": "Qibla",
+  "featureQna": "Zikr ahlidan so‘rang",
+  "featureBarcode": "Mahsulot tarkibini tekshirish",
+  "featureHousing": "Uy-joy e’lonlari",
+  "featureCars": "Vegukin Cars",
+  "featureHikorea": "Immigratsiya xizmatlari",
+  "featureJobs": "Ish e’lonlari",
+  "featureParcel": "Pochta",
+  "featureLinks": "Foydali linklar",
+  "featureDonation": "Qo‘llab-quvvatlash",
+  "featureCommunity": "Jamoa",
+  "featureBusiness": "Biznes Katalogi",
+  "businessTagline": "Koreyadagi o‘zbek bizneslari",
+  "@businessTagline": {
+    "description": "Under the business directory title until the live count loads."
+  },
+  "businessCount": "{count} ta biznes",
+  "@businessCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryCount": "{count} ta yo‘nalish",
+  "@categoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "webLoadFailed": "Sahifani ochib bo‘lmadi. Internetni tekshiring.",
+  "webReload": "Yangilash",
+  "webOpenInBrowser": "Brauzerda ochish",
+  "cameraDenied": "Kameraga ruxsat berilmagan",
+  "@cameraDenied": {
+    "description": "Shown when a page needs the camera and the user did not allow it at first launch; the action opens the app settings."
+  },
+  "widgetOpenApp": "Namoz vaqtlari uchun ilovani oching",
+  "@widgetOpenApp": {
+    "description": "Home-screen widget, before the app has a location and prayer times."
+  },
+  "exactAlarmsTitle": "Aniq vaqt uchun ruxsat",
+  "exactAlarmsBody": "Namoz eslatmalari va bosh ekrandagi vidjet aynan o‘z vaqtida ishlashi uchun keyingi sahifada «Signal va eslatmalar»ni yoqing.",
+  "exactAlarmsAllow": "Davom etish",
+  "exactAlarmsLater": "Keyinroq",
+  "@exactAlarmsBody": {
+    "description": "Asked once at first launch, after location and camera, when Android 14+ keeps the exact-alarm permission off."
+  },
+  "prayersTitle": "Namoz vaqtlari",
+  "nextPrayer": "Keyingi namoz",
+  "remaining": "qoldi",
+  "suhoorLabel": "Saharlik (oxiri)",
+  "iftarLabel": "Iftorlik",
+  "chipNow": "hozir",
+  "chipNext": "keyingi",
+  "fastWindow": "Ro‘za vaqti · Saharlikdan Iftorlikkacha",
+  "dayToday": "Bugun",
+  "dayTomorrow": "Ertaga",
+  "dayYesterday": "Kecha",
+  "previousDay": "Oldingi kun",
+  "nextDay": "Keyingi kun",
+  "backToToday": "Bugunga qaytish",
+  "dayLoading": "Yuklanmoqda...",
+  "dayLoadFailed": "Yuklab bo‘lmadi",
+  "commentFajr": "Xufton vaqti tugaydi",
+  "commentSunrise": "Bomdod vaqti tugaydi",
+  "commentAsr": "Peshin vaqti tugaydi",
+  "commentMaghrib": "Asr vaqti tugaydi",
+  "commentIsha": "Shom vaqti tugaydi",
+  "settingsShort": "Sozlamalar",
+  "settingsTitle": "Namoz sozlamalari",
+  "settingsSubtitle": "Hisoblash usuli va mazhabingizni tanlang",
+  "methodLabel": "Hisoblash usuli",
+  "madhabLabel": "Mazhab (Asr vaqti uchun)",
+  "schoolHanafi": "Hanafiy",
+  "schoolShafii": "Shofe’iy / Molikiy / Hanbaliy",
+  "schoolShafiiShort": "Shofe’iy",
+  "hanafiNote": "Soya = 2x uzunlik",
+  "shafiiNote": "Soya = 1x uzunlik",
+  "methodMwl": "Muslim World League",
+  "methodKarachi": "Karachi",
+  "methodMakkah": "Makka",
+  "methodEgypt": "Misr",
+  "methodIsna": "ISNA",
+  "methodMwlHint": "Bomdod 18°, Xufton 17°",
+  "methodKarachiHint": "Bomdod 18°, Xufton 18°",
+  "methodMakkahHint": "Bomdod 18.5°, Xufton - Shomdan 90 daqiqa keyin",
+  "methodEgyptHint": "Bomdod 19.5°, Xufton 17.5°",
+  "methodIsnaHint": "Bomdod 15°, Xufton 15°",
+  "naflTitle": "Nafl namoz vaqtlari",
+  "tahajjudName": "Tahajjud namozi",
+  "tahajjudText": "Xuftondan keyin, uyqudan so‘ng o‘qiladigan nafl namoz. Ozi 2 rakat, ko‘pi 8 rakat. Eng afzal vaqti - kechaning oxirgi uchdan biri. Duolar qabul bo‘ladigan vaqt.",
+  "tahajjudQuote": "U Robbingizga qurbatdir, yomonliklarga kafforotdir, gunohlarni qaytaruvchidir.",
+  "tahajjudSource": "Manba: Termiziy - Abu Umoma (r.a.)",
+  "ishraqName": "Shuruq (Ishroq) namozi",
+  "ishraqQuote": "Kim bomdodni jamoat bilan o‘qisa, so‘ngra quyosh chiqquncha Allohni zikr qilib o‘tirsa, keyin ikki rakat namoz o‘qisa, uning uchun haj va umraning ajridek bo‘lur.",
+  "ishraqSource": "Manba: Termiziy - Muoz ibn Anas al-Juhaniy (r.a.)",
+  "duhaName": "Zuho (Choshgoh) namozi",
+  "duhaText": "Quyosh bir nayza bo‘yi ko‘tarilganda kirib, zavolga bir soat qolguncha davom etadi. Afzali 4 rakat o‘qish. Eng afzal vaqti - nahorning to‘rtdan biri o‘tgandan keyin.",
+  "duhaQuote": "Kim choshgoh namozini bardavom o‘qisa, uning gunohlari dengiz ko‘pigicha bo‘lsa ham mag‘firat qilinadi.",
+  "duhaSource": "Manba: Termiziy - Abu Hurayra (r.a.)",
+  "statusNow": "Ayni vaqti",
+  "statusUpcoming": "Kutilmoqda",
+  "statusPassed": "Vaqti o‘tdi",
+  "statusOtherDay": "Boshqa kun",
+  "reminderHint": "Har bir namoz uchun eslatmani qo‘ng‘iroqcha orqali sozlang",
+  "reminderFor": "{name}: eslatma",
+  "@reminderFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderToday": "Bugun: {range}",
+  "@reminderToday": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderHow": "Qanday eslatilsin",
+  "reminderWhen": "Qachon",
+  "reminderOff": "O‘chiq",
+  "reminderOffHint": "Eslatmasin",
+  "reminderSilent": "Jim",
+  "reminderSilentHint": "Faqat bildirishnoma",
+  "reminderVibrate": "Tebranish",
+  "reminderVibrateHint": "Ovozsiz, tebranadi",
+  "reminderSound": "Ovoz",
+  "reminderSoundHint": "Qisqa, yoqimli ohang",
+  "reminderPlay": "Eshitib ko‘rish",
+  "reminderAt": "Eslatma vaqti",
+  "reminderDone": "Tayyor",
+  "offsetOnTime": "Vaqtida",
+  "offsetBefore": "{duration} oldin",
+  "@offsetBefore": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "offsetAfter": "{duration} keyin",
+  "@offsetAfter": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "{minutes} daq",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{hours} soat",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} soat {minutes} daq",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsOff": "Bildirishnomalar o‘chiq — eslatmalar kelmaydi",
+  "notificationsTurnOn": "Yoqish",
+  "notifyAt": "{name} vaqti kirdi",
+  "@notifyAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyBefore": "{name} vaqtiga {duration} qoldi",
+  "@notifyBefore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyAfter": "{name} vaqti kirganiga {duration} bo‘ldi",
+  "@notifyAfter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifySunriseAt": "Quyosh chiqdi — Bomdod vaqti tugadi",
+  "notifySunriseBefore": "Bomdod vaqti tugashiga {duration} qoldi",
+  "@notifySunriseBefore": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifySunriseAfter": "Quyosh chiqqaniga {duration} bo‘ldi",
+  "@notifySunriseAfter": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyImsakAt": "Saharlik vaqti tugadi",
+  "notifyImsakBefore": "Saharlik tugashiga {duration} qoldi",
+  "@notifyImsakBefore": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyImsakAfter": "Saharlik tugaganiga {duration} bo‘ldi",
+  "@notifyImsakAfter": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyBody": "{name}: {start} – {end} · {city}",
+  "@notifyBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      },
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "suhoorShort": "Saharlik",
+  "qiblaTitle": "Qibla yo‘nalishi",
+  "qiblaPreparing": "Kompas tayyorlanmoqda...",
+  "qiblaHoldFlat": "Qurilmangizni tekis ushlang",
+  "qiblaHoldFlatShort": "Telefonni tekis ushlang",
+  "qiblaNoLocation": "Qibla yo‘nalishini hisoblash uchun joylashuvingiz kerak.",
+  "qiblaNoCompassTitle": "Kompas topilmadi",
+  "qiblaNoCompass": "Bu qurilmada kompas sensori mavjud emas.",
+  "qiblaNorth": "Shimol",
+  "qiblaEast": "Sharq",
+  "qiblaSouth": "Janub",
+  "qiblaWest": "G‘arb",
+  "qiblaDirection": "Yo‘nalish",
+  "qiblaAngle": "Qibla burchagi",
+  "qiblaLocation": "Joylashuv",
+  "qiblaToMakkah": "Makkagacha",
+  "qiblaSignal": "Kompas signali",
+  "qiblaQualityExcellent": "A’lo",
+  "qiblaQualityGood": "Yaxshi",
+  "qiblaQualityMedium": "O‘rtacha",
+  "qiblaQualityPoor": "Yomon",
+  "qiblaNeedsCalibration": "Kalibratsiya kerak",
+  "qiblaInterference": "Yaqinda metall yoki elektronika bor",
+  "qiblaAccuracy": "±{degrees}°",
+  "@qiblaAccuracy": {
+    "placeholders": {
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaDeclination": "Magnit og‘ishi {degrees}° hisobga olingan",
+  "@qiblaDeclination": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaTipsTitle": "Aniqroq natija uchun",
+  "qiblaTip1": "Telefonni gorizontal (tekis) ushlang",
+  "qiblaTip2": "Metall buyumlardan uzoqroq turing",
+  "qiblaTip3": "Elektron qurilmalardan uzoqlashing",
+  "qiblaTip4": "Ochiq maydonlarda ishlating",
+  "qiblaTip5": "Kamera rejimida telefonni tik ushlang va Ka’ba belgisini markazga keltiring",
+  "qiblaAligned": "Qiblaga to‘g‘ri yuzlangansiz!",
+  "qiblaSlightlyRight": "Biroz o‘ngga buriling",
+  "qiblaSlightlyLeft": "Biroz chapga buriling",
+  "qiblaTurnRight": "O‘ngga buriling",
+  "qiblaTurnLeft": "Chapga buriling",
+  "qiblaModeCompass": "Kompas",
+  "qiblaModeCamera": "Kamera",
+  "qiblaHoldUpright": "Telefonni tik ushlang",
+  "qiblaCameraFailed": "Kamerani ochib bo‘lmadi",
+  "qiblaSunTitle": "Quyosh bo‘yicha tekshirish",
+  "qiblaSunRight": "Quyosh hozir {sun}° da. Quyoshga yuzlanib, {angle}° o‘ngga burilsangiz — Qibla.",
+  "@qiblaSunRight": {
+    "placeholders": {
+      "sun": {
+        "type": "int"
+      },
+      "angle": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaSunLeft": "Quyosh hozir {sun}° da. Quyoshga yuzlanib, {angle}° chapga burilsangiz — Qibla.",
+  "@qiblaSunLeft": {
+    "placeholders": {
+      "sun": {
+        "type": "int"
+      },
+      "angle": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaSunAhead": "Quyosh hozir {sun}° da — aynan Qibla tomonda.",
+  "@qiblaSunAhead": {
+    "placeholders": {
+      "sun": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaSunDown": "Quyosh ufqdan pastda. Kunduzi Qiblani quyosh bo‘yicha ham tekshirish mumkin — magnitlar unga ta’sir qilmaydi.",
+  "qiblaSunOverKaaba": "Quyosh Ka’ba ustida bo‘ladi: {when}. O‘sha daqiqada soyalar Qibladan teskari tomonga tushadi.",
+  "@qiblaSunOverKaaba": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaPhaseMove": "Harakat",
+  "qiblaPhaseHold": "Barqarorlik",
+  "qiblaCalibrateTitle": "Kompasni kalibratsiya qiling",
+  "qiblaCalibrateMove": "Telefonni bilakni burab ∞ shaklida aylantiring — faqat surmang.",
+  "qiblaCalibrateHold": "Pufakchani markazda ushlab, qimirlamay turing.",
+  "qiblaMovements": "{count}/{total} harakat",
+  "@qiblaMovements": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "qiblaCalMoving": "Telefonni ∞ shaklida harakatlantiring...",
+  "qiblaCalGood": "Yaxshi! Davom eting...",
+  "qiblaCalHoldStill": "Endi telefonni tekis ushlab, qimirlatmang...",
+  "qiblaCalChecking": "Barqarorlik tekshirilmoqda...",
+  "qiblaCalDone": "✓ Kalibratsiya tayyor!",
+  "qiblaCalibrateShort": "Kalibrlash",
+  "qiblaSkip": "O‘tkazib yuborish",
+  "qiblaUndo": "Bekor qilish",
+  "qiblaSunMarker": "Quyosh",
+  "qiblaSunTapHint": "Quyosh doirada emasmi? Haqiqiy quyoshga bosing",
+  "qiblaSunNotThere": "Quyoshning o‘ziga bosing: u punktir chiziqda turadi",
+  "qiblaSunCorrected": "Quyosh bo‘yicha tuzatildi: {degrees}°",
+  "@qiblaSunCorrected": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaSunCheckCamera": "Kamerada tekshirish",
+  "parcelTitle": "Pochta yuborish",
+  "parcelTagline": "Kuryer topib, pochtangizni yetkazing",
+  "parcelFrom": "Qayerdan",
+  "parcelTo": "Qayerga",
+  "parcelSwap": "Yo‘nalishni almashtirish",
+  "parcelUzbekistan": "O‘zbekiston",
+  "parcelKorea": "Koreya",
+  "parcelUzbToKor": "O‘zbekistondan Koreyaga",
+  "parcelKorToUzb": "Koreyadan O‘zbekistonga",
+  "parcelByDate": "Sana bo‘yicha",
+  "parcelByCity": "Shahar bo‘yicha",
+  "parcelPostCount": "{count, plural, other{{count} ta e’lon}}",
+  "@parcelPostCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "parcelNoDates": "Bu yo‘nalishda hozircha e’lonlar yo‘q",
+  "parcelNoPosts": "E’lonlar topilmadi",
+  "parcelNoCities": "Shaharlar topilmadi",
+  "parcelSeeOther": "Boshqa yo‘nalish: {route}",
+  "@parcelSeeOther": {
+    "placeholders": {
+      "route": {
+        "type": "String"
+      }
+    }
+  },
+  "parcelError": "Ma’lumotni yuklab bo‘lmadi. Internetni tekshirib, qaytadan urinib ko‘ring.",
+  "parcelHowTitle": "Qanday ishlaydi?",
+  "parcelHow1": "Yo‘nalish va qidiruv usulini tanlang",
+  "parcelHow2": "E’lonni ko‘rib chiqing va kuryer bilan bog‘laning",
+  "parcelHow3": "Pochtangizni xavfsiz yetkazing!",
+  "parcelWriteTelegram": "Telegramda yozish",
+  "parcelCall": "Qo‘ng‘iroq qilish",
+  "parcelContactInText": "Kuryer kontakti xabarda ko‘rsatilgan",
+  "parcelShowMore": "Ko‘proq",
+  "parcelShowLess": "Yig‘ish",
+  "parcelSearchCity": "Shaharni qidirish",
+  "parcelNoticeTitle": "Ehtiyot bo‘ling",
+  "parcelNotice": "Bu e’lonlar Telegram guruhlaridan olinadi. Biz kuryerlar bilan bog‘liq emasmiz — faqat ularning e’lonlarini ko‘rsatamiz. Orada firibgarlar ham bo‘lishi mumkin. Yuzaga kelgan har qanday zarar uchun javobgar emasmiz.",
+  "parcelNoticeShort": "E’lonlar Telegram guruhlaridan. Biz kuryerlar bilan bog‘liq emasmiz.",
+  "parcelNoticeOk": "Tushundim",
+  "parcelWaking": "Server ishga tushmoqda, biroz kuting…",
+  "parcelOffline": "Internet aloqasi yo‘q. Oxirgi yuklangan e’lonlar ko‘rsatilmoqda.",
+  "parcelSearch": "Qidirish",
+  "parcelSearchPosts": "E’lonlardan qidirish",
+  "parcelSearching": "Qidirilmoqda… {done}/{total} kun",
+  "@parcelSearching": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "parcelNothingFound": "Hech narsa topilmadi",
+  "parcelSavedTitle": "Saqlangan e’lonlar",
+  "parcelSave": "Saqlash",
+  "parcelUnsave": "Saqlanganlardan olib tashlash",
+  "parcelSavedEmpty": "Hozircha saqlangan e’lon yo‘q. E’londagi belgini bosib saqlang.",
+  "parcelRemoved": "Olib tashlandi",
+  "parcelUndo": "Bekor qilish",
+  "parcelShare": "Ulashish",
+  "parcelEnd": "Boshqa e’lonlar yo‘q",
+  "parcelDraft": "Assalomu alaykum! {route} reysingiz ({date}) bo‘yicha pochta haqida yozyapman.",
+  "@parcelDraft": {
+    "placeholders": {
+      "route": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "parcelDraftNoDate": "Assalomu alaykum! {route} reysingiz bo‘yicha pochta haqida yozyapman.",
+  "@parcelDraftNoDate": {
+    "placeholders": {
+      "route": {
+        "type": "String"
+      }
+    }
+  },
+  "linksTitle": "Foydali linklar",
+  "linksSubtitle": "{count} ta Telegram guruh va kanal",
+  "@linksSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "linksSearch": "Guruh, shahar yoki mavzu",
+  "linksJobs": "Ish",
+  "linksLife": "Koreya hayoti",
+  "linksGroups": "Guruhlar",
+  "linksFavorites": "Sevimlilar",
+  "linksNearest": "Yaqinlik",
+  "linksByRegion": "Hududlar",
+  "linksYourPlace": "Joylashuvingiz: {city}",
+  "@linksYourPlace": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "linksLocate": "Joylashuvni aniqlang — yaqin guruhlar birinchi chiqadi",
+  "linksLocateButton": "Aniqlash",
+  "linksNationwide": "Butun Koreya",
+  "linksNearby": "Yaqin atrofda",
+  "linksFarther": "Boshqa shaharlar",
+  "linksRegionCapital": "Seul va Gyeonggi",
+  "linksRegionChungcheong": "Chungcheong",
+  "linksRegionJeolla": "Jeolla",
+  "linksRegionGyeongsang": "Gyeongsang",
+  "linksOther": "Boshqalar",
+  "linksTopicOfficial": "Rasmiy",
+  "linksTopicNews": "Yangiliklar va ma’lumot",
+  "linksTopicLegal": "Huquq va vizalar",
+  "linksTopicInsurance": "Sug‘urta",
+  "linksTopicWork": "Ish va karyera",
+  "linksTopicEveryday": "Kundalik hayot",
+  "linksForEveryone": "Umumiy",
+  "linksForWomen": "Ayollar uchun",
+  "linksOurs": "Bizning guruh: taklif va savollar uchun",
+  "linksSuggestTitle": "Guruhingiz ro‘yxatda yo‘qmi?",
+  "linksSuggestBody": "Muslim Vegukin guruhiga yozing, qo‘shamiz.",
+  "linksOpen": "Telegramda ochish",
+  "linksCopy": "Havolani nusxalash",
+  "linksCopied": "Havola nusxalandi",
+  "linksShare": "Ulashish",
+  "linksFavorite": "Sevimlilarga qo‘shish",
+  "linksUnfavorite": "Sevimlilardan olib tashlash",
+  "linksNothing": "Hech narsa topilmadi",
+  "linksResults": "{count} ta natija",
+  "@linksResults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "donationTitle": "Xayriya",
+  "donationHeroTitle": "Loyiha faoliyatini qo‘llab-quvvatlang",
+  "donationHeroSubtitle": "Yordamingiz bilan loyiha yanada rivojlanadi",
+  "donationMessage": "Agar ushbu bot sizga foydali bo‘layotgan bo‘lsa va uning ishlashi hamda rivojlanishiga o‘z hissangizni qo‘shmoqchi bo‘lsangiz, quyidagi hisob raqamga istalgan miqdorda moddiy mablag‘laringizni yuborishingiz mumkin.",
+  "donationName": "Ism",
+  "donationAccount": "Hisob raqam",
+  "donationCopied": "Nusxa olindi!",
+  "donationUsageTitle": "Yig‘ilgan mablag‘lar quyidagilar uchun ishlatiladi",
+  "donationUsage1": "Server va hosting xarajatlari",
+  "donationUsage2": "Texnik xizmat va muntazam yangilanishlar",
+  "donationUsage3": "Dasturchilar mehnati va loyihani rivojlantirish",
+  "donationThanksText": "Sizning har qanday hissangiz biz uchun katta ahamiyatga ega!",
+  "donationThanks": "Rahmat!",
+  "communityTitle": "Jamoa",
+  "communityHeroTitle": "Rasmiy Telegram Guruhi",
+  "communityHeroSubtitle": "Bot foydalanuvchilari jamiyati",
+  "communityJoinNow": "Hoziroq qo‘shiling",
+  "communityPurposeTitle": "Guruh maqsadi",
+  "communityPurposeText": "Ushbu guruh Muslim Vegukin Bot foydalanuvchilari uchun rasmiy muhokama maydonidir. Bu yerda bot bilan bog‘liq barcha masalalarni muhokama qilishingiz mumkin.",
+  "communityAllowedTitle": "Guruh muhokama mavzulari",
+  "communityTopicPlaceTitle": "Yangi manzillar haqida xabar berish",
+  "communityTopicPlaceBody": "Yangi masjid, restoran yoki do‘kon qo‘shilishi kerak bo‘lsa",
+  "communityTopicIdeaTitle": "Takliflar va g‘oyalar",
+  "communityTopicIdeaBody": "Botni yaxshilash uchun fikrlaringiz",
+  "communityTopicBugTitle": "Xatolar haqida xabar berish",
+  "communityTopicBugBody": "Agar botda muammo topsangiz",
+  "communityTopicNewsTitle": "Bot yangiliklari",
+  "communityTopicNewsBody": "Yangi funksiyalar va o‘zgarishlar haqida e’lonlar",
+  "communityTopicBetaTitle": "Beta versiyalar muhokamasi",
+  "communityTopicBetaBody": "Yangi funksiyalarni ommaga chiqarishdan oldin sinab ko‘rish",
+  "communityTopicQuestionTitle": "Bot haqida savollar",
+  "communityTopicQuestionBody": "Qanday ishlatish, funksiyalar haqida",
+  "communityTopicPeopleTitle": "Jamiyat bilan muloqot",
+  "communityTopicPeopleBody": "Boshqa foydalanuvchilar bilan tajriba almashish",
+  "communityRulesTitle": "Guruh qoidalari",
+  "communityRulesWarning": "Quyidagi turdagi xabarlar o‘chirib tashlanadi",
+  "communityBanned1Title": "Reklama va savdo e’lonlari",
+  "communityBanned1Body": "Har qanday turdagi sotish yoki xarid e’lonlari",
+  "communityBanned2Title": "O‘quv kurslari reklamasi",
+  "communityBanned2Body": "Til kurslari, o‘quv markazlari va boshqalar",
+  "communityBanned3Title": "Bot bilan bog‘liq bo‘lmagan savollar",
+  "communityBanned3Body": "Umumiy savollar uchun boshqa guruhlardan foydalaning",
+  "communityBanned4Title": "Spam va takroriy xabarlar",
+  "communityBanned4Body": "Bir xil xabarlarni qayta-qayta yozish",
+  "communityBanned5Title": "Mavzudan tashqari munozaralar",
+  "communityBanned5Body": "Bot bilan aloqasi bo‘lmagan suhbatlar",
+  "communityPenaltyTitle": "Ogohlantirish",
+  "communityPenaltyText": "Qoidalarga zid xabarlar o‘chiriladi. Agar o‘chirilgan xabar qayta yozilsa, foydalanuvchi guruhda yozish huquqidan cheklanadi (restrict).",
+  "communityCta": "Qoidalarga rioya qilgan holda guruhga qo‘shilishingizni so‘rab qolamiz!",
+  "donationTransfer": "Pul o‘tkazish",
+  "donationBank": "Bank",
+  "donationCopyAccount": "Hisob raqamni nusxalash",
+  "donationCopyName": "Ismni nusxalash",
+  "donationOpenApp": "Bank ilovasida o‘tkazish",
+  "donationOpenAppHint": "Hisob raqam nusxalanadi — ilovada joylang",
+  "donationPasteHint": "Hisob raqam nusxalandi — ilovada joylang",
+  "donationShare": "Rekvizitlarni ulashish",
+  "donationAsk": "Savol va takliflar uchun — guruhimiz",
+  "communityCopyLink": "Havolani nusxalash",
+  "communityLinkCopied": "Havola nusxalandi",
+  "communityShare": "Ulashish",
+  "communityMore": "Guruhda yana",
+  "communityTemplateHint": "Shablon nusxalanadi. Guruhda joylab, bo‘sh joylarni to‘ldiring.",
+  "communityTemplateGo": "Nusxalash va guruhni ochish",
+  "communityTemplateCopied": "Shablon nusxalandi — guruhda joylang",
+  "communityTemplatePlace": "📍 Yangi joy\nNomi: \nTuri: masjid / oshxona / do‘kon\nManzil: \nXaritadagi havola: \nQo‘shimcha: ",
+  "communityTemplateBug": "🐛 Xato\nQaysi bo‘limda: \nNima bo‘ldi: \nNima bo‘lishi kerak edi: \n\nTelefon: {phone}\nIlova: {version}",
+  "@communityTemplateBug": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "barcodeTitle": "Tarkib tekshirish",
+  "barcodeHint": "Shtrix kodni ramkaga to‘g‘rilang",
+  "barcodeChecking": "Tekshirilmoqda…",
+  "barcodeTypeCode": "Kodni kiritish",
+  "barcodeTorch": "Chiroq",
+  "barcodeSwitchCamera": "Kamerani almashtirish",
+  "barcodeBackToCamera": "Skanerlash",
+  "barcodeCameraOffTitle": "Kameraga ruxsat berilmagan",
+  "barcodeCameraOffBody": "Skanerlash uchun kameraga ruxsat bering yoki kodni qo‘lda kiriting.",
+  "barcodeOpenSettings": "Sozlamalarni ochish",
+  "barcodeCameraError": "Kameraga ulanib bo‘lmadi.",
+  "barcodeRetry": "Qayta urinish",
+  "barcodeVerdictJoiz": "Joiz",
+  "barcodeVerdictShubhali": "Shubhali",
+  "barcodeVerdictNojoiz": "Joiz emas",
+  "barcodeVerdictJoizDesc": "Tarkibida ta’qiqlangan ingredientlar topilmadi",
+  "barcodeVerdictShubhaliDesc": "Ta’qiqlangan moddalar yo‘q, lekin bir zavodda ishlab chiqarilgan yoki ayrim ingredientlar o‘zagi HAYVONlardan olingan bo‘lishi mumkin.",
+  "barcodeVerdictNojoizDesc": "Tarkibida ta’qiqlangan ingredientlar aniqlandi",
+  "barcodePork": "Cho‘chqa",
+  "barcodeAlcohol": "Alkogol",
+  "barcodeMeat": "Boshqa go‘sht",
+  "barcodeSeafood": "Dengiz mahsulotlari",
+  "barcodeAbsent": "yo‘q",
+  "barcodePresent": "bor",
+  "barcodeAmbiguous": "Tarkibida 트랜스지방, 쇼트닝, 향료 yoki 글리세린 bor — o‘simlik yoki HAYVON YOG‘idan olinishi mumkin.",
+  "barcodeFactoryWarn": "Mahsulot ta’qiqlangan ingredientlar tayyorlanadigan zavod/uskunalarda ishlab chiqarilgan.",
+  "barcodeFactoryOk": "Mahsulot ishlab chiqarilgan zavod/uskunalarda ta’qiqlangan mahsulotlar ishlatilmaydi.",
+  "barcodeIngredients": "Tarkibi",
+  "barcodeDoubtfulLink": "Shubhali mahsulotni yesa bo‘ladimi?",
+  "barcodeFoundIn": "Topildi:",
+  "barcodeGeneralDb": "Umumiy ma’lumotlar bazasi",
+  "barcodeStoreUnknown": "Do‘kon belgilanmagan",
+  "barcodeAlsoAt": "Boshqa do‘konlarda ham bor:",
+  "barcodeCopyCode": "Kodni nusxalash",
+  "barcodeCopied": "Nusxalandi",
+  "barcodeScanNext": "Keyingisini skanerlash",
+  "barcodeNotFound": "Mahsulot topilmadi",
+  "barcodeNotFoundDesc": "Ushbu mahsulot hozircha bazada yo‘q. Tez orada qo‘shilishi mumkin.",
+  "barcodeOfflineTitle": "Internet yo‘q",
+  "barcodeOfflineBody": "Mahsulotni tekshirish uchun internet kerak. Ulanishni tekshirib, qayta urinib ko‘ring.",
+  "barcodeSaved": "Avval saqlangan natija · internet yo‘q",
+  "barcodeRecent": "So‘nggi tekshiruvlar",
+  "barcodeClear": "Tozalash",
+  "barcodeTypeTitle": "Shtrix-kodni kiriting",
+  "barcodeTypeHint": "Shtrixlar ostidagi raqamlar: 8 tadan 14 tagacha.",
+  "barcodeSearch": "Qidirish",
+  "barcodeErrEmpty": "Shtrix-kod kiriting.",
+  "barcodeErrNonDigit": "Faqat raqamlar kiriting.",
+  "barcodeErrLength": "Shtrix-kod 8 dan 14 tagacha raqamdan iborat bo‘lishi kerak.",
+  "barcodeErrChecksum": "Shtrix-kod noto‘g‘ri. Raqamlarni tekshiring.",
+  "barcodeStores": "Do‘konlar",
+  "barcodeProducts": "{count, plural, other{{count} ta mahsulot}}",
+  "@barcodeProducts": {
+    "description": "How many products a store has.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "barcodeSoon": "Yaqinda",
+  "barcodeStoresError": "Do‘konlar yuklanmadi",
+  "barcodeAll": "Hammasi",
+  "barcodeStoreEmpty": "Mahsulot topilmadi",
+  "barcodeStoreEmptyDesc": "Boshqa turkum yoki hukmni tanlang.",
+  "barcodeProductsError": "Mahsulotlar yuklanmadi",
+  "barcodeCheckConnection": "Internetni tekshirib, qayta urinib ko‘ring.",
+  "barcodeContribTitle": "Halol baza yig‘ishga sherik bo‘ling",
+  "barcodeContribBody": "Mahsulotlar tarkibini o‘qiy oladiganlar uchun: GS25, CU, 7-Eleven, Emart24, No Brand va Daiso do‘konlaridagi halol mahsulotlar bazasini birgalikda yig‘amiz. Har bir yozuv minglab yurtdoshlarimizga yetib boradi — ortingizdan sadaqa-i joriyangizni qoldiring.",
+  "barcodeContribCta": "Adminga yozish",
+  "barcodeDisclaimer": "Bu ma’lumotlar faqat mahsulot tarkibi asosida taqdim etilgan bo‘lib, *xatoliklar bo‘lishi mumkin*. Biz rasmiy diniy hukm (fatvo) bermaymiz. Xatolik topsangiz, Telegram guruhimizga xabar bering.",
+  "barcodeCatDrinks": "Ichimliklar",
+  "barcodeCatSnacks": "Yengil ovqatlar",
+  "barcodeCatSweets": "Shirinliklar",
+  "barcodeCatIceCream": "Muzqaymoq",
+  "barcodeCatBaked": "Non mahsulotlari",
+  "barcodeCatNoodles": "Lag‘mon/Ramen",
+  "barcodeCatLunchbox": "Pechenya/Pishiriqlar",
+  "barcodeCatDairy": "Sut mahsulotlari",
+  "barcodeCatCanned": "Konserva",
+  "barcodeCatFrozen": "Muzlatilgan",
+  "barcodeCatSauces": "Ziravor/Souslar",
+  "barcodeCatFruits": "Meva/Sabzavot",
+  "barcodeCatDried": "Quritilgan",
+  "qnaLabel": "Savol-javob markazi",
+  "qnaVerseRef": "Nahl surasi, 43-oyat",
+  "qnaSource": "Shayx Muhammad Sodiq Muhammad Yusuf va boshqa ustozlarning javoblari",
+  "qnaCount": "100 000+ savol",
+  "qnaAi": "Sun’iy intellekt qidiruvi",
+  "qnaSearchHint": "Savolingizni o‘z so‘zlaringiz bilan yozing…",
+  "qnaUzbekNote": "Savollar va javoblar o‘zbek tilida.",
+  "qnaDaily": "Kunlik tanlov",
+  "qnaDailySub": "Har kuni yangi savollar",
+  "qnaNewSet": "Yangi savollar",
+  "qnaLoadError": "Savollar yuklanmadi",
+  "qnaCheckConnection": "Internetni tekshirib, qayta urinib ko‘ring.",
+  "qnaRetry": "Qayta urinish",
+  "qnaSaved": "Saqlangan javoblar",
+  "qnaSavedEmpty": "Hali hech narsa saqlanmagan",
+  "qnaSavedHint": "Javobni belgi tugmasi bilan saqlang — internet bo‘lmasa ham o‘qiysiz.",
+  "qnaSave": "Saqlash",
+  "qnaUnsave": "Saqlanganlardan olib tashlash",
+  "qnaSavedNote": "Saqlandi",
+  "qnaRemovedNote": "Saqlanganlardan olib tashlandi",
+  "qnaShare": "Ulashish",
+  "qnaTextSize": "Matn o‘lchami",
+  "qnaQuestion": "Savol",
+  "qnaAnswer": "Javob",
+  "qnaOpenSource": "Manbaga o‘tish",
+  "qnaCopy": "Nusxalash",
+  "qnaCopied": "Savol va javob nusxalandi",
+  "qnaRelated": "O‘xshash savollar",
+  "qnaAnswerError": "Javob yuklanmadi",
+  "qnaOther": "Boshqa",
+  "qnaSearchTitle": "Savol qidirish",
+  "qnaSearchButton": "Qidirish",
+  "qnaMinLetters": "Kamida 3 ta harf yozing",
+  "qnaHowTitle": "Qanday ishlaydi?",
+  "qnaHowBody": "Sun’iy intellekt o‘zbek til modeli savolingizning ma’nosini tushunib, minglab savol-javoblar ichidan eng o‘xshashlarini topadi. So‘zma-so‘z mos kelishi shart emas: savolingizni to‘liq va grammatik to‘g‘ri yozsangiz, javob aniqroq bo‘ladi. Lotin yoki kirill yozuvida yozishingiz mumkin.",
+  "qnaRecent": "So‘nggi qidiruvlar",
+  "qnaClear": "Tozalash",
+  "qnaRemove": "O‘chirish",
+  "qnaExamples": "Masalan",
+  "qnaResults": "{count, plural, other{{count} ta natija}}",
+  "@qnaResults": {
+    "description": "How many questions a search found.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "qnaNoResults": "Hech narsa topilmadi",
+  "qnaNoResultsHint": "Savolni boshqacharoq, to‘liqroq yozib ko‘ring.",
+  "qnaOfflineTitle": "Internet yo‘q",
+  "qnaOfflineBody": "Qidiruv uchun internet kerak. Saqlangan javoblar internetsiz ham ochiladi.",
+  "bizTitle": "Biznes katalogi",
+  "bizTagline": "Koreyadagi o‘zbek bizneslari — bir joyda",
+  "bizSearchTitle": "Qidiruv",
+  "bizSearchHint": "Biznes yoki xizmatni qidiring",
+  "bizCountAll": "{count, plural, other{{count} ta biznes}}",
+  "@bizCountAll": {
+    "description": "How many businesses are listed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizCountFound": "{count, plural, other{{count} ta topildi}}",
+  "@bizCountFound": {
+    "description": "How many businesses a search found.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizTileEmpty": "Hozircha bo‘sh",
+  "bizDirectoryEmpty": "Katalog hozircha bo‘sh",
+  "bizDirectoryEmptyBody": "Bu yerda Koreyadagi o‘zbek bizneslari to‘planadi.",
+  "bizSaved": "Saqlanganlar",
+  "bizCategories": "Yo‘nalishlar",
+  "bizOrderNote": "Mijozlar eng ko‘p yoqtirgan bizneslar yuqorida",
+  "bizCategoryEmpty": "Bu yo‘nalishda hali biznes yo‘q",
+  "bizCategoryEmptyBody": "Yangi bizneslar qo‘shilgach shu yerda ko‘rinadi. Boshqa yo‘nalishlarga ham qarab ko‘ring.",
+  "bizSeeAll": "Barchasi",
+  "bizNothingFound": "Hech narsa topilmadi",
+  "bizNothingFoundBody": "“{query}” bo‘yicha biznes topilmadi. Boshqacha yozib ko‘ring yoki yo‘nalishlardan qidiring.",
+  "@bizNothingFoundBody": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "bizLoadError": "Yuklab bo‘lmadi",
+  "bizCheckConnection": "Internet aloqasini tekshirib, qayta urinib ko‘ring.",
+  "bizRetry": "Qayta urinish",
+  "bizUzbekNote": "Bizneslar haqidagi ma’lumotlar o‘zbek tilida.",
+  "bizSave": "Saqlash",
+  "bizUnsave": "Saqlanganlardan olib tashlash",
+  "bizSavedNote": "Saqlandi — aloqa ma’lumotlari internetsiz ham ochiladi",
+  "bizRemovedNote": "Saqlanganlardan olib tashlandi",
+  "bizShare": "Ulashish",
+  "bizShareFooter": "Muslim Vegukin biznes katalogidan",
+  "bizViews": "{count, plural, other{{count} marta ko‘rilgan}}",
+  "@bizViews": {
+    "description": "How many times a listing was opened.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizLikes": "{count, plural, other{{count} kishiga yoqdi}}",
+  "@bizLikes": {
+    "description": "How many people liked a business.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bizLoadFailed": "Ma’lumotni yuklab bo‘lmadi.",
+  "bizLinks": "Boshqa havolalar",
+  "bizAbout": "Biznes haqida",
+  "bizNoInfo": "Bu biznes hali to‘liq ma’lumot kiritmagan.",
+  "bizNoContact": "Aloqa ma’lumotlari ko‘rsatilmagan.",
+  "bizNoContactAsk": "Admin orqali so‘rash",
+  "bizReport": "Ma’lumot noto‘g‘rimi? Adminga xabar bering",
+  "bizCopyAddress": "Nusxalash",
+  "bizAddressCopied": "Manzil nusxalandi",
+  "bizPhoneCopied": "Raqam nusxalandi",
+  "bizActCall": "Qo‘ng‘iroq qilish",
+  "bizActTelegram": "Telegramda yozish",
+  "bizActChannel": "Telegramda ochish",
+  "bizActKakao": "KakaoTalkda yozish",
+  "bizActWebsite": "Saytni ochish",
+  "bizActInstagram": "Instagramda ko‘rish",
+  "bizActTiktok": "TikTokda ko‘rish",
+  "bizActYoutube": "YouTube’da ko‘rish",
+  "bizActFacebook": "Facebookda ochish",
+  "bizActPlay": "Google Play’da ochish",
+  "bizActAppStore": "App Store’da ochish",
+  "bizActOpen": "Ochish",
+  "bizChannelPhone": "Telefon",
+  "bizChannelGroup": "Telegram kanal / guruh",
+  "bizChannelWebsite": "Veb-sayt",
+  "bizPrivateGroup": "Yopiq guruh",
+  "bizMapNaver": "Naver xarita",
+  "bizMapKakao": "Kakao xarita",
+  "bizMapGoogle": "Google xarita",
+  "bizOwnerTitle": "Biznes egasimisiz?",
+  "bizOwnerBody": "Biznesingizni katalogga qo‘shing — mijozlar sizni shu yerdan topadi.",
+  "bizOwnerBodyEmpty": "Bu yo‘nalishga birinchi bo‘lib qo‘shiling.",
+  "bizOwnerEyebrow": "Biznes egalari uchun",
+  "bizOwnerSheetTitle": "Katalogga qo‘shilish",
+  "bizStep1Title": "Ariza yuborish",
+  "bizStep1Body": "Biznes logosi, nomi, yo‘nalishi va aloqa ma’lumotlarini kiriting.",
+  "bizStep2Title": "To‘lov",
+  "bizStep2Body": "Bir martalik to‘lov — {amount}. Adminga to‘lov skrinshotini yuborasiz.",
+  "@bizStep2Body": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "bizStep3Title": "Katalogda",
+  "bizStep3Body": "To‘lov tasdiqlangach biznesingiz katalogda ko‘rina boshlaydi.",
+  "bizOwnerFine": "Katalogda ko‘rinish tartibi biznesga bosilgan klass soniga qarab belgilanadi: eng ko‘p yoqtirilgan biznes yuqorida turadi.",
+  "bizOwnerHow": "Ariza Telegram orqali yuboriladi: adminga yozing, u biznesingizni qo‘shishda yordam beradi.",
+  "bizOwnerContact": "Admin bilan bog‘lanish",
+  "bizCurrency": "{amount} won",
+  "@bizCurrency": {
+    "description": "A sum in Korean won, already formatted.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "accountTitle": "Hisob",
+  "signInTitle": "Hisobingizga kiring",
+  "signInWhy": "Joylarni kuzatish va bildirishnomalar kirmasdan ham ishlaydi. Izoh yozish, ma’lumotni tuzatish va e’lon berish uchun kiring — boshqalar kim yozganini bilsin.",
+  "signInTelegramNote": "Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi hisobingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.",
+  "signInTelegram": "Telegram orqali kirish",
+  "signInWhatsApp": "WhatsApp orqali kirish",
+  "signInGoogle": "Google orqali kirish",
+  "signInWaitingTitle": "{app}da «Ha, kirish»ni bosing",
+  "@signInWaitingTitle": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "signInWaitingBody": "Shu yerda kutib turamiz. Tasdiqlagach, ilovaga qayting.",
+  "signInOpenAgain": "{app}ni qayta ochish",
+  "@signInOpenAgain": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "signInCancel": "Bekor qilish",
+  "signInExpired": "Vaqt tugadi yoki bekor qilindi. Qaytadan urinib ko‘ring.",
+  "signInFailed": "Bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.",
+  "signInDone": "Kirdingiz",
+  "signedInWith": "{provider} orqali kirilgan",
+  "@signedInWith": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "signOut": "Chiqish",
+  "accountDelete": "Hisobni o‘chirish",
+  "accountDeleteTitle": "Hisob o‘chirilsinmi?",
+  "accountDeleteBody": "Kuzatuvlaringiz, hududlaringiz va izohlaringiz butunlay o‘chiriladi. Buni qaytarib bo‘lmaydi.",
+  "accountDeleteTelegram": "Telegram botda qilinganlari ham.",
+  "accountDeleteConfirm": "O‘chirish",
+  "accountDeleted": "Hisob o‘chirildi",
+  "accountPushOn": "Bildirishnomalar shu telefonga keladi",
+  "accountPushOff": "Bildirishnomalar o‘chiq. Yoqish uchun sozlamalarni oching.",
+  "pushOpen": "Ochish",
+  "themeToDay": "Kunduzgi rejim",
+  "themeToNight": "Tungi rejim"
+}

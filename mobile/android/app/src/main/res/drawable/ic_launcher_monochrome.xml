@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated: the khatam brand mark (see lib/core/widgets/khatam.dart). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M54.00,26.00 L62.19,34.19 L73.81,34.19 L73.81,45.81 L82.00,54.00 L73.81,62.19 L73.81,73.81 L62.19,73.81 L54.00,82.00 L45.81,73.81 L34.19,73.81 L34.19,62.19 L26.00,54.00 L34.19,45.81 L34.19,34.19 L45.81,34.19 Z M54.00,36.08 L59.24,41.32 L66.68,41.32 L66.68,48.76 L71.92,54.00 L66.68,59.24 L66.68,66.68 L59.24,66.68 L54.00,71.92 L48.76,66.68 L41.32,66.68 L41.32,59.24 L36.08,54.00 L41.32,48.76 L41.32,41.32 L48.76,41.32 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M57.00,46.76 L58.24,49.75 L61.25,51.00 L60.00,54.00 L61.24,57.00 L58.25,58.24 L57.00,61.25 L54.00,60.00 L51.00,61.24 L49.76,58.25 L46.75,57.00 L48.00,54.00 L46.76,51.00 L49.75,49.76 L51.00,46.75 L54.00,48.00 Z" />
+</vector>

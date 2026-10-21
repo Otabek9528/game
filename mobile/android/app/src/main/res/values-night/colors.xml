@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home-screen widgets in dark mode: white and gold on emerald. -->
+    <color name="widget_ink">#FFFFFFFF</color>
+    <color name="widget_soft">#D9FFFFFF</color>
+    <color name="widget_faint">#8CFFFFFF</color>
+    <color name="widget_accent">#FFF7D56B</color>
+    <color name="widget_current_bg">#26FFFFFF</color>
+    <color name="widget_chip_stroke">#80F7D56B</color>
+    <color name="widget_rosette">#2EF7D56B</color>
+    <color name="widget_glow">#3DF7D56B</color>
+    <color name="widget_edge">#47F7D56B</color>
+</resources>
