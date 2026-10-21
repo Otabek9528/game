@@ -737,6 +737,12 @@
   "accountDarkMode": "Тёмная тема",
   "accountManage": "Управление аккаунтом",
   "accountActive": "{count, plural, one{{count} активное} few{{count} активных} other{{count} активных}}",
+  "hkDormantTitle": "HiKorea не показывает дней в этом окне",
+  "hkDormantBody": "С {date} HiKorea не показывает здесь ни одного дня — ни свободного, ни занятого. Так бывает, когда HiKorea заменяет окно новым. Посмотрите другие окна этого офиса или проверьте на сайте HiKorea.",
+  "hkDormantBodyNoDate": "HiKorea не показывает здесь ни одного дня — ни свободного, ни занятого. Так бывает, когда HiKorea заменяет окно новым. Посмотрите другие окна этого офиса или проверьте на сайте HiKorea.",
+  "hkOtherCounters": "Другие окна этого офиса",
+  "hkCheckOnHikorea": "Проверить на HiKorea",
+  "hkNoDaysShort": "На HiKorea нет дней",
   "themeToDay": "Дневной режим",
   "themeToNight": "Ночной режим"
 }

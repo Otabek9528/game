@@ -2421,12 +2421,12 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String hkFreeDays(int n, String date) {
-    return '$date gacha $n ta bo‘sh kun';
+    return '${date}gacha $n ta bo‘sh kun';
   }
 
   @override
   String hkBookedUntil(String date) {
-    return '$date gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.';
+    return '${date}gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.';
   }
 
   @override
@@ -2510,6 +2510,28 @@ class AppLocalizationsUz extends AppLocalizations {
   String accountActive(int count) {
     return '$count ta faol';
   }
+
+  @override
+  String get hkDormantTitle =>
+      'HiKorea bu bo‘limda hech qanday kun ko‘rsatmayapti';
+
+  @override
+  String hkDormantBody(String date) {
+    return '${date}dan beri HiKorea bu yerda hech qanday kun ko‘rsatmayapti — na bo‘sh, na band. HiKorea bo‘limni yangisiga almashtirganda shunday bo‘ladi. Ofisning boshqa bo‘limlarini ko‘ring yoki HiKorea saytida tekshiring.';
+  }
+
+  @override
+  String get hkDormantBodyNoDate =>
+      'HiKorea bu yerda hech qanday kun ko‘rsatmayapti — na bo‘sh, na band. HiKorea bo‘limni yangisiga almashtirganda shunday bo‘ladi. Ofisning boshqa bo‘limlarini ko‘ring yoki HiKorea saytida tekshiring.';
+
+  @override
+  String get hkOtherCounters => 'Ofisning boshqa bo‘limlari';
+
+  @override
+  String get hkCheckOnHikorea => 'HiKorea\'da tekshirish';
+
+  @override
+  String get hkNoDaysShort => 'HiKorea\'da kun ko‘rinmayapti';
 
   @override
   String get themeToDay => 'Kunduzgi rejim';

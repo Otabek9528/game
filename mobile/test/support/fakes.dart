@@ -1093,6 +1093,9 @@ class FakeHikorea implements HikoreaSource {
     return const [];
   }
 
+  /// Counters HiKorea retired: they list nothing since 16 October.
+  final dormantDesks = <int>{};
+
   /// Mon 19 Oct: 5 booked, Tue 20: 40 (full), Mon 26: 10 (full), Tue 27: 20;
   /// the other working days to the end of November nobody has booked yet;
   /// Tue 3 Nov is a holiday.
@@ -1100,6 +1103,9 @@ class FakeHikorea implements HikoreaSource {
   Future<HkCalendar> calendar(int desk) async {
     _online();
     asked.add('calendar $desk');
+    if (dormantDesks.contains(desk)) {
+      return HkCalendar(deskSeq: desk, dormant: true, listedUntil: DateTime(2026, 10, 16), deskCapacity: 180, status: 'ok');
+    }
     return HkCalendar(
       deskSeq: desk,
       listed: const {'20261019': 5, '20261020': 40, '20261026': 10, '20261027': 20},

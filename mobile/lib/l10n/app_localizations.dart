@@ -4369,13 +4369,13 @@ abstract class AppLocalizations {
   /// No description provided for @hkFreeDays.
   ///
   /// In uz, this message translates to:
-  /// **'{date} gacha {n} ta bo‘sh kun'**
+  /// **'{date}gacha {n} ta bo‘sh kun'**
   String hkFreeDays(int n, String date);
 
   /// No description provided for @hkBookedUntil.
   ///
   /// In uz, this message translates to:
-  /// **'{date} gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.'**
+  /// **'{date}gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.'**
   String hkBookedUntil(String date);
 
   /// No description provided for @hkHowBooking.
@@ -4521,6 +4521,42 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'{count} ta faol'**
   String accountActive(int count);
+
+  /// No description provided for @hkDormantTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea bu bo‘limda hech qanday kun ko‘rsatmayapti'**
+  String get hkDormantTitle;
+
+  /// No description provided for @hkDormantBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'{date}dan beri HiKorea bu yerda hech qanday kun ko‘rsatmayapti — na bo‘sh, na band. HiKorea bo‘limni yangisiga almashtirganda shunday bo‘ladi. Ofisning boshqa bo‘limlarini ko‘ring yoki HiKorea saytida tekshiring.'**
+  String hkDormantBody(String date);
+
+  /// No description provided for @hkDormantBodyNoDate.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea bu yerda hech qanday kun ko‘rsatmayapti — na bo‘sh, na band. HiKorea bo‘limni yangisiga almashtirganda shunday bo‘ladi. Ofisning boshqa bo‘limlarini ko‘ring yoki HiKorea saytida tekshiring.'**
+  String get hkDormantBodyNoDate;
+
+  /// No description provided for @hkOtherCounters.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ofisning boshqa bo‘limlari'**
+  String get hkOtherCounters;
+
+  /// No description provided for @hkCheckOnHikorea.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea\'da tekshirish'**
+  String get hkCheckOnHikorea;
+
+  /// No description provided for @hkNoDaysShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea\'da kun ko‘rinmayapti'**
+  String get hkNoDaysShort;
 
   /// No description provided for @themeToDay.
   ///

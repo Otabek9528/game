@@ -133,6 +133,34 @@ void main() {
     });
   });
 
+  group('a counter\'s capacity and HiKorea retiring one', () {
+    test('measured against the counter\'s capacity: full is full, the busiest Monday need not be', () {
+      final calendar = HkCalendar.fromJson({
+        'desk_seq': 1,
+        'dates': [
+          {'visi_ymd': '20261019', 'taken': 3},
+          {'visi_ymd': '20261026', 'taken': 36},
+          {'visi_ymd': '20261020', 'taken': 30},
+        ],
+        'capacity': 36,
+        'schedule': {'bookable_min_ymd': '20261019', 'bookable_max_ymd': '20261221', 'active_weekdays': [0, 1, 2, 3, 4]},
+        'listing': 'ok',
+      });
+      expect(calendar.deskCapacity, 36);
+      expect(calendar.tierOf('20261019').$1, HkTier.open, reason: '3 of 36');
+      expect(calendar.tierOf('20261026').$1, HkTier.full);
+      expect(calendar.tierOf('20261020'), (HkTier.some, 30 / 36));
+      expect(calendar.dormant, isFalse);
+    });
+
+    test('a counter that lists nothing', () {
+      final calendar = HkCalendar.fromJson({'desk_seq': 774, 'dates': [], 'schedule': null, 'listing': 'none',
+          'listed_until': '20261016', 'capacity': 180});
+      expect((calendar.dormant, calendar.listedUntil), (true, DateTime(2026, 10, 16)));
+      expect(calendar.days, isEmpty);
+    });
+  });
+
   group('the server', () {
     test('offices sorted; watches carry the account; errors keep their code', () async {
       final requests = <http.Request>[];
@@ -325,6 +353,34 @@ void main() {
       expect(find.text('Which office is yours?'), findsNothing, reason: 'not new any more');
       expect(find.text('Not sure which office?'), findsOneWidget);
       expect(app.hikorea.watchList.single.deskSeq, 102);
+    });
+
+    testWidgets('a counter HiKorea retired: said so, the way to the others, no watch', (tester) async {
+      final app = TestApp(language: 'en')..hikorea.dormantDesks.add(101);
+      await openHikorea(tester, app: app);
+      await tapOffice(tester, 'Ansan');
+      expect(find.text('No days on HiKorea'), findsOneWidget, reason: 'the counters say which');
+      expect(find.text('Earliest free day: Monday, 19 October'), findsOneWidget);
+      await tapVisible(tester, find.textContaining('Ansan Center'));
+      expect(find.text('HiKorea shows no days at this counter'), findsOneWidget);
+      expect(find.textContaining('Since 16 October HiKorea has listed no days here'), findsOneWidget);
+      expect(find.text('October 2026'), findsNothing, reason: 'no calendar of closed days');
+      expect(find.text('Notify me when a slot opens'), findsNothing);
+      expect(find.text('Watch'), findsNothing);
+
+      await tester.tap(find.text('This office’s other counters'));
+      await tester.pumpAndSettle();
+      expect(find.text('Which counter do you need?'), findsOneWidget);
+      await tapVisible(tester, find.textContaining('Siheung Center'));
+      expect(find.text('Monday, 19 October'), findsOneWidget, reason: 'the other counter: a calendar');
+    });
+
+    testWidgets('three months at least', (tester) async {
+      await openHikorea(tester);
+      await tapOffice(tester, 'Seoul');
+      await tester.scrollUntilVisible(find.text('December 2026'), 300,
+          scrollable: find.descendant(of: find.byType(HkCalendarScreen), matching: find.byType(Scrollable)).first);
+      expect(find.text('December 2026'), findsOneWidget);
     });
 
     testWidgets('in Uzbek', (tester) async {

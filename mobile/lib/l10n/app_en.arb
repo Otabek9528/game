@@ -737,6 +737,12 @@
   "accountDarkMode": "Dark mode",
   "accountManage": "Manage account",
   "accountActive": "{count} active",
+  "hkDormantTitle": "HiKorea shows no days at this counter",
+  "hkDormantBody": "Since {date} HiKorea has listed no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.",
+  "hkDormantBodyNoDate": "HiKorea lists no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.",
+  "hkOtherCounters": "This office’s other counters",
+  "hkCheckOnHikorea": "Check on HiKorea",
+  "hkNoDaysShort": "No days on HiKorea",
   "themeToDay": "Day mode",
   "themeToNight": "Night mode"
 }

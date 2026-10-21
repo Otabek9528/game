@@ -2608,6 +2608,27 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get hkDormantTitle => 'HiKorea не показывает дней в этом окне';
+
+  @override
+  String hkDormantBody(String date) {
+    return 'С $date HiKorea не показывает здесь ни одного дня — ни свободного, ни занятого. Так бывает, когда HiKorea заменяет окно новым. Посмотрите другие окна этого офиса или проверьте на сайте HiKorea.';
+  }
+
+  @override
+  String get hkDormantBodyNoDate =>
+      'HiKorea не показывает здесь ни одного дня — ни свободного, ни занятого. Так бывает, когда HiKorea заменяет окно новым. Посмотрите другие окна этого офиса или проверьте на сайте HiKorea.';
+
+  @override
+  String get hkOtherCounters => 'Другие окна этого офиса';
+
+  @override
+  String get hkCheckOnHikorea => 'Проверить на HiKorea';
+
+  @override
+  String get hkNoDaysShort => 'На HiKorea нет дней';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

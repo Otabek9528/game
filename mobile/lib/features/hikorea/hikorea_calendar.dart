@@ -9,6 +9,7 @@ import '../qna/qna_parts.dart';
 import 'hikorea_kit.dart';
 import 'hikorea_models.dart';
 import 'hikorea_parts.dart';
+import 'hikorea_screen.dart';
 import 'hikorea_source.dart';
 import 'hikorea_text.dart';
 import 'hikorea_watch.dart';
@@ -75,9 +76,10 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
         (calendar.status == 'failing' ||
             (checked != null && _kit.services.clock().difference(checked) > const Duration(minutes: 30)));
     // This month, on to the month the window ends in, and the one after, to
-    // show what isn't open yet: 2 to 4 of them.
-    final end = calendar?.windowEnd ?? today;
-    final months = ((end.year - today.year) * 12 + end.month - today.month + 2).clamp(2, 4);
+    // show what isn't open yet: 3 to 4 of them.
+    final windowEnd = calendar?.windowEnd;
+    final end = windowEnd != null && windowEnd.isAfter(today) ? windowEnd : today;
+    final months = ((end.year - today.year) * 12 + end.month - today.month + 2).clamp(3, 4);
     return Scaffold(
       backgroundColor: p.page,
       appBar: AppBar(
@@ -139,6 +141,8 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
               )
             else if (calendar == null)
               const Padding(padding: EdgeInsets.all(48), child: Center(child: CircularProgressIndicator()))
+            else if (calendar.dormant)
+              _Dormant(kit: _kit, office: widget.office, desk: widget.desk, calendar: calendar)
             else ...[
               _Summary(kit: _kit, calendar: calendar, free: free, onDay: _openDay, onWatch: _watch),
               Padding(
@@ -178,7 +182,7 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: DecoratedBox(
+      bottomNavigationBar: calendar?.dormant ?? false ? null : DecoratedBox(
         decoration: BoxDecoration(color: p.page, border: Border(top: BorderSide(color: p.hairline))),
         child: SafeArea(
           top: false,
@@ -210,6 +214,72 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
                   ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A counter HiKorea lists no day at, free or booked: retired, its bookings
+/// under a new counter. Said plainly, with the ways on: the office's other
+/// counters, and HiKorea itself. No calendar of closed days, no watch that
+/// would never fire.
+class _Dormant extends StatelessWidget {
+  const _Dormant({required this.kit, required this.office, required this.desk, required this.calendar});
+
+  final HikoreaKit kit;
+  final HkOffice office;
+  final HkDesk desk;
+  final HkCalendar calendar;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    final tone = hkTone(context, HkTone.low);
+    final since = calendar.listedUntil;
+    // The office's other counters, unless every one of them is known to list nothing too.
+    final others = office.desks.any((d) => d.seq != desk.seq && !(kit.calendarOf(d.seq)?.dormant ?? false));
+    return HkCard(
+      color: tone.background,
+      edge: Colors.transparent,
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.event_busy_rounded, color: tone.ink),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(s.hkDormantTitle, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: tone.ink)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            since == null ? s.hkDormantBodyNoDate : s.hkDormantBody(dayMonth(since, kit.language)),
+            style: TextStyle(fontSize: 14, height: 1.45, color: p.ink),
+          ),
+          const SizedBox(height: 14),
+          if (others) ...[
+            FilledButton.icon(
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+                  builder: (_) => HkCountersScreen(kit: kit, office: office),
+                ));
+              },
+              icon: const Icon(Icons.swap_horiz_rounded),
+              label: Text(s.hkOtherCounters),
+            ),
+            const SizedBox(height: 8),
+          ],
+          OutlinedButton.icon(
+            onPressed: () => kit.services.openLink(Uri.parse('https://www.hikorea.go.kr/')),
+            icon: const Icon(Icons.open_in_new_rounded),
+            label: Text(s.hkCheckOnHikorea),
+          ),
+        ],
       ),
     );
   }

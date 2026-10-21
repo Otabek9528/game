@@ -1289,7 +1289,7 @@
     }
   },
   "hkAllOffices": "Barcha ofislar",
-  "hkFreeDays": "{date} gacha {n} ta bo‘sh kun",
+  "hkFreeDays": "{date}gacha {n} ta bo‘sh kun",
   "@hkFreeDays": {
     "placeholders": {
       "n": {
@@ -1300,7 +1300,7 @@
       }
     }
   },
-  "hkBookedUntil": "{date} gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.",
+  "hkBookedUntil": "{date}gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.",
   "@hkBookedUntil": {
     "placeholders": {
       "date": {
@@ -1346,6 +1346,19 @@
       }
     }
   },
+  "hkDormantTitle": "HiKorea bu bo‘limda hech qanday kun ko‘rsatmayapti",
+  "hkDormantBody": "{date}dan beri HiKorea bu yerda hech qanday kun ko‘rsatmayapti — na bo‘sh, na band. HiKorea bo‘limni yangisiga almashtirganda shunday bo‘ladi. Ofisning boshqa bo‘limlarini ko‘ring yoki HiKorea saytida tekshiring.",
+  "@hkDormantBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "hkDormantBodyNoDate": "HiKorea bu yerda hech qanday kun ko‘rsatmayapti — na bo‘sh, na band. HiKorea bo‘limni yangisiga almashtirganda shunday bo‘ladi. Ofisning boshqa bo‘limlarini ko‘ring yoki HiKorea saytida tekshiring.",
+  "hkOtherCounters": "Ofisning boshqa bo‘limlari",
+  "hkCheckOnHikorea": "HiKorea'da tekshirish",
+  "hkNoDaysShort": "HiKorea'da kun ko‘rinmayapti",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

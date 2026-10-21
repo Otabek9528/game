@@ -950,6 +950,22 @@ const I18N = {
       uz: 'Bron qilish uchun eng erta joy:', ru: 'Ближайший слот:', en: 'Earliest opening:',
     },
 
+    'hk.cal.dormantTitle': {
+      uz: "HiKorea bu bo'limda hech qanday kun ko'rsatmayapti",
+      ru: 'HiKorea не показывает дней в этом окне',
+      en: 'HiKorea shows no days at this counter',
+    },
+    'hk.cal.dormantBody': {
+      uz: "{date}dan beri HiKorea bu yerda hech qanday kun ko'rsatmayapti - na bo'sh, na band. HiKorea bo'limni yangisiga almashtirganda shunday bo'ladi. Ofisning boshqa bo'limlarini ko'ring yoki HiKorea saytida tekshiring.",
+      ru: 'С {date} HiKorea не показывает здесь ни одного дня - ни свободного, ни занятого. Так бывает, когда HiKorea заменяет окно новым. Посмотрите другие окна этого офиса или проверьте на сайте HiKorea.',
+      en: 'Since {date} HiKorea has listed no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.',
+    },
+    'hk.cal.dormantBodyNoDate': {
+      uz: "HiKorea bu yerda hech qanday kun ko'rsatmayapti - na bo'sh, na band. HiKorea bo'limni yangisiga almashtirganda shunday bo'ladi. Ofisning boshqa bo'limlarini ko'ring yoki HiKorea saytida tekshiring.",
+      ru: 'HiKorea не показывает здесь ни одного дня - ни свободного, ни занятого. Так бывает, когда HiKorea заменяет окно новым. Посмотрите другие окна этого офиса или проверьте на сайте HiKorea.',
+      en: 'HiKorea lists no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.',
+    },
+
     'hk.summary.allFull': {
       uz: "Hozir hamma sana to'la",
       ru: 'Сейчас всё занято',

@@ -134,8 +134,11 @@ class HkCalendar {
     this.listed = const {},
     this.schedule,
     this.capacity = const {},
+    this.deskCapacity,
     this.checkedAt,
     this.status = 'unknown',
+    this.dormant = false,
+    this.listedUntil,
   }) : days = _days(listed, schedule);
 
   final int deskSeq;
@@ -144,14 +147,25 @@ class HkCalendar {
   final Map<String, int> listed;
   final HkSchedule? schedule;
 
-  /// Days whose timetable the server has read: how many appointments each takes.
+  /// Days whose capacity the server sent: how many appointments each takes.
   final Map<String, int> capacity;
+
+  /// How many appointments the counter takes a day: its timetable, the same
+  /// every day. Days without their own [capacity] are measured against it.
+  final int? deskCapacity;
 
   /// When the server last read this counter.
   final DateTime? checkedAt;
 
   /// 'ok', 'failing' or 'unknown'.
   final String status;
+
+  /// HiKorea has listed no day here for a day or more, free or booked: it
+  /// retired the counter (a new one takes the bookings).
+  final bool dormant;
+
+  /// The last day it listed, when [dormant].
+  final DateTime? listedUntil;
 
   /// Every day one can book: those listed, and the working days between the
   /// first and the last that aren't (no bookings yet), as the web page has it.
@@ -195,7 +209,7 @@ class HkCalendar {
       final end = windowEnd;
       return (end != null && parseYmd(day)!.isAfter(end) ? HkTier.later : HkTier.closed, 0);
     }
-    if (capacity[day] case final cap? when cap > 0) {
+    if (capacity[day] ?? deskCapacity case final cap? when cap > 0) {
       final ratio = (taken / cap).clamp(0.0, 1.0);
       if (taken >= cap) return (HkTier.full, 1);
       return (ratio < 0.5 ? HkTier.open : HkTier.some, ratio);
@@ -234,8 +248,11 @@ class HkCalendar {
         for (final d in dates)
           if (d['capacity'] case final num cap when cap > 0) d['visi_ymd'] as String: cap.toInt(),
       },
+      deskCapacity: (json['capacity'] as num?)?.toInt(),
       checkedAt: checked is String ? DateTime.tryParse(checked)?.toLocal() : null,
       status: json['desk_status'] as String? ?? 'unknown',
+      dormant: json['listing'] == 'none',
+      listedUntil: parseYmd(json['listed_until'] as String?),
     );
   }
 }

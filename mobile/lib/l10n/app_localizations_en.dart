@@ -2571,6 +2571,27 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get hkDormantTitle => 'HiKorea shows no days at this counter';
+
+  @override
+  String hkDormantBody(String date) {
+    return 'Since $date HiKorea has listed no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.';
+  }
+
+  @override
+  String get hkDormantBodyNoDate =>
+      'HiKorea lists no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.';
+
+  @override
+  String get hkOtherCounters => 'This office’s other counters';
+
+  @override
+  String get hkCheckOnHikorea => 'Check on HiKorea';
+
+  @override
+  String get hkNoDaysShort => 'No days on HiKorea';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

@@ -655,13 +655,24 @@
   // ---------------------------------------------------------------------
 
   function renderCalendar(data) {
-    // Meta chips
+    // Meta chips: when this desk was last read (the poller's last cycle on
+    // older servers).
     const meta = $('calMeta');
     const chips = [];
-    if (data.last_polled_at) {
-      chips.push(`<span class="hk-meta-chip">🔄 ${esc(t('hk.cal.checked', 'Checked'))} ${esc(relativeTime(data.last_polled_at))}</span>`);
+    const checked = data.desk_checked_at || data.last_polled_at;
+    if (checked) {
+      chips.push(`<span class="hk-meta-chip">🔄 ${esc(t('hk.cal.checked', 'Checked'))} ${esc(relativeTime(checked))}</span>`);
     }
     meta.innerHTML = chips.join('');
+
+    // A desk HiKorea retired lists no day at all, free or booked: said so,
+    // instead of three months of "closed", and no watch that would never fire.
+    const dormant = data.listing === 'none';
+    $('goToWatchBtn').hidden = dormant;
+    if (dormant) {
+      renderDormant(data);
+      return;
+    }
 
     // Build slot lookup. HiKorea's monthResvDataJSONList only contains
     // dates with at least one booking — so dates with zero bookings
@@ -694,8 +705,11 @@
       }
     }
 
-    // Per-DoW capacity heuristic for the visible window
-    const maxByDow = computeMaxTakenByDow(Object.values(slotMap));
+    // The desk's capacity (its timetable, the same every day) when the
+    // server sends it; else the per-DoW heuristic for the visible window.
+    const maxByDow = data.capacity
+      ? [0, 1, 2, 3, 4, 5, 6].map(() => data.capacity)
+      : computeMaxTakenByDow(Object.values(slotMap));
 
     // Summary banner
     renderSummaryBanner(Object.values(slotMap), maxByDow);
@@ -723,6 +737,25 @@
     $$('.hk-cal-cell-bookable', container).forEach((cell) => {
       cell.addEventListener('click', () => openDateSheet(cell.dataset.ymd));
     });
+  }
+
+  function renderDormant(data) {
+    const summary = $('calSummary');
+    summary.hidden = false;
+    summary.className = 'hk-cal-summary muted';
+    const since = data.listed_until ? fmtDayMonth(ymdToDate(data.listed_until)) : null;
+    const body = since
+      ? t('hk.cal.dormantBody', 'Since {date} HiKorea has listed no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.').replace('{date}', since)
+      : t('hk.cal.dormantBodyNoDate', 'HiKorea lists no days here, free or booked. It does this when it replaces a counter with a new one. Look at this office’s other counters, or check on the HiKorea website.');
+    summary.innerHTML = `
+      <div class="hk-summary-icon">🚫</div>
+      <div class="hk-summary-body">
+        <div class="hk-summary-headline">
+          <span class="hk-summary-headline-value">${esc(t('hk.cal.dormantTitle', 'HiKorea shows no days at this counter'))}</span>
+        </div>
+        <div class="hk-summary-sub">${esc(body)}</div>
+      </div>`;
+    $('calMonths').innerHTML = '';
   }
 
   function renderSummaryBanner(dates, maxByDow) {

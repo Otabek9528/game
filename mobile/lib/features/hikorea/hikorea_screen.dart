@@ -325,7 +325,11 @@ class _StandLine extends StatelessWidget {
     }
     return Align(
       alignment: AlignmentDirectional.centerStart,
-      child: HkPill(text, tone: tone, icon: tone == HkTone.open ? Icons.event_available_rounded : Icons.hourglass_top_rounded),
+      child: HkPill(text, tone: tone, icon: switch (tone) {
+        HkTone.open => Icons.event_available_rounded,
+        HkTone.low => Icons.event_busy_rounded,
+        _ => Icons.hourglass_top_rounded,
+      }),
     );
   }
 }
@@ -378,6 +382,7 @@ class _WatchTile extends StatelessWidget {
                   desk: watch.deskSeq,
                   builder: (context, calendar) {
                     if (calendar == null) return const _StandLine(text: null, tone: HkTone.none);
+                    if (calendar.dormant) return _StandLine(text: s.hkNoDaysShort, tone: HkTone.low);
                     final today = kit.today;
                     final free = calendar.openDays(watch.start.isAfter(today) ? watch.start : today, until: watch.end);
                     return free.isEmpty
@@ -406,7 +411,6 @@ class _CounterTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final booth = boothName(desk, kit.language);
     return HkCard(
@@ -441,13 +445,7 @@ class _CounterTile extends StatelessWidget {
                   desk: desk.seq,
                   builder: (context, calendar) {
                     if (calendar == null) return const _StandLine(text: null, tone: HkTone.none);
-                    final earliest = calendar.earliestOpen(kit.today);
-                    return earliest == null
-                        ? _StandLine(text: s.hkAllFullShort, tone: HkTone.none)
-                        : _StandLine(
-                            text: s.hkEarliestShort('${weekdayName(earliest, kit.language)}, ${dayMonth(earliest, kit.language)}'),
-                            tone: HkTone.open,
-                          );
+                    return _CounterStand(kit: kit, calendar: calendar);
                   },
                 ),
               ],
@@ -457,6 +455,28 @@ class _CounterTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// A counter's state in a pill: its earliest free day, all booked, or no
+/// days on HiKorea at all.
+class _CounterStand extends StatelessWidget {
+  const _CounterStand({required this.kit, required this.calendar});
+
+  final HikoreaKit kit;
+  final HkCalendar calendar;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    if (calendar.dormant) return _StandLine(text: s.hkNoDaysShort, tone: HkTone.low);
+    final earliest = calendar.earliestOpen(kit.today);
+    return earliest == null
+        ? _StandLine(text: s.hkAllFullShort, tone: HkTone.none)
+        : _StandLine(
+            text: s.hkEarliestShort('${weekdayName(earliest, kit.language)}, ${dayMonth(earliest, kit.language)}'),
+            tone: HkTone.open,
+          );
   }
 }
 
@@ -761,6 +781,18 @@ class _DeskCardState extends State<_DeskCard> {
               ),
               Icon(Icons.chevron_right_rounded, color: p.inkMuted),
             ],
+          ),
+          const SizedBox(height: 10),
+          // Which counter takes bookings, and how soon: before the description.
+          ListenableBuilder(
+            listenable: kit,
+            builder: (context, _) => _Live(
+              kit: kit,
+              desk: widget.desk.seq,
+              builder: (context, calendar) => calendar == null
+                  ? const _StandLine(text: null, tone: HkTone.none)
+                  : _CounterStand(kit: kit, calendar: calendar),
+            ),
           ),
           if (booth.afternoon) ...[
             const SizedBox(height: 8),
