@@ -940,8 +940,16 @@ class FakeAccounts implements AccountSource {
   int pageSize = 50;
 
   /// An alert pushed to [userId], as the server keeps it.
-  InboxItem alert(int userId, String title, {String body = '', Map<String, String> data = const {}, DateTime? at}) {
-    final item = InboxItem(id: ++_alerts, title: title, body: body, data: data, at: at ?? testNow);
+  InboxItem alert(
+    int userId,
+    String title, {
+    String body = '',
+    String? text,
+    List<String> images = const [],
+    Map<String, String> data = const {},
+    DateTime? at,
+  }) {
+    final item = InboxItem(id: ++_alerts, title: title, body: body, text: text, images: images, data: data, at: at ?? testNow);
     (inboxes[userId] ??= []).add(item);
     return item;
   }

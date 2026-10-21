@@ -6,6 +6,8 @@ import 'app_services.dart';
 import 'core/app_language.dart';
 import 'core/push.dart';
 import 'core/theme.dart';
+import 'features/account/inbox_message.dart';
+import 'features/account/inbox_screen.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/home/home_screen.dart';
 import 'features/onboarding/language_screen.dart';
@@ -65,13 +67,32 @@ class _VegukinAppState extends State<VegukinApp> {
     unawaited(widget.services.account.languageChanged());
   }
 
-  /// A notification was tapped: its page.
+  /// A notification was tapped: its page; one without a page of its own
+  /// (a message, an announcement) opens whole from the inbox.
   void _openPush(PushMessage message) {
-    unawaited(widget.services.account.refreshInbox());
     final feature = featureForPush(message.data);
+    final inboxId = int.tryParse(message.data['inbox_id'] ?? '');
     final context = _navigator.currentContext;
+    if (feature == null && inboxId != null) {
+      unawaited(_openMessage(inboxId));
+      return;
+    }
+    unawaited(widget.services.account.refreshInbox());
     if (feature == null || context == null) return;
     widget.services.openFeature(context, feature, widget.services);
+  }
+
+  Future<void> _openMessage(int id) async {
+    final services = widget.services;
+    await services.account.refreshInbox();
+    final context = _navigator.currentContext;
+    if (context == null || !context.mounted) return;
+    final item = services.account.inbox.where((i) => i.id == id).firstOrNull;
+    if (item != null) {
+      openInboxMessage(context, services, item);
+    } else {
+      openInbox(context, services);
+    }
   }
 
   /// One arrived while the app was open: Android doesn't show it, so the app does.
@@ -80,7 +101,7 @@ class _VegukinAppState extends State<VegukinApp> {
     final text = [?message.title, ?message.body].join('\n');
     final context = _navigator.currentContext;
     if (text.isEmpty || context == null) return;
-    final canOpen = featureForPush(message.data) != null;
+    final canOpen = featureForPush(message.data) != null || message.data.containsKey('inbox_id');
     _messenger.currentState
       ?..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(

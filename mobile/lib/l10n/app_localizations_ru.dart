@@ -2078,6 +2078,19 @@ class AppLocalizationsRu extends AppLocalizations {
       'Уведомления на этом телефоне выключены. Новые сообщения всё равно появятся здесь.';
 
   @override
+  String get inboxMessage => 'Сообщение';
+
+  @override
+  String inboxOpenSection(String section) {
+    return 'Открыть «$section»';
+  }
+
+  @override
+  String inboxPhoto(int index, int total) {
+    return 'Фото $index из $total';
+  }
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

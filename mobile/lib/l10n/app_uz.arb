@@ -1055,6 +1055,26 @@
   "inboxFailed": "Yuklab bo‘lmadi. Internetni tekshiring.",
   "inboxEarlier": "Avvalgilarini ko‘rsatish",
   "inboxPushOff": "Bu telefonda bildirishnomalar o‘chiq. Yangi xabarlar baribir shu yerda chiqadi.",
+  "inboxMessage": "Xabar",
+  "inboxOpenSection": "«{section}» bo‘limini ochish",
+  "@inboxOpenSection": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "inboxPhoto": "{total} ta rasmdan {index}-si",
+  "@inboxPhoto": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

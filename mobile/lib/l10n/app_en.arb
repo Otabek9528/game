@@ -602,6 +602,9 @@
   "inboxFailed": "Couldn’t load. Check your connection.",
   "inboxEarlier": "Show earlier",
   "inboxPushOff": "Notifications are off on this phone. New alerts still show up here.",
+  "inboxMessage": "Message",
+  "inboxOpenSection": "Open {section}",
+  "inboxPhoto": "Photo {index} of {total}",
   "themeToDay": "Day mode",
   "themeToNight": "Night mode"
 }

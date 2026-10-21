@@ -2037,6 +2037,19 @@ class AppLocalizationsUz extends AppLocalizations {
       'Bu telefonda bildirishnomalar o‘chiq. Yangi xabarlar baribir shu yerda chiqadi.';
 
   @override
+  String get inboxMessage => 'Xabar';
+
+  @override
+  String inboxOpenSection(String section) {
+    return '«$section» bo‘limini ochish';
+  }
+
+  @override
+  String inboxPhoto(int index, int total) {
+    return '$total ta rasmdan $index-si';
+  }
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

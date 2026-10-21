@@ -2057,6 +2057,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Notifications are off on this phone. New alerts still show up here.';
 
   @override
+  String get inboxMessage => 'Message';
+
+  @override
+  String inboxOpenSection(String section) {
+    return 'Open $section';
+  }
+
+  @override
+  String inboxPhoto(int index, int total) {
+    return 'Photo $index of $total';
+  }
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

@@ -147,11 +147,14 @@ class _Star extends CustomPainter {
 /// Selectable text whose links can be tapped, shown shortened as on the web
 /// page. Links glued to the word before them are set apart first.
 class LinkedText extends StatefulWidget {
-  const LinkedText(this.text, {super.key, required this.style, required this.onLink});
+  const LinkedText(this.text, {super.key, required this.style, required this.onLink, this.phones = false});
 
   final String text;
   final TextStyle style;
   final ValueChanged<Uri> onLink;
+
+  /// Phone numbers can be tapped too (they call).
+  final bool phones;
 
   @override
   State<LinkedText> createState() => _LinkedTextState();
@@ -178,8 +181,11 @@ class _LinkedTextState extends State<LinkedText> {
     final text = widget.text.replaceAllMapped(RegExp(r'(\S)(https?://)'), (m) => '${m[1]} ${m[2]}');
     final spans = <InlineSpan>[];
     for (final piece in linkify(text)) {
-      // Links and Telegram names; numbers stay text (years, hadith numbers).
-      if (piece.kind == PieceKind.link || piece.kind == PieceKind.telegram) {
+      // Links and Telegram names; numbers stay text (years, hadith numbers)
+      // unless asked for.
+      if (piece.kind == PieceKind.link ||
+          piece.kind == PieceKind.telegram ||
+          (widget.phones && piece.kind == PieceKind.phone)) {
         final tap = TapGestureRecognizer()..onTap = () => widget.onLink(piece.target!);
         _taps.add(tap);
         spans.add(TextSpan(

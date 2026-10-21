@@ -10,6 +10,7 @@ import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/feature_catalog.dart';
+import 'inbox_message.dart';
 
 void openInbox(BuildContext context, AppServices services) {
   HapticFeedback.selectionClick();
@@ -18,7 +19,7 @@ void openInbox(BuildContext context, AppServices services) {
 
 /// Every alert pushed to this person, newest first, as the server keeps it:
 /// also those that came while notifications were off on this phone, or were
-/// swiped away. Tapping one opens its page, as the notification would.
+/// swiped away. Each card is the start of one; a tap shows it whole.
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key, required this.services});
 
@@ -36,7 +37,6 @@ class _InboxScreenState extends State<InboxScreen> {
   bool _loading = true;
   bool _failed = false;
   bool _loadingMore = false;
-  final _expanded = <int>{};
 
   @override
   void initState() {
@@ -80,14 +80,6 @@ class _InboxScreenState extends State<InboxScreen> {
     if (mounted) setState(() => _loadingMore = false);
   }
 
-  void _tap(InboxItem item, Feature? target) {
-    if (target == null) {
-      setState(() => _expanded.contains(item.id) ? _expanded.remove(item.id) : _expanded.add(item.id));
-      return;
-    }
-    HapticFeedback.lightImpact();
-    widget.services.openFeature(context, target, widget.services);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,16 +138,14 @@ class _InboxScreenState extends State<InboxScreen> {
         final row = rows[i];
         if (row is DateTime) return _DayHeader(day: row, today: today, language: language);
         final item = row as InboxItem;
-        final target = featureForPush(item.data);
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: _Item(
             item: item,
-            target: target,
+            target: featureForPush(item.data),
             language: language,
             isNew: item.id > _seenBefore,
-            expanded: _expanded.contains(item.id),
-            onTap: () => _tap(item, target),
+            onTap: () => openInboxMessage(context, services, item),
           ),
         );
       },
@@ -197,17 +187,15 @@ class _Item extends StatelessWidget {
     required this.target,
     required this.language,
     required this.isNew,
-    required this.expanded,
     required this.onTap,
   });
 
   final InboxItem item;
 
-  /// The page a tap opens; none: a tap shows the whole text.
+  /// The section it is about, if any.
   final Feature? target;
   final AppLanguage language;
   final bool isNew;
-  final bool expanded;
   final VoidCallback onTap;
 
   @override
@@ -275,24 +263,76 @@ class _Item extends StatelessWidget {
                     if (item.body.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
-                        item.body,
-                        maxLines: expanded ? null : 5,
-                        overflow: expanded ? null : TextOverflow.ellipsis,
+                        item.text,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 14, height: 1.4, color: p.inkSoft),
                       ),
                     ],
                     if (target != null) ...[
                       const SizedBox(height: 8),
                       Text(
-                        '${target.label(s)}  ›',
+                        target.label(s),
                         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: p.accent),
                       ),
                     ],
                   ],
                 ),
               ),
+              if (item.images.isNotEmpty) ...[
+                const SizedBox(width: 12),
+                _Thumbnail(url: item.images.first, count: item.images.length),
+              ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A message's first photo, small, with how many there are.
+class _Thumbnail extends StatelessWidget {
+  const _Thumbnail({required this.url, required this.count});
+
+  final String url;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: SizedBox.square(
+        dimension: 60,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.network(
+              url,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stack) =>
+                  ColoredBox(color: p.badge, child: Icon(Icons.image_outlined, color: p.inkMuted)),
+            ),
+            if (count > 1)
+              Positioned(
+                right: 4,
+                bottom: 4,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                    child: Text(
+                      '+${count - 1}',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

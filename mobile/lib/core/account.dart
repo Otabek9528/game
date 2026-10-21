@@ -50,11 +50,27 @@ class AppUser {
 /// An alert that was pushed to this person, as the inbox keeps it.
 @immutable
 class InboxItem {
-  const InboxItem({required this.id, required this.title, this.body = '', this.data = const {}, required this.at});
+  const InboxItem({
+    required this.id,
+    required this.title,
+    this.body = '',
+    String? text,
+    this.images = const [],
+    this.data = const {},
+    required this.at,
+  }) : text = text ?? body;
 
   final int id;
   final String title;
+
+  /// What the notification showed: the start of [text] when that is long.
   final String body;
+
+  /// The whole message.
+  final String text;
+
+  /// Its photos' addresses.
+  final List<String> images;
 
   /// What a tap opens: `url`, `kind` (as in a push).
   final Map<String, String> data;
@@ -66,10 +82,13 @@ class InboxItem {
     final at = DateTime.tryParse(json['at'] as String? ?? '');
     if (id is! num || at == null) return null;
     final data = json['data'];
+    final images = json['images'];
     return InboxItem(
       id: id.toInt(),
       title: json['title'] as String? ?? '',
       body: json['body'] as String? ?? '',
+      text: json['text'] as String?,
+      images: [if (images is List) for (final url in images) if (url is String && url.startsWith('https://')) url],
       data: data is Map ? {for (final e in data.entries) '${e.key}': '${e.value}'} : const {},
       at: at.toLocal(),
     );

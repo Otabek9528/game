@@ -1,8 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/core/account.dart';
 import 'package:muslim_vegukin/core/app_language.dart';
 import 'package:muslim_vegukin/features/account/account_screen.dart';
+import 'package:muslim_vegukin/features/account/inbox_message.dart';
 import 'package:muslim_vegukin/features/account/inbox_screen.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 
@@ -31,6 +33,18 @@ Future<TestApp> openAccountScreen(WidgetTester tester, {String language = 'en', 
 Future<void> settleWaiting(WidgetTester tester) async {
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 500));
+}
+
+/// Taps the link [text] in the message's selectable text.
+void tapSpan(WidgetTester tester, String text) {
+  final spans = <TextSpan>[];
+  for (final widget in tester.widgetList<SelectableText>(find.byType(SelectableText))) {
+    widget.textSpan?.visitChildren((span) {
+      if (span is TextSpan && span.text == text) spans.add(span);
+      return true;
+    });
+  }
+  (spans.single.recognizer! as TapGestureRecognizer).onTap!();
 }
 
 /// Top to bottom, the sign-in buttons on screen.
@@ -373,7 +387,7 @@ void main() {
       return app;
     }
 
-    testWidgets('the bell counts what is new; the inbox shows it by day, and opens each one', (tester) async {
+    testWidgets('the bell counts what is new; the inbox shows it by day; each opens whole', (tester) async {
       final app = await withAlerts(tester);
       expect(badge('3'), findsOneWidget);
 
@@ -385,14 +399,75 @@ void main() {
       expect(find.text('Your residence card is ready'), findsOneWidget);
 
       await tester.tap(find.text('Kebab House'));
+      await tester.pumpAndSettle();
+      expect(find.byType(InboxMessageScreen), findsOneWidget);
+      expect(find.textContaining('A new restaurant near you', findRichText: true), findsOneWidget);
+      await tester.tap(find.text('Open Restaurants'));
       expect(app.opened.ids.last, 'restaurant');
-      await tester.tap(find.text('Your residence card is ready'));
-      expect(app.opened.ids.last, 'hikorea');
+      await tester.pageBack();
+      await tester.pumpAndSettle();
 
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.byType(Badge), findsOneWidget);
       expect(badge('3'), findsNothing, reason: 'seen');
+    });
+
+    test('as the server sends it: the whole text, and its photos (https only)', () {
+      final item = InboxItem.fromJson({
+        'id': 9,
+        'title': 'Eid',
+        'body': 'Eid prayer at…',
+        'text': 'Eid prayer at 7:00, Ansan mosque.',
+        'images': ['https://x/a.jpg', 'http://x/b.jpg', 3],
+        'at': '2026-10-21T03:15:00Z',
+      })!;
+      expect(item.text, 'Eid prayer at 7:00, Ansan mosque.');
+      expect(item.images, ['https://x/a.jpg']);
+      expect(InboxItem.fromJson({'id': 1, 'title': 'x', 'body': 'Short', 'at': '2026-10-21T03:15:00Z'})!.text, 'Short');
+    });
+
+    testWidgets('a long message with photos: the start on its card; all of it, and the photos, on its page',
+        (tester) async {
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      final long = 'Ramadan timetable for Ansan.\n${'Details of the day. ' * 40}\nCall +82 10-1234-5678 or see https://vegukin.uz/r';
+      app.accounts.alert(app.account.user!.id, 'Ramadan', body: 'Ramadan timetable for Ansan.', text: long,
+          images: ['https://x/a.jpg', 'https://x/b.jpg'], data: {'kind': 'message'});
+      await tester.tap(find.byTooltip('Inbox'));
+      await tester.pumpAndSettle();
+      expect(find.text('+1'), findsOneWidget, reason: 'a second photo');
+
+      await tester.tap(find.text('Ramadan'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Details of the day. Details', findRichText: true), findsOneWidget);
+      expect(find.text('1 / 2'), findsOneWidget);
+      expect(find.text('Open Restaurants'), findsNothing, reason: 'no section');
+
+      final page = find.descendant(of: find.byType(InboxMessageScreen), matching: find.byType(Scrollable)).first;
+      await tester.scrollUntilVisible(find.textContaining('vegukin.uz', findRichText: true), 300, scrollable: page);
+      tapSpan(tester, 'https://vegukin.uz/r');
+      expect(app.links.last, Uri.parse('https://vegukin.uz/r'));
+      tapSpan(tester, '+82 10-1234-5678');
+      expect(app.links.last, Uri.parse('tel:+821012345678'));
+
+      await tester.scrollUntilVisible(find.bySemanticsLabel('Photo 1 of 2'), -300, scrollable: page);
+      await tester.tap(find.bySemanticsLabel('Photo 1 of 2'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Close'), findsOneWidget);
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+      expect(find.byType(InboxMessageScreen), findsOneWidget);
+    });
+
+    testWidgets('a tapped notification that is a message opens it whole', (tester) async {
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      final item = app.accounts.alert(app.account.user!.id, 'Eid', text: 'Eid prayer at 7:00.', data: {'kind': 'message'});
+      app.push.open({'kind': 'message', 'inbox_id': '${item.id}'});
+      await tester.pumpAndSettle();
+      expect(find.byType(InboxMessageScreen), findsOneWidget);
+      expect(find.textContaining('Eid prayer at 7:00.', findRichText: true), findsOneWidget);
     });
 
     testWidgets('one arriving while the app is open is counted', (tester) async {

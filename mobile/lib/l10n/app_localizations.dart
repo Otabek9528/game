@@ -3712,6 +3712,24 @@ abstract class AppLocalizations {
   /// **'Bu telefonda bildirishnomalar o‘chiq. Yangi xabarlar baribir shu yerda chiqadi.'**
   String get inboxPushOff;
 
+  /// No description provided for @inboxMessage.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabar'**
+  String get inboxMessage;
+
+  /// No description provided for @inboxOpenSection.
+  ///
+  /// In uz, this message translates to:
+  /// **'«{section}» bo‘limini ochish'**
+  String inboxOpenSection(String section);
+
+  /// No description provided for @inboxPhoto.
+  ///
+  /// In uz, this message translates to:
+  /// **'{total} ta rasmdan {index}-si'**
+  String inboxPhoto(int index, int total);
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

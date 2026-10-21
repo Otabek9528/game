@@ -602,6 +602,9 @@
   "inboxFailed": "Не удалось загрузить. Проверьте интернет.",
   "inboxEarlier": "Показать более ранние",
   "inboxPushOff": "Уведомления на этом телефоне выключены. Новые сообщения всё равно появятся здесь.",
+  "inboxMessage": "Сообщение",
+  "inboxOpenSection": "Открыть «{section}»",
+  "inboxPhoto": "Фото {index} из {total}",
   "themeToDay": "Дневной режим",
   "themeToNight": "Ночной режим"
 }
