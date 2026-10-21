@@ -938,6 +938,29 @@ class FakeAccounts implements AccountSource {
     users.remove(token);
   }
 
+  /// Profile photos by user id; how many times one was fetched.
+  final photos = <int, Uint8List>{};
+  int photoFetches = 0;
+
+  @override
+  Future<Uint8List?> photo(String token) async {
+    _online();
+    photoFetches++;
+    return photos[_of(token).id];
+  }
+
+  /// Test notifications asked for, by token; [testPushError]: the answer instead.
+  final testPushes = <String>[];
+  String? testPushError;
+
+  @override
+  Future<void> testPush(String token) async {
+    _online();
+    _of(token);
+    if (testPushError case final code?) throw AccountException(code, 409);
+    testPushes.add(token);
+  }
+
   /// What was pushed to each user id, oldest first.
   final inboxes = <int, List<InboxItem>>{};
   int _alerts = 0;
@@ -994,6 +1017,9 @@ class FakePush implements PushService {
     if (allowed) onToken(token);
     return allowed;
   }
+
+  @override
+  Future<bool> isAllowed() async => allowed;
 }
 
 /// Google's account picker: a token, or null when the person closes it.
@@ -1007,6 +1033,9 @@ class FakeGoogle implements GoogleAuth {
   @override
   Future<void> signOut() async => signOuts++;
 }
+
+/// A 1×1 PNG: a profile photo, for tests.
+final transparentPng = Uint8List.fromList(const [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x44, 0x41, 0x54, 0x78, 0xDA, 0x63, 0x64, 0x60, 0xF8, 0x5F, 0x0F, 0x00, 0x02, 0x87, 0x01, 0x80, 0xEB, 0x47, 0xBA, 0x92, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82]);
 
 /// The HiKorea server, played by the test: three offices (Ansan with two
 /// counters), a calendar around [testNow], live days, and watches.

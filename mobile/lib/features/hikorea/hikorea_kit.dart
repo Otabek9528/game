@@ -6,7 +6,8 @@ import 'hikorea_models.dart';
 import 'hikorea_source.dart';
 
 /// What the HiKorea pages share while open: the offices (fetched once), this
-/// person's watches, and the counter they looked at last (kept on the phone).
+/// person's watches, the counter they looked at last (kept on the phone), and
+/// the calendars seen, so the first page can say how those counters stand.
 class HikoreaKit extends ChangeNotifier {
   HikoreaKit(this.services);
 
@@ -20,6 +21,8 @@ class HikoreaKit extends ChangeNotifier {
 
   List<HkOffice>? _offices;
   List<HkWatch>? _watches;
+  final _calendars = <int, HkCalendar>{};
+  final _loading = <int, Future<HkCalendar?>>{};
 
   List<HkOffice>? get offices => _offices;
 
@@ -60,7 +63,42 @@ class HikoreaKit extends ChangeNotifier {
     }
   }
 
+  /// A counter's calendar as last fetched; null until it has been.
+  HkCalendar? calendarOf(int desk) => _calendars[desk];
+
+  /// Fetches a counter's calendar (once at a time); null when offline, the
+  /// one fetched before staying.
+  Future<HkCalendar?> loadCalendar(int desk) =>
+      // A block: an arrow would hand back the removed future, and this one would wait on itself.
+      _loading[desk] ??= _fetchCalendar(desk).whenComplete(() {
+        _loading.remove(desk);
+      });
+
+  Future<HkCalendar?> _fetchCalendar(int desk) async {
+    try {
+      final calendar = _calendars[desk] = await source.calendar(desk);
+      notifyListeners();
+      return calendar;
+    } on HkException {
+      return null;
+    }
+  }
+
   int? get lastDesk => int.tryParse(services.store.read(_lastKey) ?? '');
+
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  // Answers arriving after the pages closed change nothing.
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
 
   void remember(HkDesk desk) {
     services.store.write(_lastKey, '${desk.seq}');

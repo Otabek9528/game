@@ -2026,7 +2026,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountPushOff =>
-      'Notifications are off. Turn them on in settings.';
+      'Alerts still reach your Inbox, but this phone won’t show them.';
 
   @override
   String get pushOpen => 'Open';
@@ -2071,7 +2071,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hkLede =>
-      'We check HiKorea every 5 minutes and tell you the moment a slot opens on your dates.';
+      'See the free days at your office. When everything is booked, set a watch and we’ll tell you the moment a slot opens.';
 
   @override
   String get hkSearchHint => 'Search for your office';
@@ -2094,13 +2094,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hkLastViewed => 'Last viewed';
 
   @override
-  String get hkStep1 => 'Pick your office';
+  String get hkStep1 => 'Find your office';
 
   @override
-  String get hkStep2 => 'See the open days';
+  String get hkStep2 => 'See the free days';
 
   @override
-  String get hkStep3 => 'Hear when a slot opens';
+  String get hkStep3 => 'Book on HiKorea';
 
   @override
   String get hkAddressCardTitle => 'Not sure which office?';
@@ -2206,7 +2206,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hkEarliest => 'Earliest open day';
+  String get hkEarliest => 'Earliest free day';
 
   @override
   String get hkAllFull => 'Every day is booked right now';
@@ -2396,6 +2396,179 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hkPickOffice => 'Pick an office';
+
+  @override
+  String get hkStep1Body => 'By its name, or by your home address';
+
+  @override
+  String get hkStep2Body =>
+      'Every counter’s next 3 months, updated every 5 minutes';
+
+  @override
+  String get hkStep3Body =>
+      'All booked? Set a watch and we’ll tell you when a slot opens';
+
+  @override
+  String get hkHowTitle => 'How it works';
+
+  @override
+  String get hkStartTitle => 'Which office is yours?';
+
+  @override
+  String get hkStartBody =>
+      'It depends on where you live: each office serves its own districts.';
+
+  @override
+  String get hkStartOr => 'or pick it from the list below';
+
+  @override
+  String get hkYourWatches => 'Your watches';
+
+  @override
+  String hkSeeAll(int count) {
+    return 'See all ($count)';
+  }
+
+  @override
+  String hkWatchFree(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n free days in your dates',
+      one: '1 free day in your dates',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkWatchFull => 'All booked — we’re watching';
+
+  @override
+  String hkEarliestShort(String day) {
+    return 'Earliest free day: $day';
+  }
+
+  @override
+  String get hkAllFullShort => 'Every day is booked now';
+
+  @override
+  String get hkOfficeMain => 'Immigration office';
+
+  @override
+  String get hkOfficeBranch => 'Branch office';
+
+  @override
+  String hkOfficeBranchOf(String office) {
+    return 'Branch of $office';
+  }
+
+  @override
+  String get hkAllOffices => 'All offices';
+
+  @override
+  String hkFreeDays(int n, String date) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n free days up to $date',
+      one: '1 free day up to $date',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String hkBookedUntil(String date) {
+    return 'Booked up to $date. Set a watch and we’ll tell you the moment a slot opens.';
+  }
+
+  @override
+  String get hkHowBooking =>
+      'You book on the HiKorea website, with your own HiKorea account. Here you see which days are free.';
+
+  @override
+  String get hkLegendLater => 'Not open yet';
+
+  @override
+  String get hkWatchShort => 'Watch';
+
+  @override
+  String get hkStale =>
+      'We couldn’t check this counter lately, so these days may be out of date.';
+
+  @override
+  String get accountGuest => 'Guest';
+
+  @override
+  String get accountGuestBody =>
+      'Sign in so your name shows with your reviews, and your watches move with you to a new phone.';
+
+  @override
+  String get accountSignIn => 'Sign in';
+
+  @override
+  String get accountNoPhoto =>
+      'WhatsApp doesn’t share profile photos with apps.';
+
+  @override
+  String get accountNotifications => 'Notifications';
+
+  @override
+  String get accountPushOffTitle => 'Notifications are off';
+
+  @override
+  String get accountTurnOn => 'Turn on';
+
+  @override
+  String get accountWhatComes =>
+      'Slots opening on HiKorea, news from places and areas you follow, and announcements.';
+
+  @override
+  String get accountTelegramToo =>
+      'They also come from the Muslim Vegukin bot in Telegram.';
+
+  @override
+  String get accountTestPush => 'Send a test';
+
+  @override
+  String get accountTestSent => 'Sent — look at your phone';
+
+  @override
+  String get accountTestFailed =>
+      'Couldn’t send. Please try again in a moment.';
+
+  @override
+  String get accountActivity => 'Your activity';
+
+  @override
+  String get accountInboxNone => 'No messages yet';
+
+  @override
+  String accountInboxAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count messages',
+      one: '1 message',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountApp => 'App';
+
+  @override
+  String get accountLanguage => 'Language';
+
+  @override
+  String get accountDarkMode => 'Dark mode';
+
+  @override
+  String get accountManage => 'Manage account';
+
+  @override
+  String accountActive(int count) {
+    return '$count active';
+  }
 
   @override
   String get themeToDay => 'Day mode';

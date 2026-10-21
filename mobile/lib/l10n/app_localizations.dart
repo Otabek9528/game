@@ -3523,13 +3523,13 @@ abstract class AppLocalizations {
   /// No description provided for @accountTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Hisob'**
+  /// **'Akkaunt'**
   String get accountTitle;
 
   /// No description provided for @signInTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Hisobingizga kiring'**
+  /// **'Akkauntingizga kiring'**
   String get signInTitle;
 
   /// No description provided for @signInWhy.
@@ -3541,7 +3541,7 @@ abstract class AppLocalizations {
   /// No description provided for @signInTelegramNote.
   ///
   /// In uz, this message translates to:
-  /// **'Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi hisobingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.'**
+  /// **'Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi akkauntingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.'**
   String get signInTelegramNote;
 
   /// No description provided for @signInTelegram.
@@ -3619,13 +3619,13 @@ abstract class AppLocalizations {
   /// No description provided for @accountDelete.
   ///
   /// In uz, this message translates to:
-  /// **'Hisobni o‘chirish'**
+  /// **'Akkauntni o‘chirish'**
   String get accountDelete;
 
   /// No description provided for @accountDeleteTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Hisob o‘chirilsinmi?'**
+  /// **'Akkaunt o‘chirilsinmi?'**
   String get accountDeleteTitle;
 
   /// No description provided for @accountDeleteBody.
@@ -3649,7 +3649,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleted.
   ///
   /// In uz, this message translates to:
-  /// **'Hisob o‘chirildi'**
+  /// **'Akkaunt o‘chirildi'**
   String get accountDeleted;
 
   /// No description provided for @accountPushOn.
@@ -3661,7 +3661,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountPushOff.
   ///
   /// In uz, this message translates to:
-  /// **'Bildirishnomalar o‘chiq. Yoqish uchun sozlamalarni oching.'**
+  /// **'Xabarlar baribir «Kelgan xabarlar»ga tushadi, lekin telefon ularni ko‘rsatmaydi.'**
   String get accountPushOff;
 
   /// No description provided for @pushOpen.
@@ -3733,7 +3733,7 @@ abstract class AppLocalizations {
   /// No description provided for @hkLede.
   ///
   /// In uz, this message translates to:
-  /// **'HiKorea\'dagi bo‘sh joylarni har 5 daqiqada tekshiramiz. Siz tanlagan kunlarda joy ochilishi bilan xabar beramiz.'**
+  /// **'Ofisingizdagi bo‘sh kunlarni ko‘ring. Hammasi band bo‘lsa, kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.'**
   String get hkLede;
 
   /// No description provided for @hkSearchHint.
@@ -3763,7 +3763,7 @@ abstract class AppLocalizations {
   /// No description provided for @hkStep1.
   ///
   /// In uz, this message translates to:
-  /// **'Ofisingizni tanlang'**
+  /// **'Ofisingizni toping'**
   String get hkStep1;
 
   /// No description provided for @hkStep2.
@@ -3775,7 +3775,7 @@ abstract class AppLocalizations {
   /// No description provided for @hkStep3.
   ///
   /// In uz, this message translates to:
-  /// **'Joy ochilganda xabar oling'**
+  /// **'HiKorea\'da bron qiling'**
   String get hkStep3;
 
   /// No description provided for @hkAddressCardTitle.
@@ -4263,6 +4263,264 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Ofisni tanlash'**
   String get hkPickOffice;
+
+  /// No description provided for @hkStep1Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomi yoki uy manzilingiz bo‘yicha'**
+  String get hkStep1Body;
+
+  /// No description provided for @hkStep2Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Har bir bo‘limning keyingi 3 oyi, har 5 daqiqada yangilanadi'**
+  String get hkStep2Body;
+
+  /// No description provided for @hkStep3Body.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hammasi band bo‘lsa — kuzatuv o‘rnating, joy ochilganda xabar beramiz'**
+  String get hkStep3Body;
+
+  /// No description provided for @hkHowTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday ishlaydi'**
+  String get hkHowTitle;
+
+  /// No description provided for @hkStartTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizning ofisingiz qaysi?'**
+  String get hkStartTitle;
+
+  /// No description provided for @hkStartBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yashash joyingizga bog‘liq: har bir ofis o‘z tumanlariga xizmat qiladi.'**
+  String get hkStartBody;
+
+  /// No description provided for @hkStartOr.
+  ///
+  /// In uz, this message translates to:
+  /// **'yoki quyidagi ro‘yxatdan tanlang'**
+  String get hkStartOr;
+
+  /// No description provided for @hkYourWatches.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvlaringiz'**
+  String get hkYourWatches;
+
+  /// No description provided for @hkSeeAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hammasi ({count})'**
+  String hkSeeAll(int count);
+
+  /// No description provided for @hkWatchFree.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sanalaringizda {n} ta bo‘sh kun bor'**
+  String hkWatchFree(int n);
+
+  /// No description provided for @hkWatchFull.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hammasi band — kuzatyapmiz'**
+  String get hkWatchFull;
+
+  /// No description provided for @hkEarliestShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng yaqin bo‘sh kun: {day}'**
+  String hkEarliestShort(String day);
+
+  /// No description provided for @hkAllFullShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozir hamma kunlar band'**
+  String get hkAllFullShort;
+
+  /// No description provided for @hkOfficeMain.
+  ///
+  /// In uz, this message translates to:
+  /// **'Immigratsiya ofisi'**
+  String get hkOfficeMain;
+
+  /// No description provided for @hkOfficeBranch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Filial'**
+  String get hkOfficeBranch;
+
+  /// No description provided for @hkOfficeBranchOf.
+  ///
+  /// In uz, this message translates to:
+  /// **'{office} filiali'**
+  String hkOfficeBranchOf(String office);
+
+  /// No description provided for @hkAllOffices.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha ofislar'**
+  String get hkAllOffices;
+
+  /// No description provided for @hkFreeDays.
+  ///
+  /// In uz, this message translates to:
+  /// **'{date} gacha {n} ta bo‘sh kun'**
+  String hkFreeDays(int n, String date);
+
+  /// No description provided for @hkBookedUntil.
+  ///
+  /// In uz, this message translates to:
+  /// **'{date} gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.'**
+  String hkBookedUntil(String date);
+
+  /// No description provided for @hkHowBooking.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bron qilish HiKorea saytida, o‘z HiKorea akkauntingiz bilan bo‘ladi. Bu yerda bo‘sh kunlarni ko‘rasiz.'**
+  String get hkHowBooking;
+
+  /// No description provided for @hkLegendLater.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali ochilmagan'**
+  String get hkLegendLater;
+
+  /// No description provided for @hkWatchShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatish'**
+  String get hkWatchShort;
+
+  /// No description provided for @hkStale.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu bo‘limni oxirgi paytda tekshira olmadik — kunlar eskirgan bo‘lishi mumkin.'**
+  String get hkStale;
+
+  /// No description provided for @accountGuest.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mehmon'**
+  String get accountGuest;
+
+  /// No description provided for @accountGuestBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kirsangiz, izohlaringizda ismingiz ko‘rinadi, kuzatuvlaringiz esa yangi telefonga ham o‘tadi.'**
+  String get accountGuestBody;
+
+  /// No description provided for @accountSignIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kirish'**
+  String get accountSignIn;
+
+  /// No description provided for @accountNoPhoto.
+  ///
+  /// In uz, this message translates to:
+  /// **'WhatsApp profil rasmini ilovalarga bermaydi.'**
+  String get accountNoPhoto;
+
+  /// No description provided for @accountNotifications.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar'**
+  String get accountNotifications;
+
+  /// No description provided for @accountPushOffTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar o‘chiq'**
+  String get accountPushOffTitle;
+
+  /// No description provided for @accountTurnOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get accountTurnOn;
+
+  /// No description provided for @accountWhatComes.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea\'da joy ochilishi, kuzatayotgan joy va hududlaringiz yangiliklari, e’lonlar.'**
+  String get accountWhatComes;
+
+  /// No description provided for @accountTelegramToo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ular Telegram\'dagi Muslim Vegukin botidan ham keladi.'**
+  String get accountTelegramToo;
+
+  /// No description provided for @accountTestPush.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sinov bildirishnomasi'**
+  String get accountTestPush;
+
+  /// No description provided for @accountTestSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborildi — telefoningizda ko‘ring'**
+  String get accountTestSent;
+
+  /// No description provided for @accountTestFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.'**
+  String get accountTestFailed;
+
+  /// No description provided for @accountActivity.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faoliyatingiz'**
+  String get accountActivity;
+
+  /// No description provided for @accountInboxNone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha xabar yo‘q'**
+  String get accountInboxNone;
+
+  /// No description provided for @accountInboxAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta xabar'**
+  String accountInboxAll(int count);
+
+  /// No description provided for @accountApp.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ilova'**
+  String get accountApp;
+
+  /// No description provided for @accountLanguage.
+  ///
+  /// In uz, this message translates to:
+  /// **'Til'**
+  String get accountLanguage;
+
+  /// No description provided for @accountDarkMode.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tungi rejim'**
+  String get accountDarkMode;
+
+  /// No description provided for @accountManage.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntni boshqarish'**
+  String get accountManage;
+
+  /// No description provided for @accountActive.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta faol'**
+  String accountActive(int count);
 
   /// No description provided for @themeToDay.
   ///

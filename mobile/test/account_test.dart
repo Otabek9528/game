@@ -6,7 +6,9 @@ import 'package:muslim_vegukin/core/app_language.dart';
 import 'package:muslim_vegukin/features/account/account_screen.dart';
 import 'package:muslim_vegukin/features/account/inbox_message.dart';
 import 'package:muslim_vegukin/features/account/inbox_screen.dart';
+import 'package:muslim_vegukin/features/hikorea/hikorea_models.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_screen.dart';
+import 'package:muslim_vegukin/features/hikorea/hikorea_watches.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 
 import 'support/fakes.dart';
@@ -23,11 +25,27 @@ AccountController controller(MemoryStore store, FakeAccounts accounts, {FakePush
 Future<TestApp> openAccountScreen(WidgetTester tester, {String language = 'en', TestApp? app}) async {
   app ??= TestApp(language: language);
   await app.launch(tester);
-  final tooltip = switch (language) { 'uz' => 'Hisob', 'ru' => 'Аккаунт', _ => 'Account' };
+  final tooltip = switch (language) { 'uz' => 'Akkaunt', 'ru' => 'Аккаунт', _ => 'Account' };
   await tester.tap(find.byTooltip(tooltip));
   await tester.pumpAndSettle();
   expect(find.byType(AccountScreen), findsOneWidget);
   return app;
+}
+
+/// The account page, and its sign-in sheet open.
+Future<TestApp> openSignIn(WidgetTester tester, {String language = 'en', TestApp? app}) async {
+  app = await openAccountScreen(tester, language: language, app: app);
+  await tester.tap(find.text(switch (language) { 'uz' => 'Kirish', 'ru' => 'Войти', _ => 'Sign in' }));
+  await tester.pumpAndSettle();
+  return app;
+}
+
+Future<void> tapScrolled(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(finder, 150, scrollable: find.byType(Scrollable).last);
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
 }
 
 /// The waiting screen's spinner never settles: step time instead.
@@ -168,19 +186,19 @@ void main() {
 
   group('signing in', () {
     testWidgets('the ways in, WhatsApp first for non-Uzbeks, Telegram first for Uzbeks', (tester) async {
-      await openAccountScreen(tester);
+      await openSignIn(tester);
       expect(buttons(tester, ['Continue with WhatsApp', 'Continue with Google', 'Continue with Telegram']),
           ['Continue with WhatsApp', 'Continue with Google', 'Continue with Telegram']);
     });
 
     testWidgets('in Uzbek, Telegram first', (tester) async {
-      await openAccountScreen(tester, language: 'uz');
+      await openSignIn(tester, language: 'uz');
       expect(buttons(tester, ['Telegram orqali kirish', 'WhatsApp orqali kirish', 'Google orqali kirish']),
           ['Telegram orqali kirish', 'WhatsApp orqali kirish', 'Google orqali kirish']);
     });
 
     testWidgets('WhatsApp: the bot opens, the app waits, and is signed in when Yes is tapped', (tester) async {
-      final app = await openAccountScreen(tester);
+      final app = await openSignIn(tester);
       await tester.tap(find.text('Continue with WhatsApp'));
       await settleWaiting(tester);
       expect(app.links.last, Uri.parse('https://wa.me/821012345678?text=LOGIN%20CODE1'));
@@ -200,7 +218,7 @@ void main() {
     });
 
     testWidgets('back from the bot: looked at straight away', (tester) async {
-      final app = await openAccountScreen(tester);
+      final app = await openSignIn(tester);
       await tester.tap(find.text('Continue with Telegram'));
       await settleWaiting(tester);
       app.accounts.confirm('CODE1', const AppUser(id: 555000111, signedIn: true, provider: 'telegram', name: 'Aziz'));
@@ -210,7 +228,7 @@ void main() {
     });
 
     testWidgets('cancelled in the bot: said so, and the ways in are back', (tester) async {
-      final app = await openAccountScreen(tester);
+      final app = await openSignIn(tester);
       await tester.tap(find.text('Continue with Telegram'));
       await settleWaiting(tester);
       app.accounts.cancel('CODE1');
@@ -221,7 +239,7 @@ void main() {
     });
 
     testWidgets('Google: the picker, then signed in; closing the picker changes nothing', (tester) async {
-      final app = await openAccountScreen(tester);
+      final app = await openSignIn(tester);
       app.google.answer = null;
       await tester.tap(find.text('Continue with Google'));
       await tester.pumpAndSettle();
@@ -236,7 +254,7 @@ void main() {
     });
 
     testWidgets('offline: said so', (tester) async {
-      final app = await openAccountScreen(tester);
+      final app = await openSignIn(tester);
       app.accounts.fail = true;
       await tester.tap(find.text('Continue with WhatsApp'));
       await tester.pumpAndSettle();
@@ -263,35 +281,37 @@ void main() {
 
   group('signed in', () {
     Future<TestApp> signedIn(WidgetTester tester, {String provider = 'whatsapp'}) async {
-      final app = await openAccountScreen(tester);
+      final app = await openSignIn(tester);
       await tester.tap(find.text(provider == 'telegram' ? 'Continue with Telegram' : 'Continue with WhatsApp'));
       await settleWaiting(tester);
       app.accounts.confirm('CODE1', AppUser(id: provider == 'telegram' ? 555000111 : -9000000000001,
           signedIn: true, provider: provider, name: 'Rahim'));
       await tester.pump(const Duration(seconds: 3));
       await tester.pumpAndSettle();
+      // "You're signed in" goes, and with it what it covers.
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
       return app;
     }
 
     testWidgets('signing out: this phone starts again as nobody in particular', (tester) async {
       final app = await signedIn(tester);
-      await tester.tap(find.text('Sign out'));
-      await tester.pumpAndSettle();
+      await tapScrolled(tester, find.text('Sign out'));
       expect(app.account.signedIn, isFalse);
-      expect(find.text('Continue with WhatsApp'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Guest'), -150, scrollable: find.byType(Scrollable).last);
+      expect(find.text('Guest'), findsOneWidget);
+      expect(find.text('Sign out'), findsNothing);
     });
 
     testWidgets('deleting: asked first, then gone, and a new empty account', (tester) async {
       final app = await signedIn(tester, provider: 'telegram');
-      await tester.tap(find.text('Delete account'));
-      await tester.pumpAndSettle();
+      await tapScrolled(tester, find.text('Delete account'));
       expect(find.textContaining('This includes those made in the Telegram bot.'), findsOneWidget);
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
       expect(app.accounts.deleted, isEmpty);
 
-      await tester.tap(find.text('Delete account'));
-      await tester.pumpAndSettle();
+      await tapScrolled(tester, find.text('Delete account'));
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       expect(app.accounts.deleted, ['token-1']);
@@ -527,12 +547,93 @@ void main() {
     });
   });
 
-  testWidgets('notifications off: said so, with the way to the settings', (tester) async {
-    final app = TestApp(language: 'en');
-    app.push.allowed = false;
-    await openAccountScreen(tester, app: app);
-    expect(find.text('Notifications are off. Turn them on in settings.'), findsOneWidget);
-    await tester.tap(find.text('Open settings'));
-    expect(app.permissions.settingsOpened, 1);
+  group('the account page', () {
+    testWidgets('notifications off: said so, with the way to turn them on; on again when back from settings',
+        (tester) async {
+      final app = TestApp(language: 'en');
+      app.push.allowed = false;
+      await openAccountScreen(tester, app: app);
+      expect(find.text('Notifications are off'), findsOneWidget);
+      expect(find.text('Alerts still reach your Inbox, but this phone won’t show them.'), findsOneWidget);
+      await tester.tap(find.text('Turn on'));
+      expect(app.permissions.settingsOpened, 1);
+
+      app.push.allowed = true;
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      expect(find.text('Notifications come to this phone'), findsOneWidget);
+    });
+
+    testWidgets('a test notification to this phone', (tester) async {
+      final app = await openAccountScreen(tester);
+      await tester.tap(find.text('Send a test'));
+      await tester.pumpAndSettle();
+      expect(app.accounts.testPushes, ['token-1']);
+      expect(find.text('Sent — look at your phone'), findsOneWidget);
+
+      app.accounts.testPushError = 'no_push_token';
+      await tester.tap(find.text('Send a test'));
+      await tester.pumpAndSettle();
+      expect(find.text('Couldn’t send. Please try again in a moment.'), findsOneWidget);
+    });
+
+    testWidgets('the Telegram photo, on the page and on the home screen; fetched once', (tester) async {
+      final app = TestApp(language: 'en');
+      app.accounts.photos[555000111] = transparentPng;
+      await openSignIn(tester, app: app);
+      await tester.tap(find.text('Continue with Telegram'));
+      await settleWaiting(tester);
+      app.accounts.confirm('CODE1',
+          const AppUser(id: 555000111, signedIn: true, provider: 'telegram', name: 'Aziz Karimov', detail: '@aziz', photo: 'v1'));
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: find.byType(AccountAvatar), matching: find.byType(Image)), findsOneWidget);
+      expect(find.text('They also come from the Muslim Vegukin bot in Telegram.'), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: find.byType(AccountAvatar), matching: find.byType(Image)), findsOneWidget,
+          reason: 'the home screen shows who is signed in');
+      expect(app.accounts.photoFetches, 1);
+      expect(app.store.read('app_photo_v'), 'v1', reason: 'kept for the next launch');
+    });
+
+    testWidgets('WhatsApp: initials, and why there is no photo', (tester) async {
+      final app = await openSignIn(tester);
+      await tester.tap(find.text('Continue with WhatsApp'));
+      await settleWaiting(tester);
+      app.accounts.confirm('CODE1',
+          const AppUser(id: -9000000000001, signedIn: true, provider: 'whatsapp', name: 'Rahim Aliyev', detail: '+8210'));
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+      expect(find.text('RA'), findsOneWidget);
+      expect(find.text('WhatsApp doesn’t share profile photos with apps.'), findsOneWidget);
+    });
+
+    testWidgets('what they have going: the inbox and the watches, one tap away; the app\'s settings', (tester) async {
+      final app = TestApp(language: 'en');
+      app.hikorea.watchList.add(HkWatch(
+        id: 1,
+        officeId: '1270100',
+        officeNameEn: 'Seoul Immigration Office',
+        deskSeq: 201,
+        start: DateTime(2026, 10, 18),
+        end: DateTime(2026, 10, 31),
+        status: 'active',
+      ));
+      await app.launch(tester);
+      app.accounts.alert(app.account.user!.id, 'Kebab House');
+      await tester.tap(find.byTooltip('Account'));
+      await tester.pumpAndSettle();
+      expect(find.text('1 new'), findsOneWidget);
+      expect(find.text('1 active'), findsOneWidget);
+      await tapScrolled(tester, find.text('My watches'));
+      expect(find.byType(HkWatchesScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      expect(find.text('English'), findsOneWidget, reason: 'the language');
+      await tapScrolled(tester, find.text('Dark mode'));
+      expect(Theme.of(tester.element(find.byType(AccountScreen))).brightness, Brightness.dark);
+    });
   });
 }

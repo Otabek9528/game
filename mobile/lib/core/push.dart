@@ -30,6 +30,10 @@ abstract interface class PushService {
     required PushOpened onOpen,
     required PushArrived onForeground,
   });
+
+  /// Whether notifications are allowed now: the person may have changed it
+  /// in the phone's settings since [start].
+  Future<bool> isAllowed();
 }
 
 /// The Firebase project's Android app (from google-services.json). Read by
@@ -89,6 +93,18 @@ class FirebasePushService implements PushService {
       // No Google Play services, or no network for the first token: the app
       // works on without notifications.
       debugPrint('Push unavailable: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> isAllowed() async {
+    try {
+      if (Firebase.apps.isEmpty) return false;
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+      return settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+    } catch (e) {
       return false;
     }
   }

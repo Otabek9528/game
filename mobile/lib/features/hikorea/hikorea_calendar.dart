@@ -28,7 +28,8 @@ class HkCalendarScreen extends StatefulWidget {
 }
 
 class _HkCalendarScreenState extends State<HkCalendarScreen> {
-  HkCalendar? _calendar;
+  // The one the first page fetched shows at once; a fresh one follows.
+  late HkCalendar? _calendar = widget.kit.calendarOf(widget.desk.seq);
   bool _failed = false;
 
   HikoreaKit get _kit => widget.kit;
@@ -42,17 +43,17 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
   }
 
   Future<void> _load() async {
-    try {
-      final calendar = await _kit.source.calendar(widget.desk.seq);
-      if (mounted) {
-        setState(() {
-          _calendar = calendar;
-          _failed = false;
-        });
-      }
-    } on HkException {
-      if (mounted) setState(() => _failed = _calendar == null);
-    }
+    final calendar = await _kit.loadCalendar(widget.desk.seq);
+    if (!mounted) return;
+    setState(() {
+      _calendar = calendar ?? _calendar;
+      _failed = _calendar == null;
+    });
+  }
+
+  void _watch() {
+    HapticFeedback.lightImpact();
+    unawaited(showHkWatchSheet(context, kit: _kit, office: widget.office, desk: widget.desk));
   }
 
   void _openDay(DateTime day) {
@@ -67,6 +68,16 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
     final calendar = _calendar;
     final today = _kit.today;
     final booth = boothName(widget.desk, _kit.language);
+    final free = calendar?.openDays(today) ?? const <DateTime>[];
+    final checked = calendar?.checkedAt;
+    // The server reads every counter every 5 minutes; much older, or failing, and it says so.
+    final stale = calendar != null &&
+        (calendar.status == 'failing' ||
+            (checked != null && _kit.services.clock().difference(checked) > const Duration(minutes: 30)));
+    // This month, on to the month the window ends in, and the one after, to
+    // show what isn't open yet: 2 to 4 of them.
+    final end = calendar?.windowEnd ?? today;
+    final months = ((end.year - today.year) * 12 + end.month - today.month + 2).clamp(2, 4);
     return Scaffold(
       backgroundColor: p.page,
       appBar: AppBar(
@@ -103,10 +114,15 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
                     runSpacing: 6,
                     children: [
                       if (booth.afternoon) HkPill(s.hkFromAfternoon, tone: HkTone.filling, icon: Icons.schedule_rounded),
-                      if (calendar?.checkedAt case final at?)
-                        HkPill(checkedAgo(s, at, _kit.services.clock()), tone: HkTone.none, icon: Icons.sync_rounded),
+                      if (checked != null)
+                        HkPill(checkedAgo(s, checked, _kit.services.clock()),
+                            tone: stale ? HkTone.low : HkTone.none, icon: Icons.sync_rounded),
                     ],
                   ),
+                  if (stale) ...[
+                    const SizedBox(height: 8),
+                    Text(s.hkStale, style: TextStyle(fontSize: 13, height: 1.4, color: hkTone(context, HkTone.low).ink)),
+                  ],
                 ],
               ),
             ),
@@ -124,13 +140,26 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
             else if (calendar == null)
               const Padding(padding: EdgeInsets.all(48), child: Center(child: CircularProgressIndicator()))
             else ...[
-              _Summary(kit: _kit, calendar: calendar, onDay: _openDay),
+              _Summary(kit: _kit, calendar: calendar, free: free, onDay: _openDay, onWatch: _watch),
               Padding(
-                padding: const EdgeInsets.fromLTRB(4, 12, 4, 10),
-                child: Text(s.hkCalendarHint, style: TextStyle(fontSize: 13.5, height: 1.4, color: p.inkSoft)),
+                padding: const EdgeInsets.fromLTRB(4, 14, 4, 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: Icon(Icons.info_outline_rounded, size: 18, color: p.inkMuted),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('${s.hkHowBooking} ${s.hkCalendarHint}',
+                          style: TextStyle(fontSize: 13.5, height: 1.4, color: p.inkSoft)),
+                    ),
+                  ],
+                ),
               ),
               const _Legend(),
-              for (var m = 0; m < 3; m++)
+              for (var m = 0; m < months; m++)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
                   child: _Month(
@@ -155,14 +184,30 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
           top: false,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-            child: FilledButton.icon(
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                unawaited(showHkWatchSheet(context, kit: _kit, office: widget.office, desk: widget.desk));
-              },
-              icon: const Icon(Icons.notifications_active_outlined),
-              label: Text(s.hkNotifyMe),
-            ),
+            // Free days: book them; none: watch for one.
+            child: free.isEmpty
+                ? FilledButton.icon(
+                    onPressed: _watch,
+                    icon: const Icon(Icons.notifications_active_outlined),
+                    label: Text(s.hkNotifyMe),
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () => _kit.services.openLink(Uri.parse('https://www.hikorea.go.kr/')),
+                          icon: const Icon(Icons.open_in_new_rounded),
+                          label: Text(s.hkBook, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      OutlinedButton.icon(
+                        onPressed: _watch,
+                        icon: const Icon(Icons.notifications_active_outlined),
+                        label: Text(s.hkWatchShort),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ),
@@ -170,28 +215,43 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
   }
 }
 
-/// The first day one can still get, or, when there is none, the advice to
-/// set a watch.
+/// The first day one can still get and how many there are; when there is
+/// none, until when it is booked, and the way to a watch.
 class _Summary extends StatelessWidget {
-  const _Summary({required this.kit, required this.calendar, required this.onDay});
+  const _Summary({
+    required this.kit,
+    required this.calendar,
+    required this.free,
+    required this.onDay,
+    required this.onWatch,
+  });
 
   final HikoreaKit kit;
   final HkCalendar calendar;
+  final List<DateTime> free;
   final ValueChanged<DateTime> onDay;
+  final VoidCallback onWatch;
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
-    final earliest = calendar.earliestOpen(kit.today);
     if (calendar.days.isEmpty) return const SizedBox.shrink();
+    final earliest = free.firstOrNull;
+    final end = calendar.windowEnd;
     final tone = hkTone(context, earliest == null ? HkTone.filling : HkTone.open);
+    final below = earliest == null
+        ? (end == null ? s.hkAllFullBody : s.hkBookedUntil(dayMonth(end, kit.language)))
+        : end == null
+            ? null
+            : s.hkFreeDays(free.length, dayMonth(end, kit.language));
     return HkCard(
-      onTap: earliest == null ? null : () => onDay(earliest),
+      onTap: earliest == null ? onWatch : () => onDay(earliest),
       color: tone.background,
       edge: Colors.transparent,
+      padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
       child: Row(
         children: [
-          Text(earliest == null ? '🌙' : '⚡', style: const TextStyle(fontSize: 24)),
+          Text(earliest == null ? '🌙' : '⚡', style: const TextStyle(fontSize: 26)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -201,22 +261,21 @@ class _Summary extends StatelessWidget {
                   earliest == null ? s.hkAllFull : s.hkEarliest,
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: tone.ink),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  earliest == null
-                      ? s.hkAllFullBody
-                      : '${weekdayName(earliest, kit.language)}, ${dayMonth(earliest, kit.language)}',
-                  style: TextStyle(
-                    fontSize: earliest == null ? 13.5 : 17,
-                    height: 1.3,
-                    fontWeight: earliest == null ? FontWeight.w500 : FontWeight.w800,
-                    color: tone.ink,
+                if (earliest != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${weekdayName(earliest, kit.language)}, ${dayMonth(earliest, kit.language)}',
+                    style: TextStyle(fontSize: 19, height: 1.25, fontWeight: FontWeight.w800, color: tone.ink),
                   ),
-                ),
+                ],
+                if (below != null) ...[
+                  const SizedBox(height: 3),
+                  Text(below, style: TextStyle(fontSize: 13.5, height: 1.35, color: tone.ink)),
+                ],
               ],
             ),
           ),
-          if (earliest != null) Icon(Icons.chevron_right_rounded, color: tone.ink),
+          Icon(earliest == null ? Icons.notifications_active_outlined : Icons.chevron_right_rounded, color: tone.ink),
         ],
       ),
     );
@@ -236,7 +295,11 @@ class _Legend extends StatelessWidget {
             Container(
               width: 14,
               height: 14,
-              decoration: BoxDecoration(color: hkDayColours(context, tier).background, borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(
+                color: hkDayColours(context, tier).background,
+                borderRadius: BorderRadius.circular(4),
+                border: tier == HkTier.later ? Border.all(color: p.hairlineStrong) : null,
+              ),
             ),
             const SizedBox(width: 6),
             Text(text, style: TextStyle(fontSize: 12.5, color: p.inkSoft)),
@@ -252,6 +315,7 @@ class _Legend extends StatelessWidget {
           item(HkTier.some, s.hkLegendSome),
           item(HkTier.full, s.hkLegendFull),
           item(HkTier.closed, s.hkLegendClosed),
+          item(HkTier.later, s.hkLegendLater),
         ],
       ),
     );
@@ -270,9 +334,12 @@ class _Month extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     final today = kit.today;
-    final lead = month.weekday - 1;
     final days = DateUtils.getDaysInMonth(month.year, month.month);
-    final cells = ((lead + days) / 7).ceil() * 7;
+    // Weeks gone by are left out: this month starts at this week.
+    final skip = month.year == today.year && month.month == today.month ? (today.day - today.weekday + 1).clamp(1, days) - 1 : 0;
+    final first = DateTime(month.year, month.month, skip + 1);
+    final lead = first.weekday - 1;
+    final cells = ((lead + days - skip) / 7).ceil() * 7;
     return HkCard(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
       child: Column(
@@ -308,8 +375,8 @@ class _Month extends StatelessWidget {
               crossAxisSpacing: 5,
             ),
             itemBuilder: (context, i) {
-              final n = i - lead + 1;
-              if (n < 1 || n > days) return const SizedBox.shrink();
+              final n = i - lead + 1 + skip;
+              if (n < 1 + skip || n > days) return const SizedBox.shrink();
               final day = DateTime(month.year, month.month, n);
               return _Day(
                 day: day,
@@ -339,17 +406,22 @@ class _Day extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     final (kind, fill) = tier;
-    final open = !past && kind != HkTier.closed;
+    final open = !past && kind != HkTier.closed && kind != HkTier.later;
     final colours = hkDayColours(context, kind);
     final background = past ? Colors.transparent : colours.background;
-    final ink = past ? p.inkMuted.withValues(alpha: 0.55) : colours.ink;
+    final ink = past || kind == HkTier.later ? p.inkMuted.withValues(alpha: 0.6) : colours.ink;
+    final edge = today
+        ? BorderSide(color: p.accent, width: 2)
+        : !past && kind == HkTier.later
+            ? BorderSide(color: p.hairlineStrong)
+            : BorderSide.none;
     return Semantics(
       button: open,
       child: Material(
         color: background,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: today ? BorderSide(color: p.accent, width: 2) : BorderSide.none,
+          side: edge,
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(

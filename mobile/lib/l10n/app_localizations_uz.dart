@@ -1924,10 +1924,10 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
-  String get accountTitle => 'Hisob';
+  String get accountTitle => 'Akkaunt';
 
   @override
-  String get signInTitle => 'Hisobingizga kiring';
+  String get signInTitle => 'Akkauntingizga kiring';
 
   @override
   String get signInWhy =>
@@ -1935,7 +1935,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get signInTelegramNote =>
-      'Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi hisobingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.';
+      'Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi akkauntingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.';
 
   @override
   String get signInTelegram => 'Telegram orqali kirish';
@@ -1983,10 +1983,10 @@ class AppLocalizationsUz extends AppLocalizations {
   String get signOut => 'Chiqish';
 
   @override
-  String get accountDelete => 'Hisobni o‘chirish';
+  String get accountDelete => 'Akkauntni o‘chirish';
 
   @override
-  String get accountDeleteTitle => 'Hisob o‘chirilsinmi?';
+  String get accountDeleteTitle => 'Akkaunt o‘chirilsinmi?';
 
   @override
   String get accountDeleteBody =>
@@ -1999,14 +1999,14 @@ class AppLocalizationsUz extends AppLocalizations {
   String get accountDeleteConfirm => 'O‘chirish';
 
   @override
-  String get accountDeleted => 'Hisob o‘chirildi';
+  String get accountDeleted => 'Akkaunt o‘chirildi';
 
   @override
   String get accountPushOn => 'Bildirishnomalar shu telefonga keladi';
 
   @override
   String get accountPushOff =>
-      'Bildirishnomalar o‘chiq. Yoqish uchun sozlamalarni oching.';
+      'Xabarlar baribir «Kelgan xabarlar»ga tushadi, lekin telefon ularni ko‘rsatmaydi.';
 
   @override
   String get pushOpen => 'Ochish';
@@ -2051,7 +2051,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get hkLede =>
-      'HiKorea\'dagi bo‘sh joylarni har 5 daqiqada tekshiramiz. Siz tanlagan kunlarda joy ochilishi bilan xabar beramiz.';
+      'Ofisingizdagi bo‘sh kunlarni ko‘ring. Hammasi band bo‘lsa, kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.';
 
   @override
   String get hkSearchHint => 'Ofis nomini izlang';
@@ -2068,13 +2068,13 @@ class AppLocalizationsUz extends AppLocalizations {
   String get hkLastViewed => 'Oxirgi ko‘rilgan';
 
   @override
-  String get hkStep1 => 'Ofisingizni tanlang';
+  String get hkStep1 => 'Ofisingizni toping';
 
   @override
   String get hkStep2 => 'Bo‘sh kunlarni ko‘ring';
 
   @override
-  String get hkStep3 => 'Joy ochilganda xabar oling';
+  String get hkStep3 => 'HiKorea\'da bron qiling';
 
   @override
   String get hkAddressCardTitle => 'Ofisingizni bilmaysizmi?';
@@ -2356,6 +2356,160 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get hkPickOffice => 'Ofisni tanlash';
+
+  @override
+  String get hkStep1Body => 'Nomi yoki uy manzilingiz bo‘yicha';
+
+  @override
+  String get hkStep2Body =>
+      'Har bir bo‘limning keyingi 3 oyi, har 5 daqiqada yangilanadi';
+
+  @override
+  String get hkStep3Body =>
+      'Hammasi band bo‘lsa — kuzatuv o‘rnating, joy ochilganda xabar beramiz';
+
+  @override
+  String get hkHowTitle => 'Qanday ishlaydi';
+
+  @override
+  String get hkStartTitle => 'Sizning ofisingiz qaysi?';
+
+  @override
+  String get hkStartBody =>
+      'Bu yashash joyingizga bog‘liq: har bir ofis o‘z tumanlariga xizmat qiladi.';
+
+  @override
+  String get hkStartOr => 'yoki quyidagi ro‘yxatdan tanlang';
+
+  @override
+  String get hkYourWatches => 'Kuzatuvlaringiz';
+
+  @override
+  String hkSeeAll(int count) {
+    return 'Hammasi ($count)';
+  }
+
+  @override
+  String hkWatchFree(int n) {
+    return 'Sanalaringizda $n ta bo‘sh kun bor';
+  }
+
+  @override
+  String get hkWatchFull => 'Hammasi band — kuzatyapmiz';
+
+  @override
+  String hkEarliestShort(String day) {
+    return 'Eng yaqin bo‘sh kun: $day';
+  }
+
+  @override
+  String get hkAllFullShort => 'Hozir hamma kunlar band';
+
+  @override
+  String get hkOfficeMain => 'Immigratsiya ofisi';
+
+  @override
+  String get hkOfficeBranch => 'Filial';
+
+  @override
+  String hkOfficeBranchOf(String office) {
+    return '$office filiali';
+  }
+
+  @override
+  String get hkAllOffices => 'Barcha ofislar';
+
+  @override
+  String hkFreeDays(int n, String date) {
+    return '$date gacha $n ta bo‘sh kun';
+  }
+
+  @override
+  String hkBookedUntil(String date) {
+    return '$date gacha band. Kuzatuv o‘rnating — joy ochilishi bilan xabar beramiz.';
+  }
+
+  @override
+  String get hkHowBooking =>
+      'Bron qilish HiKorea saytida, o‘z HiKorea akkauntingiz bilan bo‘ladi. Bu yerda bo‘sh kunlarni ko‘rasiz.';
+
+  @override
+  String get hkLegendLater => 'Hali ochilmagan';
+
+  @override
+  String get hkWatchShort => 'Kuzatish';
+
+  @override
+  String get hkStale =>
+      'Bu bo‘limni oxirgi paytda tekshira olmadik — kunlar eskirgan bo‘lishi mumkin.';
+
+  @override
+  String get accountGuest => 'Mehmon';
+
+  @override
+  String get accountGuestBody =>
+      'Kirsangiz, izohlaringizda ismingiz ko‘rinadi, kuzatuvlaringiz esa yangi telefonga ham o‘tadi.';
+
+  @override
+  String get accountSignIn => 'Kirish';
+
+  @override
+  String get accountNoPhoto => 'WhatsApp profil rasmini ilovalarga bermaydi.';
+
+  @override
+  String get accountNotifications => 'Bildirishnomalar';
+
+  @override
+  String get accountPushOffTitle => 'Bildirishnomalar o‘chiq';
+
+  @override
+  String get accountTurnOn => 'Yoqish';
+
+  @override
+  String get accountWhatComes =>
+      'HiKorea\'da joy ochilishi, kuzatayotgan joy va hududlaringiz yangiliklari, e’lonlar.';
+
+  @override
+  String get accountTelegramToo =>
+      'Ular Telegram\'dagi Muslim Vegukin botidan ham keladi.';
+
+  @override
+  String get accountTestPush => 'Sinov bildirishnomasi';
+
+  @override
+  String get accountTestSent => 'Yuborildi — telefoningizda ko‘ring';
+
+  @override
+  String get accountTestFailed =>
+      'Yuborib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.';
+
+  @override
+  String get accountActivity => 'Faoliyatingiz';
+
+  @override
+  String get accountInboxNone => 'Hozircha xabar yo‘q';
+
+  @override
+  String accountInboxAll(int count) {
+    return '$count ta xabar';
+  }
+
+  @override
+  String get accountApp => 'Ilova';
+
+  @override
+  String get accountLanguage => 'Til';
+
+  @override
+  String get accountDarkMode => 'Tungi rejim';
+
+  @override
+  String get accountManage => 'Akkauntni boshqarish';
+
+  @override
+  String accountActive(int count) {
+    return '$count ta faol';
+  }
 
   @override
   String get themeToDay => 'Kunduzgi rejim';

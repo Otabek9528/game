@@ -2047,7 +2047,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get accountPushOff =>
-      'Уведомления выключены. Включите их в настройках.';
+      'Сообщения всё равно попадут во «Входящие», но телефон их не покажет.';
 
   @override
   String get pushOpen => 'Открыть';
@@ -2092,7 +2092,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get hkLede =>
-      'Каждые 5 минут проверяем HiKorea и сообщаем, как только в выбранные вами дни появится свободное место.';
+      'Смотрите свободные дни в своём офисе. Если всё занято, включите слежение — сообщим, как только появится место.';
 
   @override
   String get hkSearchHint => 'Поиск офиса';
@@ -2116,13 +2116,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get hkLastViewed => 'Недавно смотрели';
 
   @override
-  String get hkStep1 => 'Выберите офис';
+  String get hkStep1 => 'Найдите свой офис';
 
   @override
   String get hkStep2 => 'Посмотрите свободные дни';
 
   @override
-  String get hkStep3 => 'Узнайте, когда появится место';
+  String get hkStep3 => 'Запишитесь на HiKorea';
 
   @override
   String get hkAddressCardTitle => 'Не знаете свой офис?';
@@ -2424,6 +2424,188 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get hkPickOffice => 'Выбрать офис';
+
+  @override
+  String get hkStep1Body => 'По названию или по домашнему адресу';
+
+  @override
+  String get hkStep2Body =>
+      'Следующие 3 месяца каждого окна, обновляются каждые 5 минут';
+
+  @override
+  String get hkStep3Body =>
+      'Если всё занято — включите слежение, сообщим, когда появится место';
+
+  @override
+  String get hkHowTitle => 'Как это работает';
+
+  @override
+  String get hkStartTitle => 'Какой офис ваш?';
+
+  @override
+  String get hkStartBody =>
+      'Это зависит от адреса: каждый офис обслуживает свои районы.';
+
+  @override
+  String get hkStartOr => 'или выберите в списке ниже';
+
+  @override
+  String get hkYourWatches => 'Ваши слежения';
+
+  @override
+  String hkSeeAll(int count) {
+    return 'Все ($count)';
+  }
+
+  @override
+  String hkWatchFree(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'В ваши даты $n свободных дней',
+      few: 'В ваши даты $n свободных дня',
+      one: 'В ваши даты $n свободный день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hkWatchFull => 'Всё занято — следим';
+
+  @override
+  String hkEarliestShort(String day) {
+    return 'Ближайший свободный: $day';
+  }
+
+  @override
+  String get hkAllFullShort => 'Сейчас все дни заняты';
+
+  @override
+  String get hkOfficeMain => 'Иммиграционный офис';
+
+  @override
+  String get hkOfficeBranch => 'Филиал';
+
+  @override
+  String hkOfficeBranchOf(String office) {
+    return 'Филиал · $office';
+  }
+
+  @override
+  String get hkAllOffices => 'Все офисы';
+
+  @override
+  String hkFreeDays(int n, String date) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n свободных дней до $date',
+      few: '$n свободных дня до $date',
+      one: '$n свободный день до $date',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String hkBookedUntil(String date) {
+    return 'Занято до $date. Включите слежение — сообщим, как только появится место.';
+  }
+
+  @override
+  String get hkHowBooking =>
+      'Запись — на сайте HiKorea, со своей учётной записью HiKorea. Здесь вы видите свободные дни.';
+
+  @override
+  String get hkLegendLater => 'Запись ещё не открыта';
+
+  @override
+  String get hkWatchShort => 'Следить';
+
+  @override
+  String get hkStale =>
+      'Это окно давно не удавалось проверить — дни могут быть устаревшими.';
+
+  @override
+  String get accountGuest => 'Гость';
+
+  @override
+  String get accountGuestBody =>
+      'Войдите — ваше имя будет видно в отзывах, а слежения перейдут и на новый телефон.';
+
+  @override
+  String get accountSignIn => 'Войти';
+
+  @override
+  String get accountNoPhoto => 'WhatsApp не передаёт фото профиля приложениям.';
+
+  @override
+  String get accountNotifications => 'Уведомления';
+
+  @override
+  String get accountPushOffTitle => 'Уведомления выключены';
+
+  @override
+  String get accountTurnOn => 'Включить';
+
+  @override
+  String get accountWhatComes =>
+      'Свободные места на HiKorea, новости мест и районов, за которыми вы следите, и объявления.';
+
+  @override
+  String get accountTelegramToo =>
+      'Они приходят и от бота Muslim Vegukin в Telegram.';
+
+  @override
+  String get accountTestPush => 'Тестовое уведомление';
+
+  @override
+  String get accountTestSent => 'Отправлено — посмотрите на телефоне';
+
+  @override
+  String get accountTestFailed =>
+      'Не удалось отправить. Попробуйте чуть позже.';
+
+  @override
+  String get accountActivity => 'Ваша активность';
+
+  @override
+  String get accountInboxNone => 'Сообщений пока нет';
+
+  @override
+  String accountInboxAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сообщений',
+      few: '$count сообщения',
+      one: '$count сообщение',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountApp => 'Приложение';
+
+  @override
+  String get accountLanguage => 'Язык';
+
+  @override
+  String get accountDarkMode => 'Тёмная тема';
+
+  @override
+  String get accountManage => 'Управление аккаунтом';
+
+  @override
+  String accountActive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count активных',
+      few: '$count активных',
+      one: '$count активное',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get themeToDay => 'Дневной режим';

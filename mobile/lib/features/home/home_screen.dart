@@ -104,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _services.prayer.refresh();
       _services.reminders.checkNotifications();
       _services.account.refreshInbox();
+      _services.account.recheckPush();
       _takeWidgetAction();
     }
   }
@@ -278,11 +279,17 @@ class _Header extends StatelessWidget {
                 ),
               ),
               _InboxButton(account: account, onTap: onInbox),
+              // Who the app is signed in as, at a glance: their photo or initials.
               IconButton(
                 onPressed: onAccount,
                 tooltip: s.accountTitle,
                 visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
+                icon: ListenableBuilder(
+                  listenable: account,
+                  builder: (context, _) => account.signedIn
+                      ? AccountAvatar(account: account, size: 28, onDark: true)
+                      : const Icon(Icons.account_circle_outlined, color: Colors.white),
+                ),
               ),
               _ThemeButton(onTap: onTheme),
               const SizedBox(width: 8),

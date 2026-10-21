@@ -16,7 +16,7 @@ import 'push.dart';
 /// is attached.
 @immutable
 class AppUser {
-  const AppUser({required this.id, this.signedIn = false, this.provider, this.name, this.detail});
+  const AppUser({required this.id, this.signedIn = false, this.provider, this.name, this.detail, this.photo});
 
   /// The id the server knows this person by: their Telegram id when signed in
   /// with Telegram, a negative number otherwise.
@@ -30,6 +30,10 @@ class AppUser {
   /// Their email, number or @username.
   final String? detail;
 
+  /// The profile photo's version, when the sign-in brought one (Telegram's,
+  /// Google's): it changes when the photo does.
+  final String? photo;
+
   static AppUser? fromJson(Object? json) {
     if (json is! Map<String, dynamic>) return null;
     final id = json['id'];
@@ -40,11 +44,12 @@ class AppUser {
       provider: json['provider'] as String?,
       name: json['name'] as String?,
       detail: json['detail'] as String?,
+      photo: json['photo'] as String?,
     );
   }
 
   Map<String, Object?> toJson() =>
-      {'id': id, 'signedIn': signedIn, 'provider': provider, 'name': name, 'detail': detail};
+      {'id': id, 'signedIn': signedIn, 'provider': provider, 'name': name, 'detail': detail, 'photo': photo};
 }
 
 /// An alert that was pushed to this person, as the inbox keeps it.
@@ -137,6 +142,12 @@ abstract interface class AccountSource {
 
   /// Newest first, a page at a time; [before]: the last id of the page before.
   Future<(List<InboxItem> items, bool more)> inbox(String token, {int? before});
+
+  /// The signed-in account's profile photo; null when it has none.
+  Future<Uint8List?> photo(String token);
+
+  /// A notification to this phone, to see that they arrive.
+  Future<void> testPush(String token);
 }
 
 class HttpAccountSource implements AccountSource {
@@ -226,6 +237,27 @@ class HttpAccountSource implements AccountSource {
   Future<void> delete(String token) => _call('DELETE', 'api/app/me', token: token);
 
   @override
+  Future<Uint8List?> photo(String token) async {
+    final request = http.Request('GET', AppConfig.apiBase.resolve('api/app/me/photo'))
+      ..headers['Authorization'] = 'Bearer $token';
+    try {
+      final response = await http.Response.fromStream(await _http.send(request).timeout(_timeout));
+      if (response.statusCode == 404) return null;
+      if (response.statusCode != 200) throw AccountException('server_error', response.statusCode);
+      return response.bodyBytes;
+    } on SocketException {
+      throw const AccountException('offline');
+    } on http.ClientException {
+      throw const AccountException('offline');
+    } on TimeoutException {
+      throw const AccountException('offline');
+    }
+  }
+
+  @override
+  Future<void> testPush(String token) => _call('POST', 'api/app/me/test-push', token: token);
+
+  @override
   Future<(List<InboxItem>, bool)> inbox(String token, {int? before}) async {
     final json = await _call('GET', before == null ? 'api/app/inbox' : 'api/app/inbox?before=$before', token: token);
     return (
@@ -255,6 +287,14 @@ class AccountController extends ChangeNotifier {
     } on FormatException {
       _user = null;
     }
+    // The photo kept from before shows at once, offline too.
+    if (_user?.photo case final version? when _store.read(_photoVersionKey) == version) {
+      try {
+        _photo = base64Decode(_store.read(_photoKey) ?? '');
+      } on FormatException {
+        _photo = null;
+      }
+    }
   }
 
   final KeyValueStore _store;
@@ -266,6 +306,8 @@ class AccountController extends ChangeNotifier {
   static const _tokenKey = 'app_session';
   static const _userKey = 'app_user';
   static const _seenKey = 'inbox_seen';
+  static const _photoKey = 'app_photo';
+  static const _photoVersionKey = 'app_photo_v';
 
   /// The language the server was last told: its alerts, and the bots' sign-in
   /// questions, are written in it.
@@ -282,11 +324,19 @@ class AccountController extends ChangeNotifier {
 
   static void _ignore(PushMessage _) {}
 
+  Uint8List? _photo;
+
+  /// The photo version being fetched, so it is fetched once.
+  String? _photoFetching;
+
   List<InboxItem> _inbox = const [];
   bool _inboxMore = false;
   int _inboxSeen = 0;
 
   AppUser? get user => _user;
+
+  /// The signed-in account's profile photo (Telegram's, Google's), once fetched.
+  Uint8List? get photo => _user?.photo == null ? null : _photo;
 
   /// What was pushed to this person, newest first, as far as loaded.
   List<InboxItem> get inbox => _inbox;
@@ -329,6 +379,16 @@ class AccountController extends ChangeNotifier {
         notifyListeners();
       });
 
+  /// Looks again whether notifications are allowed: back from the phone's
+  /// settings, say.
+  Future<void> recheckPush() async {
+    if (_pushStarted == null) return;
+    final allowed = await _push.isAllowed();
+    if (allowed == _pushAllowed) return;
+    _pushAllowed = allowed;
+    notifyListeners();
+  }
+
   /// The account, created when missing. Safe to call again and again.
   Future<void> ensure() => _starting ??= _ensure().whenComplete(() => _starting = null);
 
@@ -364,12 +424,45 @@ class AccountController extends ChangeNotifier {
       _clearInbox();
       unawaited(refreshInbox());
     }
+    unawaited(_syncPhoto());
     notifyListeners();
+  }
+
+  /// Fetches the photo when its version is new; forgets it when there is none.
+  Future<void> _syncPhoto() async {
+    final version = _user?.photo, session = _token;
+    if (version == null) {
+      if (_photo == null) return;
+      _photo = null;
+      _store.write(_photoKey, '');
+      _store.write(_photoVersionKey, '');
+      notifyListeners();
+      return;
+    }
+    if (session == null || _photoFetching == version || (_photo != null && _store.read(_photoVersionKey) == version)) {
+      return;
+    }
+    _photoFetching = version;
+    try {
+      final photo = await _source.photo(session);
+      if (_user?.photo != version) return;
+      _photo = photo;
+      _store.write(_photoKey, photo == null ? '' : base64Encode(photo));
+      _store.write(_photoVersionKey, photo == null ? '' : version);
+      notifyListeners();
+    } on AccountException {
+      // The initials meanwhile; tried again with the next look at the account.
+    } finally {
+      if (_photoFetching == version) _photoFetching = null;
+    }
   }
 
   void _forget() {
     _token = null;
     _user = null;
+    _photo = null;
+    _store.write(_photoKey, '');
+    _store.write(_photoVersionKey, '');
     _store.write(_tokenKey, '');
     _store.write(_userKey, 'null');
     _clearInbox();
@@ -430,6 +523,9 @@ class AccountController extends ChangeNotifier {
     _store.write(_seenKey, '$newest');
     notifyListeners();
   }
+
+  /// A notification to this phone now, in the app's language.
+  Future<void> sendTestPush() async => _source.testPush(await _session());
 
   /// The app's language changed: notifications from now on come in it.
   Future<void> languageChanged() async {

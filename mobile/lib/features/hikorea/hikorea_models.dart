@@ -96,8 +96,10 @@ class HkMatch {
   }
 }
 
-/// How booked a day is, as far as the counter's list shows.
-enum HkTier { open, some, full, closed }
+/// How booked a day is: [open] (half or more free), [some] (filling up),
+/// [full], [closed] (no appointments that day), [later] (past the booking
+/// window: not taken yet).
+enum HkTier { open, some, full, closed, later }
 
 /// Which days a counter takes appointments on.
 @immutable
@@ -131,6 +133,7 @@ class HkCalendar {
     required this.deskSeq,
     this.listed = const {},
     this.schedule,
+    this.capacity = const {},
     this.checkedAt,
     this.status = 'unknown',
   }) : days = _days(listed, schedule);
@@ -141,7 +144,10 @@ class HkCalendar {
   final Map<String, int> listed;
   final HkSchedule? schedule;
 
-  /// When the server last looked.
+  /// Days whose timetable the server has read: how many appointments each takes.
+  final Map<String, int> capacity;
+
+  /// When the server last read this counter.
   final DateTime? checkedAt;
 
   /// 'ok', 'failing' or 'unknown'.
@@ -165,8 +171,14 @@ class HkCalendar {
     return days;
   }
 
+  /// The last day one can book now; null when nothing is known.
+  late final DateTime? windowEnd = () {
+    final ends = [?schedule?.last, ...days.keys]..sort();
+    return ends.isEmpty ? null : parseYmd(ends.last);
+  }();
+
   /// The most booked day of each weekday: as near as the list gets to a day's
-  /// capacity.
+  /// capacity, for days whose timetable hasn't been read.
   late final Map<int, int> _busiest = () {
     final most = <int, int>{};
     for (final MapEntry(:key, :value) in days.entries) {
@@ -179,29 +191,49 @@ class HkCalendar {
   /// How booked [day] is, and how full (0–1) for the bar under it.
   (HkTier, double) tierOf(String day) {
     final taken = days[day];
-    if (taken == null) return (HkTier.closed, 0);
+    if (taken == null) {
+      final end = windowEnd;
+      return (end != null && parseYmd(day)!.isAfter(end) ? HkTier.later : HkTier.closed, 0);
+    }
+    if (capacity[day] case final cap? when cap > 0) {
+      final ratio = (taken / cap).clamp(0.0, 1.0);
+      if (taken >= cap) return (HkTier.full, 1);
+      return (ratio < 0.5 ? HkTier.open : HkTier.some, ratio);
+    }
     if (taken == 0) return (HkTier.open, 0);
     final most = _busiest[parseYmd(day)!.weekday] ?? taken;
     final ratio = (taken / most).clamp(0.0, 1.0);
     return (ratio >= 1 ? HkTier.full : HkTier.some, ratio);
   }
 
-  /// The first day from [today] on that isn't fully booked.
-  DateTime? earliestOpen(DateTime today) {
-    final from = ymdOf(today);
-    final open = [for (final d in days.keys) if (d.compareTo(from) >= 0 && tierOf(d).$1 != HkTier.full) d]..sort();
-    return open.isEmpty ? null : parseYmd(open.first);
+  /// Days from [today] on that aren't fully booked, in order.
+  List<DateTime> openDays(DateTime today, {DateTime? until}) {
+    final from = ymdOf(today), to = until == null ? null : ymdOf(until);
+    final open = [
+      for (final d in days.keys)
+        if (d.compareTo(from) >= 0 && (to == null || d.compareTo(to) <= 0) && tierOf(d).$1 != HkTier.full) d,
+    ]..sort();
+    return [for (final d in open) parseYmd(d)!];
   }
 
+  /// The first day from [today] on that isn't fully booked.
+  DateTime? earliestOpen(DateTime today) => openDays(today).firstOrNull;
+
   static HkCalendar fromJson(Map<String, dynamic> json) {
-    final checked = json['last_polled_at'];
+    final checked = json['desk_checked_at'] ?? json['last_polled_at'];
+    final dates = [for (final d in (json['dates'] as List?) ?? const []) if (d is Map<String, dynamic> && d['visi_ymd'] is String) d];
+    final capacity = json['day_capacity'];
     return HkCalendar(
       deskSeq: _int(json['desk_seq']),
-      listed: {
-        for (final d in (json['dates'] as List?) ?? const [])
-          if (d is Map<String, dynamic> && d['visi_ymd'] is String) d['visi_ymd'] as String: _int(d['taken']),
-      },
+      listed: {for (final d in dates) d['visi_ymd'] as String: _int(d['taken'])},
       schedule: HkSchedule.fromJson(json['schedule']),
+      capacity: {
+        if (capacity is Map)
+          for (final MapEntry(:key, :value) in capacity.entries)
+            if (key is String && value is num && value > 0) key: value.toInt(),
+        for (final d in dates)
+          if (d['capacity'] case final num cap when cap > 0) d['visi_ymd'] as String: cap.toInt(),
+      },
       checkedAt: checked is String ? DateTime.tryParse(checked)?.toLocal() : null,
       status: json['desk_status'] as String? ?? 'unknown',
     );

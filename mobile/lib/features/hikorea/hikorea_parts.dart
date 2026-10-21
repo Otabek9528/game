@@ -62,18 +62,20 @@ class HkBadge extends StatelessWidget {
   }
 }
 
-/// A heading over a list.
+/// A heading over a list; [trailing] a count, or [action] a link.
 class HkHeading extends StatelessWidget {
-  const HkHeading(this.text, {super.key, this.trailing});
+  const HkHeading(this.text, {super.key, this.trailing, this.action, this.onAction});
 
   final String text;
   final String? trailing;
+  final String? action;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 18, 4, 10),
+      padding: EdgeInsets.fromLTRB(4, 18, 4, action == null ? 10 : 4),
       child: Row(
         children: [
           Expanded(
@@ -81,6 +83,12 @@ class HkHeading extends StatelessWidget {
           ),
           if (trailing case final trailing?)
             Text(trailing, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: p.inkMuted)),
+          if (action case final action?)
+            TextButton(
+              onPressed: onAction,
+              style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+              child: Text(action),
+            ),
         ],
       ),
     );
@@ -116,6 +124,7 @@ enum HkTone { open, filling, low, none }
     HkTier.some => (background: const Color(0xFFFCD34D), ink: const Color(0xFF78350F)),
     HkTier.full => (background: const Color(0xFFFCA5A5), ink: const Color(0xFF7F1D1D)),
     HkTier.closed => (background: p.badge, ink: p.inkMuted),
+    HkTier.later => (background: Colors.transparent, ink: p.inkMuted),
   };
 }
 

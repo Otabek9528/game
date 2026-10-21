@@ -70,8 +70,13 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
         listenable: _kit,
         builder: (context, _) {
           final offices = _kit.offices;
-          final shown = [for (final o in offices ?? const <HkOffice>[]) if (o.matches(_query)) o];
+          final shown = [for (final o in offices ?? const <HkOffice>[]) if (o.matches(_query)) o]
+            ..sort((a, b) => officeParts(a.nameEn).place.toLowerCase().compareTo(officeParts(b.nameEn).place.toLowerCase()));
           final searching = _query.trim().isNotEmpty;
+          final watches = _kit.watches ?? const <HkWatch>[];
+          final last = _kit.lastDesk == null ? null : _kit.deskOf(_kit.lastDesk!);
+          // Someone new: no watch, no counter looked at yet.
+          final newcomer = watches.isEmpty && last == null;
           return RefreshIndicator(
             onRefresh: _refresh,
             edgeOffset: MediaQuery.paddingOf(context).top + kToolbarHeight,
@@ -103,16 +108,38 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
                   ),
                 ),
                 SliverPadding(
-                  padding: EdgeInsets.fromLTRB(14, 14, 14, 28 + MediaQuery.paddingOf(context).bottom),
+                  padding: EdgeInsets.fromLTRB(14, 4, 14, 28 + MediaQuery.paddingOf(context).bottom),
                   sliver: SliverList.list(
                     children: [
                       if (!searching) ...[
-                        _WatchingCard(kit: _kit),
-                        _LastCounter(kit: _kit),
-                        if ((_kit.watches?.isEmpty ?? true) && _kit.lastDesk == null) const _Steps(),
-                        _AddressCard(kit: _kit),
+                        // What is theirs first: the watches, and how they stand now.
+                        if (watches.isNotEmpty) ...[
+                          HkHeading(s.hkYourWatches,
+                              action: watches.length > 2 ? s.hkSeeAll(watches.length) : null,
+                              onAction: () => openWatches(context, _kit)),
+                          for (final watch in watches.take(2))
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: _WatchTile(kit: _kit, watch: watch),
+                            ),
+                        ],
+                        if (last case (final office, final desk)) ...[
+                          HkHeading(s.hkLastViewed),
+                          _CounterTile(kit: _kit, office: office, desk: desk),
+                        ],
+                        // Then, for someone new, where to start; for the others, a quiet way back to it.
+                        // (Offline, the message saying so comes first.)
+                        if (newcomer && offices != null) ...[
+                          const SizedBox(height: 14),
+                          _StartCard(kit: _kit),
+                          const _HowItWorks(),
+                        ] else if (!newcomer) ...[
+                          const SizedBox(height: 10),
+                          _AddressRow(kit: _kit),
+                        ],
                       ],
-                      HkHeading(s.hkOffices, trailing: offices == null ? null : '${shown.length}'),
+                      HkHeading(searching ? s.hkOffices : s.hkAllOffices,
+                          trailing: offices == null ? null : '${shown.length}'),
                       if (offices == null && _failed)
                         QnaMessage(
                           icon: Icons.wifi_off_rounded,
@@ -256,156 +283,283 @@ class _WatchesButton extends StatelessWidget {
   }
 }
 
-/// The watches running now, one tap from their list.
-class _WatchingCard extends StatelessWidget {
-  const _WatchingCard({required this.kit});
+/// The calendar of a counter, kept fresh while the tile shows; [builder]
+/// gets null until it is in.
+class _Live extends StatefulWidget {
+  const _Live({required this.kit, required this.desk, required this.builder});
 
   final HikoreaKit kit;
+  final int desk;
+  final Widget Function(BuildContext context, HkCalendar? calendar) builder;
+
+  @override
+  State<_Live> createState() => _LiveState();
+}
+
+class _LiveState extends State<_Live> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(widget.kit.loadCalendar(widget.desk));
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, widget.kit.calendarOf(widget.desk));
+}
+
+/// How a counter stands, in a line: a pill, or a quiet wait while it loads.
+class _StandLine extends StatelessWidget {
+  const _StandLine({required this.text, required this.tone});
+
+  final String? text;
+  final HkTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final watches = kit.watches ?? const <HkWatch>[];
-    if (watches.isEmpty) return const SizedBox.shrink();
+    final text = this.text;
+    if (text == null) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 6),
+        child: SizedBox(width: 90, height: 3, child: LinearProgressIndicator()),
+      );
+    }
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: HkPill(text, tone: tone, icon: tone == HkTone.open ? Icons.event_available_rounded : Icons.hourglass_top_rounded),
+    );
+  }
+}
+
+/// A watch: whose counter, which days, and whether any of them is free now.
+class _WatchTile extends StatelessWidget {
+  const _WatchTile({required this.kit, required this.watch});
+
+  final HikoreaKit kit;
+  final HkWatch watch;
+
+  @override
+  Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final next = watches.first;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: HkCard(
-        onTap: () => openWatches(context, kit),
-        color: Color.alphaBlend(p.gold.withValues(alpha: 0.12), p.card),
-        edge: p.gold.withValues(alpha: 0.45),
-        child: Row(
-          children: [
-            const HkBadge('👁️'),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+    final found = kit.deskOf(watch.deskSeq);
+    final booth = watchBooth(watch, kit.language);
+    return HkCard(
+      onTap: found == null
+          ? () => openWatches(context, kit)
+          : () {
+              HapticFeedback.selectionClick();
+              Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => HkCalendarScreen(kit: kit, office: found.$1, desk: found.$2),
+              ));
+            },
+      color: Color.alphaBlend(p.gold.withValues(alpha: 0.10), p.card),
+      edge: p.gold.withValues(alpha: 0.4),
+      child: Row(
+        children: [
+          const HkBadge('🔔'),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  officeParts(watch.officeNameEn).place,
+                  style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: p.ink),
+                ),
+                Text(
+                  '${dayMonth(watch.start, kit.language)} – ${dayMonth(watch.end, kit.language)}',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: p.ink),
+                ),
+                if (booth.isNotEmpty && (found == null || found.$1.desks.length > 1))
+                  Text(booth, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: p.inkSoft)),
+                const SizedBox(height: 8),
+                _Live(
+                  kit: kit,
+                  desk: watch.deskSeq,
+                  builder: (context, calendar) {
+                    if (calendar == null) return const _StandLine(text: null, tone: HkTone.none);
+                    final today = kit.today;
+                    final free = calendar.openDays(watch.start.isAfter(today) ? watch.start : today, until: watch.end);
+                    return free.isEmpty
+                        ? _StandLine(text: s.hkWatchFull, tone: HkTone.none)
+                        : _StandLine(text: s.hkWatchFree(free.length), tone: HkTone.open);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.chevron_right_rounded, color: p.inkMuted),
+        ],
+      ),
+    );
+  }
+}
+
+/// The counter looked at last, with its earliest free day, so coming back
+/// is one tap and often none.
+class _CounterTile extends StatelessWidget {
+  const _CounterTile({required this.kit, required this.office, required this.desk});
+
+  final HikoreaKit kit;
+  final HkOffice office;
+  final HkDesk desk;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    final booth = boothName(desk, kit.language);
+    return HkCard(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (_) => HkCalendarScreen(kit: kit, office: office, desk: desk),
+        ));
+      },
+      child: Row(
+        children: [
+          const HkBadge('🗓️'),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  officeParts(office.nameEn).place,
+                  style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: p.ink),
+                ),
+                if (office.desks.length > 1 && booth.name.isNotEmpty)
                   Text(
-                    s.hkActiveWatches(watches.length),
-                    style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: p.ink),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${officeName(next.officeNameEn)} · ${dayMonth(next.start, kit.language)} – ${dayMonth(next.end, kit.language)}',
+                    booth.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 13, color: p.inkSoft),
                   ),
-                ],
-              ),
+                const SizedBox(height: 8),
+                _Live(
+                  kit: kit,
+                  desk: desk.seq,
+                  builder: (context, calendar) {
+                    if (calendar == null) return const _StandLine(text: null, tone: HkTone.none);
+                    final earliest = calendar.earliestOpen(kit.today);
+                    return earliest == null
+                        ? _StandLine(text: s.hkAllFullShort, tone: HkTone.none)
+                        : _StandLine(
+                            text: s.hkEarliestShort('${weekdayName(earliest, kit.language)}, ${dayMonth(earliest, kit.language)}'),
+                            tone: HkTone.open,
+                          );
+                  },
+                ),
+              ],
             ),
-            Icon(Icons.chevron_right_rounded, color: p.inkMuted),
-          ],
-        ),
+          ),
+          Icon(Icons.chevron_right_rounded, color: p.inkMuted),
+        ],
       ),
     );
   }
 }
 
-/// The counter looked at last, so coming back is one tap.
-class _LastCounter extends StatelessWidget {
-  const _LastCounter({required this.kit});
+/// Where someone new starts: their office depends on their address.
+class _StartCard extends StatelessWidget {
+  const _StartCard({required this.kit});
 
   final HikoreaKit kit;
 
   @override
   Widget build(BuildContext context) {
-    final seq = kit.lastDesk;
-    final found = seq == null ? null : kit.deskOf(seq);
-    if (found == null) return const SizedBox.shrink();
-    final (office, desk) = found;
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final booth = boothName(desk, kit.language);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: HkCard(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (_) => HkCalendarScreen(kit: kit, office: office, desk: desk),
-          ));
-        },
-        child: Row(
-          children: [
-            const HkBadge('🗓️'),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    s.hkLastViewed.toUpperCase(),
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: p.accent),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    officeName(office.nameEn),
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink),
-                  ),
-                  if (office.desks.length > 1 && booth.name.isNotEmpty)
-                    Text(
-                      booth.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 13, color: p.inkSoft),
-                    ),
-                ],
+    return HkCard(
+      color: p.cardSelected,
+      edge: p.accent.withValues(alpha: 0.25),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Text('📍', style: TextStyle(fontSize: 22)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  s.hkStartTitle,
+                  style: TextStyle(fontFamily: Brand.displayFont, fontSize: 20, fontWeight: FontWeight.w700, color: p.ink),
+                ),
               ),
-            ),
-            Icon(Icons.chevron_right_rounded, color: p.inkMuted),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(s.hkStartBody, style: TextStyle(fontSize: 14, height: 1.45, color: p.inkSoft)),
+          const SizedBox(height: 14),
+          FilledButton.icon(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => HkAddressScreen(kit: kit)));
+            },
+            icon: const Icon(Icons.home_work_outlined),
+            label: Text(s.hkAddressTitle),
+          ),
+          const SizedBox(height: 6),
+          Text(s.hkStartOr, textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: p.inkMuted)),
+        ],
       ),
     );
   }
 }
 
-/// How it works, for someone new to it.
-class _Steps extends StatelessWidget {
-  const _Steps();
+/// How it works, for someone new: find, see, book (or watch).
+class _HowItWorks extends StatelessWidget {
+  const _HowItWorks();
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    Widget step(int n, String text) => Expanded(
-          child: Column(
+    Widget step(int n, String title, String body) => Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 30,
-                height: 30,
+                width: 26,
+                height: 26,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(color: p.accent, shape: BoxShape.circle),
-                child: Text('$n', style: const TextStyle(fontWeight: FontWeight.w800, color: Colors.white)),
+                child: Text('$n', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
               ),
-              const SizedBox(height: 8),
-              Text(
-                text,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12.5, height: 1.3, fontWeight: FontWeight.w600, color: p.inkSoft),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink)),
+                    Text(body, style: TextStyle(fontSize: 13, height: 1.35, color: p.inkSoft)),
+                  ],
+                ),
               ),
             ],
           ),
         );
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: HkCard(
-        padding: const EdgeInsets.fromLTRB(8, 16, 8, 14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [step(1, s.hkStep1), step(2, s.hkStep2), step(3, s.hkStep3)],
-        ),
+      padding: const EdgeInsets.fromLTRB(4, 18, 4, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(s.hkHowTitle.toUpperCase(),
+              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: p.inkMuted)),
+          step(1, s.hkStep1, s.hkStep1Body),
+          step(2, s.hkStep2, s.hkStep2Body),
+          step(3, s.hkStep3, s.hkStep3Body),
+        ],
       ),
     );
   }
 }
 
-class _AddressCard extends StatelessWidget {
-  const _AddressCard({required this.kit});
+/// The address finder, for those who already know their way.
+class _AddressRow extends StatelessWidget {
+  const _AddressRow({required this.kit});
 
   final HikoreaKit kit;
 
@@ -418,22 +572,15 @@ class _AddressCard extends StatelessWidget {
         HapticFeedback.lightImpact();
         Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => HkAddressScreen(kit: kit)));
       },
-      color: p.cardSelected,
-      edge: p.accent.withValues(alpha: 0.25),
+      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
       child: Row(
         children: [
-          const HkBadge('📍'),
+          Icon(Icons.home_work_outlined, color: p.accent),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(s.hkAddressCardTitle, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink)),
-                const SizedBox(height: 2),
-                Text(s.hkAddressCardBody, style: TextStyle(fontSize: 13, color: p.inkSoft)),
-              ],
-            ),
+            child: Text(s.hkAddressCardTitle, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink)),
           ),
+          Text(s.hkAddressTitle, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: p.accent)),
           Icon(Icons.chevron_right_rounded, color: p.accent),
         ],
       ),
@@ -441,37 +588,60 @@ class _AddressCard extends StatelessWidget {
   }
 }
 
-/// An office in a list: its short code, names, and how many counters.
+/// An office in a list: its place first (every name ends alike), what it
+/// is, how many counters, and its Korean name as letters and signs have it.
 class OfficeRow extends StatelessWidget {
   const OfficeRow({super.key, required this.office, required this.onTap, this.subtitle});
 
   final HkOffice office;
   final VoidCallback onTap;
 
-  /// Instead of the Korean name and counters.
+  /// Instead of the Korean name.
   final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final code = office.shortCode;
-    final below = subtitle ??
-        [if (office.nameKo case final ko? when ko.isNotEmpty) ko, s.hkCounters(office.desks.length)].join(' · ');
+    final parts = officeParts(office.nameEn);
+    final kind = parts.branch
+        ? (parts.of == null ? s.hkOfficeBranch : s.hkOfficeBranchOf(parts.of!))
+        : s.hkOfficeMain;
+    final below = subtitle ?? office.nameKo;
     return HkCard(
       onTap: onTap,
       padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
       child: Row(
         children: [
-          code == null ? const HkBadge('🏢') : HkBadge(code, emoji: false),
+          Container(
+            width: 42,
+            height: 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: parts.branch ? p.card : p.accent,
+              shape: BoxShape.circle,
+              border: parts.branch ? Border.all(color: p.accent, width: 1.5) : null,
+            ),
+            child: Text(
+              parts.place.characters.first.toUpperCase(),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: parts.branch ? p.accent : Colors.white),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(officeName(office.nameEn), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink)),
-                const SizedBox(height: 2),
-                Text(below, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
+                Text(parts.place, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: p.ink)),
+                const SizedBox(height: 1),
+                Text(
+                  [kind, if (office.desks.isNotEmpty) s.hkCounters(office.desks.length)].join(' · '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, color: p.inkSoft),
+                ),
+                if (below != null && below.isNotEmpty)
+                  Text(below, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: p.inkMuted)),
               ],
             ),
           ),

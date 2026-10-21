@@ -10,6 +10,21 @@ String officeName(String name) {
   return text.toLowerCase().replaceAllMapped(RegExp(r"(^|[\s(-])([a-z])"), (m) => '${m[1]}${m[2]!.toUpperCase()}');
 }
 
+final _branchOfOffice = RegExp(r'^(.+?) Immigration Office (.+?) Branch Office$', caseSensitive: false);
+final _branch = RegExp(r'^(.+?) Branch Office$', caseSensitive: false);
+final _main = RegExp(r'^(.+?) Immigration Office$', caseSensitive: false);
+
+/// An office as its place, and whether it is a branch (of which office):
+/// "Daejeon Immigration Office Cheonan Branch Office" → Cheonan, a branch
+/// of Daejeon. Lists lead with the place: every name ends alike.
+({String place, bool branch, String? of}) officeParts(String name) {
+  final full = officeName(name);
+  if (_branchOfOffice.firstMatch(full) case final m?) return (place: m[2]!, branch: true, of: m[1]);
+  if (_branch.firstMatch(full) case final m?) return (place: m[1]!, branch: true, of: null);
+  if (_main.firstMatch(full) case final m?) return (place: m[1]!, branch: false, of: null);
+  return (place: full, branch: false, of: null);
+}
+
 final _afternoon = RegExp(r'AFTER\s*0?9:36', caseSensitive: false);
 final _bracket = RegExp(r'\s*\(([^()]*)\)');
 final _months = RegExp(
