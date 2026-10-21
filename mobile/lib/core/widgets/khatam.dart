@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 
 /// The eight-pointed star (khatam) the web app already uses as its progress
-/// marker. It is the brand mark here too: simple enough to read at launcher
-/// icon size, and familiar from mosque tilework.
+/// marker. It is the heart of the brand mark too ([Emblem]): simple enough
+/// to read at launcher icon size, and familiar from mosque tilework.
 ///
 /// Points are on a 16×16 grid, the same path as index.html's progress dot.
 const _khatamPoints = <Offset>[
@@ -38,8 +38,66 @@ Path khatamPath(Offset center, double size, {double rotation = 0}) {
   return path..close();
 }
 
-/// The app mark: a gold khatam with an emerald one cut into it and a small
-/// gold one at the heart, on an emerald disc.
+/// The emblem's shapes, in units of the star's half-width (centre to tip).
+/// tool/emblem.py draws the Android icon and splash from the same numbers;
+/// change both together.
+abstract final class Emblem {
+  /// The emerald star cut into the gold one.
+  static const ringCut = 0.76;
+  static const mWidth = 0.69;
+  static const mHeight = 0.54;
+
+  /// Of the M's width.
+  static const mStem = 0.21;
+
+  /// The V's arms leave the top a little wider than the stems.
+  static const mFlare = 1.12;
+
+  /// Depth of the M's top valley, and where the V's underside meets the
+  /// stems, of the M's height.
+  static const mNotch = 0.50;
+  static const mJoin = 0.30;
+
+  /// The small star at the heart, where the opening starts.
+  static const heartStar = 0.28;
+
+  static const cream = Color(0xFFFFF6E0);
+
+  /// The gold star with the emerald one cut out of it: a ring.
+  static Path ring(Offset center, double radius, {double rotation = 0}) => Path()
+    ..fillType = PathFillType.evenOdd
+    ..addPath(khatamPath(center, radius * 2, rotation: rotation), Offset.zero)
+    ..addPath(khatamPath(center, radius * 2 * ringCut, rotation: rotation), Offset.zero);
+
+  /// The M's two stems, and the V that is its middle: M for Muslim, V for
+  /// Vegukin.
+  static (Path stems, Path v) monogram(Offset center, double radius) {
+    final w = mWidth * radius;
+    final h = mHeight * radius;
+    final origin = center - Offset(w / 2, h / 2);
+    Offset p(double x, double y) => origin + Offset(x * w, y * h);
+    Path polygon(List<Offset> points) => Path()..addPolygon(points, true);
+    const t = mStem;
+    const a = mStem * mFlare;
+    final stems = polygon([p(0, 0), p(t, 0), p(t, 1), p(0, 1)])
+      ..addPolygon([p(1 - t, 0), p(1, 0), p(1, 1), p(1 - t, 1)], true);
+    final v = polygon([
+      p(t, 0), p(a, 0), p(0.5, mNotch), p(1 - a, 0), p(1 - t, 0), //
+      p(1 - t, mJoin), p(0.5, 1), p(t, mJoin),
+    ]);
+    return (stems, v);
+  }
+
+  /// The gold of the ring: light top-left, deep bottom-right.
+  static Shader gold(Offset center, double radius) => const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Brand.gold300, Brand.gold500],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+}
+
+/// The app mark: a gold khatam with an emerald one cut into it, and in its
+/// heart the M·V monogram, on an emerald disc.
 class KhatamMark extends StatelessWidget {
   const KhatamMark({super.key, this.size = 96, this.glow = true});
 
@@ -82,26 +140,12 @@ class _MarkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final c = size.center(Offset.zero);
-    final outer = size.width * 0.62;
-    final outerRect = Rect.fromCenter(center: c, width: outer, height: outer);
-
-    canvas.drawPath(
-      khatamPath(c, outer),
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Brand.gold300, Brand.gold500],
-        ).createShader(outerRect),
-    );
-    canvas.drawPath(
-      khatamPath(c, outer * 0.64),
-      Paint()..color = Brand.emerald800,
-    );
-    canvas.drawPath(
-      khatamPath(c, outer * 0.28, rotation: math.pi / 8),
-      Paint()..color = Brand.gold300,
-    );
+    final r = size.width * 0.35;
+    canvas.drawPath(khatamPath(c, r * 2 * Emblem.ringCut), Paint()..color = Brand.emerald800);
+    canvas.drawPath(Emblem.ring(c, r), Paint()..shader = Emblem.gold(c, r));
+    final (stems, v) = Emblem.monogram(c, r);
+    canvas.drawPath(stems, Paint()..color = Emblem.cream);
+    canvas.drawPath(v, Paint()..color = Brand.gold400);
   }
 
   @override

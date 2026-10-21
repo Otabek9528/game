@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Splash before Android 12: brand emerald with the mark in the middle,
-     shown until Flutter draws its first frame. -->
+     shown until Flutter draws its first frame. The same mark, at the same
+     size, as Android 12's splash, so the app's opening starts from it. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/splash_background" />
     <item
-        android:drawable="@drawable/splash_mark_small"
+        android:drawable="@drawable/ic_splash_mark"
         android:gravity="center" />
 </layer-list>

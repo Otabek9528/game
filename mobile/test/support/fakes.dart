@@ -307,6 +307,7 @@ class TestApp {
     List<Locale> device = const [Locale('ko')],
     Size screen = const Size(411, 891),
     double textScale = 1,
+    bool settle = true,
   }) async {
     tester.view
       ..physicalSize = screen * 3
@@ -323,7 +324,7 @@ class TestApp {
 
     await prayer.start();
     await tester.pumpWidget(VegukinApp(services: services, deviceLocales: device));
-    await tester.pumpAndSettle();
+    if (settle) await tester.pumpAndSettle();
   }
 }
 

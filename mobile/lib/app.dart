@@ -9,6 +9,7 @@ import 'core/theme.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/home/home_screen.dart';
 import 'features/onboarding/language_screen.dart';
+import 'features/opening/opening.dart';
 import 'l10n/app_localizations.dart';
 
 class VegukinApp extends StatefulWidget {
@@ -109,6 +110,8 @@ class _VegukinAppState extends State<VegukinApp> {
         locale: (locale.language ?? _guess).locale,
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
+        // At launch, over whichever screen comes first while it loads.
+        builder: (context, child) => Opening(child: child!),
         home: _needsLanguage
             ? LanguageScreen(services: widget.services, initialLanguage: _guess)
             : HomeScreen(services: widget.services),
