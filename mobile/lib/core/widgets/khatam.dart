@@ -44,8 +44,11 @@ Path khatamPath(Offset center, double size, {double rotation = 0}) {
 abstract final class Emblem {
   /// The emerald star cut into the gold one.
   static const ringCut = 0.76;
-  static const mWidth = 0.69;
-  static const mHeight = 0.54;
+  static const mWidth = 0.62;
+  static const mHeight = 0.40;
+
+  /// Below the star's centre, to make room for the roof.
+  static const mCentre = 0.13;
 
   /// Of the M's width.
   static const mStem = 0.21;
@@ -61,6 +64,22 @@ abstract final class Emblem {
   /// The small star at the heart, where the opening starts.
   static const heartStar = 0.28;
 
+  /// The roof, front view: a level ridge, hips that sag as they run down,
+  /// and eave corners that lift; the eave line is lowest in the middle.
+  /// [roofEave]: that lowest point, from the star's centre; the ridge and
+  /// the corners are [roofHeight] and [roofLift] above it.
+  static const roofEave = -0.10;
+  static const roofHeight = 0.17;
+  static const roofLift = 0.08;
+  static const roofWidth = 0.92;
+
+  /// Half the ridge's length.
+  static const roofRidge = 0.26;
+
+  /// Where the hips' and the eave line's curves are pulled to.
+  static const roofSag = 0.25;
+  static const roofCurve = 0.50;
+
   static const cream = Color(0xFFFFF6E0);
 
   /// The gold star with the emerald one cut out of it: a ring.
@@ -69,12 +88,30 @@ abstract final class Emblem {
     ..addPath(khatamPath(center, radius * 2, rotation: rotation), Offset.zero)
     ..addPath(khatamPath(center, radius * 2 * ringCut, rotation: rotation), Offset.zero);
 
+  /// A hanok roof: with the M's stems for pillars, a Korean house.
+  static Path roof(Offset center, double radius) {
+    final half = roofWidth * radius / 2;
+    final ridge = roofRidge * radius;
+    final eave = center.dy + roofEave * radius;
+    final top = eave - roofHeight * radius;
+    final corner = eave - roofLift * radius;
+    final x = center.dx;
+    double hip(double side) => x + side * (ridge + roofSag * (half - ridge));
+    return Path()
+      ..moveTo(x + ridge, top)
+      ..quadraticBezierTo(hip(1), corner, x + half, corner)
+      ..quadraticBezierTo(x + roofCurve * half, eave, x, eave)
+      ..quadraticBezierTo(x - roofCurve * half, eave, x - half, corner)
+      ..quadraticBezierTo(hip(-1), corner, x - ridge, top)
+      ..close();
+  }
+
   /// The M's two stems, and the V that is its middle: M for Muslim, V for
   /// Vegukin.
   static (Path stems, Path v) monogram(Offset center, double radius) {
     final w = mWidth * radius;
     final h = mHeight * radius;
-    final origin = center - Offset(w / 2, h / 2);
+    final origin = center + Offset(-w / 2, mCentre * radius - h / 2);
     Offset p(double x, double y) => origin + Offset(x * w, y * h);
     Path polygon(List<Offset> points) => Path()..addPolygon(points, true);
     const t = mStem;
@@ -96,8 +133,9 @@ abstract final class Emblem {
       ).createShader(Rect.fromCircle(center: center, radius: radius));
 }
 
-/// The app mark: a gold khatam with an emerald one cut into it, and in its
-/// heart the M·V monogram, on an emerald disc.
+/// The app mark, on an emerald disc: a gold khatam with an emerald one cut
+/// into it, and in its heart a Korean house whose pillars and gold V spell
+/// M·V. Islam's star, around a home in Korea, that spells the name.
 class KhatamMark extends StatelessWidget {
   const KhatamMark({super.key, this.size = 96, this.glow = true});
 
@@ -143,6 +181,7 @@ class _MarkPainter extends CustomPainter {
     final r = size.width * 0.35;
     canvas.drawPath(khatamPath(c, r * 2 * Emblem.ringCut), Paint()..color = Brand.emerald800);
     canvas.drawPath(Emblem.ring(c, r), Paint()..shader = Emblem.gold(c, r));
+    canvas.drawPath(Emblem.roof(c, r), Paint()..color = Brand.gold300);
     final (stems, v) = Emblem.monogram(c, r);
     canvas.drawPath(stems, Paint()..color = Emblem.cream);
     canvas.drawPath(v, Paint()..color = Brand.gold400);

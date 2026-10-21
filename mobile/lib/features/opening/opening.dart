@@ -12,8 +12,9 @@ import '../../core/widgets/khatam.dart';
 /// It starts from the system splash screen's picture: the gold star with a
 /// small star at its heart, on emerald (ic_splash_mark.xml, the same size and
 /// place), so the hand-over can't be seen. The star turns, the small star
-/// sinks into the heart, and the M·V rises in its place; the name appears,
-/// and the app shows through. About a second and a half, while the app
+/// sinks into the heart, the M·V rises in its place, and a Korean roof
+/// settles on its pillars: a home in Korea, inside Islam's star. The name
+/// appears, and the app shows through. Under two seconds, while the app
 /// loads behind it. A tap skips it; with animations turned off in the
 /// phone's settings there is none.
 class Opening extends StatefulWidget {
@@ -22,7 +23,7 @@ class Opening extends StatefulWidget {
   final Widget child;
 
   /// How long it plays, fading out included.
-  static const duration = Duration(milliseconds: 1500);
+  static const duration = Duration(milliseconds: 1700);
 
   /// The star's half-width: 29 of the splash icon's 108 units, on Android's
   /// 288 dp splash icon.
@@ -41,7 +42,7 @@ class _OpeningState extends State<Opening> with SingleTickerProviderStateMixin {
   bool _done = false;
 
   // Where the fading out begins.
-  static const _leaving = 0.82;
+  static const _leaving = 0.84;
 
   @override
   void didChangeDependencies() {
@@ -82,7 +83,7 @@ class _OpeningState extends State<Opening> with SingleTickerProviderStateMixin {
                 animation: _play,
                 builder: (context, _) {
                   final t = _play.value;
-                  final name = _phase(t, 0.55, 0.75, Curves.easeOutCubic);
+                  final name = _phase(t, 0.62, 0.80, Curves.easeOutCubic);
                   return Opacity(
                     opacity: 1 - _phase(t, _leaving, 1, Curves.easeInOut),
                     child: ColoredBox(
@@ -140,8 +141,8 @@ class _OpeningPainter extends CustomPainter {
 
     // The star turns an eighth (where it looks as it began), drawing in a
     // breath as it goes; on leaving it opens towards the viewer.
-    final turn = _phase(t, 0.05, 0.40, Curves.easeInOutCubic);
-    final scale = (1 - 0.06 * math.sin(turn * math.pi)) * (1 + 0.08 * _phase(t, 0.82, 1, Curves.easeInCubic));
+    final turn = _phase(t, 0.05, 0.36, Curves.easeInOutCubic);
+    final scale = (1 - 0.06 * math.sin(turn * math.pi)) * (1 + 0.08 * _phase(t, 0.84, 1, Curves.easeInCubic));
     canvas
       ..save()
       ..translate(c.dx, c.dy)
@@ -152,7 +153,7 @@ class _OpeningPainter extends CustomPainter {
     canvas.drawPath(ring, Paint()..shader = Emblem.gold(c, r));
 
     // A glint of light across the gold.
-    final glint = _phase(t, 0.55, 0.80, Curves.easeInOut);
+    final glint = _phase(t, 0.62, 0.86, Curves.easeInOut);
     if (glint > 0 && glint < 1) {
       final along = Offset(r, r) * (2.6 * glint - 1.3);
       canvas.drawPath(
@@ -167,7 +168,7 @@ class _OpeningPainter extends CustomPainter {
     }
 
     // The small star of the splash spins down into the heart.
-    final sink = _phase(t, 0.05, 0.32, Curves.easeInCubic);
+    final sink = _phase(t, 0.05, 0.30, Curves.easeInCubic);
     if (sink < 1) {
       canvas.drawPath(
         khatamPath(c, r * 2 * Emblem.heartStar * (1 - sink), rotation: math.pi / 8 + sink * math.pi / 2),
@@ -177,7 +178,7 @@ class _OpeningPainter extends CustomPainter {
 
     // The M·V rises from its foot: the gold V first, then the stems.
     final (stems, v) = Emblem.monogram(c, r);
-    final foot = c.dy + Emblem.mHeight * r / 2;
+    final foot = c.dy + (Emblem.mCentre + Emblem.mHeight / 2) * r;
     void rise(Path shape, Color color, double amount) {
       if (amount <= 0) return;
       canvas
@@ -187,8 +188,18 @@ class _OpeningPainter extends CustomPainter {
         ..restore();
     }
 
-    rise(v, Brand.gold400, _phase(t, 0.26, 0.50, Curves.easeOutCubic));
-    rise(stems, Emblem.cream, _phase(t, 0.36, 0.60, Curves.easeOutCubic));
+    rise(v, Brand.gold400, _phase(t, 0.24, 0.44, Curves.easeOutCubic));
+    rise(stems, Emblem.cream, _phase(t, 0.32, 0.52, Curves.easeOutCubic));
+
+    // Then the roof comes down onto the pillars, settling with a small give.
+    final roof = _phase(t, 0.46, 0.66);
+    if (roof > 0) {
+      final drop = (1 - Curves.easeOutBack.transform(roof)) * r * 0.35;
+      canvas.drawPath(
+        Emblem.roof(c, r).shift(Offset(0, -drop)),
+        Paint()..color = Brand.gold300.withValues(alpha: Curves.easeOut.transform(math.min(1, roof * 2.5))),
+      );
+    }
     canvas.restore();
   }
 

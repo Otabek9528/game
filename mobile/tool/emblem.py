@@ -1,9 +1,11 @@
 """Draws the app's emblem into the Android icon and splash files.
 
 The emblem: a gold eight-pointed star (khatam) with an emerald star cut into
-it, and in its heart an M whose middle stroke is a gold V: M for Muslim, V
-for Vegukin. The same shapes, with the same numbers, are painted in the app
-by lib/core/widgets/khatam.dart; change both together.
+it, and in its heart a Korean house: a hanok roof on two pillars, the
+pillars and the gold V between them an M. Islam's star, around a home in
+Korea, that spells the name: M for Muslim, V for Vegukin. The same shapes,
+with the same numbers, are painted in the app by
+lib/core/widgets/khatam.dart; change both together.
 
     pip install pillow numpy
     python3 tool/emblem.py            # from mobile/
@@ -20,13 +22,24 @@ RES = 'android/app/src/main/res'
 
 # Shapes, in units of the star's half-width (centre to tip).
 RING_CUT = 0.76      # the emerald star cut into the gold one
-M_WIDTH = 0.69
-M_HEIGHT = 0.54
+M_WIDTH = 0.62
+M_HEIGHT = 0.40
+M_CENTRE = 0.13      # below the star's centre, to make room for the roof
 M_STEM = 0.21        # of the M's width
 M_FLARE = 1.12       # the V's arms leave the top a little wider than the stems
 M_NOTCH = 0.50       # depth of the M's top valley, of its height
 M_JOIN = 0.30        # where the V's underside meets the stems, of its height
 HEART_STAR = 0.28    # the small star at the heart, on the splash screen
+
+# The roof, front view: a level ridge, hips that sag as they run down, and
+# eave corners that lift (cheoma); the eave line is lowest in the middle.
+ROOF_EAVE = -0.10    # lowest point of the eave line, from the star's centre
+ROOF_HEIGHT = 0.17   # ridge above it
+ROOF_LIFT = 0.08     # eave corners above it
+ROOF_WIDTH = 0.92
+ROOF_RIDGE = 0.26    # half the ridge's length
+ROOF_SAG = 0.25      # where the hips' curve is pulled to, along them
+ROOF_CURVE = 0.50    # where the eave line's curve is pulled to, from the middle
 
 EMERALD900 = '#064E3B'
 EMERALD800 = '#065F46'
@@ -49,10 +62,42 @@ def khatam(cx, cy, r, rotation=0.0):
     return out
 
 
+def roof(cx, cy, r):
+    """The roof as [(start), (control, end), ...]: quadratic curves, for a
+    star of half-width r centred on (cx, cy)."""
+    half = ROOF_WIDTH * r / 2
+    ridge = ROOF_RIDGE * r
+    eave = cy + ROOF_EAVE * r
+    top = eave - ROOF_HEIGHT * r
+    corner = eave - ROOF_LIFT * r
+    hip = lambda side: (cx + side * (ridge + ROOF_SAG * (half - ridge)), corner)
+    return [
+        (cx + ridge, top),
+        (hip(1), (cx + half, corner)),
+        ((cx + ROOF_CURVE * half, eave), (cx, eave)),
+        ((cx - ROOF_CURVE * half, eave), (cx - half, corner)),
+        (hip(-1), (cx - ridge, top)),
+    ]
+
+
+def roof_points(cx, cy, r, n=24):
+    """The roof as a polygon, for drawing pictures."""
+    start, *curves = roof(cx, cy, r)
+    out = [start]
+    for (qx, qy), (ex, ey) in curves:
+        sx, sy = out[-1]
+        for i in range(1, n + 1):
+            t = i / n
+            out.append(((1 - t) ** 2 * sx + 2 * (1 - t) * t * qx + t * t * ex,
+                        (1 - t) ** 2 * sy + 2 * (1 - t) * t * qy + t * t * ey))
+    return out
+
+
 def monogram(cx, cy, r):
-    """(left stem, right stem, V) of the M, for a star of half-width r."""
+    """(left stem, right stem, V) of the M, for a star of half-width r
+    centred on (cx, cy)."""
     w, h = M_WIDTH * r, M_HEIGHT * r
-    x0, y0 = cx - w / 2, cy - h / 2
+    x0, y0 = cx - w / 2, cy + M_CENTRE * r - h / 2
     t = M_STEM
     a = M_STEM * M_FLARE
 
@@ -69,6 +114,11 @@ def monogram(cx, cy, r):
 
 def _d(*polygons):
     return ' '.join('M' + ' L'.join(f'{x:.2f},{y:.2f}' for x, y in poly) + ' Z' for poly in polygons)
+
+
+def _roof_d(cx, cy, r):
+    (sx, sy), *curves = roof(cx, cy, r)
+    return f'M{sx:.2f},{sy:.2f} ' + ' '.join(f'Q{qx:.2f},{qy:.2f} {ex:.2f},{ey:.2f}' for (qx, qy), (ex, ey) in curves) + ' Z'
 
 
 def _argb(hex_color):
@@ -122,6 +172,7 @@ def emblem_vector(r, size_dp, comment):
     left, right, v = monogram(c, c, r)
     body = '\n'.join([
         _gold_ring(ring_d(c, r), r, c),
+        _path(_roof_d(c, c, r), _argb(GOLD300)),
         _path(_d(left, right), _argb(CREAM)),
         _path(_d(v), _argb(GOLD400)),
     ])
@@ -133,7 +184,7 @@ def monochrome_vector(r):
     left, right, v = monogram(c, c, r)
     body = '\n'.join([
         _path(ring_d(c, r), '#FFFFFFFF', even_odd=True),
-        _path(_d(left, right, v), '#FFFFFFFF'),
+        _path(_roof_d(c, c, r) + ' ' + _d(left, right, v), '#FFFFFFFF'),
     ])
     return _vector(108, 'the emblem in one colour, for Android 13+ themed icons.', body)
 
@@ -181,6 +232,7 @@ def picture(px, star=0.54, square=False):
     im.paste(ramp, (0, 0), mask)
 
     d = ImageDraw.Draw(im)
+    d.polygon(roof_points(c, c, r), fill=_rgb(GOLD300))
     left, right, v = monogram(c, c, r)
     d.polygon(left, fill=_rgb(CREAM))
     d.polygon(right, fill=_rgb(CREAM))
