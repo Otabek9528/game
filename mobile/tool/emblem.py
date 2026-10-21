@@ -29,7 +29,6 @@ M_STEM = 0.21        # of the M's width
 M_FLARE = 1.12       # the V's arms leave the top a little wider than the stems
 M_NOTCH = 0.50       # depth of the M's top valley, of its height
 M_JOIN = 0.30        # where the V's underside meets the stems, of its height
-HEART_STAR = 0.28    # the small star at the heart, on the splash screen
 
 # The roof, front view: a level ridge, hips that sag as they run down, and
 # eave corners that lift (cheoma); the eave line is lowest in the middle.
@@ -189,15 +188,39 @@ def monochrome_vector(r):
     return _vector(108, 'the emblem in one colour, for Android 13+ themed icons.', body)
 
 
-def splash_vector(r):
-    """The opening's first frame: the star with the small star at its heart.
-    The app's opening animation (lib/features/opening) starts from it."""
-    c = 54
+def widget_vector(size_dp):
+    """The emblem on its emerald disc with a thin gold edge, as in the app's
+    header: for the home-screen widgets."""
+    c, R = 54, 54
+    r = R * 0.70
+    edge = R * 0.016
+    disc = f'M{c},{c - R} A{R},{R} 0 1,1 {c},{c + R} A{R},{R} 0 1,1 {c},{c - R} Z'
+    rim = R - edge / 2
+    rim_d = f'M{c},{c - rim:.2f} A{rim:.2f},{rim:.2f} 0 1,1 {c},{c + rim:.2f} A{rim:.2f},{rim:.2f} 0 1,1 {c},{c - rim:.2f} Z'
+    left, right, v = monogram(c, c, r)
     body = '\n'.join([
+        f'''    <path android:pathData="{disc}">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="{c}" android:centerY="{c}"
+                android:gradientRadius="{R}">
+                <item android:offset="0" android:color="#FF047857" />
+                <item android:offset="1" android:color="{_argb(EMERALD900)}" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="{rim_d}"
+        android:strokeColor="#8CF7D56B"
+        android:strokeWidth="{edge:.2f}" />''',
+        _path(_d(khatam(c, c, r * RING_CUT)), _argb(EMERALD800)),
         _gold_ring(ring_d(c, r), r, c),
-        _path(_d(khatam(c, c, r * HEART_STAR, math.pi / 8)), _argb(GOLD300)),
+        _path(_roof_d(c, c, r), _argb(GOLD300)),
+        _path(_d(left, right), _argb(CREAM)),
+        _path(_d(v), _argb(GOLD400)),
     ])
-    return _vector(288, 'the splash mark, the first frame of the app\'s opening animation.', body)
+    return _vector(size_dp, 'the emblem on its disc, for the home-screen widgets.', body)
 
 
 # ---------------------------------------------------------------- pictures
@@ -250,7 +273,11 @@ def main():
     write(f'{RES}/drawable/ic_launcher_foreground.xml',
           emblem_vector(29, 108, 'the emblem, the launcher icon\'s foreground.'))
     write(f'{RES}/drawable/ic_launcher_monochrome.xml', monochrome_vector(29))
-    write(f'{RES}/drawable/ic_splash_mark.xml', splash_vector(29))
+    # The splash: what the app's opening animation (lib/features/opening)
+    # starts from, at the same size and place.
+    write(f'{RES}/drawable/ic_splash_mark.xml',
+          emblem_vector(29, 288, 'the splash mark, the first frame of the app\'s opening animation.'))
+    write(f'{RES}/drawable/ic_widget_emblem.xml', widget_vector(40))
     for folder, px in (('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('xxxhdpi', 192)):
         path = f'{RES}/mipmap-{folder}/ic_launcher.png'
         picture(px).save(path, optimize=True)

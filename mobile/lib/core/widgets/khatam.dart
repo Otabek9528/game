@@ -61,9 +61,6 @@ abstract final class Emblem {
   static const mNotch = 0.50;
   static const mJoin = 0.30;
 
-  /// The small star at the heart, where the opening starts.
-  static const heartStar = 0.28;
-
   /// The roof, front view: a level ridge, hips that sag as they run down,
   /// and eave corners that lift; the eave line is lowest in the middle.
   /// [roofEave]: that lowest point, from the star's centre; the ridge and

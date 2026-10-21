@@ -1,9 +1,9 @@
-"""Turns "Muslim Vegukin Bot" in Playfair Display Bold into a VectorDrawable
+"""Turns "Muslim Vegukin" in Playfair Display Bold into a VectorDrawable
 for the home-screen widgets: app fonts don't reach widgets, paths do.
 
     pip install fonttools
     python3 tool/widget_wordmark.py assets/fonts/PlayfairDisplay-Bold.ttf \
-        android/app/src/main/res/drawable/ic_widget_wordmark.xml "Muslim Vegukin Bot" 16
+        android/app/src/main/res/drawable/ic_widget_wordmark.xml "Muslim Vegukin" 19
 """
 import sys
 from fontTools.ttLib import TTFont

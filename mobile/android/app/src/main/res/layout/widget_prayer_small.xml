@@ -33,16 +33,16 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:importantForAccessibility="no"
-                android:src="@drawable/ic_widget_bot" />
+                android:src="@drawable/ic_widget_emblem" />
 
             <!-- Shrinks on narrow launchers rather than being cut. -->
             <ImageView
                 android:layout_width="0dp"
-                android:layout_height="13dp"
-                android:layout_marginStart="6dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="7dp"
                 android:layout_weight="1"
                 android:contentDescription="@string/widget_brand"
                 android:scaleType="fitStart"
