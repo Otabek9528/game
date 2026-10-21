@@ -7,7 +7,11 @@ import 'package:muslim_vegukin/app.dart';
 import 'package:muslim_vegukin/app_services.dart';
 import 'package:muslim_vegukin/core/key_value_store.dart';
 import 'package:muslim_vegukin/core/locale_controller.dart';
+import 'package:muslim_vegukin/core/account.dart';
 import 'package:muslim_vegukin/core/activity_log.dart';
+import 'package:muslim_vegukin/core/app_language.dart';
+import 'package:muslim_vegukin/core/google_auth.dart';
+import 'package:muslim_vegukin/core/push.dart';
 import 'package:muslim_vegukin/core/system.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_camera.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_models.dart';
@@ -225,9 +229,17 @@ class TestApp {
     );
     permissions = FakePermissions(prayer);
     reminders = ReminderController(this.store);
+    final locale = LocaleController(languageStore);
+    account = AccountController(
+      store: this.store,
+      source: accounts,
+      push: push,
+      google: google,
+      language: () => locale.language ?? AppLanguage.uz,
+    );
     services = AppServices(
       store: this.store,
-      locale: LocaleController(languageStore),
+      locale: locale,
       theme: ThemeController(this.store),
       prayer: prayer,
       permissions: permissions,
@@ -235,6 +247,7 @@ class TestApp {
       homeWidget: HomeWidgetBridge(),
       reminders: reminders,
       activity: activity,
+      account: account,
       qiblaDevice: qibla,
       businessStats: () async => stats,
       parcels: this.parcels,
@@ -260,6 +273,10 @@ class TestApp {
   final MemoryStore store;
   final opened = OpenedFeatures();
   final activity = FakeActivityLog();
+  final accounts = FakeAccounts();
+  final push = FakePush();
+  final google = FakeGoogle();
+  late final AccountController account;
   final qibla = FakeQiblaDevice();
   final FakeParcels parcels;
 
@@ -819,4 +836,139 @@ class FakeBusinesses implements BusinessSource {
 Future<void> pushPage(WidgetTester tester, Widget page) async {
   tester.state<NavigatorState>(find.byType(Navigator).first).push(MaterialPageRoute<void>(builder: (_) => page));
   await tester.pump();
+}
+
+/// The server's app accounts: one per hello, ids counting down from
+/// -9000000000001. A sign-in link is answered with [confirm]. [fail]: offline.
+class FakeAccounts implements AccountSource {
+  bool fail = false;
+  int _next = 0;
+  final users = <String, AppUser>{};
+  final devices = <(String token, String? pushToken, String? lang)>[];
+  final links = <String>[];
+  final _answers = <String, (String, AppUser?)>{};
+  final deleted = <String>[];
+
+  void _online() {
+    if (fail) throw const AccountException('offline');
+  }
+
+  AppUser _anonymous() => AppUser(id: -9000000000000 - ++_next);
+
+  AppUser _of(String token) => users[token] ?? (throw const AccountException('bad_session', 401));
+
+  /// The person said Yes in the bot: signed in as [user].
+  void confirm(String code, AppUser user) => _answers[code] = ('done', user);
+
+  void cancel(String code) => _answers[code] = ('cancelled', null);
+
+  @override
+  Future<(String, AppUser)> hello({required String lang, String? pushToken}) async {
+    _online();
+    final token = 'token-${_next + 1}';
+    final user = _anonymous();
+    users[token] = user;
+    devices.add((token, pushToken, lang));
+    return (token, user);
+  }
+
+  @override
+  Future<AppUser> me(String token) async {
+    _online();
+    return _of(token);
+  }
+
+  @override
+  Future<void> updateDevice(String token, {String? pushToken, String? lang}) async {
+    _online();
+    _of(token);
+    devices.add((token, pushToken, lang));
+  }
+
+  @override
+  Future<AppUser> signInWithGoogle(String token, String idToken) async {
+    _online();
+    _of(token);
+    if (idToken != 'google-id-token') throw const AccountException('bad_token', 401);
+    return users[token] =
+        const AppUser(id: -9000000000777, signedIn: true, provider: 'google', name: 'Rahim', detail: 'rahim@example.com');
+  }
+
+  @override
+  Future<LoginLink> link(String token, String provider) async {
+    _online();
+    _of(token);
+    final code = 'CODE${links.length + 1}';
+    links.add(code);
+    return LoginLink(
+      code: code,
+      url: provider == 'telegram'
+          ? Uri.parse('https://t.me/MuslimVegukinBot?start=applogin_$code')
+          : Uri.parse('https://wa.me/821012345678?text=LOGIN%20$code'),
+      expiresIn: const Duration(minutes: 10),
+    );
+  }
+
+  @override
+  Future<(String, AppUser?)> linkStatus(String token, String code) async {
+    _online();
+    _of(token);
+    final answer = _answers[code] ?? ('pending', null);
+    if (answer.$2 != null) users[token] = answer.$2!;
+    return answer;
+  }
+
+  @override
+  Future<AppUser> signOut(String token) async {
+    _online();
+    _of(token);
+    return users[token] = _anonymous();
+  }
+
+  @override
+  Future<void> delete(String token) async {
+    _online();
+    _of(token);
+    deleted.add(token);
+    users.remove(token);
+  }
+}
+
+/// Notifications, played by the test: [allowed] or not, and [open] / [arrive].
+class FakePush implements PushService {
+  bool allowed = true;
+  String token = 'push-token';
+  int starts = 0;
+  PushOpened? _onOpen;
+  PushArrived? _onForeground;
+
+  void open(Map<String, String> data) => _onOpen?.call(PushMessage(data: data));
+
+  void arrive(String title, String body, [Map<String, String> data = const {}]) =>
+      _onForeground?.call(PushMessage(title: title, body: body, data: data));
+
+  @override
+  Future<bool> start({
+    required void Function(String token) onToken,
+    required PushOpened onOpen,
+    required PushArrived onForeground,
+  }) async {
+    starts++;
+    _onOpen = onOpen;
+    _onForeground = onForeground;
+    if (allowed) onToken(token);
+    return allowed;
+  }
+}
+
+/// Google's account picker: a token, or null when the person closes it.
+class FakeGoogle implements GoogleAuth {
+  String? answer = 'google-id-token';
+  int signOuts = 0;
+
+  @override
+  Future<String?> idToken() async => answer;
+
+  @override
+  Future<void> signOut() async => signOuts++;
 }

@@ -3520,6 +3520,156 @@ abstract class AppLocalizations {
   /// **'{amount} won'**
   String bizCurrency(String amount);
 
+  /// No description provided for @accountTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisob'**
+  String get accountTitle;
+
+  /// No description provided for @signInTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisobingizga kiring'**
+  String get signInTitle;
+
+  /// No description provided for @signInWhy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylarni kuzatish va bildirishnomalar kirmasdan ham ishlaydi. Izoh yozish, ma’lumotni tuzatish va e’lon berish uchun kiring — boshqalar kim yozganini bilsin.'**
+  String get signInWhy;
+
+  /// No description provided for @signInTelegramNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi hisobingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.'**
+  String get signInTelegramNote;
+
+  /// No description provided for @signInTelegram.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram orqali kirish'**
+  String get signInTelegram;
+
+  /// No description provided for @signInWhatsApp.
+  ///
+  /// In uz, this message translates to:
+  /// **'WhatsApp orqali kirish'**
+  String get signInWhatsApp;
+
+  /// No description provided for @signInGoogle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Google orqali kirish'**
+  String get signInGoogle;
+
+  /// No description provided for @signInWaitingTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'{app}da «Ha, kirish»ni bosing'**
+  String signInWaitingTitle(String app);
+
+  /// No description provided for @signInWaitingBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu yerda kutib turamiz. Tasdiqlagach, ilovaga qayting.'**
+  String get signInWaitingBody;
+
+  /// No description provided for @signInOpenAgain.
+  ///
+  /// In uz, this message translates to:
+  /// **'{app}ni qayta ochish'**
+  String signInOpenAgain(String app);
+
+  /// No description provided for @signInCancel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bekor qilish'**
+  String get signInCancel;
+
+  /// No description provided for @signInExpired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vaqt tugadi yoki bekor qilindi. Qaytadan urinib ko‘ring.'**
+  String get signInExpired;
+
+  /// No description provided for @signInFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.'**
+  String get signInFailed;
+
+  /// No description provided for @signInDone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kirdingiz'**
+  String get signInDone;
+
+  /// No description provided for @signedInWith.
+  ///
+  /// In uz, this message translates to:
+  /// **'{provider} orqali kirilgan'**
+  String signedInWith(String provider);
+
+  /// No description provided for @signOut.
+  ///
+  /// In uz, this message translates to:
+  /// **'Chiqish'**
+  String get signOut;
+
+  /// No description provided for @accountDelete.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisobni o‘chirish'**
+  String get accountDelete;
+
+  /// No description provided for @accountDeleteTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisob o‘chirilsinmi?'**
+  String get accountDeleteTitle;
+
+  /// No description provided for @accountDeleteBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvlaringiz, hududlaringiz va izohlaringiz butunlay o‘chiriladi. Buni qaytarib bo‘lmaydi.'**
+  String get accountDeleteBody;
+
+  /// No description provided for @accountDeleteTelegram.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram botda qilinganlari ham.'**
+  String get accountDeleteTelegram;
+
+  /// No description provided for @accountDeleteConfirm.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirish'**
+  String get accountDeleteConfirm;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hisob o‘chirildi'**
+  String get accountDeleted;
+
+  /// No description provided for @accountPushOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar shu telefonga keladi'**
+  String get accountPushOn;
+
+  /// No description provided for @accountPushOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar o‘chiq. Yoqish uchun sozlamalarni oching.'**
+  String get accountPushOff;
+
+  /// No description provided for @pushOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ochish'**
+  String get pushOpen;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

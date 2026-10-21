@@ -77,3 +77,21 @@ List<Feature> featuresFor(AppLanguage language) => language == AppLanguage.uz
 
 /// The business directory band is for Uzbeks, as on the web.
 bool showsBusiness(AppLanguage language) => language == AppLanguage.uz;
+
+/// The page a tapped notification is about, titled like its section: a
+/// place (by its type), the notifications page, HiKorea. Null when there is
+/// nothing to open.
+Feature? featureForPush(Map<String, String> data) {
+  final url = Uri.tryParse(data['url'] ?? '');
+  final at = url?.path.indexOf('/pages/') ?? -1;
+  if (url != null && at != -1) {
+    final path = url.path.substring(at + 1) + (url.hasQuery ? '?${url.query}' : '');
+    final folder = url.pathSegments.skipWhile((s) => s != 'pages').skip(1).firstOrNull;
+    final type = url.queryParameters['type'];
+    final section = featureGrid.where((f) => f.id == type).firstOrNull ??
+        featureGrid.where((f) => f.path.startsWith('pages/$folder/')).firstOrNull;
+    return Feature(id: section?.id ?? 'notifications', emoji: section?.emoji ?? '🔔', path: path);
+  }
+  if (data['kind'] == 'hikorea') return featureGrid.firstWhere((f) => f.id == 'hikorea');
+  return null;
+}

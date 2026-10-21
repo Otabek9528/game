@@ -8,4 +8,5 @@
     <string name="reminders_channel_sound">Namoz eslatmalari: ovoz</string>
     <string name="reminders_channel_vibrate">Namoz eslatmalari: tebranish</string>
     <string name="reminders_channel_silent">Namoz eslatmalari: jim</string>
+    <string name="alerts_channel">Xabarlar: joylar va HiKorea</string>
 </resources>

@@ -11,4 +11,5 @@
     <string name="reminders_channel_sound">Prayer reminders: sound</string>
     <string name="reminders_channel_vibrate">Prayer reminders: vibration</string>
     <string name="reminders_channel_silent">Prayer reminders: silent</string>
+    <string name="alerts_channel">Alerts: places and HiKorea</string>
 </resources>

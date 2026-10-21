@@ -1924,6 +1924,94 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
+  String get accountTitle => 'Hisob';
+
+  @override
+  String get signInTitle => 'Hisobingizga kiring';
+
+  @override
+  String get signInWhy =>
+      'Joylarni kuzatish va bildirishnomalar kirmasdan ham ishlaydi. Izoh yozish, ma’lumotni tuzatish va e’lon berish uchun kiring — boshqalar kim yozganini bilsin.';
+
+  @override
+  String get signInTelegramNote =>
+      'Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi hisobingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.';
+
+  @override
+  String get signInTelegram => 'Telegram orqali kirish';
+
+  @override
+  String get signInWhatsApp => 'WhatsApp orqali kirish';
+
+  @override
+  String get signInGoogle => 'Google orqali kirish';
+
+  @override
+  String signInWaitingTitle(String app) {
+    return '${app}da «Ha, kirish»ni bosing';
+  }
+
+  @override
+  String get signInWaitingBody =>
+      'Shu yerda kutib turamiz. Tasdiqlagach, ilovaga qayting.';
+
+  @override
+  String signInOpenAgain(String app) {
+    return '${app}ni qayta ochish';
+  }
+
+  @override
+  String get signInCancel => 'Bekor qilish';
+
+  @override
+  String get signInExpired =>
+      'Vaqt tugadi yoki bekor qilindi. Qaytadan urinib ko‘ring.';
+
+  @override
+  String get signInFailed =>
+      'Bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.';
+
+  @override
+  String get signInDone => 'Kirdingiz';
+
+  @override
+  String signedInWith(String provider) {
+    return '$provider orqali kirilgan';
+  }
+
+  @override
+  String get signOut => 'Chiqish';
+
+  @override
+  String get accountDelete => 'Hisobni o‘chirish';
+
+  @override
+  String get accountDeleteTitle => 'Hisob o‘chirilsinmi?';
+
+  @override
+  String get accountDeleteBody =>
+      'Kuzatuvlaringiz, hududlaringiz va izohlaringiz butunlay o‘chiriladi. Buni qaytarib bo‘lmaydi.';
+
+  @override
+  String get accountDeleteTelegram => 'Telegram botda qilinganlari ham.';
+
+  @override
+  String get accountDeleteConfirm => 'O‘chirish';
+
+  @override
+  String get accountDeleted => 'Hisob o‘chirildi';
+
+  @override
+  String get accountPushOn => 'Bildirishnomalar shu telefonga keladi';
+
+  @override
+  String get accountPushOff =>
+      'Bildirishnomalar o‘chiq. Yoqish uchun sozlamalarni oching.';
+
+  @override
+  String get pushOpen => 'Ochish';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

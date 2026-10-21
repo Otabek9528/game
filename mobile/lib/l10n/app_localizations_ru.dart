@@ -1966,6 +1966,93 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get accountTitle => 'Аккаунт';
+
+  @override
+  String get signInTitle => 'Войдите в аккаунт';
+
+  @override
+  String get signInWhy =>
+      'Отслеживание мест и уведомления работают и без входа. Чтобы писать отзывы, исправлять данные и публиковать объявления, войдите — другие должны знать, кто пишет.';
+
+  @override
+  String get signInTelegramNote =>
+      'Этот раздел работает через Telegram. Войдите с аккаунтом из бота Muslim Vegukin — ваши объявления из бота будут видны и здесь.';
+
+  @override
+  String get signInTelegram => 'Войти через Telegram';
+
+  @override
+  String get signInWhatsApp => 'Войти через WhatsApp';
+
+  @override
+  String get signInGoogle => 'Войти через Google';
+
+  @override
+  String signInWaitingTitle(String app) {
+    return 'Нажмите «Да, войти» в $app';
+  }
+
+  @override
+  String get signInWaitingBody =>
+      'Мы подождём здесь. Подтвердите и вернитесь в приложение.';
+
+  @override
+  String signInOpenAgain(String app) {
+    return 'Открыть $app снова';
+  }
+
+  @override
+  String get signInCancel => 'Отмена';
+
+  @override
+  String get signInExpired => 'Время вышло или вход отменён. Попробуйте снова.';
+
+  @override
+  String get signInFailed =>
+      'Не получилось. Проверьте интернет и попробуйте снова.';
+
+  @override
+  String get signInDone => 'Вы вошли';
+
+  @override
+  String signedInWith(String provider) {
+    return 'Вход через $provider';
+  }
+
+  @override
+  String get signOut => 'Выйти';
+
+  @override
+  String get accountDelete => 'Удалить аккаунт';
+
+  @override
+  String get accountDeleteTitle => 'Удалить аккаунт?';
+
+  @override
+  String get accountDeleteBody =>
+      'Ваши отслеживания, районы и отзывы будут удалены навсегда. Это нельзя отменить.';
+
+  @override
+  String get accountDeleteTelegram => 'Включая сделанные в Telegram-боте.';
+
+  @override
+  String get accountDeleteConfirm => 'Удалить';
+
+  @override
+  String get accountDeleted => 'Аккаунт удалён';
+
+  @override
+  String get accountPushOn => 'Уведомления приходят на этот телефон';
+
+  @override
+  String get accountPushOff =>
+      'Уведомления выключены. Включите их в настройках.';
+
+  @override
+  String get pushOpen => 'Открыть';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

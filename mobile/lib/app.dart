@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'app_services.dart';
 import 'core/app_language.dart';
+import 'core/push.dart';
 import 'core/theme.dart';
+import 'features/home/feature_catalog.dart';
 import 'features/home/home_screen.dart';
 import 'features/onboarding/language_screen.dart';
 import 'l10n/app_localizations.dart';
@@ -30,6 +34,59 @@ class _VegukinAppState extends State<VegukinApp> {
   // screen out from under the navigator; the language screen navigates on.
   late final bool _needsLanguage = !widget.services.locale.hasChosen;
 
+  final _navigator = GlobalKey<NavigatorState>();
+  final _messenger = GlobalKey<ScaffoldMessengerState>();
+  late AppLanguage? _language = widget.services.locale.language;
+
+  @override
+  void initState() {
+    super.initState();
+    final services = widget.services;
+    services.locale.addListener(_languageChanged);
+    services.account.handlePush(onOpen: _openPush, onForeground: _showPush);
+    // The account exists from the first launch, so watches need no sign-in.
+    unawaited(services.account.ensure());
+  }
+
+  @override
+  void dispose() {
+    widget.services.locale.removeListener(_languageChanged);
+    super.dispose();
+  }
+
+  void _languageChanged() {
+    final language = widget.services.locale.language;
+    if (language == _language) return;
+    _language = language;
+    unawaited(widget.services.account.languageChanged());
+  }
+
+  /// A notification was tapped: its page.
+  void _openPush(PushMessage message) {
+    final feature = featureForPush(message.data);
+    final context = _navigator.currentContext;
+    if (feature == null || context == null) return;
+    widget.services.openFeature(context, feature, widget.services);
+  }
+
+  /// One arrived while the app was open: Android doesn't show it, so the app does.
+  void _showPush(PushMessage message) {
+    final text = [?message.title, ?message.body].join('\n');
+    final context = _navigator.currentContext;
+    if (text.isEmpty || context == null) return;
+    final canOpen = featureForPush(message.data) != null;
+    _messenger.currentState
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(text, maxLines: 4, overflow: TextOverflow.ellipsis),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 6),
+        action: canOpen
+            ? SnackBarAction(label: AppLocalizations.of(context).pushOpen, onPressed: () => _openPush(message))
+            : null,
+      ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = widget.services.locale;
@@ -38,6 +95,8 @@ class _VegukinAppState extends State<VegukinApp> {
       listenable: Listenable.merge([locale, theme]),
       builder: (context, _) => MaterialApp(
         title: 'Muslim Vegukin',
+        navigatorKey: _navigator,
+        scaffoldMessengerKey: _messenger,
         debugShowCheckedModeBanner: false,
         theme: VegukinTheme.light,
         darkTheme: VegukinTheme.dark,

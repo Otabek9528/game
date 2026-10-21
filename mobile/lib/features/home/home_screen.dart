@@ -12,6 +12,7 @@ import '../../l10n/app_localizations.dart';
 import '../barcode/barcode_screen.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
+import '../account/account_screen.dart';
 import '../business/business_screen.dart';
 import '../links/links_screen.dart';
 import '../parcel/parcel_controller.dart';
@@ -50,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // home screen, so the page opens fresh even on a slow line.
       unawaited(warmParcels(_services.parcels, _services.store, clock: _services.clock));
       await _services.permissions.askOnce();
+      unawaited(_services.account.startPush());
       await _takeWidgetAction();
       await _offerExactAlarms();
     });
@@ -167,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           children: [
             _Header(
               language: language,
+              onAccount: () => openAccount(context, _services),
               onLanguage: _openLanguage,
               onTheme: () {
                 HapticFeedback.selectionClick();
@@ -243,9 +246,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.language, required this.onLanguage, required this.onTheme});
+  const _Header({required this.language, required this.onAccount, required this.onLanguage, required this.onTheme});
 
   final AppLanguage language;
+  final VoidCallback onAccount;
   final VoidCallback onLanguage;
 
   /// Day ↔ night.
@@ -282,6 +286,11 @@ class _Header extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
+              ),
+              IconButton(
+                onPressed: onAccount,
+                tooltip: s.accountTitle,
+                icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
               ),
               _ThemeButton(onTap: onTheme),
               const SizedBox(width: 8),

@@ -1943,6 +1943,95 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get accountTitle => 'Account';
+
+  @override
+  String get signInTitle => 'Sign in';
+
+  @override
+  String get signInWhy =>
+      'Watching places and notifications work without signing in. Sign in to write reviews, correct details and post announcements, so others know who wrote them.';
+
+  @override
+  String get signInTelegramNote =>
+      'This section works through Telegram. Sign in with your Muslim Vegukin bot account — your posts from the bot show here too.';
+
+  @override
+  String get signInTelegram => 'Continue with Telegram';
+
+  @override
+  String get signInWhatsApp => 'Continue with WhatsApp';
+
+  @override
+  String get signInGoogle => 'Continue with Google';
+
+  @override
+  String signInWaitingTitle(String app) {
+    return 'Tap “Yes, log in” in $app';
+  }
+
+  @override
+  String get signInWaitingBody =>
+      'We’ll wait here. Confirm, then come back to the app.';
+
+  @override
+  String signInOpenAgain(String app) {
+    return 'Open $app again';
+  }
+
+  @override
+  String get signInCancel => 'Cancel';
+
+  @override
+  String get signInExpired =>
+      'That timed out or was cancelled. Please try again.';
+
+  @override
+  String get signInFailed =>
+      'That didn’t work. Check your connection and try again.';
+
+  @override
+  String get signInDone => 'You’re signed in';
+
+  @override
+  String signedInWith(String provider) {
+    return 'Signed in with $provider';
+  }
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String get accountDelete => 'Delete account';
+
+  @override
+  String get accountDeleteTitle => 'Delete your account?';
+
+  @override
+  String get accountDeleteBody =>
+      'Your watches, areas and reviews will be deleted for good. This can’t be undone.';
+
+  @override
+  String get accountDeleteTelegram =>
+      'This includes those made in the Telegram bot.';
+
+  @override
+  String get accountDeleteConfirm => 'Delete';
+
+  @override
+  String get accountDeleted => 'Account deleted';
+
+  @override
+  String get accountPushOn => 'Notifications come to this phone';
+
+  @override
+  String get accountPushOff =>
+      'Notifications are off. Turn them on in settings.';
+
+  @override
+  String get pushOpen => 'Open';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

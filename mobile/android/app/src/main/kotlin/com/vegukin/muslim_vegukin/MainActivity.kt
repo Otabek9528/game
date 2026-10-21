@@ -1,5 +1,7 @@
 package com.vegukin.muslim_vegukin
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -26,7 +28,21 @@ class MainActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createAlertsChannel()
         readLaunchAction(intent)
+    }
+
+    /**
+     * Push notifications from the server (watched places, areas, HiKorea) go
+     * to their own channel, named in the phone's language, so they can be
+     * muted apart from prayer reminders. The manifest points Firebase at it.
+     */
+    private fun createAlertsChannel() {
+        if (Build.VERSION.SDK_INT < 26) return
+        val manager = getSystemService(NotificationManager::class.java) ?: return
+        manager.createNotificationChannel(
+            NotificationChannel("alerts", getString(R.string.alerts_channel), NotificationManager.IMPORTANCE_HIGH),
+        )
     }
 
     override fun onNewIntent(intent: Intent) {

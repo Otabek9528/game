@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart' as ph;
 
+import 'core/account.dart';
 import 'core/activity_log.dart';
 import 'core/config.dart';
 import 'core/key_value_store.dart';
@@ -140,6 +141,7 @@ class AppServices {
     required this.homeWidget,
     required this.reminders,
     required this.activity,
+    required this.account,
     this.qiblaDevice = const AndroidQiblaDevice(),
     this.businessStats = BusinessStats.fetch,
     this.parcels = const HttpParcelSource(),
@@ -166,6 +168,9 @@ class AppServices {
 
   /// What people open, counted on the server like the web app's visits.
   final ActivityLog activity;
+
+  /// The app's account: who is asking, for the server; push notifications.
+  final AccountController account;
   final QiblaDevice qiblaDevice;
   final Future<BusinessStats?> Function() businessStats;
   final ParcelSource parcels;

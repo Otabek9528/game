@@ -8,4 +8,5 @@
     <string name="reminders_channel_sound">Напоминания о намазе: звук</string>
     <string name="reminders_channel_vibrate">Напоминания о намазе: вибрация</string>
     <string name="reminders_channel_silent">Напоминания о намазе: тихо</string>
+    <string name="alerts_channel">Оповещения: места и HiKorea</string>
 </resources>

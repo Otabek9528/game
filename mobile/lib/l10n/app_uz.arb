@@ -995,6 +995,52 @@
       }
     }
   },
+  "accountTitle": "Hisob",
+  "signInTitle": "Hisobingizga kiring",
+  "signInWhy": "Joylarni kuzatish va bildirishnomalar kirmasdan ham ishlaydi. Izoh yozish, ma’lumotni tuzatish va e’lon berish uchun kiring — boshqalar kim yozganini bilsin.",
+  "signInTelegramNote": "Bu bo‘lim Telegram orqali ishlaydi. Muslim Vegukin botidagi hisobingiz bilan kiring — botda joylagan e’lonlaringiz shu yerda ham ko‘rinadi.",
+  "signInTelegram": "Telegram orqali kirish",
+  "signInWhatsApp": "WhatsApp orqali kirish",
+  "signInGoogle": "Google orqali kirish",
+  "signInWaitingTitle": "{app}da «Ha, kirish»ni bosing",
+  "@signInWaitingTitle": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "signInWaitingBody": "Shu yerda kutib turamiz. Tasdiqlagach, ilovaga qayting.",
+  "signInOpenAgain": "{app}ni qayta ochish",
+  "@signInOpenAgain": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "signInCancel": "Bekor qilish",
+  "signInExpired": "Vaqt tugadi yoki bekor qilindi. Qaytadan urinib ko‘ring.",
+  "signInFailed": "Bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.",
+  "signInDone": "Kirdingiz",
+  "signedInWith": "{provider} orqali kirilgan",
+  "@signedInWith": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "signOut": "Chiqish",
+  "accountDelete": "Hisobni o‘chirish",
+  "accountDeleteTitle": "Hisob o‘chirilsinmi?",
+  "accountDeleteBody": "Kuzatuvlaringiz, hududlaringiz va izohlaringiz butunlay o‘chiriladi. Buni qaytarib bo‘lmaydi.",
+  "accountDeleteTelegram": "Telegram botda qilinganlari ham.",
+  "accountDeleteConfirm": "O‘chirish",
+  "accountDeleted": "Hisob o‘chirildi",
+  "accountPushOn": "Bildirishnomalar shu telefonga keladi",
+  "accountPushOff": "Bildirishnomalar o‘chiq. Yoqish uchun sozlamalarni oching.",
+  "pushOpen": "Ochish",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }
