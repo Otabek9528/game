@@ -4606,24 +4606,6 @@ abstract class AppLocalizations {
   /// **'{count} ta izoh'**
   String plReviewCount(int count);
 
-  /// No description provided for @plCall.
-  ///
-  /// In uz, this message translates to:
-  /// **'Qo‘ng‘iroq'**
-  String get plCall;
-
-  /// No description provided for @plRoute.
-  ///
-  /// In uz, this message translates to:
-  /// **'Yo‘l'**
-  String get plRoute;
-
-  /// No description provided for @plCopy.
-  ///
-  /// In uz, this message translates to:
-  /// **'Nusxa'**
-  String get plCopy;
-
   /// No description provided for @plShare.
   ///
   /// In uz, this message translates to:
@@ -4750,16 +4732,10 @@ abstract class AppLocalizations {
   /// **'Manzil nusxalandi'**
   String get plAddressCopied;
 
-  /// No description provided for @plCallWhich.
-  ///
-  /// In uz, this message translates to:
-  /// **'Qaysi raqamga qo‘ng‘iroq qilamiz?'**
-  String get plCallWhich;
-
   /// No description provided for @plRouteTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Qaysi xaritada ochamiz?'**
+  /// **'Qaysi navigatorda ochamiz?'**
   String get plRouteTitle;
 
   /// No description provided for @plRouteHint.
@@ -4773,12 +4749,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Manzilni nusxalash'**
   String get plCopyAddress;
-
-  /// No description provided for @plCopyAddressHint.
-  ///
-  /// In uz, this message translates to:
-  /// **'Taksi yoki xaritaga qo‘yish uchun'**
-  String get plCopyAddressHint;
 
   /// No description provided for @plMapAttribution.
   ///
@@ -4813,13 +4783,13 @@ abstract class AppLocalizations {
   /// No description provided for @plSocial.
   ///
   /// In uz, this message translates to:
-  /// **'Ijtimoiy tarmoqlar'**
+  /// **'Ijtimoiy tarmoqlarda'**
   String get plSocial;
 
   /// No description provided for @plSocialEmpty.
   ///
   /// In uz, this message translates to:
-  /// **'Bu joyning ijtimoiy tarmoqdagi sahifasini bilasizmi?'**
+  /// **'Bu joy ijtimoiy tarmoqlarda bormi?'**
   String get plSocialEmpty;
 
   /// No description provided for @plSocialAdd.
@@ -4905,12 +4875,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Bu joy topilmadi — ro‘yxatdan olib tashlangan bo‘lishi mumkin.'**
   String get plGone;
-
-  /// No description provided for @plShareText.
-  ///
-  /// In uz, this message translates to:
-  /// **'{emoji} {name}\n📍 {address}\n🗺 {map}\n\nMuslim Vegukin ilovasida topildi'**
-  String plShareText(String emoji, String name, String address, String map);
 
   /// No description provided for @plRateQuestion.
   ///
@@ -5464,18 +5428,6 @@ abstract class AppLocalizations {
   /// **'Hozirgi joylashuvni aniqlab bo‘lmadi — oldingi joylashuv bo‘yicha ({when})'**
   String plSavedNoteNoCity(String when);
 
-  /// No description provided for @plRelocate.
-  ///
-  /// In uz, this message translates to:
-  /// **'Yangilash'**
-  String get plRelocate;
-
-  /// No description provided for @plChange.
-  ///
-  /// In uz, this message translates to:
-  /// **'O‘zgartirish'**
-  String get plChange;
-
   /// No description provided for @plLocatingYou.
   ///
   /// In uz, this message translates to:
@@ -5542,16 +5494,10 @@ abstract class AppLocalizations {
   /// **'Manzildan {km}'**
   String plKmFromAddress(String km);
 
-  /// No description provided for @plOnMap.
-  ///
-  /// In uz, this message translates to:
-  /// **'Xaritada'**
-  String get plOnMap;
-
   /// No description provided for @plGetDirections.
   ///
   /// In uz, this message translates to:
-  /// **'Yo‘lni ko‘rsatish'**
+  /// **'Navigatorda ko‘rish'**
   String get plGetDirections;
 
   /// No description provided for @themeToDay.
@@ -5565,6 +5511,24 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Tungi rejim'**
   String get themeToNight;
+
+  /// No description provided for @plSocialMore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa tarmoqdagi sahifasini bilasizmi?'**
+  String get plSocialMore;
+
+  /// No description provided for @plCallNumber.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘ng‘iroq qilish'**
+  String get plCallNumber;
+
+  /// No description provided for @plShareFooter.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin ilovasida topildi'**
+  String get plShareFooter;
 }
 
 class _AppLocalizationsDelegate

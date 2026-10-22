@@ -140,7 +140,7 @@ class HttpPlacesSource implements PlacesSource {
   Future<Map<String, List<String>>> photoManifest() async {
     final http.Response response;
     try {
-      response = await _http.get(AppConfig.webBase.resolve('Photos/manifest.json')).timeout(_timeout);
+      response = await _http.get(AppConfig.photosBase.resolve('Photos/manifest.json')).timeout(_timeout);
     } on Exception catch (e) {
       throw _offline(e);
     }

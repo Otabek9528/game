@@ -2628,15 +2628,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plCall => 'Call';
-
-  @override
-  String get plRoute => 'Directions';
-
-  @override
-  String get plCopy => 'Copy';
-
-  @override
   String get plShare => 'Share';
 
   @override
@@ -2711,10 +2702,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plAddressCopied => 'Address copied';
 
   @override
-  String get plCallWhich => 'Which number?';
-
-  @override
-  String get plRouteTitle => 'Open in which map?';
+  String get plRouteTitle => 'Open in which navigator?';
 
   @override
   String get plRouteHint =>
@@ -2722,9 +2710,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plCopyAddress => 'Copy the address';
-
-  @override
-  String get plCopyAddressHint => 'For a taxi or a map';
 
   @override
   String get plMapAttribution => '© OpenStreetMap';
@@ -2794,11 +2779,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plGone => 'This place wasn’t found. It may have been removed.';
-
-  @override
-  String plShareText(String emoji, String name, String address, String map) {
-    return '$emoji $name\n📍 $address\n🗺 $map\n\nFound in the Muslim Vegukin app';
-  }
 
   @override
   String get plRateQuestion => 'How would you rate it?';
@@ -3139,12 +3119,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plRelocate => 'Update';
-
-  @override
-  String get plChange => 'Change';
-
-  @override
   String get plLocatingYou => 'Finding your location…';
 
   @override
@@ -3186,14 +3160,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plOnMap => 'On the map';
-
-  @override
-  String get plGetDirections => 'Get directions';
+  String get plGetDirections => 'Open in navigator';
 
   @override
   String get themeToDay => 'Day mode';
 
   @override
   String get themeToNight => 'Night mode';
+
+  @override
+  String get plSocialMore => 'Know a page on another network?';
+
+  @override
+  String get plCallNumber => 'Call';
+
+  @override
+  String get plShareFooter => 'Found in the Muslim Vegukin app';
 }

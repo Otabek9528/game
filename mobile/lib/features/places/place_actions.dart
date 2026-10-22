@@ -25,36 +25,7 @@ Uri googleUri(Place place) => place.located
     ? Uri.https('www.google.com', '/maps/dir/', {'api': '1', 'destination': '${place.lat},${place.lon}'})
     : Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': place.address ?? place.name});
 
-/// Calls the place: its one number, or a choice of them.
-Future<void> callPlace(BuildContext context, AppServices services, Place place) async {
-  if (place.phones.isEmpty) return;
-  if (place.phones.length == 1) return services.openLink(telUri(place.phones.single));
-  final s = AppLocalizations.of(context);
-  final phone = await showModalBottomSheet<String>(
-    context: context,
-    showDragHandle: true,
-    backgroundColor: VegukinPalette.of(context).card,
-    builder: (context) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _SheetTitle(s.plCallWhich),
-          for (final phone in place.phones)
-            ListTile(
-              leading: Icon(Icons.call_rounded, color: VegukinPalette.of(context).accent),
-              title: Text(phone, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              onTap: () => Navigator.pop(context, phone),
-            ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    ),
-  );
-  if (phone != null) await services.openLink(telUri(phone));
-}
-
-/// Directions: Naver, Kakao or Google Maps, or the address to copy.
+/// The way there: Naver, Kakao or Google Maps.
 Future<void> routeToPlace(BuildContext context, AppServices services, Place place) async {
   final s = AppLocalizations.of(context);
   final p = VegukinPalette.of(context);
@@ -79,16 +50,6 @@ Future<void> routeToPlace(BuildContext context, AppServices services, Place plac
             row('naver', const _MapMark('N', Color(0xFF03C75A), Colors.white), 'Naver Map', null),
             row('kakao', const _MapMark('K', Color(0xFFFEE500), Color(0xFF191600)), 'Kakao Map', null),
             row('google', const _MapMark('G', Color(0xFF4285F4), Colors.white), 'Google Maps', null),
-            if (place.address != null)
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: p.cardSelected,
-                  child: Icon(Icons.copy_rounded, color: p.accent, size: 20),
-                ),
-                title: Text(s.plCopyAddress, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: p.ink)),
-                subtitle: Text(s.plCopyAddressHint, style: TextStyle(color: p.inkMuted)),
-                onTap: () => Navigator.pop(context, 'copy'),
-              ),
             const SizedBox(height: 8),
           ],
         ),
@@ -103,8 +64,6 @@ Future<void> routeToPlace(BuildContext context, AppServices services, Place plac
       await services.openLink(kakaoUri(place));
     case 'google':
       await services.openLink(googleUri(place));
-    case 'copy':
-      await copyAddress(context, place);
   }
 }
 
@@ -117,11 +76,20 @@ Future<void> copyAddress(BuildContext context, Place place) async {
   if (context.mounted) showPlacesSnack(context, s.plAddressCopied);
 }
 
-/// The phone's share sheet: name, address, a map link.
+/// The phone's share sheet: name, address, number, and the place in both
+/// Korean maps (people use one or the other; neither is everyone's).
 Future<void> sharePlace(BuildContext context, AppServices services, Place place) {
   final s = AppLocalizations.of(context);
-  final map = place.naverUrl ?? place.kakaoUrl ?? '${place.located ? googleUri(place) : naverUri(place)}';
-  return services.shareText(s.plShareText(place.kind.emoji, place.name, place.address ?? place.city ?? '', map).trim());
+  return services.shareText([
+    '${place.kind.emoji} ${place.name}',
+    if (place.address != null) '📍 ${place.address}',
+    if (place.phones.isNotEmpty) '📞 ${place.phones.join(', ')}',
+    '',
+    'Naver Map: ${naverUri(place)}',
+    'Kakao Map: ${kakaoUri(place)}',
+    '',
+    s.plShareFooter,
+  ].join('\n'));
 }
 
 class _SheetTitle extends StatelessWidget {

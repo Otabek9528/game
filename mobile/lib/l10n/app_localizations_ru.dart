@@ -2667,15 +2667,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get plCall => 'Позвонить';
-
-  @override
-  String get plRoute => 'Маршрут';
-
-  @override
-  String get plCopy => 'Копировать';
-
-  @override
   String get plShare => 'Поделиться';
 
   @override
@@ -2752,10 +2743,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plAddressCopied => 'Адрес скопирован';
 
   @override
-  String get plCallWhich => 'Какой номер набрать?';
-
-  @override
-  String get plRouteTitle => 'В какой карте открыть?';
+  String get plRouteTitle => 'В каком навигаторе открыть?';
 
   @override
   String get plRouteHint =>
@@ -2763,9 +2751,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plCopyAddress => 'Скопировать адрес';
-
-  @override
-  String get plCopyAddressHint => 'Для такси или карты';
 
   @override
   String get plMapAttribution => '© OpenStreetMap';
@@ -2786,7 +2771,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plSocial => 'Соцсети';
 
   @override
-  String get plSocialEmpty => 'Знаете страницу этого места в соцсетях?';
+  String get plSocialEmpty => 'Знаете соцсети этого места?';
 
   @override
   String get plSocialAdd => 'Добавить';
@@ -2834,11 +2819,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plGone => 'Место не найдено — возможно, его убрали из списка.';
-
-  @override
-  String plShareText(String emoji, String name, String address, String map) {
-    return '$emoji $name\n📍 $address\n🗺 $map\n\nНайдено в приложении Muslim Vegukin';
-  }
 
   @override
   String get plRateQuestion => 'Ваша оценка?';
@@ -3182,12 +3162,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get plRelocate => 'Обновить';
-
-  @override
-  String get plChange => 'Изменить';
-
-  @override
   String get plLocatingYou => 'Определяем ваше местоположение…';
 
   @override
@@ -3229,14 +3203,20 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get plOnMap => 'На карте';
-
-  @override
-  String get plGetDirections => 'Проложить маршрут';
+  String get plGetDirections => 'Открыть в навигаторе';
 
   @override
   String get themeToDay => 'Дневной режим';
 
   @override
   String get themeToNight => 'Ночной режим';
+
+  @override
+  String get plSocialMore => 'Знаете страницу в другой соцсети?';
+
+  @override
+  String get plCallNumber => 'Позвонить';
+
+  @override
+  String get plShareFooter => 'Найдено в приложении Muslim Vegukin';
 }

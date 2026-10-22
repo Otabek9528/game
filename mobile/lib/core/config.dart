@@ -7,6 +7,11 @@ abstract final class AppConfig {
   /// pages from somewhere else, change it here.
   static final webBase = Uri.parse('https://otabek9528.github.io/game/');
 
+  /// The live web app on Cloudflare Pages, built from the main repository:
+  /// where the places' photos are (Photos/, ~1 GB). The GitHub Pages copy
+  /// above has only a few.
+  static final photosBase = Uri.parse('https://vegukin-twa.pages.dev/');
+
   /// The Muslim Vegukin API (places, business directory, …).
   static final apiBase = Uri.parse('https://vegukin-api.duckdns.org/');
 

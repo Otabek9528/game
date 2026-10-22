@@ -2564,15 +2564,6 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
-  String get plCall => 'Qo‘ng‘iroq';
-
-  @override
-  String get plRoute => 'Yo‘l';
-
-  @override
-  String get plCopy => 'Nusxa';
-
-  @override
   String get plShare => 'Ulashish';
 
   @override
@@ -2641,10 +2632,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get plAddressCopied => 'Manzil nusxalandi';
 
   @override
-  String get plCallWhich => 'Qaysi raqamga qo‘ng‘iroq qilamiz?';
-
-  @override
-  String get plRouteTitle => 'Qaysi xaritada ochamiz?';
+  String get plRouteTitle => 'Qaysi navigatorda ochamiz?';
 
   @override
   String get plRouteHint =>
@@ -2652,9 +2640,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plCopyAddress => 'Manzilni nusxalash';
-
-  @override
-  String get plCopyAddressHint => 'Taksi yoki xaritaga qo‘yish uchun';
 
   @override
   String get plMapAttribution => '© OpenStreetMap';
@@ -2673,11 +2658,10 @@ class AppLocalizationsUz extends AppLocalizations {
   String get plSuggestChange => 'O‘zgartirishni taklif qilish';
 
   @override
-  String get plSocial => 'Ijtimoiy tarmoqlar';
+  String get plSocial => 'Ijtimoiy tarmoqlarda';
 
   @override
-  String get plSocialEmpty =>
-      'Bu joyning ijtimoiy tarmoqdagi sahifasini bilasizmi?';
+  String get plSocialEmpty => 'Bu joy ijtimoiy tarmoqlarda bormi?';
 
   @override
   String get plSocialAdd => 'Qo‘shish';
@@ -2728,11 +2712,6 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get plGone =>
       'Bu joy topilmadi — ro‘yxatdan olib tashlangan bo‘lishi mumkin.';
-
-  @override
-  String plShareText(String emoji, String name, String address, String map) {
-    return '$emoji $name\n📍 $address\n🗺 $map\n\nMuslim Vegukin ilovasida topildi';
-  }
 
   @override
   String get plRateQuestion => 'Qanday baholaysiz?';
@@ -3073,12 +3052,6 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
-  String get plRelocate => 'Yangilash';
-
-  @override
-  String get plChange => 'O‘zgartirish';
-
-  @override
   String get plLocatingYou => 'Joylashuvingiz aniqlanmoqda…';
 
   @override
@@ -3120,14 +3093,20 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
-  String get plOnMap => 'Xaritada';
-
-  @override
-  String get plGetDirections => 'Yo‘lni ko‘rsatish';
+  String get plGetDirections => 'Navigatorda ko‘rish';
 
   @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override
   String get themeToNight => 'Tungi rejim';
+
+  @override
+  String get plSocialMore => 'Boshqa tarmoqdagi sahifasini bilasizmi?';
+
+  @override
+  String get plCallNumber => 'Qo‘ng‘iroq qilish';
+
+  @override
+  String get plShareFooter => 'Muslim Vegukin ilovasida topildi';
 }

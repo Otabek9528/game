@@ -1388,9 +1388,6 @@
       }
     }
   },
-  "plCall": "Qo‘ng‘iroq",
-  "plRoute": "Yo‘l",
-  "plCopy": "Nusxa",
   "plShare": "Ulashish",
   "plAddressNotFound": "Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.",
   "plNothingFound": "Hech narsa topilmadi",
@@ -1429,18 +1426,16 @@
   "plMenu": "Menyu",
   "plMenuOpen": "Menyuni ochish",
   "plAddressCopied": "Manzil nusxalandi",
-  "plCallWhich": "Qaysi raqamga qo‘ng‘iroq qilamiz?",
-  "plRouteTitle": "Qaysi xaritada ochamiz?",
+  "plRouteTitle": "Qaysi navigatorda ochamiz?",
   "plRouteHint": "Koreyada Naver va Kakao xaritalari yo‘lni aniqroq ko‘rsatadi.",
   "plCopyAddress": "Manzilni nusxalash",
-  "plCopyAddressHint": "Taksi yoki xaritaga qo‘yish uchun",
   "plMapAttribution": "© OpenStreetMap",
   "plAbout": "Muassasa haqida",
   "plAboutEmpty": "Ish vaqti va dam olish kunlari hali qo‘shilmagan.",
   "plAboutAdd": "Ma’lumot qo‘shish",
   "plSuggestChange": "O‘zgartirishni taklif qilish",
-  "plSocial": "Ijtimoiy tarmoqlar",
-  "plSocialEmpty": "Bu joyning ijtimoiy tarmoqdagi sahifasini bilasizmi?",
+  "plSocial": "Ijtimoiy tarmoqlarda",
+  "plSocialEmpty": "Bu joy ijtimoiy tarmoqlarda bormi?",
   "plSocialAdd": "Qo‘shish",
   "plInviteLink": "Havola",
   "plPendingField": "{what}: taklifingiz ko‘rib chiqilmoqda",
@@ -1469,23 +1464,6 @@
   "plCorrections": "Nomi, manzili yoki telefoni noto‘g‘rimi? Guruhimizga yozing.",
   "plLoadDetailFailed": "Ma’lumotlarni yuklab bo‘lmadi. Internetni tekshiring.",
   "plGone": "Bu joy topilmadi — ro‘yxatdan olib tashlangan bo‘lishi mumkin.",
-  "plShareText": "{emoji} {name}\n📍 {address}\n🗺 {map}\n\nMuslim Vegukin ilovasida topildi",
-  "@plShareText": {
-    "placeholders": {
-      "emoji": {
-        "type": "String"
-      },
-      "name": {
-        "type": "String"
-      },
-      "address": {
-        "type": "String"
-      },
-      "map": {
-        "type": "String"
-      }
-    }
-  },
   "plRateQuestion": "Qanday baholaysiz?",
   "plStar1": "Juda yomon",
   "plStar2": "Yomon",
@@ -1668,8 +1646,6 @@
       }
     }
   },
-  "plRelocate": "Yangilash",
-  "plChange": "O‘zgartirish",
   "plLocatingYou": "Joylashuvingiz aniqlanmoqda…",
   "plLoadingPlaces": "Joylar yuklanmoqda…",
   "plDeniedBody": "Eng yaqin joylarni topish uchun joylashuvga ruxsat bering — yoki manzil bo‘yicha izlang.",
@@ -1695,8 +1671,10 @@
       }
     }
   },
-  "plOnMap": "Xaritada",
-  "plGetDirections": "Yo‘lni ko‘rsatish",
+  "plGetDirections": "Navigatorda ko‘rish",
   "themeToDay": "Kunduzgi rejim",
-  "themeToNight": "Tungi rejim"
+  "themeToNight": "Tungi rejim",
+  "plSocialMore": "Boshqa tarmoqdagi sahifasini bilasizmi?",
+  "plCallNumber": "Qo‘ng‘iroq qilish",
+  "plShareFooter": "Muslim Vegukin ilovasida topildi"
 }

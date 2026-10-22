@@ -189,8 +189,8 @@ class PlacesKit extends ChangeNotifier {
     return [
       for (var i = 0; i < entries.length && i < 10; i++)
         (
-          full: AppConfig.webBase.resolve('$folder/${i + 1}.webp?v=${entries[i].split(':').last}'),
-          thumb: AppConfig.webBase.resolve('$folder/${i + 1}.thumb.webp?v=${entries[i].split(':').last}'),
+          full: AppConfig.photosBase.resolve('$folder/${i + 1}.webp?v=${entries[i].split(':').last}'),
+          thumb: AppConfig.photosBase.resolve('$folder/${i + 1}.thumb.webp?v=${entries[i].split(':').last}'),
         ),
     ];
   }

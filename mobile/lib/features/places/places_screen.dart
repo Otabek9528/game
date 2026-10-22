@@ -7,7 +7,7 @@ import '../../app_services.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
-import 'place_actions.dart';
+import 'place_sheets.dart';
 import 'place_detail.dart';
 import 'places_kit.dart';
 import 'places_models.dart';
@@ -25,7 +25,7 @@ const _addressExample = {
 
 /// Mosques, restaurants or shops, as on the web page: "near me" or "near
 /// another address", and the five nearest. "Near me" always takes a new
-/// location fix, and runs by itself when the phone already lets it.
+/// location fix.
 class PlacesScreen extends StatefulWidget {
   const PlacesScreen({super.key, required this.services, required this.kind});
 
@@ -55,12 +55,6 @@ class _PlacesScreenState extends State<PlacesScreen> {
     super.initState();
     unawaited(_kit.loadPhotos());
     unawaited(_kit.loadWatched());
-    unawaited(_start());
-  }
-
-  /// "Near me" at once when the phone allows it without asking.
-  Future<void> _start() async {
-    if (await _kit.locationAllowed() && mounted && _mode == _Mode.none) await _nearMe();
   }
 
   @override
@@ -121,6 +115,18 @@ class _PlacesScreenState extends State<PlacesScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  /// The place page; the keyboard stays down, there and back.
+  Future<void> _open(Place place, PlacesFound found) async {
+    _addressFocus.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => PlaceDetailScreen(kit: _kit, id: place.id, preview: place, km: found.kmTo(place), origin: found.origin),
+    ));
+    if (!mounted) return;
+    _addressFocus.unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   Future<void> _refresh() => switch (_mode) {
@@ -282,11 +288,8 @@ class _PlacesScreenState extends State<PlacesScreen> {
           style: TextStyle(fontFamily: Brand.displayFont, fontSize: 21, fontWeight: FontWeight.w700, color: p.ink),
         ),
       ),
-      _Origin(
-        found: found,
-        now: prayer.now,
-        onAgain: found.origin == PlaceOrigin.address ? _openAddress : _nearMe,
-      ),
+      // Near me: from where, and how fresh. An address is in its field above.
+      if (found.origin != PlaceOrigin.address) _Origin(found: found, now: prayer.now),
       const SizedBox(height: 12),
       if (found.places.isEmpty)
         _Message(icon: Icons.search_off_rounded, title: s.plNothingFound)
@@ -299,7 +302,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
               place: place,
               km: found.kmTo(place),
               nearest: i == 0,
-              onTap: () => openPlace(context, _kit, place, km: found.kmTo(place), origin: found.origin),
+              onTap: () => _open(place, found),
             ),
           ),
     ];
@@ -530,11 +533,10 @@ class _AddressPanel extends StatelessWidget {
 /// Where the five were measured from: the phone just now, the location
 /// saved earlier (said plainly, since it can be far off), or the address.
 class _Origin extends StatelessWidget {
-  const _Origin({required this.found, required this.now, required this.onAgain});
+  const _Origin({required this.found, required this.now});
 
   final PlacesFound found;
   final DateTime now;
-  final VoidCallback onAgain;
 
   @override
   Widget build(BuildContext context) {
@@ -563,11 +565,6 @@ class _Origin extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: Text(text, style: TextStyle(fontSize: 13, height: 1.35, color: warn ? p.inkSoft : p.inkMuted)),
-        ),
-        TextButton(
-          onPressed: onAgain,
-          style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
-          child: Text(found.origin == PlaceOrigin.address ? s.plChange : s.plRelocate),
         ),
       ],
     );
@@ -625,7 +622,7 @@ class PlaceCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  PlacePhotos(kit: kit, place: place, onTap: open),
+                  PlacePhotos(kit: kit, place: place, onPhoto: (i) => showPlacePhotos(context, kit.photosOf(place), i)),
                   Positioned(
                     left: 10,
                     top: 10,
@@ -705,38 +702,18 @@ class PlaceCard extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 6, 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        if (place.phones.isNotEmpty)
-                          PlaceMiniAction(
-                            icon: Icons.call_rounded,
-                            label: s.plCall,
-                            onTap: () => callPlace(context, kit.services, place),
-                          ),
-                        PlaceMiniAction(
-                          icon: Icons.directions_rounded,
-                          label: s.plRoute,
-                          onTap: () => routeToPlace(context, kit.services, place),
-                        ),
-                      ],
-                    ),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(6, 2, 6, 6),
+                child: TextButton(
+                  onPressed: open,
+                  style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [Text(s.plDetails), const Icon(Icons.chevron_right_rounded, size: 20)],
                   ),
-                  TextButton(
-                    onPressed: open,
-                    style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [Text(s.plDetails), const Icon(Icons.chevron_right_rounded, size: 20)],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ],

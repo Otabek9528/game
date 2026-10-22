@@ -245,7 +245,6 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
         : widget.origin == PlaceOrigin.address
             ? s.plKmFromAddress(distanceText(s, km))
             : s.plKmFromYou(distanceText(s, km));
-    final photos = _kit.photosOf(place);
     return Scaffold(
       backgroundColor: p.page,
       body: ListenableBuilder(
@@ -277,7 +276,12 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
               ],
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.parallax,
-                background: photos.isNotEmpty ? _Photos(photos: photos) : PlaceBackdrop(kind: place.kind),
+                background: PlacePhotos(
+                  kit: _kit,
+                  place: place,
+                  counter: true,
+                  onPhoto: (i) => showPlacePhotos(context, _kit.photosOf(place), i),
+                ),
               ),
             ),
             SliverPadding(
@@ -297,12 +301,10 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                     },
                   ),
                   const SizedBox(height: 18),
-                  _Actions(place: place, services: _services),
-                  const SizedBox(height: 18),
                   _Contact(place: place, services: _services),
                   if (place.located) ...[
                     const SizedBox(height: 12),
-                    _MapCard(place: place, onRoute: () => routeToPlace(context, _services, place)),
+                    _MapCard(place: place, onOpen: () => routeToPlace(context, _services, place)),
                   ],
                   if (_error != null && detail == null) ...[
                     const SizedBox(height: 16),
@@ -315,7 +317,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                     _Social(
                       detail: detail,
                       services: _services,
-                      onSuggest: () => _suggest([for (final f in suggestFields) if (f != 'note' && !detail.pending.contains(f)) f]),
+                      onSuggest: _suggest,
                     ),
                     KeyedSubtree(
                       key: _reviewsKey,
@@ -375,64 +377,12 @@ class _Round extends StatelessWidget {
   }
 }
 
-class _Photos extends StatefulWidget {
-  const _Photos({required this.photos});
-
-  final List<PlacePhoto> photos;
-
-  @override
-  State<_Photos> createState() => _PhotosState();
-}
-
-class _PhotosState extends State<_Photos> {
-  int _index = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        PageView.builder(
-          itemCount: widget.photos.length,
-          onPageChanged: (i) => setState(() => _index = i),
-          itemBuilder: (context, i) => GestureDetector(
-            onTap: () => showPlacePhotos(context, widget.photos, i),
-            child: Image.network(
-              '${widget.photos[i].full}',
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => ColoredBox(color: p.badge),
-              frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : ColoredBox(color: p.badge),
-            ),
-          ),
-        ),
-        if (widget.photos.length > 1)
-          Positioned(
-            right: 12,
-            bottom: 12,
-            child: DecoratedBox(
-              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(20)),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                child: Text(
-                  s.plPhotoCount('${_index + 1}', '${widget.photos.length}'),
-                  style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700),
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-/// Where it is: the map around it, and the way there.
+/// Where it is, and the one way there: the map opens a navigator.
 class _MapCard extends StatelessWidget {
-  const _MapCard({required this.place, required this.onRoute});
+  const _MapCard({required this.place, required this.onOpen});
 
   final Place place;
-  final VoidCallback onRoute;
+  final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -440,7 +390,10 @@ class _MapCard extends StatelessWidget {
     final p = VegukinPalette.of(context);
     return PlacesCard(
       padding: EdgeInsets.zero,
-      onTap: onRoute,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onOpen();
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -448,16 +401,21 @@ class _MapCard extends StatelessWidget {
             height: 156,
             child: PlaceMap(lat: place.lat!, lon: place.lon!, colour: kindColour(context, place.kind), emoji: place.kind.emoji),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
-            child: Row(
-              children: [
-                Icon(Icons.map_outlined, size: 20, color: p.accent),
-                const SizedBox(width: 10),
-                Expanded(child: Text(s.plOnMap, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink))),
-                Text(s.plGetDirections, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: p.accent)),
-                Icon(Icons.chevron_right_rounded, color: p.accent),
-              ],
+          ColoredBox(
+            color: p.cardSelected,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+              child: Row(
+                children: [
+                  Icon(Icons.navigation_rounded, size: 20, color: p.accent),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(s.plGetDirections, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: p.accent)),
+                  ),
+                  Text('Naver · Kakao', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.inkMuted)),
+                  Icon(Icons.chevron_right_rounded, color: p.accent),
+                ],
+              ),
             ),
           ),
         ],
@@ -602,71 +560,6 @@ class _WatchPill extends StatelessWidget {
   }
 }
 
-/// Call, the way there, the address copied, shared: the reasons people
-/// open a place, each one tap.
-class _Actions extends StatelessWidget {
-  const _Actions({required this.place, required this.services});
-
-  final Place place;
-  final AppServices services;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final actions = [
-      if (place.phones.isNotEmpty) (Icons.call_rounded, s.plCall, () => callPlace(context, services, place)),
-      (Icons.directions_rounded, s.plRoute, () => routeToPlace(context, services, place)),
-      if (place.address != null) (Icons.copy_rounded, s.plCopy, () => copyAddress(context, place)),
-      (Icons.share_rounded, s.plShare, () => sharePlace(context, services, place)),
-    ];
-    return Row(
-      children: [
-        for (final (icon, label, onTap) in actions) Expanded(child: _BigAction(icon: icon, label: label, onTap: onTap)),
-      ],
-    );
-  }
-}
-
-class _BigAction extends StatelessWidget {
-  const _BigAction({required this.icon, required this.label, required this.onTap});
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Column(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(color: p.cardSelected, shape: BoxShape.circle, border: Border.all(color: p.accent.withValues(alpha: 0.25))),
-              child: Icon(icon, color: p.accent),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.inkSoft),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _Contact extends StatelessWidget {
   const _Contact({required this.place, required this.services});
 
@@ -706,15 +599,17 @@ class _Contact extends StatelessWidget {
     final rows = [
       if (place.address != null)
         row(Icons.place_rounded, s.plAddress, place.address,
-            onTap: () => copyAddress(context, place), trailing: Icon(Icons.copy_rounded, size: 18, color: p.inkMuted))
+            onTap: () => copyAddress(context, place), trailing: _RowAction(Icons.copy_rounded, s.plCopyAddress))
       else
         row(Icons.place_outlined, s.plAddress, s.plNoAddress, muted: true),
       if (place.phones.isEmpty)
         row(Icons.call_outlined, s.plPhone, s.plNoPhone, muted: true)
       else
         for (final phone in place.phones)
-          row(Icons.call_rounded, s.plPhone, phone,
-              onTap: () => services.openLink(telUri(phone)), trailing: Icon(Icons.chevron_right_rounded, color: p.inkMuted)),
+          row(Icons.call_rounded, s.plPhone, phone, onTap: () {
+            HapticFeedback.lightImpact();
+            services.openLink(telUri(phone));
+          }, trailing: _RowAction(Icons.call_rounded, s.plCallNumber)),
       if (place.menuUrl != null)
         row(Icons.restaurant_menu_rounded, s.plMenu, s.plMenuOpen,
             onTap: () => services.openLink(Uri.parse(place.menuUrl!)),
@@ -729,6 +624,29 @@ class _Contact extends StatelessWidget {
             r,
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// What tapping a contact row does, as a round button at its end.
+class _RowAction extends StatelessWidget {
+  const _RowAction(this.icon, this.label);
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return Semantics(
+      label: label,
+      child: Container(
+        width: 38,
+        height: 38,
+        margin: const EdgeInsetsDirectional.only(start: 8),
+        decoration: BoxDecoration(color: p.cardSelected, shape: BoxShape.circle),
+        child: Icon(icon, size: 18, color: p.accent),
       ),
     );
   }
@@ -811,65 +729,135 @@ String socialHandle(AppLocalizations s, String field, String url) {
   return '@${segments.first.replaceFirst('@', '')}';
 }
 
+/// Its pages, as the web shows them: one wide tile for a single link,
+/// equal tiles for two or three. A link once set stays (changes go through
+/// the admin); one waiting for review shows as nothing and isn't offered
+/// again. The rest offered in a quiet line, not a button.
 class _Social extends StatelessWidget {
   const _Social({required this.detail, required this.services, required this.onSuggest});
 
   final PlaceDetail detail;
   final AppServices services;
-  final VoidCallback onSuggest;
+  final ValueChanged<List<String>> onSuggest;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final place = detail.place;
+    final fields = suggestFields.where((f) => f != 'note');
+    final links = [for (final f in fields) if (place.social(f) != null) f];
+    final offerable = [for (final f in fields) if (place.social(f) == null && !detail.pending.contains(f)) f];
+    if (links.isEmpty && offerable.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PlacesHeading(s.plSocial),
+        if (links.length == 1)
+          _SocialTile(field: links.single, url: place.social(links.single)!, wide: true, services: services)
+        else if (links.isNotEmpty)
+          Row(
+            children: [
+              for (final (i, f) in links.indexed) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(child: _SocialTile(field: f, url: place.social(f)!, wide: false, services: services)),
+              ],
+            ],
+          ),
+        if (offerable.isNotEmpty)
+          _QuietPrompt(
+            text: links.isEmpty ? s.plSocialEmpty : s.plSocialMore,
+            action: s.plSocialAdd,
+            onTap: () => onSuggest(offerable),
+          ),
+      ],
+    );
+  }
+}
+
+class _SocialTile extends StatelessWidget {
+  const _SocialTile({required this.field, required this.url, required this.wide, required this.services});
+
+  final String field;
+  final String url;
+  final bool wide;
+  final AppServices services;
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final place = detail.place;
-    final links = [for (final f in suggestFields) if (f != 'note' && place.social(f) != null) f];
-    final pending = [for (final f in suggestFields) if (f != 'note' && detail.pending.contains(f)) f];
-    final offerable = suggestFields.any((f) => f != 'note' && !detail.pending.contains(f));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        PlacesHeading(s.plSocial),
-        PlacesCard(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (links.isEmpty)
-                Text(s.plSocialEmpty, style: TextStyle(fontSize: 14.5, height: 1.4, color: p.inkMuted))
-              else
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+    final colour = fieldColour(context, field);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final name = Text(fieldLabel(s, field),
+        maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: wide ? 15.5 : 13.5, fontWeight: FontWeight.w800, color: p.ink));
+    final handle = Text(socialHandle(s, field, url),
+        maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: wide ? 13 : 11.5, color: p.inkSoft));
+    final icon = Icon(fieldIcon(field), size: wide ? 30 : 26, color: colour);
+    return Material(
+      color: colour.withValues(alpha: dark ? 0.16 : (field == 'tiktok' ? 0.07 : 0.10)),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          services.openLink(Uri.parse(url));
+        },
+        child: wide
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                child: Row(
                   children: [
-                    for (final f in links)
-                      ActionChip(
-                        avatar: Icon(fieldIcon(f), size: 18, color: fieldColour(context, f)),
-                        label: Text('${fieldLabel(s, f)} · ${socialHandle(s, f, place.social(f)!)}'),
-                        backgroundColor: p.page,
-                        side: BorderSide(color: p.hairline),
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          services.openLink(Uri.parse(place.social(f)!));
-                        },
-                      ),
+                    icon,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [name, const SizedBox(height: 2), handle]),
+                    ),
+                    Icon(Icons.open_in_new_rounded, size: 18, color: p.inkMuted),
                   ],
                 ),
-              for (final f in pending) _PendingLine(s.plPendingField(fieldLabel(s, f))),
-              if (offerable)
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: TextButton.icon(
-                    onPressed: onSuggest,
-                    style: TextButton.styleFrom(padding: EdgeInsets.zero, visualDensity: VisualDensity.compact),
-                    icon: Icon(links.isEmpty ? Icons.add_rounded : Icons.edit_outlined, size: 18),
-                    label: Text(links.isEmpty ? s.plSocialAdd : s.plSuggestChange),
+              )
+            : SizedBox(
+                height: 96,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [icon, const SizedBox(height: 6), name, const SizedBox(height: 2), handle],
                   ),
                 ),
-            ],
+              ),
+      ),
+    );
+  }
+}
+
+/// "Do you know …? Add": a sentence with a link in it.
+class _QuietPrompt extends StatelessWidget {
+  const _QuietPrompt({required this.text, required this.action, required this.onTap});
+
+  final String text;
+  final String action;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 10, 4, 0),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text('$text ', style: TextStyle(fontSize: 14, color: p.inkMuted)),
+          InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+              child: Text(action, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: p.accent)),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

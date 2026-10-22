@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
@@ -94,17 +93,53 @@ class PlaceStars extends StatelessWidget {
   }
 }
 
-/// A place's photos, swiped through, with dots; its kind on its colour in
-/// tilework while they load, or when it has none.
+/// A photo as wide as the screen: the small copy at once, the large one
+/// faded in over it. Decoded at the screen's width, so a card's photo and
+/// the place page's are one image, loaded once.
+class PlaceImage extends StatelessWidget {
+  const PlaceImage({super.key, required this.photo, required this.fallback});
+
+  final PlacePhoto photo;
+  final Widget fallback;
+
+  /// The large copy at the screen's width.
+  static ImageProvider full(BuildContext context, PlacePhoto photo) => ResizeImage(
+        NetworkImage('${photo.full}'),
+        width: (MediaQuery.sizeOf(context).width * MediaQuery.devicePixelRatioOf(context)).round(),
+      );
+
+  @override
+  Widget build(BuildContext context) => Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(
+            '${photo.thumb}',
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => fallback,
+            frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : fallback,
+          ),
+          Image(
+            image: full(context, photo),
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            frameBuilder: (_, child, frame, sync) => sync
+                ? child
+                : AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: const Duration(milliseconds: 220), child: child),
+          ),
+        ],
+      );
+}
+
+/// A place's photos, swiped through, with dots ([counter]: "1 / 3"
+/// instead); a tap on one gives its number. Only the photo on screen and
+/// the next are loaded. Its kind on its colour when it has none.
 class PlacePhotos extends StatefulWidget {
-  const PlacePhotos({super.key, required this.kit, required this.place, this.onTap, this.full = false});
+  const PlacePhotos({super.key, required this.kit, required this.place, this.onPhoto, this.counter = false});
 
   final PlacesKit kit;
   final Place place;
-  final VoidCallback? onTap;
-
-  /// The large photos (the place page) rather than the card's.
-  final bool full;
+  final ValueChanged<int>? onPhoto;
+  final bool counter;
 
   @override
   State<PlacePhotos> createState() => _PlacePhotosState();
@@ -117,54 +152,66 @@ class _PlacePhotosState extends State<PlacePhotos> {
   Widget build(BuildContext context) {
     final photos = widget.kit.photosOf(widget.place);
     final backdrop = PlaceBackdrop(kind: widget.place.kind);
-    if (photos.isEmpty) return GestureDetector(onTap: widget.onTap, child: backdrop);
-    return LayoutBuilder(builder: (context, box) {
-      final width = (box.maxWidth * MediaQuery.devicePixelRatioOf(context)).round();
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          PageView.builder(
-            itemCount: photos.length,
-            onPageChanged: (i) => setState(() => _index = i),
-            itemBuilder: (context, i) => GestureDetector(
-              onTap: widget.onTap,
-              child: Image.network(
-                '${photos[i].full}',
-                fit: BoxFit.cover,
-                cacheWidth: widget.full ? null : width,
-                errorBuilder: (_, _, _) => backdrop,
-                frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : backdrop,
-              ),
-            ),
+    if (photos.isEmpty) return backdrop;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        PageView.builder(
+          itemCount: photos.length,
+          onPageChanged: (i) {
+            setState(() => _index = i);
+            // The one after, ready before it is swiped to.
+            if (i + 1 < photos.length) precacheImage(PlaceImage.full(context, photos[i + 1]), context).ignore();
+          },
+          itemBuilder: (context, i) => GestureDetector(
+            onTap: widget.onPhoto == null ? null : () => widget.onPhoto!(i),
+            child: PlaceImage(photo: photos[i], fallback: backdrop),
           ),
-          if (photos.length > 1)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 10,
-              child: IgnorePointer(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (var i = 0; i < photos.length; i++)
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        width: i == _index ? 18 : 7,
-                        height: 7,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: i == _index ? 1 : 0.6),
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 3)],
-                        ),
-                      ),
-                  ],
+        ),
+        if (photos.length > 1 && widget.counter)
+          Positioned(
+            right: 12,
+            bottom: 12,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(20)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  child: Text(
+                    AppLocalizations.of(context).plPhotoCount('${_index + 1}', '${photos.length}'),
+                    style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
             ),
-        ],
-      );
-    });
+          )
+        else if (photos.length > 1)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 10,
+            child: IgnorePointer(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var i = 0; i < photos.length; i++)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: i == _index ? 18 : 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: i == _index ? 1 : 0.6),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 3)],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
 
@@ -191,49 +238,6 @@ class PlaceBackdrop extends StatelessWidget {
           CustomPaint(painter: KhatamLatticePainter(color: Colors.white.withValues(alpha: 0.08))),
           Center(child: Text(kind.emoji, style: const TextStyle(fontSize: 56))),
         ],
-      ),
-    );
-  }
-}
-
-/// A small rounded action under a place: call, directions.
-class PlaceMiniAction extends StatelessWidget {
-  const PlaceMiniAction({super.key, required this.icon, required this.label, required this.onTap});
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return Material(
-      color: p.cardSelected,
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onTap();
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 16, color: p.accent),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: p.accent),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -531,6 +531,7 @@ class _PhotoViewer extends StatefulWidget {
 class _PhotoViewerState extends State<_PhotoViewer> {
   late final _pages = PageController(initialPage: widget.start);
   late int _index = widget.start;
+  bool _zoomed = false;
 
   @override
   void dispose() {
@@ -549,23 +550,18 @@ class _PhotoViewerState extends State<_PhotoViewer> {
           children: [
             PageView.builder(
               controller: _pages,
+              // A zoomed photo pans; swiping to the next waits until it's back.
+              physics: _zoomed ? const NeverScrollableScrollPhysics() : null,
               itemCount: widget.photos.length,
               onPageChanged: (i) {
                 HapticFeedback.selectionClick();
                 setState(() => _index = i);
               },
-              itemBuilder: (context, i) => InteractiveViewer(
-                maxScale: 5,
-                child: Center(
-                  child: Image.network(
-                    '${widget.photos[i].full}',
-                    fit: BoxFit.contain,
-                    loadingBuilder: (_, child, progress) => progress == null
-                        ? child
-                        : const Center(child: CircularProgressIndicator(color: Colors.white54)),
-                    errorBuilder: (_, _, _) => Text(s.plPhotoFailed, style: const TextStyle(color: Colors.white70)),
-                  ),
-                ),
+              itemBuilder: (context, i) => _ZoomPhoto(
+                photo: widget.photos[i],
+                onZoom: (zoomed) {
+                  if (zoomed != _zoomed) setState(() => _zoomed = zoomed);
+                },
               ),
             ),
             SafeArea(
@@ -576,22 +572,111 @@ class _PhotoViewerState extends State<_PhotoViewer> {
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                      style: IconButton.styleFrom(backgroundColor: Colors.black38),
                       icon: const Icon(Icons.close_rounded, color: Colors.white),
                     ),
                     const Spacer(),
                     if (widget.photos.length > 1)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: Text(
-                          s.plPhotoCount('${_index + 1}', '${widget.photos.length}'),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                      DecoratedBox(
+                        decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(20)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Text(
+                            s.plPhotoCount('${_index + 1}', '${widget.photos.length}'),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                          ),
                         ),
                       ),
+                    const SizedBox(width: 8),
                   ],
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One photo, fitted: pinch to zoom, double-tap to zoom in where tapped
+/// and again to fit. The copy the list already has shows at once; the
+/// large one, sharp when zoomed, over it once loaded.
+class _ZoomPhoto extends StatefulWidget {
+  const _ZoomPhoto({required this.photo, required this.onZoom});
+
+  final PlacePhoto photo;
+  final ValueChanged<bool> onZoom;
+
+  @override
+  State<_ZoomPhoto> createState() => _ZoomPhotoState();
+}
+
+class _ZoomPhotoState extends State<_ZoomPhoto> with SingleTickerProviderStateMixin {
+  final _zoom = TransformationController();
+  late final _animation = AnimationController(vsync: this, duration: const Duration(milliseconds: 220));
+  Animation<Matrix4>? _to;
+  Offset _tap = Offset.zero;
+
+  static const _doubleTapScale = 2.6;
+
+  @override
+  void initState() {
+    super.initState();
+    _zoom.addListener(() => widget.onZoom(_zoom.value.getMaxScaleOnAxis() > 1.01));
+    _animation.addListener(() => _zoom.value = _to!.value);
+  }
+
+  @override
+  void dispose() {
+    _animation.dispose();
+    _zoom.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    final Matrix4 end;
+    if (_zoom.value.getMaxScaleOnAxis() > 1.01) {
+      end = Matrix4.identity();
+    } else {
+      end = Matrix4.identity()
+        ..translateByDouble(-_tap.dx * (_doubleTapScale - 1), -_tap.dy * (_doubleTapScale - 1), 0, 1)
+        ..scaleByDouble(_doubleTapScale, _doubleTapScale, 1, 1);
+    }
+    _to = Matrix4Tween(begin: _zoom.value, end: end).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOutCubic));
+    _animation.forward(from: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    return GestureDetector(
+      onDoubleTapDown: (d) => _tap = d.localPosition,
+      onDoubleTap: _toggle,
+      child: InteractiveViewer(
+        transformationController: _zoom,
+        maxScale: 5,
+        child: SizedBox.expand(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image(
+                image: PlaceImage.full(context, widget.photo),
+                fit: BoxFit.contain,
+                loadingBuilder: (_, child, progress) =>
+                    progress == null ? child : const Center(child: CircularProgressIndicator(color: Colors.white54)),
+                errorBuilder: (_, _, _) =>
+                    Center(child: Text(s.plPhotoFailed, style: const TextStyle(color: Colors.white70))),
+              ),
+              Image.network(
+                '${widget.photo.full}',
+                fit: BoxFit.contain,
+                gaplessPlayback: true,
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : const SizedBox.shrink(),
+              ),
+            ],
+          ),
         ),
       ),
     );
