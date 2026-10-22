@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../barcode/barcode_screen.dart';
 import '../business/business_screen.dart';
+import '../cars/cars_screen.dart';
 import '../hikorea/hikorea_screen.dart';
 import '../hikorea/hikorea_watches.dart';
 import '../links/links_screen.dart';
@@ -45,6 +46,7 @@ void openSection(BuildContext context, Feature feature, AppServices services) {
     'donation' => (BuildContext _) => DonationScreen(services: services),
     'community' => (BuildContext _) => CommunityScreen(services: services),
     'hikorea' => (BuildContext _) => HikoreaScreen(services: services),
+    'cars' => (BuildContext _) => CarsScreen(services: services),
     _ => null,
   };
   if (native != null) {

@@ -3102,4 +3102,381 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plNewsTitle => 'Yangiliklar';
+
+  @override
+  String get carMarket => 'Avto Bozor';
+
+  @override
+  String get carTabBrowse => 'Ko‘rish';
+
+  @override
+  String get carTabSearch => 'Qidirish';
+
+  @override
+  String get carTabSaved => 'Sevimlilar';
+
+  @override
+  String carListings(String count) {
+    return '$count ta e’lon';
+  }
+
+  @override
+  String carAvailableSold(String available, String sold) {
+    return '$available mavjud · $sold sotilgan';
+  }
+
+  @override
+  String get carSearchSub => 'Atributlar bo‘yicha toping';
+
+  @override
+  String carSavedSub(String count) {
+    return '$count ta saqlangan';
+  }
+
+  @override
+  String get carLoading => 'Yuklanmoqda…';
+
+  @override
+  String get carMedianPrice => 'o‘rtacha narx';
+
+  @override
+  String get carNoneOnSale => 'Hozircha sotuvda yo‘q';
+
+  @override
+  String carSoldCount(String count) {
+    return '$count sotilgan';
+  }
+
+  @override
+  String get carSortNew => 'Yangi';
+
+  @override
+  String get carSortValue => 'Eng arzonlari';
+
+  @override
+  String get carSortPriceUp => 'Narx ↑';
+
+  @override
+  String get carSortPriceDown => 'Narx ↓';
+
+  @override
+  String get carSortMileage => 'Yurgani ↑';
+
+  @override
+  String get carSortYear => 'Yili ↓';
+
+  @override
+  String get carAll => 'Hammasi';
+
+  @override
+  String get carAvailable => 'Mavjud';
+
+  @override
+  String get carSold => 'Sotilgan';
+
+  @override
+  String get carEmptyAllTitle => 'Hozircha e’lon yo‘q';
+
+  @override
+  String get carEmptyAllBody => 'Tez orada yangi mashinalar qo‘shiladi';
+
+  @override
+  String get carEmptyModelTitle => 'Bu modelda e’lon yo‘q';
+
+  @override
+  String get carEmptyModelBody => 'Yuqoridagi nomdan boshqa modelni tanlang';
+
+  @override
+  String get carChannelTitle => 'Vegukin Avto — kanal';
+
+  @override
+  String get carChannelBody => 'Barcha yangi e’lonlar shu yerda jonli chiqadi';
+
+  @override
+  String get carOpen => 'Ochish';
+
+  @override
+  String get carLoadFailed => 'Yuklab bo‘lmadi';
+
+  @override
+  String get carCheckInternet => 'Internet aloqasini tekshiring';
+
+  @override
+  String get carDeal => 'Arzon';
+
+  @override
+  String get carNegotiable => 'Kelishiladi';
+
+  @override
+  String get carNoPrice => 'Narxi keltirilmagan';
+
+  @override
+  String get carFewDetails => 'Ma’lumot kam';
+
+  @override
+  String get carSeen => 'Ko‘rilgan';
+
+  @override
+  String get carSave => 'Saqlash';
+
+  @override
+  String get carUnsave => 'Saqlanganlardan olib tashlash';
+
+  @override
+  String get carFuelPetrol => 'Benzin';
+
+  @override
+  String get carFuelDiesel => 'Dizel';
+
+  @override
+  String get carFuelLpg => 'LPG';
+
+  @override
+  String get carFuelHybrid => 'Gibrid';
+
+  @override
+  String get carAutomatic => 'Avtomat';
+
+  @override
+  String get carManual => 'Mexanika';
+
+  @override
+  String get carNotGiven => 'Keltirilmagan';
+
+  @override
+  String get carPickModel => 'Marka va modelni tanlang';
+
+  @override
+  String get carPriceMax => 'Narx (gacha), ₩';
+
+  @override
+  String get carMileageMax => 'Yurgani (km gacha)';
+
+  @override
+  String get carYearFrom => 'Yildan';
+
+  @override
+  String get carFuel => 'Yoqilg‘i';
+
+  @override
+  String get carStatus => 'Holati';
+
+  @override
+  String carResults(String count) {
+    return '$count ta natija';
+  }
+
+  @override
+  String get carNothingFound => 'Hech narsa topilmadi';
+
+  @override
+  String get carWidenFilters => 'Filtrlarni kengaytiring';
+
+  @override
+  String get carClearFilters => 'Tozalash';
+
+  @override
+  String get carSavedEmptyTitle => 'Sevimlilar bo‘sh';
+
+  @override
+  String get carSavedEmptyBody => 'Yoqqan mashinalarni ❤ tugmasi bilan saqlang';
+
+  @override
+  String get carStartBrowsing => 'Ko‘rishni boshlash';
+
+  @override
+  String get carPickBrand => 'Markani tanlang';
+
+  @override
+  String get carAnyBrand => 'Har qanday';
+
+  @override
+  String get carAllBrands => 'barcha markalar';
+
+  @override
+  String carBrandListings(String count) {
+    return '$count e’lon';
+  }
+
+  @override
+  String carAllOf(String brand) {
+    return 'Barcha $brand';
+  }
+
+  @override
+  String get carSearchHint => 'Qidirish…';
+
+  @override
+  String get carCatalogFailed =>
+      'Markalar yuklanmadi. Internetni tekshirib, qayta oching.';
+
+  @override
+  String carViews(String count) {
+    return '$count marta ko‘rilgan';
+  }
+
+  @override
+  String get carNotice =>
+      'Ma’lumotlar e’lon matnidan avtomatik o‘qilgan va xato bo‘lishi mumkin. Aniq narx va tafsilotlar uchun e’lon matnini diqqat bilan o‘qing.';
+
+  @override
+  String get carPostText => 'E’lon matni';
+
+  @override
+  String get carNoText => 'Matn keltirilmagan';
+
+  @override
+  String get carReadMore => 'Ko‘proq o‘qish';
+
+  @override
+  String get carReadLess => 'Yopish';
+
+  @override
+  String carSource(String name) {
+    return 'Manba: $name kanali';
+  }
+
+  @override
+  String get carPriceAnalysis => 'Narx tahlili';
+
+  @override
+  String get carVeryCheap => 'Juda arzon';
+
+  @override
+  String get carCheap => 'Arzon';
+
+  @override
+  String get carAtMarket => 'Bozor narxida';
+
+  @override
+  String get carPricier => 'Qimmatroq';
+
+  @override
+  String get carExpensive => 'Qimmat';
+
+  @override
+  String get carNearAverage => 'o‘rtachaga yaqin';
+
+  @override
+  String carBelowAverage(String percent) {
+    return 'o‘rtachadan $percent% arzon';
+  }
+
+  @override
+  String carAboveAverage(String percent) {
+    return 'o‘rtachadan $percent% qimmat';
+  }
+
+  @override
+  String carFewComparables(String count) {
+    return 'faqat $count ta taqqoslash bor';
+  }
+
+  @override
+  String carScaleCheap(String price) {
+    return 'arzon $price';
+  }
+
+  @override
+  String carScaleDear(String price) {
+    return 'qimmat $price';
+  }
+
+  @override
+  String carNearYearBasis(String year, String count, String median) {
+    return '$year y. atrofidagi $count ta · o‘rtacha $median';
+  }
+
+  @override
+  String carModelBasis(String count, String median) {
+    return '$count ta sotuvda · o‘rtacha $median';
+  }
+
+  @override
+  String carSoldBasis(String count, String median) {
+    return '$count ta sotilgan · $median';
+  }
+
+  @override
+  String get carDetails => 'Batafsil';
+
+  @override
+  String get carGeneration => 'Avlod';
+
+  @override
+  String get carYear => 'Yili';
+
+  @override
+  String get carMileage => 'Yurgani';
+
+  @override
+  String get carGearbox => 'Karobka';
+
+  @override
+  String get carLegal => 'Hujjatlari';
+
+  @override
+  String get carLegalOk => 'Legal';
+
+  @override
+  String get carLegalNoReg => 'Oformleniyasiz';
+
+  @override
+  String get carRegistration => 'Nomiga o‘tkazish';
+
+  @override
+  String get carRequired => 'Shart';
+
+  @override
+  String get carNotRequired => 'Shart emas';
+
+  @override
+  String get carPosted => 'E’lon';
+
+  @override
+  String get carSourceLabel => 'Manba';
+
+  @override
+  String get carContact => 'Bog‘lanish';
+
+  @override
+  String get carSellerPhone => 'Sotuvchi telefoni';
+
+  @override
+  String get carCall => 'Qo‘ng‘iroq';
+
+  @override
+  String get carCopy => 'Nusxa';
+
+  @override
+  String get carCopied => 'Raqam nusxalandi';
+
+  @override
+  String get carWriteOnTelegram => 'Telegram orqali yozish';
+
+  @override
+  String get carWrite => 'Yozish';
+
+  @override
+  String get carNumberInText => 'Raqam e’lon matnida';
+
+  @override
+  String get carSimilar => 'O‘xshash mashinalar';
+
+  @override
+  String get carSimilarSub => 'narx bo‘yicha';
+
+  @override
+  String get carNoComparables => 'Taqqoslash uchun e’lon yo‘q';
+
+  @override
+  String get carListingFailed => 'E’lon yuklanmadi';
+
+  @override
+  String carVideoSize(String size) {
+    return 'Video · $size MB';
+  }
+
+  @override
+  String get carListing => 'E’lon';
 }

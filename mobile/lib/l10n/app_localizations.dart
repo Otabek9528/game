@@ -5517,6 +5517,684 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Yangiliklar'**
   String get plNewsTitle;
+
+  /// No description provided for @carMarket.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avto Bozor'**
+  String get carMarket;
+
+  /// No description provided for @carTabBrowse.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘rish'**
+  String get carTabBrowse;
+
+  /// No description provided for @carTabSearch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish'**
+  String get carTabSearch;
+
+  /// No description provided for @carTabSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sevimlilar'**
+  String get carTabSaved;
+
+  /// No description provided for @carListings.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta e’lon'**
+  String carListings(String count);
+
+  /// No description provided for @carAvailableSold.
+  ///
+  /// In uz, this message translates to:
+  /// **'{available} mavjud · {sold} sotilgan'**
+  String carAvailableSold(String available, String sold);
+
+  /// No description provided for @carSearchSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'Atributlar bo‘yicha toping'**
+  String get carSearchSub;
+
+  /// No description provided for @carSavedSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta saqlangan'**
+  String carSavedSub(String count);
+
+  /// No description provided for @carLoading.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklanmoqda…'**
+  String get carLoading;
+
+  /// No description provided for @carMedianPrice.
+  ///
+  /// In uz, this message translates to:
+  /// **'o‘rtacha narx'**
+  String get carMedianPrice;
+
+  /// No description provided for @carNoneOnSale.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha sotuvda yo‘q'**
+  String get carNoneOnSale;
+
+  /// No description provided for @carSoldCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} sotilgan'**
+  String carSoldCount(String count);
+
+  /// No description provided for @carSortNew.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi'**
+  String get carSortNew;
+
+  /// No description provided for @carSortValue.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng arzonlari'**
+  String get carSortValue;
+
+  /// No description provided for @carSortPriceUp.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narx ↑'**
+  String get carSortPriceUp;
+
+  /// No description provided for @carSortPriceDown.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narx ↓'**
+  String get carSortPriceDown;
+
+  /// No description provided for @carSortMileage.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yurgani ↑'**
+  String get carSortMileage;
+
+  /// No description provided for @carSortYear.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yili ↓'**
+  String get carSortYear;
+
+  /// No description provided for @carAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hammasi'**
+  String get carAll;
+
+  /// No description provided for @carAvailable.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mavjud'**
+  String get carAvailable;
+
+  /// No description provided for @carSold.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sotilgan'**
+  String get carSold;
+
+  /// No description provided for @carEmptyAllTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha e’lon yo‘q'**
+  String get carEmptyAllTitle;
+
+  /// No description provided for @carEmptyAllBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tez orada yangi mashinalar qo‘shiladi'**
+  String get carEmptyAllBody;
+
+  /// No description provided for @carEmptyModelTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu modelda e’lon yo‘q'**
+  String get carEmptyModelTitle;
+
+  /// No description provided for @carEmptyModelBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuqoridagi nomdan boshqa modelni tanlang'**
+  String get carEmptyModelBody;
+
+  /// No description provided for @carChannelTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vegukin Avto — kanal'**
+  String get carChannelTitle;
+
+  /// No description provided for @carChannelBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha yangi e’lonlar shu yerda jonli chiqadi'**
+  String get carChannelBody;
+
+  /// No description provided for @carOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ochish'**
+  String get carOpen;
+
+  /// No description provided for @carLoadFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklab bo‘lmadi'**
+  String get carLoadFailed;
+
+  /// No description provided for @carCheckInternet.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet aloqasini tekshiring'**
+  String get carCheckInternet;
+
+  /// No description provided for @carDeal.
+  ///
+  /// In uz, this message translates to:
+  /// **'Arzon'**
+  String get carDeal;
+
+  /// No description provided for @carNegotiable.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kelishiladi'**
+  String get carNegotiable;
+
+  /// No description provided for @carNoPrice.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narxi keltirilmagan'**
+  String get carNoPrice;
+
+  /// No description provided for @carFewDetails.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumot kam'**
+  String get carFewDetails;
+
+  /// No description provided for @carSeen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘rilgan'**
+  String get carSeen;
+
+  /// No description provided for @carSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get carSave;
+
+  /// No description provided for @carUnsave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlanganlardan olib tashlash'**
+  String get carUnsave;
+
+  /// No description provided for @carFuelPetrol.
+  ///
+  /// In uz, this message translates to:
+  /// **'Benzin'**
+  String get carFuelPetrol;
+
+  /// No description provided for @carFuelDiesel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Dizel'**
+  String get carFuelDiesel;
+
+  /// No description provided for @carFuelLpg.
+  ///
+  /// In uz, this message translates to:
+  /// **'LPG'**
+  String get carFuelLpg;
+
+  /// No description provided for @carFuelHybrid.
+  ///
+  /// In uz, this message translates to:
+  /// **'Gibrid'**
+  String get carFuelHybrid;
+
+  /// No description provided for @carAutomatic.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avtomat'**
+  String get carAutomatic;
+
+  /// No description provided for @carManual.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mexanika'**
+  String get carManual;
+
+  /// No description provided for @carNotGiven.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keltirilmagan'**
+  String get carNotGiven;
+
+  /// No description provided for @carPickModel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Marka va modelni tanlang'**
+  String get carPickModel;
+
+  /// No description provided for @carPriceMax.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narx (gacha), ₩'**
+  String get carPriceMax;
+
+  /// No description provided for @carMileageMax.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yurgani (km gacha)'**
+  String get carMileageMax;
+
+  /// No description provided for @carYearFrom.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yildan'**
+  String get carYearFrom;
+
+  /// No description provided for @carFuel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqilg‘i'**
+  String get carFuel;
+
+  /// No description provided for @carStatus.
+  ///
+  /// In uz, this message translates to:
+  /// **'Holati'**
+  String get carStatus;
+
+  /// No description provided for @carResults.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta natija'**
+  String carResults(String count);
+
+  /// No description provided for @carNothingFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsa topilmadi'**
+  String get carNothingFound;
+
+  /// No description provided for @carWidenFilters.
+  ///
+  /// In uz, this message translates to:
+  /// **'Filtrlarni kengaytiring'**
+  String get carWidenFilters;
+
+  /// No description provided for @carClearFilters.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tozalash'**
+  String get carClearFilters;
+
+  /// No description provided for @carSavedEmptyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sevimlilar bo‘sh'**
+  String get carSavedEmptyTitle;
+
+  /// No description provided for @carSavedEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqqan mashinalarni ❤ tugmasi bilan saqlang'**
+  String get carSavedEmptyBody;
+
+  /// No description provided for @carStartBrowsing.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘rishni boshlash'**
+  String get carStartBrowsing;
+
+  /// No description provided for @carPickBrand.
+  ///
+  /// In uz, this message translates to:
+  /// **'Markani tanlang'**
+  String get carPickBrand;
+
+  /// No description provided for @carAnyBrand.
+  ///
+  /// In uz, this message translates to:
+  /// **'Har qanday'**
+  String get carAnyBrand;
+
+  /// No description provided for @carAllBrands.
+  ///
+  /// In uz, this message translates to:
+  /// **'barcha markalar'**
+  String get carAllBrands;
+
+  /// No description provided for @carBrandListings.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} e’lon'**
+  String carBrandListings(String count);
+
+  /// No description provided for @carAllOf.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha {brand}'**
+  String carAllOf(String brand);
+
+  /// No description provided for @carSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish…'**
+  String get carSearchHint;
+
+  /// No description provided for @carCatalogFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Markalar yuklanmadi. Internetni tekshirib, qayta oching.'**
+  String get carCatalogFailed;
+
+  /// No description provided for @carViews.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} marta ko‘rilgan'**
+  String carViews(String count);
+
+  /// No description provided for @carNotice.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumotlar e’lon matnidan avtomatik o‘qilgan va xato bo‘lishi mumkin. Aniq narx va tafsilotlar uchun e’lon matnini diqqat bilan o‘qing.'**
+  String get carNotice;
+
+  /// No description provided for @carPostText.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon matni'**
+  String get carPostText;
+
+  /// No description provided for @carNoText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Matn keltirilmagan'**
+  String get carNoText;
+
+  /// No description provided for @carReadMore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘proq o‘qish'**
+  String get carReadMore;
+
+  /// No description provided for @carReadLess.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yopish'**
+  String get carReadLess;
+
+  /// No description provided for @carSource.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manba: {name} kanali'**
+  String carSource(String name);
+
+  /// No description provided for @carPriceAnalysis.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narx tahlili'**
+  String get carPriceAnalysis;
+
+  /// No description provided for @carVeryCheap.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda arzon'**
+  String get carVeryCheap;
+
+  /// No description provided for @carCheap.
+  ///
+  /// In uz, this message translates to:
+  /// **'Arzon'**
+  String get carCheap;
+
+  /// No description provided for @carAtMarket.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bozor narxida'**
+  String get carAtMarket;
+
+  /// No description provided for @carPricier.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qimmatroq'**
+  String get carPricier;
+
+  /// No description provided for @carExpensive.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qimmat'**
+  String get carExpensive;
+
+  /// No description provided for @carNearAverage.
+  ///
+  /// In uz, this message translates to:
+  /// **'o‘rtachaga yaqin'**
+  String get carNearAverage;
+
+  /// No description provided for @carBelowAverage.
+  ///
+  /// In uz, this message translates to:
+  /// **'o‘rtachadan {percent}% arzon'**
+  String carBelowAverage(String percent);
+
+  /// No description provided for @carAboveAverage.
+  ///
+  /// In uz, this message translates to:
+  /// **'o‘rtachadan {percent}% qimmat'**
+  String carAboveAverage(String percent);
+
+  /// No description provided for @carFewComparables.
+  ///
+  /// In uz, this message translates to:
+  /// **'faqat {count} ta taqqoslash bor'**
+  String carFewComparables(String count);
+
+  /// No description provided for @carScaleCheap.
+  ///
+  /// In uz, this message translates to:
+  /// **'arzon {price}'**
+  String carScaleCheap(String price);
+
+  /// No description provided for @carScaleDear.
+  ///
+  /// In uz, this message translates to:
+  /// **'qimmat {price}'**
+  String carScaleDear(String price);
+
+  /// No description provided for @carNearYearBasis.
+  ///
+  /// In uz, this message translates to:
+  /// **'{year} y. atrofidagi {count} ta · o‘rtacha {median}'**
+  String carNearYearBasis(String year, String count, String median);
+
+  /// No description provided for @carModelBasis.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta sotuvda · o‘rtacha {median}'**
+  String carModelBasis(String count, String median);
+
+  /// No description provided for @carSoldBasis.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta sotilgan · {median}'**
+  String carSoldBasis(String count, String median);
+
+  /// No description provided for @carDetails.
+  ///
+  /// In uz, this message translates to:
+  /// **'Batafsil'**
+  String get carDetails;
+
+  /// No description provided for @carGeneration.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avlod'**
+  String get carGeneration;
+
+  /// No description provided for @carYear.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yili'**
+  String get carYear;
+
+  /// No description provided for @carMileage.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yurgani'**
+  String get carMileage;
+
+  /// No description provided for @carGearbox.
+  ///
+  /// In uz, this message translates to:
+  /// **'Karobka'**
+  String get carGearbox;
+
+  /// No description provided for @carLegal.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hujjatlari'**
+  String get carLegal;
+
+  /// No description provided for @carLegalOk.
+  ///
+  /// In uz, this message translates to:
+  /// **'Legal'**
+  String get carLegalOk;
+
+  /// No description provided for @carLegalNoReg.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oformleniyasiz'**
+  String get carLegalNoReg;
+
+  /// No description provided for @carRegistration.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomiga o‘tkazish'**
+  String get carRegistration;
+
+  /// No description provided for @carRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shart'**
+  String get carRequired;
+
+  /// No description provided for @carNotRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shart emas'**
+  String get carNotRequired;
+
+  /// No description provided for @carPosted.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon'**
+  String get carPosted;
+
+  /// No description provided for @carSourceLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manba'**
+  String get carSourceLabel;
+
+  /// No description provided for @carContact.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bog‘lanish'**
+  String get carContact;
+
+  /// No description provided for @carSellerPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sotuvchi telefoni'**
+  String get carSellerPhone;
+
+  /// No description provided for @carCall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘ng‘iroq'**
+  String get carCall;
+
+  /// No description provided for @carCopy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxa'**
+  String get carCopy;
+
+  /// No description provided for @carCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Raqam nusxalandi'**
+  String get carCopied;
+
+  /// No description provided for @carWriteOnTelegram.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram orqali yozish'**
+  String get carWriteOnTelegram;
+
+  /// No description provided for @carWrite.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yozish'**
+  String get carWrite;
+
+  /// No description provided for @carNumberInText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Raqam e’lon matnida'**
+  String get carNumberInText;
+
+  /// No description provided for @carSimilar.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘xshash mashinalar'**
+  String get carSimilar;
+
+  /// No description provided for @carSimilarSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'narx bo‘yicha'**
+  String get carSimilarSub;
+
+  /// No description provided for @carNoComparables.
+  ///
+  /// In uz, this message translates to:
+  /// **'Taqqoslash uchun e’lon yo‘q'**
+  String get carNoComparables;
+
+  /// No description provided for @carListingFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon yuklanmadi'**
+  String get carListingFailed;
+
+  /// No description provided for @carVideoSize.
+  ///
+  /// In uz, this message translates to:
+  /// **'Video · {size} MB'**
+  String carVideoSize(String size);
+
+  /// No description provided for @carListing.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon'**
+  String get carListing;
 }
 
 class _AppLocalizationsDelegate

@@ -19,6 +19,8 @@ import 'package:muslim_vegukin/features/barcode/barcode_models.dart';
 import 'package:muslim_vegukin/features/barcode/barcode_source.dart';
 import 'package:muslim_vegukin/features/business/business_models.dart';
 import 'package:muslim_vegukin/features/business/business_source.dart';
+import 'package:muslim_vegukin/features/cars/cars_models.dart';
+import 'package:muslim_vegukin/features/cars/cars_source.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_models.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_source.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
@@ -265,6 +267,7 @@ class TestApp {
       businesses: this.businesses,
       hikorea: hikorea,
       places: places,
+      cars: cars,
       clock: () => clockNow,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
@@ -301,6 +304,7 @@ class TestApp {
   final FakeBusinesses businesses;
   final hikorea = FakeHikorea();
   final places = FakePlaces();
+  final cars = FakeCars();
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];
@@ -1417,5 +1421,97 @@ class FakePlaces implements PlacesSource {
     await probeGate?.future;
     _online('photo');
     return files[url.pathSegments.join('/')];
+  }
+}
+
+
+/// The used-car market: Hyundai Sonata (six listings, one sold), Kia K5
+/// (one), a Genesis without a price.
+class FakeCars implements CarsSource {
+  bool fail = false;
+  final asked = <String>[];
+  final views = <int>[];
+
+  static Map<String, Object?> _car(int id, String brand, String model,
+          {int? year, int? price, int? km, String status = 'active', String? fuel, String? gen, bool negotiable = false}) =>
+      {
+        'id': id, 'brand': brand, 'model': model, 'year': year, 'price_krw': price, 'mileage_km': km, 'status': status,
+        'fuel': fuel, 'transmission': 'automatic', 'generation': gen, 'negotiable': negotiable, 'posted_rel': '$id kun oldin',
+        'thumb': '/media/cars/$id/t.jpg', 'photo': '/media/cars/$id/1.jpg',
+      };
+
+  final cars = <Map<String, Object?>>[
+    _car(1, 'Hyundai', 'Sonata', year: 2015, price: 5500000, km: 120000, fuel: 'lpg', gen: 'LF'),
+    _car(2, 'Hyundai', 'Sonata', year: 2014, price: 7200000, km: 98000, fuel: 'petrol', gen: 'LF', negotiable: true),
+    _car(3, 'Hyundai', 'Sonata', year: 2016, price: 7500000, km: 80000, fuel: 'petrol', gen: 'LF'),
+    _car(4, 'Hyundai', 'Sonata', year: 2015, price: 7800000, km: 110000, fuel: 'lpg', gen: 'LF'),
+    _car(5, 'Hyundai', 'Sonata', year: 2014, price: 8100000, km: 150000, fuel: 'diesel', gen: 'LF'),
+    _car(6, 'Hyundai', 'Sonata', year: 2013, price: 6000000, km: 170000, status: 'sold', gen: 'YF'),
+    _car(7, 'Kia', 'K5', year: 2017, price: 9900000, km: 60000, fuel: 'hybrid'),
+    _car(8, 'Genesis', 'G80', year: 2018, km: 70000),
+  ];
+
+  List<Car> _of(Iterable<Map<String, Object?>> json) => [for (final c in json) Car.fromJson(c)!];
+
+  void _online(String call) {
+    asked.add(call);
+    if (fail) throw const CarsException('offline');
+  }
+
+  @override
+  Future<List<CarBrand>> catalog() async {
+    _online('catalog');
+    return [
+      for (final b in ['Hyundai', 'Kia', 'Genesis'])
+        CarBrand(brand: b, total: cars.where((c) => c['brand'] == b).length, models: [
+          for (final m in {for (final c in cars) if (c['brand'] == b) c['model'] as String})
+            (model: m, count: cars.where((c) => c['model'] == m).length),
+        ]),
+    ];
+  }
+
+  @override
+  Future<List<Car>> model(String brand, String? model) async {
+    _online('model $brand ${model ?? '*'}');
+    return _of(cars.where((c) => c['brand'] == brand && (model == null || c['model'] == model)));
+  }
+
+  @override
+  Future<({List<Car> cars, int count})> search(CarQuery query) async {
+    final q = query.params;
+    _online('search ${q.entries.map((e) => '${e.key}=${e.value}').join('&')}');
+    final found = _of(cars.where((c) =>
+        (q['brand'] == null || c['brand'] == q['brand']) &&
+        (q['model'] == null || c['model'] == q['model']) &&
+        (q['price_max'] == null || ((c['price_krw'] as int?) ?? 0) <= int.parse(q['price_max']!)) &&
+        (q['fuel'] == null || q['fuel']!.split(',').contains(c['fuel'])) &&
+        (q['status'] == null || c['status'] == q['status'])));
+    return (cars: found, count: found.length);
+  }
+
+  @override
+  Future<Car> car(int id) async {
+    _online('car $id');
+    final json = cars.firstWhere((c) => c['id'] == id);
+    return Car.fromJson({
+      ...json,
+      'media': [
+        {'type': 'photo', 'url': '/media/cars/$id/1.jpg', 'thumb': '/media/cars/$id/t.jpg'},
+        {'type': 'video', 'url': '/media/cars/$id/v.mp4', 'thumb': '/media/cars/$id/vt.jpg', 'size_bytes': 5242880},
+      ],
+      'raw_text': 'Sotiladi ${json['brand']} ${json['model']} ${json['year']}\nNarxi: ${json['price_krw']}\nTel: 010-1234-5678',
+      'contact': id == 1 ? '010-1234-5678' : null,
+      'contact_handle': id == 2 ? '@sonata_seller' : null,
+      'legal_status': 'legal',
+      'registration_required': true,
+      'source_name': 'Vegukin Avto',
+      'views': 12,
+    })!;
+  }
+
+  @override
+  Future<int?> view(int id) async {
+    views.add(id);
+    return 13;
   }
 }

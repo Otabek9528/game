@@ -16,6 +16,7 @@ import 'core/theme_controller.dart';
 import 'features/barcode/barcode_camera.dart';
 import 'features/barcode/barcode_source.dart';
 import 'features/business/business_source.dart';
+import 'features/cars/cars_source.dart';
 import 'features/hikorea/hikorea_source.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/links/links_controller.dart';
@@ -157,6 +158,7 @@ class AppServices {
     this.businesses = const HttpBusinessSource(),
     this.hikorea = const HttpHikoreaSource(),
     this.places = const HttpPlacesSource(),
+    this.cars = const HttpCarsSource(),
     this.clock = DateTime.now,
   });
 
@@ -208,6 +210,9 @@ class AppServices {
 
   /// Mosques, restaurants and shops.
   final PlacesSource places;
+
+  /// The used-car market.
+  final CarsSource cars;
 
   /// What day it is, for the pages that list days: the phone's clock, or a
   /// test's.

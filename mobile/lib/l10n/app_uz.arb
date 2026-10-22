@@ -1674,5 +1674,259 @@
   "plPhotoLoadingSpeed": "Yuklanish tezligi internetingizga bog‘liq",
   "plGettingThere": "Qanday borish mumkin",
   "plContact": "Aloqa",
-  "plNewsTitle": "Yangiliklar"
+  "plNewsTitle": "Yangiliklar",
+  "carMarket": "Avto Bozor",
+  "carTabBrowse": "Ko‘rish",
+  "carTabSearch": "Qidirish",
+  "carTabSaved": "Sevimlilar",
+  "carListings": "{count} ta e’lon",
+  "@carListings": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "carAvailableSold": "{available} mavjud · {sold} sotilgan",
+  "@carAvailableSold": {
+    "placeholders": {
+      "available": {
+        "type": "String"
+      },
+      "sold": {
+        "type": "String"
+      }
+    }
+  },
+  "carSearchSub": "Atributlar bo‘yicha toping",
+  "carSavedSub": "{count} ta saqlangan",
+  "@carSavedSub": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "carLoading": "Yuklanmoqda…",
+  "carMedianPrice": "o‘rtacha narx",
+  "carNoneOnSale": "Hozircha sotuvda yo‘q",
+  "carSoldCount": "{count} sotilgan",
+  "@carSoldCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "carSortNew": "Yangi",
+  "carSortValue": "Eng arzonlari",
+  "carSortPriceUp": "Narx ↑",
+  "carSortPriceDown": "Narx ↓",
+  "carSortMileage": "Yurgani ↑",
+  "carSortYear": "Yili ↓",
+  "carAll": "Hammasi",
+  "carAvailable": "Mavjud",
+  "carSold": "Sotilgan",
+  "carEmptyAllTitle": "Hozircha e’lon yo‘q",
+  "carEmptyAllBody": "Tez orada yangi mashinalar qo‘shiladi",
+  "carEmptyModelTitle": "Bu modelda e’lon yo‘q",
+  "carEmptyModelBody": "Yuqoridagi nomdan boshqa modelni tanlang",
+  "carChannelTitle": "Vegukin Avto — kanal",
+  "carChannelBody": "Barcha yangi e’lonlar shu yerda jonli chiqadi",
+  "carOpen": "Ochish",
+  "carLoadFailed": "Yuklab bo‘lmadi",
+  "carCheckInternet": "Internet aloqasini tekshiring",
+  "carDeal": "Arzon",
+  "carNegotiable": "Kelishiladi",
+  "carNoPrice": "Narxi keltirilmagan",
+  "carFewDetails": "Ma’lumot kam",
+  "carSeen": "Ko‘rilgan",
+  "carSave": "Saqlash",
+  "carUnsave": "Saqlanganlardan olib tashlash",
+  "carFuelPetrol": "Benzin",
+  "carFuelDiesel": "Dizel",
+  "carFuelLpg": "LPG",
+  "carFuelHybrid": "Gibrid",
+  "carAutomatic": "Avtomat",
+  "carManual": "Mexanika",
+  "carNotGiven": "Keltirilmagan",
+  "carPickModel": "Marka va modelni tanlang",
+  "carPriceMax": "Narx (gacha), ₩",
+  "carMileageMax": "Yurgani (km gacha)",
+  "carYearFrom": "Yildan",
+  "carFuel": "Yoqilg‘i",
+  "carStatus": "Holati",
+  "carResults": "{count} ta natija",
+  "@carResults": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "carNothingFound": "Hech narsa topilmadi",
+  "carWidenFilters": "Filtrlarni kengaytiring",
+  "carClearFilters": "Tozalash",
+  "carSavedEmptyTitle": "Sevimlilar bo‘sh",
+  "carSavedEmptyBody": "Yoqqan mashinalarni ❤ tugmasi bilan saqlang",
+  "carStartBrowsing": "Ko‘rishni boshlash",
+  "carPickBrand": "Markani tanlang",
+  "carAnyBrand": "Har qanday",
+  "carAllBrands": "barcha markalar",
+  "carBrandListings": "{count} e’lon",
+  "@carBrandListings": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "carAllOf": "Barcha {brand}",
+  "@carAllOf": {
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      }
+    }
+  },
+  "carSearchHint": "Qidirish…",
+  "carCatalogFailed": "Markalar yuklanmadi. Internetni tekshirib, qayta oching.",
+  "carViews": "{count} marta ko‘rilgan",
+  "@carViews": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "carNotice": "Ma’lumotlar e’lon matnidan avtomatik o‘qilgan va xato bo‘lishi mumkin. Aniq narx va tafsilotlar uchun e’lon matnini diqqat bilan o‘qing.",
+  "carPostText": "E’lon matni",
+  "carNoText": "Matn keltirilmagan",
+  "carReadMore": "Ko‘proq o‘qish",
+  "carReadLess": "Yopish",
+  "carSource": "Manba: {name} kanali",
+  "@carSource": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "carPriceAnalysis": "Narx tahlili",
+  "carVeryCheap": "Juda arzon",
+  "carCheap": "Arzon",
+  "carAtMarket": "Bozor narxida",
+  "carPricier": "Qimmatroq",
+  "carExpensive": "Qimmat",
+  "carNearAverage": "o‘rtachaga yaqin",
+  "carBelowAverage": "o‘rtachadan {percent}% arzon",
+  "@carBelowAverage": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "carAboveAverage": "o‘rtachadan {percent}% qimmat",
+  "@carAboveAverage": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "carFewComparables": "faqat {count} ta taqqoslash bor",
+  "@carFewComparables": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "carScaleCheap": "arzon {price}",
+  "@carScaleCheap": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "carScaleDear": "qimmat {price}",
+  "@carScaleDear": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "carNearYearBasis": "{year} y. atrofidagi {count} ta · o‘rtacha {median}",
+  "@carNearYearBasis": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "median": {
+        "type": "String"
+      }
+    }
+  },
+  "carModelBasis": "{count} ta sotuvda · o‘rtacha {median}",
+  "@carModelBasis": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "median": {
+        "type": "String"
+      }
+    }
+  },
+  "carSoldBasis": "{count} ta sotilgan · {median}",
+  "@carSoldBasis": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "median": {
+        "type": "String"
+      }
+    }
+  },
+  "carDetails": "Batafsil",
+  "carGeneration": "Avlod",
+  "carYear": "Yili",
+  "carMileage": "Yurgani",
+  "carGearbox": "Karobka",
+  "carLegal": "Hujjatlari",
+  "carLegalOk": "Legal",
+  "carLegalNoReg": "Oformleniyasiz",
+  "carRegistration": "Nomiga o‘tkazish",
+  "carRequired": "Shart",
+  "carNotRequired": "Shart emas",
+  "carPosted": "E’lon",
+  "carSourceLabel": "Manba",
+  "carContact": "Bog‘lanish",
+  "carSellerPhone": "Sotuvchi telefoni",
+  "carCall": "Qo‘ng‘iroq",
+  "carCopy": "Nusxa",
+  "carCopied": "Raqam nusxalandi",
+  "carWriteOnTelegram": "Telegram orqali yozish",
+  "carWrite": "Yozish",
+  "carNumberInText": "Raqam e’lon matnida",
+  "carSimilar": "O‘xshash mashinalar",
+  "carSimilarSub": "narx bo‘yicha",
+  "carNoComparables": "Taqqoslash uchun e’lon yo‘q",
+  "carListingFailed": "E’lon yuklanmadi",
+  "carVideoSize": "Video · {size} MB",
+  "@carVideoSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "carListing": "E’lon"
 }

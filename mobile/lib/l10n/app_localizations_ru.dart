@@ -3213,4 +3213,381 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plNewsTitle => 'Новости';
+
+  @override
+  String get carMarket => 'Авто Базар';
+
+  @override
+  String get carTabBrowse => 'Обзор';
+
+  @override
+  String get carTabSearch => 'Поиск';
+
+  @override
+  String get carTabSaved => 'Избранное';
+
+  @override
+  String carListings(String count) {
+    return 'Объявлений: $count';
+  }
+
+  @override
+  String carAvailableSold(String available, String sold) {
+    return '$available в продаже · $sold продано';
+  }
+
+  @override
+  String get carSearchSub => 'По параметрам';
+
+  @override
+  String carSavedSub(String count) {
+    return 'Сохранено: $count';
+  }
+
+  @override
+  String get carLoading => 'Загрузка…';
+
+  @override
+  String get carMedianPrice => 'средняя цена';
+
+  @override
+  String get carNoneOnSale => 'Сейчас нет в продаже';
+
+  @override
+  String carSoldCount(String count) {
+    return 'Продано: $count';
+  }
+
+  @override
+  String get carSortNew => 'Новые';
+
+  @override
+  String get carSortValue => 'Выгодные';
+
+  @override
+  String get carSortPriceUp => 'Цена ↑';
+
+  @override
+  String get carSortPriceDown => 'Цена ↓';
+
+  @override
+  String get carSortMileage => 'Пробег ↑';
+
+  @override
+  String get carSortYear => 'Год ↓';
+
+  @override
+  String get carAll => 'Все';
+
+  @override
+  String get carAvailable => 'В продаже';
+
+  @override
+  String get carSold => 'Продано';
+
+  @override
+  String get carEmptyAllTitle => 'Пока нет объявлений';
+
+  @override
+  String get carEmptyAllBody => 'Скоро появятся новые машины';
+
+  @override
+  String get carEmptyModelTitle => 'По этой модели нет объявлений';
+
+  @override
+  String get carEmptyModelBody => 'Выберите другую модель вверху';
+
+  @override
+  String get carChannelTitle => 'Vegukin Avto — канал';
+
+  @override
+  String get carChannelBody => 'Все новые объявления появляются там сразу';
+
+  @override
+  String get carOpen => 'Открыть';
+
+  @override
+  String get carLoadFailed => 'Не удалось загрузить';
+
+  @override
+  String get carCheckInternet => 'Проверьте интернет';
+
+  @override
+  String get carDeal => 'Выгодно';
+
+  @override
+  String get carNegotiable => 'Торг';
+
+  @override
+  String get carNoPrice => 'Цена не указана';
+
+  @override
+  String get carFewDetails => 'Мало данных';
+
+  @override
+  String get carSeen => 'Просмотрено';
+
+  @override
+  String get carSave => 'Сохранить';
+
+  @override
+  String get carUnsave => 'Убрать из избранного';
+
+  @override
+  String get carFuelPetrol => 'Бензин';
+
+  @override
+  String get carFuelDiesel => 'Дизель';
+
+  @override
+  String get carFuelLpg => 'Газ (LPG)';
+
+  @override
+  String get carFuelHybrid => 'Гибрид';
+
+  @override
+  String get carAutomatic => 'Автомат';
+
+  @override
+  String get carManual => 'Механика';
+
+  @override
+  String get carNotGiven => 'Не указано';
+
+  @override
+  String get carPickModel => 'Выберите марку и модель';
+
+  @override
+  String get carPriceMax => 'Цена до, ₩';
+
+  @override
+  String get carMileageMax => 'Пробег до, км';
+
+  @override
+  String get carYearFrom => 'Год от';
+
+  @override
+  String get carFuel => 'Топливо';
+
+  @override
+  String get carStatus => 'Статус';
+
+  @override
+  String carResults(String count) {
+    return 'Найдено: $count';
+  }
+
+  @override
+  String get carNothingFound => 'Ничего не найдено';
+
+  @override
+  String get carWidenFilters => 'Ослабьте фильтры';
+
+  @override
+  String get carClearFilters => 'Сбросить';
+
+  @override
+  String get carSavedEmptyTitle => 'В избранном пусто';
+
+  @override
+  String get carSavedEmptyBody => 'Сохраняйте понравившиеся машины кнопкой ❤';
+
+  @override
+  String get carStartBrowsing => 'Начать просмотр';
+
+  @override
+  String get carPickBrand => 'Выберите марку';
+
+  @override
+  String get carAnyBrand => 'Любая';
+
+  @override
+  String get carAllBrands => 'все марки';
+
+  @override
+  String carBrandListings(String count) {
+    return '$count объявл.';
+  }
+
+  @override
+  String carAllOf(String brand) {
+    return 'Все $brand';
+  }
+
+  @override
+  String get carSearchHint => 'Поиск…';
+
+  @override
+  String get carCatalogFailed =>
+      'Марки не загрузились. Проверьте интернет и откройте снова.';
+
+  @override
+  String carViews(String count) {
+    return 'Просмотров: $count';
+  }
+
+  @override
+  String get carNotice =>
+      'Данные извлечены из текста объявления автоматически и могут быть неточны. Точную цену и детали смотрите в тексте объявления.';
+
+  @override
+  String get carPostText => 'Текст объявления';
+
+  @override
+  String get carNoText => 'Текста нет';
+
+  @override
+  String get carReadMore => 'Читать дальше';
+
+  @override
+  String get carReadLess => 'Свернуть';
+
+  @override
+  String carSource(String name) {
+    return 'Источник: канал $name';
+  }
+
+  @override
+  String get carPriceAnalysis => 'Анализ цены';
+
+  @override
+  String get carVeryCheap => 'Очень дёшево';
+
+  @override
+  String get carCheap => 'Дёшево';
+
+  @override
+  String get carAtMarket => 'По рынку';
+
+  @override
+  String get carPricier => 'Дороговато';
+
+  @override
+  String get carExpensive => 'Дорого';
+
+  @override
+  String get carNearAverage => 'около средней';
+
+  @override
+  String carBelowAverage(String percent) {
+    return 'на $percent% ниже средней';
+  }
+
+  @override
+  String carAboveAverage(String percent) {
+    return 'на $percent% выше средней';
+  }
+
+  @override
+  String carFewComparables(String count) {
+    return 'сравнить можно лишь с $count';
+  }
+
+  @override
+  String carScaleCheap(String price) {
+    return 'дешевле $price';
+  }
+
+  @override
+  String carScaleDear(String price) {
+    return 'дороже $price';
+  }
+
+  @override
+  String carNearYearBasis(String year, String count, String median) {
+    return '$count машин около $year г. · средняя $median';
+  }
+
+  @override
+  String carModelBasis(String count, String median) {
+    return '$count в продаже · средняя $median';
+  }
+
+  @override
+  String carSoldBasis(String count, String median) {
+    return '$count продано · $median';
+  }
+
+  @override
+  String get carDetails => 'Подробно';
+
+  @override
+  String get carGeneration => 'Поколение';
+
+  @override
+  String get carYear => 'Год';
+
+  @override
+  String get carMileage => 'Пробег';
+
+  @override
+  String get carGearbox => 'Коробка';
+
+  @override
+  String get carLegal => 'Документы';
+
+  @override
+  String get carLegalOk => 'Легально';
+
+  @override
+  String get carLegalNoReg => 'Без оформления';
+
+  @override
+  String get carRegistration => 'Переоформление';
+
+  @override
+  String get carRequired => 'Обязательно';
+
+  @override
+  String get carNotRequired => 'Не обязательно';
+
+  @override
+  String get carPosted => 'Опубликовано';
+
+  @override
+  String get carSourceLabel => 'Источник';
+
+  @override
+  String get carContact => 'Связаться';
+
+  @override
+  String get carSellerPhone => 'Телефон продавца';
+
+  @override
+  String get carCall => 'Позвонить';
+
+  @override
+  String get carCopy => 'Копировать';
+
+  @override
+  String get carCopied => 'Номер скопирован';
+
+  @override
+  String get carWriteOnTelegram => 'Написать в Telegram';
+
+  @override
+  String get carWrite => 'Написать';
+
+  @override
+  String get carNumberInText => 'Номер в тексте объявления';
+
+  @override
+  String get carSimilar => 'Похожие машины';
+
+  @override
+  String get carSimilarSub => 'по цене';
+
+  @override
+  String get carNoComparables => 'Не с чем сравнить';
+
+  @override
+  String get carListingFailed => 'Объявление не загрузилось';
+
+  @override
+  String carVideoSize(String size) {
+    return 'Видео · $size МБ';
+  }
+
+  @override
+  String get carListing => 'Объявление';
 }

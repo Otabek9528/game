@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/photos.dart';
 import '../../l10n/app_localizations.dart';
 import 'places_kit.dart';
 import 'places_models.dart';
@@ -510,191 +511,20 @@ class _AnnounceSheetState extends State<AnnounceSheet> {
 }
 
 /// The photos full screen: swipe between them, pinch or double-tap to zoom.
-Future<void> showPlacePhotos(BuildContext context, List<PlacePhoto> photos, int start) =>
-    Navigator.of(context).push(PageRouteBuilder<void>(
-      opaque: false,
-      barrierColor: Colors.black,
-      pageBuilder: (_, _, _) => _PhotoViewer(photos: photos, start: start),
-      transitionsBuilder: (_, animation, _, child) => FadeTransition(opacity: animation, child: child),
-    ));
-
-class _PhotoViewer extends StatefulWidget {
-  const _PhotoViewer({required this.photos, required this.start});
-
-  final List<PlacePhoto> photos;
-  final int start;
-
-  @override
-  State<_PhotoViewer> createState() => _PhotoViewerState();
-}
-
-class _PhotoViewerState extends State<_PhotoViewer> {
-  late final _pages = PageController(initialPage: widget.start);
-  late int _index = widget.start;
-  bool _zoomed = false;
-
-  /// Fingers on the screen: with two, it's a pinch, not a swipe.
-  int _fingers = 0;
-
-  void _finger(int change) {
-    final pinching = _fingers >= 2;
-    _fingers = (_fingers + change).clamp(0, 10);
-    if ((_fingers >= 2) != pinching) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _pages.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            Listener(
-              onPointerDown: (_) => _finger(1),
-              onPointerUp: (_) => _finger(-1),
-              onPointerCancel: (_) => _finger(-1),
-              child: PageView.builder(
-                controller: _pages,
-                // A pinch zooms from its first moment, and a zoomed photo
-                // pans: no swipe to the next until it's back.
-                physics: _zoomed || _fingers >= 2 ? const NeverScrollableScrollPhysics() : null,
-                itemCount: widget.photos.length,
-                onPageChanged: (i) {
-                  HapticFeedback.selectionClick();
-                  setState(() => _index = i);
-                },
-                itemBuilder: (context, i) => _ZoomPhoto(
-                  photo: widget.photos[i],
-                  onZoom: (zoomed) {
-                    if (zoomed != _zoomed) setState(() => _zoomed = zoomed);
-                  },
-                ),
-              ),
-            ),
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                      style: IconButton.styleFrom(backgroundColor: Colors.black38),
-                      icon: const Icon(Icons.close_rounded, color: Colors.white),
-                    ),
-                    const Spacer(),
-                    if (widget.photos.length > 1)
-                      DecoratedBox(
-                        decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(20)),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          child: Text(
-                            s.plPhotoCount('${_index + 1}', '${widget.photos.length}'),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                      ),
-                    const SizedBox(width: 8),
-                  ],
-                ),
-              ),
-            ),
-          ],
+Future<void> showPlacePhotos(BuildContext context, List<PlacePhoto> photos, int start) {
+  final s = AppLocalizations.of(context);
+  return showPhotoViewer(
+    context,
+    [
+      for (final p in photos)
+        ViewerPicture(
+          quick: NetworkImage('${p.thumb}'),
+          screen: PlaceImage.full(context, p),
+          sharp: p.original == p.full ? null : sharpImage(p.original),
         ),
-      ),
-    );
-  }
-}
-
-/// One photo, fitted: pinch to zoom, double-tap to zoom in where tapped
-/// and again to fit. Zoomable at once: the small copy the list already has
-/// shows straight away, the screen-sized one over it; the original, sharp
-/// up close, is fetched only once zoomed in (no megabytes for a look).
-class _ZoomPhoto extends StatefulWidget {
-  const _ZoomPhoto({required this.photo, required this.onZoom});
-
-  final PlacePhoto photo;
-  final ValueChanged<bool> onZoom;
-
-  @override
-  State<_ZoomPhoto> createState() => _ZoomPhotoState();
-}
-
-class _ZoomPhotoState extends State<_ZoomPhoto> with SingleTickerProviderStateMixin, PhotoLayers {
-  final _zoom = TransformationController();
-  late final _animation = AnimationController(vsync: this, duration: const Duration(milliseconds: 220));
-  Animation<Matrix4>? _to;
-  Offset _tap = Offset.zero;
-  bool _sharp = false;
-
-  static const _doubleTapScale = 2.6;
-
-  @override
-  void initState() {
-    super.initState();
-    _zoom.addListener(() {
-      final zoomed = _zoom.value.getMaxScaleOnAxis() > 1.01;
-      widget.onZoom(zoomed);
-      if (zoomed && !_sharp) setState(() => _sharp = true);
-    });
-    _animation.addListener(() => _zoom.value = _to!.value);
-  }
-
-  @override
-  void dispose() {
-    _animation.dispose();
-    _zoom.dispose();
-    super.dispose();
-  }
-
-  void _toggle() {
-    final Matrix4 end;
-    if (_zoom.value.getMaxScaleOnAxis() > 1.01) {
-      end = Matrix4.identity();
-    } else {
-      end = Matrix4.identity()
-        ..translateByDouble(-_tap.dx * (_doubleTapScale - 1), -_tap.dy * (_doubleTapScale - 1), 0, 1)
-        ..scaleByDouble(_doubleTapScale, _doubleTapScale, 1, 1);
-    }
-    _to = Matrix4Tween(begin: _zoom.value, end: end).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOutCubic));
-    _animation.forward(from: 0);
-  }
-
-  /// The original, without decoding a camera's full size.
-  ImageProvider get _original =>
-      ResizeImage(NetworkImage('${widget.photo.original}'), width: 2560, height: 2560, policy: ResizeImagePolicy.fit);
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final photo = widget.photo;
-    Widget none() => layersFailed(Center(child: Text(s.plPhotoFailed, style: const TextStyle(color: Colors.white70))));
-    return GestureDetector(
-      onDoubleTapDown: (d) => _tap = d.localPosition,
-      onDoubleTap: _toggle,
-      child: InteractiveViewer(
-        transformationController: _zoom,
-        maxScale: 5,
-        child: SizedBox.expand(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (!shown && !failed) const PhotoLoading(),
-              layer(NetworkImage('${photo.thumb}'), BoxFit.contain, () => const SizedBox.shrink()),
-              layer(PlaceImage.full(context, photo), BoxFit.contain, () => photo.original == photo.full ? none() : layer(_original, BoxFit.contain, none)),
-              if (_sharp && photo.original != photo.full) layer(_original, BoxFit.contain, () => const SizedBox.shrink()),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+    ],
+    start,
+    counter: (i, n) => s.plPhotoCount('$i', '$n'),
+    failed: s.plPhotoFailed,
+  );
 }

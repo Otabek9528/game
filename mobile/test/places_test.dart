@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:muslim_vegukin/core/widgets/photos.dart';
 import 'package:muslim_vegukin/features/places/place_actions.dart';
 import 'package:muslim_vegukin/features/places/place_detail.dart';
 import 'package:muslim_vegukin/features/places/places_kit.dart';

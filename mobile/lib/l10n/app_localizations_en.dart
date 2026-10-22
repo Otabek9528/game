@@ -3170,4 +3170,381 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plNewsTitle => 'News';
+
+  @override
+  String get carMarket => 'Car Market';
+
+  @override
+  String get carTabBrowse => 'Browse';
+
+  @override
+  String get carTabSearch => 'Search';
+
+  @override
+  String get carTabSaved => 'Saved';
+
+  @override
+  String carListings(String count) {
+    return '$count listings';
+  }
+
+  @override
+  String carAvailableSold(String available, String sold) {
+    return '$available for sale · $sold sold';
+  }
+
+  @override
+  String get carSearchSub => 'By details';
+
+  @override
+  String carSavedSub(String count) {
+    return '$count saved';
+  }
+
+  @override
+  String get carLoading => 'Loading…';
+
+  @override
+  String get carMedianPrice => 'average price';
+
+  @override
+  String get carNoneOnSale => 'None for sale right now';
+
+  @override
+  String carSoldCount(String count) {
+    return '$count sold';
+  }
+
+  @override
+  String get carSortNew => 'Newest';
+
+  @override
+  String get carSortValue => 'Best value';
+
+  @override
+  String get carSortPriceUp => 'Price ↑';
+
+  @override
+  String get carSortPriceDown => 'Price ↓';
+
+  @override
+  String get carSortMileage => 'Mileage ↑';
+
+  @override
+  String get carSortYear => 'Year ↓';
+
+  @override
+  String get carAll => 'All';
+
+  @override
+  String get carAvailable => 'For sale';
+
+  @override
+  String get carSold => 'Sold';
+
+  @override
+  String get carEmptyAllTitle => 'No listings yet';
+
+  @override
+  String get carEmptyAllBody => 'New cars are added soon';
+
+  @override
+  String get carEmptyModelTitle => 'No listings for this model';
+
+  @override
+  String get carEmptyModelBody => 'Pick another model at the top';
+
+  @override
+  String get carChannelTitle => 'Vegukin Avto — channel';
+
+  @override
+  String get carChannelBody => 'Every new listing appears there first';
+
+  @override
+  String get carOpen => 'Open';
+
+  @override
+  String get carLoadFailed => 'Couldn’t load';
+
+  @override
+  String get carCheckInternet => 'Check your internet connection';
+
+  @override
+  String get carDeal => 'Good price';
+
+  @override
+  String get carNegotiable => 'Negotiable';
+
+  @override
+  String get carNoPrice => 'No price given';
+
+  @override
+  String get carFewDetails => 'Few details';
+
+  @override
+  String get carSeen => 'Seen';
+
+  @override
+  String get carSave => 'Save';
+
+  @override
+  String get carUnsave => 'Remove from saved';
+
+  @override
+  String get carFuelPetrol => 'Petrol';
+
+  @override
+  String get carFuelDiesel => 'Diesel';
+
+  @override
+  String get carFuelLpg => 'LPG';
+
+  @override
+  String get carFuelHybrid => 'Hybrid';
+
+  @override
+  String get carAutomatic => 'Automatic';
+
+  @override
+  String get carManual => 'Manual';
+
+  @override
+  String get carNotGiven => 'Not given';
+
+  @override
+  String get carPickModel => 'Choose a make and model';
+
+  @override
+  String get carPriceMax => 'Price up to, ₩';
+
+  @override
+  String get carMileageMax => 'Mileage up to, km';
+
+  @override
+  String get carYearFrom => 'Year from';
+
+  @override
+  String get carFuel => 'Fuel';
+
+  @override
+  String get carStatus => 'Status';
+
+  @override
+  String carResults(String count) {
+    return '$count results';
+  }
+
+  @override
+  String get carNothingFound => 'Nothing found';
+
+  @override
+  String get carWidenFilters => 'Try wider filters';
+
+  @override
+  String get carClearFilters => 'Clear';
+
+  @override
+  String get carSavedEmptyTitle => 'Nothing saved yet';
+
+  @override
+  String get carSavedEmptyBody => 'Save the cars you like with ❤';
+
+  @override
+  String get carStartBrowsing => 'Start browsing';
+
+  @override
+  String get carPickBrand => 'Choose a make';
+
+  @override
+  String get carAnyBrand => 'Any';
+
+  @override
+  String get carAllBrands => 'all makes';
+
+  @override
+  String carBrandListings(String count) {
+    return '$count listings';
+  }
+
+  @override
+  String carAllOf(String brand) {
+    return 'All $brand';
+  }
+
+  @override
+  String get carSearchHint => 'Search…';
+
+  @override
+  String get carCatalogFailed =>
+      'Couldn’t load the makes. Check your connection and try again.';
+
+  @override
+  String carViews(String count) {
+    return '$count views';
+  }
+
+  @override
+  String get carNotice =>
+      'These details were read from the post automatically and may be wrong. Read the post for the exact price and details.';
+
+  @override
+  String get carPostText => 'The post';
+
+  @override
+  String get carNoText => 'No text';
+
+  @override
+  String get carReadMore => 'Read more';
+
+  @override
+  String get carReadLess => 'Show less';
+
+  @override
+  String carSource(String name) {
+    return 'From the $name channel';
+  }
+
+  @override
+  String get carPriceAnalysis => 'Price check';
+
+  @override
+  String get carVeryCheap => 'Very cheap';
+
+  @override
+  String get carCheap => 'Cheap';
+
+  @override
+  String get carAtMarket => 'At market price';
+
+  @override
+  String get carPricier => 'A bit pricey';
+
+  @override
+  String get carExpensive => 'Expensive';
+
+  @override
+  String get carNearAverage => 'close to average';
+
+  @override
+  String carBelowAverage(String percent) {
+    return '$percent% below average';
+  }
+
+  @override
+  String carAboveAverage(String percent) {
+    return '$percent% above average';
+  }
+
+  @override
+  String carFewComparables(String count) {
+    return 'only $count to compare with';
+  }
+
+  @override
+  String carScaleCheap(String price) {
+    return 'cheapest $price';
+  }
+
+  @override
+  String carScaleDear(String price) {
+    return 'priciest $price';
+  }
+
+  @override
+  String carNearYearBasis(String year, String count, String median) {
+    return '$count from around $year · average $median';
+  }
+
+  @override
+  String carModelBasis(String count, String median) {
+    return '$count for sale · average $median';
+  }
+
+  @override
+  String carSoldBasis(String count, String median) {
+    return '$count sold · $median';
+  }
+
+  @override
+  String get carDetails => 'Details';
+
+  @override
+  String get carGeneration => 'Generation';
+
+  @override
+  String get carYear => 'Year';
+
+  @override
+  String get carMileage => 'Mileage';
+
+  @override
+  String get carGearbox => 'Gearbox';
+
+  @override
+  String get carLegal => 'Papers';
+
+  @override
+  String get carLegalOk => 'Legal';
+
+  @override
+  String get carLegalNoReg => 'Not registered';
+
+  @override
+  String get carRegistration => 'Transfer of ownership';
+
+  @override
+  String get carRequired => 'Required';
+
+  @override
+  String get carNotRequired => 'Not required';
+
+  @override
+  String get carPosted => 'Posted';
+
+  @override
+  String get carSourceLabel => 'Source';
+
+  @override
+  String get carContact => 'Contact';
+
+  @override
+  String get carSellerPhone => 'Seller’s phone';
+
+  @override
+  String get carCall => 'Call';
+
+  @override
+  String get carCopy => 'Copy';
+
+  @override
+  String get carCopied => 'Number copied';
+
+  @override
+  String get carWriteOnTelegram => 'Message on Telegram';
+
+  @override
+  String get carWrite => 'Message';
+
+  @override
+  String get carNumberInText => 'The number is in the post';
+
+  @override
+  String get carSimilar => 'Similar cars';
+
+  @override
+  String get carSimilarSub => 'by price';
+
+  @override
+  String get carNoComparables => 'Nothing to compare with';
+
+  @override
+  String get carListingFailed => 'Couldn’t load the listing';
+
+  @override
+  String carVideoSize(String size) {
+    return 'Video · $size MB';
+  }
+
+  @override
+  String get carListing => 'Listing';
 }

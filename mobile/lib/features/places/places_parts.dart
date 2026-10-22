@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
+import '../../core/widgets/photos.dart';
 import '../../l10n/app_localizations.dart';
 import 'places_kit.dart';
 import 'places_models.dart';
@@ -93,109 +94,6 @@ class PlaceStars extends StatelessWidget {
   }
 }
 
-/// A photo on its way: a spinner, and after a moment why it may take a
-/// while. On the kind's colour in a card ([kind]), or on black full screen.
-class PhotoLoading extends StatelessWidget {
-  const PhotoLoading({super.key, this.kind});
-
-  final PlaceKind? kind;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final kind = this.kind;
-    final colour = kind == null ? null : kindColour(context, kind);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: colour == null
-            ? null
-            : LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color.lerp(colour, Colors.black, 0.6)!, Color.lerp(colour, Colors.black, 0.35)!],
-              ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (colour != null) CustomPaint(painter: KhatamLatticePainter(color: Colors.white.withValues(alpha: 0.06))),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox.square(
-                    dimension: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    s.plPhotoLoading,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white),
-                  ),
-                  const SizedBox(height: 3),
-                  // Only once it's taking a moment.
-                  TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: 1),
-                    duration: const Duration(milliseconds: 1600),
-                    curve: const Interval(0.55, 1),
-                    builder: (_, opacity, child) => Opacity(opacity: opacity, child: child),
-                    child: Text(
-                      s.plPhotoLoadingSpeed,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 12, height: 1.3, color: Colors.white70),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Photo layers over each other, each faded in when it arrives, and
-/// whether one is on screen yet ([shown]) or all failed ([failed]).
-mixin PhotoLayers<T extends StatefulWidget> on State<T> {
-  bool shown = false;
-  bool failed = false;
-
-  void _mark({bool shown = false, bool failed = false}) {
-    if (!(shown && !this.shown) && !(failed && !this.failed)) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(() {
-        this.shown |= shown;
-        this.failed |= failed;
-      });
-    });
-  }
-
-  /// [image], faded in; [onError] in its place if it can't be had.
-  Widget layer(ImageProvider image, BoxFit fit, Widget Function() onError) => Image(
-        image: image,
-        fit: fit,
-        gaplessPlayback: true,
-        errorBuilder: (_, _, _) => onError(),
-        frameBuilder: (_, child, frame, sync) {
-          if (frame != null) _mark(shown: true);
-          return sync
-              ? child
-              : AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: const Duration(milliseconds: 220), child: child);
-        },
-      );
-
-  /// None of the layers could be had: [instead] unless one is shown.
-  Widget layersFailed(Widget instead) {
-    _mark(failed: true);
-    return shown ? const SizedBox.shrink() : instead;
-  }
-}
-
 /// A photo as wide as the screen: [PhotoLoading] until the small copy is
 /// there, the large one faded in over it; the original if the large copy
 /// can't be had, the kind's picture if nothing can. Decoded at the
@@ -230,7 +128,7 @@ class _PlaceImageState extends State<PlaceImage> with PhotoLayers {
     return Stack(
       fit: StackFit.expand,
       children: [
-        if (!shown && !failed) PhotoLoading(kind: widget.kind),
+        if (!shown && !failed) PhotoLoading(colour: kindColour(context, widget.kind)),
         layer(NetworkImage('${photo.thumb}'), BoxFit.cover, () => const SizedBox.shrink()),
         layer(
           PlaceImage.full(context, photo),
@@ -267,7 +165,7 @@ class _PlacePhotosState extends State<PlacePhotos> {
   Widget build(BuildContext context) {
     final photos = widget.kit.photosOf(widget.place);
     final kind = widget.place.kind;
-    if (photos.isEmpty) return widget.kit.photosPending(widget.place) ? PhotoLoading(kind: kind) : PlaceBackdrop(kind: kind);
+    if (photos.isEmpty) return widget.kit.photosPending(widget.place) ? PhotoLoading(colour: kindColour(context, kind)) : PlaceBackdrop(kind: kind);
     return Stack(
       fit: StackFit.expand,
       children: [
