@@ -211,9 +211,15 @@
 
   async function api(path, opts) {
     opts = opts || {};
+    // Signed initData: the server takes the user from it and ignores the
+    // telegram_user_id still sent below (kept for older servers).
     const init = {
       method: opts.method || 'GET',
-      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Init-Data': (tg && tg.initData) || '',
+        ...(opts.headers || {}),
+      },
     };
     if (opts.body) init.body = JSON.stringify(opts.body);
     let res, data;
