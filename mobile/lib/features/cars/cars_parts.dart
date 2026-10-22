@@ -673,3 +673,220 @@ class CarsMessage extends StatelessWidget {
     );
   }
 }
+
+/// A tab's top: its title (or the make picker), a line under it.
+class CarsTabBar extends StatelessWidget {
+  const CarsTabBar({super.key, required this.title, this.subtitle, this.leading, this.onTap, this.trailing});
+
+  final String title;
+  final Widget? subtitle;
+  final Widget? leading;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    final content = Row(
+      children: [
+        if (leading != null) ...[leading!, const SizedBox(width: 10)],
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: p.ink)),
+              if (subtitle != null)
+                DefaultTextStyle(
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 12.5, color: p.inkMuted),
+                  child: subtitle!,
+                ),
+            ],
+          ),
+        ),
+        if (onTap != null) ...[
+          const SizedBox(width: 6),
+          Container(
+            width: 26,
+            height: 26,
+            decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(8)),
+            child: Icon(Icons.expand_more_rounded, size: 20, color: p.accent),
+          ),
+        ],
+      ],
+    );
+    return SliverAppBar(
+      pinned: true,
+      backgroundColor: p.page,
+      surfaceTintColor: Colors.transparent,
+      toolbarHeight: 64,
+      titleSpacing: 0,
+      title: onTap == null
+          ? Padding(padding: const EdgeInsets.only(left: 4), child: content)
+          : InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), child: content),
+            ),
+      actions: [?trailing, const SizedBox(width: 8)],
+    );
+  }
+}
+
+
+/// A field's name above it.
+class CarFieldLabel extends StatelessWidget {
+  const CarFieldLabel(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+        child: Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: VegukinPalette.of(context).inkSoft)),
+      );
+}
+
+/// A number typed in: "7 000 000" as it's typed when [grouped].
+class CarNumberField extends StatelessWidget {
+  const CarNumberField({super.key, required this.label, required this.controller, required this.hint, required this.onChanged, this.grouped = false, this.maxLength});
+
+  final String label;
+  final TextEditingController controller;
+  final String hint;
+  final VoidCallback onChanged;
+  final bool grouped;
+  final int? maxLength;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: p.hairline));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        CarFieldLabel(label),
+        TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            if (maxLength != null) LengthLimitingTextInputFormatter(maxLength),
+            if (grouped) const GroupedDigits(),
+          ],
+          onChanged: (_) => onChanged(),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: p.ink),
+          decoration: InputDecoration(
+            hintText: hint,
+            isDense: true,
+            filled: true,
+            fillColor: p.card,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            border: border,
+            enabledBorder: border,
+            focusedBorder: border.copyWith(borderSide: BorderSide(color: p.accent, width: 1.5)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class GroupedDigits extends TextInputFormatter {
+  const GroupedDigits();
+
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    final text = digits.isEmpty ? '' : groupDigits(digits);
+    return TextEditingValue(text: text, selection: TextSelection.collapsed(offset: text.length));
+  }
+}
+
+
+/// The make and model chosen (its badge and name), or [empty]; a tap
+/// changes it.
+class CarPickField extends StatelessWidget {
+  const CarPickField({super.key, required this.pick, required this.empty, required this.onTap});
+
+  final CarPick? pick;
+  final String empty;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    final pick = this.pick;
+    return Material(
+      color: p.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: pick == null ? p.hairlineStrong : p.accent, width: pick == null ? 1 : 1.5),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              pick == null
+                  ? Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(color: p.accent, borderRadius: BorderRadius.circular(11)),
+                      child: const Icon(Icons.directions_car_rounded, color: Colors.white, size: 22),
+                    )
+                  : BrandLogo(pick.brand, size: 38),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  pick == null ? empty : pick.model == null ? s.carAllOf(pick.brand) : '${pick.brand} ${pick.model}',
+                  style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: pick == null ? p.inkSoft : p.ink),
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: p.inkMuted),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// What signing in brings, and the button: alerts and posts need a name.
+class SignInCard extends StatelessWidget {
+  const SignInCard({super.key, required this.icon, required this.title, required this.body, required this.action, required this.onAction});
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final String action;
+  final VoidCallback onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      decoration: BoxDecoration(color: p.card, borderRadius: BorderRadius.circular(22), border: Border.all(color: p.hairline)),
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(20)),
+            child: Icon(icon, size: 32, color: p.accent),
+          ),
+          const SizedBox(height: 14),
+          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: p.ink)),
+          const SizedBox(height: 6),
+          Text(body, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.45, color: p.inkSoft)),
+          const SizedBox(height: 18),
+          FilledButton.icon(onPressed: onAction, icon: const Icon(Icons.login_rounded), label: Text(action)),
+        ],
+      ),
+    );
+  }
+}

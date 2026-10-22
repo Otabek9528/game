@@ -3590,4 +3590,281 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get carListing => 'Объявление';
+
+  @override
+  String get carTabAlerts => 'Уведомления';
+
+  @override
+  String get carTabSell => 'Продать';
+
+  @override
+  String get carAlertsTitle => 'Уведомления';
+
+  @override
+  String carAlertsActive(String count) {
+    return 'Активных: $count';
+  }
+
+  @override
+  String get carNewAlert => 'Новое уведомление';
+
+  @override
+  String get carAnyCar => 'Все машины';
+
+  @override
+  String get carCreateAlert => 'Создать уведомление';
+
+  @override
+  String get carMyAlerts => 'Мои уведомления';
+
+  @override
+  String get carNoAlertsTitle => 'Уведомлений нет';
+
+  @override
+  String get carNoAlertsBody => 'Сообщим, когда появится подходящая машина';
+
+  @override
+  String get carAllListings => 'Все объявления';
+
+  @override
+  String get carAlertNeedsFilter =>
+      'Выберите хотя бы один фильтр (модель, цена, пробег, год или топливо).';
+
+  @override
+  String get carAlertDuplicate => 'Такое уведомление уже есть.';
+
+  @override
+  String get carAlertLimit => 'Достигнут предел уведомлений.';
+
+  @override
+  String get carAlertCreated =>
+      'Готово: подходящие объявления придут на телефон.';
+
+  @override
+  String get carAlertDeleted => 'Уведомление удалено';
+
+  @override
+  String get carSignInAlertsTitle => 'Сообщим о подходящей машине';
+
+  @override
+  String get carSignInAlertsBody =>
+      'Для уведомлений войдите в аккаунт. Смотреть и сохранять можно без входа.';
+
+  @override
+  String get carSignInButton => 'Войти';
+
+  @override
+  String get carPushOff => 'Уведомления выключены — сообщения не придут.';
+
+  @override
+  String get carPushOn => 'Включить';
+
+  @override
+  String get carErrorGeneric => 'Ошибка. Попробуйте ещё раз.';
+
+  @override
+  String get carMyPosts => 'Мои объявления';
+
+  @override
+  String get carNewPost => 'Новое объявление';
+
+  @override
+  String get carNewPostSub => 'Продайте свою машину';
+
+  @override
+  String get carNoPostsTitle => 'Объявлений пока нет';
+
+  @override
+  String get carNoPostsBody =>
+      'Разместите первое объявление кнопкой выше — это займёт пару минут.';
+
+  @override
+  String get carStatePending => 'На проверке';
+
+  @override
+  String get carStateApproved => 'Опубликовано';
+
+  @override
+  String get carStateRejected => 'Отклонено';
+
+  @override
+  String get carStateChanges => 'Нужны правки';
+
+  @override
+  String get carStateDraft => 'Черновик';
+
+  @override
+  String get carEdit => 'Изменить';
+
+  @override
+  String get carMarkSold => 'Продано';
+
+  @override
+  String get carDelete => 'Удалить';
+
+  @override
+  String get carSoldConfirmTitle => 'Отметить как проданное?';
+
+  @override
+  String get carSoldConfirmBody => 'Объявление будет показано как проданное.';
+
+  @override
+  String get carSoldConfirmYes => 'Да, продано';
+
+  @override
+  String get carMarkedSold => 'Отмечено как проданное';
+
+  @override
+  String get carDeleteConfirmTitle => 'Удалить объявление?';
+
+  @override
+  String get carDeleteConfirmBody => 'Это нельзя отменить.';
+
+  @override
+  String get carDeleted => 'Удалено';
+
+  @override
+  String get carCancel => 'Отмена';
+
+  @override
+  String get carSignInSellTitle => 'Продайте свою машину';
+
+  @override
+  String get carSignInSellBody =>
+      'Чтобы разместить объявление, войдите в аккаунт.';
+
+  @override
+  String get carNewPostTitle => 'Новое объявление';
+
+  @override
+  String get carEditPostTitle => 'Изменить объявление';
+
+  @override
+  String get carPhotos => 'Фото и видео';
+
+  @override
+  String get carPhotosHint =>
+      'Первое станет обложкой. До 10 файлов, видео ≤ 50 МБ.';
+
+  @override
+  String get carPhotosLocked => 'После отправки фото менять нельзя.';
+
+  @override
+  String get carAddMedia => 'Добавить';
+
+  @override
+  String get carCover => 'Обложка';
+
+  @override
+  String get carCarSection => 'Машина';
+
+  @override
+  String get carBrand => 'Марка';
+
+  @override
+  String get carModel => 'Модель';
+
+  @override
+  String get carPickBrandFirst => 'Сначала выберите марку';
+
+  @override
+  String get carPickModelTitle => 'Выберите модель';
+
+  @override
+  String get carOtherModel => 'Другая модель (вручную)';
+
+  @override
+  String get carModelHint => 'например: Sonata';
+
+  @override
+  String get carPickYear => 'Выберите год';
+
+  @override
+  String get carGenerationOptional => 'Поколение (необяз.)';
+
+  @override
+  String get carMileageLabel => 'Пробег (км)';
+
+  @override
+  String get carFuelType => 'Тип топлива';
+
+  @override
+  String get carPriceSection => 'Цена и документы';
+
+  @override
+  String get carPriceLabel => 'Цена (₩)';
+
+  @override
+  String get carNegotiableSub => 'Возможен торг с покупателем';
+
+  @override
+  String get carLegalLabel => 'Оформление';
+
+  @override
+  String get carLegalNo => 'Нелегально';
+
+  @override
+  String get carRegQuestion => 'Нужно переоформление?';
+
+  @override
+  String get carRegYes => 'Да, нужно';
+
+  @override
+  String get carPhoneLabel => 'Номер телефона';
+
+  @override
+  String get carContactHint => 'Заполните хотя бы одно.';
+
+  @override
+  String get carDescription => 'Описание';
+
+  @override
+  String get carDescriptionHint =>
+      'Состояние, замены деталей, причина продажи...';
+
+  @override
+  String get carSubmit => 'Отправить на проверку';
+
+  @override
+  String get carSaveChanges => 'Сохранить';
+
+  @override
+  String get carRequiredMissing => 'Заполните обязательные поля';
+
+  @override
+  String get carChangesSaved => 'Сохранено';
+
+  @override
+  String get carSubmitted => 'Отправлено! Объявление появится после проверки.';
+
+  @override
+  String carUploading(String done, String total) {
+    return 'Загрузка: $done / $total';
+  }
+
+  @override
+  String get carVideoTooBig => 'Видео больше 50 МБ';
+
+  @override
+  String get carMediaLimit => 'Не больше 10';
+
+  @override
+  String get carNeedPhoto => 'Добавьте хотя бы одно фото';
+
+  @override
+  String get carDupTitle => 'Эта машина уже размещена';
+
+  @override
+  String get carDupBody =>
+      'Есть объявление с тем же номером и машиной. Повторно разместить нельзя.';
+
+  @override
+  String get carDupOwn => 'Ваше объявление';
+
+  @override
+  String get carOk => 'Понятно';
+
+  @override
+  String get carChannelNudge =>
+      'Подпишитесь на @vegukin_car, чтобы первыми видеть новые объявления';
 }

@@ -155,6 +155,23 @@ class _PhotoViewerState extends State<_PhotoViewer> {
   late final _pages = PageController(initialPage: widget.start);
   late int _index = widget.start;
   bool _zoomed = false;
+  bool _started = false;
+
+  /// The ones either side (and the one after next) fetched while this one
+  /// is looked at, so a swipe doesn't wait.
+  void _prefetch(int i) {
+    for (final j in [i + 1, i - 1, i + 2]) {
+      if (j >= 0 && j < widget.pictures.length) precacheImage(widget.pictures[j].screen, context, onError: (_, _) {}).ignore();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    _prefetch(_index);
+  }
 
   /// Fingers on the screen: with two, it's a pinch, not a swipe.
   int _fingers = 0;
@@ -192,6 +209,7 @@ class _PhotoViewerState extends State<_PhotoViewer> {
                 onPageChanged: (i) {
                   HapticFeedback.selectionClick();
                   setState(() => _index = i);
+                  _prefetch(i);
                 },
                 itemBuilder: (context, i) => _ZoomPhoto(
                   picture: widget.pictures[i],

@@ -108,8 +108,80 @@ class CarsKit extends ChangeNotifier {
   bool isFavorite(int id) => _favorites.containsKey(id);
 
   void toggleFavorite(Car car) {
-    if (_favorites.remove(car.id) == null) _favorites[car.id] = _byId[car.id] ?? car;
+    final on = _favorites.remove(car.id) == null;
+    if (on) _favorites[car.id] = _byId[car.id] ?? car;
     _saveFavorites();
+    _notify();
+    unawaited(() async {
+      try {
+        await source.setFavorite(await auth(), car.id, on: on);
+      } on CarsException {
+        // Sent with the next sync.
+      }
+    }());
+  }
+
+  /// The saved cars here and on the server made one: the phone's sent up,
+  /// the server's (saved in the Mini App, or on another phone) brought down.
+  Future<void> syncFavorites() async {
+    try {
+      final auth = await this.auth();
+      if (auth.isEmpty) return;
+      final remote = await source.favoriteIds(auth);
+      for (final id in _favorites.keys.where((id) => !remote.contains(id)).toList()) {
+        await source.setFavorite(auth, id, on: true);
+      }
+      for (final id in remote.where((id) => !_favorites.containsKey(id))) {
+        try {
+          _favorites[id] = remember([await source.car(id)]).single;
+        } on CarsException {
+          // Gone from the market.
+        }
+      }
+      _saveFavorites();
+      _notify();
+    } on CarsException {
+      // Offline: as on the phone.
+    }
+  }
+
+  /// The account's header; the account is made when missing. Empty offline.
+  Future<Map<String, String>> auth() async {
+    try {
+      await services.account.ensure();
+    } catch (_) {}
+    return services.account.authHeaders;
+  }
+
+  bool get signedIn => services.account.signedIn;
+
+  // ------------------------------------------------------------ alerts
+
+  List<CarAlert>? alerts;
+
+  Future<void> loadAlerts() async {
+    alerts = await source.alerts(await auth());
+    _notify();
+  }
+
+  Future<void> addAlert(CarQuery query) async {
+    final alert = await source.addAlert(await auth(), query);
+    alerts = [alert, ...?alerts];
+    _notify();
+  }
+
+  Future<void> deleteAlert(int id) async {
+    await source.deleteAlert(await auth(), id);
+    alerts = [for (final a in alerts ?? const <CarAlert>[]) if (a.id != id) a];
+    _notify();
+  }
+
+  // ------------------------------------------------------------ posts
+
+  List<OwnCar>? ownCars;
+
+  Future<void> loadOwn() async {
+    ownCars = await source.ownCars(await auth());
     _notify();
   }
 

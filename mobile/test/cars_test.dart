@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:muslim_vegukin/features/cars/car_detail.dart';
+import 'package:muslim_vegukin/features/cars/cars_sell.dart';
 import 'package:muslim_vegukin/features/cars/cars_models.dart';
 import 'package:muslim_vegukin/features/cars/cars_parts.dart';
 import 'package:muslim_vegukin/features/cars/cars_screen.dart';
@@ -258,6 +261,141 @@ void main() {
       final app = await openCars(tester);
       await tapVisible(tester, find.text('Open'));
       expect(app.links.last, Uri.parse('https://t.me/vegukin_car'));
+    });
+  });
+
+  group('with an account', () {
+    /// A choice in the form: its field (by label), then [option] in the sheet.
+    Future<void> choose(WidgetTester tester, String field, String option) async {
+      final box = find.descendant(
+        of: find.ancestor(of: find.text(field), matching: find.byType(Column)).first,
+        matching: find.byIcon(Icons.expand_more_rounded),
+      );
+      await tester.ensureVisible(box);
+      await tester.pumpAndSettle();
+      await tester.tap(box);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(option).last);
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> type(WidgetTester tester, String hint, String text) async {
+      final field = find.widgetWithText(TextField, hint);
+      await tester.scrollUntilVisible(field, 200, scrollable: find.byType(Scrollable).first);
+      await tester.pumpAndSettle();
+      await tester.enterText(field, text);
+    }
+
+    Future<void> signIn(WidgetTester tester, TestApp app) async {
+      await tester.tap(find.text('Sign in').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue with Google'));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      app.cars.signedIn = true;
+    }
+
+    testWidgets('saved cars made one with the server: the phone’s sent up, the Mini App’s brought down', (tester) async {
+      final app = TestApp(language: 'en');
+      await app.store.write('cars_favorites', '[{"id":3,"brand":"Hyundai","model":"Sonata"}]');
+      app.cars.favorites.add(7);
+      await openCars(tester, app: app);
+      expect(app.cars.favorites, {3, 7});
+      await tester.tap(find.text('Saved'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 saved'), findsOneWidget);
+      await tester.tap(find.descendant(of: card(7), matching: find.byTooltip('Remove from saved')));
+      await tester.pumpAndSettle();
+      expect(app.cars.favorites, {3});
+    });
+
+    testWidgets('alerts: anyone browses, an alert asks to sign in; then made, listed, deleted', (tester) async {
+      final app = await openCars(tester);
+      await tester.tap(find.text('Alerts'));
+      await tester.pumpAndSettle();
+      expect(find.text('Hear about the right car first'), findsOneWidget);
+      await signIn(tester, app);
+      await tester.tap(find.text('Alerts').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Create alert'));
+      await tester.pumpAndSettle();
+      expect(find.text('Choose at least one filter (model, price, mileage, year or fuel).'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).first, '7000000');
+      await tester.tap(find.text('LPG'));
+      await tester.tap(find.text('Create alert'));
+      await tester.pumpAndSettle();
+      expect(app.cars.asked, contains('alert price_max=7000000&fuel=lpg'));
+      expect(find.text('≤ 7 000 000 ₩'), findsOneWidget);
+      await tester.tap(find.byTooltip('Delete'));
+      await tester.pumpAndSettle();
+      expect(app.cars.alertList, isEmpty);
+      expect(find.text('No alerts yet'), findsOneWidget);
+    });
+
+    testWidgets('a post: required fields said; photos sent; to the admin; listed as under review', (tester) async {
+      CarPostForm.debugPickMedia = (limit) async => [
+            XFile.fromData(Uint8List.fromList([1, 2, 3]), path: 'front.jpg', mimeType: 'image/jpeg'),
+            XFile.fromData(Uint8List.fromList([4, 5]), path: 'walk.mp4', mimeType: 'video/mp4'),
+          ];
+      addTearDown(() => CarPostForm.debugPickMedia = null);
+      final app = await openCars(tester);
+      await tester.tap(find.text('Sell'));
+      await tester.pumpAndSettle();
+      await signIn(tester, app);
+      await tester.tap(find.text('New listing').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Send for review'));
+      await tester.pumpAndSettle();
+      expect(find.text('Fill in the required fields'), findsOneWidget);
+
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+      expect(find.text('Cover'), findsOneWidget);
+      await choose(tester, 'Make *', 'Kia');
+      await choose(tester, 'Model *', 'K5');
+      await choose(tester, 'Year *', '2017');
+      await type(tester, '7 000 000', '9900000');
+      await type(tester, '010 1234 5678', '010-1111-2222');
+      await tester.tap(find.text('Send for review'));
+      await tester.pumpAndSettle();
+      expect(app.cars.asked, contains('post Kia K5 2017 9900000 01011112222'));
+      expect(app.cars.uploads.map((u) => (u.$2, u.$3)), [('front.jpg', false), ('walk.mp4', true)]);
+      expect(app.cars.asked, contains('submit 100'));
+      expect(find.text('Under review'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'Sold'), findsNothing, reason: 'not before it’s live');
+    });
+
+    testWidgets('the same car posted again: said so, and nothing sent', (tester) async {
+      CarPostForm.debugPickMedia = (limit) async => [XFile.fromData(Uint8List.fromList([1]), name: 'a.jpg', mimeType: 'image/jpeg')];
+      addTearDown(() => CarPostForm.debugPickMedia = null);
+      final app = await openCars(tester);
+      app.cars.dupes = [const CarDuplicate(id: 1, brand: 'Hyundai', model: 'Sonata', year: 2015, priceKrw: 5500000, viewable: true)];
+      await tester.tap(find.text('Sell'));
+      await tester.pumpAndSettle();
+      await signIn(tester, app);
+      await tester.tap(find.text('New listing').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+      for (final (field, option) in [('Make *', 'Hyundai'), ('Model *', 'Sonata'), ('Year *', '2015')]) {
+        await choose(tester, field, option);
+      }
+      await type(tester, '7 000 000', '5500000');
+      await type(tester, '@username', '@seller');
+      await tester.tap(find.text('Send for review'));
+      await tester.pumpAndSettle();
+      expect(find.text('This car is already listed'), findsOneWidget);
+      expect(app.cars.asked.where((a) => a.startsWith('post')), isEmpty);
+    });
+
+    testWidgets('a notification about a listing opens it', (tester) async {
+      final app = TestApp(language: 'uz');
+      await app.launch(tester);
+      app.push.open({'url': 'https://vegukin-twa.pages.dev/pages/cars/cars.html?startapp=car2', 'kind': 'car'});
+      await tester.pumpAndSettle();
+      expect(find.byType(CarDetailScreen), findsOneWidget);
+      expect(find.text('2014 Hyundai Sonata LF'), findsOneWidget);
     });
   });
 }

@@ -46,7 +46,7 @@ void openSection(BuildContext context, Feature feature, AppServices services) {
     'donation' => (BuildContext _) => DonationScreen(services: services),
     'community' => (BuildContext _) => CommunityScreen(services: services),
     'hikorea' => (BuildContext _) => HikoreaScreen(services: services),
-    'cars' => (BuildContext _) => CarsScreen(services: services),
+    'cars' => (BuildContext _) => CarsScreen(services: services, startCar: CarsScreen.carIn(feature.path)),
     _ => null,
   };
   if (native != null) {

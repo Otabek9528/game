@@ -3479,4 +3479,284 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get carListing => 'E’lon';
+
+  @override
+  String get carTabAlerts => 'Xabarnoma';
+
+  @override
+  String get carTabSell => 'Sotish';
+
+  @override
+  String get carAlertsTitle => 'Xabarnomalar';
+
+  @override
+  String carAlertsActive(String count) {
+    return '$count ta faol';
+  }
+
+  @override
+  String get carNewAlert => 'Yangi xabarnoma';
+
+  @override
+  String get carAnyCar => 'Barcha mashinalar';
+
+  @override
+  String get carCreateAlert => 'Xabarnoma yaratish';
+
+  @override
+  String get carMyAlerts => 'Mening xabarnomalarim';
+
+  @override
+  String get carNoAlertsTitle => 'Xabarnoma yo‘q';
+
+  @override
+  String get carNoAlertsBody => 'Yangi mos e’lon chiqsa, sizga bildiramiz';
+
+  @override
+  String get carAllListings => 'Barcha e’lonlar';
+
+  @override
+  String get carAlertNeedsFilter =>
+      'Kamida bitta filtr tanlang (model, narx, yurgani, yil yoki yoqilg‘i).';
+
+  @override
+  String get carAlertDuplicate => 'Bunday xabarnoma allaqachon mavjud.';
+
+  @override
+  String get carAlertLimit => 'Xabarnomalar soni chegarasiga yetdingiz.';
+
+  @override
+  String get carAlertCreated =>
+      'Xabarnoma yaratildi: mos e’lon chiqsa, telefoningizga keladi.';
+
+  @override
+  String get carAlertDeleted => 'Xabarnoma o‘chirildi';
+
+  @override
+  String get carSignInAlertsTitle => 'Mos mashina chiqsa, xabar beramiz';
+
+  @override
+  String get carSignInAlertsBody =>
+      'Xabarnoma uchun akkauntga kiring. Ko‘rish va saqlash uchun kirish shart emas.';
+
+  @override
+  String get carSignInButton => 'Akkauntga kirish';
+
+  @override
+  String get carPushOff =>
+      'Bildirishnomalar o‘chiq — xabarnomalar telefonga kelmaydi.';
+
+  @override
+  String get carPushOn => 'Yoqish';
+
+  @override
+  String get carErrorGeneric => 'Xatolik yuz berdi. Qayta urinib ko‘ring.';
+
+  @override
+  String get carMyPosts => 'Mening e’lonlarim';
+
+  @override
+  String get carNewPost => 'Yangi e’lon qo‘shish';
+
+  @override
+  String get carNewPostSub => 'Mashinangizni soting';
+
+  @override
+  String get carNoPostsTitle => 'Hali e’lon yo‘q';
+
+  @override
+  String get carNoPostsBody =>
+      'Yuqoridagi tugma orqali birinchi e’loningizni joylang — bir necha daqiqada tayyor bo‘ladi.';
+
+  @override
+  String get carStatePending => 'Ko‘rib chiqilmoqda';
+
+  @override
+  String get carStateApproved => 'Joylandi';
+
+  @override
+  String get carStateRejected => 'Rad etildi';
+
+  @override
+  String get carStateChanges => 'O‘zgartirish kerak';
+
+  @override
+  String get carStateDraft => 'Qoralama';
+
+  @override
+  String get carEdit => 'Tahrirlash';
+
+  @override
+  String get carMarkSold => 'Sotildi';
+
+  @override
+  String get carDelete => 'O‘chirish';
+
+  @override
+  String get carSoldConfirmTitle => 'Sotildi deb belgilash?';
+
+  @override
+  String get carSoldConfirmBody =>
+      'E’lon bozorda sotilgan sifatida ko‘rsatiladi.';
+
+  @override
+  String get carSoldConfirmYes => 'Ha, sotildi';
+
+  @override
+  String get carMarkedSold => 'Sotilgan deb belgilandi';
+
+  @override
+  String get carDeleteConfirmTitle => 'E’lonni o‘chirish?';
+
+  @override
+  String get carDeleteConfirmBody => 'Bu amalni qaytarib bo‘lmaydi.';
+
+  @override
+  String get carDeleted => 'O‘chirildi';
+
+  @override
+  String get carCancel => 'Bekor qilish';
+
+  @override
+  String get carSignInSellTitle => 'Mashinangizni soting';
+
+  @override
+  String get carSignInSellBody => 'E’lon joylash uchun akkauntga kiring.';
+
+  @override
+  String get carNewPostTitle => 'Yangi e’lon';
+
+  @override
+  String get carEditPostTitle => 'E’lonni tahrirlash';
+
+  @override
+  String get carPhotos => 'Rasmlar va video';
+
+  @override
+  String get carPhotosHint =>
+      'Birinchisi muqova bo‘ladi. Ko‘pi bilan 10 ta, har bir video ≤ 50MB.';
+
+  @override
+  String get carPhotosLocked =>
+      'Yuborilgandan keyin rasmlarni o‘zgartirib bo‘lmaydi.';
+
+  @override
+  String get carAddMedia => 'Qo‘shish';
+
+  @override
+  String get carCover => 'Muqova';
+
+  @override
+  String get carCarSection => 'Mashina';
+
+  @override
+  String get carBrand => 'Marka';
+
+  @override
+  String get carModel => 'Model';
+
+  @override
+  String get carPickBrandFirst => 'Avval markani tanlang';
+
+  @override
+  String get carPickModelTitle => 'Modelni tanlang';
+
+  @override
+  String get carOtherModel => 'Boshqa model (qo‘lda)';
+
+  @override
+  String get carModelHint => 'masalan: Sonata';
+
+  @override
+  String get carPickYear => 'Yilni tanlang';
+
+  @override
+  String get carGenerationOptional => 'Avlod (ixtiyoriy)';
+
+  @override
+  String get carMileageLabel => 'Yurgan masofasi (km)';
+
+  @override
+  String get carFuelType => 'Yoqilg‘i turi';
+
+  @override
+  String get carPriceSection => 'Narx va hujjatlar';
+
+  @override
+  String get carPriceLabel => 'Narxi (₩)';
+
+  @override
+  String get carNegotiableSub => 'Xaridor bilan kelishish mumkin';
+
+  @override
+  String get carLegalLabel => 'Rasmiy holati';
+
+  @override
+  String get carLegalNo => 'Nolegal';
+
+  @override
+  String get carRegQuestion => 'Nomiga o‘tkazish kerakmi?';
+
+  @override
+  String get carRegYes => 'Ha, kerak';
+
+  @override
+  String get carPhoneLabel => 'Telefon raqam';
+
+  @override
+  String get carContactHint => 'Kamida bittasini to‘ldiring.';
+
+  @override
+  String get carDescription => 'Tavsif';
+
+  @override
+  String get carDescriptionHint =>
+      'Holati, butligi, almashtirilgan qismlar, sababi...';
+
+  @override
+  String get carSubmit => 'Ko‘rib chiqishga yuborish';
+
+  @override
+  String get carSaveChanges => 'Saqlash';
+
+  @override
+  String get carRequiredMissing => 'Majburiy maydonlarni to‘ldiring';
+
+  @override
+  String get carChangesSaved => 'Saqlandi';
+
+  @override
+  String get carSubmitted =>
+      'Yuborildi! Admin tekshirgach e’loningiz joylanadi.';
+
+  @override
+  String carUploading(String done, String total) {
+    return 'Yuklanmoqda: $done / $total';
+  }
+
+  @override
+  String get carVideoTooBig => 'Video 50MB dan katta';
+
+  @override
+  String get carMediaLimit => 'Ko‘pi bilan 10 ta';
+
+  @override
+  String get carNeedPhoto => 'Kamida bitta rasm qo‘shing';
+
+  @override
+  String get carDupTitle => 'Bu mashina allaqachon e’lon qilingan';
+
+  @override
+  String get carDupBody =>
+      'Shu raqam va shu mashina bilan e’lon bor. Bir xil e’lonni qayta joylab bo‘lmaydi.';
+
+  @override
+  String get carDupOwn => 'Sizning e’loningiz';
+
+  @override
+  String get carOk => 'Tushunarli';
+
+  @override
+  String get carChannelNudge =>
+      'Yangi e’lonlarni birinchi bo‘lib ko‘rish uchun @vegukin_car kanaliga a’zo bo‘ling';
 }

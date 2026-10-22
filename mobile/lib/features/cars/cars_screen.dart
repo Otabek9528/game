@@ -7,18 +7,27 @@ import '../../app_services.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 import 'car_detail.dart';
+import 'cars_alerts.dart';
 import 'cars_kit.dart';
 import 'cars_models.dart';
 import 'cars_parts.dart';
 import 'cars_picker.dart';
+import 'cars_sell.dart';
 
 /// The used-car market, as the Mini App has it: everything newest first or
 /// one model with its going price (Browse), filters (Search), and the cars
 /// saved on this phone (Saved).
 class CarsScreen extends StatefulWidget {
-  const CarsScreen({super.key, required this.services});
+  const CarsScreen({super.key, required this.services, this.startCar});
 
   final AppServices services;
+
+  /// A listing to open at once: a notification's.
+  final int? startCar;
+
+  /// The listing a link names: "…cars.html?startapp=car123".
+  static int? carIn(String path) =>
+      int.tryParse(RegExp(r'^car(\d+)$').firstMatch(Uri.tryParse(path)?.queryParameters['startapp'] ?? '')?.group(1) ?? '');
 
   @override
   State<CarsScreen> createState() => _CarsScreenState();
@@ -33,6 +42,12 @@ class _CarsScreenState extends State<CarsScreen> {
   void initState() {
     super.initState();
     unawaited(_kit.loadCatalog());
+    unawaited(_kit.syncFavorites());
+    if (widget.startCar case final id?) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) openCar(context, _kit, id);
+      });
+    }
   }
 
   @override
@@ -48,7 +63,7 @@ class _CarsScreenState extends State<CarsScreen> {
       _tab = tab;
       _opened.add(tab);
     });
-    if (tab == 2) unawaited(_kit.refreshFavorites());
+    if (tab == 3) unawaited(_kit.refreshFavorites());
   }
 
   @override
@@ -67,7 +82,9 @@ class _CarsScreenState extends State<CarsScreen> {
           children: [
             _BrowseTab(kit: _kit),
             if (_opened.contains(1)) _SearchTab(kit: _kit) else const SizedBox.shrink(),
-            if (_opened.contains(2)) _SavedTab(kit: _kit, onBrowse: () => _go(0)) else const SizedBox.shrink(),
+            if (_opened.contains(2)) CarsSellTab(kit: _kit) else const SizedBox.shrink(),
+            if (_opened.contains(3)) _SavedTab(kit: _kit, onBrowse: () => _go(0)) else const SizedBox.shrink(),
+            if (_opened.contains(4)) CarsAlertsTab(kit: _kit) else const SizedBox.shrink(),
           ],
         ),
         bottomNavigationBar: ListenableBuilder(
@@ -89,6 +106,15 @@ class _CarsScreenState extends State<CarsScreen> {
                 label: s.carTabSearch,
               ),
               NavigationDestination(
+                icon: Container(
+                  width: 40,
+                  height: 32,
+                  decoration: BoxDecoration(color: p.accent, borderRadius: BorderRadius.circular(12)),
+                  child: const Icon(Icons.add_rounded, color: Colors.white),
+                ),
+                label: s.carTabSell,
+              ),
+              NavigationDestination(
                 icon: Badge(
                   isLabelVisible: _kit.favorites.isNotEmpty,
                   label: Text('${_kit.favorites.length}'),
@@ -101,6 +127,11 @@ class _CarsScreenState extends State<CarsScreen> {
                 ),
                 label: s.carTabSaved,
               ),
+              NavigationDestination(
+                icon: const Icon(Icons.notifications_none_rounded),
+                selectedIcon: Icon(Icons.notifications_rounded, color: p.accent),
+                label: s.carTabAlerts,
+              ),
             ],
           ),
         ),
@@ -108,66 +139,6 @@ class _CarsScreenState extends State<CarsScreen> {
     );
   }
 }
-
-/// A tab's top: its title (or the make picker), a line under it.
-class _TabBar extends StatelessWidget {
-  const _TabBar({required this.title, this.subtitle, this.leading, this.onTap, this.trailing});
-
-  final String title;
-  final Widget? subtitle;
-  final Widget? leading;
-  final VoidCallback? onTap;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    final content = Row(
-      children: [
-        if (leading != null) ...[leading!, const SizedBox(width: 10)],
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: p.ink)),
-              if (subtitle != null)
-                DefaultTextStyle(
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 12.5, color: p.inkMuted),
-                  child: subtitle!,
-                ),
-            ],
-          ),
-        ),
-        if (onTap != null) ...[
-          const SizedBox(width: 6),
-          Container(
-            width: 26,
-            height: 26,
-            decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(8)),
-            child: Icon(Icons.expand_more_rounded, size: 20, color: p.accent),
-          ),
-        ],
-      ],
-    );
-    return SliverAppBar(
-      pinned: true,
-      backgroundColor: p.page,
-      surfaceTintColor: Colors.transparent,
-      toolbarHeight: 64,
-      titleSpacing: 0,
-      title: onTap == null
-          ? Padding(padding: const EdgeInsets.only(left: 4), child: content)
-          : InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(14),
-              child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), child: content),
-            ),
-      actions: [?trailing, const SizedBox(width: 8)],
-    );
-  }
-}
-
 
 // ------------------------------------------------------------------ browse
 
@@ -261,7 +232,7 @@ class _BrowseTabState extends State<_BrowseTab> with AutomaticKeepAliveClientMix
           onRefresh: _load,
           child: CustomScrollView(
             slivers: [
-              _TabBar(
+              CarsTabBar(
                 title: pick == null ? s.carMarket : [pick.brand, ?pick.model].join(' '),
                 leading: pick == null ? null : BrandLogo(pick.brand, size: 38),
                 subtitle: cars == null
@@ -434,7 +405,7 @@ class _SearchTabState extends State<_SearchTab> with AutomaticKeepAliveClientMix
       builder: (context, _) => CustomScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         slivers: [
-          _TabBar(
+          CarsTabBar(
             title: s.carTabSearch,
             subtitle: Text(s.carSearchSub),
             trailing: _filtered ? TextButton(onPressed: _clear, child: Text(s.carClearFilters)) : null,
@@ -443,52 +414,19 @@ class _SearchTabState extends State<_SearchTab> with AutomaticKeepAliveClientMix
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
             sliver: SliverList.list(
               children: [
-                Material(
-                  color: p.card,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: pick == null ? p.hairline : p.accent, width: pick == null ? 1 : 1.5),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: _choose,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          pick == null
-                              ? Container(
-                                  width: 38,
-                                  height: 38,
-                                  decoration: BoxDecoration(color: p.accent, borderRadius: BorderRadius.circular(11)),
-                                  child: const Icon(Icons.directions_car_rounded, color: Colors.white, size: 22),
-                                )
-                              : BrandLogo(pick.brand, size: 38),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              pick == null ? s.carPickModel : pick.model == null ? s.carAllOf(pick.brand) : '${pick.brand} ${pick.model}',
-                              style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: pick == null ? p.inkSoft : p.ink),
-                            ),
-                          ),
-                          Icon(Icons.chevron_right_rounded, color: p.inkMuted),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                CarPickField(pick: pick, empty: s.carPickModel, onTap: _choose),
                 const SizedBox(height: 14),
-                _Field(label: s.carPriceMax, controller: _price, hint: '7 000 000', grouped: true, onChanged: _soon),
+                CarNumberField(label: s.carPriceMax, controller: _price, hint: '7 000 000', grouped: true, onChanged: _soon),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _Field(label: s.carMileageMax, controller: _mileage, hint: '150 000', grouped: true, onChanged: _soon)),
+                    Expanded(child: CarNumberField(label: s.carMileageMax, controller: _mileage, hint: '150 000', grouped: true, onChanged: _soon)),
                     const SizedBox(width: 12),
-                    Expanded(child: _Field(label: s.carYearFrom, controller: _year, hint: '2012', maxLength: 4, onChanged: _soon)),
+                    Expanded(child: CarNumberField(label: s.carYearFrom, controller: _year, hint: '2012', maxLength: 4, onChanged: _soon)),
                   ],
                 ),
                 const SizedBox(height: 14),
-                _Label(s.carFuel),
+                CarFieldLabel(s.carFuel),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -505,7 +443,7 @@ class _SearchTabState extends State<_SearchTab> with AutomaticKeepAliveClientMix
                   ],
                 ),
                 const SizedBox(height: 14),
-                _Label(s.carStatus),
+                CarFieldLabel(s.carStatus),
                 StatusSwitch(
                   value: _status,
                   onChanged: (v) {
@@ -540,74 +478,6 @@ class _SearchTabState extends State<_SearchTab> with AutomaticKeepAliveClientMix
   }
 }
 
-class _Label extends StatelessWidget {
-  const _Label(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-        child: Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: VegukinPalette.of(context).inkSoft)),
-      );
-}
-
-/// A number typed in: "7 000 000" as it's typed when [grouped].
-class _Field extends StatelessWidget {
-  const _Field({required this.label, required this.controller, required this.hint, required this.onChanged, this.grouped = false, this.maxLength});
-
-  final String label;
-  final TextEditingController controller;
-  final String hint;
-  final VoidCallback onChanged;
-  final bool grouped;
-  final int? maxLength;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: p.hairline));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _Label(label),
-        TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            if (maxLength != null) LengthLimitingTextInputFormatter(maxLength),
-            if (grouped) const _Grouped(),
-          ],
-          onChanged: (_) => onChanged(),
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: p.ink),
-          decoration: InputDecoration(
-            hintText: hint,
-            isDense: true,
-            filled: true,
-            fillColor: p.card,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-            border: border,
-            enabledBorder: border,
-            focusedBorder: border.copyWith(borderSide: BorderSide(color: p.accent, width: 1.5)),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Grouped extends TextInputFormatter {
-  const _Grouped();
-
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
-    final text = digits.isEmpty ? '' : groupDigits(digits);
-    return TextEditingValue(text: text, selection: TextSelection.collapsed(offset: text.length));
-  }
-}
-
 // ------------------------------------------------------------------ saved
 
 class _SavedTab extends StatelessWidget {
@@ -627,7 +497,7 @@ class _SavedTab extends StatelessWidget {
           onRefresh: kit.refreshFavorites,
           child: CustomScrollView(
             slivers: [
-              _TabBar(title: s.carTabSaved, subtitle: Text(s.carSavedSub('${saved.length}'))),
+              CarsTabBar(title: s.carTabSaved, subtitle: Text(s.carSavedSub('${saved.length}'))),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                 sliver: SliverList.list(

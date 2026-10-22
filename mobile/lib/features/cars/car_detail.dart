@@ -97,9 +97,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         for (final m in media)
           ViewerPicture(
             quick: m.thumb == null ? null : NetworkImage('${m.thumb}'),
-            screen: m.video || m.url == null
-                ? NetworkImage('${m.thumb ?? m.url}')
-                : ResizeImage(NetworkImage('${m.url}'), width: (width * 1.5).round(), policy: ResizeImagePolicy.fit),
+            screen: m.video || m.url == null ? NetworkImage('${m.thumb ?? m.url}') : galleryImage(m.url!, width),
             onPlay: m.video && m.url != null ? () => _kit.services.openLink(m.url!) : null,
             caption: m.video && m.sizeBytes != null ? s.carVideoSize((m.sizeBytes! / 1048576).toStringAsFixed(1)) : null,
           ),
@@ -251,8 +249,24 @@ class _Gallery extends StatefulWidget {
   State<_Gallery> createState() => _GalleryState();
 }
 
+/// A listing's photo at the screen's width: the gallery's and the full
+/// screen viewer's, one image.
+ImageProvider galleryImage(Uri url, int width) => ResizeImage(NetworkImage('$url'), width: width);
+
 class _GalleryState extends State<_Gallery> {
   int _index = 0;
+  bool _fetching = false;
+
+  /// Every photo, one after another in order, while the first is looked
+  /// at: swiping, or opening one full screen, finds it there.
+  Future<void> _fetchAll(List<CarMedia> media, int width) async {
+    if (_fetching) return;
+    _fetching = true;
+    for (final m in media.skip(1)) {
+      if (!mounted) return;
+      if (!m.video && m.url != null) await precacheImage(galleryImage(m.url!, width), context, onError: (_, _) {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,6 +275,7 @@ class _GalleryState extends State<_Gallery> {
     final media = car.media ?? const [];
     if (media.isEmpty) return CarPhoto(car: car, width: 1080);
     final width = (MediaQuery.sizeOf(context).width * MediaQuery.devicePixelRatioOf(context)).round();
+    if (media.length > 1) WidgetsBinding.instance.addPostFrameCallback((_) => _fetchAll(media, width));
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -280,7 +295,8 @@ class _GalleryState extends State<_Gallery> {
                 children: [
                   placeholder,
                   image(m.thumb, cache: 400),
-                  if (!m.video) image(m.url, cache: width),
+                  if (!m.video && m.url != null)
+                    Image(image: galleryImage(m.url!, width), fit: BoxFit.cover, gaplessPlayback: true, errorBuilder: (_, _, _) => const SizedBox.shrink()),
                   if (m.video)
                     const Center(
                       child: CircleAvatar(

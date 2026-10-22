@@ -7,10 +7,13 @@ import '../../core/config.dart';
 /// What went wrong talking to the cars server: `offline`, `http_<status>`,
 /// `bad_response`.
 class CarsException implements Exception {
-  const CarsException(this.code, [this.status]);
+  const CarsException(this.code, [this.status, this.matches = const []]);
 
   final String code;
   final int? status;
+
+  /// For `duplicate`: the listings this one looks like.
+  final List<CarDuplicate> matches;
 
   @override
   String toString() => 'CarsException($code)';
@@ -409,3 +412,227 @@ String kmShort(int v) => v >= 1000 ? '${(v / 1000).round()}k km' : '$v km';
 
 /// 7500000 → "7 500 000".
 String groupDigits(Object v) => '$v'.replaceAll(RegExp(r'\D'), '').replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ' ');
+
+
+// ------------------------------------------------------------- one's own
+
+/// "Tell me when a car like this is posted": a make (and model), and limits.
+@immutable
+class CarAlert {
+  const CarAlert({required this.id, this.brand, this.model, this.priceMax, this.mileageMax, this.yearFrom, this.fuels = const []});
+
+  final int id;
+  final String? brand;
+  final String? model;
+  final int? priceMax;
+  final int? mileageMax;
+  final int? yearFrom;
+  final List<String> fuels;
+
+  static CarAlert? fromJson(Object? json) {
+    if (json is! Map) return null;
+    final id = _int(json['id']);
+    if (id == null) return null;
+    final fuel = json['fuel'];
+    return CarAlert(
+      id: id,
+      brand: _text(json['brand']),
+      model: _text(json['model']),
+      priceMax: _int(json['price_max']),
+      mileageMax: _int(json['mileage_max']),
+      yearFrom: _int(json['year_from']),
+      fuels: [for (final f in fuel is List ? fuel : fuel is String ? fuel.split(',') : const []) if ('$f'.isNotEmpty) '$f'],
+    );
+  }
+}
+
+/// Where a post of one's own stands: being written, with the admin, live,
+/// sent back for changes, refused.
+enum CarModeration { draft, pending, approved, changesRequested, rejected }
+
+/// A photo or video of one's own post, on the server.
+typedef OwnMedia = ({int id, bool video, Uri? url, Uri? thumb});
+
+/// A car one has posted (or is posting).
+@immutable
+class OwnCar {
+  const OwnCar({
+    required this.id,
+    required this.moderation,
+    this.brand,
+    this.model,
+    this.generation,
+    this.year,
+    this.priceKrw,
+    this.mileageKm,
+    this.transmission,
+    this.fuel,
+    this.negotiable = false,
+    this.legalStatus,
+    this.registrationRequired,
+    this.phone,
+    this.handle,
+    this.description,
+    this.sold = false,
+    this.reviewNote,
+    this.thumb,
+    this.media = const [],
+    this.views = 0,
+  });
+
+  final int id;
+  final CarModeration moderation;
+  final String? brand;
+  final String? model;
+  final String? generation;
+  final int? year;
+  final int? priceKrw;
+  final int? mileageKm;
+  final String? transmission;
+  final String? fuel;
+  final bool negotiable;
+  final String? legalStatus;
+  final bool? registrationRequired;
+  final String? phone;
+  final String? handle;
+  final String? description;
+  final bool sold;
+
+  /// What the admin said, when sent back or refused.
+  final String? reviewNote;
+  final Uri? thumb;
+  final List<OwnMedia> media;
+  final int views;
+
+  static OwnCar? fromJson(Object? json) {
+    if (json is! Map) return null;
+    final id = _int(json['id']);
+    if (id == null) return null;
+    final reg = json['registration_required'];
+    return OwnCar(
+      id: id,
+      moderation: switch (json['moderation_status']) {
+        'pending' => CarModeration.pending,
+        'approved' || null => CarModeration.approved,
+        'changes_requested' => CarModeration.changesRequested,
+        'rejected' => CarModeration.rejected,
+        _ => CarModeration.draft,
+      },
+      brand: _text(json['brand']),
+      model: _text(json['model']),
+      generation: _text(json['generation']),
+      year: _int(json['year']),
+      priceKrw: _int(json['price_krw']),
+      mileageKm: _int(json['mileage_km']),
+      transmission: _text(json['transmission']),
+      fuel: _text(json['fuel']),
+      negotiable: json['negotiable'] == true || json['negotiable'] == 1,
+      legalStatus: _text(json['legal_status']),
+      registrationRequired: reg == null ? null : reg == true || reg == 1,
+      phone: _text(json['contact_phone']),
+      handle: _text(json['contact_handle'])?.replaceFirst(RegExp(r'^@'), ''),
+      description: _text(json['raw_text']),
+      sold: json['status'] == 'sold',
+      reviewNote: _text(json['review_note']),
+      thumb: mediaUri(json['thumb']),
+      media: [
+        for (final m in (json['media'] as List?) ?? const [])
+          if (m is Map && _int(m['id']) != null)
+            (id: _int(m['id'])!, video: (m['media_type'] ?? m['type']) == 'video', url: mediaUri(m['url']), thumb: mediaUri(m['thumb'])),
+      ],
+      views: _int(json['views']) ?? 0,
+    );
+  }
+}
+
+/// What a post says about the car: the form's fields, as the server takes
+/// them.
+@immutable
+class CarPost {
+  const CarPost({
+    required this.brand,
+    required this.model,
+    required this.year,
+    required this.priceKrw,
+    this.generation,
+    this.mileageKm,
+    this.transmission,
+    this.fuel,
+    this.negotiable = false,
+    this.legalStatus,
+    this.registrationRequired,
+    this.phone,
+    this.handle,
+    this.description,
+  });
+
+  final String brand;
+  final String model;
+  final int year;
+  final int priceKrw;
+  final String? generation;
+  final int? mileageKm;
+  final String? transmission;
+  final String? fuel;
+  final bool negotiable;
+
+  /// legal, nolegal.
+  final String? legalStatus;
+  final bool? registrationRequired;
+
+  /// Digits only.
+  final String? phone;
+  final String? handle;
+  final String? description;
+
+  Map<String, Object?> toJson() => {
+        'brand': brand,
+        'model': model,
+        'generation': generation,
+        'year': year,
+        'mileage_km': mileageKm,
+        'transmission': transmission,
+        'fuel': fuel,
+        'price_krw': priceKrw,
+        'negotiable': negotiable,
+        'legal_status': legalStatus,
+        'registration_required': registrationRequired == null ? null : (registrationRequired! ? 1 : 0),
+        'contact_phone': phone,
+        'contact_handle': handle,
+        'description': description,
+        'lang': 'uz',
+      };
+}
+
+/// A listing a new post looks the same as.
+@immutable
+class CarDuplicate {
+  const CarDuplicate({required this.id, this.brand, this.model, this.year, this.priceKrw, this.thumb, this.viewable = false, this.own = false});
+
+  final int id;
+  final String? brand;
+  final String? model;
+  final int? year;
+  final int? priceKrw;
+  final Uri? thumb;
+
+  /// On the market, so it can be opened.
+  final bool viewable;
+
+  /// One's own earlier post.
+  final bool own;
+
+  static CarDuplicate? fromJson(Object? json) {
+    if (json is! Map || _int(json['id']) == null) return null;
+    return CarDuplicate(
+      id: _int(json['id'])!,
+      brand: _text(json['brand']),
+      model: _text(json['model']),
+      year: _int(json['year']),
+      priceKrw: _int(json['price_krw']),
+      thumb: mediaUri(json['thumb']),
+      viewable: json['viewable'] == true,
+      own: json['own'] == true,
+    );
+  }
+}

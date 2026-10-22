@@ -1514,4 +1514,114 @@ class FakeCars implements CarsSource {
     views.add(id);
     return 13;
   }
+
+  // ---- with the account
+
+  /// Saved on the server; alerts; one's posts.
+  final favorites = <int>{};
+  final alertList = <CarAlert>[];
+  final own = <Map<String, Object?>>[];
+  final uploads = <(int, String, bool)>[];
+  List<CarDuplicate> dupes = const [];
+  int _nextAlert = 1, _nextPost = 100;
+
+  void _account(Map<String, String> auth, {bool signIn = false}) {
+    if (auth.isEmpty) throw const CarsException('no_session', 401);
+    if (signIn && !signedIn) throw const CarsException('sign_in_required', 401);
+  }
+
+  /// Whether the account is signed in, as the server sees it.
+  bool signedIn = false;
+
+  @override
+  Future<Set<int>> favoriteIds(Map<String, String> auth) async {
+    _online('favorites');
+    _account(auth);
+    return {...favorites};
+  }
+
+  @override
+  Future<void> setFavorite(Map<String, String> auth, int id, {required bool on}) async {
+    _online('favorite $id $on');
+    _account(auth);
+    on ? favorites.add(id) : favorites.remove(id);
+  }
+
+  @override
+  Future<List<CarAlert>> alerts(Map<String, String> auth) async {
+    _online('alerts');
+    _account(auth, signIn: true);
+    return [...alertList];
+  }
+
+  @override
+  Future<CarAlert> addAlert(Map<String, String> auth, CarQuery query) async {
+    _online('alert ${query.params.entries.map((e) => '${e.key}=${e.value}').join('&')}');
+    _account(auth, signIn: true);
+    if (query.params.isEmpty) throw const CarsException('validation_failed', 422);
+    final alert = CarAlert(
+        id: _nextAlert++, brand: query.pick?.brand, model: query.pick?.model, priceMax: query.priceMax, fuels: [...query.fuels]);
+    alertList.insert(0, alert);
+    return alert;
+  }
+
+  @override
+  Future<void> deleteAlert(Map<String, String> auth, int id) async {
+    _online('unalert $id');
+    alertList.removeWhere((a) => a.id == id);
+  }
+
+  @override
+  Future<List<OwnCar>> ownCars(Map<String, String> auth) async {
+    _online('own');
+    _account(auth, signIn: true);
+    return [for (final c in own.reversed) OwnCar.fromJson(c)!];
+  }
+
+  @override
+  Future<int> createPost(Map<String, String> auth, CarPost post) async {
+    _online('post ${post.brand} ${post.model} ${post.year} ${post.priceKrw} ${post.phone}');
+    _account(auth, signIn: true);
+    own.add({...post.toJson(), 'id': _nextPost, 'moderation_status': 'draft', 'status': 'active', 'raw_text': post.description});
+    return _nextPost++;
+  }
+
+  @override
+  Future<void> editPost(Map<String, String> auth, int id, CarPost post) async {
+    _online('edit $id ${post.priceKrw}');
+    final i = own.indexWhere((c) => c['id'] == id);
+    own[i] = {...own[i], ...post.toJson()};
+  }
+
+  @override
+  Future<void> addMedia(Map<String, String> auth, int id, List<int> bytes, String name, {required bool video, required int order}) async {
+    _online('media $id $name');
+    uploads.add((id, name, video));
+  }
+
+  @override
+  Future<List<CarDuplicate>> duplicates(Map<String, String> auth, CarPost post, {int? except}) async {
+    _online('dupes');
+    return dupes;
+  }
+
+  @override
+  Future<void> submitPost(Map<String, String> auth, int id) async {
+    _online('submit $id');
+    final i = own.indexWhere((c) => c['id'] == id);
+    own[i] = {...own[i], 'moderation_status': 'pending'};
+  }
+
+  @override
+  Future<void> markSold(Map<String, String> auth, int id) async {
+    _online('sold $id');
+    final i = own.indexWhere((c) => c['id'] == id);
+    own[i] = {...own[i], 'status': 'sold'};
+  }
+
+  @override
+  Future<void> withdrawPost(Map<String, String> auth, int id) async {
+    _online('withdraw $id');
+    own.removeWhere((c) => c['id'] == id);
+  }
 }

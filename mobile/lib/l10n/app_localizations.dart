@@ -6195,6 +6195,534 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'E’lon'**
   String get carListing;
+
+  /// No description provided for @carTabAlerts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnoma'**
+  String get carTabAlerts;
+
+  /// No description provided for @carTabSell.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sotish'**
+  String get carTabSell;
+
+  /// No description provided for @carAlertsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnomalar'**
+  String get carAlertsTitle;
+
+  /// No description provided for @carAlertsActive.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta faol'**
+  String carAlertsActive(String count);
+
+  /// No description provided for @carNewAlert.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi xabarnoma'**
+  String get carNewAlert;
+
+  /// No description provided for @carAnyCar.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha mashinalar'**
+  String get carAnyCar;
+
+  /// No description provided for @carCreateAlert.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnoma yaratish'**
+  String get carCreateAlert;
+
+  /// No description provided for @carMyAlerts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mening xabarnomalarim'**
+  String get carMyAlerts;
+
+  /// No description provided for @carNoAlertsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnoma yo‘q'**
+  String get carNoAlertsTitle;
+
+  /// No description provided for @carNoAlertsBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi mos e’lon chiqsa, sizga bildiramiz'**
+  String get carNoAlertsBody;
+
+  /// No description provided for @carAllListings.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha e’lonlar'**
+  String get carAllListings;
+
+  /// No description provided for @carAlertNeedsFilter.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamida bitta filtr tanlang (model, narx, yurgani, yil yoki yoqilg‘i).'**
+  String get carAlertNeedsFilter;
+
+  /// No description provided for @carAlertDuplicate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bunday xabarnoma allaqachon mavjud.'**
+  String get carAlertDuplicate;
+
+  /// No description provided for @carAlertLimit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnomalar soni chegarasiga yetdingiz.'**
+  String get carAlertLimit;
+
+  /// No description provided for @carAlertCreated.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnoma yaratildi: mos e’lon chiqsa, telefoningizga keladi.'**
+  String get carAlertCreated;
+
+  /// No description provided for @carAlertDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnoma o‘chirildi'**
+  String get carAlertDeleted;
+
+  /// No description provided for @carSignInAlertsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mos mashina chiqsa, xabar beramiz'**
+  String get carSignInAlertsTitle;
+
+  /// No description provided for @carSignInAlertsBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnoma uchun akkauntga kiring. Ko‘rish va saqlash uchun kirish shart emas.'**
+  String get carSignInAlertsBody;
+
+  /// No description provided for @carSignInButton.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntga kirish'**
+  String get carSignInButton;
+
+  /// No description provided for @carPushOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar o‘chiq — xabarnomalar telefonga kelmaydi.'**
+  String get carPushOff;
+
+  /// No description provided for @carPushOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get carPushOn;
+
+  /// No description provided for @carErrorGeneric.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik yuz berdi. Qayta urinib ko‘ring.'**
+  String get carErrorGeneric;
+
+  /// No description provided for @carMyPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mening e’lonlarim'**
+  String get carMyPosts;
+
+  /// No description provided for @carNewPost.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi e’lon qo‘shish'**
+  String get carNewPost;
+
+  /// No description provided for @carNewPostSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mashinangizni soting'**
+  String get carNewPostSub;
+
+  /// No description provided for @carNoPostsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali e’lon yo‘q'**
+  String get carNoPostsTitle;
+
+  /// No description provided for @carNoPostsBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuqoridagi tugma orqali birinchi e’loningizni joylang — bir necha daqiqada tayyor bo‘ladi.'**
+  String get carNoPostsBody;
+
+  /// No description provided for @carStatePending.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘rib chiqilmoqda'**
+  String get carStatePending;
+
+  /// No description provided for @carStateApproved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylandi'**
+  String get carStateApproved;
+
+  /// No description provided for @carStateRejected.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rad etildi'**
+  String get carStateRejected;
+
+  /// No description provided for @carStateChanges.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgartirish kerak'**
+  String get carStateChanges;
+
+  /// No description provided for @carStateDraft.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qoralama'**
+  String get carStateDraft;
+
+  /// No description provided for @carEdit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tahrirlash'**
+  String get carEdit;
+
+  /// No description provided for @carMarkSold.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sotildi'**
+  String get carMarkSold;
+
+  /// No description provided for @carDelete.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirish'**
+  String get carDelete;
+
+  /// No description provided for @carSoldConfirmTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sotildi deb belgilash?'**
+  String get carSoldConfirmTitle;
+
+  /// No description provided for @carSoldConfirmBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon bozorda sotilgan sifatida ko‘rsatiladi.'**
+  String get carSoldConfirmBody;
+
+  /// No description provided for @carSoldConfirmYes.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ha, sotildi'**
+  String get carSoldConfirmYes;
+
+  /// No description provided for @carMarkedSold.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sotilgan deb belgilandi'**
+  String get carMarkedSold;
+
+  /// No description provided for @carDeleteConfirmTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni o‘chirish?'**
+  String get carDeleteConfirmTitle;
+
+  /// No description provided for @carDeleteConfirmBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu amalni qaytarib bo‘lmaydi.'**
+  String get carDeleteConfirmBody;
+
+  /// No description provided for @carDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirildi'**
+  String get carDeleted;
+
+  /// No description provided for @carCancel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bekor qilish'**
+  String get carCancel;
+
+  /// No description provided for @carSignInSellTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mashinangizni soting'**
+  String get carSignInSellTitle;
+
+  /// No description provided for @carSignInSellBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon joylash uchun akkauntga kiring.'**
+  String get carSignInSellBody;
+
+  /// No description provided for @carNewPostTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi e’lon'**
+  String get carNewPostTitle;
+
+  /// No description provided for @carEditPostTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni tahrirlash'**
+  String get carEditPostTitle;
+
+  /// No description provided for @carPhotos.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rasmlar va video'**
+  String get carPhotos;
+
+  /// No description provided for @carPhotosHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Birinchisi muqova bo‘ladi. Ko‘pi bilan 10 ta, har bir video ≤ 50MB.'**
+  String get carPhotosHint;
+
+  /// No description provided for @carPhotosLocked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborilgandan keyin rasmlarni o‘zgartirib bo‘lmaydi.'**
+  String get carPhotosLocked;
+
+  /// No description provided for @carAddMedia.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘shish'**
+  String get carAddMedia;
+
+  /// No description provided for @carCover.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muqova'**
+  String get carCover;
+
+  /// No description provided for @carCarSection.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mashina'**
+  String get carCarSection;
+
+  /// No description provided for @carBrand.
+  ///
+  /// In uz, this message translates to:
+  /// **'Marka'**
+  String get carBrand;
+
+  /// No description provided for @carModel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Model'**
+  String get carModel;
+
+  /// No description provided for @carPickBrandFirst.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avval markani tanlang'**
+  String get carPickBrandFirst;
+
+  /// No description provided for @carPickModelTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Modelni tanlang'**
+  String get carPickModelTitle;
+
+  /// No description provided for @carOtherModel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa model (qo‘lda)'**
+  String get carOtherModel;
+
+  /// No description provided for @carModelHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'masalan: Sonata'**
+  String get carModelHint;
+
+  /// No description provided for @carPickYear.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yilni tanlang'**
+  String get carPickYear;
+
+  /// No description provided for @carGenerationOptional.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avlod (ixtiyoriy)'**
+  String get carGenerationOptional;
+
+  /// No description provided for @carMileageLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yurgan masofasi (km)'**
+  String get carMileageLabel;
+
+  /// No description provided for @carFuelType.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqilg‘i turi'**
+  String get carFuelType;
+
+  /// No description provided for @carPriceSection.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narx va hujjatlar'**
+  String get carPriceSection;
+
+  /// No description provided for @carPriceLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Narxi (₩)'**
+  String get carPriceLabel;
+
+  /// No description provided for @carNegotiableSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xaridor bilan kelishish mumkin'**
+  String get carNegotiableSub;
+
+  /// No description provided for @carLegalLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rasmiy holati'**
+  String get carLegalLabel;
+
+  /// No description provided for @carLegalNo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nolegal'**
+  String get carLegalNo;
+
+  /// No description provided for @carRegQuestion.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomiga o‘tkazish kerakmi?'**
+  String get carRegQuestion;
+
+  /// No description provided for @carRegYes.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ha, kerak'**
+  String get carRegYes;
+
+  /// No description provided for @carPhoneLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon raqam'**
+  String get carPhoneLabel;
+
+  /// No description provided for @carContactHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamida bittasini to‘ldiring.'**
+  String get carContactHint;
+
+  /// No description provided for @carDescription.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tavsif'**
+  String get carDescription;
+
+  /// No description provided for @carDescriptionHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Holati, butligi, almashtirilgan qismlar, sababi...'**
+  String get carDescriptionHint;
+
+  /// No description provided for @carSubmit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘rib chiqishga yuborish'**
+  String get carSubmit;
+
+  /// No description provided for @carSaveChanges.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get carSaveChanges;
+
+  /// No description provided for @carRequiredMissing.
+  ///
+  /// In uz, this message translates to:
+  /// **'Majburiy maydonlarni to‘ldiring'**
+  String get carRequiredMissing;
+
+  /// No description provided for @carChangesSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlandi'**
+  String get carChangesSaved;
+
+  /// No description provided for @carSubmitted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborildi! Admin tekshirgach e’loningiz joylanadi.'**
+  String get carSubmitted;
+
+  /// No description provided for @carUploading.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklanmoqda: {done} / {total}'**
+  String carUploading(String done, String total);
+
+  /// No description provided for @carVideoTooBig.
+  ///
+  /// In uz, this message translates to:
+  /// **'Video 50MB dan katta'**
+  String get carVideoTooBig;
+
+  /// No description provided for @carMediaLimit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko‘pi bilan 10 ta'**
+  String get carMediaLimit;
+
+  /// No description provided for @carNeedPhoto.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamida bitta rasm qo‘shing'**
+  String get carNeedPhoto;
+
+  /// No description provided for @carDupTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu mashina allaqachon e’lon qilingan'**
+  String get carDupTitle;
+
+  /// No description provided for @carDupBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu raqam va shu mashina bilan e’lon bor. Bir xil e’lonni qayta joylab bo‘lmaydi.'**
+  String get carDupBody;
+
+  /// No description provided for @carDupOwn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizning e’loningiz'**
+  String get carDupOwn;
+
+  /// No description provided for @carOk.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tushunarli'**
+  String get carOk;
+
+  /// No description provided for @carChannelNudge.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi e’lonlarni birinchi bo‘lib ko‘rish uchun @vegukin_car kanaliga a’zo bo‘ling'**
+  String get carChannelNudge;
 }
 
 class _AppLocalizationsDelegate

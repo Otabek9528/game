@@ -3547,4 +3547,279 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get carListing => 'Listing';
+
+  @override
+  String get carTabAlerts => 'Alerts';
+
+  @override
+  String get carTabSell => 'Sell';
+
+  @override
+  String get carAlertsTitle => 'Alerts';
+
+  @override
+  String carAlertsActive(String count) {
+    return '$count active';
+  }
+
+  @override
+  String get carNewAlert => 'New alert';
+
+  @override
+  String get carAnyCar => 'Any car';
+
+  @override
+  String get carCreateAlert => 'Create alert';
+
+  @override
+  String get carMyAlerts => 'My alerts';
+
+  @override
+  String get carNoAlertsTitle => 'No alerts yet';
+
+  @override
+  String get carNoAlertsBody => 'We’ll tell you when a matching car is posted';
+
+  @override
+  String get carAllListings => 'All listings';
+
+  @override
+  String get carAlertNeedsFilter =>
+      'Choose at least one filter (model, price, mileage, year or fuel).';
+
+  @override
+  String get carAlertDuplicate => 'You already have this alert.';
+
+  @override
+  String get carAlertLimit => 'You’ve reached the alert limit.';
+
+  @override
+  String get carAlertCreated =>
+      'Done: matching listings will come to your phone.';
+
+  @override
+  String get carAlertDeleted => 'Alert deleted';
+
+  @override
+  String get carSignInAlertsTitle => 'Hear about the right car first';
+
+  @override
+  String get carSignInAlertsBody =>
+      'Sign in for alerts. Browsing and saving need no account.';
+
+  @override
+  String get carSignInButton => 'Sign in';
+
+  @override
+  String get carPushOff => 'Notifications are off, so alerts won’t arrive.';
+
+  @override
+  String get carPushOn => 'Turn on';
+
+  @override
+  String get carErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get carMyPosts => 'My listings';
+
+  @override
+  String get carNewPost => 'New listing';
+
+  @override
+  String get carNewPostSub => 'Sell your car';
+
+  @override
+  String get carNoPostsTitle => 'No listings yet';
+
+  @override
+  String get carNoPostsBody =>
+      'Post your first listing with the button above — it takes a few minutes.';
+
+  @override
+  String get carStatePending => 'Under review';
+
+  @override
+  String get carStateApproved => 'Live';
+
+  @override
+  String get carStateRejected => 'Rejected';
+
+  @override
+  String get carStateChanges => 'Changes needed';
+
+  @override
+  String get carStateDraft => 'Draft';
+
+  @override
+  String get carEdit => 'Edit';
+
+  @override
+  String get carMarkSold => 'Sold';
+
+  @override
+  String get carDelete => 'Delete';
+
+  @override
+  String get carSoldConfirmTitle => 'Mark as sold?';
+
+  @override
+  String get carSoldConfirmBody => 'The listing will show as sold.';
+
+  @override
+  String get carSoldConfirmYes => 'Yes, sold';
+
+  @override
+  String get carMarkedSold => 'Marked as sold';
+
+  @override
+  String get carDeleteConfirmTitle => 'Delete the listing?';
+
+  @override
+  String get carDeleteConfirmBody => 'This can’t be undone.';
+
+  @override
+  String get carDeleted => 'Deleted';
+
+  @override
+  String get carCancel => 'Cancel';
+
+  @override
+  String get carSignInSellTitle => 'Sell your car';
+
+  @override
+  String get carSignInSellBody => 'Sign in to post a listing.';
+
+  @override
+  String get carNewPostTitle => 'New listing';
+
+  @override
+  String get carEditPostTitle => 'Edit listing';
+
+  @override
+  String get carPhotos => 'Photos and video';
+
+  @override
+  String get carPhotosHint =>
+      'The first is the cover. Up to 10, each video ≤ 50MB.';
+
+  @override
+  String get carPhotosLocked => 'Photos can’t be changed once sent.';
+
+  @override
+  String get carAddMedia => 'Add';
+
+  @override
+  String get carCover => 'Cover';
+
+  @override
+  String get carCarSection => 'The car';
+
+  @override
+  String get carBrand => 'Make';
+
+  @override
+  String get carModel => 'Model';
+
+  @override
+  String get carPickBrandFirst => 'Choose the make first';
+
+  @override
+  String get carPickModelTitle => 'Choose the model';
+
+  @override
+  String get carOtherModel => 'Another model (type it)';
+
+  @override
+  String get carModelHint => 'e.g. Sonata';
+
+  @override
+  String get carPickYear => 'Choose the year';
+
+  @override
+  String get carGenerationOptional => 'Generation (optional)';
+
+  @override
+  String get carMileageLabel => 'Mileage (km)';
+
+  @override
+  String get carFuelType => 'Fuel';
+
+  @override
+  String get carPriceSection => 'Price and papers';
+
+  @override
+  String get carPriceLabel => 'Price (₩)';
+
+  @override
+  String get carNegotiableSub => 'Open to offers';
+
+  @override
+  String get carLegalLabel => 'Registration status';
+
+  @override
+  String get carLegalNo => 'Not legal';
+
+  @override
+  String get carRegQuestion => 'Transfer of ownership needed?';
+
+  @override
+  String get carRegYes => 'Yes';
+
+  @override
+  String get carPhoneLabel => 'Phone number';
+
+  @override
+  String get carContactHint => 'Fill in at least one.';
+
+  @override
+  String get carDescription => 'Description';
+
+  @override
+  String get carDescriptionHint =>
+      'Condition, replaced parts, why you’re selling...';
+
+  @override
+  String get carSubmit => 'Send for review';
+
+  @override
+  String get carSaveChanges => 'Save';
+
+  @override
+  String get carRequiredMissing => 'Fill in the required fields';
+
+  @override
+  String get carChangesSaved => 'Saved';
+
+  @override
+  String get carSubmitted => 'Sent! Your listing goes live once checked.';
+
+  @override
+  String carUploading(String done, String total) {
+    return 'Uploading: $done / $total';
+  }
+
+  @override
+  String get carVideoTooBig => 'The video is over 50MB';
+
+  @override
+  String get carMediaLimit => 'Up to 10';
+
+  @override
+  String get carNeedPhoto => 'Add at least one photo';
+
+  @override
+  String get carDupTitle => 'This car is already listed';
+
+  @override
+  String get carDupBody =>
+      'A listing with the same number and car exists. It can’t be posted twice.';
+
+  @override
+  String get carDupOwn => 'Your listing';
+
+  @override
+  String get carOk => 'OK';
+
+  @override
+  String get carChannelNudge => 'Join @vegukin_car to see new listings first';
 }
