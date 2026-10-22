@@ -2620,9 +2620,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get plPhone => 'Telefon';
 
   @override
-  String get plNoPhone => 'Telefon ko‘rsatilmagan';
-
-  @override
   String get plMenu => 'Menyu';
 
   @override
@@ -2630,13 +2627,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plAddressCopied => 'Manzil nusxalandi';
-
-  @override
-  String get plRouteTitle => 'Qaysi navigatorda ochamiz?';
-
-  @override
-  String get plRouteHint =>
-      'Koreyada Naver va Kakao xaritalari yo‘lni aniqroq ko‘rsatadi.';
 
   @override
   String get plCopyAddress => 'Manzilni nusxalash';
@@ -2876,9 +2866,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get plClaimPrompt => 'Bu joy egasimisiz?';
 
   @override
-  String get plClaimLink => 'Egalikni tasdiqlash';
-
-  @override
   String get plClaimWhy => 'Egasi kuzatayotganlarga e’lon yubora oladi.';
 
   @override
@@ -3093,9 +3080,6 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
-  String get plGetDirections => 'Navigatorda ko‘rish';
-
-  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override
@@ -3115,4 +3099,13 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plPhotoLoadingSpeed => 'Yuklanish tezligi internetingizga bog‘liq';
+
+  @override
+  String get plGettingThere => 'Qanday borish mumkin';
+
+  @override
+  String get plContact => 'Aloqa';
+
+  @override
+  String get plNewsTitle => 'Yangiliklar';
 }

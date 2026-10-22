@@ -246,12 +246,15 @@ class _PlaceImageState extends State<PlaceImage> with PhotoLayers {
 /// instead); a tap on one gives its number. Only the photo on screen and
 /// the next are loaded. Its kind on its colour when it has none.
 class PlacePhotos extends StatefulWidget {
-  const PlacePhotos({super.key, required this.kit, required this.place, this.onPhoto, this.counter = false});
+  const PlacePhotos({super.key, required this.kit, required this.place, this.onPhoto, this.counter = false, this.inset = 0});
 
   final PlacesKit kit;
   final Place place;
   final ValueChanged<int>? onPhoto;
   final bool counter;
+
+  /// How much of the bottom is covered (the place page's rounded edge).
+  final double inset;
 
   @override
   State<PlacePhotos> createState() => _PlacePhotosState();
@@ -283,7 +286,7 @@ class _PlacePhotosState extends State<PlacePhotos> {
         if (photos.length > 1 && widget.counter)
           Positioned(
             right: 12,
-            bottom: 12,
+            bottom: 12 + widget.inset,
             child: IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(20)),
@@ -301,7 +304,7 @@ class _PlacePhotosState extends State<PlacePhotos> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 10,
+            bottom: 10 + widget.inset,
             child: IgnorePointer(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -369,7 +372,7 @@ class PlacesCard extends StatelessWidget {
     final p = VegukinPalette.of(context);
     return Material(
       color: color ?? p.card,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18), side: BorderSide(color: p.hairline)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: p.hairline)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(onTap: onTap, child: Padding(padding: padding, child: child)),
     );
@@ -387,11 +390,11 @@ class PlacesHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 22, 4, 10),
+      padding: const EdgeInsets.fromLTRB(4, 28, 4, 10),
       child: Row(
         children: [
           Expanded(
-            child: Text(text, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: p.ink)),
+            child: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2, color: p.ink)),
           ),
           ?trailing,
         ],

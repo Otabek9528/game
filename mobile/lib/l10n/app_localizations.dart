@@ -4708,12 +4708,6 @@ abstract class AppLocalizations {
   /// **'Telefon'**
   String get plPhone;
 
-  /// No description provided for @plNoPhone.
-  ///
-  /// In uz, this message translates to:
-  /// **'Telefon ko‘rsatilmagan'**
-  String get plNoPhone;
-
   /// No description provided for @plMenu.
   ///
   /// In uz, this message translates to:
@@ -4731,18 +4725,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Manzil nusxalandi'**
   String get plAddressCopied;
-
-  /// No description provided for @plRouteTitle.
-  ///
-  /// In uz, this message translates to:
-  /// **'Qaysi navigatorda ochamiz?'**
-  String get plRouteTitle;
-
-  /// No description provided for @plRouteHint.
-  ///
-  /// In uz, this message translates to:
-  /// **'Koreyada Naver va Kakao xaritalari yo‘lni aniqroq ko‘rsatadi.'**
-  String get plRouteHint;
 
   /// No description provided for @plCopyAddress.
   ///
@@ -5164,12 +5146,6 @@ abstract class AppLocalizations {
   /// **'Bu joy egasimisiz?'**
   String get plClaimPrompt;
 
-  /// No description provided for @plClaimLink.
-  ///
-  /// In uz, this message translates to:
-  /// **'Egalikni tasdiqlash'**
-  String get plClaimLink;
-
   /// No description provided for @plClaimWhy.
   ///
   /// In uz, this message translates to:
@@ -5494,12 +5470,6 @@ abstract class AppLocalizations {
   /// **'Manzildan {km}'**
   String plKmFromAddress(String km);
 
-  /// No description provided for @plGetDirections.
-  ///
-  /// In uz, this message translates to:
-  /// **'Navigatorda ko‘rish'**
-  String get plGetDirections;
-
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:
@@ -5541,6 +5511,24 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Yuklanish tezligi internetingizga bog‘liq'**
   String get plPhotoLoadingSpeed;
+
+  /// No description provided for @plGettingThere.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday borish mumkin'**
+  String get plGettingThere;
+
+  /// No description provided for @plContact.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aloqa'**
+  String get plContact;
+
+  /// No description provided for @plNewsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangiliklar'**
+  String get plNewsTitle;
 }
 
 class _AppLocalizationsDelegate

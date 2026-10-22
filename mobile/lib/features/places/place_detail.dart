@@ -86,7 +86,10 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
   final _reviewsKey = GlobalKey();
   bool _collapsed = false;
 
-  static const _heroHeight = 236.0;
+  static const _heroHeight = 268.0;
+
+  /// The page's rounded top edge, over the bottom of the photo.
+  static const _lip = 22.0;
 
   @override
   void initState() {
@@ -94,7 +97,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
     unawaited(_load());
     unawaited(_kit.loadPhotos());
     _scroll.addListener(() {
-      final collapsed = _scroll.hasClients && _scroll.offset > _heroHeight - kToolbarHeight - 20;
+      final collapsed = _scroll.hasClients && _scroll.offset > _heroHeight - kToolbarHeight - _lip - 16;
       if (collapsed != _collapsed) setState(() => _collapsed = collapsed);
     });
   }
@@ -280,14 +283,27 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                   kit: _kit,
                   place: place,
                   counter: true,
+                  inset: _lip,
                   onPhoto: (i) => showPlacePhotos(context, _kit.photosOf(place), i),
+                ),
+              ),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(_lip),
+                child: Container(
+                  height: _lip,
+                  decoration: BoxDecoration(
+                    color: p.page,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(_lip + 2)),
+                  ),
                 ),
               ),
             ),
             SliverPadding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 32 + MediaQuery.paddingOf(context).bottom),
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 28 + MediaQuery.paddingOf(context).bottom),
               sliver: SliverList.list(
                 children: [
+                  // Most wanted first: what it is, the way there, a call;
+                  // then what it's like, what people say, its news.
                   _Head(
                     place: place,
                     distance: distance,
@@ -300,25 +316,18 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       if (target != null) Scrollable.ensureVisible(target, duration: const Duration(milliseconds: 350));
                     },
                   ),
-                  const SizedBox(height: 18),
-                  _Contact(place: place, services: _services),
-                  if (place.located) ...[
-                    const SizedBox(height: 12),
-                    _MapCard(place: place, onOpen: () => routeToPlace(context, _services, place)),
-                  ],
+                  _Section(title: s.plGettingThere, child: _Location(place: place, services: _services)),
+                  if (place.phones.isNotEmpty || place.menuUrl != null)
+                    _Section(title: s.plContact, child: _Contact(place: place, services: _services)),
                   if (_error != null && detail == null) ...[
                     const SizedBox(height: 16),
                     _Failed(code: _error!, onRetry: _load),
                   ] else if (detail == null) ...[
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 36),
                     const Center(child: CircularProgressIndicator()),
                   ] else ...[
-                    _About(detail: detail, onSuggest: () => _suggest(const ['note'])),
-                    _Social(
-                      detail: detail,
-                      services: _services,
-                      onSuggest: _suggest,
-                    ),
+                    _Section(title: s.plAbout, child: _About(detail: detail, onSuggest: () => _suggest(const ['note']))),
+                    _Social(detail: detail, services: _services, onSuggest: _suggest),
                     KeyedSubtree(
                       key: _reviewsKey,
                       child: _Reviews(
@@ -336,11 +345,14 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       onClaim: _claim,
                     ),
                   ],
-                  const SizedBox(height: 22),
-                  TextButton(
-                    onPressed: () => _services.openLink(Uri.parse(placesGroupUrl)),
-                    style: TextButton.styleFrom(foregroundColor: p.inkMuted),
-                    child: Text(s.plCorrections, textAlign: TextAlign.center),
+                  const SizedBox(height: 26),
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () => _services.openLink(Uri.parse(placesGroupUrl)),
+                      style: TextButton.styleFrom(foregroundColor: p.inkMuted),
+                      icon: const Icon(Icons.edit_note_rounded, size: 18),
+                      label: Text(s.plCorrections, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13)),
+                    ),
                   ),
                 ],
               ),
@@ -350,6 +362,21 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
       ),
     );
   }
+}
+
+/// A part of the page: its title, and what's under it.
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.child, this.trailing});
+
+  final String title;
+  final Widget child;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [PlacesHeading(title, trailing: trailing), child],
+      );
 }
 
 /// A white disc behind the top bar's buttons while they float over the
@@ -377,48 +404,210 @@ class _Round extends StatelessWidget {
   }
 }
 
-/// Where it is, and the one way there: the map opens a navigator.
-class _MapCard extends StatelessWidget {
-  const _MapCard({required this.place, required this.onOpen});
+/// Where it is: the map, a navigator in one tap (Naver and Kakao first:
+/// they route best in Korea; Google gives transit only here), and the
+/// address, copied with a tap.
+class _Location extends StatelessWidget {
+  const _Location({required this.place, required this.services});
 
   final Place place;
-  final VoidCallback onOpen;
+  final AppServices services;
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
+    final address = place.address;
     return PlacesCard(
       padding: EdgeInsets.zero,
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onOpen();
-      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
-            height: 156,
-            child: PlaceMap(lat: place.lat!, lon: place.lon!, colour: kindColour(context, place.kind), emoji: place.kind.emoji),
-          ),
-          ColoredBox(
-            color: p.cardSelected,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-              child: Row(
-                children: [
-                  Icon(Icons.navigation_rounded, size: 20, color: p.accent),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(s.plGetDirections, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: p.accent)),
+          if (place.located)
+            SizedBox(
+              height: 168,
+              child: PlaceMap(lat: place.lat!, lon: place.lon!, colour: kindColour(context, place.kind), emoji: place.kind.emoji),
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 14, 12, 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _NavButton(
+                    mark: 'N',
+                    name: 'Naver',
+                    brand: const Color(0xFF03C75A),
+                    onMark: Colors.white,
+                    onTap: () => services.openLink(naverUri(place)),
                   ),
-                  Text('Naver · Kakao', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.inkMuted)),
-                  Icon(Icons.chevron_right_rounded, color: p.accent),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _NavButton(
+                    mark: 'K',
+                    name: 'Kakao',
+                    brand: const Color(0xFFFEE500),
+                    onMark: const Color(0xFF191600),
+                    onTap: () => services.openLink(kakaoUri(place)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _NavButton(
+                    mark: 'G',
+                    name: 'Google',
+                    brand: const Color(0xFF4285F4),
+                    onMark: Colors.white,
+                    onTap: () => services.openLink(googleUri(place)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 18, indent: 16, endIndent: 16, color: p.hairline),
+          _InfoRow(
+            icon: Icons.place_rounded,
+            label: s.plAddress,
+            value: address ?? s.plNoAddress,
+            muted: address == null,
+            action: address == null ? null : _RowAction(Icons.copy_rounded, s.plCopyAddress),
+            onTap: address == null ? null : () => copyAddress(context, place),
+          ),
+          const SizedBox(height: 4),
+        ],
+      ),
+    );
+  }
+}
+
+/// A navigator, big enough to hit without looking: its mark on its
+/// colour, its name under it.
+class _NavButton extends StatelessWidget {
+  const _NavButton({required this.mark, required this.name, required this.brand, required this.onMark, required this.onTap});
+
+  final String mark;
+  final String name;
+  final Color brand;
+  final Color onMark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    // A wash of the brand on light (Kakao's pale yellow a little more);
+    // on dark, washes turn muddy: the page's own raised colour.
+    final tint = Theme.of(context).brightness == Brightness.dark
+        ? p.cardSelected
+        : brand.withValues(alpha: brand.computeLuminance() > 0.5 ? 0.22 : 0.11);
+    return Semantics(
+      button: true,
+      label: '$name Map',
+      child: ExcludeSemantics(
+        child: Material(
+          color: tint,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              onTap();
+            },
+            child: SizedBox(
+              height: 78,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: brand,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [BoxShadow(color: brand.withValues(alpha: 0.35), blurRadius: 8, offset: const Offset(0, 2))],
+                    ),
+                    child: Text(mark, style: TextStyle(fontSize: 17, height: 1, fontWeight: FontWeight.w900, color: onMark)),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(name, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink)),
                 ],
               ),
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A line of the page's facts: an icon, what it is, the value, and what a
+/// tap does at its end.
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({
+    required this.icon,
+    required this.value,
+    this.label,
+    this.detail,
+    this.action,
+    this.onTap,
+    this.muted = false,
+    this.below,
+  });
+
+  final IconData icon;
+
+  /// What it is, small above: "Telefon".
+  final String? label;
+  final String value;
+
+  /// A word more, under the value.
+  final String? detail;
+  final Widget? action;
+  final VoidCallback? onTap;
+  final bool muted;
+
+  /// More under the value: a line waiting for review.
+  final Widget? below;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return InkWell(
+      onTap: onTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 64),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: muted ? p.badge : p.cardSelected, shape: BoxShape.circle),
+                child: Icon(icon, size: 20, color: muted ? p.inkMuted : p.accent),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (label case final label?) ...[
+                      Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: p.inkMuted)),
+                      const SizedBox(height: 2),
+                    ],
+                    Text(value, style: TextStyle(fontSize: 15, height: 1.35, fontWeight: FontWeight.w600, color: muted ? p.inkMuted : p.ink)),
+                    if (detail case final detail?) ...[
+                      const SizedBox(height: 2),
+                      Text(detail, style: TextStyle(fontSize: 13, height: 1.35, color: p.inkSoft)),
+                    ],
+                    ?below,
+                  ],
+                ),
+              ),
+              ?action,
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -560,6 +749,7 @@ class _WatchPill extends StatelessWidget {
   }
 }
 
+/// The numbers, each called with a tap, and a restaurant's menu.
 class _Contact extends StatelessWidget {
   const _Contact({required this.place, required this.services});
 
@@ -570,57 +760,33 @@ class _Contact extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    Widget row(IconData icon, String title, String? value, {VoidCallback? onTap, Widget? trailing, bool muted = false}) =>
-        InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
-              children: [
-                Icon(icon, size: 21, color: muted ? p.inkMuted : p.accent),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: p.inkMuted)),
-                      if (value != null) ...[
-                        const SizedBox(height: 2),
-                        Text(value, style: TextStyle(fontSize: 15, height: 1.35, color: muted ? p.inkMuted : p.ink)),
-                      ],
-                    ],
-                  ),
-                ),
-                ?trailing,
-              ],
-            ),
-          ),
-        );
     final rows = [
-      if (place.address != null)
-        row(Icons.place_rounded, s.plAddress, place.address,
-            onTap: () => copyAddress(context, place), trailing: _RowAction(Icons.copy_rounded, s.plCopyAddress))
-      else
-        row(Icons.place_outlined, s.plAddress, s.plNoAddress, muted: true),
-      if (place.phones.isEmpty)
-        row(Icons.call_outlined, s.plPhone, s.plNoPhone, muted: true)
-      else
-        for (final phone in place.phones)
-          row(Icons.call_rounded, s.plPhone, phone, onTap: () {
+      for (final phone in place.phones)
+        _InfoRow(
+          icon: Icons.contact_phone_rounded,
+          label: s.plPhone,
+          value: phone,
+          action: _RowAction(Icons.call_rounded, s.plCallNumber, filled: true),
+          onTap: () {
             HapticFeedback.lightImpact();
             services.openLink(telUri(phone));
-          }, trailing: _RowAction(Icons.call_rounded, s.plCallNumber)),
+          },
+        ),
       if (place.menuUrl != null)
-        row(Icons.restaurant_menu_rounded, s.plMenu, s.plMenuOpen,
-            onTap: () => services.openLink(Uri.parse(place.menuUrl!)),
-            trailing: Icon(Icons.open_in_new_rounded, size: 18, color: p.inkMuted)),
+        _InfoRow(
+          icon: Icons.restaurant_menu_rounded,
+          label: s.plMenu,
+          value: s.plMenuOpen,
+          action: _RowAction(Icons.open_in_new_rounded, s.plMenuOpen),
+          onTap: () => services.openLink(Uri.parse(place.menuUrl!)),
+        ),
     ];
     return PlacesCard(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
         children: [
           for (final (i, r) in rows.indexed) ...[
-            if (i > 0) Divider(height: 1, indent: 47, color: p.hairline),
+            if (i > 0) Divider(height: 1, indent: 68, endIndent: 16, color: p.hairline),
             r,
           ],
         ],
@@ -631,10 +797,13 @@ class _Contact extends StatelessWidget {
 
 /// What tapping a contact row does, as a round button at its end.
 class _RowAction extends StatelessWidget {
-  const _RowAction(this.icon, this.label);
+  const _RowAction(this.icon, this.label, {this.filled = false});
 
   final IconData icon;
   final String label;
+
+  /// The page's colour: the row's main act (a call).
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
@@ -642,11 +811,11 @@ class _RowAction extends StatelessWidget {
     return Semantics(
       label: label,
       child: Container(
-        width: 38,
-        height: 38,
-        margin: const EdgeInsetsDirectional.only(start: 8),
-        decoration: BoxDecoration(color: p.cardSelected, shape: BoxShape.circle),
-        child: Icon(icon, size: 18, color: p.accent),
+        width: 42,
+        height: 42,
+        margin: const EdgeInsetsDirectional.only(start: 10),
+        decoration: BoxDecoration(color: filled ? p.accent : p.cardSelected, shape: BoxShape.circle),
+        child: Icon(icon, size: 19, color: filled ? Colors.white : p.accent),
       ),
     );
   }
@@ -686,35 +855,36 @@ class _About extends StatelessWidget {
     final p = VegukinPalette.of(context);
     final note = detail.place.note;
     final pending = detail.pending.contains('note');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        PlacesHeading(s.plAbout),
-        PlacesCard(
-          color: note == null ? null : p.cardSelected,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                note ?? s.plAboutEmpty,
-                style: TextStyle(fontSize: 15, height: 1.5, color: note == null ? p.inkMuted : p.ink),
-              ),
-              if (pending)
-                _PendingLine(s.plPendingField(s.plNoteLabel))
-              else
+    return PlacesCard(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (note != null)
+            Text(note, style: TextStyle(fontSize: 15, height: 1.55, color: p.ink))
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: TextButton.icon(
-                    onPressed: onSuggest,
-                    style: TextButton.styleFrom(padding: EdgeInsets.zero, visualDensity: VisualDensity.compact),
-                    icon: Icon(note == null ? Icons.add_rounded : Icons.edit_outlined, size: 18),
-                    label: Text(note == null ? s.plAboutAdd : s.plSuggestChange),
-                  ),
+                  padding: const EdgeInsets.only(top: 1),
+                  child: Icon(Icons.schedule_rounded, size: 19, color: p.inkMuted),
                 ),
-            ],
-          ),
-        ),
-      ],
+                const SizedBox(width: 10),
+                Expanded(child: Text(s.plAboutEmpty, style: TextStyle(fontSize: 14.5, height: 1.45, color: p.inkMuted))),
+              ],
+            ),
+          if (pending)
+            Padding(padding: const EdgeInsets.only(bottom: 10), child: _PendingLine(s.plPendingField(s.plNoteLabel)))
+          else
+            TextButton.icon(
+              onPressed: onSuggest,
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 10), visualDensity: VisualDensity.compact),
+              icon: Icon(note == null ? Icons.add_rounded : Icons.edit_outlined, size: 18),
+              label: Text(note == null ? s.plAboutAdd : s.plSuggestChange),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -871,6 +1041,8 @@ String reviewDate(DateTime at, AppLanguage language, DateTime now) {
   return DateFormat(pattern, language.code).format(at);
 }
 
+/// What people say: the average and its spread, the way to add one's own,
+/// and the reviews (one's own first), all in one card.
 class _Reviews extends StatelessWidget {
   const _Reviews({
     required this.detail,
@@ -894,43 +1066,42 @@ class _Reviews extends StatelessWidget {
     final ordered = [?mine, ...detail.reviews.where((r) => r != mine)];
     final shown = all ? ordered : ordered.take(3).toList();
     final now = DateTime.now();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        PlacesHeading(
-          s.plReviews,
-          trailing: detail.reviews.isEmpty
-              ? null
-              : Text('${detail.reviews.length}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.inkMuted)),
-        ),
-        PlacesCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (detail.reviews.isEmpty)
-                Text(s.plReviewsFirst, style: TextStyle(fontSize: 14.5, height: 1.4, color: p.inkSoft))
-              else
-                _Summary(detail: detail),
-              const SizedBox(height: 12),
-              FilledButton.tonalIcon(
-                onPressed: onWrite,
-                icon: Icon(mine == null ? Icons.rate_review_outlined : Icons.edit_outlined),
-                label: Text(mine == null ? s.plWriteReview : s.plEditReview),
+    return _Section(
+      title: s.plReviews,
+      trailing: detail.reviews.isEmpty
+          ? null
+          : Text('${detail.reviews.length}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.inkMuted)),
+      child: PlacesCard(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (detail.reviews.isEmpty)
+              Text(s.plReviewsFirst, style: TextStyle(fontSize: 14.5, height: 1.45, color: p.inkSoft))
+            else
+              _Summary(detail: detail),
+            const SizedBox(height: 14),
+            FilledButton.tonalIcon(
+              onPressed: onWrite,
+              icon: Icon(mine == null ? Icons.rate_review_outlined : Icons.edit_outlined),
+              label: Text(mine == null ? s.plWriteReview : s.plEditReview),
+            ),
+            const SizedBox(height: 8),
+            for (final review in shown) ...[
+              Divider(height: 1, color: p.hairline),
+              _ReviewItem(
+                review: review,
+                date: review.at == null ? null : reviewDate(review.at!, language, now),
+                onEdit: review.mine ? onWrite : null,
               ),
             ],
-          ),
+            if (!all && ordered.length > 3) ...[
+              Divider(height: 1, color: p.hairline),
+              TextButton(onPressed: onAll, child: Text(s.plAllReviews(ordered.length))),
+            ],
+          ],
         ),
-        for (final review in shown)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: _ReviewCard(review: review, date: review.at == null ? null : reviewDate(review.at!, language, now), onEdit: review.mine ? onWrite : null),
-          ),
-        if (!all && ordered.length > 3)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: TextButton(onPressed: onAll, child: Text(s.plAllReviews(ordered.length))),
-          ),
-      ],
+      ),
     );
   }
 }
@@ -995,8 +1166,10 @@ class _Summary extends StatelessWidget {
   }
 }
 
-class _ReviewCard extends StatelessWidget {
-  const _ReviewCard({required this.review, required this.date, required this.onEdit});
+/// A review in the list: its stars and date, its words; one's own marked,
+/// and changed with a tap.
+class _ReviewItem extends StatelessWidget {
+  const _ReviewItem({required this.review, required this.date, required this.onEdit});
 
   final PlaceReview review;
   final String? date;
@@ -1006,51 +1179,62 @@ class _ReviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    return PlacesCard(
-      color: review.mine ? p.cardSelected : null,
+    return InkWell(
       onTap: onEdit,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              PlaceStars(review.rating.toDouble(), size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: review.mine
-                    ? Text(
-                        s.plYourReview,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: p.accent),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-              if (date != null) Text(date!, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
-              if (onEdit != null) ...[
-                const SizedBox(width: 6),
-                Icon(Icons.edit_outlined, size: 16, color: p.accent),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                PlaceStars(review.rating.toDouble(), size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: review.mine
+                      ? Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(10)),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              child: Text(
+                                s.plYourReview,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: p.accent),
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                if (date != null) Text(date!, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
+                if (onEdit != null) ...[
+                  const SizedBox(width: 6),
+                  Icon(Icons.edit_outlined, size: 16, color: p.accent),
+                ],
               ],
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            review.text.isEmpty ? s.plNoText : review.text,
-            style: TextStyle(
-              fontSize: 14.5,
-              height: 1.45,
-              color: review.text.isEmpty ? p.inkMuted : p.ink,
-              fontStyle: review.text.isEmpty ? FontStyle.italic : null,
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              review.text.isEmpty ? s.plNoText : review.text,
+              style: TextStyle(
+                fontSize: 14.5,
+                height: 1.45,
+                color: review.text.isEmpty ? p.inkMuted : p.ink,
+                fontStyle: review.text.isEmpty ? FontStyle.italic : null,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 /// News to the watchers: anyone's for a mosque, the owner's for the rest;
-/// and the way to become that owner.
+/// and the way to become that owner. One card, a row each.
 class _Community extends StatelessWidget {
   const _Community({required this.detail, required this.claimSent, required this.onAnnounce, required this.onClaim});
 
@@ -1065,74 +1249,47 @@ class _Community extends StatelessWidget {
     final p = VegukinPalette.of(context);
     final watch = detail.watch;
     final mosque = detail.place.kind == PlaceKind.mosque;
-    final canPost = mosque || watch.isOwner;
-    final children = <Widget>[];
-    if (watch.isOwner) {
-      children.add(Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Row(
-          children: [
-            Icon(Icons.verified_rounded, size: 18, color: p.accent),
-            const SizedBox(width: 6),
-            Text(s.plYouOwn, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.accent)),
-          ],
+    final rows = <Widget>[
+      if (watch.isOwner)
+        _InfoRow(icon: Icons.verified_rounded, value: s.plYouOwn),
+      if (mosque || watch.isOwner)
+        _InfoRow(
+          icon: Icons.campaign_rounded,
+          value: mosque && !watch.isOwner ? s.plAnnounceMosque : s.plAnnounceOwner,
+          detail: mosque ? s.plAnnounceWhyMosque : s.plAnnounceWhyOwner,
+          below: watch.pendingAnnouncements > 0 ? _PendingLine(s.plAnnouncePending(watch.pendingAnnouncements)) : null,
+          action: Icon(Icons.chevron_right_rounded, color: p.inkMuted),
+          onTap: onAnnounce,
         ),
-      ));
-    }
-    if (canPost) {
-      children.add(PlacesCard(
-        onTap: onAnnounce,
-        child: Row(
-          children: [
-            Icon(Icons.campaign_rounded, color: p.accent),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(mosque && !watch.isOwner ? s.plAnnounceMosque : s.plAnnounceOwner,
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink)),
-                  const SizedBox(height: 2),
-                  Text(mosque ? s.plAnnounceWhyMosque : s.plAnnounceWhyOwner, style: TextStyle(fontSize: 13, color: p.inkSoft)),
-                  if (watch.pendingAnnouncements > 0) _PendingLine(s.plAnnouncePending(watch.pendingAnnouncements)),
-                ],
+      if (!mosque && !watch.hasOwner && !watch.isOwner)
+        claimSent || watch.claimPending
+            ? _InfoRow(
+                icon: Icons.storefront_rounded,
+                value: claimSent ? s.plClaimSent : s.plClaimPending,
+                muted: true,
+              )
+            : _InfoRow(
+                icon: Icons.storefront_rounded,
+                value: s.plClaimPrompt,
+                detail: s.plClaimWhy,
+                action: Icon(Icons.chevron_right_rounded, color: p.inkMuted),
+                onTap: onClaim,
               ),
-            ),
-            Icon(Icons.chevron_right_rounded, color: p.inkMuted),
+    ];
+    if (rows.isEmpty) return const SizedBox.shrink();
+    return _Section(
+      title: s.plNewsTitle,
+      child: PlacesCard(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          children: [
+            for (final (i, r) in rows.indexed) ...[
+              if (i > 0) Divider(height: 1, indent: 68, endIndent: 16, color: p.hairline),
+              r,
+            ],
           ],
         ),
-      ));
-    }
-    if (!mosque && !watch.hasOwner && !watch.isOwner) {
-      children.add(Padding(
-        padding: EdgeInsets.only(top: canPost ? 10 : 0),
-        child: PlacesCard(
-          child: claimSent || watch.claimPending
-              ? _PendingLine(claimSent ? s.plClaimSent : s.plClaimPending)
-              : Row(
-                  children: [
-                    Icon(Icons.storefront_rounded, color: p.gold),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(s.plClaimPrompt, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink)),
-                          const SizedBox(height: 2),
-                          Text(s.plClaimWhy, style: TextStyle(fontSize: 13, color: p.inkSoft)),
-                        ],
-                      ),
-                    ),
-                    TextButton(onPressed: onClaim, child: Text(s.plClaimLink)),
-                  ],
-                ),
-        ),
-      ));
-    }
-    if (children.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(top: 22),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+      ),
     );
   }
 }

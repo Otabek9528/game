@@ -449,7 +449,9 @@ void main() {
       final app = await openAnsan(tester);
       expect(find.text('🕌  MOSQUE'), findsOneWidget);
       expect(find.textContaining('2.1 km from you · Ansan'), findsOneWidget);
-      expect(find.text('Open in navigator'), findsOneWidget, reason: 'its map');
+      for (final navigator in ['Naver', 'Kakao', 'Google']) {
+        expect(find.text(navigator), findsOneWidget, reason: 'one tap to a navigator');
+      }
       for (final gone in ['Call', 'Directions', 'Copy']) {
         expect(find.text(gone), findsNothing, reason: 'one way to each thing');
       }
@@ -467,22 +469,22 @@ void main() {
       expect(app.places.asked.where((a) => a.startsWith('detail 1')), hasLength(1));
     });
 
-    testWidgets('a number called, the navigator from the map, the address copied, shared with both maps', (tester) async {
+    testWidgets('a number called, each navigator in one tap, the address copied, shared with both maps', (tester) async {
       final app = await openAnsan(tester);
       String? copied;
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
         if (call.method == 'Clipboard.setData') copied = (call.arguments as Map)['text'] as String;
         return null;
       });
-      await tester.tap(find.text('031-555-6666'));
-      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('031-555-6666'));
       expect(app.links.last, Uri.parse('tel:031-555-6666'));
 
-      await tapVisible(tester, find.text('Open in navigator'));
-      expect(find.text('Open in which navigator?'), findsOneWidget);
-      await tester.tap(find.text('Naver Map'));
-      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('Naver'));
       expect(app.links.last, Uri.parse('https://naver.me/abc'), reason: 'its own Naver page');
+      await tapVisible(tester, find.text('Kakao'));
+      expect(app.links.last, Uri.parse('https://place.map.kakao.com/1'));
+      await tapVisible(tester, find.text('Google'));
+      expect('${app.links.last}', 'https://www.google.com/maps/dir/?api=1&destination=37.33%2C126.81');
 
       await tapVisible(tester, find.text('경기 안산시 단원구 원곡로 5'));
       expect(copied, '경기 안산시 단원구 원곡로 5');
@@ -589,7 +591,7 @@ void main() {
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Samarqand Osh Markazi'));
       expect(find.text('Write an announcement'), findsNothing, reason: 'only its owner posts');
-      await tapVisible(tester, find.text('Claim it'));
+      await tapVisible(tester, find.text('Do you own this place?'));
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
       expect(app.places.claims, [101]);

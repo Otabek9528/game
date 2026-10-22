@@ -2690,9 +2690,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plPhone => 'Phone';
 
   @override
-  String get plNoPhone => 'No phone given';
-
-  @override
   String get plMenu => 'Menu';
 
   @override
@@ -2700,13 +2697,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plAddressCopied => 'Address copied';
-
-  @override
-  String get plRouteTitle => 'Open in which navigator?';
-
-  @override
-  String get plRouteHint =>
-      'In Korea, Naver and Kakao give the best directions.';
 
   @override
   String get plCopyAddress => 'Copy the address';
@@ -2944,9 +2934,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plClaimPrompt => 'Do you own this place?';
 
   @override
-  String get plClaimLink => 'Claim it';
-
-  @override
   String get plClaimWhy =>
       'The owner can send news to the people who watch it.';
 
@@ -3160,9 +3147,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plGetDirections => 'Open in navigator';
-
-  @override
   String get themeToDay => 'Day mode';
 
   @override
@@ -3183,4 +3167,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get plPhotoLoadingSpeed =>
       'How fast depends on your internet connection';
+
+  @override
+  String get plGettingThere => 'Getting there';
+
+  @override
+  String get plContact => 'Contact';
+
+  @override
+  String get plNewsTitle => 'News';
 }

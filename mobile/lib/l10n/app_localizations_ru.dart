@@ -2731,9 +2731,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plPhone => 'Телефон';
 
   @override
-  String get plNoPhone => 'Телефон не указан';
-
-  @override
   String get plMenu => 'Меню';
 
   @override
@@ -2741,13 +2738,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plAddressCopied => 'Адрес скопирован';
-
-  @override
-  String get plRouteTitle => 'В каком навигаторе открыть?';
-
-  @override
-  String get plRouteHint =>
-      'В Корее Naver и Kakao точнее прокладывают маршрут.';
 
   @override
   String get plCopyAddress => 'Скопировать адрес';
@@ -2981,9 +2971,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plClaimPrompt => 'Вы владелец этого места?';
 
   @override
-  String get plClaimLink => 'Подтвердить владение';
-
-  @override
   String get plClaimWhy =>
       'Владелец может отправлять объявления тем, кто следит.';
 
@@ -3203,9 +3190,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get plGetDirections => 'Открыть в навигаторе';
-
-  @override
   String get themeToDay => 'Дневной режим';
 
   @override
@@ -3226,4 +3210,13 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get plPhotoLoadingSpeed =>
       'Скорость загрузки зависит от вашего интернета';
+
+  @override
+  String get plGettingThere => 'Как добраться';
+
+  @override
+  String get plContact => 'Контакты';
+
+  @override
+  String get plNewsTitle => 'Новости';
 }

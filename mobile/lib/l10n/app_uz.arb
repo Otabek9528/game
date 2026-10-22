@@ -1422,12 +1422,9 @@
   "plAddress": "Manzil",
   "plNoAddress": "Manzil ko‘rsatilmagan",
   "plPhone": "Telefon",
-  "plNoPhone": "Telefon ko‘rsatilmagan",
   "plMenu": "Menyu",
   "plMenuOpen": "Menyuni ochish",
   "plAddressCopied": "Manzil nusxalandi",
-  "plRouteTitle": "Qaysi navigatorda ochamiz?",
-  "plRouteHint": "Koreyada Naver va Kakao xaritalari yo‘lni aniqroq ko‘rsatadi.",
   "plCopyAddress": "Manzilni nusxalash",
   "plMapAttribution": "© OpenStreetMap",
   "plAbout": "Muassasa haqida",
@@ -1547,7 +1544,6 @@
   "plAnnounceSent": "E’lon tekshiruvga yuborildi",
   "plTextEmpty": "Avval matn yozing.",
   "plClaimPrompt": "Bu joy egasimisiz?",
-  "plClaimLink": "Egalikni tasdiqlash",
   "plClaimWhy": "Egasi kuzatayotganlarga e’lon yubora oladi.",
   "plClaimConfirm": "Ismingiz va aloqa ma’lumotingiz administratorga yuboriladi. U egalikni tekshirish uchun siz bilan bog‘lanadi. Davom etasizmi?",
   "plClaimContinue": "Davom etish",
@@ -1671,12 +1667,14 @@
       }
     }
   },
-  "plGetDirections": "Navigatorda ko‘rish",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim",
   "plSocialMore": "Boshqa tarmoqdagi sahifasini bilasizmi?",
   "plCallNumber": "Qo‘ng‘iroq qilish",
   "plShareFooter": "Muslim Vegukin ilovasida topildi",
   "plPhotoLoading": "Rasm yuklanmoqda…",
-  "plPhotoLoadingSpeed": "Yuklanish tezligi internetingizga bog‘liq"
+  "plPhotoLoadingSpeed": "Yuklanish tezligi internetingizga bog‘liq",
+  "plGettingThere": "Qanday borish mumkin",
+  "plContact": "Aloqa",
+  "plNewsTitle": "Yangiliklar"
 }
