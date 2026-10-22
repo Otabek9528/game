@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
-import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../account/account_screen.dart';
 import 'place_actions.dart';
@@ -19,10 +18,11 @@ import 'places_models.dart';
 import 'places_parts.dart';
 import 'places_screen.dart';
 
-/// A place from a list: its page shows at once what the list knew.
-void openPlace(BuildContext context, PlacesKit kit, Place place) {
+/// A place from a search: its page shows at once what the search knew,
+/// with how far it is from the point searched around.
+void openPlace(BuildContext context, PlacesKit kit, Place place, {double? km, PlaceOrigin? origin}) {
   Navigator.of(context).push(MaterialPageRoute<void>(
-    builder: (_) => PlaceDetailScreen(kit: kit, id: place.id, preview: place),
+    builder: (_) => PlaceDetailScreen(kit: kit, id: place.id, preview: place, km: km, origin: origin),
   ));
 }
 
@@ -58,13 +58,17 @@ class _OwnKitState extends State<_OwnKit> {
 /// A place: where it is, how to call and get there, what it's like and
 /// what people say, and its news by notification.
 class PlaceDetailScreen extends StatefulWidget {
-  const PlaceDetailScreen({super.key, required this.kit, required this.id, this.preview});
+  const PlaceDetailScreen({super.key, required this.kit, required this.id, this.preview, this.km, this.origin});
 
   final PlacesKit kit;
   final int id;
 
   /// What the list knew, shown while the page loads.
   final Place? preview;
+
+  /// How far it is from where the search looked: the phone, or an address.
+  final double? km;
+  final PlaceOrigin? origin;
 
   @override
   State<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
@@ -235,8 +239,12 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
             : _Failed(code: _error!, onRetry: _load),
       );
     }
-    final km = _kit.distanceTo(place);
-    final colour = kindColour(context, place.kind);
+    final km = widget.km;
+    final distance = km == null
+        ? null
+        : widget.origin == PlaceOrigin.address
+            ? s.plKmFromAddress(distanceText(s, km))
+            : s.plKmFromYou(distanceText(s, km));
     final photos = _kit.photosOf(place);
     return Scaffold(
       backgroundColor: p.page,
@@ -269,14 +277,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
               ],
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.parallax,
-                background: photos.isNotEmpty
-                    ? _Photos(photos: photos)
-                    : place.located
-                        ? GestureDetector(
-                            onTap: () => routeToPlace(context, _services, place),
-                            child: PlaceMap(lat: place.lat!, lon: place.lon!, colour: colour, emoji: place.kind.emoji),
-                          )
-                        : _KindBackdrop(kind: place.kind),
+                background: photos.isNotEmpty ? _Photos(photos: photos) : PlaceBackdrop(kind: place.kind),
               ),
             ),
             SliverPadding(
@@ -285,7 +286,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                 children: [
                   _Head(
                     place: place,
-                    km: km,
+                    distance: distance,
                     watch: detail?.watch,
                     reviews: detail?.reviews.length ?? place.reviewCount,
                     rating: detail?.average ?? place.rating,
@@ -299,6 +300,10 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                   _Actions(place: place, services: _services),
                   const SizedBox(height: 18),
                   _Contact(place: place, services: _services),
+                  if (place.located) ...[
+                    const SizedBox(height: 12),
+                    _MapCard(place: place, onRoute: () => routeToPlace(context, _services, place)),
+                  ],
                   if (_error != null && detail == null) ...[
                     const SizedBox(height: 16),
                     _Failed(code: _error!, onRetry: _load),
@@ -422,28 +427,39 @@ class _PhotosState extends State<_Photos> {
   }
 }
 
-/// No photo and no location: the kind on its colour, in tilework.
-class _KindBackdrop extends StatelessWidget {
-  const _KindBackdrop({required this.kind});
+/// Where it is: the map around it, and the way there.
+class _MapCard extends StatelessWidget {
+  const _MapCard({required this.place, required this.onRoute});
 
-  final PlaceKind kind;
+  final Place place;
+  final VoidCallback onRoute;
 
   @override
   Widget build(BuildContext context) {
-    final colour = kindColour(context, kind);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color.lerp(colour, Colors.black, 0.35)!, colour],
-        ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    return PlacesCard(
+      padding: EdgeInsets.zero,
+      onTap: onRoute,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CustomPaint(painter: KhatamLatticePainter(color: Colors.white.withValues(alpha: 0.08))),
-          Center(child: Text(kind.emoji, style: const TextStyle(fontSize: 64))),
+          SizedBox(
+            height: 156,
+            child: PlaceMap(lat: place.lat!, lon: place.lon!, colour: kindColour(context, place.kind), emoji: place.kind.emoji),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+            child: Row(
+              children: [
+                Icon(Icons.map_outlined, size: 20, color: p.accent),
+                const SizedBox(width: 10),
+                Expanded(child: Text(s.plOnMap, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink))),
+                Text(s.plGetDirections, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: p.accent)),
+                Icon(Icons.chevron_right_rounded, color: p.accent),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -453,7 +469,7 @@ class _KindBackdrop extends StatelessWidget {
 class _Head extends StatelessWidget {
   const _Head({
     required this.place,
-    required this.km,
+    required this.distance,
     required this.watch,
     required this.reviews,
     required this.rating,
@@ -462,7 +478,9 @@ class _Head extends StatelessWidget {
   });
 
   final Place place;
-  final double? km;
+
+  /// "Sizdan 1.4 km": from where the search looked.
+  final String? distance;
   final PlaceWatch? watch;
   final int reviews;
   final double rating;
@@ -474,7 +492,7 @@ class _Head extends StatelessWidget {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final colour = kindColour(context, place.kind);
-    final km = this.km;
+    final distance = this.distance;
     final watch = this.watch;
     final kindName = switch (place.kind) {
       PlaceKind.mosque => s.plMosque,
@@ -508,8 +526,8 @@ class _Head extends StatelessWidget {
         const SizedBox(height: 6),
         Text.rich(
           TextSpan(children: [
-            if (km != null) TextSpan(text: distanceText(s, km), style: TextStyle(fontWeight: FontWeight.w800, color: p.accent)),
-            if (km != null && place.city != null) const TextSpan(text: ' · '),
+            if (distance != null) TextSpan(text: distance, style: TextStyle(fontWeight: FontWeight.w800, color: p.accent)),
+            if (distance != null && place.city != null) const TextSpan(text: ' · '),
             if (place.city != null) TextSpan(text: place.city),
           ]),
           style: TextStyle(fontSize: 15, color: p.inkSoft),

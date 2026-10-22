@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import 'places_kit.dart';
 import 'places_models.dart';
@@ -22,13 +23,6 @@ String kindPlural(AppLocalizations s, PlaceKind kind) => switch (kind) {
       PlaceKind.mosque => s.featureMosques,
       PlaceKind.restaurant => s.featureRestaurants,
       PlaceKind.shop => s.featureShops,
-    };
-
-/// "34 ta masjid", "34 мечети", "34 mosques".
-String kindCount(AppLocalizations s, PlaceKind kind, int n) => switch (kind) {
-      PlaceKind.mosque => s.plCountMosques(n),
-      PlaceKind.restaurant => s.plCountRestaurants(n),
-      PlaceKind.shop => s.plCountShops(n),
     };
 
 /// "650 m", "2.4 km", "23 km".
@@ -100,39 +94,103 @@ class PlaceStars extends StatelessWidget {
   }
 }
 
-/// A place's picture in a list: its first photo, or its kind on its colour.
-class PlaceThumb extends StatelessWidget {
-  const PlaceThumb({super.key, required this.kit, required this.place, this.size = 58});
+/// A place's photos, swiped through, with dots; its kind on its colour in
+/// tilework while they load, or when it has none.
+class PlacePhotos extends StatefulWidget {
+  const PlacePhotos({super.key, required this.kit, required this.place, this.onTap, this.full = false});
 
   final PlacesKit kit;
   final Place place;
-  final double size;
+  final VoidCallback? onTap;
+
+  /// The large photos (the place page) rather than the card's.
+  final bool full;
+
+  @override
+  State<PlacePhotos> createState() => _PlacePhotosState();
+}
+
+class _PlacePhotosState extends State<PlacePhotos> {
+  int _index = 0;
 
   @override
   Widget build(BuildContext context) {
-    final colour = kindColour(context, place.kind);
-    final photos = kit.photosOf(place);
-    final tile = Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
+    final photos = widget.kit.photosOf(widget.place);
+    final backdrop = PlaceBackdrop(kind: widget.place.kind);
+    if (photos.isEmpty) return GestureDetector(onTap: widget.onTap, child: backdrop);
+    return LayoutBuilder(builder: (context, box) {
+      final width = (box.maxWidth * MediaQuery.devicePixelRatioOf(context)).round();
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          PageView.builder(
+            itemCount: photos.length,
+            onPageChanged: (i) => setState(() => _index = i),
+            itemBuilder: (context, i) => GestureDetector(
+              onTap: widget.onTap,
+              child: Image.network(
+                '${photos[i].full}',
+                fit: BoxFit.cover,
+                cacheWidth: widget.full ? null : width,
+                errorBuilder: (_, _, _) => backdrop,
+                frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : backdrop,
+              ),
+            ),
+          ),
+          if (photos.length > 1)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 10,
+              child: IgnorePointer(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < photos.length; i++)
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        width: i == _index ? 18 : 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: i == _index ? 1 : 0.6),
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 3)],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      );
+    });
+  }
+}
+
+/// A place's kind on its colour, in tilework: where its photo goes.
+class PlaceBackdrop extends StatelessWidget {
+  const PlaceBackdrop({super.key, required this.kind});
+
+  final PlaceKind kind;
+
+  @override
+  Widget build(BuildContext context) {
+    final colour = kindColour(context, kind);
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: colour.withValues(alpha: 0.13),
-        borderRadius: BorderRadius.circular(size * 0.28),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color.lerp(colour, Colors.black, 0.35)!, colour],
+        ),
       ),
-      child: Text(place.kind.emoji, style: TextStyle(fontSize: size * 0.46)),
-    );
-    if (photos.isEmpty) return tile;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(size * 0.28),
-      child: Image.network(
-        '${photos.first.thumb}',
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        cacheWidth: (size * MediaQuery.devicePixelRatioOf(context)).round(),
-        errorBuilder: (_, _, _) => tile,
-        frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : tile,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CustomPaint(painter: KhatamLatticePainter(color: Colors.white.withValues(alpha: 0.08))),
+          Center(child: Text(kind.emoji, style: const TextStyle(fontSize: 56))),
+        ],
       ),
     );
   }

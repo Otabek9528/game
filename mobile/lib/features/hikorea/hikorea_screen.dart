@@ -39,6 +39,7 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
   void initState() {
     super.initState();
     unawaited(_load());
+    unawaited(_kit.loadAllCalendars());
     unawaited(_kit.refreshWatches());
   }
 
@@ -60,7 +61,11 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
 
   Future<void> _refresh() {
     _kit.retryFailed();
-    return Future.wait([if (_kit.offices == null) _load(), _kit.refreshWatches()]);
+    return Future.wait([
+      if (_kit.offices == null) _load(),
+      _kit.loadAllCalendars(again: true),
+      _kit.refreshWatches(),
+    ]);
   }
 
   @override

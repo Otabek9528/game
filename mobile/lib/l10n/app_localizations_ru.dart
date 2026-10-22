@@ -2638,91 +2638,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get hkWatchingHere => 'Здесь у вас есть наблюдение';
 
   @override
-  String get plSearchHint => 'Название, город или адрес';
-
-  @override
-  String get plClearSearch => 'Очистить';
-
-  @override
-  String plAround(String city, String when) {
-    return 'Рядом: $city · $when';
-  }
-
-  @override
-  String plAroundHere(String when) {
-    return 'Рядом с вами · $when';
-  }
-
-  @override
-  String get plLocatePrompt =>
-      'Включите геолокацию, чтобы ближайшие были первыми';
-
-  @override
-  String get plLocateButton => 'Включить';
-
-  @override
-  String get plLocateBlocked => 'Нет доступа к геолокации';
-
-  @override
-  String get plLocateOff => 'Геолокация на телефоне выключена';
-
-  @override
-  String get plLocateFailed => 'Не удалось определить местоположение';
-
-  @override
-  String get plAllCities => 'Все';
-
-  @override
-  String plCountMosques(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count мечети',
-      many: '$count мечетей',
-      few: '$count мечети',
-      one: '$count мечеть',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String plCountRestaurants(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count ресторана',
-      many: '$count ресторанов',
-      few: '$count ресторана',
-      one: '$count ресторан',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String plCountShops(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count магазина',
-      many: '$count магазинов',
-      few: '$count магазина',
-      one: '$count магазин',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get plSortedNearest => 'сначала ближайшие';
-
-  @override
-  String get plSortedCity => 'по городам';
-
-  @override
-  String plSortedFrom(String place) {
-    return 'ближе к «$place» — выше';
-  }
-
-  @override
   String get plNearest => 'Ближайшая';
 
   @override
@@ -2764,26 +2679,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plShare => 'Поделиться';
 
   @override
-  String plSearchNear(String address) {
-    return 'Искать рядом с «$address»';
-  }
-
-  @override
-  String get plSearchNearHint => 'Адрес на корейском: ближайшие будут первыми';
-
-  @override
-  String get plAddressHint =>
-      'Чтобы искать по адресу, напишите его по-корейски: 안산시 단원구';
-
-  @override
-  String get plFinding => 'Ищем адрес…';
-
-  @override
-  String plNearAddress(String address) {
-    return 'Рядом с «$address»';
-  }
-
-  @override
   String get plAddressNotFound =>
       'Адрес не найден. Попробуйте написать точнее, на корейском.';
 
@@ -2791,27 +2686,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get plNothingFound => 'Ничего не найдено';
 
   @override
-  String get plNothingFoundHint =>
-      'Попробуйте написать иначе или введите адрес по-корейски.';
-
-  @override
-  String get plNoneYetMosque => 'Мечетей пока нет';
-
-  @override
-  String get plNoneYetRestaurant => 'Ресторанов пока нет';
-
-  @override
-  String get plNoneYetShop => 'Магазинов пока нет';
-
-  @override
   String get plLoadFailed => 'Не удалось загрузить места. Проверьте интернет.';
-
-  @override
-  String get plNeedsLocation =>
-      'Чтобы показать ближайшие места, нужна геолокация — или напишите адрес по-корейски выше.';
-
-  @override
-  String get plRecent => 'Недавно смотрели';
 
   @override
   String get plMissingTitle => 'Знаете место, которого нет в списке?';
@@ -2854,10 +2729,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plWatchPushOn => 'Включить';
-
-  @override
-  String get plWatchWhat =>
-      'Сообщим, если сменится название или телефон, место закроется или опубликует объявление.';
 
   @override
   String get plAddress => 'Адрес';
@@ -2953,9 +2824,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plNoText => 'Только оценка';
-
-  @override
-  String get plOutOf => 'из 5';
 
   @override
   String get plCorrections =>
@@ -3227,6 +3095,144 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plShop => 'Магазин';
+
+  @override
+  String get plNearMe => 'Искать рядом со мной';
+
+  @override
+  String get plByAddress => 'Искать у другого адреса';
+
+  @override
+  String get plAddressTip =>
+      'Напишите адрес по-КОРЕЙСКИ: город, район, улица. Можно скопировать из карты.';
+
+  @override
+  String get plSearchButton => 'Найти';
+
+  @override
+  String get plRecentAddresses => 'Недавние адреса';
+
+  @override
+  String get plChooseTitle => 'Где искать?';
+
+  @override
+  String get plChooseBody =>
+      'Выберите одну из кнопок выше: рядом с вами или у другого адреса — покажем 5 ближайших мест.';
+
+  @override
+  String plNearestMosques(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ближайших мечети',
+      many: '$count ближайших мечетей',
+      few: '$count ближайшие мечети',
+      one: 'Ближайшая мечеть',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plNearestRestaurants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ближайших ресторана',
+      many: '$count ближайших ресторанов',
+      few: '$count ближайших ресторана',
+      one: 'Ближайший ресторан',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plNearestShops(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ближайших магазина',
+      many: '$count ближайших магазинов',
+      few: '$count ближайших магазина',
+      one: 'Ближайший магазин',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plNearestToAddress => 'Ближайшие к адресу';
+
+  @override
+  String plHereNow(String city, String when) {
+    return 'Вы здесь: $city · $when';
+  }
+
+  @override
+  String plHereNowNoCity(String when) {
+    return 'Местоположение определено · $when';
+  }
+
+  @override
+  String plSavedNote(String city, String when) {
+    return 'Не удалось определить текущее место — показано для $city ($when)';
+  }
+
+  @override
+  String plSavedNoteNoCity(String when) {
+    return 'Не удалось определить текущее место — показано по прежнему ($when)';
+  }
+
+  @override
+  String get plRelocate => 'Обновить';
+
+  @override
+  String get plChange => 'Изменить';
+
+  @override
+  String get plLocatingYou => 'Определяем ваше местоположение…';
+
+  @override
+  String get plLoadingPlaces => 'Загружаем места…';
+
+  @override
+  String get plDeniedBody =>
+      'Разрешите доступ к геолокации, чтобы найти ближайшие места, или ищите по адресу.';
+
+  @override
+  String get plAllow => 'Разрешить';
+
+  @override
+  String get plBlockedBody =>
+      'Доступ к геолокации выключен в настройках. Включите его или ищите по адресу.';
+
+  @override
+  String get plOffBody =>
+      'Геолокация на телефоне выключена. Включите её или ищите по адресу.';
+
+  @override
+  String get plFailedBody =>
+      'Не удалось определить местоположение. Попробуйте ещё раз или ищите по адресу.';
+
+  @override
+  String get plUseAddress => 'Искать по адресу';
+
+  @override
+  String get plDetails => 'Подробнее';
+
+  @override
+  String plKmFromYou(String km) {
+    return 'От вас $km';
+  }
+
+  @override
+  String plKmFromAddress(String km) {
+    return 'От адреса $km';
+  }
+
+  @override
+  String get plOnMap => 'На карте';
+
+  @override
+  String get plGetDirections => 'Проложить маршрут';
 
   @override
   String get themeToDay => 'Дневной режим';

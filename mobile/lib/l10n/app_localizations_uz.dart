@@ -2543,67 +2543,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get hkWatchingHere => 'Shu yerda kuzatuvingiz bor';
 
   @override
-  String get plSearchHint => 'Nomi, shahar yoki manzil';
-
-  @override
-  String get plClearSearch => 'Tozalash';
-
-  @override
-  String plAround(String city, String when) {
-    return '$city atrofida · $when';
-  }
-
-  @override
-  String plAroundHere(String when) {
-    return 'Joylashuvingiz atrofida · $when';
-  }
-
-  @override
-  String get plLocatePrompt =>
-      'Eng yaqinlari birinchi chiqishi uchun joylashuvni yoqing';
-
-  @override
-  String get plLocateButton => 'Yoqish';
-
-  @override
-  String get plLocateBlocked => 'Joylashuvga ruxsat berilmagan';
-
-  @override
-  String get plLocateOff => 'Telefonda joylashuv o‘chiq';
-
-  @override
-  String get plLocateFailed => 'Joylashuvni aniqlab bo‘lmadi';
-
-  @override
-  String get plAllCities => 'Hammasi';
-
-  @override
-  String plCountMosques(int count) {
-    return '$count ta masjid';
-  }
-
-  @override
-  String plCountRestaurants(int count) {
-    return '$count ta oshxona';
-  }
-
-  @override
-  String plCountShops(int count) {
-    return '$count ta do‘kon';
-  }
-
-  @override
-  String get plSortedNearest => 'eng yaqini birinchi';
-
-  @override
-  String get plSortedCity => 'shahar bo‘yicha';
-
-  @override
-  String plSortedFrom(String place) {
-    return '“$place” ga eng yaqini birinchi';
-  }
-
-  @override
   String get plNearest => 'Eng yaqin';
 
   @override
@@ -2637,27 +2576,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get plShare => 'Ulashish';
 
   @override
-  String plSearchNear(String address) {
-    return '“$address” atrofidan qidirish';
-  }
-
-  @override
-  String get plSearchNearHint =>
-      'Koreyscha manzil: eng yaqinlari birinchi chiqadi';
-
-  @override
-  String get plAddressHint =>
-      'Manzil bo‘yicha qidirish uchun uni koreys tilida yozing: 안산시 단원구';
-
-  @override
-  String get plFinding => 'Manzil qidirilmoqda…';
-
-  @override
-  String plNearAddress(String address) {
-    return '“$address” atrofida';
-  }
-
-  @override
   String get plAddressNotFound =>
       'Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.';
 
@@ -2665,27 +2583,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get plNothingFound => 'Hech narsa topilmadi';
 
   @override
-  String get plNothingFoundHint =>
-      'Boshqacha yozib ko‘ring yoki manzilni koreys tilida kiriting.';
-
-  @override
-  String get plNoneYetMosque => 'Hali masjid qo‘shilmagan';
-
-  @override
-  String get plNoneYetRestaurant => 'Hali oshxona qo‘shilmagan';
-
-  @override
-  String get plNoneYetShop => 'Hali do‘kon qo‘shilmagan';
-
-  @override
   String get plLoadFailed => 'Joylarni yuklab bo‘lmadi. Internetni tekshiring.';
-
-  @override
-  String get plNeedsLocation =>
-      'Eng yaqin joylarni ko‘rsatish uchun joylashuvingiz kerak — yoki yuqorida manzilni koreys tilida yozing.';
-
-  @override
-  String get plRecent => 'Yaqinda ko‘rilganlar';
 
   @override
   String get plMissingTitle => 'Ro‘yxatda yo‘q joyni bilasizmi?';
@@ -2720,10 +2618,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plWatchPushOn => 'Yoqish';
-
-  @override
-  String get plWatchWhat =>
-      'Nomi, telefoni o‘zgarsa, yopilsa yoki e’lon bersa — xabar olasiz.';
 
   @override
   String get plAddress => 'Manzil';
@@ -2822,9 +2716,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plNoText => 'Faqat baho';
-
-  @override
-  String get plOutOf => '5 dan';
 
   @override
   String get plCorrections =>
@@ -3101,6 +2992,138 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plShop => 'Do‘kon';
+
+  @override
+  String get plNearMe => 'O‘z atrofimdan izlash';
+
+  @override
+  String get plByAddress => 'Boshqa manzil atrofidan izlash';
+
+  @override
+  String get plAddressTip =>
+      'Manzilni KOREYS tilida yozing: shahar, tuman, ko‘cha. Xaritadan nusxa olsangiz ham bo‘ladi.';
+
+  @override
+  String get plSearchButton => 'Qidirish';
+
+  @override
+  String get plRecentAddresses => 'Oldingi manzillar';
+
+  @override
+  String get plChooseTitle => 'Qayerdan izlaymiz?';
+
+  @override
+  String get plChooseBody =>
+      'Yuqoridagi tugmalardan birini tanlang: o‘z atrofingizdan yoki boshqa manzil atrofidan — eng yaqin 5 ta joy chiqadi.';
+
+  @override
+  String plNearestMosques(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sizga eng yaqin $count ta masjid',
+      one: 'Sizga eng yaqin masjid',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plNearestRestaurants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sizga eng yaqin $count ta oshxona',
+      one: 'Sizga eng yaqin oshxona',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plNearestShops(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sizga eng yaqin $count ta do‘kon',
+      one: 'Sizga eng yaqin do‘kon',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plNearestToAddress => 'Manzilga eng yaqinlari';
+
+  @override
+  String plHereNow(String city, String when) {
+    return 'Joylashuvingiz: $city · $when';
+  }
+
+  @override
+  String plHereNowNoCity(String when) {
+    return 'Joylashuvingiz aniqlandi · $when';
+  }
+
+  @override
+  String plSavedNote(String city, String when) {
+    return 'Hozirgi joylashuvni aniqlab bo‘lmadi — ${city}dagi oldingi joylashuv bo‘yicha ($when)';
+  }
+
+  @override
+  String plSavedNoteNoCity(String when) {
+    return 'Hozirgi joylashuvni aniqlab bo‘lmadi — oldingi joylashuv bo‘yicha ($when)';
+  }
+
+  @override
+  String get plRelocate => 'Yangilash';
+
+  @override
+  String get plChange => 'O‘zgartirish';
+
+  @override
+  String get plLocatingYou => 'Joylashuvingiz aniqlanmoqda…';
+
+  @override
+  String get plLoadingPlaces => 'Joylar yuklanmoqda…';
+
+  @override
+  String get plDeniedBody =>
+      'Eng yaqin joylarni topish uchun joylashuvga ruxsat bering — yoki manzil bo‘yicha izlang.';
+
+  @override
+  String get plAllow => 'Ruxsat berish';
+
+  @override
+  String get plBlockedBody =>
+      'Joylashuvga ruxsat sozlamalarda o‘chirilgan. Uni yoqing — yoki manzil bo‘yicha izlang.';
+
+  @override
+  String get plOffBody =>
+      'Telefonda joylashuv o‘chiq. Uni yoqing — yoki manzil bo‘yicha izlang.';
+
+  @override
+  String get plFailedBody =>
+      'Joylashuvni aniqlab bo‘lmadi. Qayta urinib ko‘ring — yoki manzil bo‘yicha izlang.';
+
+  @override
+  String get plUseAddress => 'Manzil bo‘yicha izlash';
+
+  @override
+  String get plDetails => 'Batafsil';
+
+  @override
+  String plKmFromYou(String km) {
+    return 'Sizdan $km';
+  }
+
+  @override
+  String plKmFromAddress(String km) {
+    return 'Manzildan $km';
+  }
+
+  @override
+  String get plOnMap => 'Xaritada';
+
+  @override
+  String get plGetDirections => 'Yo‘lni ko‘rsatish';
 
   @override
   String get themeToDay => 'Kunduzgi rejim';

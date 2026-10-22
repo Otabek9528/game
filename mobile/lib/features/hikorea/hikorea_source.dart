@@ -21,6 +21,10 @@ abstract interface class HikoreaSource {
 
   Future<HkCalendar> calendar(int desk);
 
+  /// Every counter's calendar in one answer; `unsupported` from a server
+  /// without it (before update 7).
+  Future<Map<int, HkCalendar>> calendars();
+
   /// A day's appointment times, checked on HiKorea now (a few seconds).
   Future<HkDay> day(int desk, String ymd);
 
@@ -88,6 +92,22 @@ class HttpHikoreaSource implements HikoreaSource {
 
   @override
   Future<HkCalendar> calendar(int desk) async => HkCalendar.fromJson(await _call('GET', 'desks/$desk/slots'));
+
+  @override
+  Future<Map<int, HkCalendar>> calendars() async {
+    final Map<String, dynamic> json;
+    try {
+      json = await _call('GET', 'calendars');
+    } on HkException catch (e) {
+      throw e.status == 404 ? const HkException('unsupported', 404) : e;
+    }
+    final all = json['calendars'];
+    return {
+      if (all is Map)
+        for (final MapEntry(:key, :value) in all.entries)
+          if (int.tryParse('$key') case final seq? when value is Map<String, dynamic>) seq: HkCalendar.fromJson(value),
+    };
+  }
 
   @override
   Future<HkDay> day(int desk, String ymd) async => HkDay.fromJson(await _call('GET', 'desks/$desk/dates/$ymd'));

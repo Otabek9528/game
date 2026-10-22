@@ -1111,6 +1111,20 @@ class FakeHikorea implements HikoreaSource {
   /// Mon 19 Oct: 5 booked, Tue 20: 40 (full), Mon 26: 10 (full), Tue 27: 20;
   /// the other working days to the end of November nobody has booked yet;
   /// Tue 3 Nov is a holiday.
+  /// Answers every counter's calendar in one request (update 7 on).
+  bool bulk = true;
+
+  @override
+  Future<Map<int, HkCalendar>> calendars() async {
+    _online();
+    asked.add('calendars');
+    if (!bulk) throw const HkException('unsupported', 404);
+    return {
+      for (final office in officesOverride ?? _offices)
+        for (final desk in office.desks) desk.seq: _calendarOf(desk.seq),
+    };
+  }
+
   @override
   Future<HkCalendar> calendar(int desk) async {
     _online();
@@ -1120,6 +1134,10 @@ class FakeHikorea implements HikoreaSource {
       await Future<void>.delayed(delay);
       inFlight--;
     }
+    return _calendarOf(desk);
+  }
+
+  HkCalendar _calendarOf(int desk) {
     if (calendarFor[desk] case final calendar?) return calendar;
     if (dormantDesks.contains(desk)) {
       return HkCalendar(deskSeq: desk, dormant: true, listedUntil: DateTime(2026, 10, 16), deskCapacity: 180, status: 'ok');
@@ -1216,10 +1234,9 @@ class FakeHikorea implements HikoreaSource {
 class FakePlaces implements PlacesSource {
   bool fail = false;
 
-  /// A server before update 6: no list of them all.
+  /// A server before update 6: reviews don't say whose.
   bool oldServer = false;
   final asked = <String>[];
-  int _etag = 1;
 
   static Place _p(int id, String name, PlaceKind kind,
           {String? city, String? address, String phone = '', double? lat, double? lon, int reviews = 0, double rating = 0,
@@ -1276,20 +1293,13 @@ class FakePlaces implements PlacesSource {
     if (failNext.remove(call.split(' ').first) case final code?) throw PlacesException(code, 400);
   }
 
-  @override
-  Future<PlacesList?> all(PlaceKind kind, {String? etag}) async {
-    _online('all ${kind.key} ${etag ?? '-'}');
-    if (oldServer) throw const PlacesException('unsupported', 404);
-    if (etag == 'e$_etag') return null;
-    return (places: List.of(places[kind]!), etag: 'e$_etag');
-  }
-
-  /// The list changed on the server: a new tag.
-  void changed() => _etag++;
+  /// Where the last nearby search looked from.
+  ({double lat, double lon})? lastNear;
 
   @override
-  Future<List<Place>> nearby(PlaceKind kind, double lat, double lon, {int limit = 10}) async {
-    _online('nearby ${kind.key}');
+  Future<List<Place>> nearby(PlaceKind kind, double lat, double lon, {int limit = 5}) async {
+    _online('nearby ${kind.key} $limit');
+    lastNear = (lat: lat, lon: lon);
     final list = [
       for (final p in places[kind]!)
         if (p.located) p,
@@ -1300,8 +1310,8 @@ class FakePlaces implements PlacesSource {
   }
 
   @override
-  Future<AddressPlaces> nearAddress(PlaceKind kind, String address, {int limit = 10}) async {
-    _online('address ${kind.key} $address');
+  Future<AddressPlaces> nearAddress(PlaceKind kind, String address, {int limit = 5}) async {
+    _online('address ${kind.key} $address $limit');
     if (!address.contains('서울')) throw const PlacesException('http_404', 404);
     // Itaewon.
     final near = await nearby(kind, 37.534, 126.994, limit: limit);
@@ -1382,11 +1392,14 @@ class FakePlaces implements PlacesSource {
     ];
   }
 
+  /// The web app's photo list.
+  Map<String, List<String>> manifest = {
+    'Photos/117': ['png:9991877d', 'jpg:28c75fa8'],
+  };
+
   @override
   Future<Map<String, List<String>>> photoManifest() async {
     _online('photos');
-    return {
-      'Photos/117': ['png:9991877d', 'jpg:28c75fa8'],
-    };
+    return manifest;
   }
 }

@@ -34,6 +34,8 @@ class HkDesk {
   /// What it handles and where it is, by language.
   final Map<String, String> details;
 
+  Map<String, Object?> toJson() => {'desk_seq': seq, 'booth': booth, 'details': details};
+
   static HkDesk? fromJson(Object? json) {
     if (json is! Map<String, dynamic> || json['desk_seq'] is! int) return null;
     return HkDesk(seq: json['desk_seq'] as int, booth: _texts(json['booth']), details: _texts(json['details']));
@@ -56,6 +58,14 @@ class HkOffice {
   }
 
   HkDesk? desk(int seq) => desks.where((d) => d.seq == seq).firstOrNull;
+
+  Map<String, Object?> toJson() => {
+        'office_id': id,
+        'name_en': nameEn,
+        'name_ko': nameKo,
+        'short_code': shortCode,
+        'desks': [for (final d in desks) d.toJson()],
+      };
 
   static HkOffice? fromJson(Object? json) {
     if (json is! Map<String, dynamic>) return null;

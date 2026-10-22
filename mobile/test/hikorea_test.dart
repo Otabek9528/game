@@ -230,9 +230,26 @@ void main() {
       semantics.dispose();
     });
 
-    testWidgets('the leaves load a few calendars at a time; offline, a cloud, tried again on a pull', (tester) async {
+    testWidgets('every counter’s calendar in one request; the leaves kept for next time, shown even offline', (tester) async {
+      final app = TestApp(language: 'en');
+      await openHikorea(tester, app: app);
+      expect(app.hikorea.asked.where((a) => a.startsWith('calendar')), ['calendars'], reason: 'not one per counter');
+      expect(find.text('OCT', skipOffstage: false), findsWidgets);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      app.hikorea.fail = true;
+      await pushPage(tester, HikoreaScreen(services: app.services));
+      await tester.pumpAndSettle();
+      expect(find.text('Couldn’t load. Check your connection.'), findsNothing, reason: 'the offices kept on the phone');
+      expect(find.text('Seoul', skipOffstage: false), findsOneWidget);
+      expect(find.text('OCT', skipOffstage: false), findsWidgets, reason: 'the leaves as last time');
+    });
+
+    testWidgets('a server without it: a few calendars at a time; offline, a cloud, tried again on a pull', (tester) async {
       final app = TestApp(language: 'en');
       app.hikorea
+        ..bulk = false
         ..officesOverride = [
           for (var i = 0; i < 12; i++)
             HkOffice(id: '$i', nameEn: 'Place$i Immigration Office', desks: [HkDesk(seq: 2 * i), HkDesk(seq: 2 * i + 1)]),
@@ -243,7 +260,7 @@ void main() {
       for (var i = 0; i < 20; i++) {
         await tester.pump(const Duration(milliseconds: 100));
       }
-      expect(app.hikorea.mostInFlight, 3);
+      expect(app.hikorea.mostInFlight, 6);
       expect(find.text('OCT', skipOffstage: false), findsWidgets, reason: 'the first rows, below the start card');
 
       final semantics = tester.ensureSemantics();

@@ -2601,84 +2601,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hkWatchingHere => 'You watch a counter here';
 
   @override
-  String get plSearchHint => 'Name, city or address';
-
-  @override
-  String get plClearSearch => 'Clear';
-
-  @override
-  String plAround(String city, String when) {
-    return 'Around $city · $when';
-  }
-
-  @override
-  String plAroundHere(String when) {
-    return 'Around you · $when';
-  }
-
-  @override
-  String get plLocatePrompt => 'Turn on location to see the nearest first';
-
-  @override
-  String get plLocateButton => 'Turn on';
-
-  @override
-  String get plLocateBlocked => 'Location access is off';
-
-  @override
-  String get plLocateOff => 'Location is off on the phone';
-
-  @override
-  String get plLocateFailed => 'Couldn’t get your location';
-
-  @override
-  String get plAllCities => 'All';
-
-  @override
-  String plCountMosques(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count mosques',
-      one: '1 mosque',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String plCountRestaurants(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count restaurants',
-      one: '1 restaurant',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String plCountShops(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count shops',
-      one: '1 shop',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get plSortedNearest => 'nearest first';
-
-  @override
-  String get plSortedCity => 'by city';
-
-  @override
-  String plSortedFrom(String place) {
-    return 'nearest to “$place” first';
-  }
-
-  @override
   String get plNearest => 'Nearest';
 
   @override
@@ -2718,26 +2640,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plShare => 'Share';
 
   @override
-  String plSearchNear(String address) {
-    return 'Search near “$address”';
-  }
-
-  @override
-  String get plSearchNearHint => 'An address in Korean: the nearest come first';
-
-  @override
-  String get plAddressHint =>
-      'To search by address, type it in Korean: 안산시 단원구';
-
-  @override
-  String get plFinding => 'Looking up the address…';
-
-  @override
-  String plNearAddress(String address) {
-    return 'Around “$address”';
-  }
-
-  @override
   String get plAddressNotFound =>
       'That address wasn’t found. Try writing it more precisely, in Korean.';
 
@@ -2745,27 +2647,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get plNothingFound => 'Nothing found';
 
   @override
-  String get plNothingFoundHint =>
-      'Try another spelling, or type an address in Korean.';
-
-  @override
-  String get plNoneYetMosque => 'No mosques yet';
-
-  @override
-  String get plNoneYetRestaurant => 'No restaurants yet';
-
-  @override
-  String get plNoneYetShop => 'No shops yet';
-
-  @override
   String get plLoadFailed => 'Couldn’t load the places. Check your connection.';
-
-  @override
-  String get plNeedsLocation =>
-      'To show the nearest places we need your location — or type an address in Korean above.';
-
-  @override
-  String get plRecent => 'Recently viewed';
 
   @override
   String get plMissingTitle => 'Know a place that isn’t listed?';
@@ -2806,10 +2688,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plWatchPushOn => 'Turn on';
-
-  @override
-  String get plWatchWhat =>
-      'You’ll hear when its name or phone changes, it closes, or it posts news.';
 
   @override
   String get plAddress => 'Address';
@@ -2906,9 +2784,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plNoText => 'Rating only';
-
-  @override
-  String get plOutOf => 'out of 5';
 
   @override
   String get plCorrections =>
@@ -3183,6 +3058,138 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plShop => 'Shop';
+
+  @override
+  String get plNearMe => 'Search near me';
+
+  @override
+  String get plByAddress => 'Search near an address';
+
+  @override
+  String get plAddressTip =>
+      'Write the address in KOREAN: city, district, street. Copying it from a map works too.';
+
+  @override
+  String get plSearchButton => 'Search';
+
+  @override
+  String get plRecentAddresses => 'Recent addresses';
+
+  @override
+  String get plChooseTitle => 'Where shall we look?';
+
+  @override
+  String get plChooseBody =>
+      'Choose one of the buttons above: around you or around another address. We show the 5 nearest.';
+
+  @override
+  String plNearestMosques(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'The $count nearest mosques',
+      one: 'The nearest mosque',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plNearestRestaurants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'The $count nearest restaurants',
+      one: 'The nearest restaurant',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plNearestShops(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'The $count nearest shops',
+      one: 'The nearest shop',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plNearestToAddress => 'Nearest to the address';
+
+  @override
+  String plHereNow(String city, String when) {
+    return 'You’re in $city · $when';
+  }
+
+  @override
+  String plHereNowNoCity(String when) {
+    return 'Located · $when';
+  }
+
+  @override
+  String plSavedNote(String city, String when) {
+    return 'Couldn’t get your current location — showing for $city ($when)';
+  }
+
+  @override
+  String plSavedNoteNoCity(String when) {
+    return 'Couldn’t get your current location — showing for the earlier one ($when)';
+  }
+
+  @override
+  String get plRelocate => 'Update';
+
+  @override
+  String get plChange => 'Change';
+
+  @override
+  String get plLocatingYou => 'Finding your location…';
+
+  @override
+  String get plLoadingPlaces => 'Loading places…';
+
+  @override
+  String get plDeniedBody =>
+      'Allow location to find the nearest places, or search by address.';
+
+  @override
+  String get plAllow => 'Allow';
+
+  @override
+  String get plBlockedBody =>
+      'Location access is off in the settings. Turn it on, or search by address.';
+
+  @override
+  String get plOffBody =>
+      'Location is off on the phone. Turn it on, or search by address.';
+
+  @override
+  String get plFailedBody =>
+      'Couldn’t get your location. Try again, or search by address.';
+
+  @override
+  String get plUseAddress => 'Search by address';
+
+  @override
+  String get plDetails => 'Details';
+
+  @override
+  String plKmFromYou(String km) {
+    return '$km from you';
+  }
+
+  @override
+  String plKmFromAddress(String km) {
+    return '$km from the address';
+  }
+
+  @override
+  String get plOnMap => 'On the map';
+
+  @override
+  String get plGetDirections => 'Get directions';
 
   @override
   String get themeToDay => 'Day mode';

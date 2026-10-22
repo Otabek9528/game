@@ -1362,67 +1362,6 @@
   "hkLeafLegend": "Sana — eng yaqin bo‘sh kun",
   "hkLeafFull": "Band",
   "hkWatchingHere": "Shu yerda kuzatuvingiz bor",
-  "plSearchHint": "Nomi, shahar yoki manzil",
-  "plClearSearch": "Tozalash",
-  "plAround": "{city} atrofida · {when}",
-  "@plAround": {
-    "placeholders": {
-      "city": {
-        "type": "String"
-      },
-      "when": {
-        "type": "String"
-      }
-    }
-  },
-  "plAroundHere": "Joylashuvingiz atrofida · {when}",
-  "@plAroundHere": {
-    "placeholders": {
-      "when": {
-        "type": "String"
-      }
-    }
-  },
-  "plLocatePrompt": "Eng yaqinlari birinchi chiqishi uchun joylashuvni yoqing",
-  "plLocateButton": "Yoqish",
-  "plLocateBlocked": "Joylashuvga ruxsat berilmagan",
-  "plLocateOff": "Telefonda joylashuv o‘chiq",
-  "plLocateFailed": "Joylashuvni aniqlab bo‘lmadi",
-  "plAllCities": "Hammasi",
-  "plCountMosques": "{count} ta masjid",
-  "@plCountMosques": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "plCountRestaurants": "{count} ta oshxona",
-  "@plCountRestaurants": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "plCountShops": "{count} ta do‘kon",
-  "@plCountShops": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "plSortedNearest": "eng yaqini birinchi",
-  "plSortedCity": "shahar bo‘yicha",
-  "plSortedFrom": "“{place}” ga eng yaqini birinchi",
-  "@plSortedFrom": {
-    "placeholders": {
-      "place": {
-        "type": "String"
-      }
-    }
-  },
   "plNearest": "Eng yaqin",
   "plMetres": "{n} m",
   "@plMetres": {
@@ -1453,34 +1392,9 @@
   "plRoute": "Yo‘l",
   "plCopy": "Nusxa",
   "plShare": "Ulashish",
-  "plSearchNear": "“{address}” atrofidan qidirish",
-  "@plSearchNear": {
-    "placeholders": {
-      "address": {
-        "type": "String"
-      }
-    }
-  },
-  "plSearchNearHint": "Koreyscha manzil: eng yaqinlari birinchi chiqadi",
-  "plAddressHint": "Manzil bo‘yicha qidirish uchun uni koreys tilida yozing: 안산시 단원구",
-  "plFinding": "Manzil qidirilmoqda…",
-  "plNearAddress": "“{address}” atrofida",
-  "@plNearAddress": {
-    "placeholders": {
-      "address": {
-        "type": "String"
-      }
-    }
-  },
   "plAddressNotFound": "Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.",
   "plNothingFound": "Hech narsa topilmadi",
-  "plNothingFoundHint": "Boshqacha yozib ko‘ring yoki manzilni koreys tilida kiriting.",
-  "plNoneYetMosque": "Hali masjid qo‘shilmagan",
-  "plNoneYetRestaurant": "Hali oshxona qo‘shilmagan",
-  "plNoneYetShop": "Hali do‘kon qo‘shilmagan",
   "plLoadFailed": "Joylarni yuklab bo‘lmadi. Internetni tekshiring.",
-  "plNeedsLocation": "Eng yaqin joylarni ko‘rsatish uchun joylashuvingiz kerak — yoki yuqorida manzilni koreys tilida yozing.",
-  "plRecent": "Yaqinda ko‘rilganlar",
   "plMissingTitle": "Ro‘yxatda yo‘q joyni bilasizmi?",
   "plMissingBody": "Guruhimizga yozing — qo‘shib qo‘yamiz.",
   "plWatchingBadge": "Kuzatilmoqda",
@@ -1508,7 +1422,6 @@
   "plWatchOff": "Kuzatish to‘xtatildi",
   "plWatchNoPush": "Bildirishnomalar o‘chiq — yangiliklar kelmaydi",
   "plWatchPushOn": "Yoqish",
-  "plWatchWhat": "Nomi, telefoni o‘zgarsa, yopilsa yoki e’lon bersa — xabar olasiz.",
   "plAddress": "Manzil",
   "plNoAddress": "Manzil ko‘rsatilmagan",
   "plPhone": "Telefon",
@@ -1553,7 +1466,6 @@
     }
   },
   "plNoText": "Faqat baho",
-  "plOutOf": "5 dan",
   "plCorrections": "Nomi, manzili yoki telefoni noto‘g‘rimi? Guruhimizga yozing.",
   "plLoadDetailFailed": "Ma’lumotlarni yuklab bo‘lmadi. Internetni tekshiring.",
   "plGone": "Bu joy topilmadi — ro‘yxatdan olib tashlangan bo‘lishi mumkin.",
@@ -1686,6 +1598,105 @@
   "plMosque": "Masjid",
   "plRestaurant": "Oshxona",
   "plShop": "Do‘kon",
+  "plNearMe": "O‘z atrofimdan izlash",
+  "plByAddress": "Boshqa manzil atrofidan izlash",
+  "plAddressTip": "Manzilni KOREYS tilida yozing: shahar, tuman, ko‘cha. Xaritadan nusxa olsangiz ham bo‘ladi.",
+  "plSearchButton": "Qidirish",
+  "plRecentAddresses": "Oldingi manzillar",
+  "plChooseTitle": "Qayerdan izlaymiz?",
+  "plChooseBody": "Yuqoridagi tugmalardan birini tanlang: o‘z atrofingizdan yoki boshqa manzil atrofidan — eng yaqin 5 ta joy chiqadi.",
+  "plNearestMosques": "{count, plural, =1{Sizga eng yaqin masjid} other{Sizga eng yaqin {count} ta masjid}}",
+  "@plNearestMosques": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plNearestRestaurants": "{count, plural, =1{Sizga eng yaqin oshxona} other{Sizga eng yaqin {count} ta oshxona}}",
+  "@plNearestRestaurants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plNearestShops": "{count, plural, =1{Sizga eng yaqin do‘kon} other{Sizga eng yaqin {count} ta do‘kon}}",
+  "@plNearestShops": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plNearestToAddress": "Manzilga eng yaqinlari",
+  "plHereNow": "Joylashuvingiz: {city} · {when}",
+  "@plHereNow": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "plHereNowNoCity": "Joylashuvingiz aniqlandi · {when}",
+  "@plHereNowNoCity": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "plSavedNote": "Hozirgi joylashuvni aniqlab bo‘lmadi — {city}dagi oldingi joylashuv bo‘yicha ({when})",
+  "@plSavedNote": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "plSavedNoteNoCity": "Hozirgi joylashuvni aniqlab bo‘lmadi — oldingi joylashuv bo‘yicha ({when})",
+  "@plSavedNoteNoCity": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "plRelocate": "Yangilash",
+  "plChange": "O‘zgartirish",
+  "plLocatingYou": "Joylashuvingiz aniqlanmoqda…",
+  "plLoadingPlaces": "Joylar yuklanmoqda…",
+  "plDeniedBody": "Eng yaqin joylarni topish uchun joylashuvga ruxsat bering — yoki manzil bo‘yicha izlang.",
+  "plAllow": "Ruxsat berish",
+  "plBlockedBody": "Joylashuvga ruxsat sozlamalarda o‘chirilgan. Uni yoqing — yoki manzil bo‘yicha izlang.",
+  "plOffBody": "Telefonda joylashuv o‘chiq. Uni yoqing — yoki manzil bo‘yicha izlang.",
+  "plFailedBody": "Joylashuvni aniqlab bo‘lmadi. Qayta urinib ko‘ring — yoki manzil bo‘yicha izlang.",
+  "plUseAddress": "Manzil bo‘yicha izlash",
+  "plDetails": "Batafsil",
+  "plKmFromYou": "Sizdan {km}",
+  "@plKmFromYou": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "plKmFromAddress": "Manzildan {km}",
+  "@plKmFromAddress": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "plOnMap": "Xaritada",
+  "plGetDirections": "Yo‘lni ko‘rsatish",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

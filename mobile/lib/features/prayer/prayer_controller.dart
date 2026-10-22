@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -130,6 +131,28 @@ class PrayerController extends ChangeNotifier {
   /// [userAsked]: the user tapped a button, so the permission dialog may show.
   Future<void> locate({bool userAsked = false}) async {
     if (locating) return;
+    final (:granted, fix: _) = await _takeFix(userAsked);
+    if (granted) await loadTimes();
+  }
+
+  /// A fix taken now, where the phone is to the metre, for what is near
+  /// (the places): [place] keeps a saved point for hours, and the same one
+  /// within [samePlaceKm]. The saved place follows it as [locate] makes it,
+  /// and the times with it. Null when there is no fix: [status] or
+  /// [lastLocateFailed] says why.
+  Future<({double lat, double lon})?> freshFix({bool userAsked = false}) async {
+    final (:granted, :fix) = await _takeFix(userAsked);
+    if (granted) unawaited(loadTimes());
+    return fix;
+  }
+
+  Future<({bool granted, ({double lat, double lon})? fix})>? _fixing;
+
+  /// One fix at a time; a second asker waits for the one running.
+  Future<({bool granted, ({double lat, double lon})? fix})> _takeFix(bool userAsked) =>
+      _fixing ??= _fix(userAsked).whenComplete(() => _fixing = null);
+
+  Future<({bool granted, ({double lat, double lon})? fix})> _fix(bool userAsked) async {
     var access = await _location.check();
     if (access == LocationAccess.denied && userAsked) {
       access = await _location.request();
@@ -141,7 +164,7 @@ class PrayerController extends ChangeNotifier {
         lastLocateFailed = userAsked;
         notifyListeners();
       }
-      return;
+      return (granted: false, fix: null);
     }
 
     locating = true;
@@ -149,8 +172,9 @@ class PrayerController extends ChangeNotifier {
     if (place == null) status = PrayerStatus.loading;
     notifyListeners();
 
+    ({double lat, double lon})? taken;
     try {
-      final fix = await _location.current();
+      final fix = taken = await _location.current();
       final previous = place;
       final distance = previous?.distanceTo(fix.lat, fix.lon) ?? double.infinity;
       final SavedLocation updated;
@@ -176,7 +200,7 @@ class PrayerController extends ChangeNotifier {
       locating = false;
       notifyListeners();
     }
-    await loadTimes();
+    return (granted: true, fix: taken);
   }
 
   /// Makes sure [day] holds today's times for the current place and settings.

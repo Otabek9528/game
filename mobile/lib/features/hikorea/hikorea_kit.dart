@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
@@ -32,10 +33,62 @@ class HikoreaKit extends ChangeNotifier {
   /// Active ones; null until known.
   List<HkWatch>? get watches => _watches;
 
+  static const _officesKey = 'hikorea_offices';
+
+  /// The offices: those kept on the phone at once, then the server's. Offline
+  /// with some kept, those stay.
   Future<List<HkOffice>> loadOffices() async {
-    final offices = _offices ??= await source.offices();
+    if (_offices case final offices?) return offices;
+    final kept = _readOffices();
+    if (kept != null) {
+      _offices = kept;
+      notifyListeners();
+    }
+    try {
+      final fresh = await source.offices();
+      _offices = fresh;
+      unawaited(services.store.write(_officesKey, jsonEncode([for (final o in fresh) o.toJson()])));
+    } on HkException {
+      if (kept == null) rethrow;
+    }
+    _keepOutlooks();
     notifyListeners();
-    return offices;
+    return _offices!;
+  }
+
+  List<HkOffice>? _readOffices() {
+    try {
+      final json = jsonDecode(services.store.read(_officesKey) ?? '');
+      if (json is! List) return null;
+      final offices = [for (final o in json) ?HkOffice.fromJson(o)];
+      return offices.isEmpty ? null : offices;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  // Every counter's calendar in one request (update 7 on). While it runs
+  // the leaves wait for it; when it fails they ask counter by counter.
+  Future<void>? _all;
+  bool _allLoading = false;
+
+  /// Asks for every counter's calendar at once; [again] even when asked.
+  Future<void> loadAllCalendars({bool again = false}) {
+    if (again) _all = null;
+    return _all ??= () async {
+      _allLoading = true;
+      try {
+        final all = await source.calendars();
+        _calendars.addAll(all);
+        _failed.removeAll(all.keys);
+        _keepOutlooks();
+      } on HkException {
+        // Counter by counter, then.
+      } finally {
+        _allLoading = false;
+        notifyListeners();
+      }
+    }();
   }
 
   /// The office and counter of a desk number, once the offices are in.
@@ -90,14 +143,19 @@ class HikoreaKit extends ChangeNotifier {
     }
   }
 
-  // The office list's calendars, a few at a time: a screen of offices
-  // would otherwise ask for twenty at once.
+  // Without the one request, the office list's calendars a few at a time:
+  // a screen of offices would otherwise ask for twenty at once.
   final _queue = <int>[];
   var _running = 0;
 
-  /// Fetches a counter's calendar soon, unless it is in or failed already.
+  /// Fetches a counter's calendar soon, unless it is in or failed already,
+  /// or the request for them all is on its way.
   void prefetch(int desk) {
-    if (_calendars.containsKey(desk) || _loading.containsKey(desk) || _failed.contains(desk) || _queue.contains(desk)) {
+    if (_allLoading ||
+        _calendars.containsKey(desk) ||
+        _loading.containsKey(desk) ||
+        _failed.contains(desk) ||
+        _queue.contains(desk)) {
       return;
     }
     _queue.add(desk);
@@ -105,7 +163,7 @@ class HikoreaKit extends ChangeNotifier {
   }
 
   void _pump() {
-    while (_running < 3 && _queue.isNotEmpty && !_disposed) {
+    while (_running < 6 && _queue.isNotEmpty && !_disposed) {
       final desk = _queue.removeAt(0);
       if (_calendars.containsKey(desk) || _loading.containsKey(desk)) continue;
       _running++;
@@ -143,11 +201,52 @@ class HikoreaKit extends ChangeNotifier {
       final day = calendar.earliestOpen(today);
       if (day != null && (soonest == null || day.isBefore(soonest))) soonest = day;
     }
-    if (waiting) return (kind: HkOutlook.loading, day: null);
+    if (waiting || (failed && soonest == null)) {
+      // What it was last time, until the calendars come (or while they can't).
+      final kept = _keptOutlooks[office.id];
+      if (kept != null && (kept.day == null || !kept.day!.isBefore(today))) return kept;
+      if (waiting) return (kind: HkOutlook.loading, day: null);
+    }
     if (soonest != null) return (kind: HkOutlook.free, day: soonest);
     // A counter not heard from may have room.
     if (failed) return (kind: HkOutlook.unknown, day: null);
     return (kind: live ? HkOutlook.full : HkOutlook.retired, day: null);
+  }
+
+  static const _outlookKey = 'hikorea_outlook';
+  Map<String, ({HkOutlook kind, DateTime? day})>? _kept;
+
+  /// Each office's leaf as last shown, kept on the phone for three days: the
+  /// next visit shows them at once, and the fresh ones replace them.
+  Map<String, ({HkOutlook kind, DateTime? day})> get _keptOutlooks => _kept ??= _readOutlooks();
+
+  Map<String, ({HkOutlook kind, DateTime? day})> _readOutlooks() {
+    try {
+      final json = jsonDecode(services.store.read(_outlookKey) ?? '');
+      if (json is! Map || json['at'] is! int) return {};
+      final at = DateTime.fromMillisecondsSinceEpoch(json['at'] as int);
+      if (services.clock().difference(at) > const Duration(days: 3)) return {};
+      return {
+        for (final MapEntry(:key, :value) in ((json['o'] as Map?) ?? const {}).entries)
+          if (value is List && value.length == 2 && value[0] is int && (value[0] as int) < HkOutlook.values.length)
+            '$key': (kind: HkOutlook.values[value[0] as int], day: parseYmd(value[1] as String?)),
+      };
+    } on FormatException {
+      return {};
+    }
+  }
+
+  void _keepOutlooks() {
+    final offices = _offices;
+    if (offices == null) return;
+    final known = <String, List<Object?>>{};
+    for (final office in offices) {
+      final o = outlookOf(office);
+      if (o.kind != HkOutlook.loading) known[office.id] = [o.kind.index, o.day == null ? null : ymdOf(o.day!)];
+    }
+    if (known.isEmpty) return;
+    _kept = null;
+    unawaited(services.store.write(_outlookKey, jsonEncode({'at': services.clock().millisecondsSinceEpoch, 'o': known})));
   }
 
   /// Whether one of this person's watches is at [office].

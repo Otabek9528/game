@@ -4576,102 +4576,6 @@ abstract class AppLocalizations {
   /// **'Shu yerda kuzatuvingiz bor'**
   String get hkWatchingHere;
 
-  /// No description provided for @plSearchHint.
-  ///
-  /// In uz, this message translates to:
-  /// **'Nomi, shahar yoki manzil'**
-  String get plSearchHint;
-
-  /// No description provided for @plClearSearch.
-  ///
-  /// In uz, this message translates to:
-  /// **'Tozalash'**
-  String get plClearSearch;
-
-  /// No description provided for @plAround.
-  ///
-  /// In uz, this message translates to:
-  /// **'{city} atrofida · {when}'**
-  String plAround(String city, String when);
-
-  /// No description provided for @plAroundHere.
-  ///
-  /// In uz, this message translates to:
-  /// **'Joylashuvingiz atrofida · {when}'**
-  String plAroundHere(String when);
-
-  /// No description provided for @plLocatePrompt.
-  ///
-  /// In uz, this message translates to:
-  /// **'Eng yaqinlari birinchi chiqishi uchun joylashuvni yoqing'**
-  String get plLocatePrompt;
-
-  /// No description provided for @plLocateButton.
-  ///
-  /// In uz, this message translates to:
-  /// **'Yoqish'**
-  String get plLocateButton;
-
-  /// No description provided for @plLocateBlocked.
-  ///
-  /// In uz, this message translates to:
-  /// **'Joylashuvga ruxsat berilmagan'**
-  String get plLocateBlocked;
-
-  /// No description provided for @plLocateOff.
-  ///
-  /// In uz, this message translates to:
-  /// **'Telefonda joylashuv o‘chiq'**
-  String get plLocateOff;
-
-  /// No description provided for @plLocateFailed.
-  ///
-  /// In uz, this message translates to:
-  /// **'Joylashuvni aniqlab bo‘lmadi'**
-  String get plLocateFailed;
-
-  /// No description provided for @plAllCities.
-  ///
-  /// In uz, this message translates to:
-  /// **'Hammasi'**
-  String get plAllCities;
-
-  /// No description provided for @plCountMosques.
-  ///
-  /// In uz, this message translates to:
-  /// **'{count} ta masjid'**
-  String plCountMosques(int count);
-
-  /// No description provided for @plCountRestaurants.
-  ///
-  /// In uz, this message translates to:
-  /// **'{count} ta oshxona'**
-  String plCountRestaurants(int count);
-
-  /// No description provided for @plCountShops.
-  ///
-  /// In uz, this message translates to:
-  /// **'{count} ta do‘kon'**
-  String plCountShops(int count);
-
-  /// No description provided for @plSortedNearest.
-  ///
-  /// In uz, this message translates to:
-  /// **'eng yaqini birinchi'**
-  String get plSortedNearest;
-
-  /// No description provided for @plSortedCity.
-  ///
-  /// In uz, this message translates to:
-  /// **'shahar bo‘yicha'**
-  String get plSortedCity;
-
-  /// No description provided for @plSortedFrom.
-  ///
-  /// In uz, this message translates to:
-  /// **'“{place}” ga eng yaqini birinchi'**
-  String plSortedFrom(String place);
-
   /// No description provided for @plNearest.
   ///
   /// In uz, this message translates to:
@@ -4726,36 +4630,6 @@ abstract class AppLocalizations {
   /// **'Ulashish'**
   String get plShare;
 
-  /// No description provided for @plSearchNear.
-  ///
-  /// In uz, this message translates to:
-  /// **'“{address}” atrofidan qidirish'**
-  String plSearchNear(String address);
-
-  /// No description provided for @plSearchNearHint.
-  ///
-  /// In uz, this message translates to:
-  /// **'Koreyscha manzil: eng yaqinlari birinchi chiqadi'**
-  String get plSearchNearHint;
-
-  /// No description provided for @plAddressHint.
-  ///
-  /// In uz, this message translates to:
-  /// **'Manzil bo‘yicha qidirish uchun uni koreys tilida yozing: 안산시 단원구'**
-  String get plAddressHint;
-
-  /// No description provided for @plFinding.
-  ///
-  /// In uz, this message translates to:
-  /// **'Manzil qidirilmoqda…'**
-  String get plFinding;
-
-  /// No description provided for @plNearAddress.
-  ///
-  /// In uz, this message translates to:
-  /// **'“{address}” atrofida'**
-  String plNearAddress(String address);
-
   /// No description provided for @plAddressNotFound.
   ///
   /// In uz, this message translates to:
@@ -4768,47 +4642,11 @@ abstract class AppLocalizations {
   /// **'Hech narsa topilmadi'**
   String get plNothingFound;
 
-  /// No description provided for @plNothingFoundHint.
-  ///
-  /// In uz, this message translates to:
-  /// **'Boshqacha yozib ko‘ring yoki manzilni koreys tilida kiriting.'**
-  String get plNothingFoundHint;
-
-  /// No description provided for @plNoneYetMosque.
-  ///
-  /// In uz, this message translates to:
-  /// **'Hali masjid qo‘shilmagan'**
-  String get plNoneYetMosque;
-
-  /// No description provided for @plNoneYetRestaurant.
-  ///
-  /// In uz, this message translates to:
-  /// **'Hali oshxona qo‘shilmagan'**
-  String get plNoneYetRestaurant;
-
-  /// No description provided for @plNoneYetShop.
-  ///
-  /// In uz, this message translates to:
-  /// **'Hali do‘kon qo‘shilmagan'**
-  String get plNoneYetShop;
-
   /// No description provided for @plLoadFailed.
   ///
   /// In uz, this message translates to:
   /// **'Joylarni yuklab bo‘lmadi. Internetni tekshiring.'**
   String get plLoadFailed;
-
-  /// No description provided for @plNeedsLocation.
-  ///
-  /// In uz, this message translates to:
-  /// **'Eng yaqin joylarni ko‘rsatish uchun joylashuvingiz kerak — yoki yuqorida manzilni koreys tilida yozing.'**
-  String get plNeedsLocation;
-
-  /// No description provided for @plRecent.
-  ///
-  /// In uz, this message translates to:
-  /// **'Yaqinda ko‘rilganlar'**
-  String get plRecent;
 
   /// No description provided for @plMissingTitle.
   ///
@@ -4869,12 +4707,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Yoqish'**
   String get plWatchPushOn;
-
-  /// No description provided for @plWatchWhat.
-  ///
-  /// In uz, this message translates to:
-  /// **'Nomi, telefoni o‘zgarsa, yopilsa yoki e’lon bersa — xabar olasiz.'**
-  String get plWatchWhat;
 
   /// No description provided for @plAddress.
   ///
@@ -5055,12 +4887,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Faqat baho'**
   String get plNoText;
-
-  /// No description provided for @plOutOf.
-  ///
-  /// In uz, this message translates to:
-  /// **'5 dan'**
-  String get plOutOf;
 
   /// No description provided for @plCorrections.
   ///
@@ -5547,6 +5373,186 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Do‘kon'**
   String get plShop;
+
+  /// No description provided for @plNearMe.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘z atrofimdan izlash'**
+  String get plNearMe;
+
+  /// No description provided for @plByAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa manzil atrofidan izlash'**
+  String get plByAddress;
+
+  /// No description provided for @plAddressTip.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilni KOREYS tilida yozing: shahar, tuman, ko‘cha. Xaritadan nusxa olsangiz ham bo‘ladi.'**
+  String get plAddressTip;
+
+  /// No description provided for @plSearchButton.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidirish'**
+  String get plSearchButton;
+
+  /// No description provided for @plRecentAddresses.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oldingi manzillar'**
+  String get plRecentAddresses;
+
+  /// No description provided for @plChooseTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayerdan izlaymiz?'**
+  String get plChooseTitle;
+
+  /// No description provided for @plChooseBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuqoridagi tugmalardan birini tanlang: o‘z atrofingizdan yoki boshqa manzil atrofidan — eng yaqin 5 ta joy chiqadi.'**
+  String get plChooseBody;
+
+  /// No description provided for @plNearestMosques.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, =1{Sizga eng yaqin masjid} other{Sizga eng yaqin {count} ta masjid}}'**
+  String plNearestMosques(int count);
+
+  /// No description provided for @plNearestRestaurants.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, =1{Sizga eng yaqin oshxona} other{Sizga eng yaqin {count} ta oshxona}}'**
+  String plNearestRestaurants(int count);
+
+  /// No description provided for @plNearestShops.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count, plural, =1{Sizga eng yaqin do‘kon} other{Sizga eng yaqin {count} ta do‘kon}}'**
+  String plNearestShops(int count);
+
+  /// No description provided for @plNearestToAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilga eng yaqinlari'**
+  String get plNearestToAddress;
+
+  /// No description provided for @plHereNow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvingiz: {city} · {when}'**
+  String plHereNow(String city, String when);
+
+  /// No description provided for @plHereNowNoCity.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvingiz aniqlandi · {when}'**
+  String plHereNowNoCity(String when);
+
+  /// No description provided for @plSavedNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozirgi joylashuvni aniqlab bo‘lmadi — {city}dagi oldingi joylashuv bo‘yicha ({when})'**
+  String plSavedNote(String city, String when);
+
+  /// No description provided for @plSavedNoteNoCity.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozirgi joylashuvni aniqlab bo‘lmadi — oldingi joylashuv bo‘yicha ({when})'**
+  String plSavedNoteNoCity(String when);
+
+  /// No description provided for @plRelocate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangilash'**
+  String get plRelocate;
+
+  /// No description provided for @plChange.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgartirish'**
+  String get plChange;
+
+  /// No description provided for @plLocatingYou.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvingiz aniqlanmoqda…'**
+  String get plLocatingYou;
+
+  /// No description provided for @plLoadingPlaces.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylar yuklanmoqda…'**
+  String get plLoadingPlaces;
+
+  /// No description provided for @plDeniedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng yaqin joylarni topish uchun joylashuvga ruxsat bering — yoki manzil bo‘yicha izlang.'**
+  String get plDeniedBody;
+
+  /// No description provided for @plAllow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ruxsat berish'**
+  String get plAllow;
+
+  /// No description provided for @plBlockedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvga ruxsat sozlamalarda o‘chirilgan. Uni yoqing — yoki manzil bo‘yicha izlang.'**
+  String get plBlockedBody;
+
+  /// No description provided for @plOffBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonda joylashuv o‘chiq. Uni yoqing — yoki manzil bo‘yicha izlang.'**
+  String get plOffBody;
+
+  /// No description provided for @plFailedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvni aniqlab bo‘lmadi. Qayta urinib ko‘ring — yoki manzil bo‘yicha izlang.'**
+  String get plFailedBody;
+
+  /// No description provided for @plUseAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil bo‘yicha izlash'**
+  String get plUseAddress;
+
+  /// No description provided for @plDetails.
+  ///
+  /// In uz, this message translates to:
+  /// **'Batafsil'**
+  String get plDetails;
+
+  /// No description provided for @plKmFromYou.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizdan {km}'**
+  String plKmFromYou(String km);
+
+  /// No description provided for @plKmFromAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzildan {km}'**
+  String plKmFromAddress(String km);
+
+  /// No description provided for @plOnMap.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xaritada'**
+  String get plOnMap;
+
+  /// No description provided for @plGetDirections.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yo‘lni ko‘rsatish'**
+  String get plGetDirections;
 
   /// No description provided for @themeToDay.
   ///

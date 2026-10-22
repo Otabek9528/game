@@ -7,9 +7,6 @@ import 'package:http/http.dart' as http;
 import '../../core/config.dart';
 import 'places_models.dart';
 
-/// Every place of a kind, with the server's tag for that list.
-typedef PlacesList = ({List<Place> places, String? etag});
-
 /// Places near an address the server found.
 typedef AddressPlaces = ({List<Place> places, double? lat, double? lon, String? label});
 
@@ -19,15 +16,12 @@ typedef AddressPlaces = ({List<Place> places, double? lat, double? lon, String? 
 /// user who hasn't signed in may watch places; reviews, suggestions,
 /// announcements and claims need someone signed in (`sign_in_required`).
 abstract interface class PlacesSource {
-  /// Every place of [kind]. Null when it hasn't changed since [etag] was
-  /// given; throws `unsupported` for a server before update 6.
-  Future<PlacesList?> all(PlaceKind kind, {String? etag});
-
-  /// The nearest ones, at most 10, with their distance.
-  Future<List<Place>> nearby(PlaceKind kind, double lat, double lon, {int limit = 10});
+  /// The nearest [limit], with their distance. Five, as the web page shows:
+  /// the places aren't handed out more than a few at a time.
+  Future<List<Place>> nearby(PlaceKind kind, double lat, double lon, {int limit = 5});
 
   /// The nearest ones to an address in Korean, found by the server.
-  Future<AddressPlaces> nearAddress(PlaceKind kind, String address, {int limit = 10});
+  Future<AddressPlaces> nearAddress(PlaceKind kind, String address, {int limit = 5});
 
   /// Counts a view.
   Future<PlaceDetail> detail(int id, Map<String, String> auth);
@@ -71,18 +65,7 @@ class HttpPlacesSource implements PlacesSource {
       [for (final p in (json['places'] as List?) ?? const []) ?Place.fromJson(p, kind: kind)];
 
   @override
-  Future<PlacesList?> all(PlaceKind kind, {String? etag}) async {
-    final response = await _send('GET', 'api/places/all',
-        query: {'building_type': kind.buildingType}, headers: {'If-None-Match': ?etag});
-    if (response.statusCode == 304) return null;
-    // Flask's own page, before update 6.
-    if (response.statusCode == 404 && _json(response)['code'] == null) throw const PlacesException('unsupported', 404);
-    final json = _check(response);
-    return (places: _places(json, kind), etag: response.headers['etag']);
-  }
-
-  @override
-  Future<List<Place>> nearby(PlaceKind kind, double lat, double lon, {int limit = 10}) async {
+  Future<List<Place>> nearby(PlaceKind kind, double lat, double lon, {int limit = 5}) async {
     final json = _check(await _send('GET', 'api/places/nearby', query: {
       'lat': '$lat',
       'lon': '$lon',
@@ -93,7 +76,7 @@ class HttpPlacesSource implements PlacesSource {
   }
 
   @override
-  Future<AddressPlaces> nearAddress(PlaceKind kind, String address, {int limit = 10}) async {
+  Future<AddressPlaces> nearAddress(PlaceKind kind, String address, {int limit = 5}) async {
     final json = _check(await _send('GET', 'api/places/by-address',
         query: {'address': address, 'building_type': kind.buildingType, 'limit': '$limit'}));
     final at = json['geocoded_location'];

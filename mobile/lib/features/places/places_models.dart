@@ -26,6 +26,9 @@ String? _text(Object? value) => value is String && value.trim().isNotEmpty ? val
 
 double? _number(Object? value) => value is num ? value.toDouble() : (value is String ? double.tryParse(value) : null);
 
+/// The server's place numbers come as text ("103") or as numbers.
+int? _id(Object? value) => value is int ? value : (value is String ? int.tryParse(value.trim()) : null);
+
 /// A link the server keeps; only http(s) ones are opened.
 String? _link(Object? value) {
   final text = _text(value);
@@ -106,10 +109,10 @@ class Place {
   /// [kind] when the answer doesn't say (it always does).
   static Place? fromJson(Object? json, {PlaceKind? kind}) {
     if (json is! Map<String, dynamic>) return null;
-    final id = json['id'];
+    final id = _id(json['id']);
     final name = _text(json['name']);
     final placeKind = PlaceKind.fromBuildingType(json['buildingType']) ?? kind;
-    if (id is! int || name == null || placeKind == null) return null;
+    if (id == null || name == null || placeKind == null) return null;
     var lat = _number(json['lat']), lon = _number(json['lon']);
     // Saved without a location: the admin panel writes 0, 0.
     if (lat == 0 && lon == 0) lat = lon = null;
@@ -133,7 +136,7 @@ class Place {
       tiktokUrl: _link(json['tiktokUrl']),
       instagramUrl: _link(json['instagramUrl']),
       note: _text(json['ownerNote']),
-      reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
+      reviewCount: _number(json['reviewCount'])?.toInt() ?? 0,
       rating: _number(json['averageRating']) ?? 0,
       distanceKm: _number(json['distance']),
     );
@@ -184,7 +187,7 @@ class PlaceReview {
 
   static PlaceReview? fromJson(Object? json) {
     if (json is! Map<String, dynamic>) return null;
-    final rating = (json['rating'] as num?)?.toInt();
+    final rating = _number(json['rating'])?.toInt();
     if (rating == null || rating < 1 || rating > 5) return null;
     return PlaceReview(
       rating: rating,
@@ -227,12 +230,12 @@ class PlaceWatch {
   static PlaceWatch fromJson(Object? json) {
     if (json is! Map<String, dynamic>) return const PlaceWatch();
     return PlaceWatch(
-      count: (json['watchCount'] as num?)?.toInt() ?? 0,
+      count: _number(json['watchCount'])?.toInt() ?? 0,
       watching: json['watching'] == true,
       hasOwner: json['hasOwner'] == true,
       isOwner: json['isOwner'] == true,
       claimPending: json['claimPending'] == true,
-      pendingAnnouncements: (json['pendingAnnouncements'] as num?)?.toInt() ?? 0,
+      pendingAnnouncements: _number(json['pendingAnnouncements'])?.toInt() ?? 0,
     );
   }
 }
@@ -306,9 +309,9 @@ class WatchedPlace {
 
   static WatchedPlace? fromJson(Object? json) {
     if (json is! Map<String, dynamic>) return null;
-    final id = json['placeId'], name = _text(json['name']);
+    final id = _id(json['placeId']), name = _text(json['name']);
     final kind = PlaceKind.fromKey(json['type']) ?? PlaceKind.fromBuildingType(json['type']);
-    if (id is! int || name == null || kind == null) return null;
+    if (id == null || name == null || kind == null) return null;
     return WatchedPlace(id: id, name: name, kind: kind, city: _text(json['city']));
   }
 }

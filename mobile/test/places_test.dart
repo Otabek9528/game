@@ -12,6 +12,7 @@ import 'package:muslim_vegukin/features/places/places_models.dart';
 import 'package:muslim_vegukin/features/places/places_parts.dart';
 import 'package:muslim_vegukin/features/places/places_screen.dart';
 import 'package:muslim_vegukin/features/places/places_source.dart';
+import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
 import 'package:muslim_vegukin/l10n/app_localizations_en.dart';
 
 import 'support/fakes.dart';
@@ -31,8 +32,11 @@ Finder card(String name) => find.ancestor(of: find.text(name), matching: find.by
 List<int> cardIds(WidgetTester tester) =>
     tester.widgetList<PlaceCard>(find.byType(PlaceCard, skipOffstage: false)).map((c) => c.place.id).toList();
 
+/// Scrolled to the middle of the screen (clear of the pinned bar), and tapped.
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
   await tester.scrollUntilVisible(finder, 200, scrollable: find.byType(Scrollable).first);
+  await tester.pumpAndSettle();
+  await tester.runAsync(() => Scrollable.ensureVisible(tester.element(finder), alignment: 0.5));
   await tester.pumpAndSettle();
   await tester.tap(finder);
   await tester.pumpAndSettle();
@@ -68,10 +72,11 @@ void main() {
       expect(Place.fromJson({'id': 1, 'name': 'x', 'buildingType': "Do'kon"})!.kind, PlaceKind.shop);
     });
 
-    test('typed in Cyrillic or Latin, with or without apostrophes, finds the same', () {
-      expect(foldForSearch('Ансан'), 'ansan');
-      expect(foldForSearch("O‘zbek  Do'kon"), 'ozbek dokon');
-      expect(foldForSearch('Ўзбек'), foldForSearch('O‘zbek'));
+    test('its number as text, as the server sends it, or as a number', () {
+      final place = Place.fromJson({'id': '103', 'name': 'Pusan markaziy masjidi', 'buildingType': 'Masjid', 'reviewCount': '4'})!;
+      expect((place.id, place.reviewCount), (103, 4));
+      expect(Place.fromJson({'id': 'abc', 'name': 'x', 'buildingType': 'Masjid'}), isNull);
+      expect(WatchedPlace.fromJson({'placeId': '7', 'name': 'Nur', 'type': 'mosque'})!.id, 7);
       expect(hasHangul('서울 용산구'), isTrue);
       expect(hasHangul('Seoul'), isFalse);
     });
@@ -125,33 +130,27 @@ void main() {
   });
 
   group('the server', () {
-    test('every place, asked again with its tag; unchanged: nothing; before update 6: unsupported', () async {
+    test('five nearest, as the web page asks; the server’s place numbers as text', () async {
       final asked = <http.Request>[];
-      var status = 200;
       final source = HttpPlacesSource(MockClient((request) async {
         asked.add(request);
-        if (status == 304) return http.Response('', 304);
-        if (status == 404) return http.Response('<html>Not Found</html>', 404);
         return http.Response(
           jsonEncode({
             'success': true,
             'places': [
-              {'id': 1, 'name': 'Nur', 'buildingType': 'Masjid', 'city': 'Ansan'},
+              {'id': '103', 'name': 'Pusan markaziy masjidi', 'buildingType': 'Masjid', 'city': 'Busan', 'distance': 1.27,
+                'lat': 35.259987044324, 'lon': 129.092258069682, 'kakaoMapUrl': 'http://kko.to/CqJss1CVA'},
             ],
           }),
           200,
-          headers: {'etag': '"abc"', 'content-type': 'application/json'},
         );
       }));
-      final first = await source.all(PlaceKind.mosque);
-      expect((first!.places.single.city, first.etag), ('Ansan', '"abc"'));
-      expect(asked.last.url.toString(), 'https://vegukin-api.duckdns.org/api/places/all?building_type=Masjid');
-      status = 304;
-      expect(await source.all(PlaceKind.mosque, etag: '"abc"'), isNull);
-      expect(asked.last.headers['If-None-Match'], '"abc"');
-      status = 404;
-      await expectLater(source.all(PlaceKind.shop), throwsA(isA<PlacesException>().having((e) => e.code, 'code', 'unsupported')));
-      expect(asked.last.url.queryParameters['building_type'], "Do'kon");
+      final places = await source.nearby(PlaceKind.mosque, 35.2, 129.1);
+      expect((places.single.id, places.single.distanceKm, places.single.kakaoUrl), (103, 1.27, 'http://kko.to/CqJss1CVA'));
+      expect(asked.last.url.queryParameters, {'lat': '35.2', 'lon': '129.1', 'building_type': 'Masjid', 'limit': '5'});
+      await source.nearAddress(PlaceKind.shop, '서울 용산구');
+      expect(asked.last.url.path, '/api/places/by-address');
+      expect(asked.last.url.queryParameters, {'address': '서울 용산구', 'building_type': "Do'kon", 'limit': '5'});
     });
 
     test('a page with the account; a review in its shape; unwatching without a body; errors by their code', () async {
@@ -192,53 +191,115 @@ void main() {
   });
 
   group('the list', () {
-    testWidgets('native from the home screen: every mosque, the nearest first, how far', (tester) async {
+    testWidgets('with location allowed, near me at once: a new fix, the five nearest, how far', (tester) async {
       final app = await openPlaces(tester);
       expect(find.byType(PlacesScreen), findsOneWidget);
       expect(app.opened.ids, isEmpty, reason: 'not the web page');
-      expect(find.text('6 mosques · nearest first'), findsOneWidget);
-      expect(find.textContaining('Around Ansan'), findsOneWidget);
+      expect(find.text('Search near me'), findsOneWidget);
+      expect(find.text('Search near an address'), findsOneWidget);
+      expect(app.places.asked, contains('nearby mosque 5'));
+      expect(find.text('🕌  The 5 nearest mosques'), findsOneWidget);
+      expect(find.text('You’re in Ansan · Just now'), findsOneWidget);
       expect(cardIds(tester).take(3), [6, 1, 2]);
+      await tester.scrollUntilVisible(find.text('Daegu Masjid'), 300, scrollable: find.byType(Scrollable).first);
+      expect(find.text('Yangi namozxona'), findsNothing, reason: 'five: the one without a location isn’t near');
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, 3000));
+      await tester.pumpAndSettle();
       expect(find.text('Nearest'), findsOneWidget);
-      expect(find.textContaining('1.4 km · Ansan'), findsOneWidget);
-      expect(find.text('Ansan · 2', skipOffstage: false), findsOneWidget, reason: 'its cities, the busiest first');
+      expect(find.text('1.4 km'), findsOneWidget);
     });
 
-    testWidgets('found by name in either script; a Korean address searched around; its city alone', (tester) async {
+    testWidgets('near me measures again every time: moved a few km, other places', (tester) async {
       final app = await openPlaces(tester);
-      await tester.enterText(find.byType(TextField), 'Ансан');
+      final fixes = app.location.fixes;
+      app.location
+        ..lat = 37.534
+        ..lon = 126.994
+        ..city = 'Seoul';
+      await tester.tap(find.text('Search near me'));
       await tester.pumpAndSettle();
-      expect(find.text('2 mosques'), findsOneWidget);
-      expect(cardIds(tester), [6, 1]);
+      expect(app.location.fixes, fixes + 1, reason: 'a new fix, not the one kept for the prayer times');
+      expect(app.places.lastNear, (lat: 37.534, lon: 126.994));
+      expect(cardIds(tester).first, 3);
+      expect(find.text('You’re in Seoul · Just now'), findsOneWidget);
 
+      // Only 2 km on: the prayer times keep their point, the places don't.
+      app.location.lat = 37.552;
+      await tester.tap(find.text('Search near me'));
+      await tester.pumpAndSettle();
+      expect(app.places.lastNear, (lat: 37.552, lon: 126.994));
+    });
+
+    testWidgets('location not allowed yet: the choice first; near me asks; refused: allow, or an address', (tester) async {
+      final app = TestApp(language: 'en', location: FakeLocation(access: LocationAccess.denied, afterRequest: LocationAccess.denied));
+      await openPlaces(tester, app: app);
+      expect(find.text('Where shall we look?'), findsOneWidget);
+      expect(app.places.asked.where((a) => a.startsWith('nearby')), isEmpty, reason: 'nothing asked unasked');
+      final asked = app.location.requests;
+      await tester.tap(find.text('Search near me'));
+      await tester.pumpAndSettle();
+      expect(app.location.requests, asked + 1, reason: 'the tap asks for it');
+      expect(find.text('Allow location to find the nearest places, or search by address.'), findsOneWidget);
+      await tester.tap(find.text('Search by address'));
+      await tester.pumpAndSettle();
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('no new fix: the location saved before, said so', (tester) async {
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      app.location.failFix = true;
+      await tester.scrollUntilVisible(find.text('Mosques'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.text('Mosques'));
+      await tester.pumpAndSettle();
+      expect(find.text('Couldn’t get your current location — showing for Ansan (just now)'), findsOneWidget);
+      expect(cardIds(tester).first, 6);
+    });
+
+    testWidgets('near an address: in Korean, found, remembered; one not found said under the field', (tester) async {
+      final app = await openPlaces(tester);
+      await tester.tap(find.text('Search near an address'));
+      await tester.pumpAndSettle();
+      expect(find.text('서울 강동구 구천면로 271'), findsOneWidget, reason: 'the web page’s example');
       await tester.enterText(find.byType(TextField), '서울 용산구');
+      await tester.tap(find.text('Search'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Search near “서울 용산구”'));
-      await tester.pumpAndSettle();
-      expect(app.places.asked, contains('address mosque 서울 용산구'));
-      expect(find.text('Around “서울 용산구 이태원동”'), findsOneWidget);
-      expect(cardIds(tester).first, 3, reason: 'Seoul’s, measured from Itaewon');
+      expect(app.places.asked, contains('address mosque 서울 용산구 5'));
+      expect(find.text('🕌  Nearest to the address'), findsOneWidget);
+      expect(find.text('서울 용산구 이태원동'), findsOneWidget);
+      expect(cardIds(tester).first, 3);
+      expect(find.text('290 m'), findsOneWidget);
 
-      await tester.enterText(find.byType(TextField), '부산');
+      await tester.tap(find.text('Change'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Search near “부산”'));
+      expect(find.text('Recent addresses'), findsOneWidget);
+      await tester.enterText(find.byType(TextField), '부산');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
       expect(find.text('That address wasn’t found. Try writing it more precisely, in Korean.'), findsOneWidget);
-
-      await tester.tap(find.byTooltip('Clear').first);
+      await tester.tap(find.widgetWithText(InkWell, '서울 용산구').last);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Daegu · 1'));
-      await tester.pumpAndSettle();
-      expect(cardIds(tester), [4]);
+      expect(cardIds(tester).first, 3, reason: 'a recent address, one tap');
     });
 
-    testWidgets('restaurants and shops a tap away; the call and the way there on the card', (tester) async {
-      final app = await openPlaces(tester);
-      await tester.tap(find.descendant(of: find.byType(PlacesScreen), matching: find.text('Restaurants')).last);
-      await tester.pumpAndSettle();
-      expect(cardIds(tester), [101]);
-      expect(find.text('1 restaurant · nearest first'), findsOneWidget);
+    testWidgets('each kind opened is counted apart, as on the web', (tester) async {
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      for (final label in ['Mosques', 'Restaurants', 'Shops']) {
+        await tester.scrollUntilVisible(find.text(label), 200, scrollable: find.byType(Scrollable).first);
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
+        expect(find.byType(PlacesScreen), findsOneWidget);
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+      }
+      expect(app.activity.actions.where((a) => ['mosque', 'restaurant', 'shop'].contains(a)), ['mosque', 'restaurant', 'shop']);
+    });
 
+    testWidgets('the call and the way there on the card', (tester) async {
+      final app = await openPlaces(tester, label: 'Restaurants');
+      expect(cardIds(tester), [101]);
+      expect(find.text('🍽️  The nearest restaurant'), findsOneWidget);
       await tester.tap(find.descendant(of: card('Samarqand Osh Markazi'), matching: find.text('Call')));
       await tester.pumpAndSettle();
       expect(app.links.last, Uri.parse('tel:010-3333-4444'));
@@ -252,8 +313,7 @@ void main() {
 
     testWidgets('two numbers: which one to call', (tester) async {
       final app = await openPlaces(tester);
-      await tester.tap(find.descendant(of: card('Ansan Markaziy Masjidi'), matching: find.text('Call')));
-      await tester.pumpAndSettle();
+      await tapVisible(tester, find.descendant(of: card('Ansan Markaziy Masjidi'), matching: find.text('Call')));
       expect(find.text('Which number?'), findsOneWidget);
       await tester.tap(find.text('031-555-6666'));
       await tester.pumpAndSettle();
@@ -268,42 +328,14 @@ void main() {
       app.places.fail = false;
       await tester.tap(find.text('Try again'));
       await tester.pumpAndSettle();
-      expect(find.text('6 mosques · nearest first'), findsOneWidget);
-    });
-
-    testWidgets('kept on the phone: the next time asks only whether it changed', (tester) async {
-      final app = await openPlaces(tester);
-      expect(app.places.asked.where((a) => a.startsWith('all')), ['all mosque -']);
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-      app.places.fail = true;
-      await tester.tap(find.text('Mosques'));
-      await tester.pumpAndSettle();
-      expect(find.text('6 mosques · nearest first'), findsOneWidget, reason: 'offline, from the phone');
-      expect(find.text('Couldn’t load the places. Check your connection.'), findsNothing);
-      app.places.fail = false;
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Mosques'));
-      await tester.pumpAndSettle();
-      expect(app.places.asked.where((a) => a.startsWith('all')).last, 'all mosque e1');
-    });
-
-    testWidgets('a server before update 6: the nearest few from the location', (tester) async {
-      final app = TestApp(language: 'en');
-      app.places.oldServer = true;
-      await openPlaces(tester, app: app);
-      expect(app.places.asked, contains('nearby mosque'));
-      expect(cardIds(tester).take(3), [6, 1, 2]);
-      expect(find.text('Ansan · 2'), findsNothing, reason: 'no cities from a few');
+      expect(find.text('🕌  The 5 nearest mosques'), findsOneWidget);
     });
   });
 
   group('a place’s page', () {
     Future<TestApp> openAnsan(WidgetTester tester, {TestApp? app}) async {
       app = await openPlaces(tester, app: app);
-      await tester.tap(find.text('Ansan Markaziy Masjidi'));
-      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('Ansan Markaziy Masjidi'));
       expect(find.byType(PlaceDetailScreen), findsOneWidget);
       return app;
     }
@@ -311,7 +343,8 @@ void main() {
     testWidgets('what it is, how far, its numbers and note and links, what people say', (tester) async {
       final app = await openAnsan(tester);
       expect(find.text('🕌  MOSQUE'), findsOneWidget);
-      expect(find.textContaining('2.1 km · Ansan'), findsOneWidget);
+      expect(find.textContaining('2.1 km from you · Ansan'), findsOneWidget);
+      expect(find.text('Get directions'), findsOneWidget, reason: 'its map');
       expect(find.text('4.7'), findsWidgets);
       expect(find.text('· 3 reviews'), findsOneWidget);
       expect(find.text('010-1111-2222'), findsOneWidget);
@@ -361,7 +394,7 @@ void main() {
       expect(find.textContaining('this phone').evaluate().isNotEmpty || find.text('Notifications are off, so news won’t arrive').evaluate().isNotEmpty, isTrue);
       await tester.pageBack();
       await tester.pumpAndSettle();
-      expect(find.descendant(of: card('Ansan Markaziy Masjidi'), matching: find.byIcon(Icons.notifications_active_rounded)), findsOneWidget);
+      expect(find.descendant(of: card('Ansan Markaziy Masjidi'), matching: find.text('Watching')), findsOneWidget);
     });
 
     testWidgets('a review: signed in first; one per person, changed and deleted', (tester) async {
@@ -396,8 +429,7 @@ void main() {
 
     testWidgets('opening hours suggested, and shown as waiting; a bad link said so', (tester) async {
       final app = await openPlaces(tester);
-      await tester.tap(find.text('Siheung Masjidi'));
-      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('Siheung Masjidi'));
       await tapVisible(tester, find.text('Add information'));
       await signInWithGoogle(tester);
       expect(find.text('It appears once an admin has checked it.'), findsOneWidget);
@@ -432,10 +464,12 @@ void main() {
 
       await tester.pageBack();
       await tester.pumpAndSettle();
-      await tester.tap(find.descendant(of: find.byType(PlacesScreen), matching: find.text('Restaurants')).last);
+      await tester.pageBack();
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Samarqand Osh Markazi'));
+      await tester.scrollUntilVisible(find.text('Restaurants'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.text('Restaurants'));
       await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('Samarqand Osh Markazi'));
       expect(find.text('Write an announcement'), findsNothing, reason: 'only its owner posts');
       await tapVisible(tester, find.text('Claim it'));
       await tester.tap(find.text('Continue'));
@@ -446,9 +480,8 @@ void main() {
 
     testWidgets('a restaurant’s menu', (tester) async {
       final app = await openPlaces(tester, label: 'Restaurants');
-      await tester.tap(find.text('Samarqand Osh Markazi'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Open the menu'));
+      await tapVisible(tester, find.text('Samarqand Osh Markazi'));
+      await tapVisible(tester, find.text('Open the menu'));
       await tester.pumpAndSettle();
       expect(app.links.last, Uri.parse('https://menu.example/osh'));
     });

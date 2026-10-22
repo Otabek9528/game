@@ -7,7 +7,6 @@ import '../../app_services.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
-import '../prayer/prayer_controller.dart';
 import 'place_actions.dart';
 import 'place_detail.dart';
 import 'places_kit.dart';
@@ -17,9 +16,16 @@ import 'places_parts.dart';
 /// Where people tell other people's places to go: the group.
 const placesGroupUrl = 'https://t.me/MuslimVegukin';
 
-/// Mosques, halal restaurants and shops in Korea: every one of a kind, the
-/// nearest first (from the location the prayer times use), found by name,
-/// city or a Korean address, with a call or the way there one tap away.
+/// The web page's example address for each kind, in the field until typed over.
+const _addressExample = {
+  PlaceKind.mosque: '서울 강동구 구천면로 271',
+  PlaceKind.restaurant: '서울 강남구 테헤란로 123',
+  PlaceKind.shop: '서울 용산구 이태원로 123',
+};
+
+/// Mosques, restaurants or shops, as on the web page: "near me" or "near
+/// another address", and the five nearest. "Near me" always takes a new
+/// location fix, and runs by itself when the phone already lets it.
 class PlacesScreen extends StatefulWidget {
   const PlacesScreen({super.key, required this.services, required this.kind});
 
@@ -30,86 +36,98 @@ class PlacesScreen extends StatefulWidget {
   State<PlacesScreen> createState() => _PlacesScreenState();
 }
 
-/// An address the server found, to measure from.
-typedef _Around = ({String text, double lat, double lon, String? label});
+enum _Mode { none, here, address }
 
 class _PlacesScreenState extends State<PlacesScreen> {
   late final PlacesKit _kit = PlacesKit(widget.services);
-  late PlaceKind _kind = widget.kind;
-  final _search = TextEditingController();
-  String _query = '';
-  String? _city;
+  PlaceKind get _kind => widget.kind;
+  final _address = TextEditingController();
+  final _addressFocus = FocusNode();
 
-  _Around? _around;
-
-  /// Before update 6: the places the server found near the address.
-  List<Place>? _aroundFew;
-  bool _finding = false;
+  _Mode _mode = _Mode.none;
+  bool _busy = false;
+  PlacesFound? _found;
+  String? _error;
+  String? _addressError;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_kit.load(_kind));
     unawaited(_kit.loadPhotos());
     unawaited(_kit.loadWatched());
+    unawaited(_start());
+  }
+
+  /// "Near me" at once when the phone allows it without asking.
+  Future<void> _start() async {
+    if (await _kit.locationAllowed() && mounted && _mode == _Mode.none) await _nearMe();
   }
 
   @override
   void dispose() {
-    _search.dispose();
+    _address.dispose();
+    _addressFocus.dispose();
     _kit.dispose();
     super.dispose();
   }
 
-  void _setKind(PlaceKind kind) {
-    if (kind == _kind) return;
-    HapticFeedback.selectionClick();
-    setState(() {
-      _kind = kind;
-      _city = null;
-      _aroundFew = null;
-    });
-    unawaited(_kit.load(kind));
-    if (_around case final around?) unawaited(_findAround(around.text));
-  }
-
-  void _onQuery(String query) => setState(() {
-        _query = query;
-        if (_around != null && query.trim() != _around!.text) {
-          _around = null;
-          _aroundFew = null;
-        }
-      });
-
-  Future<void> _findAround(String address) async {
+  Future<void> _nearMe() async {
     FocusScope.of(context).unfocus();
-    setState(() => _finding = true);
+    setState(() {
+      _mode = _Mode.here;
+      _busy = true;
+      _error = null;
+      _found = null;
+    });
     try {
-      final found = await _kit.nearAddress(_kind, address);
-      if (!mounted) return;
-      if (found.lat == null || found.lon == null) throw const PlacesException('http_404', 404);
-      setState(() {
-        _around = (text: address, lat: found.lat!, lon: found.lon!, label: found.label);
-        _aroundFew = _kit.fewOnly ? found.places : null;
-        _city = null;
-      });
+      final found = await _kit.nearMe(_kind);
+      if (mounted) setState(() => _found = found);
     } on PlacesException catch (e) {
-      if (!mounted) return;
-      final s = AppLocalizations.of(context);
-      showPlacesSnack(context, e.status == 404 ? s.plAddressNotFound : placesMessage(s, e.code));
+      if (mounted) setState(() => _error = e.code);
     } finally {
-      if (mounted) setState(() => _finding = false);
+      if (mounted) setState(() => _busy = false);
     }
   }
 
-  Future<void> _refresh() async {
-    await Future.wait([
-      _kit.load(_kind, refresh: true),
-      _kit.loadWatched(),
-    ]);
+  void _openAddress() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _mode = _Mode.address;
+      _error = null;
+      _addressError = null;
+      if (_found?.origin != PlaceOrigin.address) _found = null;
+    });
+    _addressFocus.requestFocus();
   }
 
-  void _open(Place place) => openPlace(context, _kit, place);
+  Future<void> _searchAddress([String? text]) async {
+    final s = AppLocalizations.of(context);
+    final address = (text ?? _address.text).trim();
+    if (text != null) _address.text = text;
+    if (address.isEmpty) return setState(() => _addressError = s.plTextEmpty);
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _busy = true;
+      _error = null;
+      _addressError = null;
+      _found = null;
+    });
+    try {
+      final found = await _kit.nearAddress(_kind, address);
+      if (mounted) setState(() => _found = found);
+    } on PlacesException catch (e) {
+      if (!mounted) return;
+      setState(() => e.code == 'address_not_found' ? _addressError = s.plAddressNotFound : _error = e.code);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _refresh() => switch (_mode) {
+        _Mode.here => _nearMe(),
+        _Mode.address when _address.text.trim().isNotEmpty => _searchAddress(),
+        _ => Future.value(),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -119,213 +137,49 @@ class _PlacesScreenState extends State<PlacesScreen> {
       backgroundColor: p.page,
       body: ListenableBuilder(
         listenable: Listenable.merge([_kit, widget.services.prayer]),
-        builder: (context, _) {
-          final around = _around;
-          final searching = _query.trim().isNotEmpty && around == null;
-          final all = _kit.placesOf(_kind);
-          final shown = _aroundFew ??
-              _kit.find(
-                _kind,
-                city: _city,
-                query: around == null ? _query : '',
-                from: around == null ? null : (lat: around.lat, lon: around.lon),
-              );
-          final byDistance = around != null || _kit.here != null || _kit.fewOnly;
-          final failure = _kit.failureOf(_kind);
-          final cities = _kit.fewOnly ? const <(String, int)>[] : _kit.citiesOf(_kind);
-          final recent = searching || around != null ? const <Place>[] : _kit.recent.where((r) => r.kind == _kind).take(8).toList();
-          final hangul = searching && hasHangul(_query) && _query.trim().length >= 2;
-
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            edgeOffset: MediaQuery.paddingOf(context).top + kToolbarHeight,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: p.hero.first,
-                  surfaceTintColor: Colors.transparent,
-                  foregroundColor: Colors.white,
-                  systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
-                  titleTextStyle: const TextStyle(
-                    fontFamily: Brand.displayFont,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 21,
-                    color: Colors.white,
-                  ),
-                  title: Text(kindPlural(s, _kind)),
+        builder: (context, _) => RefreshIndicator(
+          onRefresh: _refresh,
+          edgeOffset: MediaQuery.paddingOf(context).top + kToolbarHeight,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: p.hero.first,
+                surfaceTintColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
+                titleTextStyle: const TextStyle(
+                  fontFamily: Brand.displayFont,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 21,
+                  color: Colors.white,
                 ),
-                SliverToBoxAdapter(
-                  child: _Hero(
-                    kind: _kind,
-                    onKind: _setKind,
-                    controller: _search,
-                    onChanged: _onQuery,
-                    onSubmitted: (q) {
-                      if (hasHangul(q) && q.trim().length >= 2) unawaited(_findAround(q.trim()));
-                    },
-                    location: _LocationLine(kit: _kit, kind: _kind),
-                  ),
+                title: Text(kindPlural(s, _kind)),
+              ),
+              SliverToBoxAdapter(child: _hero(context)),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(14, 16, 14, 28 + MediaQuery.paddingOf(context).bottom),
+                sliver: SliverList.list(
+                  children: [
+                    ..._body(context),
+                    const SizedBox(height: 16),
+                    _Missing(onTap: () => widget.services.openLink(Uri.parse(placesGroupUrl))),
+                  ],
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(14, 12, 14, 28 + MediaQuery.paddingOf(context).bottom),
-                  sliver: SliverList.list(
-                    children: [
-                      if (hangul) ...[
-                        _AroundOffer(address: _query.trim(), busy: _finding, onTap: () => _findAround(_query.trim())),
-                        const SizedBox(height: 10),
-                      ],
-                      if (around != null) ...[
-                        _AroundBanner(
-                          text: s.plNearAddress(around.label ?? around.text),
-                          onClear: () {
-                            HapticFeedback.selectionClick();
-                            _search.clear();
-                            setState(() {
-                              _query = '';
-                              _around = null;
-                              _aroundFew = null;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                      if (recent.isNotEmpty) ...[
-                        _Label(icon: Icons.history_rounded, text: s.plRecent),
-                        SizedBox(
-                          height: 40,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: recent.length,
-                            separatorBuilder: (_, _) => const SizedBox(width: 8),
-                            itemBuilder: (context, i) => ActionChip(
-                              avatar: Text(recent[i].kind.emoji),
-                              label: Text(recent[i].name),
-                              backgroundColor: p.card,
-                              side: BorderSide(color: p.hairline),
-                              onPressed: () => _open(_kit.placesOf(_kind)?.where((x) => x.id == recent[i].id).firstOrNull ?? recent[i]),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                      ],
-                      if (cities.length > 1 && !searching && around == null) ...[
-                        SizedBox(
-                          height: 40,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: cities.length + 1,
-                            separatorBuilder: (_, _) => const SizedBox(width: 8),
-                            itemBuilder: (context, i) {
-                              final city = i == 0 ? null : cities[i - 1].$1;
-                              final selected = _city == city;
-                              return ChoiceChip(
-                                label: Text(i == 0 ? s.plAllCities : '${cities[i - 1].$1} · ${cities[i - 1].$2}'),
-                                selected: selected,
-                                showCheckmark: false,
-                                selectedColor: p.action,
-                                backgroundColor: p.card,
-                                side: BorderSide(color: selected ? p.action : p.hairline),
-                                labelStyle: TextStyle(
-                                  color: selected ? Colors.white : p.inkSoft,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                onSelected: (_) {
-                                  HapticFeedback.selectionClick();
-                                  setState(() => _city = city);
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      if (all == null && failure == null && _aroundFew == null)
-                        for (var i = 0; i < 5; i++) const _SkeletonCard()
-                      else if (all == null && failure == 'needs_location' && _aroundFew == null)
-                        _Message(icon: Icons.near_me_rounded, title: s.plNeedsLocation)
-                      else if (all == null && failure != null && _aroundFew == null)
-                        _Message(
-                          icon: Icons.wifi_off_rounded,
-                          title: s.plLoadFailed,
-                          action: FilledButton.tonalIcon(
-                            onPressed: () => _kit.load(_kind, refresh: true),
-                            icon: const Icon(Icons.refresh_rounded),
-                            label: Text(s.retry),
-                          ),
-                        )
-                      else if (shown.isEmpty)
-                        _Message(
-                          icon: searching ? Icons.search_off_rounded : Icons.place_outlined,
-                          title: searching
-                              ? s.plNothingFound
-                              : switch (_kind) {
-                                  PlaceKind.mosque => s.plNoneYetMosque,
-                                  PlaceKind.restaurant => s.plNoneYetRestaurant,
-                                  PlaceKind.shop => s.plNoneYetShop,
-                                },
-                          body: searching && !hangul ? s.plNothingFoundHint : null,
-                        )
-                      else ...[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
-                          child: Text(
-                            [
-                              kindCount(s, _kind, shown.length),
-                              if (!searching) byDistance ? s.plSortedNearest : s.plSortedCity,
-                            ].join(' · '),
-                            style: TextStyle(fontSize: 13, color: p.inkMuted),
-                          ),
-                        ),
-                        for (final (i, place) in shown.indexed)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: PlaceCard(
-                              kit: _kit,
-                              place: place,
-                              km: around != null ? place.distanceFrom(around.lat, around.lon) : _kit.distanceTo(place),
-                              nearest: i == 0 && byDistance && !searching && _city == null,
-                              onTap: () => _open(place),
-                            ),
-                          ),
-                      ],
-                      const SizedBox(height: 8),
-                      _Missing(onTap: () => widget.services.openLink(Uri.parse(placesGroupUrl))),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
-}
 
-class _Hero extends StatelessWidget {
-  const _Hero({
-    required this.kind,
-    required this.onKind,
-    required this.controller,
-    required this.onChanged,
-    required this.onSubmitted,
-    required this.location,
-  });
-
-  final PlaceKind kind;
-  final ValueChanged<PlaceKind> onKind;
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-  final ValueChanged<String> onSubmitted;
-  final Widget location;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _hero(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     const radius = BorderRadius.vertical(bottom: Radius.circular(26));
+    final recent = _kit.addresses;
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [p.hero.first, p.hero.last]),
@@ -340,54 +194,56 @@ class _Hero extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 2, 16, 14),
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  children: [
-                    for (final k in PlaceKind.values) ...[
-                      Expanded(child: _KindTab(kind: k, selected: k == kind, onTap: () => onKind(k))),
-                      if (k != PlaceKind.values.last) const SizedBox(width: 8),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Material(
-                  color: Colors.white,
-                  shape: const StadiumBorder(),
-                  elevation: 2,
-                  shadowColor: Colors.black26,
-                  child: TextField(
-                    controller: controller,
-                    onChanged: onChanged,
-                    onSubmitted: onSubmitted,
-                    textInputAction: TextInputAction.search,
-                    style: const TextStyle(fontSize: 15, color: Color(0xFF292524)),
-                    decoration: InputDecoration(
-                      hintText: s.plSearchHint,
-                      hintStyle: const TextStyle(color: Color(0xFF78716C)),
-                      prefixIcon: const Icon(Icons.search_rounded, color: Brand.emerald700),
-                      suffixIcon: ListenableBuilder(
-                        listenable: controller,
-                        builder: (context, _) => controller.text.isEmpty
-                            ? const SizedBox.shrink()
-                            : IconButton(
-                                onPressed: () {
-                                  controller.clear();
-                                  onChanged('');
-                                },
-                                tooltip: s.plClearSearch,
-                                icon: const Icon(Icons.close_rounded, color: Color(0xFF78716C)),
-                              ),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: _ModeButton(
+                          icon: Icons.my_location_rounded,
+                          label: s.plNearMe,
+                          selected: _mode == _Mode.here,
+                          onTap: _busy ? null : _nearMe,
+                        ),
                       ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _ModeButton(
+                          icon: Icons.travel_explore_rounded,
+                          label: s.plByAddress,
+                          selected: _mode == _Mode.address,
+                          onTap: _busy ? null : _openAddress,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                location,
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.topCenter,
+                  child: _mode != _Mode.address
+                      ? const SizedBox(width: double.infinity)
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 14),
+                          child: _AddressPanel(
+                            controller: _address,
+                            focus: _addressFocus,
+                            example: _addressExample[_kind]!,
+                            error: _addressError,
+                            busy: _busy,
+                            recent: recent,
+                            onSearch: _searchAddress,
+                            onChanged: () {
+                              if (_addressError != null) setState(() => _addressError = null);
+                            },
+                          ),
+                        ),
+                ),
               ],
             ),
           ),
@@ -395,44 +251,157 @@ class _Hero extends StatelessWidget {
       ),
     );
   }
+
+  List<Widget> _body(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    final prayer = widget.services.prayer;
+    if (_busy) {
+      return [
+        _Status(text: prayer.locating ? s.plLocatingYou : s.plLoadingPlaces),
+        for (var i = 0; i < 3; i++) const _SkeletonCard(),
+      ];
+    }
+    if (_error case final code?) return [_problem(context, code)];
+    final found = _found;
+    if (found == null) {
+      return [if (_mode == _Mode.none) _Message(icon: Icons.touch_app_rounded, title: s.plChooseTitle, body: s.plChooseBody)];
+    }
+    final title = found.origin == PlaceOrigin.address
+        ? s.plNearestToAddress
+        : switch (_kind) {
+            PlaceKind.mosque => s.plNearestMosques(found.places.length),
+            PlaceKind.restaurant => s.plNearestRestaurants(found.places.length),
+            PlaceKind.shop => s.plNearestShops(found.places.length),
+          };
+    return [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+        child: Text(
+          '${_kind.emoji}  $title',
+          style: TextStyle(fontFamily: Brand.displayFont, fontSize: 21, fontWeight: FontWeight.w700, color: p.ink),
+        ),
+      ),
+      _Origin(
+        found: found,
+        now: prayer.now,
+        onAgain: found.origin == PlaceOrigin.address ? _openAddress : _nearMe,
+      ),
+      const SizedBox(height: 12),
+      if (found.places.isEmpty)
+        _Message(icon: Icons.search_off_rounded, title: s.plNothingFound)
+      else
+        for (final (i, place) in found.places.indexed)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: PlaceCard(
+              kit: _kit,
+              place: place,
+              km: found.kmTo(place),
+              nearest: i == 0,
+              onTap: () => openPlace(context, _kit, place, km: found.kmTo(place), origin: found.origin),
+            ),
+          ),
+    ];
+  }
+
+  /// Why no places: the location (with the way to fix it, and the address
+  /// instead), or the connection.
+  Widget _problem(BuildContext context, String code) {
+    final s = AppLocalizations.of(context);
+    final prayer = widget.services.prayer;
+    final address = OutlinedButton.icon(
+      onPressed: _openAddress,
+      icon: const Icon(Icons.travel_explore_rounded),
+      label: Text(s.plUseAddress),
+    );
+    return switch (code) {
+      'location_denied' => _Message(
+          icon: Icons.location_searching_rounded,
+          title: s.plDeniedBody,
+          action: FilledButton.icon(onPressed: _nearMe, icon: const Icon(Icons.my_location_rounded), label: Text(s.plAllow)),
+          secondary: address,
+        ),
+      'location_blocked' => _Message(
+          icon: Icons.location_disabled_rounded,
+          title: s.plBlockedBody,
+          action: FilledButton.icon(
+            onPressed: prayer.openAppSettings,
+            icon: const Icon(Icons.settings_rounded),
+            label: Text(s.openSettings),
+          ),
+          secondary: address,
+        ),
+      'location_off' => _Message(
+          icon: Icons.location_off_rounded,
+          title: s.plOffBody,
+          action: FilledButton.icon(
+            onPressed: prayer.openLocationSettings,
+            icon: const Icon(Icons.location_on_rounded),
+            label: Text(s.turnOnLocation),
+          ),
+          secondary: address,
+        ),
+      'location_failed' => _Message(
+          icon: Icons.near_me_disabled_rounded,
+          title: s.plFailedBody,
+          action: FilledButton.icon(onPressed: _nearMe, icon: const Icon(Icons.refresh_rounded), label: Text(s.retry)),
+          secondary: address,
+        ),
+      _ => _Message(
+          icon: Icons.wifi_off_rounded,
+          title: s.plLoadFailed,
+          action: FilledButton.icon(onPressed: _refresh, icon: const Icon(Icons.refresh_rounded), label: Text(s.retry)),
+        ),
+    };
+  }
 }
 
-class _KindTab extends StatelessWidget {
-  const _KindTab({required this.kind, required this.selected, required this.onTap});
+/// One of the two ways to look, large, as on the web page.
+class _ModeButton extends StatelessWidget {
+  const _ModeButton({required this.icon, required this.label, required this.selected, required this.onTap});
 
-  final PlaceKind kind;
+  final IconData icon;
+  final String label;
   final bool selected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
+    final ink = selected ? Brand.emerald800 : Colors.white;
     return Material(
       color: selected ? Colors.white : Colors.white.withValues(alpha: 0.12),
-      shape: StadiumBorder(side: BorderSide(color: Colors.white.withValues(alpha: selected ? 1 : 0.25))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: Colors.white.withValues(alpha: selected ? 1 : 0.35)),
+      ),
+      elevation: selected ? 3 : 0,
+      shadowColor: Colors.black38,
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(kind.emoji, style: const TextStyle(fontSize: 15)),
-              const SizedBox(width: 5),
-              Flexible(
-                child: Text(
-                  kindPlural(s, kind),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: selected ? Brand.emerald800 : Colors.white,
-                  ),
+        onTap: onTap == null
+            ? null
+            : () {
+                HapticFeedback.lightImpact();
+                onTap!();
+              },
+        child: Semantics(
+          button: true,
+          selected: selected,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: ink, size: 26),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, height: 1.25, fontWeight: FontWeight.w800, color: ink),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -440,61 +409,168 @@ class _KindTab extends StatelessWidget {
   }
 }
 
-/// Where distances are measured from, with a way to measure again; or how
-/// to turn location on.
-class _LocationLine extends StatelessWidget {
-  const _LocationLine({required this.kit, required this.kind});
+/// The address to look around: typed in Korean, or one searched before.
+class _AddressPanel extends StatelessWidget {
+  const _AddressPanel({
+    required this.controller,
+    required this.focus,
+    required this.example,
+    required this.error,
+    required this.busy,
+    required this.recent,
+    required this.onSearch,
+    required this.onChanged,
+  });
 
-  final PlacesKit kit;
-  final PlaceKind kind;
+  final TextEditingController controller;
+  final FocusNode focus;
+  final String example;
+  final String? error;
+  final bool busy;
+  final List<String> recent;
+  final void Function([String? text]) onSearch;
+  final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
-    final prayer = kit.services.prayer;
-    final here = kit.here;
-    const soft = TextStyle(fontSize: 13, height: 1.3, color: Color(0xE6FFFFFF));
-    Widget line(IconData icon, String text, {String? action, VoidCallback? onAction, bool busy = false}) => Row(
-          children: [
-            Icon(icon, size: 16, color: Colors.white70),
-            const SizedBox(width: 6),
-            Expanded(child: Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: soft)),
-            if (busy)
-              const Padding(
-                padding: EdgeInsets.all(10),
-                child: SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
-              )
-            else if (action != null)
-              TextButton(
-                onPressed: onAction,
-                style: TextButton.styleFrom(foregroundColor: Colors.white, visualDensity: VisualDensity.compact),
-                child: Text(action, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+    final error = this.error;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          elevation: 2,
+          shadowColor: Colors.black26,
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  focusNode: focus,
+                  enabled: !busy,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (_) => onSearch(),
+                  onChanged: (_) => onChanged(),
+                  style: const TextStyle(fontSize: 16, color: Color(0xFF292524)),
+                  decoration: InputDecoration(
+                    hintText: example,
+                    hintStyle: const TextStyle(color: Color(0xFFA8A29E)),
+                    prefixIcon: const Icon(Icons.place_outlined, color: Brand.emerald700),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
               ),
-          ],
-        );
-    void locate() {
-      HapticFeedback.lightImpact();
-      unawaited(kit.locate(kind));
-    }
+              Padding(
+                padding: const EdgeInsets.all(6),
+                child: FilledButton(
+                  onPressed: busy ? null : () => onSearch(),
+                  style: FilledButton.styleFrom(minimumSize: const Size(0, 44), padding: const EdgeInsets.symmetric(horizontal: 16)),
+                  child: Text(s.plSearchButton),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          error ?? s.plAddressTip,
+          style: TextStyle(
+            fontSize: 13,
+            height: 1.4,
+            fontWeight: error == null ? FontWeight.w400 : FontWeight.w700,
+            color: error == null ? const Color(0xE6FFFFFF) : const Color(0xFFFDE68A),
+          ),
+        ),
+        if (recent.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text(s.plRecentAddresses, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white70)),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final address in recent)
+                Material(
+                  color: Colors.white.withValues(alpha: 0.14),
+                  shape: StadiumBorder(side: BorderSide(color: Colors.white.withValues(alpha: 0.35))),
+                  child: InkWell(
+                    customBorder: const StadiumBorder(),
+                    onTap: busy ? null : () => onSearch(address),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 7, 14, 7),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.history_rounded, size: 16, color: Colors.white),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              address,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
 
-    if (prayer.locating) return line(Icons.near_me_rounded, s.locating, busy: true);
-    if (here != null) {
-      final when = ageText(s, prayer.now.difference(here.timestamp));
-      return line(
-        Icons.near_me_rounded,
-        here.city == null ? s.plAroundHere(when) : s.plAround(here.city!, when),
-        action: s.refreshLocation,
-        onAction: locate,
-      );
-    }
-    return switch (prayer.status) {
-      PrayerStatus.permissionBlocked =>
-        line(Icons.location_disabled_rounded, s.plLocateBlocked, action: s.openSettings, onAction: prayer.openAppSettings),
-      PrayerStatus.locationOff =>
-        line(Icons.location_off_rounded, s.plLocateOff, action: s.turnOnLocation, onAction: prayer.openLocationSettings),
-      PrayerStatus.locationFailed => line(Icons.near_me_disabled_rounded, s.plLocateFailed, action: s.retry, onAction: locate),
-      _ => line(Icons.near_me_rounded, s.plLocatePrompt, action: s.plLocateButton, onAction: locate),
+/// Where the five were measured from: the phone just now, the location
+/// saved earlier (said plainly, since it can be far off), or the address.
+class _Origin extends StatelessWidget {
+  const _Origin({required this.found, required this.now, required this.onAgain});
+
+  final PlacesFound found;
+  final DateTime now;
+  final VoidCallback onAgain;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    final when = found.at == null ? '' : ageText(s, now.difference(found.at!));
+    final (icon, text, warn) = switch (found.origin) {
+      PlaceOrigin.here => (
+          Icons.my_location_rounded,
+          found.label == null ? s.plHereNowNoCity(when) : s.plHereNow(found.label!, when),
+          false,
+        ),
+      PlaceOrigin.saved => (
+          Icons.history_rounded,
+          found.label == null
+              ? s.plSavedNoteNoCity(when.toLowerCase())
+              : s.plSavedNote(found.label!, when.toLowerCase()),
+          true,
+        ),
+      PlaceOrigin.address => (Icons.place_rounded, found.label ?? '', false),
     };
+    return Row(
+      children: [
+        const SizedBox(width: 4),
+        Icon(icon, size: 16, color: warn ? p.gold : p.accent),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(text, style: TextStyle(fontSize: 13, height: 1.35, color: warn ? p.inkSoft : p.inkMuted)),
+        ),
+        TextButton(
+          onPressed: onAgain,
+          style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+          child: Text(found.origin == PlaceOrigin.address ? s.plChange : s.plRelocate),
+        ),
+      ],
+    );
   }
 }
 
@@ -506,8 +582,8 @@ String ageText(AppLocalizations s, Duration age) {
   return s.locationDaysAgo(age.inDays);
 }
 
-/// A place in the list: its picture, name, where and how far, its reviews,
-/// and the call and the way there right on it.
+/// A place found: its photos, how far, its name, rating and address, and
+/// the call and the way there right on it.
 class PlaceCard extends StatelessWidget {
   const PlaceCard({
     super.key,
@@ -530,229 +606,185 @@ class PlaceCard extends StatelessWidget {
     final p = VegukinPalette.of(context);
     final km = this.km;
     final watched = kit.watching(place.id);
-    return PlacesCard(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        onTap();
-      },
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              PlaceThumb(kit: kit, place: place),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    void open() {
+      HapticFeedback.selectionClick();
+      onTap();
+    }
+
+    return Material(
+      color: p.card,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: p.hairline)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: open,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 188,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  PlacePhotos(kit: kit, place: place, onTap: open),
+                  Positioned(
+                    left: 10,
+                    top: 10,
+                    child: Row(
                       children: [
-                        Expanded(
-                          child: Text(
-                            place.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 16, height: 1.25, fontWeight: FontWeight.w700, color: p.ink),
-                          ),
-                        ),
-                        if (watched) ...[
+                        if (km != null) _Chip(icon: Icons.near_me_rounded, text: distanceText(s, km)),
+                        if (nearest) ...[
                           const SizedBox(width: 6),
-                          Icon(Icons.notifications_active_rounded, size: 18, color: p.gold, semanticLabel: s.plWatchingBadge),
+                          _Chip(text: s.plNearest, colour: Brand.emerald700),
                         ],
                       ],
                     ),
-                    const SizedBox(height: 3),
-                    Text.rich(
-                      TextSpan(children: [
-                        if (km != null)
-                          TextSpan(
-                            text: distanceText(s, km),
-                            style: TextStyle(fontWeight: FontWeight.w800, color: p.accent),
-                          ),
-                        if (km != null && place.city != null) const TextSpan(text: ' · '),
-                        if (place.city != null) TextSpan(text: place.city),
-                      ]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 13.5, color: p.inkSoft),
-                    ),
-                    const SizedBox(height: 4),
-                    if (place.reviewCount > 0)
-                      Row(
-                        children: [
-                          PlaceStars(place.rating, size: 14),
-                          const SizedBox(width: 5),
-                          Text(
-                            '${place.rating.toStringAsFixed(1)} · ${s.plReviewCount(place.reviewCount)}',
-                            style: TextStyle(fontSize: 12.5, color: p.inkMuted),
-                          ),
-                        ],
-                      )
-                    else
-                      Text(s.plNoReviews, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          if (place.address != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              place.address!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12.5, color: p.inkMuted),
-            ),
-          ],
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              if (place.phones.isNotEmpty) ...[
-                Flexible(
-                  flex: 0,
-                  child: PlaceMiniAction(
-                    icon: Icons.call_rounded,
-                    label: s.plCall,
-                    onTap: () => callPlace(context, kit.services, place),
                   ),
-                ),
-                const SizedBox(width: 8),
-              ],
-              Flexible(
-                flex: 0,
-                child: PlaceMiniAction(
-                  icon: Icons.directions_rounded,
-                  label: s.plRoute,
-                  onTap: () => routeToPlace(context, kit.services, place),
-                ),
+                  if (watched)
+                    Positioned(
+                      right: 10,
+                      top: 10,
+                      child: _Chip(icon: Icons.notifications_active_rounded, text: s.plWatchingBadge, colour: const Color(0xCC8A6508)),
+                    ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: nearest
-                    ? Align(
-                        alignment: AlignmentDirectional.centerEnd,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: p.accent.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            child: Text(
-                              s.plNearest,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: p.accent),
-                            ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    place.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontFamily: Brand.displayFont, fontSize: 19, height: 1.25, fontWeight: FontWeight.w700, color: p.ink),
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      if (place.city != null)
+                        Flexible(
+                          child: Text(
+                            place.city!.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: p.accent),
                           ),
                         ),
-                      )
-                    : const SizedBox.shrink(),
+                      if (place.city != null) const SizedBox(width: 10),
+                      if (place.reviewCount > 0) ...[
+                        PlaceStars(place.rating, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${place.rating.toStringAsFixed(1)} (${place.reviewCount})',
+                          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.inkSoft),
+                        ),
+                      ] else
+                        Flexible(
+                          child: Text(s.plNoReviews, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
+                        ),
+                    ],
+                  ),
+                  if (place.address != null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(Icons.place_outlined, size: 15, color: p.inkMuted),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            place.address!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 13, color: p.inkSoft),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// "Search near 역삼동": the server finds the address, the list measures
-/// from there.
-class _AroundOffer extends StatelessWidget {
-  const _AroundOffer({required this.address, required this.busy, required this.onTap});
-
-  final String address;
-  final bool busy;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final p = VegukinPalette.of(context);
-    return PlacesCard(
-      onTap: busy ? null : onTap,
-      color: p.cardSelected,
-      child: Row(
-        children: [
-          Icon(Icons.travel_explore_rounded, color: p.accent),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  busy ? s.plFinding : s.plSearchNear(address),
-                  style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink),
-                ),
-                const SizedBox(height: 2),
-                Text(s.plSearchNearHint, style: TextStyle(fontSize: 12.5, color: p.inkSoft)),
-              ],
             ),
-          ),
-          busy
-              ? SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2.4, color: p.accent))
-              : Icon(Icons.chevron_right_rounded, color: p.accent),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 6, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        if (place.phones.isNotEmpty)
+                          PlaceMiniAction(
+                            icon: Icons.call_rounded,
+                            label: s.plCall,
+                            onTap: () => callPlace(context, kit.services, place),
+                          ),
+                        PlaceMiniAction(
+                          icon: Icons.directions_rounded,
+                          label: s.plRoute,
+                          onTap: () => routeToPlace(context, kit.services, place),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: open,
+                    style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Text(s.plDetails), const Icon(Icons.chevron_right_rounded, size: 20)],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _AroundBanner extends StatelessWidget {
-  const _AroundBanner({required this.text, required this.onClear});
+/// A small label on a photo.
+class _Chip extends StatelessWidget {
+  const _Chip({required this.text, this.icon, this.colour = const Color(0xB3000000)});
 
   final String text;
-  final VoidCallback onClear;
+  final IconData? icon;
+  final Color colour;
 
   @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
-      decoration: BoxDecoration(
-        color: p.cardSelected,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: p.accent.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.place_rounded, size: 18, color: p.accent),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink)),
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: BoxDecoration(color: colour, borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[Icon(icon, size: 14, color: Colors.white), const SizedBox(width: 4)],
+              Text(text, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+            ],
           ),
-          IconButton(
-            onPressed: onClear,
-            tooltip: AppLocalizations.of(context).plClearSearch,
-            icon: Icon(Icons.close_rounded, color: p.inkMuted),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      );
 }
 
-class _Label extends StatelessWidget {
-  const _Label({required this.icon, required this.text});
+class _Status extends StatelessWidget {
+  const _Status({required this.text});
 
-  final IconData icon;
   final String text;
 
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 14),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: p.inkMuted),
-          const SizedBox(width: 6),
-          Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: p.inkMuted)),
+          SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2.2, color: p.accent)),
+          const SizedBox(width: 10),
+          Text(text, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: p.inkSoft)),
         ],
       ),
     );
@@ -760,28 +792,31 @@ class _Label extends StatelessWidget {
 }
 
 class _Message extends StatelessWidget {
-  const _Message({required this.icon, required this.title, this.body, this.action});
+  const _Message({required this.icon, required this.title, this.body, this.action, this.secondary});
 
   final IconData icon;
   final String title;
   final String? body;
   final Widget? action;
+  final Widget? secondary;
 
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
+    return PlacesCard(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(icon, size: 44, color: p.inkMuted),
+          Icon(icon, size: 40, color: p.accent),
           const SizedBox(height: 12),
-          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15.5, height: 1.4, fontWeight: FontWeight.w600, color: p.inkSoft)),
+          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15.5, height: 1.45, fontWeight: FontWeight.w700, color: p.ink)),
           if (body case final body?) ...[
             const SizedBox(height: 6),
-            Text(body, textAlign: TextAlign.center, style: TextStyle(fontSize: 13.5, height: 1.4, color: p.inkMuted)),
+            Text(body, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.45, color: p.inkSoft)),
           ],
-          if (action case final action?) ...[const SizedBox(height: 14), action],
+          if (action case final action?) ...[const SizedBox(height: 16), action],
+          if (secondary case final secondary?) ...[const SizedBox(height: 8), secondary],
         ],
       ),
     );
@@ -795,10 +830,19 @@ class _SkeletonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Container(
-        height: 132,
-        decoration: BoxDecoration(color: p.card, borderRadius: BorderRadius.circular(18), border: Border.all(color: p.hairline)),
+        height: 300,
+        decoration: BoxDecoration(color: p.card, borderRadius: BorderRadius.circular(20), border: Border.all(color: p.hairline)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              height: 188,
+              decoration: BoxDecoration(color: p.badge, borderRadius: const BorderRadius.vertical(top: Radius.circular(20))),
+            ),
+          ],
+        ),
       ),
     );
   }
