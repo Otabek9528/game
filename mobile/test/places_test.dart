@@ -342,6 +342,41 @@ void main() {
       expect(find.byType(PlacesScreen), findsOneWidget);
     });
 
+    testWidgets('a site without a photo list: the originals found as the web does, resized, kept', (tester) async {
+      final app = TestApp(language: 'en');
+      // What the old site's list left on the phone is not used.
+      await app.store.write('places_photos', jsonEncode({'Photos/117': ['png:old']}));
+      app.places
+        ..manifest = {}
+        ..files = {
+          'Photos/117/1.jpg': 'aa',
+          'Photos/117/2.png': 'bb',
+          'Photos/117/3.jpeg': 'cc',
+          'Photos/117/5.jpg': 'dd',
+        };
+      await openPlaces(tester, app: app);
+      await tapVisible(tester, find.descendant(of: card('Seoul Markaziy Masjidi'), matching: find.byType(PlacePhotos)));
+      final probes = app.places.photoProbes;
+      expect(probes, greaterThan(0));
+      expect(find.text('1 / 3'), findsOneWidget, reason: 'up to the first gap');
+      final shown = tester.widgetList<Image>(find.byType(Image)).map((i) => i.image).whereType<ResizeImage>()
+          .map((r) => (r.imageProvider as NetworkImage).url);
+      expect(shown, contains('https://vegukin-twa.pages.dev/Photos/117/1.jpg?v=aa'), reason: 'sharp when zoomed');
+      expect(shown.any((u) => u.startsWith('https://wsrv.nl/?url=${Uri.encodeComponent('https://vegukin-twa.pages.dev/Photos/117/1.jpg?v=aa')}&w=1080')),
+          isTrue, reason: 'a resized copy for the screen');
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+
+      // Again: from the phone, no looking.
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Mosques'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Search near me'));
+      await tester.pumpAndSettle();
+      expect(app.places.photoProbes, probes);
+    });
+
     testWidgets('offline: said so, and tried again', (tester) async {
       final app = TestApp(language: 'en');
       app.places.fail = true;

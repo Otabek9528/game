@@ -1402,4 +1402,16 @@ class FakePlaces implements PlacesSource {
     _online('photos');
     return manifest;
   }
+
+  /// Photos on the site by path ("Photos/117/1.jpg"), with their version;
+  /// how many were looked for.
+  Map<String, String> files = {};
+  int photoProbes = 0;
+
+  @override
+  Future<String?> photoTag(Uri url) async {
+    photoProbes++;
+    _online('photo');
+    return files[url.pathSegments.join('/')];
+  }
 }

@@ -665,14 +665,16 @@ class _ZoomPhotoState extends State<_ZoomPhoto> with SingleTickerProviderStateMi
                 fit: BoxFit.contain,
                 loadingBuilder: (_, child, progress) =>
                     progress == null ? child : const Center(child: CircularProgressIndicator(color: Colors.white54)),
-                errorBuilder: (_, _, _) =>
-                    Center(child: Text(s.plPhotoFailed, style: const TextStyle(color: Colors.white70))),
+                // The original, over it, stands in.
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
               ),
-              Image.network(
-                '${widget.photo.full}',
+              Image(
+                // Sharp when zoomed, without decoding a camera's full size.
+                image: ResizeImage(NetworkImage('${widget.photo.original}'), width: 2560, policy: ResizeImagePolicy.fit, height: 2560),
                 fit: BoxFit.contain,
                 gaplessPlayback: true,
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                errorBuilder: (_, _, _) =>
+                    Center(child: Text(s.plPhotoFailed, style: const TextStyle(color: Colors.white70))),
                 frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : const SizedBox.shrink(),
               ),
             ],

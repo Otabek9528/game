@@ -10,8 +10,10 @@ import '../prayer/prayer_controller.dart';
 import 'places_models.dart';
 import 'places_source.dart';
 
-/// A photo of a place: the size for the page, and a small one for lists.
-typedef PlacePhoto = ({Uri full, Uri thumb});
+/// A photo of a place: [full] for the screen's width, [thumb] small to show
+/// first, [original] as stored (sharp when zoomed; what's shown if the
+/// resized copies can't be had).
+typedef PlacePhoto = ({Uri full, Uri thumb, Uri original});
 
 /// Where a search's places were measured from: the phone now, the location
 /// saved earlier (no new fix could be taken), or an address.
@@ -178,22 +180,124 @@ class PlacesKit extends ChangeNotifier {
 
   // ---------------------------------------------------------------- photos
 
-  static const _photosKey = 'places_photos';
+  static const _manifestKey = 'places_manifest';
+  static const _foundKey = 'places_found_photos';
+  static const _exts = ['jpg', 'jpeg', 'png'];
+  static const _maxPhotos = 10;
 
-  /// The photos of [place], by the web app's list (Photos/manifest.json).
+  /// How long photos found by looking are trusted before looking again.
+  static const _foundFor = Duration(days: 2);
+
+  /// The photos of [place]: by the site's list (Photos/manifest.json) when
+  /// it has one, else the files found by looking, as the web page does
+  /// (looked for the first time it's asked; [notifyListeners] as they turn
+  /// up). Resized copies, from the photo service, for the originals.
   List<PlacePhoto> photosOf(Place place) {
     final folder = _cleanFolder(place.photoFolder);
     if (folder == null) return const [];
     final entries = (_manifest ??= _readManifest())?[folder];
-    if (entries == null) return const [];
-    return [
-      for (var i = 0; i < entries.length && i < 10; i++)
-        (
-          full: AppConfig.photosBase.resolve('$folder/${i + 1}.webp?v=${entries[i].split(':').last}'),
-          thumb: AppConfig.photosBase.resolve('$folder/${i + 1}.thumb.webp?v=${entries[i].split(':').last}'),
-        ),
-    ];
+    if (entries != null) {
+      return [
+        for (var i = 0; i < entries.length && i < _maxPhotos; i++)
+          () {
+            final v = {'v': entries[i].split(':').last};
+            final full = _file(folder, '${i + 1}.webp', v);
+            return (full: full, thumb: _file(folder, '${i + 1}.thumb.webp', v), original: full);
+          }(),
+      ];
+    }
+    final found = _foundIn(folder);
+    if (found == null) {
+      unawaited(_look(folder));
+      return _looking[folder] ?? const [];
+    }
+    return found;
   }
+
+  final _found = <String, List<PlacePhoto>>{};
+  final _looking = <String, List<PlacePhoto>>{};
+
+  List<PlacePhoto>? _foundIn(String folder) {
+    final kept = _found[folder];
+    if (kept != null) return kept;
+    final saved = _readFound()[folder];
+    if (saved is! Map || saved['files'] is! List || saved['at'] is! int) return null;
+    if (services.clock().difference(DateTime.fromMillisecondsSinceEpoch(saved['at'] as int)) > _foundFor) return null;
+    return _found[folder] = [for (final f in saved['files'] as List) if (f is String) _foundPhoto(folder, f)];
+  }
+
+  /// Looks for photo 1, 2, … as 1.jpg, 1.jpeg, 1.png, until one is missing:
+  /// the first shown as soon as it's found, the rest four at a time.
+  Future<void> _look(String folder) async {
+    if (_looking.containsKey(folder)) return;
+    _looking[folder] = const [];
+    try {
+      await loadPhotos();
+      if (_manifest?[folder] != null) return _notify();
+      final files = <String>[];
+      Future<String?> probe(int n) async {
+        final tags = await Future.wait([for (final ext in _exts) source.photoTag(_file(folder, '$n.$ext'))]);
+        for (final (i, tag) in tags.indexed) {
+          if (tag != null) return '$n.${_exts[i]}:$tag';
+        }
+        return null;
+      }
+
+      void show() {
+        _looking[folder] = [for (final f in files) _foundPhoto(folder, f)];
+        _notify();
+      }
+
+      final first = await probe(1);
+      if (first != null) {
+        files.add(first);
+        show();
+        batches:
+        for (var start = 2; start <= _maxPhotos; start += 4) {
+          final hits = await Future.wait([for (var n = start; n < start + 4 && n <= _maxPhotos; n++) probe(n)]);
+          for (final hit in hits) {
+            if (hit == null) break batches;
+            files.add(hit);
+          }
+          show();
+        }
+      }
+      _found[folder] = [for (final f in files) _foundPhoto(folder, f)];
+      final all = _readFound()..[folder] = {'at': services.clock().millisecondsSinceEpoch, 'files': files};
+      await services.store.write(_foundKey, jsonEncode(all));
+      _notify();
+    } on PlacesException {
+      // Offline: looked for again next time.
+    } finally {
+      _looking.remove(folder);
+    }
+  }
+
+  Map<String, dynamic> _readFound() {
+    try {
+      final json = jsonDecode(services.store.read(_foundKey) ?? '{}');
+      return json is Map<String, dynamic> ? json : {};
+    } on FormatException {
+      return {};
+    }
+  }
+
+  /// "2.png:abc123": photo 2, a PNG, at version abc123 (so a photo replaced
+  /// under the same name is a new address, here and at the photo service).
+  PlacePhoto _foundPhoto(String folder, String file) {
+    final colon = file.indexOf(':');
+    final name = colon < 0 ? file : file.substring(0, colon);
+    final tag = colon < 0 ? '' : file.substring(colon + 1);
+    final original = _file(folder, name, tag.isEmpty ? null : {'v': tag});
+    Uri resized(String shape) => Uri.parse('${AppConfig.photoService}?url=${Uri.encodeComponent('$original')}&$shape&we&output=webp');
+    return (full: resized('w=1080&q=80'), thumb: resized('w=360&q=50'), original: original);
+  }
+
+  /// [name] in [folder] on the photo site.
+  static Uri _file(String folder, String name, [Map<String, String>? query]) => AppConfig.photosBase.replace(
+        pathSegments: [...AppConfig.photosBase.pathSegments.where((s) => s.isNotEmpty), ...folder.split('/'), name],
+        queryParameters: query,
+      );
 
   Future<void>? _manifestLoading;
 
@@ -201,7 +305,7 @@ class PlacesKit extends ChangeNotifier {
   Future<void> loadPhotos() => _manifestLoading ??= () async {
         try {
           _manifest = await source.photoManifest();
-          await services.store.write(_photosKey, jsonEncode(_manifest));
+          await services.store.write(_manifestKey, jsonEncode(_manifest));
           _notify();
         } on Exception {
           _manifest ??= _readManifest();
@@ -211,7 +315,7 @@ class PlacesKit extends ChangeNotifier {
 
   Map<String, List<String>>? _readManifest() {
     try {
-      final json = jsonDecode(services.store.read(_photosKey) ?? '');
+      final json = jsonDecode(services.store.read(_manifestKey) ?? '');
       if (json is! Map) return null;
       return {for (final e in json.entries) if (e.value is List) '${e.key}': [for (final v in e.value as List) '$v']};
     } on FormatException {

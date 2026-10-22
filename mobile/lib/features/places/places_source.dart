@@ -47,8 +47,14 @@ abstract interface class PlacesSource {
 
   Future<List<WatchedPlace>> watched(Map<String, String> auth);
 
-  /// The web app's photo list: folder → ["webp hash", ...] by number.
+  /// The web app's photo list: folder → ["ext:hash", ...] by number; empty
+  /// when the site has none (the main site doesn't: it answers a missing
+  /// file with its home page).
   Future<Map<String, List<String>>> photoManifest();
+
+  /// Whether a photo is at [url]: its version (ETag or date) if so, null if
+  /// not. Asked with HEAD, so a missing file costs no download.
+  Future<String?> photoTag(Uri url);
 }
 
 class HttpPlacesSource implements PlacesSource {
@@ -144,12 +150,28 @@ class HttpPlacesSource implements PlacesSource {
     } on Exception catch (e) {
       throw _offline(e);
     }
+    if (response.statusCode >= 500) throw PlacesException('http_${response.statusCode}', response.statusCode);
     final folders = _json(response)['folders'];
-    if (response.statusCode != 200 || folders is! Map) throw PlacesException('http_${response.statusCode}', response.statusCode);
+    if (response.statusCode != 200 || folders is! Map) return const {};
     return {
       for (final MapEntry(:key, :value) in folders.entries)
         if (value is List) '$key': [for (final v in value) '$v'],
     };
+  }
+
+  @override
+  Future<String?> photoTag(Uri url) async {
+    final http.Response response;
+    try {
+      response = await _http.head(url).timeout(_timeout);
+    } on Exception catch (e) {
+      throw _offline(e);
+    }
+    if (response.statusCode >= 500) throw PlacesException('http_${response.statusCode}', response.statusCode);
+    // The site's home page stands in for a missing file, with a 200.
+    if (response.statusCode != 200 || !(response.headers['content-type'] ?? '').startsWith('image/')) return null;
+    final tag = (response.headers['etag'] ?? response.headers['last-modified'] ?? '').replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
+    return tag.length > 12 ? tag.substring(tag.length - 12) : tag;
   }
 
   Future<http.Response> _send(

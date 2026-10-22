@@ -94,8 +94,9 @@ class PlaceStars extends StatelessWidget {
 }
 
 /// A photo as wide as the screen: the small copy at once, the large one
-/// faded in over it. Decoded at the screen's width, so a card's photo and
-/// the place page's are one image, loaded once.
+/// faded in over it; the original if the large copy can't be had. Decoded
+/// at the screen's width, so a card's photo and the place page's are one
+/// image, loaded once.
 class PlaceImage extends StatelessWidget {
   const PlaceImage({super.key, required this.photo, required this.fallback});
 
@@ -103,10 +104,19 @@ class PlaceImage extends StatelessWidget {
   final Widget fallback;
 
   /// The large copy at the screen's width.
-  static ImageProvider full(BuildContext context, PlacePhoto photo) => ResizeImage(
-        NetworkImage('${photo.full}'),
+  static ImageProvider full(BuildContext context, PlacePhoto photo) => _screenWide(context, photo.full);
+
+  /// The original at the screen's width: when the large copy failed.
+  static ImageProvider original(BuildContext context, PlacePhoto photo) => _screenWide(context, photo.original);
+
+  static ImageProvider _screenWide(BuildContext context, Uri url) => ResizeImage(
+        NetworkImage('$url'),
         width: (MediaQuery.sizeOf(context).width * MediaQuery.devicePixelRatioOf(context)).round(),
       );
+
+  static Widget _fadeIn(BuildContext context, Widget child, int? frame, bool sync) => sync
+      ? child
+      : AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: const Duration(milliseconds: 220), child: child);
 
   @override
   Widget build(BuildContext context) => Stack(
@@ -121,10 +131,15 @@ class PlaceImage extends StatelessWidget {
           Image(
             image: full(context, photo),
             fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => const SizedBox.shrink(),
-            frameBuilder: (_, child, frame, sync) => sync
-                ? child
-                : AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: const Duration(milliseconds: 220), child: child),
+            errorBuilder: (_, _, _) => photo.original == photo.full
+                ? const SizedBox.shrink()
+                : Image(
+                    image: original(context, photo),
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    frameBuilder: _fadeIn,
+                  ),
+            frameBuilder: _fadeIn,
           ),
         ],
       );
