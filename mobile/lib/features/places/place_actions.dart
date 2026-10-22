@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../app_services.dart';
 import '../../l10n/app_localizations.dart';
 import 'places_models.dart';
 import 'places_parts.dart';
@@ -31,20 +30,4 @@ Future<void> copyAddress(BuildContext context, Place place) async {
   HapticFeedback.lightImpact();
   await Clipboard.setData(ClipboardData(text: address));
   if (context.mounted) showPlacesSnack(context, s.plAddressCopied);
-}
-
-/// The phone's share sheet: name, address, number, and the place in both
-/// Korean maps (people use one or the other; neither is everyone's).
-Future<void> sharePlace(BuildContext context, AppServices services, Place place) {
-  final s = AppLocalizations.of(context);
-  return services.shareText([
-    '${place.kind.emoji} ${place.name}',
-    if (place.address != null) '📍 ${place.address}',
-    if (place.phones.isNotEmpty) '📞 ${place.phones.join(', ')}',
-    '',
-    'Naver Map: ${naverUri(place)}',
-    'Kakao Map: ${kakaoUri(place)}',
-    '',
-    s.plShareFooter,
-  ].join('\n'));
 }

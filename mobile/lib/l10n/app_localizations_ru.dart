@@ -2667,9 +2667,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get plShare => 'Поделиться';
-
-  @override
   String get plAddressNotFound =>
       'Адрес не найден. Попробуйте написать точнее, на корейском.';
 
@@ -3200,9 +3197,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plCallNumber => 'Позвонить';
-
-  @override
-  String get plShareFooter => 'Найдено в приложении Muslim Vegukin';
 
   @override
   String get plPhotoLoading => 'Загружаем фото…';

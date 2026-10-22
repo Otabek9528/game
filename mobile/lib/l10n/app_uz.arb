@@ -1388,7 +1388,6 @@
       }
     }
   },
-  "plShare": "Ulashish",
   "plAddressNotFound": "Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.",
   "plNothingFound": "Hech narsa topilmadi",
   "plLoadFailed": "Joylarni yuklab bo‘lmadi. Internetni tekshiring.",
@@ -1671,7 +1670,6 @@
   "themeToNight": "Tungi rejim",
   "plSocialMore": "Boshqa tarmoqdagi sahifasini bilasizmi?",
   "plCallNumber": "Qo‘ng‘iroq qilish",
-  "plShareFooter": "Muslim Vegukin ilovasida topildi",
   "plPhotoLoading": "Rasm yuklanmoqda…",
   "plPhotoLoadingSpeed": "Yuklanish tezligi internetingizga bog‘liq",
   "plGettingThere": "Qanday borish mumkin",

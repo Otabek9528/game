@@ -266,17 +266,6 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
               title: _collapsed
                   ? Text(place.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Colors.white))
                   : null,
-              actions: [
-                _Round(
-                  plain: _collapsed,
-                  child: IconButton(
-                    onPressed: () => sharePlace(context, _services, place),
-                    tooltip: s.plShare,
-                    icon: Icon(Icons.share_rounded, color: _collapsed ? Colors.white : const Color(0xFF292524)),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.parallax,
                 background: PlacePhotos(

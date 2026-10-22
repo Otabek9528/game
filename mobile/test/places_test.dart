@@ -455,7 +455,6 @@ void main() {
       for (final gone in ['Call', 'Directions', 'Copy']) {
         expect(find.text(gone), findsNothing, reason: 'one way to each thing');
       }
-      expect(find.byTooltip('Share'), findsOneWidget);
       expect(find.text('4.7'), findsWidgets);
       expect(find.text('· 3 reviews'), findsOneWidget);
       expect(find.text('010-1111-2222'), findsOneWidget);
@@ -469,7 +468,7 @@ void main() {
       expect(app.places.asked.where((a) => a.startsWith('detail 1')), hasLength(1));
     });
 
-    testWidgets('a number called, each navigator in one tap, the address copied, shared with both maps', (tester) async {
+    testWidgets('a number called, each navigator in one tap, the address copied; nothing to share', (tester) async {
       final app = await openAnsan(tester);
       String? copied;
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
@@ -490,13 +489,7 @@ void main() {
       expect(copied, '경기 안산시 단원구 원곡로 5');
       expect(find.text('Address copied'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Share'));
-      await tester.pumpAndSettle();
-      expect(app.shared.single, contains('🕌 Ansan Markaziy Masjidi'));
-      expect(app.shared.single, contains('📍 경기 안산시 단원구 원곡로 5'));
-      expect(app.shared.single, contains('📞 010-1111-2222, 031-555-6666'));
-      expect(app.shared.single, contains('Naver Map: https://naver.me/abc'));
-      expect(app.shared.single, contains('Kakao Map: https://place.map.kakao.com/1'));
+      expect(find.byTooltip('Share'), findsNothing, reason: 'no sharing: everything in one message is a scraper’s gift');
     });
 
     testWidgets('watched with a tap, no sign-in needed; and the list knows', (tester) async {

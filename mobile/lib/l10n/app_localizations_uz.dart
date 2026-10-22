@@ -2564,9 +2564,6 @@ class AppLocalizationsUz extends AppLocalizations {
   }
 
   @override
-  String get plShare => 'Ulashish';
-
-  @override
   String get plAddressNotFound =>
       'Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.';
 
@@ -3090,9 +3087,6 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plCallNumber => 'Qo‘ng‘iroq qilish';
-
-  @override
-  String get plShareFooter => 'Muslim Vegukin ilovasida topildi';
 
   @override
   String get plPhotoLoading => 'Rasm yuklanmoqda…';

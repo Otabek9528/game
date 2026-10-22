@@ -4606,12 +4606,6 @@ abstract class AppLocalizations {
   /// **'{count} ta izoh'**
   String plReviewCount(int count);
 
-  /// No description provided for @plShare.
-  ///
-  /// In uz, this message translates to:
-  /// **'Ulashish'**
-  String get plShare;
-
   /// No description provided for @plAddressNotFound.
   ///
   /// In uz, this message translates to:
@@ -5493,12 +5487,6 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Qo‘ng‘iroq qilish'**
   String get plCallNumber;
-
-  /// No description provided for @plShareFooter.
-  ///
-  /// In uz, this message translates to:
-  /// **'Muslim Vegukin ilovasida topildi'**
-  String get plShareFooter;
 
   /// No description provided for @plPhotoLoading.
   ///

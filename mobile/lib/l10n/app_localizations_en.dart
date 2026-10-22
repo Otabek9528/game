@@ -2628,9 +2628,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get plShare => 'Share';
-
-  @override
   String get plAddressNotFound =>
       'That address wasn’t found. Try writing it more precisely, in Korean.';
 
@@ -3157,9 +3154,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plCallNumber => 'Call';
-
-  @override
-  String get plShareFooter => 'Found in the Muslim Vegukin app';
 
   @override
   String get plPhotoLoading => 'Loading the photo…';
