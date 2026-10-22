@@ -3176,4 +3176,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get plShareFooter => 'Found in the Muslim Vegukin app';
+
+  @override
+  String get plPhotoLoading => 'Loading the photo…';
+
+  @override
+  String get plPhotoLoadingSpeed =>
+      'How fast depends on your internet connection';
 }

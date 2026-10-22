@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -328,12 +329,34 @@ void main() {
       expect(find.byType(PlaceDetailScreen), findsNothing, reason: 'the photo, not the page');
       expect(find.text('1 / 2'), findsOneWidget);
       final viewer = find.byType(InteractiveViewer);
-      await tester.tap(viewer);
-      await tester.pump(const Duration(milliseconds: 50));
-      await tester.tap(viewer);
-      await tester.pumpAndSettle();
       final zoom = tester.widget<InteractiveViewer>(viewer).transformationController!;
-      expect(zoom.value.getMaxScaleOnAxis(), greaterThan(2));
+
+      // A pinch at once: the swipe held from the second finger, zoomed.
+      final center = tester.getCenter(viewer);
+      final a = await tester.startGesture(center - const Offset(30, 0));
+      final b = await tester.startGesture(center + const Offset(30, 0));
+      await tester.pump();
+      expect(tester.widget<PageView>(find.byType(PageView).last).physics, isA<NeverScrollableScrollPhysics>());
+      for (var i = 0; i < 6; i++) {
+        await a.moveBy(const Offset(-15, 0));
+        await b.moveBy(const Offset(15, 0));
+        await tester.pump();
+      }
+      await a.up();
+      await b.up();
+      await tester.pumpAndSettle();
+      expect(zoom.value.getMaxScaleOnAxis(), greaterThan(1.5));
+
+      // A double tap: back to fit; another: zoomed in.
+      await tester.pump(const Duration(seconds: 1));
+      for (final scale in [lessThan(1.01), greaterThan(2)]) {
+        await tester.tap(viewer);
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.tap(viewer);
+        await tester.pumpAndSettle();
+        expect(zoom.value.getMaxScaleOnAxis(), scale);
+        await tester.pump(const Duration(seconds: 1));
+      }
       await tester.drag(find.byType(PageView).last, const Offset(-400, 0));
       await tester.pumpAndSettle();
       expect(find.text('1 / 2'), findsOneWidget, reason: 'zoomed in, a swipe moves the photo');
@@ -361,7 +384,7 @@ void main() {
       expect(find.text('1 / 3'), findsOneWidget, reason: 'up to the first gap');
       final shown = tester.widgetList<Image>(find.byType(Image)).map((i) => i.image).whereType<ResizeImage>()
           .map((r) => (r.imageProvider as NetworkImage).url);
-      expect(shown, contains('https://vegukin-twa.pages.dev/Photos/117/1.jpg?v=aa'), reason: 'sharp when zoomed');
+      expect(shown, contains('https://vegukin-twa.pages.dev/Photos/117/1.jpg?v=aa'), reason: 'the original when the copy fails');
       expect(shown.any((u) => u.startsWith('https://wsrv.nl/?url=${Uri.encodeComponent('https://vegukin-twa.pages.dev/Photos/117/1.jpg?v=aa')}&w=1080')),
           isTrue, reason: 'a resized copy for the screen');
       await tester.tap(find.byTooltip('Close'));
@@ -375,6 +398,31 @@ void main() {
       await tester.tap(find.text('Search near me'));
       await tester.pumpAndSettle();
       expect(app.places.photoProbes, probes);
+    });
+
+    testWidgets('photos on their way: said so, and why it can take a while; none at all: the kind’s picture', (tester) async {
+      final app = TestApp(language: 'en');
+      app.places
+        ..manifest = {}
+        ..files = {'Photos/117/1.jpg': 'aa'}
+        ..probeGate = Completer();
+      await openPlaces(tester, app: app, nearMe: false);
+      await tester.tap(find.text('Search near me'));
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
+      await tester.scrollUntilVisible(find.text('Seoul Markaziy Masjidi'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.pump(const Duration(seconds: 2));
+      final seoul = card('Seoul Markaziy Masjidi');
+      expect(find.descendant(of: seoul, matching: find.text('Loading the photo…')), findsOneWidget);
+      expect(find.descendant(of: seoul, matching: find.text('How fast depends on your internet connection')), findsOneWidget);
+      expect(find.descendant(of: card('Siheung Masjidi'), matching: find.byType(PhotoLoading)), findsNothing,
+          reason: 'no photos: its picture, not a wait');
+
+      app.places.probeGate!.complete();
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: seoul, matching: find.byType(PlaceImage)), findsOneWidget);
+      expect(find.descendant(of: seoul, matching: find.byType(PhotoLoading)), findsNothing, reason: 'it came, or failed');
     });
 
     testWidgets('offline: said so, and tried again', (tester) async {

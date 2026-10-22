@@ -904,5 +904,7 @@
   "themeToNight": "Night mode",
   "plSocialMore": "Know a page on another network?",
   "plCallNumber": "Call",
-  "plShareFooter": "Found in the Muslim Vegukin app"
+  "plShareFooter": "Found in the Muslim Vegukin app",
+  "plPhotoLoading": "Loading the photo…",
+  "plPhotoLoadingSpeed": "How fast depends on your internet connection"
 }

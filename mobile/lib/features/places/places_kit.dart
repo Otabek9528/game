@@ -214,13 +214,22 @@ class PlacesKit extends ChangeNotifier {
     return found;
   }
 
+  /// Whether [place]'s photos are still being looked for: then a photo is
+  /// on its way, not missing.
+  bool photosPending(Place place) {
+    final folder = _cleanFolder(place.photoFolder);
+    if (folder == null || _manifest?[folder] != null) return false;
+    return _foundIn(folder) == null;
+  }
+
   final _found = <String, List<PlacePhoto>>{};
   final _looking = <String, List<PlacePhoto>>{};
+  Map<String, dynamic>? _saved;
 
   List<PlacePhoto>? _foundIn(String folder) {
     final kept = _found[folder];
     if (kept != null) return kept;
-    final saved = _readFound()[folder];
+    final saved = (_saved ??= _readFound())[folder];
     if (saved is! Map || saved['files'] is! List || saved['at'] is! int) return null;
     if (services.clock().difference(DateTime.fromMillisecondsSinceEpoch(saved['at'] as int)) > _foundFor) return null;
     return _found[folder] = [for (final f in saved['files'] as List) if (f is String) _foundPhoto(folder, f)];
@@ -263,11 +272,13 @@ class PlacesKit extends ChangeNotifier {
         }
       }
       _found[folder] = [for (final f in files) _foundPhoto(folder, f)];
-      final all = _readFound()..[folder] = {'at': services.clock().millisecondsSinceEpoch, 'files': files};
+      final all = _saved = _readFound()..[folder] = {'at': services.clock().millisecondsSinceEpoch, 'files': files};
       await services.store.write(_foundKey, jsonEncode(all));
       _notify();
     } on PlacesException {
-      // Offline: looked for again next time.
+      // Offline: none this time (not kept), looked for again next time.
+      _found[folder] = const [];
+      _notify();
     } finally {
       _looking.remove(folder);
     }

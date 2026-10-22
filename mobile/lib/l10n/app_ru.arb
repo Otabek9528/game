@@ -904,5 +904,7 @@
   "themeToNight": "Ночной режим",
   "plSocialMore": "Знаете страницу в другой соцсети?",
   "plCallNumber": "Позвонить",
-  "plShareFooter": "Найдено в приложении Muslim Vegukin"
+  "plShareFooter": "Найдено в приложении Muslim Vegukin",
+  "plPhotoLoading": "Загружаем фото…",
+  "plPhotoLoadingSpeed": "Скорость загрузки зависит от вашего интернета"
 }

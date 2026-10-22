@@ -3109,4 +3109,10 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get plShareFooter => 'Muslim Vegukin ilovasida topildi';
+
+  @override
+  String get plPhotoLoading => 'Rasm yuklanmoqda…';
+
+  @override
+  String get plPhotoLoadingSpeed => 'Yuklanish tezligi internetingizga bog‘liq';
 }

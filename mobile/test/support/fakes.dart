@@ -1408,9 +1408,13 @@ class FakePlaces implements PlacesSource {
   Map<String, String> files = {};
   int photoProbes = 0;
 
+  /// Holds every look for a photo until completed.
+  Completer<void>? probeGate;
+
   @override
   Future<String?> photoTag(Uri url) async {
     photoProbes++;
+    await probeGate?.future;
     _online('photo');
     return files[url.pathSegments.join('/')];
   }

@@ -3219,4 +3219,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plShareFooter => 'Найдено в приложении Muslim Vegukin';
+
+  @override
+  String get plPhotoLoading => 'Загружаем фото…';
+
+  @override
+  String get plPhotoLoadingSpeed =>
+      'Скорость загрузки зависит от вашего интернета';
 }

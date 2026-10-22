@@ -533,6 +533,15 @@ class _PhotoViewerState extends State<_PhotoViewer> {
   late int _index = widget.start;
   bool _zoomed = false;
 
+  /// Fingers on the screen: with two, it's a pinch, not a swipe.
+  int _fingers = 0;
+
+  void _finger(int change) {
+    final pinching = _fingers >= 2;
+    _fingers = (_fingers + change).clamp(0, 10);
+    if ((_fingers >= 2) != pinching) setState(() {});
+  }
+
   @override
   void dispose() {
     _pages.dispose();
@@ -548,20 +557,26 @@ class _PhotoViewerState extends State<_PhotoViewer> {
         backgroundColor: Colors.black,
         body: Stack(
           children: [
-            PageView.builder(
-              controller: _pages,
-              // A zoomed photo pans; swiping to the next waits until it's back.
-              physics: _zoomed ? const NeverScrollableScrollPhysics() : null,
-              itemCount: widget.photos.length,
-              onPageChanged: (i) {
-                HapticFeedback.selectionClick();
-                setState(() => _index = i);
-              },
-              itemBuilder: (context, i) => _ZoomPhoto(
-                photo: widget.photos[i],
-                onZoom: (zoomed) {
-                  if (zoomed != _zoomed) setState(() => _zoomed = zoomed);
+            Listener(
+              onPointerDown: (_) => _finger(1),
+              onPointerUp: (_) => _finger(-1),
+              onPointerCancel: (_) => _finger(-1),
+              child: PageView.builder(
+                controller: _pages,
+                // A pinch zooms from its first moment, and a zoomed photo
+                // pans: no swipe to the next until it's back.
+                physics: _zoomed || _fingers >= 2 ? const NeverScrollableScrollPhysics() : null,
+                itemCount: widget.photos.length,
+                onPageChanged: (i) {
+                  HapticFeedback.selectionClick();
+                  setState(() => _index = i);
                 },
+                itemBuilder: (context, i) => _ZoomPhoto(
+                  photo: widget.photos[i],
+                  onZoom: (zoomed) {
+                    if (zoomed != _zoomed) setState(() => _zoomed = zoomed);
+                  },
+                ),
               ),
             ),
             SafeArea(
@@ -600,8 +615,9 @@ class _PhotoViewerState extends State<_PhotoViewer> {
 }
 
 /// One photo, fitted: pinch to zoom, double-tap to zoom in where tapped
-/// and again to fit. The copy the list already has shows at once; the
-/// large one, sharp when zoomed, over it once loaded.
+/// and again to fit. Zoomable at once: the small copy the list already has
+/// shows straight away, the screen-sized one over it; the original, sharp
+/// up close, is fetched only once zoomed in (no megabytes for a look).
 class _ZoomPhoto extends StatefulWidget {
   const _ZoomPhoto({required this.photo, required this.onZoom});
 
@@ -612,18 +628,23 @@ class _ZoomPhoto extends StatefulWidget {
   State<_ZoomPhoto> createState() => _ZoomPhotoState();
 }
 
-class _ZoomPhotoState extends State<_ZoomPhoto> with SingleTickerProviderStateMixin {
+class _ZoomPhotoState extends State<_ZoomPhoto> with SingleTickerProviderStateMixin, PhotoLayers {
   final _zoom = TransformationController();
   late final _animation = AnimationController(vsync: this, duration: const Duration(milliseconds: 220));
   Animation<Matrix4>? _to;
   Offset _tap = Offset.zero;
+  bool _sharp = false;
 
   static const _doubleTapScale = 2.6;
 
   @override
   void initState() {
     super.initState();
-    _zoom.addListener(() => widget.onZoom(_zoom.value.getMaxScaleOnAxis() > 1.01));
+    _zoom.addListener(() {
+      final zoomed = _zoom.value.getMaxScaleOnAxis() > 1.01;
+      widget.onZoom(zoomed);
+      if (zoomed && !_sharp) setState(() => _sharp = true);
+    });
     _animation.addListener(() => _zoom.value = _to!.value);
   }
 
@@ -647,9 +668,15 @@ class _ZoomPhotoState extends State<_ZoomPhoto> with SingleTickerProviderStateMi
     _animation.forward(from: 0);
   }
 
+  /// The original, without decoding a camera's full size.
+  ImageProvider get _original =>
+      ResizeImage(NetworkImage('${widget.photo.original}'), width: 2560, height: 2560, policy: ResizeImagePolicy.fit);
+
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
+    final photo = widget.photo;
+    Widget none() => layersFailed(Center(child: Text(s.plPhotoFailed, style: const TextStyle(color: Colors.white70))));
     return GestureDetector(
       onDoubleTapDown: (d) => _tap = d.localPosition,
       onDoubleTap: _toggle,
@@ -660,23 +687,10 @@ class _ZoomPhotoState extends State<_ZoomPhoto> with SingleTickerProviderStateMi
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image(
-                image: PlaceImage.full(context, widget.photo),
-                fit: BoxFit.contain,
-                loadingBuilder: (_, child, progress) =>
-                    progress == null ? child : const Center(child: CircularProgressIndicator(color: Colors.white54)),
-                // The original, over it, stands in.
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
-              ),
-              Image(
-                // Sharp when zoomed, without decoding a camera's full size.
-                image: ResizeImage(NetworkImage('${widget.photo.original}'), width: 2560, policy: ResizeImagePolicy.fit, height: 2560),
-                fit: BoxFit.contain,
-                gaplessPlayback: true,
-                errorBuilder: (_, _, _) =>
-                    Center(child: Text(s.plPhotoFailed, style: const TextStyle(color: Colors.white70))),
-                frameBuilder: (_, child, frame, sync) => sync || frame != null ? child : const SizedBox.shrink(),
-              ),
+              if (!shown && !failed) const PhotoLoading(),
+              layer(NetworkImage('${photo.thumb}'), BoxFit.contain, () => const SizedBox.shrink()),
+              layer(PlaceImage.full(context, photo), BoxFit.contain, () => photo.original == photo.full ? none() : layer(_original, BoxFit.contain, none)),
+              if (_sharp && photo.original != photo.full) layer(_original, BoxFit.contain, () => const SizedBox.shrink()),
             ],
           ),
         ),

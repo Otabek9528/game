@@ -5529,6 +5529,18 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Muslim Vegukin ilovasida topildi'**
   String get plShareFooter;
+
+  /// No description provided for @plPhotoLoading.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rasm yuklanmoqda…'**
+  String get plPhotoLoading;
+
+  /// No description provided for @plPhotoLoadingSpeed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklanish tezligi internetingizga bog‘liq'**
+  String get plPhotoLoadingSpeed;
 }
 
 class _AppLocalizationsDelegate
