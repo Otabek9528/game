@@ -11,6 +11,8 @@ import 'package:muslim_vegukin/features/hikorea/hikorea_screen.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_watches.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 
+import 'package:muslim_vegukin/features/places/place_detail.dart';
+
 import 'support/fakes.dart';
 
 AccountController controller(MemoryStore store, FakeAccounts accounts, {FakePush? push, AppLanguage language = AppLanguage.uz}) =>
@@ -161,7 +163,11 @@ void main() {
       await app.launch(tester);
       app.push.open({'url': 'https://vegukin-twa.pages.dev/pages/places/places-detail.html?id=8&type=restaurant'});
       app.push.open({});
-      expect(app.opened.ids, ['restaurant']);
+      await tester.pumpAndSettle();
+      expect(find.byType(PlaceDetailScreen), findsOneWidget, reason: 'the place itself, native');
+      expect(app.opened.ids, isEmpty);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
       app.push.open({'kind': 'hikorea'});
       await tester.pumpAndSettle();
       expect(find.byType(HikoreaScreen), findsOneWidget, reason: 'native, not the web page');
@@ -413,7 +419,7 @@ void main() {
     }
 
     testWidgets('the bell counts what is new; the inbox shows it by day; each opens whole', (tester) async {
-      final app = await withAlerts(tester);
+      await withAlerts(tester);
       expect(badge('3'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Inbox'));
@@ -428,7 +434,10 @@ void main() {
       expect(find.byType(InboxMessageScreen), findsOneWidget);
       expect(find.textContaining('A new restaurant near you', findRichText: true), findsOneWidget);
       await tester.tap(find.text('Open Restaurants'));
-      expect(app.opened.ids.last, 'restaurant');
+      await tester.pumpAndSettle();
+      expect(find.byType(PlaceDetailScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
       await tester.pageBack();
       await tester.pumpAndSettle();
 

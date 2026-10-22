@@ -8,6 +8,9 @@ import '../hikorea/hikorea_screen.dart';
 import '../hikorea/hikorea_watches.dart';
 import '../links/links_screen.dart';
 import '../parcel/parcel_screen.dart';
+import '../places/place_detail.dart';
+import '../places/places_models.dart';
+import '../places/places_screen.dart';
 import '../qibla/qibla_screen.dart';
 import '../qna/qna_screen.dart';
 import '../support/community_screen.dart';
@@ -20,6 +23,17 @@ void openSection(BuildContext context, Feature feature, AppServices services) {
   HapticFeedback.lightImpact();
   // Each opening counted, as the web home page counts its cards.
   services.activity.log(feature.id);
+  if (PlaceKind.fromKey(feature.id) case final kind?) {
+    // A notification about one place opens it; its own type decides how it looks.
+    final link = Uri.tryParse(feature.path);
+    final id = int.tryParse(link?.queryParameters['id'] ?? '');
+    if (id != null && (link?.path.endsWith('places-detail.html') ?? false)) return openPlaceById(context, services, id);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => PlacesScreen(services: services, kind: kind),
+      settings: RouteSettings(name: feature.id),
+    ));
+    return;
+  }
   final native = switch (feature.id) {
     // The phone's full sensors and camera.
     'qibla' => (BuildContext _) => QiblaScreen(services: services),

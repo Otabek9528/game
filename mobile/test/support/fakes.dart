@@ -25,6 +25,8 @@ import 'package:muslim_vegukin/core/theme_controller.dart';
 import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/parcel/parcel_models.dart';
 import 'package:muslim_vegukin/features/parcel/parcel_source.dart';
+import 'package:muslim_vegukin/features/places/places_models.dart';
+import 'package:muslim_vegukin/features/places/places_source.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_controller.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_models.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
@@ -262,6 +264,7 @@ class TestApp {
       qna: qna,
       businesses: this.businesses,
       hikorea: hikorea,
+      places: places,
       clock: () => clockNow,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
@@ -297,6 +300,7 @@ class TestApp {
   final qna = FakeQna();
   final FakeBusinesses businesses;
   final hikorea = FakeHikorea();
+  final places = FakePlaces();
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];
@@ -1203,5 +1207,186 @@ class FakeHikorea implements HikoreaSource {
   Future<void> test(Map<String, String> auth, String lang) async {
     _online();
     tests.add(lang);
+  }
+}
+
+/// The places server, played by the test: mosques around Ansan (where
+/// [FakeLocation] is), Seoul and Daegu, one without a location; a
+/// restaurant and a shop in Ansan; reviews, watches, suggestions.
+class FakePlaces implements PlacesSource {
+  bool fail = false;
+
+  /// A server before update 6: no list of them all.
+  bool oldServer = false;
+  final asked = <String>[];
+  int _etag = 1;
+
+  static Place _p(int id, String name, PlaceKind kind,
+          {String? city, String? address, String phone = '', double? lat, double? lon, int reviews = 0, double rating = 0,
+          String? photo, String? note, String? telegram, String? menu, String? kakao, String? naver}) =>
+      Place.fromJson({
+        'id': id, 'name': name, 'buildingType': kind.buildingType, 'city': city, 'address': address, 'phone': phone,
+        'lat': lat, 'lon': lon, 'reviewCount': reviews, 'averageRating': rating, 'photo': photo, 'ownerNote': note,
+        'telegramUrl': telegram, 'menuUrl': menu, 'kakaoMapUrl': kakao, 'naverMapUrl': naver,
+      })!;
+
+  final places = <PlaceKind, List<Place>>{
+    PlaceKind.mosque: [
+      _p(1, 'Ansan Markaziy Masjidi', PlaceKind.mosque, city: 'Ansan', address: '경기 안산시 단원구 원곡로 5',
+          phone: '010-1111-2222, 031-555-6666', lat: 37.33, lon: 126.81, reviews: 3, rating: 4.7,
+          note: 'Juma namozi: 13:00\nHar kuni ochiq', telegram: 'https://t.me/ansanmasjid',
+          kakao: 'https://place.map.kakao.com/1', naver: 'https://naver.me/abc'),
+      _p(2, 'Siheung Masjidi', PlaceKind.mosque, city: 'Siheung', address: '경기 시흥시 정왕동 1', lat: 37.38, lon: 126.80),
+      _p(3, 'Seoul Markaziy Masjidi', PlaceKind.mosque, city: 'Seoul', address: '서울 용산구 우사단로10길 39',
+          phone: '02-793-6908', lat: 37.533, lon: 126.997, reviews: 12, rating: 4.5, photo: 'Photos/117'),
+      _p(4, 'Daegu Masjid', PlaceKind.mosque, city: 'Daegu', address: '대구 북구 대현로 1', lat: 35.87, lon: 128.6),
+      _p(5, 'Yangi namozxona', PlaceKind.mosque, address: '경기 화성시 1'),
+      _p(6, 'Ansan Nur Masjidi', PlaceKind.mosque, city: 'Ansan', address: '경기 안산시 단원구 2', lat: 37.31, lon: 126.84),
+    ],
+    PlaceKind.restaurant: [
+      _p(101, 'Samarqand Osh Markazi', PlaceKind.restaurant, city: 'Ansan', address: '경기 안산시 단원구 3',
+          phone: '010-3333-4444', lat: 37.321, lon: 126.832, reviews: 5, rating: 4.2, menu: 'https://menu.example/osh'),
+    ],
+    PlaceKind.shop: [
+      _p(201, 'Halol Market', PlaceKind.shop, city: 'Ansan', address: '경기 안산시 단원구 4', lat: 37.322, lon: 126.828),
+    ],
+  };
+
+  final reviews = <int, List<PlaceReview>>{
+    1: [
+      PlaceReview(rating: 5, text: 'Juda toza, wudu joyi bor', at: DateTime(2026, 10, 1)),
+      PlaceReview(rating: 4, at: DateTime(2026, 9, 20)),
+      PlaceReview(rating: 5, text: 'Juma namozida joy kam', at: DateTime(2025, 12, 2)),
+    ],
+  };
+  final pending = <int, Set<String>>{};
+  final watches = <int, PlaceWatch>{1: const PlaceWatch(count: 43)};
+  final suggestions = <(int, String, String)>[];
+  final announcements = <(int, String)>[];
+  final claims = <int>[];
+
+  /// Codes to answer the next call of that name with: review, suggest, …
+  final failNext = <String, String>{};
+
+  Place byId(int id) => places.values.expand((l) => l).firstWhere((p) => p.id == id);
+
+  void _online(String call) {
+    asked.add(call);
+    if (fail) throw const PlacesException('offline');
+    if (failNext.remove(call.split(' ').first) case final code?) throw PlacesException(code, 400);
+  }
+
+  @override
+  Future<PlacesList?> all(PlaceKind kind, {String? etag}) async {
+    _online('all ${kind.key} ${etag ?? '-'}');
+    if (oldServer) throw const PlacesException('unsupported', 404);
+    if (etag == 'e$_etag') return null;
+    return (places: List.of(places[kind]!), etag: 'e$_etag');
+  }
+
+  /// The list changed on the server: a new tag.
+  void changed() => _etag++;
+
+  @override
+  Future<List<Place>> nearby(PlaceKind kind, double lat, double lon, {int limit = 10}) async {
+    _online('nearby ${kind.key}');
+    final list = [
+      for (final p in places[kind]!)
+        if (p.located) p,
+    ]..sort((a, b) => a.distanceFrom(lat, lon)!.compareTo(b.distanceFrom(lat, lon)!));
+    return [
+      for (final p in list.take(limit)) Place.fromJson({...p.toJson(), 'distance': p.distanceFrom(lat, lon)})!,
+    ];
+  }
+
+  @override
+  Future<AddressPlaces> nearAddress(PlaceKind kind, String address, {int limit = 10}) async {
+    _online('address ${kind.key} $address');
+    if (!address.contains('서울')) throw const PlacesException('http_404', 404);
+    // Itaewon.
+    final near = await nearby(kind, 37.534, 126.994, limit: limit);
+    asked.removeLast();
+    return (places: near, lat: 37.534, lon: 126.994, label: '서울 용산구 이태원동');
+  }
+
+  @override
+  Future<PlaceDetail> detail(int id, Map<String, String> auth) async {
+    _online('detail $id ${auth['Authorization'] ?? '-'}');
+    final place = places.values.expand((l) => l).where((p) => p.id == id).firstOrNull;
+    if (place == null) throw const PlacesException('http_404', 404);
+    return PlaceDetail(
+      place: place,
+      reviews: List.of(reviews[id] ?? const []),
+      pending: {...?pending[id]},
+      watch: watches[id] ?? const PlaceWatch(),
+      ownReviews: !oldServer,
+    );
+  }
+
+  @override
+  Future<bool> review(Map<String, String> auth, int id, int rating, String text) async {
+    _online('review $id $rating $text');
+    final list = reviews[id] ??= [];
+    final had = list.any((r) => r.mine);
+    list
+      ..removeWhere((r) => r.mine)
+      ..insert(0, PlaceReview(rating: rating, text: text, at: testNow, mine: true));
+    return had;
+  }
+
+  @override
+  Future<void> deleteReview(Map<String, String> auth, int id) async {
+    _online('unreview $id');
+    reviews[id]?.removeWhere((r) => r.mine);
+  }
+
+  @override
+  Future<void> suggest(Map<String, String> auth, int id, String field, String value) async {
+    _online('suggest $id $field');
+    suggestions.add((id, field, value));
+    (pending[id] ??= {}).add(field);
+  }
+
+  @override
+  Future<PlaceWatch> watch(Map<String, String> auth, int id, {required bool on, required String lang}) async {
+    _online('watch $id $on $lang');
+    final before = watches[id] ?? const PlaceWatch();
+    return watches[id] = before.copyWith(watching: on, count: before.count + (on == before.watching ? 0 : (on ? 1 : -1)));
+  }
+
+  @override
+  Future<int> reach(Map<String, String> auth, int id) async {
+    _online('reach $id');
+    return watches[id]?.count ?? 0;
+  }
+
+  @override
+  Future<int> announce(Map<String, String> auth, int id, String text, String lang) async {
+    _online('announce $id');
+    announcements.add((id, text));
+    return announcements.where((a) => a.$1 == id).length;
+  }
+
+  @override
+  Future<void> claim(Map<String, String> auth, int id, String lang) async {
+    _online('claim $id');
+    claims.add(id);
+  }
+
+  @override
+  Future<List<WatchedPlace>> watched(Map<String, String> auth) async {
+    _online('watched');
+    return [
+      for (final MapEntry(:key, :value) in watches.entries)
+        if (value.watching) WatchedPlace(id: key, name: byId(key).name, kind: byId(key).kind),
+    ];
+  }
+
+  @override
+  Future<Map<String, List<String>>> photoManifest() async {
+    _online('photos');
+    return {
+      'Photos/117': ['png:9991877d', 'jpg:28c75fa8'],
+    };
   }
 }

@@ -1362,6 +1362,330 @@
   "hkLeafLegend": "Sana — eng yaqin bo‘sh kun",
   "hkLeafFull": "Band",
   "hkWatchingHere": "Shu yerda kuzatuvingiz bor",
+  "plSearchHint": "Nomi, shahar yoki manzil",
+  "plClearSearch": "Tozalash",
+  "plAround": "{city} atrofida · {when}",
+  "@plAround": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "plAroundHere": "Joylashuvingiz atrofida · {when}",
+  "@plAroundHere": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "plLocatePrompt": "Eng yaqinlari birinchi chiqishi uchun joylashuvni yoqing",
+  "plLocateButton": "Yoqish",
+  "plLocateBlocked": "Joylashuvga ruxsat berilmagan",
+  "plLocateOff": "Telefonda joylashuv o‘chiq",
+  "plLocateFailed": "Joylashuvni aniqlab bo‘lmadi",
+  "plAllCities": "Hammasi",
+  "plCountMosques": "{count} ta masjid",
+  "@plCountMosques": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plCountRestaurants": "{count} ta oshxona",
+  "@plCountRestaurants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plCountShops": "{count} ta do‘kon",
+  "@plCountShops": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plSortedNearest": "eng yaqini birinchi",
+  "plSortedCity": "shahar bo‘yicha",
+  "plSortedFrom": "“{place}” ga eng yaqini birinchi",
+  "@plSortedFrom": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "plNearest": "Eng yaqin",
+  "plMetres": "{n} m",
+  "@plMetres": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "plKm": "{n} km",
+  "@plKm": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "plNoReviews": "Hali izoh yo‘q",
+  "plReviewCount": "{count} ta izoh",
+  "@plReviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plCall": "Qo‘ng‘iroq",
+  "plRoute": "Yo‘l",
+  "plCopy": "Nusxa",
+  "plShare": "Ulashish",
+  "plSearchNear": "“{address}” atrofidan qidirish",
+  "@plSearchNear": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "plSearchNearHint": "Koreyscha manzil: eng yaqinlari birinchi chiqadi",
+  "plAddressHint": "Manzil bo‘yicha qidirish uchun uni koreys tilida yozing: 안산시 단원구",
+  "plFinding": "Manzil qidirilmoqda…",
+  "plNearAddress": "“{address}” atrofida",
+  "@plNearAddress": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "plAddressNotFound": "Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.",
+  "plNothingFound": "Hech narsa topilmadi",
+  "plNothingFoundHint": "Boshqacha yozib ko‘ring yoki manzilni koreys tilida kiriting.",
+  "plNoneYetMosque": "Hali masjid qo‘shilmagan",
+  "plNoneYetRestaurant": "Hali oshxona qo‘shilmagan",
+  "plNoneYetShop": "Hali do‘kon qo‘shilmagan",
+  "plLoadFailed": "Joylarni yuklab bo‘lmadi. Internetni tekshiring.",
+  "plNeedsLocation": "Eng yaqin joylarni ko‘rsatish uchun joylashuvingiz kerak — yoki yuqorida manzilni koreys tilida yozing.",
+  "plRecent": "Yaqinda ko‘rilganlar",
+  "plMissingTitle": "Ro‘yxatda yo‘q joyni bilasizmi?",
+  "plMissingBody": "Guruhimizga yozing — qo‘shib qo‘yamiz.",
+  "plWatchingBadge": "Kuzatilmoqda",
+  "plPhotoCount": "{i} / {n}",
+  "@plPhotoCount": {
+    "placeholders": {
+      "i": {
+        "type": "String"
+      },
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "plWatch": "Kuzatish",
+  "plWatchers": "{count} kishi kuzatmoqda",
+  "@plWatchers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plWatchOn": "Yangiliklari shu telefonga keladi",
+  "plWatchOff": "Kuzatish to‘xtatildi",
+  "plWatchNoPush": "Bildirishnomalar o‘chiq — yangiliklar kelmaydi",
+  "plWatchPushOn": "Yoqish",
+  "plWatchWhat": "Nomi, telefoni o‘zgarsa, yopilsa yoki e’lon bersa — xabar olasiz.",
+  "plAddress": "Manzil",
+  "plNoAddress": "Manzil ko‘rsatilmagan",
+  "plPhone": "Telefon",
+  "plNoPhone": "Telefon ko‘rsatilmagan",
+  "plMenu": "Menyu",
+  "plMenuOpen": "Menyuni ochish",
+  "plAddressCopied": "Manzil nusxalandi",
+  "plCallWhich": "Qaysi raqamga qo‘ng‘iroq qilamiz?",
+  "plRouteTitle": "Qaysi xaritada ochamiz?",
+  "plRouteHint": "Koreyada Naver va Kakao xaritalari yo‘lni aniqroq ko‘rsatadi.",
+  "plCopyAddress": "Manzilni nusxalash",
+  "plCopyAddressHint": "Taksi yoki xaritaga qo‘yish uchun",
+  "plMapAttribution": "© OpenStreetMap",
+  "plAbout": "Muassasa haqida",
+  "plAboutEmpty": "Ish vaqti va dam olish kunlari hali qo‘shilmagan.",
+  "plAboutAdd": "Ma’lumot qo‘shish",
+  "plSuggestChange": "O‘zgartirishni taklif qilish",
+  "plSocial": "Ijtimoiy tarmoqlar",
+  "plSocialEmpty": "Bu joyning ijtimoiy tarmoqdagi sahifasini bilasizmi?",
+  "plSocialAdd": "Qo‘shish",
+  "plInviteLink": "Havola",
+  "plPendingField": "{what}: taklifingiz ko‘rib chiqilmoqda",
+  "@plPendingField": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "plNoteLabel": "Ma’lumot",
+  "plReviews": "Izohlar",
+  "plReviewsFirst": "Birinchi bo‘lib izoh qoldiring — boshqalarga yordam bo‘ladi.",
+  "plWriteReview": "Izoh qoldirish",
+  "plEditReview": "Izohingizni o‘zgartirish",
+  "plYourReview": "Sizning izohingiz",
+  "plAllReviews": "Hammasini ko‘rish ({count})",
+  "@plAllReviews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plNoText": "Faqat baho",
+  "plOutOf": "5 dan",
+  "plCorrections": "Nomi, manzili yoki telefoni noto‘g‘rimi? Guruhimizga yozing.",
+  "plLoadDetailFailed": "Ma’lumotlarni yuklab bo‘lmadi. Internetni tekshiring.",
+  "plGone": "Bu joy topilmadi — ro‘yxatdan olib tashlangan bo‘lishi mumkin.",
+  "plShareText": "{emoji} {name}\n📍 {address}\n🗺 {map}\n\nMuslim Vegukin ilovasida topildi",
+  "@plShareText": {
+    "placeholders": {
+      "emoji": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "address": {
+        "type": "String"
+      },
+      "map": {
+        "type": "String"
+      }
+    }
+  },
+  "plRateQuestion": "Qanday baholaysiz?",
+  "plStar1": "Juda yomon",
+  "plStar2": "Yomon",
+  "plStar3": "O‘rtacha",
+  "plStar4": "Yaxshi",
+  "plStar5": "A’lo",
+  "plReviewHintMosque": "Masalan: namoz vaqtlari, kirish eshigidagi parol, qanday borish mumkin.",
+  "plReviewHintRestaurant": "Masalan: taomlar, narxlar, xizmat, ish vaqti.",
+  "plReviewHintShop": "Masalan: nimalar sotiladi, narxlar, ish vaqti.",
+  "plReviewPlaceholder": "Fikringizni yozing (ixtiyoriy)",
+  "plReviewPublic": "Izoh hammaga ko‘rinadi, ismingiz esa ko‘rinmaydi.",
+  "plReviewSend": "Chop etish",
+  "plReviewSave": "Saqlash",
+  "plReviewPick": "Avval yulduzchani tanlang",
+  "plReviewPublished": "Rahmat! Izohingiz chop etildi.",
+  "plReviewUpdated": "Izohingiz yangilandi.",
+  "plReviewDelete": "Izohni o‘chirish",
+  "plReviewDeleteAsk": "Izohingiz o‘chirilsinmi?",
+  "plReviewDeleted": "Izohingiz o‘chirildi.",
+  "plDelete": "O‘chirish",
+  "plCancel": "Bekor qilish",
+  "plSend": "Yuborish",
+  "plSuggestPick": "Nimani qo‘shmoqchisiz?",
+  "plSuggestAddLink": "{platform} havolasini qo‘shish",
+  "@plSuggestAddLink": {
+    "placeholders": {
+      "platform": {
+        "type": "String"
+      }
+    }
+  },
+  "plSuggestEditLink": "{platform} havolasini o‘zgartirish",
+  "@plSuggestEditLink": {
+    "placeholders": {
+      "platform": {
+        "type": "String"
+      }
+    }
+  },
+  "plSuggestAddNote": "Ma’lumot qo‘shish",
+  "plSuggestEditNote": "Ma’lumotni o‘zgartirish",
+  "plSuggestCurrent": "Hozirgi: {value}",
+  "@plSuggestCurrent": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "plHintTelegram": "@username yoki t.me havolasi",
+  "plHintTiktok": "@username yoki tiktok.com havolasi",
+  "plHintInstagram": "@username yoki instagram.com havolasi",
+  "plHintNote": "Ish vaqti, dam olish kunlari yoki e’lon.",
+  "plNotePlaceholder": "Masalan:\nDu–Ju: 11:00 – 22:00\nShanba: yopiq",
+  "plModeration": "Admin tekshirgach chop etiladi.",
+  "plSuggestSent": "Rahmat! Taklifingiz ko‘rib chiqilmoqda.",
+  "plAnnounceMosque": "E’lon yozish",
+  "plAnnounceOwner": "E’lon yuborish",
+  "plAnnounceWhyMosque": "Masalan, hayit namozi vaqti — kuzatayotganlarga yuboriladi.",
+  "plAnnounceWhyOwner": "Kuzatayotganlarga yangilik yuboring.",
+  "plAnnouncePending": "{count} ta e’lon tekshiruvda",
+  "@plAnnouncePending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plAnnounceTitle": "E’lon",
+  "plAnnouncePlaceholderOwner": "Masalan: 25-dekabr kuni oshxonamiz yopiq bo‘ladi.",
+  "plAnnouncePlaceholderMosque": "Masalan: Hayit namozi 07:00, 08:00 va 09:00 da o‘qiladi.",
+  "plAnnounceReach": "Admin tasdiqlagach, taxminan {count} kishiga yuboriladi.",
+  "@plAnnounceReach": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plAnnounceSend": "Tekshiruvga yuborish",
+  "plAnnounceSent": "E’lon tekshiruvga yuborildi",
+  "plTextEmpty": "Avval matn yozing.",
+  "plClaimPrompt": "Bu joy egasimisiz?",
+  "plClaimLink": "Egalikni tasdiqlash",
+  "plClaimWhy": "Egasi kuzatayotganlarga e’lon yubora oladi.",
+  "plClaimConfirm": "Ismingiz va aloqa ma’lumotingiz administratorga yuboriladi. U egalikni tekshirish uchun siz bilan bog‘lanadi. Davom etasizmi?",
+  "plClaimContinue": "Davom etish",
+  "plClaimSent": "So‘rov yuborildi. Administrator siz bilan bog‘lanadi.",
+  "plClaimPending": "Egalik so‘rovingiz ko‘rib chiqilmoqda.",
+  "plYouOwn": "Siz bu joyning egasisiz",
+  "plErrNetwork": "Internetga ulanib bo‘lmadi. Qayta urinib ko‘ring.",
+  "plErrGeneric": "Xatolik yuz berdi. Qayta urinib ko‘ring.",
+  "plErrSignIn": "Buning uchun akkauntga kiring.",
+  "plErrTooManyReviews": "Bugun juda ko‘p izoh qoldirdingiz. Ertaga urinib ko‘ring.",
+  "plErrTooLong": "Matn juda uzun.",
+  "plErrTooShort": "Juda qisqa.",
+  "plErrWrongHost": "Bu havola boshqa saytga tegishli. To‘g‘ri havolani kiriting.",
+  "plErrHandle": "Username noto‘g‘ri. Faqat harflar, raqamlar va pastki chiziq.",
+  "plErrUrl": "Bu havolaga o‘xshamaydi.",
+  "plErrIncomplete": "Havola to‘liq emas.",
+  "plErrNotProfile": "Bu post havolasi. Profil havolasini yuboring.",
+  "plErrPending": "Bu bo‘yicha taklif allaqachon ko‘rib chiqilmoqda.",
+  "plErrSame": "Bu allaqachon saqlangan.",
+  "plErrRateLimited": "Bugungi takliflar limitiga yetdingiz. Ertaga urinib ko‘ring.",
+  "plErrGone": "Bu joy endi mavjud emas.",
+  "plErrNotOwner": "Bu joy uchun faqat tasdiqlangan egasi e’lon yubora oladi.",
+  "plErrHasOwner": "Bu joyning egasi allaqachon tasdiqlangan.",
+  "plErrTooManyPending": "Tekshiruvni kutayotgan so‘rovlaringiz ko‘p. Avval ular ko‘rib chiqilsin.",
+  "plPhotoFailed": "Rasmni yuklab bo‘lmadi",
+  "plMosque": "Masjid",
+  "plRestaurant": "Oshxona",
+  "plShop": "Do‘kon",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

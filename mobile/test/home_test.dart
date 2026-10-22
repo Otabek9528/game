@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
 import 'package:muslim_vegukin/features/prayers/prayers_screen.dart';
 
+import 'package:muslim_vegukin/features/places/places_screen.dart';
+
 import 'support/fakes.dart';
 
 /// The grid's section labels, top to bottom and left to right.
@@ -126,7 +128,11 @@ void main() {
     await app.launch(tester);
 
     await tester.tap(find.text('Masjidlar'));
-    expect(app.opened.ids, ['mosque']);
+    await tester.pumpAndSettle();
+    expect(find.byType(PlacesScreen), findsOneWidget, reason: 'native, not the web page');
+    expect(app.opened.ids, isEmpty);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('PESHINGACHA'));
     await tester.pumpAndSettle();

@@ -2638,6 +2638,597 @@ class AppLocalizationsRu extends AppLocalizations {
   String get hkWatchingHere => 'Здесь у вас есть наблюдение';
 
   @override
+  String get plSearchHint => 'Название, город или адрес';
+
+  @override
+  String get plClearSearch => 'Очистить';
+
+  @override
+  String plAround(String city, String when) {
+    return 'Рядом: $city · $when';
+  }
+
+  @override
+  String plAroundHere(String when) {
+    return 'Рядом с вами · $when';
+  }
+
+  @override
+  String get plLocatePrompt =>
+      'Включите геолокацию, чтобы ближайшие были первыми';
+
+  @override
+  String get plLocateButton => 'Включить';
+
+  @override
+  String get plLocateBlocked => 'Нет доступа к геолокации';
+
+  @override
+  String get plLocateOff => 'Геолокация на телефоне выключена';
+
+  @override
+  String get plLocateFailed => 'Не удалось определить местоположение';
+
+  @override
+  String get plAllCities => 'Все';
+
+  @override
+  String plCountMosques(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count мечети',
+      many: '$count мечетей',
+      few: '$count мечети',
+      one: '$count мечеть',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plCountRestaurants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ресторана',
+      many: '$count ресторанов',
+      few: '$count ресторана',
+      one: '$count ресторан',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plCountShops(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count магазина',
+      many: '$count магазинов',
+      few: '$count магазина',
+      one: '$count магазин',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plSortedNearest => 'сначала ближайшие';
+
+  @override
+  String get plSortedCity => 'по городам';
+
+  @override
+  String plSortedFrom(String place) {
+    return 'ближе к «$place» — выше';
+  }
+
+  @override
+  String get plNearest => 'Ближайшая';
+
+  @override
+  String plMetres(String n) {
+    return '$n м';
+  }
+
+  @override
+  String plKm(String n) {
+    return '$n км';
+  }
+
+  @override
+  String get plNoReviews => 'Пока нет отзывов';
+
+  @override
+  String plReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count отзыва',
+      many: '$count отзывов',
+      few: '$count отзыва',
+      one: '$count отзыв',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plCall => 'Позвонить';
+
+  @override
+  String get plRoute => 'Маршрут';
+
+  @override
+  String get plCopy => 'Копировать';
+
+  @override
+  String get plShare => 'Поделиться';
+
+  @override
+  String plSearchNear(String address) {
+    return 'Искать рядом с «$address»';
+  }
+
+  @override
+  String get plSearchNearHint => 'Адрес на корейском: ближайшие будут первыми';
+
+  @override
+  String get plAddressHint =>
+      'Чтобы искать по адресу, напишите его по-корейски: 안산시 단원구';
+
+  @override
+  String get plFinding => 'Ищем адрес…';
+
+  @override
+  String plNearAddress(String address) {
+    return 'Рядом с «$address»';
+  }
+
+  @override
+  String get plAddressNotFound =>
+      'Адрес не найден. Попробуйте написать точнее, на корейском.';
+
+  @override
+  String get plNothingFound => 'Ничего не найдено';
+
+  @override
+  String get plNothingFoundHint =>
+      'Попробуйте написать иначе или введите адрес по-корейски.';
+
+  @override
+  String get plNoneYetMosque => 'Мечетей пока нет';
+
+  @override
+  String get plNoneYetRestaurant => 'Ресторанов пока нет';
+
+  @override
+  String get plNoneYetShop => 'Магазинов пока нет';
+
+  @override
+  String get plLoadFailed => 'Не удалось загрузить места. Проверьте интернет.';
+
+  @override
+  String get plNeedsLocation =>
+      'Чтобы показать ближайшие места, нужна геолокация — или напишите адрес по-корейски выше.';
+
+  @override
+  String get plRecent => 'Недавно смотрели';
+
+  @override
+  String get plMissingTitle => 'Знаете место, которого нет в списке?';
+
+  @override
+  String get plMissingBody => 'Напишите в нашу группу — добавим.';
+
+  @override
+  String get plWatchingBadge => 'Вы следите';
+
+  @override
+  String plPhotoCount(String i, String n) {
+    return '$i / $n';
+  }
+
+  @override
+  String get plWatch => 'Следить';
+
+  @override
+  String plWatchers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Следят $count',
+      many: 'Следят $count',
+      few: 'Следят $count',
+      one: 'Следит $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plWatchOn => 'Новости будут приходить на этот телефон';
+
+  @override
+  String get plWatchOff => 'Вы больше не следите';
+
+  @override
+  String get plWatchNoPush => 'Уведомления выключены — новости не придут';
+
+  @override
+  String get plWatchPushOn => 'Включить';
+
+  @override
+  String get plWatchWhat =>
+      'Сообщим, если сменится название или телефон, место закроется или опубликует объявление.';
+
+  @override
+  String get plAddress => 'Адрес';
+
+  @override
+  String get plNoAddress => 'Адрес не указан';
+
+  @override
+  String get plPhone => 'Телефон';
+
+  @override
+  String get plNoPhone => 'Телефон не указан';
+
+  @override
+  String get plMenu => 'Меню';
+
+  @override
+  String get plMenuOpen => 'Открыть меню';
+
+  @override
+  String get plAddressCopied => 'Адрес скопирован';
+
+  @override
+  String get plCallWhich => 'Какой номер набрать?';
+
+  @override
+  String get plRouteTitle => 'В какой карте открыть?';
+
+  @override
+  String get plRouteHint =>
+      'В Корее Naver и Kakao точнее прокладывают маршрут.';
+
+  @override
+  String get plCopyAddress => 'Скопировать адрес';
+
+  @override
+  String get plCopyAddressHint => 'Для такси или карты';
+
+  @override
+  String get plMapAttribution => '© OpenStreetMap';
+
+  @override
+  String get plAbout => 'О заведении';
+
+  @override
+  String get plAboutEmpty => 'Часы работы и выходные пока не указаны.';
+
+  @override
+  String get plAboutAdd => 'Добавить информацию';
+
+  @override
+  String get plSuggestChange => 'Предложить изменение';
+
+  @override
+  String get plSocial => 'Соцсети';
+
+  @override
+  String get plSocialEmpty => 'Знаете страницу этого места в соцсетях?';
+
+  @override
+  String get plSocialAdd => 'Добавить';
+
+  @override
+  String get plInviteLink => 'Ссылка';
+
+  @override
+  String plPendingField(String what) {
+    return '$what: предложение на проверке';
+  }
+
+  @override
+  String get plNoteLabel => 'Информация';
+
+  @override
+  String get plReviews => 'Отзывы';
+
+  @override
+  String get plReviewsFirst => 'Оставьте первый отзыв — это поможет другим.';
+
+  @override
+  String get plWriteReview => 'Оставить отзыв';
+
+  @override
+  String get plEditReview => 'Изменить отзыв';
+
+  @override
+  String get plYourReview => 'Ваш отзыв';
+
+  @override
+  String plAllReviews(int count) {
+    return 'Показать все ($count)';
+  }
+
+  @override
+  String get plNoText => 'Только оценка';
+
+  @override
+  String get plOutOf => 'из 5';
+
+  @override
+  String get plCorrections =>
+      'Название, адрес или телефон неверны? Напишите в нашу группу.';
+
+  @override
+  String get plLoadDetailFailed => 'Не удалось загрузить. Проверьте интернет.';
+
+  @override
+  String get plGone => 'Место не найдено — возможно, его убрали из списка.';
+
+  @override
+  String plShareText(String emoji, String name, String address, String map) {
+    return '$emoji $name\n📍 $address\n🗺 $map\n\nНайдено в приложении Muslim Vegukin';
+  }
+
+  @override
+  String get plRateQuestion => 'Ваша оценка?';
+
+  @override
+  String get plStar1 => 'Очень плохо';
+
+  @override
+  String get plStar2 => 'Плохо';
+
+  @override
+  String get plStar3 => 'Нормально';
+
+  @override
+  String get plStar4 => 'Хорошо';
+
+  @override
+  String get plStar5 => 'Отлично';
+
+  @override
+  String get plReviewHintMosque =>
+      'Например: время намаза, код на двери, как добраться.';
+
+  @override
+  String get plReviewHintRestaurant =>
+      'Например: блюда, цены, обслуживание, часы работы.';
+
+  @override
+  String get plReviewHintShop => 'Например: что продают, цены, часы работы.';
+
+  @override
+  String get plReviewPlaceholder => 'Ваш отзыв (необязательно)';
+
+  @override
+  String get plReviewPublic => 'Отзыв увидят все, а ваше имя — нет.';
+
+  @override
+  String get plReviewSend => 'Опубликовать';
+
+  @override
+  String get plReviewSave => 'Сохранить';
+
+  @override
+  String get plReviewPick => 'Сначала выберите оценку';
+
+  @override
+  String get plReviewPublished => 'Спасибо! Отзыв опубликован.';
+
+  @override
+  String get plReviewUpdated => 'Отзыв обновлён.';
+
+  @override
+  String get plReviewDelete => 'Удалить отзыв';
+
+  @override
+  String get plReviewDeleteAsk => 'Удалить ваш отзыв?';
+
+  @override
+  String get plReviewDeleted => 'Отзыв удалён.';
+
+  @override
+  String get plDelete => 'Удалить';
+
+  @override
+  String get plCancel => 'Отмена';
+
+  @override
+  String get plSend => 'Отправить';
+
+  @override
+  String get plSuggestPick => 'Что хотите добавить?';
+
+  @override
+  String plSuggestAddLink(String platform) {
+    return 'Добавить ссылку $platform';
+  }
+
+  @override
+  String plSuggestEditLink(String platform) {
+    return 'Изменить ссылку $platform';
+  }
+
+  @override
+  String get plSuggestAddNote => 'Добавить информацию';
+
+  @override
+  String get plSuggestEditNote => 'Изменить информацию';
+
+  @override
+  String plSuggestCurrent(String value) {
+    return 'Сейчас: $value';
+  }
+
+  @override
+  String get plHintTelegram => '@username или ссылка t.me';
+
+  @override
+  String get plHintTiktok => '@username или ссылка tiktok.com';
+
+  @override
+  String get plHintInstagram => '@username или ссылка instagram.com';
+
+  @override
+  String get plHintNote => 'Часы работы, выходные или объявление.';
+
+  @override
+  String get plNotePlaceholder =>
+      'Например:\nПн–Пт: 11:00 – 22:00\nСуббота: выходной';
+
+  @override
+  String get plModeration => 'Появится после проверки админом.';
+
+  @override
+  String get plSuggestSent => 'Спасибо! Ваше предложение на проверке.';
+
+  @override
+  String get plAnnounceMosque => 'Написать объявление';
+
+  @override
+  String get plAnnounceOwner => 'Отправить объявление';
+
+  @override
+  String get plAnnounceWhyMosque =>
+      'Например, время праздничного намаза — придёт тем, кто следит.';
+
+  @override
+  String get plAnnounceWhyOwner => 'Отправьте новость тем, кто следит.';
+
+  @override
+  String plAnnouncePending(int count) {
+    return 'На проверке: $count';
+  }
+
+  @override
+  String get plAnnounceTitle => 'Объявление';
+
+  @override
+  String get plAnnouncePlaceholderOwner =>
+      'Например: 25 декабря мы не работаем.';
+
+  @override
+  String get plAnnouncePlaceholderMosque =>
+      'Например: праздничный намаз в 07:00, 08:00 и 09:00.';
+
+  @override
+  String plAnnounceReach(int count) {
+    return 'После проверки админом его получат примерно $count чел.';
+  }
+
+  @override
+  String get plAnnounceSend => 'На проверку';
+
+  @override
+  String get plAnnounceSent => 'Объявление отправлено на проверку';
+
+  @override
+  String get plTextEmpty => 'Сначала напишите текст.';
+
+  @override
+  String get plClaimPrompt => 'Вы владелец этого места?';
+
+  @override
+  String get plClaimLink => 'Подтвердить владение';
+
+  @override
+  String get plClaimWhy =>
+      'Владелец может отправлять объявления тем, кто следит.';
+
+  @override
+  String get plClaimConfirm =>
+      'Ваше имя и контакт получит администратор. Он свяжется с вами, чтобы проверить владение. Продолжить?';
+
+  @override
+  String get plClaimContinue => 'Продолжить';
+
+  @override
+  String get plClaimSent => 'Запрос отправлен. Администратор свяжется с вами.';
+
+  @override
+  String get plClaimPending => 'Ваш запрос на владение рассматривается.';
+
+  @override
+  String get plYouOwn => 'Вы владелец этого места';
+
+  @override
+  String get plErrNetwork => 'Нет подключения к интернету. Попробуйте ещё раз.';
+
+  @override
+  String get plErrGeneric => 'Что-то пошло не так. Попробуйте ещё раз.';
+
+  @override
+  String get plErrSignIn => 'Для этого войдите в аккаунт.';
+
+  @override
+  String get plErrTooManyReviews =>
+      'Сегодня вы оставили слишком много отзывов. Попробуйте завтра.';
+
+  @override
+  String get plErrTooLong => 'Текст слишком длинный.';
+
+  @override
+  String get plErrTooShort => 'Слишком коротко.';
+
+  @override
+  String get plErrWrongHost =>
+      'Эта ссылка ведёт на другой сайт. Введите правильную ссылку.';
+
+  @override
+  String get plErrHandle =>
+      'Неверный username. Только буквы, цифры и подчёркивание.';
+
+  @override
+  String get plErrUrl => 'Это не похоже на ссылку.';
+
+  @override
+  String get plErrIncomplete => 'Ссылка неполная.';
+
+  @override
+  String get plErrNotProfile =>
+      'Это ссылка на публикацию. Отправьте ссылку на профиль.';
+
+  @override
+  String get plErrPending => 'Предложение по этому полю уже на проверке.';
+
+  @override
+  String get plErrSame => 'Это уже сохранено.';
+
+  @override
+  String get plErrRateLimited =>
+      'Вы исчерпали лимит на сегодня. Попробуйте завтра.';
+
+  @override
+  String get plErrGone => 'Этого места больше нет.';
+
+  @override
+  String get plErrNotOwner =>
+      'Объявления для этого места может отправлять только подтверждённый владелец.';
+
+  @override
+  String get plErrHasOwner => 'Владелец этого места уже подтверждён.';
+
+  @override
+  String get plErrTooManyPending =>
+      'У вас много запросов на проверке. Дождитесь их рассмотрения.';
+
+  @override
+  String get plPhotoFailed => 'Не удалось загрузить фото';
+
+  @override
+  String get plMosque => 'Мечеть';
+
+  @override
+  String get plRestaurant => 'Ресторан';
+
+  @override
+  String get plShop => 'Магазин';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

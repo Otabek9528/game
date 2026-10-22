@@ -4576,6 +4576,978 @@ abstract class AppLocalizations {
   /// **'Shu yerda kuzatuvingiz bor'**
   String get hkWatchingHere;
 
+  /// No description provided for @plSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomi, shahar yoki manzil'**
+  String get plSearchHint;
+
+  /// No description provided for @plClearSearch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tozalash'**
+  String get plClearSearch;
+
+  /// No description provided for @plAround.
+  ///
+  /// In uz, this message translates to:
+  /// **'{city} atrofida · {when}'**
+  String plAround(String city, String when);
+
+  /// No description provided for @plAroundHere.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvingiz atrofida · {when}'**
+  String plAroundHere(String when);
+
+  /// No description provided for @plLocatePrompt.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng yaqinlari birinchi chiqishi uchun joylashuvni yoqing'**
+  String get plLocatePrompt;
+
+  /// No description provided for @plLocateButton.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get plLocateButton;
+
+  /// No description provided for @plLocateBlocked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvga ruxsat berilmagan'**
+  String get plLocateBlocked;
+
+  /// No description provided for @plLocateOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonda joylashuv o‘chiq'**
+  String get plLocateOff;
+
+  /// No description provided for @plLocateFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvni aniqlab bo‘lmadi'**
+  String get plLocateFailed;
+
+  /// No description provided for @plAllCities.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hammasi'**
+  String get plAllCities;
+
+  /// No description provided for @plCountMosques.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta masjid'**
+  String plCountMosques(int count);
+
+  /// No description provided for @plCountRestaurants.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta oshxona'**
+  String plCountRestaurants(int count);
+
+  /// No description provided for @plCountShops.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta do‘kon'**
+  String plCountShops(int count);
+
+  /// No description provided for @plSortedNearest.
+  ///
+  /// In uz, this message translates to:
+  /// **'eng yaqini birinchi'**
+  String get plSortedNearest;
+
+  /// No description provided for @plSortedCity.
+  ///
+  /// In uz, this message translates to:
+  /// **'shahar bo‘yicha'**
+  String get plSortedCity;
+
+  /// No description provided for @plSortedFrom.
+  ///
+  /// In uz, this message translates to:
+  /// **'“{place}” ga eng yaqini birinchi'**
+  String plSortedFrom(String place);
+
+  /// No description provided for @plNearest.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng yaqin'**
+  String get plNearest;
+
+  /// No description provided for @plMetres.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} m'**
+  String plMetres(String n);
+
+  /// No description provided for @plKm.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} km'**
+  String plKm(String n);
+
+  /// No description provided for @plNoReviews.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali izoh yo‘q'**
+  String get plNoReviews;
+
+  /// No description provided for @plReviewCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta izoh'**
+  String plReviewCount(int count);
+
+  /// No description provided for @plCall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘ng‘iroq'**
+  String get plCall;
+
+  /// No description provided for @plRoute.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yo‘l'**
+  String get plRoute;
+
+  /// No description provided for @plCopy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxa'**
+  String get plCopy;
+
+  /// No description provided for @plShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get plShare;
+
+  /// No description provided for @plSearchNear.
+  ///
+  /// In uz, this message translates to:
+  /// **'“{address}” atrofidan qidirish'**
+  String plSearchNear(String address);
+
+  /// No description provided for @plSearchNearHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreyscha manzil: eng yaqinlari birinchi chiqadi'**
+  String get plSearchNearHint;
+
+  /// No description provided for @plAddressHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil bo‘yicha qidirish uchun uni koreys tilida yozing: 안산시 단원구'**
+  String get plAddressHint;
+
+  /// No description provided for @plFinding.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil qidirilmoqda…'**
+  String get plFinding;
+
+  /// No description provided for @plNearAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'“{address}” atrofida'**
+  String plNearAddress(String address);
+
+  /// No description provided for @plAddressNotFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.'**
+  String get plAddressNotFound;
+
+  /// No description provided for @plNothingFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsa topilmadi'**
+  String get plNothingFound;
+
+  /// No description provided for @plNothingFoundHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqacha yozib ko‘ring yoki manzilni koreys tilida kiriting.'**
+  String get plNothingFoundHint;
+
+  /// No description provided for @plNoneYetMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali masjid qo‘shilmagan'**
+  String get plNoneYetMosque;
+
+  /// No description provided for @plNoneYetRestaurant.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali oshxona qo‘shilmagan'**
+  String get plNoneYetRestaurant;
+
+  /// No description provided for @plNoneYetShop.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali do‘kon qo‘shilmagan'**
+  String get plNoneYetShop;
+
+  /// No description provided for @plLoadFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylarni yuklab bo‘lmadi. Internetni tekshiring.'**
+  String get plLoadFailed;
+
+  /// No description provided for @plNeedsLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng yaqin joylarni ko‘rsatish uchun joylashuvingiz kerak — yoki yuqorida manzilni koreys tilida yozing.'**
+  String get plNeedsLocation;
+
+  /// No description provided for @plRecent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaqinda ko‘rilganlar'**
+  String get plRecent;
+
+  /// No description provided for @plMissingTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro‘yxatda yo‘q joyni bilasizmi?'**
+  String get plMissingTitle;
+
+  /// No description provided for @plMissingBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruhimizga yozing — qo‘shib qo‘yamiz.'**
+  String get plMissingBody;
+
+  /// No description provided for @plWatchingBadge.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatilmoqda'**
+  String get plWatchingBadge;
+
+  /// No description provided for @plPhotoCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{i} / {n}'**
+  String plPhotoCount(String i, String n);
+
+  /// No description provided for @plWatch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatish'**
+  String get plWatch;
+
+  /// No description provided for @plWatchers.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} kishi kuzatmoqda'**
+  String plWatchers(int count);
+
+  /// No description provided for @plWatchOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangiliklari shu telefonga keladi'**
+  String get plWatchOn;
+
+  /// No description provided for @plWatchOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatish to‘xtatildi'**
+  String get plWatchOff;
+
+  /// No description provided for @plWatchNoPush.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar o‘chiq — yangiliklar kelmaydi'**
+  String get plWatchNoPush;
+
+  /// No description provided for @plWatchPushOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get plWatchPushOn;
+
+  /// No description provided for @plWatchWhat.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomi, telefoni o‘zgarsa, yopilsa yoki e’lon bersa — xabar olasiz.'**
+  String get plWatchWhat;
+
+  /// No description provided for @plAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil'**
+  String get plAddress;
+
+  /// No description provided for @plNoAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil ko‘rsatilmagan'**
+  String get plNoAddress;
+
+  /// No description provided for @plPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon'**
+  String get plPhone;
+
+  /// No description provided for @plNoPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon ko‘rsatilmagan'**
+  String get plNoPhone;
+
+  /// No description provided for @plMenu.
+  ///
+  /// In uz, this message translates to:
+  /// **'Menyu'**
+  String get plMenu;
+
+  /// No description provided for @plMenuOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Menyuni ochish'**
+  String get plMenuOpen;
+
+  /// No description provided for @plAddressCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil nusxalandi'**
+  String get plAddressCopied;
+
+  /// No description provided for @plCallWhich.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi raqamga qo‘ng‘iroq qilamiz?'**
+  String get plCallWhich;
+
+  /// No description provided for @plRouteTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi xaritada ochamiz?'**
+  String get plRouteTitle;
+
+  /// No description provided for @plRouteHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreyada Naver va Kakao xaritalari yo‘lni aniqroq ko‘rsatadi.'**
+  String get plRouteHint;
+
+  /// No description provided for @plCopyAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilni nusxalash'**
+  String get plCopyAddress;
+
+  /// No description provided for @plCopyAddressHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Taksi yoki xaritaga qo‘yish uchun'**
+  String get plCopyAddressHint;
+
+  /// No description provided for @plMapAttribution.
+  ///
+  /// In uz, this message translates to:
+  /// **'© OpenStreetMap'**
+  String get plMapAttribution;
+
+  /// No description provided for @plAbout.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muassasa haqida'**
+  String get plAbout;
+
+  /// No description provided for @plAboutEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish vaqti va dam olish kunlari hali qo‘shilmagan.'**
+  String get plAboutEmpty;
+
+  /// No description provided for @plAboutAdd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumot qo‘shish'**
+  String get plAboutAdd;
+
+  /// No description provided for @plSuggestChange.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgartirishni taklif qilish'**
+  String get plSuggestChange;
+
+  /// No description provided for @plSocial.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ijtimoiy tarmoqlar'**
+  String get plSocial;
+
+  /// No description provided for @plSocialEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joyning ijtimoiy tarmoqdagi sahifasini bilasizmi?'**
+  String get plSocialEmpty;
+
+  /// No description provided for @plSocialAdd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘shish'**
+  String get plSocialAdd;
+
+  /// No description provided for @plInviteLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havola'**
+  String get plInviteLink;
+
+  /// No description provided for @plPendingField.
+  ///
+  /// In uz, this message translates to:
+  /// **'{what}: taklifingiz ko‘rib chiqilmoqda'**
+  String plPendingField(String what);
+
+  /// No description provided for @plNoteLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumot'**
+  String get plNoteLabel;
+
+  /// No description provided for @plReviews.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izohlar'**
+  String get plReviews;
+
+  /// No description provided for @plReviewsFirst.
+  ///
+  /// In uz, this message translates to:
+  /// **'Birinchi bo‘lib izoh qoldiring — boshqalarga yordam bo‘ladi.'**
+  String get plReviewsFirst;
+
+  /// No description provided for @plWriteReview.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izoh qoldirish'**
+  String get plWriteReview;
+
+  /// No description provided for @plEditReview.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izohingizni o‘zgartirish'**
+  String get plEditReview;
+
+  /// No description provided for @plYourReview.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizning izohingiz'**
+  String get plYourReview;
+
+  /// No description provided for @plAllReviews.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hammasini ko‘rish ({count})'**
+  String plAllReviews(int count);
+
+  /// No description provided for @plNoText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faqat baho'**
+  String get plNoText;
+
+  /// No description provided for @plOutOf.
+  ///
+  /// In uz, this message translates to:
+  /// **'5 dan'**
+  String get plOutOf;
+
+  /// No description provided for @plCorrections.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomi, manzili yoki telefoni noto‘g‘rimi? Guruhimizga yozing.'**
+  String get plCorrections;
+
+  /// No description provided for @plLoadDetailFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumotlarni yuklab bo‘lmadi. Internetni tekshiring.'**
+  String get plLoadDetailFailed;
+
+  /// No description provided for @plGone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joy topilmadi — ro‘yxatdan olib tashlangan bo‘lishi mumkin.'**
+  String get plGone;
+
+  /// No description provided for @plShareText.
+  ///
+  /// In uz, this message translates to:
+  /// **'{emoji} {name}\n📍 {address}\n🗺 {map}\n\nMuslim Vegukin ilovasida topildi'**
+  String plShareText(String emoji, String name, String address, String map);
+
+  /// No description provided for @plRateQuestion.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qanday baholaysiz?'**
+  String get plRateQuestion;
+
+  /// No description provided for @plStar1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda yomon'**
+  String get plStar1;
+
+  /// No description provided for @plStar2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yomon'**
+  String get plStar2;
+
+  /// No description provided for @plStar3.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘rtacha'**
+  String get plStar3;
+
+  /// No description provided for @plStar4.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaxshi'**
+  String get plStar4;
+
+  /// No description provided for @plStar5.
+  ///
+  /// In uz, this message translates to:
+  /// **'A’lo'**
+  String get plStar5;
+
+  /// No description provided for @plReviewHintMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan: namoz vaqtlari, kirish eshigidagi parol, qanday borish mumkin.'**
+  String get plReviewHintMosque;
+
+  /// No description provided for @plReviewHintRestaurant.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan: taomlar, narxlar, xizmat, ish vaqti.'**
+  String get plReviewHintRestaurant;
+
+  /// No description provided for @plReviewHintShop.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan: nimalar sotiladi, narxlar, ish vaqti.'**
+  String get plReviewHintShop;
+
+  /// No description provided for @plReviewPlaceholder.
+  ///
+  /// In uz, this message translates to:
+  /// **'Fikringizni yozing (ixtiyoriy)'**
+  String get plReviewPlaceholder;
+
+  /// No description provided for @plReviewPublic.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izoh hammaga ko‘rinadi, ismingiz esa ko‘rinmaydi.'**
+  String get plReviewPublic;
+
+  /// No description provided for @plReviewSend.
+  ///
+  /// In uz, this message translates to:
+  /// **'Chop etish'**
+  String get plReviewSend;
+
+  /// No description provided for @plReviewSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get plReviewSave;
+
+  /// No description provided for @plReviewPick.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avval yulduzchani tanlang'**
+  String get plReviewPick;
+
+  /// No description provided for @plReviewPublished.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rahmat! Izohingiz chop etildi.'**
+  String get plReviewPublished;
+
+  /// No description provided for @plReviewUpdated.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izohingiz yangilandi.'**
+  String get plReviewUpdated;
+
+  /// No description provided for @plReviewDelete.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izohni o‘chirish'**
+  String get plReviewDelete;
+
+  /// No description provided for @plReviewDeleteAsk.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izohingiz o‘chirilsinmi?'**
+  String get plReviewDeleteAsk;
+
+  /// No description provided for @plReviewDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izohingiz o‘chirildi.'**
+  String get plReviewDeleted;
+
+  /// No description provided for @plDelete.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirish'**
+  String get plDelete;
+
+  /// No description provided for @plCancel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bekor qilish'**
+  String get plCancel;
+
+  /// No description provided for @plSend.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborish'**
+  String get plSend;
+
+  /// No description provided for @plSuggestPick.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nimani qo‘shmoqchisiz?'**
+  String get plSuggestPick;
+
+  /// No description provided for @plSuggestAddLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'{platform} havolasini qo‘shish'**
+  String plSuggestAddLink(String platform);
+
+  /// No description provided for @plSuggestEditLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'{platform} havolasini o‘zgartirish'**
+  String plSuggestEditLink(String platform);
+
+  /// No description provided for @plSuggestAddNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumot qo‘shish'**
+  String get plSuggestAddNote;
+
+  /// No description provided for @plSuggestEditNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ma’lumotni o‘zgartirish'**
+  String get plSuggestEditNote;
+
+  /// No description provided for @plSuggestCurrent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozirgi: {value}'**
+  String plSuggestCurrent(String value);
+
+  /// No description provided for @plHintTelegram.
+  ///
+  /// In uz, this message translates to:
+  /// **'@username yoki t.me havolasi'**
+  String get plHintTelegram;
+
+  /// No description provided for @plHintTiktok.
+  ///
+  /// In uz, this message translates to:
+  /// **'@username yoki tiktok.com havolasi'**
+  String get plHintTiktok;
+
+  /// No description provided for @plHintInstagram.
+  ///
+  /// In uz, this message translates to:
+  /// **'@username yoki instagram.com havolasi'**
+  String get plHintInstagram;
+
+  /// No description provided for @plHintNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish vaqti, dam olish kunlari yoki e’lon.'**
+  String get plHintNote;
+
+  /// No description provided for @plNotePlaceholder.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan:\nDu–Ju: 11:00 – 22:00\nShanba: yopiq'**
+  String get plNotePlaceholder;
+
+  /// No description provided for @plModeration.
+  ///
+  /// In uz, this message translates to:
+  /// **'Admin tekshirgach chop etiladi.'**
+  String get plModeration;
+
+  /// No description provided for @plSuggestSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rahmat! Taklifingiz ko‘rib chiqilmoqda.'**
+  String get plSuggestSent;
+
+  /// No description provided for @plAnnounceMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon yozish'**
+  String get plAnnounceMosque;
+
+  /// No description provided for @plAnnounceOwner.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon yuborish'**
+  String get plAnnounceOwner;
+
+  /// No description provided for @plAnnounceWhyMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan, hayit namozi vaqti — kuzatayotganlarga yuboriladi.'**
+  String get plAnnounceWhyMosque;
+
+  /// No description provided for @plAnnounceWhyOwner.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatayotganlarga yangilik yuboring.'**
+  String get plAnnounceWhyOwner;
+
+  /// No description provided for @plAnnouncePending.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta e’lon tekshiruvda'**
+  String plAnnouncePending(int count);
+
+  /// No description provided for @plAnnounceTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon'**
+  String get plAnnounceTitle;
+
+  /// No description provided for @plAnnouncePlaceholderOwner.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan: 25-dekabr kuni oshxonamiz yopiq bo‘ladi.'**
+  String get plAnnouncePlaceholderOwner;
+
+  /// No description provided for @plAnnouncePlaceholderMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masalan: Hayit namozi 07:00, 08:00 va 09:00 da o‘qiladi.'**
+  String get plAnnouncePlaceholderMosque;
+
+  /// No description provided for @plAnnounceReach.
+  ///
+  /// In uz, this message translates to:
+  /// **'Admin tasdiqlagach, taxminan {count} kishiga yuboriladi.'**
+  String plAnnounceReach(int count);
+
+  /// No description provided for @plAnnounceSend.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tekshiruvga yuborish'**
+  String get plAnnounceSend;
+
+  /// No description provided for @plAnnounceSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon tekshiruvga yuborildi'**
+  String get plAnnounceSent;
+
+  /// No description provided for @plTextEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Avval matn yozing.'**
+  String get plTextEmpty;
+
+  /// No description provided for @plClaimPrompt.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joy egasimisiz?'**
+  String get plClaimPrompt;
+
+  /// No description provided for @plClaimLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'Egalikni tasdiqlash'**
+  String get plClaimLink;
+
+  /// No description provided for @plClaimWhy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Egasi kuzatayotganlarga e’lon yubora oladi.'**
+  String get plClaimWhy;
+
+  /// No description provided for @plClaimConfirm.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ismingiz va aloqa ma’lumotingiz administratorga yuboriladi. U egalikni tekshirish uchun siz bilan bog‘lanadi. Davom etasizmi?'**
+  String get plClaimConfirm;
+
+  /// No description provided for @plClaimContinue.
+  ///
+  /// In uz, this message translates to:
+  /// **'Davom etish'**
+  String get plClaimContinue;
+
+  /// No description provided for @plClaimSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'So‘rov yuborildi. Administrator siz bilan bog‘lanadi.'**
+  String get plClaimSent;
+
+  /// No description provided for @plClaimPending.
+  ///
+  /// In uz, this message translates to:
+  /// **'Egalik so‘rovingiz ko‘rib chiqilmoqda.'**
+  String get plClaimPending;
+
+  /// No description provided for @plYouOwn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Siz bu joyning egasisiz'**
+  String get plYouOwn;
+
+  /// No description provided for @plErrNetwork.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internetga ulanib bo‘lmadi. Qayta urinib ko‘ring.'**
+  String get plErrNetwork;
+
+  /// No description provided for @plErrGeneric.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik yuz berdi. Qayta urinib ko‘ring.'**
+  String get plErrGeneric;
+
+  /// No description provided for @plErrSignIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Buning uchun akkauntga kiring.'**
+  String get plErrSignIn;
+
+  /// No description provided for @plErrTooManyReviews.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugun juda ko‘p izoh qoldirdingiz. Ertaga urinib ko‘ring.'**
+  String get plErrTooManyReviews;
+
+  /// No description provided for @plErrTooLong.
+  ///
+  /// In uz, this message translates to:
+  /// **'Matn juda uzun.'**
+  String get plErrTooLong;
+
+  /// No description provided for @plErrTooShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda qisqa.'**
+  String get plErrTooShort;
+
+  /// No description provided for @plErrWrongHost.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu havola boshqa saytga tegishli. To‘g‘ri havolani kiriting.'**
+  String get plErrWrongHost;
+
+  /// No description provided for @plErrHandle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Username noto‘g‘ri. Faqat harflar, raqamlar va pastki chiziq.'**
+  String get plErrHandle;
+
+  /// No description provided for @plErrUrl.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu havolaga o‘xshamaydi.'**
+  String get plErrUrl;
+
+  /// No description provided for @plErrIncomplete.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havola to‘liq emas.'**
+  String get plErrIncomplete;
+
+  /// No description provided for @plErrNotProfile.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu post havolasi. Profil havolasini yuboring.'**
+  String get plErrNotProfile;
+
+  /// No description provided for @plErrPending.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu bo‘yicha taklif allaqachon ko‘rib chiqilmoqda.'**
+  String get plErrPending;
+
+  /// No description provided for @plErrSame.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu allaqachon saqlangan.'**
+  String get plErrSame;
+
+  /// No description provided for @plErrRateLimited.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugungi takliflar limitiga yetdingiz. Ertaga urinib ko‘ring.'**
+  String get plErrRateLimited;
+
+  /// No description provided for @plErrGone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joy endi mavjud emas.'**
+  String get plErrGone;
+
+  /// No description provided for @plErrNotOwner.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joy uchun faqat tasdiqlangan egasi e’lon yubora oladi.'**
+  String get plErrNotOwner;
+
+  /// No description provided for @plErrHasOwner.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joyning egasi allaqachon tasdiqlangan.'**
+  String get plErrHasOwner;
+
+  /// No description provided for @plErrTooManyPending.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tekshiruvni kutayotgan so‘rovlaringiz ko‘p. Avval ular ko‘rib chiqilsin.'**
+  String get plErrTooManyPending;
+
+  /// No description provided for @plPhotoFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rasmni yuklab bo‘lmadi'**
+  String get plPhotoFailed;
+
+  /// No description provided for @plMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masjid'**
+  String get plMosque;
+
+  /// No description provided for @plRestaurant.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oshxona'**
+  String get plRestaurant;
+
+  /// No description provided for @plShop.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘kon'**
+  String get plShop;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

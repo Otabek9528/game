@@ -20,6 +20,7 @@ import 'features/hikorea/hikorea_source.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/links/links_controller.dart';
 import 'features/parcel/parcel_source.dart';
+import 'features/places/places_source.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/qibla/qibla_sensors.dart';
 import 'features/qna/qna_source.dart';
@@ -155,6 +156,7 @@ class AppServices {
     this.qna = const HttpQnaSource(),
     this.businesses = const HttpBusinessSource(),
     this.hikorea = const HttpHikoreaSource(),
+    this.places = const HttpPlacesSource(),
     this.clock = DateTime.now,
   });
 
@@ -203,6 +205,9 @@ class AppServices {
 
   /// HiKorea appointments and watches.
   final HikoreaSource hikorea;
+
+  /// Mosques, restaurants and shops.
+  final PlacesSource places;
 
   /// What day it is, for the pages that list days: the phone's clock, or a
   /// test's.

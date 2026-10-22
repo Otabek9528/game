@@ -2543,6 +2543,566 @@ class AppLocalizationsUz extends AppLocalizations {
   String get hkWatchingHere => 'Shu yerda kuzatuvingiz bor';
 
   @override
+  String get plSearchHint => 'Nomi, shahar yoki manzil';
+
+  @override
+  String get plClearSearch => 'Tozalash';
+
+  @override
+  String plAround(String city, String when) {
+    return '$city atrofida · $when';
+  }
+
+  @override
+  String plAroundHere(String when) {
+    return 'Joylashuvingiz atrofida · $when';
+  }
+
+  @override
+  String get plLocatePrompt =>
+      'Eng yaqinlari birinchi chiqishi uchun joylashuvni yoqing';
+
+  @override
+  String get plLocateButton => 'Yoqish';
+
+  @override
+  String get plLocateBlocked => 'Joylashuvga ruxsat berilmagan';
+
+  @override
+  String get plLocateOff => 'Telefonda joylashuv o‘chiq';
+
+  @override
+  String get plLocateFailed => 'Joylashuvni aniqlab bo‘lmadi';
+
+  @override
+  String get plAllCities => 'Hammasi';
+
+  @override
+  String plCountMosques(int count) {
+    return '$count ta masjid';
+  }
+
+  @override
+  String plCountRestaurants(int count) {
+    return '$count ta oshxona';
+  }
+
+  @override
+  String plCountShops(int count) {
+    return '$count ta do‘kon';
+  }
+
+  @override
+  String get plSortedNearest => 'eng yaqini birinchi';
+
+  @override
+  String get plSortedCity => 'shahar bo‘yicha';
+
+  @override
+  String plSortedFrom(String place) {
+    return '“$place” ga eng yaqini birinchi';
+  }
+
+  @override
+  String get plNearest => 'Eng yaqin';
+
+  @override
+  String plMetres(String n) {
+    return '$n m';
+  }
+
+  @override
+  String plKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String get plNoReviews => 'Hali izoh yo‘q';
+
+  @override
+  String plReviewCount(int count) {
+    return '$count ta izoh';
+  }
+
+  @override
+  String get plCall => 'Qo‘ng‘iroq';
+
+  @override
+  String get plRoute => 'Yo‘l';
+
+  @override
+  String get plCopy => 'Nusxa';
+
+  @override
+  String get plShare => 'Ulashish';
+
+  @override
+  String plSearchNear(String address) {
+    return '“$address” atrofidan qidirish';
+  }
+
+  @override
+  String get plSearchNearHint =>
+      'Koreyscha manzil: eng yaqinlari birinchi chiqadi';
+
+  @override
+  String get plAddressHint =>
+      'Manzil bo‘yicha qidirish uchun uni koreys tilida yozing: 안산시 단원구';
+
+  @override
+  String get plFinding => 'Manzil qidirilmoqda…';
+
+  @override
+  String plNearAddress(String address) {
+    return '“$address” atrofida';
+  }
+
+  @override
+  String get plAddressNotFound =>
+      'Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.';
+
+  @override
+  String get plNothingFound => 'Hech narsa topilmadi';
+
+  @override
+  String get plNothingFoundHint =>
+      'Boshqacha yozib ko‘ring yoki manzilni koreys tilida kiriting.';
+
+  @override
+  String get plNoneYetMosque => 'Hali masjid qo‘shilmagan';
+
+  @override
+  String get plNoneYetRestaurant => 'Hali oshxona qo‘shilmagan';
+
+  @override
+  String get plNoneYetShop => 'Hali do‘kon qo‘shilmagan';
+
+  @override
+  String get plLoadFailed => 'Joylarni yuklab bo‘lmadi. Internetni tekshiring.';
+
+  @override
+  String get plNeedsLocation =>
+      'Eng yaqin joylarni ko‘rsatish uchun joylashuvingiz kerak — yoki yuqorida manzilni koreys tilida yozing.';
+
+  @override
+  String get plRecent => 'Yaqinda ko‘rilganlar';
+
+  @override
+  String get plMissingTitle => 'Ro‘yxatda yo‘q joyni bilasizmi?';
+
+  @override
+  String get plMissingBody => 'Guruhimizga yozing — qo‘shib qo‘yamiz.';
+
+  @override
+  String get plWatchingBadge => 'Kuzatilmoqda';
+
+  @override
+  String plPhotoCount(String i, String n) {
+    return '$i / $n';
+  }
+
+  @override
+  String get plWatch => 'Kuzatish';
+
+  @override
+  String plWatchers(int count) {
+    return '$count kishi kuzatmoqda';
+  }
+
+  @override
+  String get plWatchOn => 'Yangiliklari shu telefonga keladi';
+
+  @override
+  String get plWatchOff => 'Kuzatish to‘xtatildi';
+
+  @override
+  String get plWatchNoPush => 'Bildirishnomalar o‘chiq — yangiliklar kelmaydi';
+
+  @override
+  String get plWatchPushOn => 'Yoqish';
+
+  @override
+  String get plWatchWhat =>
+      'Nomi, telefoni o‘zgarsa, yopilsa yoki e’lon bersa — xabar olasiz.';
+
+  @override
+  String get plAddress => 'Manzil';
+
+  @override
+  String get plNoAddress => 'Manzil ko‘rsatilmagan';
+
+  @override
+  String get plPhone => 'Telefon';
+
+  @override
+  String get plNoPhone => 'Telefon ko‘rsatilmagan';
+
+  @override
+  String get plMenu => 'Menyu';
+
+  @override
+  String get plMenuOpen => 'Menyuni ochish';
+
+  @override
+  String get plAddressCopied => 'Manzil nusxalandi';
+
+  @override
+  String get plCallWhich => 'Qaysi raqamga qo‘ng‘iroq qilamiz?';
+
+  @override
+  String get plRouteTitle => 'Qaysi xaritada ochamiz?';
+
+  @override
+  String get plRouteHint =>
+      'Koreyada Naver va Kakao xaritalari yo‘lni aniqroq ko‘rsatadi.';
+
+  @override
+  String get plCopyAddress => 'Manzilni nusxalash';
+
+  @override
+  String get plCopyAddressHint => 'Taksi yoki xaritaga qo‘yish uchun';
+
+  @override
+  String get plMapAttribution => '© OpenStreetMap';
+
+  @override
+  String get plAbout => 'Muassasa haqida';
+
+  @override
+  String get plAboutEmpty =>
+      'Ish vaqti va dam olish kunlari hali qo‘shilmagan.';
+
+  @override
+  String get plAboutAdd => 'Ma’lumot qo‘shish';
+
+  @override
+  String get plSuggestChange => 'O‘zgartirishni taklif qilish';
+
+  @override
+  String get plSocial => 'Ijtimoiy tarmoqlar';
+
+  @override
+  String get plSocialEmpty =>
+      'Bu joyning ijtimoiy tarmoqdagi sahifasini bilasizmi?';
+
+  @override
+  String get plSocialAdd => 'Qo‘shish';
+
+  @override
+  String get plInviteLink => 'Havola';
+
+  @override
+  String plPendingField(String what) {
+    return '$what: taklifingiz ko‘rib chiqilmoqda';
+  }
+
+  @override
+  String get plNoteLabel => 'Ma’lumot';
+
+  @override
+  String get plReviews => 'Izohlar';
+
+  @override
+  String get plReviewsFirst =>
+      'Birinchi bo‘lib izoh qoldiring — boshqalarga yordam bo‘ladi.';
+
+  @override
+  String get plWriteReview => 'Izoh qoldirish';
+
+  @override
+  String get plEditReview => 'Izohingizni o‘zgartirish';
+
+  @override
+  String get plYourReview => 'Sizning izohingiz';
+
+  @override
+  String plAllReviews(int count) {
+    return 'Hammasini ko‘rish ($count)';
+  }
+
+  @override
+  String get plNoText => 'Faqat baho';
+
+  @override
+  String get plOutOf => '5 dan';
+
+  @override
+  String get plCorrections =>
+      'Nomi, manzili yoki telefoni noto‘g‘rimi? Guruhimizga yozing.';
+
+  @override
+  String get plLoadDetailFailed =>
+      'Ma’lumotlarni yuklab bo‘lmadi. Internetni tekshiring.';
+
+  @override
+  String get plGone =>
+      'Bu joy topilmadi — ro‘yxatdan olib tashlangan bo‘lishi mumkin.';
+
+  @override
+  String plShareText(String emoji, String name, String address, String map) {
+    return '$emoji $name\n📍 $address\n🗺 $map\n\nMuslim Vegukin ilovasida topildi';
+  }
+
+  @override
+  String get plRateQuestion => 'Qanday baholaysiz?';
+
+  @override
+  String get plStar1 => 'Juda yomon';
+
+  @override
+  String get plStar2 => 'Yomon';
+
+  @override
+  String get plStar3 => 'O‘rtacha';
+
+  @override
+  String get plStar4 => 'Yaxshi';
+
+  @override
+  String get plStar5 => 'A’lo';
+
+  @override
+  String get plReviewHintMosque =>
+      'Masalan: namoz vaqtlari, kirish eshigidagi parol, qanday borish mumkin.';
+
+  @override
+  String get plReviewHintRestaurant =>
+      'Masalan: taomlar, narxlar, xizmat, ish vaqti.';
+
+  @override
+  String get plReviewHintShop =>
+      'Masalan: nimalar sotiladi, narxlar, ish vaqti.';
+
+  @override
+  String get plReviewPlaceholder => 'Fikringizni yozing (ixtiyoriy)';
+
+  @override
+  String get plReviewPublic =>
+      'Izoh hammaga ko‘rinadi, ismingiz esa ko‘rinmaydi.';
+
+  @override
+  String get plReviewSend => 'Chop etish';
+
+  @override
+  String get plReviewSave => 'Saqlash';
+
+  @override
+  String get plReviewPick => 'Avval yulduzchani tanlang';
+
+  @override
+  String get plReviewPublished => 'Rahmat! Izohingiz chop etildi.';
+
+  @override
+  String get plReviewUpdated => 'Izohingiz yangilandi.';
+
+  @override
+  String get plReviewDelete => 'Izohni o‘chirish';
+
+  @override
+  String get plReviewDeleteAsk => 'Izohingiz o‘chirilsinmi?';
+
+  @override
+  String get plReviewDeleted => 'Izohingiz o‘chirildi.';
+
+  @override
+  String get plDelete => 'O‘chirish';
+
+  @override
+  String get plCancel => 'Bekor qilish';
+
+  @override
+  String get plSend => 'Yuborish';
+
+  @override
+  String get plSuggestPick => 'Nimani qo‘shmoqchisiz?';
+
+  @override
+  String plSuggestAddLink(String platform) {
+    return '$platform havolasini qo‘shish';
+  }
+
+  @override
+  String plSuggestEditLink(String platform) {
+    return '$platform havolasini o‘zgartirish';
+  }
+
+  @override
+  String get plSuggestAddNote => 'Ma’lumot qo‘shish';
+
+  @override
+  String get plSuggestEditNote => 'Ma’lumotni o‘zgartirish';
+
+  @override
+  String plSuggestCurrent(String value) {
+    return 'Hozirgi: $value';
+  }
+
+  @override
+  String get plHintTelegram => '@username yoki t.me havolasi';
+
+  @override
+  String get plHintTiktok => '@username yoki tiktok.com havolasi';
+
+  @override
+  String get plHintInstagram => '@username yoki instagram.com havolasi';
+
+  @override
+  String get plHintNote => 'Ish vaqti, dam olish kunlari yoki e’lon.';
+
+  @override
+  String get plNotePlaceholder =>
+      'Masalan:\nDu–Ju: 11:00 – 22:00\nShanba: yopiq';
+
+  @override
+  String get plModeration => 'Admin tekshirgach chop etiladi.';
+
+  @override
+  String get plSuggestSent => 'Rahmat! Taklifingiz ko‘rib chiqilmoqda.';
+
+  @override
+  String get plAnnounceMosque => 'E’lon yozish';
+
+  @override
+  String get plAnnounceOwner => 'E’lon yuborish';
+
+  @override
+  String get plAnnounceWhyMosque =>
+      'Masalan, hayit namozi vaqti — kuzatayotganlarga yuboriladi.';
+
+  @override
+  String get plAnnounceWhyOwner => 'Kuzatayotganlarga yangilik yuboring.';
+
+  @override
+  String plAnnouncePending(int count) {
+    return '$count ta e’lon tekshiruvda';
+  }
+
+  @override
+  String get plAnnounceTitle => 'E’lon';
+
+  @override
+  String get plAnnouncePlaceholderOwner =>
+      'Masalan: 25-dekabr kuni oshxonamiz yopiq bo‘ladi.';
+
+  @override
+  String get plAnnouncePlaceholderMosque =>
+      'Masalan: Hayit namozi 07:00, 08:00 va 09:00 da o‘qiladi.';
+
+  @override
+  String plAnnounceReach(int count) {
+    return 'Admin tasdiqlagach, taxminan $count kishiga yuboriladi.';
+  }
+
+  @override
+  String get plAnnounceSend => 'Tekshiruvga yuborish';
+
+  @override
+  String get plAnnounceSent => 'E’lon tekshiruvga yuborildi';
+
+  @override
+  String get plTextEmpty => 'Avval matn yozing.';
+
+  @override
+  String get plClaimPrompt => 'Bu joy egasimisiz?';
+
+  @override
+  String get plClaimLink => 'Egalikni tasdiqlash';
+
+  @override
+  String get plClaimWhy => 'Egasi kuzatayotganlarga e’lon yubora oladi.';
+
+  @override
+  String get plClaimConfirm =>
+      'Ismingiz va aloqa ma’lumotingiz administratorga yuboriladi. U egalikni tekshirish uchun siz bilan bog‘lanadi. Davom etasizmi?';
+
+  @override
+  String get plClaimContinue => 'Davom etish';
+
+  @override
+  String get plClaimSent =>
+      'So‘rov yuborildi. Administrator siz bilan bog‘lanadi.';
+
+  @override
+  String get plClaimPending => 'Egalik so‘rovingiz ko‘rib chiqilmoqda.';
+
+  @override
+  String get plYouOwn => 'Siz bu joyning egasisiz';
+
+  @override
+  String get plErrNetwork =>
+      'Internetga ulanib bo‘lmadi. Qayta urinib ko‘ring.';
+
+  @override
+  String get plErrGeneric => 'Xatolik yuz berdi. Qayta urinib ko‘ring.';
+
+  @override
+  String get plErrSignIn => 'Buning uchun akkauntga kiring.';
+
+  @override
+  String get plErrTooManyReviews =>
+      'Bugun juda ko‘p izoh qoldirdingiz. Ertaga urinib ko‘ring.';
+
+  @override
+  String get plErrTooLong => 'Matn juda uzun.';
+
+  @override
+  String get plErrTooShort => 'Juda qisqa.';
+
+  @override
+  String get plErrWrongHost =>
+      'Bu havola boshqa saytga tegishli. To‘g‘ri havolani kiriting.';
+
+  @override
+  String get plErrHandle =>
+      'Username noto‘g‘ri. Faqat harflar, raqamlar va pastki chiziq.';
+
+  @override
+  String get plErrUrl => 'Bu havolaga o‘xshamaydi.';
+
+  @override
+  String get plErrIncomplete => 'Havola to‘liq emas.';
+
+  @override
+  String get plErrNotProfile => 'Bu post havolasi. Profil havolasini yuboring.';
+
+  @override
+  String get plErrPending =>
+      'Bu bo‘yicha taklif allaqachon ko‘rib chiqilmoqda.';
+
+  @override
+  String get plErrSame => 'Bu allaqachon saqlangan.';
+
+  @override
+  String get plErrRateLimited =>
+      'Bugungi takliflar limitiga yetdingiz. Ertaga urinib ko‘ring.';
+
+  @override
+  String get plErrGone => 'Bu joy endi mavjud emas.';
+
+  @override
+  String get plErrNotOwner =>
+      'Bu joy uchun faqat tasdiqlangan egasi e’lon yubora oladi.';
+
+  @override
+  String get plErrHasOwner => 'Bu joyning egasi allaqachon tasdiqlangan.';
+
+  @override
+  String get plErrTooManyPending =>
+      'Tekshiruvni kutayotgan so‘rovlaringiz ko‘p. Avval ular ko‘rib chiqilsin.';
+
+  @override
+  String get plPhotoFailed => 'Rasmni yuklab bo‘lmadi';
+
+  @override
+  String get plMosque => 'Masjid';
+
+  @override
+  String get plRestaurant => 'Oshxona';
+
+  @override
+  String get plShop => 'Do‘kon';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

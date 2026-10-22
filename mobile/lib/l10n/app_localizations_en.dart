@@ -2601,6 +2601,590 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hkWatchingHere => 'You watch a counter here';
 
   @override
+  String get plSearchHint => 'Name, city or address';
+
+  @override
+  String get plClearSearch => 'Clear';
+
+  @override
+  String plAround(String city, String when) {
+    return 'Around $city · $when';
+  }
+
+  @override
+  String plAroundHere(String when) {
+    return 'Around you · $when';
+  }
+
+  @override
+  String get plLocatePrompt => 'Turn on location to see the nearest first';
+
+  @override
+  String get plLocateButton => 'Turn on';
+
+  @override
+  String get plLocateBlocked => 'Location access is off';
+
+  @override
+  String get plLocateOff => 'Location is off on the phone';
+
+  @override
+  String get plLocateFailed => 'Couldn’t get your location';
+
+  @override
+  String get plAllCities => 'All';
+
+  @override
+  String plCountMosques(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mosques',
+      one: '1 mosque',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plCountRestaurants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count restaurants',
+      one: '1 restaurant',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String plCountShops(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count shops',
+      one: '1 shop',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plSortedNearest => 'nearest first';
+
+  @override
+  String get plSortedCity => 'by city';
+
+  @override
+  String plSortedFrom(String place) {
+    return 'nearest to “$place” first';
+  }
+
+  @override
+  String get plNearest => 'Nearest';
+
+  @override
+  String plMetres(String n) {
+    return '$n m';
+  }
+
+  @override
+  String plKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String get plNoReviews => 'No reviews yet';
+
+  @override
+  String plReviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reviews',
+      one: '1 review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plCall => 'Call';
+
+  @override
+  String get plRoute => 'Directions';
+
+  @override
+  String get plCopy => 'Copy';
+
+  @override
+  String get plShare => 'Share';
+
+  @override
+  String plSearchNear(String address) {
+    return 'Search near “$address”';
+  }
+
+  @override
+  String get plSearchNearHint => 'An address in Korean: the nearest come first';
+
+  @override
+  String get plAddressHint =>
+      'To search by address, type it in Korean: 안산시 단원구';
+
+  @override
+  String get plFinding => 'Looking up the address…';
+
+  @override
+  String plNearAddress(String address) {
+    return 'Around “$address”';
+  }
+
+  @override
+  String get plAddressNotFound =>
+      'That address wasn’t found. Try writing it more precisely, in Korean.';
+
+  @override
+  String get plNothingFound => 'Nothing found';
+
+  @override
+  String get plNothingFoundHint =>
+      'Try another spelling, or type an address in Korean.';
+
+  @override
+  String get plNoneYetMosque => 'No mosques yet';
+
+  @override
+  String get plNoneYetRestaurant => 'No restaurants yet';
+
+  @override
+  String get plNoneYetShop => 'No shops yet';
+
+  @override
+  String get plLoadFailed => 'Couldn’t load the places. Check your connection.';
+
+  @override
+  String get plNeedsLocation =>
+      'To show the nearest places we need your location — or type an address in Korean above.';
+
+  @override
+  String get plRecent => 'Recently viewed';
+
+  @override
+  String get plMissingTitle => 'Know a place that isn’t listed?';
+
+  @override
+  String get plMissingBody => 'Write to our group and we’ll add it.';
+
+  @override
+  String get plWatchingBadge => 'Watching';
+
+  @override
+  String plPhotoCount(String i, String n) {
+    return '$i / $n';
+  }
+
+  @override
+  String get plWatch => 'Watch';
+
+  @override
+  String plWatchers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people watching',
+      one: '1 person watching',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plWatchOn => 'News about it will come to this phone';
+
+  @override
+  String get plWatchOff => 'You stopped watching';
+
+  @override
+  String get plWatchNoPush => 'Notifications are off, so news won’t arrive';
+
+  @override
+  String get plWatchPushOn => 'Turn on';
+
+  @override
+  String get plWatchWhat =>
+      'You’ll hear when its name or phone changes, it closes, or it posts news.';
+
+  @override
+  String get plAddress => 'Address';
+
+  @override
+  String get plNoAddress => 'No address given';
+
+  @override
+  String get plPhone => 'Phone';
+
+  @override
+  String get plNoPhone => 'No phone given';
+
+  @override
+  String get plMenu => 'Menu';
+
+  @override
+  String get plMenuOpen => 'Open the menu';
+
+  @override
+  String get plAddressCopied => 'Address copied';
+
+  @override
+  String get plCallWhich => 'Which number?';
+
+  @override
+  String get plRouteTitle => 'Open in which map?';
+
+  @override
+  String get plRouteHint =>
+      'In Korea, Naver and Kakao give the best directions.';
+
+  @override
+  String get plCopyAddress => 'Copy the address';
+
+  @override
+  String get plCopyAddressHint => 'For a taxi or a map';
+
+  @override
+  String get plMapAttribution => '© OpenStreetMap';
+
+  @override
+  String get plAbout => 'About the place';
+
+  @override
+  String get plAboutEmpty =>
+      'Opening hours and days off have not been added yet.';
+
+  @override
+  String get plAboutAdd => 'Add information';
+
+  @override
+  String get plSuggestChange => 'Suggest a change';
+
+  @override
+  String get plSocial => 'Social media';
+
+  @override
+  String get plSocialEmpty => 'Do you know this place’s social media?';
+
+  @override
+  String get plSocialAdd => 'Add';
+
+  @override
+  String get plInviteLink => 'Link';
+
+  @override
+  String plPendingField(String what) {
+    return '$what: a suggestion is waiting for review';
+  }
+
+  @override
+  String get plNoteLabel => 'Information';
+
+  @override
+  String get plReviews => 'Reviews';
+
+  @override
+  String get plReviewsFirst => 'Be the first to review — it helps others.';
+
+  @override
+  String get plWriteReview => 'Write a review';
+
+  @override
+  String get plEditReview => 'Change your review';
+
+  @override
+  String get plYourReview => 'Your review';
+
+  @override
+  String plAllReviews(int count) {
+    return 'Show all ($count)';
+  }
+
+  @override
+  String get plNoText => 'Rating only';
+
+  @override
+  String get plOutOf => 'out of 5';
+
+  @override
+  String get plCorrections =>
+      'Wrong name, address or phone? Write to our group.';
+
+  @override
+  String get plLoadDetailFailed => 'Couldn’t load. Check your connection.';
+
+  @override
+  String get plGone => 'This place wasn’t found. It may have been removed.';
+
+  @override
+  String plShareText(String emoji, String name, String address, String map) {
+    return '$emoji $name\n📍 $address\n🗺 $map\n\nFound in the Muslim Vegukin app';
+  }
+
+  @override
+  String get plRateQuestion => 'How would you rate it?';
+
+  @override
+  String get plStar1 => 'Very bad';
+
+  @override
+  String get plStar2 => 'Bad';
+
+  @override
+  String get plStar3 => 'Okay';
+
+  @override
+  String get plStar4 => 'Good';
+
+  @override
+  String get plStar5 => 'Excellent';
+
+  @override
+  String get plReviewHintMosque =>
+      'For example: prayer times, the door code, how to get there.';
+
+  @override
+  String get plReviewHintRestaurant =>
+      'For example: the food, prices, service, opening hours.';
+
+  @override
+  String get plReviewHintShop =>
+      'For example: what they sell, prices, opening hours.';
+
+  @override
+  String get plReviewPlaceholder => 'Your thoughts (optional)';
+
+  @override
+  String get plReviewPublic =>
+      'Everyone sees the review; nobody sees your name.';
+
+  @override
+  String get plReviewSend => 'Publish';
+
+  @override
+  String get plReviewSave => 'Save';
+
+  @override
+  String get plReviewPick => 'Choose a rating first';
+
+  @override
+  String get plReviewPublished => 'Thank you! Your review is published.';
+
+  @override
+  String get plReviewUpdated => 'Your review is updated.';
+
+  @override
+  String get plReviewDelete => 'Delete the review';
+
+  @override
+  String get plReviewDeleteAsk => 'Delete your review?';
+
+  @override
+  String get plReviewDeleted => 'Your review is deleted.';
+
+  @override
+  String get plDelete => 'Delete';
+
+  @override
+  String get plCancel => 'Cancel';
+
+  @override
+  String get plSend => 'Send';
+
+  @override
+  String get plSuggestPick => 'What would you like to add?';
+
+  @override
+  String plSuggestAddLink(String platform) {
+    return 'Add $platform link';
+  }
+
+  @override
+  String plSuggestEditLink(String platform) {
+    return 'Change $platform link';
+  }
+
+  @override
+  String get plSuggestAddNote => 'Add information';
+
+  @override
+  String get plSuggestEditNote => 'Change information';
+
+  @override
+  String plSuggestCurrent(String value) {
+    return 'Now: $value';
+  }
+
+  @override
+  String get plHintTelegram => '@username or a t.me link';
+
+  @override
+  String get plHintTiktok => '@username or a tiktok.com link';
+
+  @override
+  String get plHintInstagram => '@username or an instagram.com link';
+
+  @override
+  String get plHintNote => 'Opening hours, days off or an announcement.';
+
+  @override
+  String get plNotePlaceholder =>
+      'For example:\nMon–Fri: 11:00 – 22:00\nSaturday: closed';
+
+  @override
+  String get plModeration => 'It appears once an admin has checked it.';
+
+  @override
+  String get plSuggestSent => 'Thank you! Your suggestion is under review.';
+
+  @override
+  String get plAnnounceMosque => 'Write an announcement';
+
+  @override
+  String get plAnnounceOwner => 'Send an announcement';
+
+  @override
+  String get plAnnounceWhyMosque =>
+      'Eid prayer times, say: it goes to the people who watch this place.';
+
+  @override
+  String get plAnnounceWhyOwner =>
+      'Send news to the people who watch this place.';
+
+  @override
+  String plAnnouncePending(int count) {
+    return '$count awaiting review';
+  }
+
+  @override
+  String get plAnnounceTitle => 'Announcement';
+
+  @override
+  String get plAnnouncePlaceholderOwner =>
+      'For example: We’re closed on 25 December.';
+
+  @override
+  String get plAnnouncePlaceholderMosque =>
+      'For example: Eid prayer at 07:00, 08:00 and 09:00.';
+
+  @override
+  String plAnnounceReach(int count) {
+    return 'Once an admin approves it, about $count people will get it.';
+  }
+
+  @override
+  String get plAnnounceSend => 'Send for review';
+
+  @override
+  String get plAnnounceSent => 'Sent for review';
+
+  @override
+  String get plTextEmpty => 'Write something first.';
+
+  @override
+  String get plClaimPrompt => 'Do you own this place?';
+
+  @override
+  String get plClaimLink => 'Claim it';
+
+  @override
+  String get plClaimWhy =>
+      'The owner can send news to the people who watch it.';
+
+  @override
+  String get plClaimConfirm =>
+      'Your name and contact go to the admin, who will get in touch to check that you own it. Continue?';
+
+  @override
+  String get plClaimContinue => 'Continue';
+
+  @override
+  String get plClaimSent => 'Request sent. The admin will get in touch.';
+
+  @override
+  String get plClaimPending => 'Your ownership request is being reviewed.';
+
+  @override
+  String get plYouOwn => 'You own this place';
+
+  @override
+  String get plErrNetwork => 'No internet connection. Please try again.';
+
+  @override
+  String get plErrGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get plErrSignIn => 'Sign in to do this.';
+
+  @override
+  String get plErrTooManyReviews =>
+      'You’ve left too many reviews today. Please try again tomorrow.';
+
+  @override
+  String get plErrTooLong => 'That is too long.';
+
+  @override
+  String get plErrTooShort => 'That is too short.';
+
+  @override
+  String get plErrWrongHost =>
+      'That link points to a different site. Please enter the right one.';
+
+  @override
+  String get plErrHandle =>
+      'That username is not valid. Letters, digits and underscores only.';
+
+  @override
+  String get plErrUrl => 'That does not look like a link.';
+
+  @override
+  String get plErrIncomplete => 'That link is incomplete.';
+
+  @override
+  String get plErrNotProfile =>
+      'That is a link to a post. Please send the profile link.';
+
+  @override
+  String get plErrPending => 'A change to this is already waiting for review.';
+
+  @override
+  String get plErrSame => 'That is already what is saved.';
+
+  @override
+  String get plErrRateLimited =>
+      'You have reached today’s limit. Please try again tomorrow.';
+
+  @override
+  String get plErrGone => 'This place no longer exists.';
+
+  @override
+  String get plErrNotOwner =>
+      'Only the confirmed owner can post news for this place.';
+
+  @override
+  String get plErrHasOwner => 'This place already has a confirmed owner.';
+
+  @override
+  String get plErrTooManyPending =>
+      'You have too many requests waiting for review. Please wait until they’re handled.';
+
+  @override
+  String get plPhotoFailed => 'Couldn’t load the photo';
+
+  @override
+  String get plMosque => 'Mosque';
+
+  @override
+  String get plRestaurant => 'Restaurant';
+
+  @override
+  String get plShop => 'Shop';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override
