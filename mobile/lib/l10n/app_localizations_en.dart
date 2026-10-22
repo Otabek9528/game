@@ -3822,4 +3822,332 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get carChannelNudge => 'Join @vegukin_car to see new listings first';
+
+  @override
+  String get hsTabBoard => 'E’lonlar';
+
+  @override
+  String get hsTabMine => 'E’lonlarim';
+
+  @override
+  String get hsTabAlerts => 'Xabarnoma';
+
+  @override
+  String get hsTabPost => 'Joylash';
+
+  @override
+  String get hsSearchHint =>
+      'Koreys tilida manzil yozsangiz, e’lonlar shu joyga yaqinligi bo‘yicha saralanadi.';
+
+  @override
+  String get hsSearch => 'Izlash';
+
+  @override
+  String get hsRecent => 'Eng yangi e’lonlar';
+
+  @override
+  String get hsNearest => 'Yaqinlik bo‘yicha';
+
+  @override
+  String hsCount(String count) {
+    return '$count ta';
+  }
+
+  @override
+  String get hsCancel => 'Bekor qilish';
+
+  @override
+  String get hsMore => 'Yana yuklash';
+
+  @override
+  String get hsAllShown => 'Barcha e’lonlar ko‘rsatildi';
+
+  @override
+  String get hsNew => 'Yangi';
+
+  @override
+  String get hsYours => 'Sizniki';
+
+  @override
+  String get hsSeeNumber => 'Raqamni ko‘rish';
+
+  @override
+  String get hsViaTelegram => 'Telegram orqali bog‘lanish';
+
+  @override
+  String get hsNoContact => 'Aloqa ma’lumoti yo‘q';
+
+  @override
+  String get hsEmptyTitle => 'Hozircha e’lon yo‘q';
+
+  @override
+  String get hsEmptyBody =>
+      'Birinchi bo‘lib e’lon joylang — pastdagi «Joylash» tugmasini bosing.';
+
+  @override
+  String get hsPostAd => 'E’lon joylash';
+
+  @override
+  String get hsGeoTitle => 'Manzil topilmadi';
+
+  @override
+  String get hsGeoBody => 'Manzilni koreys tilida, to‘liqroq yozib ko‘ring:';
+
+  @override
+  String get hsRetry => 'Qayta urinish';
+
+  @override
+  String get hsLoadFailedTitle => 'E’lonlarni yuklab bo‘lmadi';
+
+  @override
+  String get hsLoadFailedBody =>
+      'Internet aloqasini tekshiring va qayta urinib ko‘ring.';
+
+  @override
+  String get hsOpenFailedTitle => 'Ochib bo‘lmadi';
+
+  @override
+  String get hsOpenFailedBody =>
+      'Bu e’lon o‘chirilgan yoki muddati tugagan bo‘lishi mumkin.';
+
+  @override
+  String get hsCopy => 'Nusxalash';
+
+  @override
+  String get hsNoPhone => 'Tel raqam ko‘rsatilmagan.';
+
+  @override
+  String get hsEdit => 'Tahrirlash';
+
+  @override
+  String get hsDelete => 'O‘chirish';
+
+  @override
+  String get hsCopied => 'Raqam nusxalab olindi';
+
+  @override
+  String get hsDeleteConfirm => 'E’lon o‘chirilsinmi? Buni qaytarib bo‘lmaydi.';
+
+  @override
+  String get hsDeleted => 'E’lon o‘chirildi';
+
+  @override
+  String get hsMineTitle => 'Mening e’lonlarim';
+
+  @override
+  String get hsMineSub =>
+      'E’lonlar 30 kundan keyin ro‘yxatdan olinadi. Muddat tugashidan oldin shu yerdan uzaytiring.';
+
+  @override
+  String get hsActive => 'Faol';
+
+  @override
+  String get hsExpired => 'Muddati tugagan';
+
+  @override
+  String hsDaysLeft(String count) {
+    return '$count kun qoldi';
+  }
+
+  @override
+  String get hsHidden => 'Ro‘yxatda ko‘rinmaydi';
+
+  @override
+  String get hsExtend => 'Uzaytirish';
+
+  @override
+  String hsExtended(String count) {
+    return 'Muddat yana $count kunga uzaytirildi';
+  }
+
+  @override
+  String get hsMineEmptyTitle => 'Sizda e’lon yo‘q';
+
+  @override
+  String get hsMineEmptyBody => 'Joylagan e’lonlaringiz shu yerda ko‘rinadi.';
+
+  @override
+  String get hsFailedTitle => 'Yuklab bo‘lmadi';
+
+  @override
+  String get hsFailedBody => 'Qayta urinib ko‘ring.';
+
+  @override
+  String get hsNewTitle => 'Yangi e’lon';
+
+  @override
+  String get hsEditTitle => 'E’lonni tahrirlash';
+
+  @override
+  String get hsComposeSub => 'Manzil, telefon raqami va qisqa tavsif kifoya';
+
+  @override
+  String get hsAddress => 'Manzil';
+
+  @override
+  String get hsRequired => 'majburiy';
+
+  @override
+  String get hsAddressHint =>
+      'Koreys tilida yozing. Manzil keyin o‘zgartirilmaydi.';
+
+  @override
+  String get hsAddressLocked =>
+      'Manzilni o‘zgartirib bo‘lmaydi. Xato bo‘lsa, e’lonni o‘chirib, yangisini joylang.';
+
+  @override
+  String get hsPhone => 'Bog‘lanish uchun telefon raqam';
+
+  @override
+  String get hsContactHint =>
+      'Telefon raqami yoki Telegram — kamida bittasi ko‘rsatilishi shart.';
+
+  @override
+  String get hsTelegramOptIn => 'Telegram orqali bog‘lanish';
+
+  @override
+  String hsYourUsername(String name) {
+    return 'Sizning username: $name';
+  }
+
+  @override
+  String get hsBody => 'E’lon matni';
+
+  @override
+  String get hsBodyHint =>
+      'Ijara haqi, depozit, boshlanish sanasi, muddati va boshqa shartlarni yozing. Masalan: oyiga 500,000 won, depozit 5,000,000 won, avgust oyidan boshlab, kamida olti oyga. Kommunal alohida.';
+
+  @override
+  String get hsSubmit => 'E’lonni joylash';
+
+  @override
+  String get hsSave => 'O‘zgarishlarni saqlash';
+
+  @override
+  String get hsSaved => 'O‘zgarishlar saqlandi';
+
+  @override
+  String get hsPosted => 'E’loningiz joylandi';
+
+  @override
+  String get hsErrUsername =>
+      '5-32 belgi: harflar, raqamlar va pastki chiziq. Harf bilan boshlansin.';
+
+  @override
+  String get hsErrContactRequired =>
+      'Telefon raqami yoki Telegram — kamida bittasini ko‘rsating.';
+
+  @override
+  String get hsErrAddress => 'Manzilni koreys tilida, to‘liq yozing.';
+
+  @override
+  String get hsErrPhone => 'Telefon raqamini to‘g‘ri yozing.';
+
+  @override
+  String get hsErrBody => 'Matn kamida 20 ta belgidan iborat bo‘lsin.';
+
+  @override
+  String get hsErrUsernameEmpty =>
+      'Username yozing yoki belgini olib tashlang.';
+
+  @override
+  String get hsErrGeocode => 'Manzil topilmadi. To‘liqroq yozib ko‘ring.';
+
+  @override
+  String get hsAlertsTitle => 'Bildirishnomalar';
+
+  @override
+  String get hsAlertsSub =>
+      'Manzil va qidiruv radiusini kiriting. Shu radius ichida yangi e’lon qo‘yilsa, darhol xabar beramiz.';
+
+  @override
+  String get hsRadius => 'Qidiruv radiusi: shu masofadagi barcha e’lonlar';
+
+  @override
+  String get hsRadiusCustom => 'Yoki o‘zingiz kiriting';
+
+  @override
+  String get hsAdd => 'Qo‘shish';
+
+  @override
+  String get hsErrRadius => 'Doira 1 km dan 500 km gacha bo‘lsin.';
+
+  @override
+  String get hsAlertOff => 'O‘chirilgan — botni bloklagansiz';
+
+  @override
+  String hsAlertSent(String count) {
+    return '$count ta xabar yuborilgan';
+  }
+
+  @override
+  String get hsAlertDeleteConfirm => 'Bu bildirishnoma o‘chirilsinmi?';
+
+  @override
+  String get hsAlertAdded => 'Bildirishnoma qo‘shildi';
+
+  @override
+  String get hsAlertDeleted => 'Bildirishnoma o‘chirildi';
+
+  @override
+  String get hsAlertsEmptyTitle => 'Hozircha bildirishnoma yo‘q';
+
+  @override
+  String get hsAlertsEmptyBody =>
+      'Yuqorida manzil yozib, qidiruv radiusini tanlang. Istalgancha bildirishnoma qo‘shishingiz mumkin.';
+
+  @override
+  String get hsSignInPostTitle => 'E’lon joylash uchun akkauntga kiring';
+
+  @override
+  String get hsSignInPostBody =>
+      'E’lonlarni ko‘rish va raqamlarni ochish uchun kirish shart emas.';
+
+  @override
+  String get hsSignInAlertsTitle => 'Yangi e’lon chiqsa, xabar beramiz';
+
+  @override
+  String get hsSignInAlertsBody =>
+      'Bildirishnoma uchun akkauntga kiring. Telefoningizga keladi.';
+
+  @override
+  String get hsSignIn => 'Akkauntga kirish';
+
+  @override
+  String get hsErrForbidden => 'Bu e’lon sizniki emas.';
+
+  @override
+  String get hsErrNotFound => 'E’lon topilmadi.';
+
+  @override
+  String get hsErrGone => 'E’lon o‘chirilgan yoki muddati tugagan.';
+
+  @override
+  String get hsErrGeoUnavailable =>
+      'Manzil xizmati javob bermayapti. Birozdan keyin urinib ko‘ring.';
+
+  @override
+  String get hsErrUnavailable => 'Xizmat vaqtincha ishlamayapti.';
+
+  @override
+  String get hsErrServer => 'Serverda xatolik yuz berdi.';
+
+  @override
+  String hsErrRateSeconds(String count) {
+    return 'Juda ko‘p urinish. $count soniyadan keyin qayta urining.';
+  }
+
+  @override
+  String hsErrRateMinutes(String count) {
+    return 'Juda ko‘p urinish. $count daqiqadan keyin qayta urining.';
+  }
+
+  @override
+  String get hsErrNetwork => 'Serverga ulanib bo‘lmadi. Qayta urinib ko‘ring.';
+
+  @override
+  String get hsErrGeneric => 'Xatolik yuz berdi.';
+
+  @override
+  String get hsSending => 'Yuborilmoqda…';
 }

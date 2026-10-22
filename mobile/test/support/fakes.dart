@@ -21,6 +21,7 @@ import 'package:muslim_vegukin/features/business/business_models.dart';
 import 'package:muslim_vegukin/features/business/business_source.dart';
 import 'package:muslim_vegukin/features/cars/cars_models.dart';
 import 'package:muslim_vegukin/features/cars/cars_source.dart';
+import 'package:muslim_vegukin/features/housing/housing_source.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_models.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_source.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
@@ -268,6 +269,7 @@ class TestApp {
       hikorea: hikorea,
       places: places,
       cars: cars,
+      housing: housing,
       clock: () => clockNow,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
@@ -305,6 +307,7 @@ class TestApp {
   final hikorea = FakeHikorea();
   final places = FakePlaces();
   final cars = FakeCars();
+  final housing = FakeHousing();
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];
@@ -1624,4 +1627,120 @@ class FakeCars implements CarsSource {
     _online('withdraw $id');
     own.removeWhere((c) => c['id'] == id);
   }
+}
+
+
+/// The housing board: three posts (one with a phone, one with Telegram, one
+/// with neither); an address in Ansan found.
+class FakeHousing implements HousingSource {
+  bool fail = false;
+  bool signedIn = false;
+  final asked = <String>[];
+  final alertList = <HousingAlert>[];
+  int _next = 10;
+
+  final board = <Map<String, Object?>>[
+    {'id': 1, 'address_display': '경기도 안산시 단원구 원곡동 123', 'body': 'Ikki kishilik xona, oyiga 450,000 won. Tel: 010-1234-5678', 'contact': '01012345678',
+     'posted_rel_uz': '2 soat oldin', 'is_new': true, 'lat': 37.33, 'lon': 126.81},
+    {'id': 2, 'address_display': '서울특별시 관악구 신림동 5', 'body': 'Yotoqxonada joy bor, depozitsiz. Telegramga yozing.', 'telegram_username': 'xonador',
+     'posted_rel_uz': '3 kun oldin', 'lat': 37.48, 'lon': 126.93},
+    {'id': 3, 'address_display': '부산광역시 사하구 1', 'body': 'Kontrakt o‘tkaziladi, avgustgacha. Batafsil kelib ko‘ring.', 'posted_rel_uz': '1 oy oldin',
+     'lat': 35.1, 'lon': 128.97},
+  ];
+
+  void _online(String call, [Map<String, String>? auth, bool signIn = false]) {
+    asked.add(call);
+    if (fail) throw const HousingException('offline');
+    if (auth != null && auth.isEmpty) throw const HousingException('no_session', status: 401);
+    if (signIn && !signedIn) throw const HousingException('sign_in_required', status: 401);
+  }
+
+  Map<String, Object?> _list(Map<String, Object?> p, {double? km}) => {
+        ...p,
+        'body_preview': (p['body'] as String).replaceAll(RegExp(r'\d[\d-]{8,}\d'), '•••'),
+        'has_contact': p['contact'] != null,
+        'has_telegram': p['telegram_username'] != null,
+        'distance_km': ?km,
+      };
+
+  @override
+  Future<HousingPage> posts({String? cursor, double? lat, double? lon}) async {
+    _online('posts ${lat == null ? 'recent' : 'near'}');
+    final live = board.where((p) => p['status'] != 'deleted').toList();
+    if (lat == null) return (posts: [for (final p in live.reversed.toList().reversed) HousingPost.fromJson(_list(p))!], next: null);
+    final near = [for (final p in live) (p, ((p['lat'] as double) - lat).abs() * 111)]..sort((a, b) => a.$2.compareTo(b.$2));
+    return (posts: [for (final (p, km) in near) HousingPost.fromJson(_list(p, km: km))!], next: null);
+  }
+
+  @override
+  Future<HousingPost> post(Map<String, String> auth, int id) async {
+    _online('post $id', auth);
+    final p = board.firstWhere((p) => p['id'] == id, orElse: () => throw const HousingException('not_found', status: 404));
+    return HousingPost.fromJson(p, full: true)!;
+  }
+
+  @override
+  Future<List<HousingPost>> mine(Map<String, String> auth) async {
+    _online('mine', auth, true);
+    return [for (final p in board.reversed) if (p['is_mine'] == true && p['status'] != 'deleted') HousingPost.fromJson(p, full: true)!];
+  }
+
+  @override
+  Future<({double lat, double lon, String name})> geocode(Map<String, String> auth, String address) async {
+    _online('geocode $address', auth);
+    if (!address.contains('안산')) throw const HousingException('geocode_failed', status: 422);
+    return (lat: 37.32, lon: 126.82, name: '경기 안산시 단원구 $address');
+  }
+
+  @override
+  Future<HousingPost> create(Map<String, String> auth, HousingDraft d) async {
+    _online('create ${d.address} ${d.contact} ${d.showUsername ? d.username : '-'}', auth, true);
+    final post = {'id': _next++, 'address_display': d.address, 'body': d.body, 'contact': d.contact.isEmpty ? null : d.contact,
+      'telegram_username': d.showUsername ? d.username : null, 'show_username': d.showUsername, 'contact_username': d.username,
+      'posted_rel_uz': 'hozirgina', 'is_new': true, 'is_mine': true, 'status': 'active', 'days_left': 30, 'lat': 37.3};
+    board.add(post);
+    return HousingPost.fromJson(post, full: true)!;
+  }
+
+  @override
+  Future<HousingPost> edit(Map<String, String> auth, int id, HousingDraft d) async {
+    _online('edit $id', auth, true);
+    final i = board.indexWhere((p) => p['id'] == id);
+    board[i] = {...board[i], 'body': d.body, 'contact': d.contact};
+    return HousingPost.fromJson(board[i], full: true)!;
+  }
+
+  @override
+  Future<void> delete(Map<String, String> auth, int id) async {
+    _online('delete $id', auth, true);
+    final i = board.indexWhere((p) => p['id'] == id);
+    board[i] = {...board[i], 'status': 'deleted'};
+  }
+
+  @override
+  Future<int> extend(Map<String, String> auth, int id) async {
+    _online('extend $id', auth, true);
+    return 30;
+  }
+
+  @override
+  Future<List<HousingAlert>> alerts(Map<String, String> auth) async {
+    _online('alerts', auth, true);
+    return [...alertList];
+  }
+
+  @override
+  Future<void> addAlert(Map<String, String> auth, String address, int radiusKm) async {
+    _online('alert $address $radiusKm', auth, true);
+    alertList.add(HousingAlert(id: _next++, address: '경기 안산시 단원구 $address', radiusKm: radiusKm));
+  }
+
+  @override
+  Future<void> deleteAlert(Map<String, String> auth, int id) async {
+    _online('unalert $id', auth, true);
+    alertList.removeWhere((a) => a.id == id);
+  }
+
+  @override
+  Future<String?> username(Map<String, String> auth) async => signedIn ? 'ali_uz' : null;
 }

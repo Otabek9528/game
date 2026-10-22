@@ -6723,6 +6723,600 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Yangi e’lonlarni birinchi bo‘lib ko‘rish uchun @vegukin_car kanaliga a’zo bo‘ling'**
   String get carChannelNudge;
+
+  /// No description provided for @hsTabBoard.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlar'**
+  String get hsTabBoard;
+
+  /// No description provided for @hsTabMine.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlarim'**
+  String get hsTabMine;
+
+  /// No description provided for @hsTabAlerts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarnoma'**
+  String get hsTabAlerts;
+
+  /// No description provided for @hsTabPost.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylash'**
+  String get hsTabPost;
+
+  /// No description provided for @hsSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreys tilida manzil yozsangiz, e’lonlar shu joyga yaqinligi bo‘yicha saralanadi.'**
+  String get hsSearchHint;
+
+  /// No description provided for @hsSearch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izlash'**
+  String get hsSearch;
+
+  /// No description provided for @hsRecent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Eng yangi e’lonlar'**
+  String get hsRecent;
+
+  /// No description provided for @hsNearest.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yaqinlik bo‘yicha'**
+  String get hsNearest;
+
+  /// No description provided for @hsCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta'**
+  String hsCount(String count);
+
+  /// No description provided for @hsCancel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bekor qilish'**
+  String get hsCancel;
+
+  /// No description provided for @hsMore.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yana yuklash'**
+  String get hsMore;
+
+  /// No description provided for @hsAllShown.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha e’lonlar ko‘rsatildi'**
+  String get hsAllShown;
+
+  /// No description provided for @hsNew.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi'**
+  String get hsNew;
+
+  /// No description provided for @hsYours.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizniki'**
+  String get hsYours;
+
+  /// No description provided for @hsSeeNumber.
+  ///
+  /// In uz, this message translates to:
+  /// **'Raqamni ko‘rish'**
+  String get hsSeeNumber;
+
+  /// No description provided for @hsViaTelegram.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram orqali bog‘lanish'**
+  String get hsViaTelegram;
+
+  /// No description provided for @hsNoContact.
+  ///
+  /// In uz, this message translates to:
+  /// **'Aloqa ma’lumoti yo‘q'**
+  String get hsNoContact;
+
+  /// No description provided for @hsEmptyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha e’lon yo‘q'**
+  String get hsEmptyTitle;
+
+  /// No description provided for @hsEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Birinchi bo‘lib e’lon joylang — pastdagi «Joylash» tugmasini bosing.'**
+  String get hsEmptyBody;
+
+  /// No description provided for @hsPostAd.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon joylash'**
+  String get hsPostAd;
+
+  /// No description provided for @hsGeoTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil topilmadi'**
+  String get hsGeoTitle;
+
+  /// No description provided for @hsGeoBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilni koreys tilida, to‘liqroq yozib ko‘ring:'**
+  String get hsGeoBody;
+
+  /// No description provided for @hsRetry.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinish'**
+  String get hsRetry;
+
+  /// No description provided for @hsLoadFailedTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlarni yuklab bo‘lmadi'**
+  String get hsLoadFailedTitle;
+
+  /// No description provided for @hsLoadFailedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet aloqasini tekshiring va qayta urinib ko‘ring.'**
+  String get hsLoadFailedBody;
+
+  /// No description provided for @hsOpenFailedTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ochib bo‘lmadi'**
+  String get hsOpenFailedTitle;
+
+  /// No description provided for @hsOpenFailedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu e’lon o‘chirilgan yoki muddati tugagan bo‘lishi mumkin.'**
+  String get hsOpenFailedBody;
+
+  /// No description provided for @hsCopy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxalash'**
+  String get hsCopy;
+
+  /// No description provided for @hsNoPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tel raqam ko‘rsatilmagan.'**
+  String get hsNoPhone;
+
+  /// No description provided for @hsEdit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tahrirlash'**
+  String get hsEdit;
+
+  /// No description provided for @hsDelete.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirish'**
+  String get hsDelete;
+
+  /// No description provided for @hsCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Raqam nusxalab olindi'**
+  String get hsCopied;
+
+  /// No description provided for @hsDeleteConfirm.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon o‘chirilsinmi? Buni qaytarib bo‘lmaydi.'**
+  String get hsDeleteConfirm;
+
+  /// No description provided for @hsDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon o‘chirildi'**
+  String get hsDeleted;
+
+  /// No description provided for @hsMineTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mening e’lonlarim'**
+  String get hsMineTitle;
+
+  /// No description provided for @hsMineSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlar 30 kundan keyin ro‘yxatdan olinadi. Muddat tugashidan oldin shu yerdan uzaytiring.'**
+  String get hsMineSub;
+
+  /// No description provided for @hsActive.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faol'**
+  String get hsActive;
+
+  /// No description provided for @hsExpired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muddati tugagan'**
+  String get hsExpired;
+
+  /// No description provided for @hsDaysLeft.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} kun qoldi'**
+  String hsDaysLeft(String count);
+
+  /// No description provided for @hsHidden.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro‘yxatda ko‘rinmaydi'**
+  String get hsHidden;
+
+  /// No description provided for @hsExtend.
+  ///
+  /// In uz, this message translates to:
+  /// **'Uzaytirish'**
+  String get hsExtend;
+
+  /// No description provided for @hsExtended.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muddat yana {count} kunga uzaytirildi'**
+  String hsExtended(String count);
+
+  /// No description provided for @hsMineEmptyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizda e’lon yo‘q'**
+  String get hsMineEmptyTitle;
+
+  /// No description provided for @hsMineEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylagan e’lonlaringiz shu yerda ko‘rinadi.'**
+  String get hsMineEmptyBody;
+
+  /// No description provided for @hsFailedTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklab bo‘lmadi'**
+  String get hsFailedTitle;
+
+  /// No description provided for @hsFailedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinib ko‘ring.'**
+  String get hsFailedBody;
+
+  /// No description provided for @hsNewTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi e’lon'**
+  String get hsNewTitle;
+
+  /// No description provided for @hsEditTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni tahrirlash'**
+  String get hsEditTitle;
+
+  /// No description provided for @hsComposeSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil, telefon raqami va qisqa tavsif kifoya'**
+  String get hsComposeSub;
+
+  /// No description provided for @hsAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil'**
+  String get hsAddress;
+
+  /// No description provided for @hsRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'majburiy'**
+  String get hsRequired;
+
+  /// No description provided for @hsAddressHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Koreys tilida yozing. Manzil keyin o‘zgartirilmaydi.'**
+  String get hsAddressHint;
+
+  /// No description provided for @hsAddressLocked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilni o‘zgartirib bo‘lmaydi. Xato bo‘lsa, e’lonni o‘chirib, yangisini joylang.'**
+  String get hsAddressLocked;
+
+  /// No description provided for @hsPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bog‘lanish uchun telefon raqam'**
+  String get hsPhone;
+
+  /// No description provided for @hsContactHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon raqami yoki Telegram — kamida bittasi ko‘rsatilishi shart.'**
+  String get hsContactHint;
+
+  /// No description provided for @hsTelegramOptIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram orqali bog‘lanish'**
+  String get hsTelegramOptIn;
+
+  /// No description provided for @hsYourUsername.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizning username: {name}'**
+  String hsYourUsername(String name);
+
+  /// No description provided for @hsBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon matni'**
+  String get hsBody;
+
+  /// No description provided for @hsBodyHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ijara haqi, depozit, boshlanish sanasi, muddati va boshqa shartlarni yozing. Masalan: oyiga 500,000 won, depozit 5,000,000 won, avgust oyidan boshlab, kamida olti oyga. Kommunal alohida.'**
+  String get hsBodyHint;
+
+  /// No description provided for @hsSubmit.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni joylash'**
+  String get hsSubmit;
+
+  /// No description provided for @hsSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgarishlarni saqlash'**
+  String get hsSave;
+
+  /// No description provided for @hsSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgarishlar saqlandi'**
+  String get hsSaved;
+
+  /// No description provided for @hsPosted.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’loningiz joylandi'**
+  String get hsPosted;
+
+  /// No description provided for @hsErrUsername.
+  ///
+  /// In uz, this message translates to:
+  /// **'5-32 belgi: harflar, raqamlar va pastki chiziq. Harf bilan boshlansin.'**
+  String get hsErrUsername;
+
+  /// No description provided for @hsErrContactRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon raqami yoki Telegram — kamida bittasini ko‘rsating.'**
+  String get hsErrContactRequired;
+
+  /// No description provided for @hsErrAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilni koreys tilida, to‘liq yozing.'**
+  String get hsErrAddress;
+
+  /// No description provided for @hsErrPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon raqamini to‘g‘ri yozing.'**
+  String get hsErrPhone;
+
+  /// No description provided for @hsErrBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Matn kamida 20 ta belgidan iborat bo‘lsin.'**
+  String get hsErrBody;
+
+  /// No description provided for @hsErrUsernameEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Username yozing yoki belgini olib tashlang.'**
+  String get hsErrUsernameEmpty;
+
+  /// No description provided for @hsErrGeocode.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil topilmadi. To‘liqroq yozib ko‘ring.'**
+  String get hsErrGeocode;
+
+  /// No description provided for @hsAlertsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar'**
+  String get hsAlertsTitle;
+
+  /// No description provided for @hsAlertsSub.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil va qidiruv radiusini kiriting. Shu radius ichida yangi e’lon qo‘yilsa, darhol xabar beramiz.'**
+  String get hsAlertsSub;
+
+  /// No description provided for @hsRadius.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidiruv radiusi: shu masofadagi barcha e’lonlar'**
+  String get hsRadius;
+
+  /// No description provided for @hsRadiusCustom.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoki o‘zingiz kiriting'**
+  String get hsRadiusCustom;
+
+  /// No description provided for @hsAdd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘shish'**
+  String get hsAdd;
+
+  /// No description provided for @hsErrRadius.
+  ///
+  /// In uz, this message translates to:
+  /// **'Doira 1 km dan 500 km gacha bo‘lsin.'**
+  String get hsErrRadius;
+
+  /// No description provided for @hsAlertOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirilgan — botni bloklagansiz'**
+  String get hsAlertOff;
+
+  /// No description provided for @hsAlertSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta xabar yuborilgan'**
+  String hsAlertSent(String count);
+
+  /// No description provided for @hsAlertDeleteConfirm.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu bildirishnoma o‘chirilsinmi?'**
+  String get hsAlertDeleteConfirm;
+
+  /// No description provided for @hsAlertAdded.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnoma qo‘shildi'**
+  String get hsAlertAdded;
+
+  /// No description provided for @hsAlertDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnoma o‘chirildi'**
+  String get hsAlertDeleted;
+
+  /// No description provided for @hsAlertsEmptyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozircha bildirishnoma yo‘q'**
+  String get hsAlertsEmptyTitle;
+
+  /// No description provided for @hsAlertsEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuqorida manzil yozib, qidiruv radiusini tanlang. Istalgancha bildirishnoma qo‘shishingiz mumkin.'**
+  String get hsAlertsEmptyBody;
+
+  /// No description provided for @hsSignInPostTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon joylash uchun akkauntga kiring'**
+  String get hsSignInPostTitle;
+
+  /// No description provided for @hsSignInPostBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlarni ko‘rish va raqamlarni ochish uchun kirish shart emas.'**
+  String get hsSignInPostBody;
+
+  /// No description provided for @hsSignInAlertsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi e’lon chiqsa, xabar beramiz'**
+  String get hsSignInAlertsTitle;
+
+  /// No description provided for @hsSignInAlertsBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnoma uchun akkauntga kiring. Telefoningizga keladi.'**
+  String get hsSignInAlertsBody;
+
+  /// No description provided for @hsSignIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntga kirish'**
+  String get hsSignIn;
+
+  /// No description provided for @hsErrForbidden.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu e’lon sizniki emas.'**
+  String get hsErrForbidden;
+
+  /// No description provided for @hsErrNotFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon topilmadi.'**
+  String get hsErrNotFound;
+
+  /// No description provided for @hsErrGone.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon o‘chirilgan yoki muddati tugagan.'**
+  String get hsErrGone;
+
+  /// No description provided for @hsErrGeoUnavailable.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil xizmati javob bermayapti. Birozdan keyin urinib ko‘ring.'**
+  String get hsErrGeoUnavailable;
+
+  /// No description provided for @hsErrUnavailable.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xizmat vaqtincha ishlamayapti.'**
+  String get hsErrUnavailable;
+
+  /// No description provided for @hsErrServer.
+  ///
+  /// In uz, this message translates to:
+  /// **'Serverda xatolik yuz berdi.'**
+  String get hsErrServer;
+
+  /// No description provided for @hsErrRateSeconds.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda ko‘p urinish. {count} soniyadan keyin qayta urining.'**
+  String hsErrRateSeconds(String count);
+
+  /// No description provided for @hsErrRateMinutes.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda ko‘p urinish. {count} daqiqadan keyin qayta urining.'**
+  String hsErrRateMinutes(String count);
+
+  /// No description provided for @hsErrNetwork.
+  ///
+  /// In uz, this message translates to:
+  /// **'Serverga ulanib bo‘lmadi. Qayta urinib ko‘ring.'**
+  String get hsErrNetwork;
+
+  /// No description provided for @hsErrGeneric.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik yuz berdi.'**
+  String get hsErrGeneric;
+
+  /// No description provided for @hsSending.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborilmoqda…'**
+  String get hsSending;
 }
 
 class _AppLocalizationsDelegate

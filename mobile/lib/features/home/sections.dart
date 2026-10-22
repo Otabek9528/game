@@ -7,6 +7,7 @@ import '../business/business_screen.dart';
 import '../cars/cars_screen.dart';
 import '../hikorea/hikorea_screen.dart';
 import '../hikorea/hikorea_watches.dart';
+import '../housing/housing_screen.dart';
 import '../links/links_screen.dart';
 import '../parcel/parcel_screen.dart';
 import '../places/place_detail.dart';
@@ -47,6 +48,7 @@ void openSection(BuildContext context, Feature feature, AppServices services) {
     'community' => (BuildContext _) => CommunityScreen(services: services),
     'hikorea' => (BuildContext _) => HikoreaScreen(services: services),
     'cars' => (BuildContext _) => CarsScreen(services: services, startCar: CarsScreen.carIn(feature.path)),
+    'housing' => (BuildContext _) => HousingScreen(services: services, startPost: HousingScreen.postIn(feature.path)),
     _ => null,
   };
   if (native != null) {
