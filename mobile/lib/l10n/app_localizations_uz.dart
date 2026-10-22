@@ -2534,6 +2534,15 @@ class AppLocalizationsUz extends AppLocalizations {
   String get hkNoDaysShort => 'HiKorea\'da kun ko‘rinmayapti';
 
   @override
+  String get hkLeafLegend => 'Sana — eng yaqin bo‘sh kun';
+
+  @override
+  String get hkLeafFull => 'Band';
+
+  @override
+  String get hkWatchingHere => 'Shu yerda kuzatuvingiz bor';
+
+  @override
   String get themeToDay => 'Kunduzgi rejim';
 
   @override

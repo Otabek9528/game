@@ -2629,6 +2629,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get hkNoDaysShort => 'На HiKorea нет дней';
 
   @override
+  String get hkLeafLegend => 'Дата — ближайший свободный день';
+
+  @override
+  String get hkLeafFull => 'Занято';
+
+  @override
+  String get hkWatchingHere => 'Здесь у вас есть наблюдение';
+
+  @override
   String get themeToDay => 'Дневной режим';
 
   @override

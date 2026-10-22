@@ -2592,6 +2592,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hkNoDaysShort => 'No days on HiKorea';
 
   @override
+  String get hkLeafLegend => 'Date: the earliest free day';
+
+  @override
+  String get hkLeafFull => 'Full';
+
+  @override
+  String get hkWatchingHere => 'You watch a counter here';
+
+  @override
   String get themeToDay => 'Day mode';
 
   @override

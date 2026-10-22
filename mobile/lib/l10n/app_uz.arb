@@ -1359,6 +1359,9 @@
   "hkOtherCounters": "Ofisning boshqa bo‘limlari",
   "hkCheckOnHikorea": "HiKorea'da tekshirish",
   "hkNoDaysShort": "HiKorea'da kun ko‘rinmayapti",
+  "hkLeafLegend": "Sana — eng yaqin bo‘sh kun",
+  "hkLeafFull": "Band",
+  "hkWatchingHere": "Shu yerda kuzatuvingiz bor",
   "themeToDay": "Kunduzgi rejim",
   "themeToNight": "Tungi rejim"
 }

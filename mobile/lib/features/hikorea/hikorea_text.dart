@@ -92,6 +92,10 @@ String dayMonthYear(DateTime day, AppLanguage language) =>
 
 String capitalized(String text) => text.isEmpty ? text : text[0].toUpperCase() + text.substring(1);
 
+/// "NOY", "НОЯБ", "NOV": a calendar leaf's month.
+String monthShort(DateTime day, AppLanguage language) =>
+    DateFormat('LLL', language.code).format(day).replaceAll('.', '').toUpperCase();
+
 /// "Payshanba", "Четверг", "Thursday".
 String weekdayName(DateTime day, AppLanguage language) => capitalized(DateFormat('EEEE', language.code).format(day));
 

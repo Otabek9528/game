@@ -4558,6 +4558,24 @@ abstract class AppLocalizations {
   /// **'HiKorea\'da kun ko‘rinmayapti'**
   String get hkNoDaysShort;
 
+  /// No description provided for @hkLeafLegend.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sana — eng yaqin bo‘sh kun'**
+  String get hkLeafLegend;
+
+  /// No description provided for @hkLeafFull.
+  ///
+  /// In uz, this message translates to:
+  /// **'Band'**
+  String get hkLeafFull;
+
+  /// No description provided for @hkWatchingHere.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu yerda kuzatuvingiz bor'**
+  String get hkWatchingHere;
+
   /// No description provided for @themeToDay.
   ///
   /// In uz, this message translates to:

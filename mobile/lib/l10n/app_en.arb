@@ -743,6 +743,9 @@
   "hkOtherCounters": "This office’s other counters",
   "hkCheckOnHikorea": "Check on HiKorea",
   "hkNoDaysShort": "No days on HiKorea",
+  "hkLeafLegend": "Date: the earliest free day",
+  "hkLeafFull": "Full",
+  "hkWatchingHere": "You watch a counter here",
   "themeToDay": "Day mode",
   "themeToNight": "Night mode"
 }

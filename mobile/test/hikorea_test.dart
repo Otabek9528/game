@@ -195,6 +195,75 @@ void main() {
   });
 
   group('the page', () {
+    testWidgets('each office’s leaf: the earliest free day of its counters, full, retired; a bell where one watches',
+        (tester) async {
+      final app = TestApp(language: 'en');
+      HkCalendar full(int seq) => HkCalendar(
+            deskSeq: seq,
+            listed: const {'20261019': 36, '20261020': 36},
+            deskCapacity: 36,
+            schedule: const HkSchedule(first: '20261019', last: '20261020', weekdays: {0, 1, 2, 3, 4}),
+            status: 'ok',
+          );
+      app.hikorea
+        ..calendarFor[101] = full(101) // Ansan's other counter is free on Monday 19 October
+        ..calendarFor[201] = full(201)
+        ..dormantDesks.add(301)
+        ..watchList.add(HkWatch(
+          id: 1,
+          officeId: '1270100',
+          officeNameEn: 'Seoul Immigration Office',
+          deskSeq: 201,
+          start: DateTime(2026, 10, 19),
+          end: DateTime(2026, 10, 30),
+          status: 'active',
+        ));
+      final semantics = tester.ensureSemantics();
+      await openHikorea(tester, app: app);
+      await tester.scrollUntilVisible(find.text('Gimhae'), 200, scrollable: find.byType(Scrollable).first);
+      expect(find.text('Date: the earliest free day'), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp(RegExp.escape('Earliest free day: Monday, 19 October'))), findsOneWidget, reason: 'Ansan');
+      expect(find.text('OCT'), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp(RegExp.escape('Every day is booked now. You watch a counter here'))), findsOneWidget, reason: 'Seoul');
+      expect(find.text('FULL'), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp(RegExp.escape('No days on HiKorea'))), findsOneWidget, reason: 'Gimhae');
+      semantics.dispose();
+    });
+
+    testWidgets('the leaves load a few calendars at a time; offline, a cloud, tried again on a pull', (tester) async {
+      final app = TestApp(language: 'en');
+      app.hikorea
+        ..officesOverride = [
+          for (var i = 0; i < 12; i++)
+            HkOffice(id: '$i', nameEn: 'Place$i Immigration Office', desks: [HkDesk(seq: 2 * i), HkDesk(seq: 2 * i + 1)]),
+        ]
+        ..calendarDelay = const Duration(milliseconds: 300);
+      await app.launch(tester);
+      await pushPage(tester, HikoreaScreen(services: app.services));
+      for (var i = 0; i < 20; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      expect(app.hikorea.mostInFlight, 3);
+      expect(find.text('OCT', skipOffstage: false), findsWidgets, reason: 'the first rows, below the start card');
+
+      final semantics = tester.ensureSemantics();
+      app.hikorea
+        ..calendarDelay = null
+        ..fail = true;
+      await tester.scrollUntilVisible(find.text('Place9'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel(RegExp(RegExp.escape('Couldn’t load. Check your connection.'))), findsWidgets);
+      app.hikorea.fail = false;
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, 3000));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, 500)); // the pull
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Place9'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel(RegExp(RegExp.escape('Couldn’t load. Check your connection.'))), findsNothing);
+      semantics.dispose();
+    });
+
     testWidgets('native from the home screen; offices, searchable; offline: said so, and tried again', (tester) async {
       final app = TestApp(language: 'en')..hikorea.fail = true;
       await app.launch(tester);

@@ -58,7 +58,10 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
     }
   }
 
-  Future<void> _refresh() => Future.wait([if (_kit.offices == null) _load(), _kit.refreshWatches()]);
+  Future<void> _refresh() {
+    _kit.retryFailed();
+    return Future.wait([if (_kit.offices == null) _load(), _kit.refreshWatches()]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +143,7 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
                       ],
                       HkHeading(searching ? s.hkOffices : s.hkAllOffices,
                           trailing: offices == null ? null : '${shown.length}'),
+                      if (shown.isNotEmpty) const _LeafLegend(),
                       if (offices == null && _failed)
                         QnaMessage(
                           icon: Icons.wifi_off_rounded,
@@ -158,7 +162,7 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
                         for (final office in shown)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8),
-                            child: OfficeRow(office: office, onTap: () => openOffice(context, _kit, office)),
+                            child: OfficeRow(kit: _kit, office: office, onTap: () => openOffice(context, _kit, office)),
                           ),
                     ],
                   ),
@@ -608,11 +612,13 @@ class _AddressRow extends StatelessWidget {
   }
 }
 
-/// An office in a list: its place first (every name ends alike), what it
-/// is, how many counters, and its Korean name as letters and signs have it.
+/// An office in a list: how soon it has a free day, its place (every name
+/// ends alike), what it is, how many counters, and its Korean name as
+/// letters and signs have it.
 class OfficeRow extends StatelessWidget {
-  const OfficeRow({super.key, required this.office, required this.onTap, this.subtitle});
+  const OfficeRow({super.key, required this.kit, required this.office, required this.onTap, this.subtitle});
 
+  final HikoreaKit kit;
   final HkOffice office;
   final VoidCallback onTap;
 
@@ -633,21 +639,8 @@ class OfficeRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
       child: Row(
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: parts.branch ? p.card : p.accent,
-              shape: BoxShape.circle,
-              border: parts.branch ? Border.all(color: p.accent, width: 1.5) : null,
-            ),
-            child: Text(
-              parts.place.characters.first.toUpperCase(),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: parts.branch ? p.accent : Colors.white),
-            ),
-          ),
-          const SizedBox(width: 12),
+          _OfficeLeaf(kit: kit, office: office),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -667,6 +660,126 @@ class OfficeRow extends StatelessWidget {
           ),
           Icon(Icons.chevron_right_rounded, color: p.inkMuted),
         ],
+      ),
+    );
+  }
+}
+
+/// What the leaves in the office list say.
+class _LeafLegend extends StatelessWidget {
+  const _LeafLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
+      child: Row(
+        children: [
+          Icon(Icons.event_available_rounded, size: 15, color: p.inkMuted),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(AppLocalizations.of(context).hkLeafLegend,
+                style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A calendar leaf with an office's earliest free day: green within two
+/// weeks, amber later, red when every day is booked; a bell when one of
+/// this person's watches is there.
+class _OfficeLeaf extends StatelessWidget {
+  const _OfficeLeaf({required this.kit, required this.office});
+
+  final HikoreaKit kit;
+  final HkOffice office;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(listenable: kit, builder: _leaf);
+
+  Widget _leaf(BuildContext context, Widget? _) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    for (final desk in office.desks) {
+      kit.prefetch(desk.seq);
+    }
+    final (:kind, :day) = kit.outlookOf(office);
+    final soon = day != null && day.difference(kit.today).inDays <= 14;
+    final colours = hkTone(context, switch (kind) {
+      HkOutlook.free => soon ? HkTone.open : HkTone.filling,
+      HkOutlook.full => HkTone.low,
+      _ => HkTone.none,
+    });
+    final strong = kind == HkOutlook.free || kind == HkOutlook.full;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final (String? band, Widget? body, String label) = switch (kind) {
+      HkOutlook.free => (
+          monthShort(day!, kit.language),
+          Text('${day.day}', style: TextStyle(fontSize: 20, height: 1, fontWeight: FontWeight.w800, color: colours.ink)),
+          s.hkEarliestShort('${weekdayName(day, kit.language)}, ${dayMonth(day, kit.language)}'),
+        ),
+      HkOutlook.full => (s.hkLeafFull.toUpperCase(), Icon(Icons.event_busy_rounded, size: 20, color: colours.ink), s.hkAllFullShort),
+      HkOutlook.retired => (null, Text('—', style: TextStyle(fontSize: 18, color: colours.ink)), s.hkNoDaysShort),
+      HkOutlook.unknown => (null, Icon(Icons.cloud_off_rounded, size: 18, color: colours.ink), s.hkLoadFailed),
+      HkOutlook.loading => (null, null, ''),
+    };
+    final watching = kit.watching(office);
+    return Semantics(
+      label: [if (label.isNotEmpty) label, if (watching) s.hkWatchingHere].join('. '),
+      child: ExcludeSemantics(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 48,
+              height: 52,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(color: colours.background, borderRadius: BorderRadius.circular(12)),
+              child: Column(
+                children: [
+                  Container(
+                    height: 16,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    color: strong ? colours.ink : p.hairline,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: band == null
+                        ? null
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              band,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                height: 1,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.6,
+                                color: dark ? Colors.black : Colors.white,
+                              ),
+                            ),
+                          ),
+                  ),
+                  Expanded(child: Center(child: body)),
+                ],
+              ),
+            ),
+            if (watching)
+              PositionedDirectional(
+                bottom: -5,
+                end: -5,
+                child: Container(
+                  width: 19,
+                  height: 19,
+                  decoration: BoxDecoration(color: p.gold, shape: BoxShape.circle, border: Border.all(color: p.card, width: 2)),
+                  child: const Icon(Icons.notifications_rounded, size: 11, color: Colors.white),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

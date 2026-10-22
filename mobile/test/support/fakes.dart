@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -1096,6 +1097,13 @@ class FakeHikorea implements HikoreaSource {
   /// Counters HiKorea retired: they list nothing since 16 October.
   final dormantDesks = <int>{};
 
+  /// Counters with a calendar of their own instead of the one below.
+  final calendarFor = <int, HkCalendar>{};
+
+  /// How long a calendar takes to come; how many were asked for at once.
+  Duration? calendarDelay;
+  int inFlight = 0, mostInFlight = 0;
+
   /// Mon 19 Oct: 5 booked, Tue 20: 40 (full), Mon 26: 10 (full), Tue 27: 20;
   /// the other working days to the end of November nobody has booked yet;
   /// Tue 3 Nov is a holiday.
@@ -1103,6 +1111,12 @@ class FakeHikorea implements HikoreaSource {
   Future<HkCalendar> calendar(int desk) async {
     _online();
     asked.add('calendar $desk');
+    if (calendarDelay case final delay?) {
+      mostInFlight = max(mostInFlight, ++inFlight);
+      await Future<void>.delayed(delay);
+      inFlight--;
+    }
+    if (calendarFor[desk] case final calendar?) return calendar;
     if (dormantDesks.contains(desk)) {
       return HkCalendar(deskSeq: desk, dormant: true, listedUntil: DateTime(2026, 10, 16), deskCapacity: 180, status: 'ok');
     }

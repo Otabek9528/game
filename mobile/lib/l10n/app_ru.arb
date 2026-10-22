@@ -743,6 +743,9 @@
   "hkOtherCounters": "Другие окна этого офиса",
   "hkCheckOnHikorea": "Проверить на HiKorea",
   "hkNoDaysShort": "На HiKorea нет дней",
+  "hkLeafLegend": "Дата — ближайший свободный день",
+  "hkLeafFull": "Занято",
+  "hkWatchingHere": "Здесь у вас есть наблюдение",
   "themeToDay": "Дневной режим",
   "themeToNight": "Ночной режим"
 }

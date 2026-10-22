@@ -163,6 +163,7 @@ class _HkAddressScreenState extends State<HkAddressScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: OfficeRow(
+                    kit: _kit,
                     office: _kit.officeOf(m.officeId) ?? HkOffice(id: m.officeId, nameEn: m.nameEn, nameKo: m.nameKo),
                     subtitle: [if (m.nameKo case final ko? when ko.isNotEmpty) ko, if (m.district.isNotEmpty) m.district]
                         .join(' · '),

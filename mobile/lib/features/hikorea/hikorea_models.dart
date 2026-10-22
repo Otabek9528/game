@@ -96,6 +96,11 @@ class HkMatch {
   }
 }
 
+/// How soon an office takes someone: [free] on a day, every day [full],
+/// only counters HiKorea [retired], [unknown] when a counter couldn't be
+/// read, or still [loading].
+enum HkOutlook { loading, free, full, retired, unknown }
+
 /// How booked a day is: [open] (half or more free), [some] (filling up),
 /// [full], [closed] (no appointments that day), [later] (past the booking
 /// window: not taken yet).
