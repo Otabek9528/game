@@ -29,6 +29,7 @@
     crosshair: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
     pin: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
     more: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+    check: '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>',
     bell: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a6.3 6.3 0 0 0-6.3 6.3c0 4.6-1.4 6.9-2.4 8a.9.9 0 0 0 .7 1.5h16a.9.9 0 0 0 .7-1.5c-1-1.1-2.4-3.4-2.4-8A6.3 6.3 0 0 0 12 2.2Z"/><path d="M9.6 19.8h4.8a2.4 2.4 0 0 1-4.8 0Z"/></svg>'
   };
 
@@ -678,7 +679,7 @@
       .catch(function (err) {
         if (my !== seq || sheet !== s) return;
         s.addrError = errorText(err);
-        if (err.code === 'address_not_found') s.addrFailed = text;
+        if (err.code === 'address_not_found' || err.code === 'address_not_exact') s.addrFailed = text;
       })
       .then(function () {
         if (sheet !== s) return;
@@ -745,6 +746,11 @@
     var found = !!s.centers.address && s.addrResolved === text;
     $('ntAddrForm').classList.toggle('is-found', found);
     $('ntAddrForm').classList.toggle('is-error', !!s.addrError);
+    // A word, not an icon: a tick before anything is found read as "done".
+    var findBtn = $('ntAddrFind');
+    findBtn.innerHTML = found ? ICON.check + '<span>' + esc(T('areaSheet.found')) + '</span>'
+                              : '<span>' + esc(T('areaSheet.find')) + '</span>';
+    findBtn.disabled = s.finding;
     var hint = $('ntAddrHint');
     hint.classList.toggle('is-error', !!s.addrError);
     if (s.addrError) hint.textContent = s.addrError;
@@ -1018,7 +1024,7 @@
       if (sheet !== s) return;
       s.saving = false;
       haptic('error');
-      if (err.code === 'address_not_found' && s.source === 'address') {
+      if ((err.code === 'address_not_found' || err.code === 'address_not_exact') && s.source === 'address') {
         s.addrError = errorText(err);
         s.centers.address = null;
       } else {

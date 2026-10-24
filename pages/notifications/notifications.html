@@ -192,9 +192,8 @@
         <form class="nt-addr-field" id="ntAddrForm" autocomplete="off">
           <svg class="pl-icon nt-addr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="nt-addr-input" id="ntAddrInput" maxlength="120" enterkeyhint="search" data-pt-placeholder="areaSheet.addressExample" />
-          <button type="submit" class="nt-addr-find" id="ntAddrFind" data-pt-aria="areaSheet.find">
-            <svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>
-          </button>
+          <!-- "Topish" until the address is found, then "✓ Topildi" (notifications.js). -->
+          <button type="submit" class="nt-addr-find" id="ntAddrFind"></button>
         </form>
         <p class="nt-hint" id="ntAddrHint" data-pt="areaSheet.addressHint"></p>
       </div>
