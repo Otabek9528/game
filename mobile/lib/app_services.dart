@@ -20,6 +20,7 @@ import 'features/cars/cars_source.dart';
 import 'features/hikorea/hikorea_source.dart';
 import 'features/home/feature_catalog.dart';
 import 'features/housing/housing_source.dart';
+import 'features/jobs/jobs_source.dart';
 import 'features/links/links_controller.dart';
 import 'features/parcel/parcel_source.dart';
 import 'features/places/places_source.dart';
@@ -161,6 +162,7 @@ class AppServices {
     this.places = const HttpPlacesSource(),
     this.cars = const HttpCarsSource(),
     this.housing = const HttpHousingSource(),
+    this.jobs = const HttpJobsSource(),
     this.clock = DateTime.now,
   });
 
@@ -218,6 +220,9 @@ class AppServices {
 
   /// The housing board.
   final HousingSource housing;
+
+  /// The job group: an invite, and one's posts in it.
+  final JobsSource jobs;
 
   /// What day it is, for the pages that list days: the phone's clock, or a
   /// test's.

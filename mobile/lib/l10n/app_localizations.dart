@@ -7317,6 +7317,564 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Yuborilmoqda…'**
   String get hsSending;
+
+  /// No description provided for @jbTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish e’lonlari guruhi'**
+  String get jbTitle;
+
+  /// No description provided for @jbSubtitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot foydalanuvchilari uchun maxsus xizmat'**
+  String get jbSubtitle;
+
+  /// No description provided for @jbBotDoes.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot tomonidan:'**
+  String get jbBotDoes;
+
+  /// No description provided for @jbPoint1.
+  ///
+  /// In uz, this message translates to:
+  /// **'50 dan ortiq ish e’lon guruhlari sizning o‘rningizga kunda 24 soat kuzatib boriladi'**
+  String get jbPoint1;
+
+  /// No description provided for @jbPoint2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faqat ish bilan bog‘liq bo‘lgan e’lonlar ajratib olinadi'**
+  String get jbPoint2;
+
+  /// No description provided for @jbPoint3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha ajratib olingan e’lonlar shu zahoti “Ish e’lonlari” guruhida e’lon qilib boriladi'**
+  String get jbPoint3;
+
+  /// No description provided for @jbGetLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruh linkini olish'**
+  String get jbGetLink;
+
+  /// No description provided for @jbLinkNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havola faqat siz uchun yaratiladi va 15 soniya amal qiladi'**
+  String get jbLinkNote;
+
+  /// No description provided for @jbLinkLoading.
+  ///
+  /// In uz, this message translates to:
+  /// **'Link yaratilmoqda…'**
+  String get jbLinkLoading;
+
+  /// No description provided for @jbSecondsLeft.
+  ///
+  /// In uz, this message translates to:
+  /// **'soniya qoldi'**
+  String get jbSecondsLeft;
+
+  /// No description provided for @jbYourLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizning havolangiz:'**
+  String get jbYourLink;
+
+  /// No description provided for @jbJoin.
+  ///
+  /// In uz, this message translates to:
+  /// **'Guruhga qo‘shilish'**
+  String get jbJoin;
+
+  /// No description provided for @jbLinkWarning.
+  ///
+  /// In uz, this message translates to:
+  /// **'Diqqat! Havola faqat 15 soniya davomida amal qiladi. Shoshiling!'**
+  String get jbLinkWarning;
+
+  /// No description provided for @jbExpiredTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Havola muddati tugadi'**
+  String get jbExpiredTitle;
+
+  /// No description provided for @jbExpiredBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi havola olish uchun quyidagi tugmani bosing'**
+  String get jbExpiredBody;
+
+  /// No description provided for @jbRetry.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinish'**
+  String get jbRetry;
+
+  /// No description provided for @jbErrorTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik yuz berdi'**
+  String get jbErrorTitle;
+
+  /// No description provided for @jbLinkError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Link yaratishda xatolik.'**
+  String get jbLinkError;
+
+  /// No description provided for @jbCopied.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nusxa olindi'**
+  String get jbCopied;
+
+  /// No description provided for @jbPost.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon joylash'**
+  String get jbPost;
+
+  /// No description provided for @jbMyPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlarim'**
+  String get jbMyPosts;
+
+  /// No description provided for @jbNewPost.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi e’lon'**
+  String get jbNewPost;
+
+  /// No description provided for @jbHowTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu qanday ishlaydi?'**
+  String get jbHowTitle;
+
+  /// No description provided for @jbHow1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish e’loningizni yozing va komissiya turini tanlang'**
+  String get jbHow1;
+
+  /// No description provided for @jbHow2.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’loningiz faqat bot guruhiga joylanadi. Foydalanuvchilar siz bilan tez orada bog‘lanishadi'**
+  String get jbHow2;
+
+  /// No description provided for @jbHow3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Odam topilgach, e’lonni “Band” deb belgilang'**
+  String get jbHow3;
+
+  /// No description provided for @jbHowCommission.
+  ///
+  /// In uz, this message translates to:
+  /// **'Komissiya ixtiyoriy — o‘zingiz tanlaysiz. Tanlasangiz, ishni olgan har bir kishi sizga bir martalik 10,000 KRW to‘laydi'**
+  String get jbHowCommission;
+
+  /// No description provided for @jbHowRule.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sharti: E’lon faqat bot guruhida e’lon qilinib, boshqa guruhlarga joylanmasligi kerak'**
+  String get jbHowRule;
+
+  /// No description provided for @jbHowWait.
+  ///
+  /// In uz, this message translates to:
+  /// **'Agar 2-3 soat ichida odam topilmasa, boshqa guruhlarda e’lon qilishingiz mumkin'**
+  String get jbHowWait;
+
+  /// No description provided for @jbEditing.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni tahrirlash'**
+  String get jbEditing;
+
+  /// No description provided for @jbCancel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bekor qilish'**
+  String get jbCancel;
+
+  /// No description provided for @jbText.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon matni'**
+  String get jbText;
+
+  /// No description provided for @jbContact.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bog‘lanish uchun'**
+  String get jbContact;
+
+  /// No description provided for @jbRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'majburiy'**
+  String get jbRequired;
+
+  /// No description provided for @jbContactManual.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoki telefon raqamni kiritish'**
+  String get jbContactManual;
+
+  /// No description provided for @jbContactBack.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram username ishlatish'**
+  String get jbContactBack;
+
+  /// No description provided for @jbContactHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tel raqam yoki Telegram username kiriting'**
+  String get jbContactHint;
+
+  /// No description provided for @jbCommission.
+  ///
+  /// In uz, this message translates to:
+  /// **'Komissiya'**
+  String get jbCommission;
+
+  /// No description provided for @jbCommissionPick.
+  ///
+  /// In uz, this message translates to:
+  /// **'tanlang'**
+  String get jbCommissionPick;
+
+  /// No description provided for @jbWithCommission.
+  ///
+  /// In uz, this message translates to:
+  /// **'Komissiyali'**
+  String get jbWithCommission;
+
+  /// No description provided for @jbWithCommissionBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ishni olgan har bir kishi sizga bir martalik 10,000 KRW to‘laydi.'**
+  String get jbWithCommissionBody;
+
+  /// No description provided for @jbNoCommission.
+  ///
+  /// In uz, this message translates to:
+  /// **'Komissiyasiz'**
+  String get jbNoCommission;
+
+  /// No description provided for @jbFree.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bepul'**
+  String get jbFree;
+
+  /// No description provided for @jbNoCommissionBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech qanday to‘lov talab qilinmaydi — faqat e’lon joylanadi.'**
+  String get jbNoCommissionBody;
+
+  /// No description provided for @jbPreview.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon ostida shunday ko‘rinadi:'**
+  String get jbPreview;
+
+  /// No description provided for @jbFootYes.
+  ///
+  /// In uz, this message translates to:
+  /// **'👉 Bu e’lon faqat shu guruhga qo‘yildi.\n👉 Ishga qatnashgan har bir kishi ish egasiga bir martalik komissiyani: 10,000 KRW ish haqini olish vaqtida to‘laydi.\n👉 E’lon egasiga murojaat qilish orqali siz ushbu to‘lovga rozilik bildirasiz.'**
+  String get jbFootYes;
+
+  /// No description provided for @jbFootNo.
+  ///
+  /// In uz, this message translates to:
+  /// **'👉 Bu e’lon faqat shu guruhga qo‘yildi.\n👉 Bu e’lon uchun hech qanday komissiya olinmaydi.'**
+  String get jbFootNo;
+
+  /// No description provided for @jbAgree.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ushbu xabar ish bilan bog‘liq e’lonligini tasdiqlayman va boshqa Telegram guruhlarga 2-3 soat ichida joylamayman.'**
+  String get jbAgree;
+
+  /// No description provided for @jbSubmit.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni joylash'**
+  String get jbSubmit;
+
+  /// No description provided for @jbSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgarishlarni saqlash'**
+  String get jbSave;
+
+  /// No description provided for @jbBanWarning.
+  ///
+  /// In uz, this message translates to:
+  /// **'Reklama, shaxsiy xabarlar yoki ish bilan bog‘liq bo‘lmagan e’lonlar davomiy qo‘ygan foydalanuvchi bloklanadi.'**
+  String get jbBanWarning;
+
+  /// No description provided for @jbSending.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon yuborilmoqda…'**
+  String get jbSending;
+
+  /// No description provided for @jbSaving.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgarishlar saqlanmoqda…'**
+  String get jbSaving;
+
+  /// No description provided for @jbSentTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon yuborildi!'**
+  String get jbSentTitle;
+
+  /// No description provided for @jbSentBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’loningiz guruhga muvaffaqiyatli joylandi.'**
+  String get jbSentBody;
+
+  /// No description provided for @jbSavedTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon yangilandi!'**
+  String get jbSavedTitle;
+
+  /// No description provided for @jbSavedBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgarishlar guruhdagi xabarga ham qo‘llanildi.'**
+  String get jbSavedBody;
+
+  /// No description provided for @jbChipCommission.
+  ///
+  /// In uz, this message translates to:
+  /// **'Komissiyali e’lon — 10,000 KRW'**
+  String get jbChipCommission;
+
+  /// No description provided for @jbChipFree.
+  ///
+  /// In uz, this message translates to:
+  /// **'Komissiyasiz e’lon'**
+  String get jbChipFree;
+
+  /// No description provided for @jbPostAgain.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yana e’lon joylash'**
+  String get jbPostAgain;
+
+  /// No description provided for @jbPostError.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon yuborishda xatolik.'**
+  String get jbPostError;
+
+  /// No description provided for @jbEmptyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali e’lon joylamadingiz'**
+  String get jbEmptyTitle;
+
+  /// No description provided for @jbEmptyAction.
+  ///
+  /// In uz, this message translates to:
+  /// **'Birinchi e’lonni joylash'**
+  String get jbEmptyAction;
+
+  /// No description provided for @jbHintText.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon matni kamida 10 belgi bo‘lishi kerak'**
+  String get jbHintText;
+
+  /// No description provided for @jbHintContact.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bog‘lanish uchun kontakt ma’lumotini kiriting'**
+  String get jbHintContact;
+
+  /// No description provided for @jbHintCommission.
+  ///
+  /// In uz, this message translates to:
+  /// **'Komissiya turini tanlang'**
+  String get jbHintCommission;
+
+  /// No description provided for @jbHintAgree.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qoidalarga rozilik belgisini qo‘ying'**
+  String get jbHintAgree;
+
+  /// No description provided for @jbActive.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faol'**
+  String get jbActive;
+
+  /// No description provided for @jbReserved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Band'**
+  String get jbReserved;
+
+  /// No description provided for @jbFinished.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bajarildi'**
+  String get jbFinished;
+
+  /// No description provided for @jbReserve.
+  ///
+  /// In uz, this message translates to:
+  /// **'Band qilish'**
+  String get jbReserve;
+
+  /// No description provided for @jbReopen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Faol qilish'**
+  String get jbReopen;
+
+  /// No description provided for @jbFinish.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yakunlash'**
+  String get jbFinish;
+
+  /// No description provided for @jbDone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish bajarildi'**
+  String get jbDone;
+
+  /// No description provided for @jbEdit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tahrirlash'**
+  String get jbEdit;
+
+  /// No description provided for @jbDelete.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirish'**
+  String get jbDelete;
+
+  /// No description provided for @jbFinishIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yakunlash uchun: {hours} soat {minutes} daq. qoldi'**
+  String jbFinishIn(int hours, int minutes);
+
+  /// No description provided for @jbReserveText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ishchi topildimi? E’lonni band sifatida belgilashni xohlaysizmi?'**
+  String get jbReserveText;
+
+  /// No description provided for @jbReopenTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta faollashtirish'**
+  String get jbReopenTitle;
+
+  /// No description provided for @jbReopenText.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni qayta faol holatga o‘tkazmoqchimisiz?'**
+  String get jbReopenText;
+
+  /// No description provided for @jbFinishText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ish bajarildi deb belgilamoqchimisiz? Bu qaytarib bo‘lmaydi.'**
+  String get jbFinishText;
+
+  /// No description provided for @jbDeleteTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonni o‘chirish'**
+  String get jbDeleteTitle;
+
+  /// No description provided for @jbDeleteText.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon guruhdan ham, ro‘yxatingizdan ham butunlay o‘chiriladi. Davom etasizmi?'**
+  String get jbDeleteText;
+
+  /// No description provided for @jbYes.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ha'**
+  String get jbYes;
+
+  /// No description provided for @jbJustNow.
+  ///
+  /// In uz, this message translates to:
+  /// **'hozirgina'**
+  String get jbJustNow;
+
+  /// No description provided for @jbMinutesAgo.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} daq. oldin'**
+  String jbMinutesAgo(int n);
+
+  /// No description provided for @jbHoursAgo.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} soat oldin'**
+  String jbHoursAgo(int n);
+
+  /// No description provided for @jbDaysAgo.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} kun oldin'**
+  String jbDaysAgo(int n);
+
+  /// No description provided for @jbErrNetwork.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tarmoq xatosi. Qayta urinib ko‘ring.'**
+  String get jbErrNetwork;
+
+  /// No description provided for @jbSignInTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lon joylash uchun kiring'**
+  String get jbSignInTitle;
+
+  /// No description provided for @jbSignInBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlaringiz akkauntingizga bog‘lanadi: keyin ularni band qilish, tahrirlash yoki o‘chirish mumkin.'**
+  String get jbSignInBody;
+
+  /// No description provided for @jbSignIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kirish'**
+  String get jbSignIn;
+
+  /// No description provided for @jbLoadFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'E’lonlarni yuklab bo‘lmadi'**
+  String get jbLoadFailed;
 }
 
 class _AppLocalizationsDelegate

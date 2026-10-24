@@ -22,6 +22,7 @@ import 'package:muslim_vegukin/features/business/business_source.dart';
 import 'package:muslim_vegukin/features/cars/cars_models.dart';
 import 'package:muslim_vegukin/features/cars/cars_source.dart';
 import 'package:muslim_vegukin/features/housing/housing_source.dart';
+import 'package:muslim_vegukin/features/jobs/jobs_source.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_models.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_source.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
@@ -270,6 +271,7 @@ class TestApp {
       places: places,
       cars: cars,
       housing: housing,
+      jobs: jobs,
       clock: () => clockNow,
       barcodeCamera: () {
         final camera = FakeScannerCamera(denied: cameraDenied);
@@ -308,6 +310,7 @@ class TestApp {
   final places = FakePlaces();
   final cars = FakeCars();
   final housing = FakeHousing();
+  final jobs = FakeJobs();
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];
@@ -1743,4 +1746,70 @@ class FakeHousing implements HousingSource {
 
   @override
   Future<String?> username(Map<String, String> auth) async => signedIn ? 'ali_uz' : null;
+}
+
+/// The job group: links handed out, and one's posts (one open, one taken an
+/// hour before the test's clock).
+class FakeJobs implements JobsSource {
+  bool fail = false;
+  final asked = <String>[];
+  final sent = <Map<String, Object?>>[];
+  int _next = 3;
+
+  final mine = <Map<String, Object?>>[
+    {'id': 1, 'message': 'Zavodga 2 kishi kerak, Ansan, kunlik 120,000 won', 'contact': '010-1111-2222', 'status': 'available',
+     'commission': true, 'created_at': kst(const Duration(hours: 2))},
+    {'id': 2, 'message': 'Qurilishga ishchi kerak, Hwaseong, bir haftaga', 'contact': '@ishchi', 'status': 'reserved',
+     'commission': false, 'created_at': kst(const Duration(days: 1)), 'reserved_at': kst(const Duration(hours: 1))},
+  ];
+
+  void _online(String call, Map<String, String> auth) {
+    asked.add(call);
+    if (fail) throw const JobsException('offline');
+    if (auth.isEmpty) throw const JobsException('http_401');
+  }
+
+  /// The server's way of writing a time [before] the test's clock: Korean time.
+  static String kst(Duration before) =>
+      testNow.toUtc().subtract(before).add(const Duration(hours: 9)).toIso8601String().substring(0, 19).replaceFirst('T', ' ');
+
+  Map<String, Object?> _post(String id) => mine.firstWhere((p) => '${p['id']}' == id);
+
+  @override
+  Future<String> invite(Map<String, String> auth, int user) async {
+    _online('invite', auth);
+    return 'https://t.me/+test$user';
+  }
+
+  @override
+  Future<List<JobPost>> posts(Map<String, String> auth, int user) async {
+    _online('posts', auth);
+    return [for (final p in mine.reversed) JobPost.fromJson(p)!];
+  }
+
+  @override
+  Future<void> create(Map<String, String> auth, int user, {required String name, required String text, required String contact, required bool commission}) async {
+    _online('create', auth);
+    final post = {'id': _next++, 'message': text, 'contact': contact, 'status': 'available', 'commission': commission, 'created_at': kst(Duration.zero)};
+    sent.add(post);
+    mine.add(post);
+  }
+
+  @override
+  Future<void> edit(Map<String, String> auth, int user, String id, {required String text, required String contact, required bool commission}) async {
+    _online('edit $id', auth);
+    _post(id).addAll({'message': text, 'contact': contact, 'commission': commission});
+  }
+
+  @override
+  Future<void> setStatus(Map<String, String> auth, int user, String id, JobStatus status) async {
+    _online('status $id ${status.name}', auth);
+    _post(id)['status'] = status.name;
+  }
+
+  @override
+  Future<void> delete(Map<String, String> auth, int user, String id) async {
+    _online('delete $id', auth);
+    mine.removeWhere((p) => '${p['id']}' == id);
+  }
 }

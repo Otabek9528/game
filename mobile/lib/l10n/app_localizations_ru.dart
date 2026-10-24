@@ -4195,4 +4195,311 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get hsSending => 'Yuborilmoqda…';
+
+  @override
+  String get jbTitle => 'Ish e’lonlari guruhi';
+
+  @override
+  String get jbSubtitle => 'Bot foydalanuvchilari uchun maxsus xizmat';
+
+  @override
+  String get jbBotDoes => 'Bot tomonidan:';
+
+  @override
+  String get jbPoint1 =>
+      '50 dan ortiq ish e’lon guruhlari sizning o‘rningizga kunda 24 soat kuzatib boriladi';
+
+  @override
+  String get jbPoint2 =>
+      'Faqat ish bilan bog‘liq bo‘lgan e’lonlar ajratib olinadi';
+
+  @override
+  String get jbPoint3 =>
+      'Barcha ajratib olingan e’lonlar shu zahoti “Ish e’lonlari” guruhida e’lon qilib boriladi';
+
+  @override
+  String get jbGetLink => 'Guruh linkini olish';
+
+  @override
+  String get jbLinkNote =>
+      'Havola faqat siz uchun yaratiladi va 15 soniya amal qiladi';
+
+  @override
+  String get jbLinkLoading => 'Link yaratilmoqda…';
+
+  @override
+  String get jbSecondsLeft => 'soniya qoldi';
+
+  @override
+  String get jbYourLink => 'Sizning havolangiz:';
+
+  @override
+  String get jbJoin => 'Guruhga qo‘shilish';
+
+  @override
+  String get jbLinkWarning =>
+      'Diqqat! Havola faqat 15 soniya davomida amal qiladi. Shoshiling!';
+
+  @override
+  String get jbExpiredTitle => 'Havola muddati tugadi';
+
+  @override
+  String get jbExpiredBody =>
+      'Yangi havola olish uchun quyidagi tugmani bosing';
+
+  @override
+  String get jbRetry => 'Qayta urinish';
+
+  @override
+  String get jbErrorTitle => 'Xatolik yuz berdi';
+
+  @override
+  String get jbLinkError => 'Link yaratishda xatolik.';
+
+  @override
+  String get jbCopied => 'Nusxa olindi';
+
+  @override
+  String get jbPost => 'E’lon joylash';
+
+  @override
+  String get jbMyPosts => 'E’lonlarim';
+
+  @override
+  String get jbNewPost => 'Yangi e’lon';
+
+  @override
+  String get jbHowTitle => 'Bu qanday ishlaydi?';
+
+  @override
+  String get jbHow1 => 'Ish e’loningizni yozing va komissiya turini tanlang';
+
+  @override
+  String get jbHow2 =>
+      'E’loningiz faqat bot guruhiga joylanadi. Foydalanuvchilar siz bilan tez orada bog‘lanishadi';
+
+  @override
+  String get jbHow3 => 'Odam topilgach, e’lonni “Band” deb belgilang';
+
+  @override
+  String get jbHowCommission =>
+      'Komissiya ixtiyoriy — o‘zingiz tanlaysiz. Tanlasangiz, ishni olgan har bir kishi sizga bir martalik 10,000 KRW to‘laydi';
+
+  @override
+  String get jbHowRule =>
+      'Sharti: E’lon faqat bot guruhida e’lon qilinib, boshqa guruhlarga joylanmasligi kerak';
+
+  @override
+  String get jbHowWait =>
+      'Agar 2-3 soat ichida odam topilmasa, boshqa guruhlarda e’lon qilishingiz mumkin';
+
+  @override
+  String get jbEditing => 'E’lonni tahrirlash';
+
+  @override
+  String get jbCancel => 'Bekor qilish';
+
+  @override
+  String get jbText => 'E’lon matni';
+
+  @override
+  String get jbContact => 'Bog‘lanish uchun';
+
+  @override
+  String get jbRequired => 'majburiy';
+
+  @override
+  String get jbContactManual => 'Yoki telefon raqamni kiritish';
+
+  @override
+  String get jbContactBack => 'Telegram username ishlatish';
+
+  @override
+  String get jbContactHint => 'Tel raqam yoki Telegram username kiriting';
+
+  @override
+  String get jbCommission => 'Komissiya';
+
+  @override
+  String get jbCommissionPick => 'tanlang';
+
+  @override
+  String get jbWithCommission => 'Komissiyali';
+
+  @override
+  String get jbWithCommissionBody =>
+      'Ishni olgan har bir kishi sizga bir martalik 10,000 KRW to‘laydi.';
+
+  @override
+  String get jbNoCommission => 'Komissiyasiz';
+
+  @override
+  String get jbFree => 'Bepul';
+
+  @override
+  String get jbNoCommissionBody =>
+      'Hech qanday to‘lov talab qilinmaydi — faqat e’lon joylanadi.';
+
+  @override
+  String get jbPreview => 'E’lon ostida shunday ko‘rinadi:';
+
+  @override
+  String get jbFootYes =>
+      '👉 Bu e’lon faqat shu guruhga qo‘yildi.\n👉 Ishga qatnashgan har bir kishi ish egasiga bir martalik komissiyani: 10,000 KRW ish haqini olish vaqtida to‘laydi.\n👉 E’lon egasiga murojaat qilish orqali siz ushbu to‘lovga rozilik bildirasiz.';
+
+  @override
+  String get jbFootNo =>
+      '👉 Bu e’lon faqat shu guruhga qo‘yildi.\n👉 Bu e’lon uchun hech qanday komissiya olinmaydi.';
+
+  @override
+  String get jbAgree =>
+      'Ushbu xabar ish bilan bog‘liq e’lonligini tasdiqlayman va boshqa Telegram guruhlarga 2-3 soat ichida joylamayman.';
+
+  @override
+  String get jbSubmit => 'E’lonni joylash';
+
+  @override
+  String get jbSave => 'O‘zgarishlarni saqlash';
+
+  @override
+  String get jbBanWarning =>
+      'Reklama, shaxsiy xabarlar yoki ish bilan bog‘liq bo‘lmagan e’lonlar davomiy qo‘ygan foydalanuvchi bloklanadi.';
+
+  @override
+  String get jbSending => 'E’lon yuborilmoqda…';
+
+  @override
+  String get jbSaving => 'O‘zgarishlar saqlanmoqda…';
+
+  @override
+  String get jbSentTitle => 'E’lon yuborildi!';
+
+  @override
+  String get jbSentBody => 'E’loningiz guruhga muvaffaqiyatli joylandi.';
+
+  @override
+  String get jbSavedTitle => 'E’lon yangilandi!';
+
+  @override
+  String get jbSavedBody => 'O‘zgarishlar guruhdagi xabarga ham qo‘llanildi.';
+
+  @override
+  String get jbChipCommission => 'Komissiyali e’lon — 10,000 KRW';
+
+  @override
+  String get jbChipFree => 'Komissiyasiz e’lon';
+
+  @override
+  String get jbPostAgain => 'Yana e’lon joylash';
+
+  @override
+  String get jbPostError => 'E’lon yuborishda xatolik.';
+
+  @override
+  String get jbEmptyTitle => 'Hali e’lon joylamadingiz';
+
+  @override
+  String get jbEmptyAction => 'Birinchi e’lonni joylash';
+
+  @override
+  String get jbHintText => 'E’lon matni kamida 10 belgi bo‘lishi kerak';
+
+  @override
+  String get jbHintContact => 'Bog‘lanish uchun kontakt ma’lumotini kiriting';
+
+  @override
+  String get jbHintCommission => 'Komissiya turini tanlang';
+
+  @override
+  String get jbHintAgree => 'Qoidalarga rozilik belgisini qo‘ying';
+
+  @override
+  String get jbActive => 'Faol';
+
+  @override
+  String get jbReserved => 'Band';
+
+  @override
+  String get jbFinished => 'Bajarildi';
+
+  @override
+  String get jbReserve => 'Band qilish';
+
+  @override
+  String get jbReopen => 'Faol qilish';
+
+  @override
+  String get jbFinish => 'Yakunlash';
+
+  @override
+  String get jbDone => 'Ish bajarildi';
+
+  @override
+  String get jbEdit => 'Tahrirlash';
+
+  @override
+  String get jbDelete => 'O‘chirish';
+
+  @override
+  String jbFinishIn(int hours, int minutes) {
+    return 'Yakunlash uchun: $hours soat $minutes daq. qoldi';
+  }
+
+  @override
+  String get jbReserveText =>
+      'Ishchi topildimi? E’lonni band sifatida belgilashni xohlaysizmi?';
+
+  @override
+  String get jbReopenTitle => 'Qayta faollashtirish';
+
+  @override
+  String get jbReopenText => 'E’lonni qayta faol holatga o‘tkazmoqchimisiz?';
+
+  @override
+  String get jbFinishText =>
+      'Ish bajarildi deb belgilamoqchimisiz? Bu qaytarib bo‘lmaydi.';
+
+  @override
+  String get jbDeleteTitle => 'E’lonni o‘chirish';
+
+  @override
+  String get jbDeleteText =>
+      'E’lon guruhdan ham, ro‘yxatingizdan ham butunlay o‘chiriladi. Davom etasizmi?';
+
+  @override
+  String get jbYes => 'Ha';
+
+  @override
+  String get jbJustNow => 'hozirgina';
+
+  @override
+  String jbMinutesAgo(int n) {
+    return '$n daq. oldin';
+  }
+
+  @override
+  String jbHoursAgo(int n) {
+    return '$n soat oldin';
+  }
+
+  @override
+  String jbDaysAgo(int n) {
+    return '$n kun oldin';
+  }
+
+  @override
+  String get jbErrNetwork => 'Tarmoq xatosi. Qayta urinib ko‘ring.';
+
+  @override
+  String get jbSignInTitle => 'E’lon joylash uchun kiring';
+
+  @override
+  String get jbSignInBody =>
+      'E’lonlaringiz akkauntingizga bog‘lanadi: keyin ularni band qilish, tahrirlash yoki o‘chirish mumkin.';
+
+  @override
+  String get jbSignIn => 'Kirish';
+
+  @override
+  String get jbLoadFailed => 'E’lonlarni yuklab bo‘lmadi';
 }
