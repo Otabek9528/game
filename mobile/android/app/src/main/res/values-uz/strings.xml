@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_open_app">Namoz vaqtlari uchun ilovani oching</string>
+    <string name="widget_large_label">Namoz vaqtlari</string>
+    <string name="widget_large_description">Bugungi namoz vaqtlari, keyingi namozgacha qolgan vaqt, milodiy va hijriy sana.</string>
+    <string name="widget_small_label">Keyingi namoz</string>
+    <string name="widget_small_description">Keyingi namozgacha qolgan vaqt, shahar va sana.</string>
+    <string name="reminders_channel_sound">Namoz eslatmalari: ovoz</string>
+    <string name="reminders_channel_vibrate">Namoz eslatmalari: tebranish</string>
+    <string name="reminders_channel_silent">Namoz eslatmalari: jim</string>
+    <string name="alerts_channel">Xabarlar: joylar va HiKorea</string>
+</resources>

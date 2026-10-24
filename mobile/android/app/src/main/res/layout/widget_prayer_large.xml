@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Large (4×2) home-screen widget. Filled in by widget/PrayerWidgets.kt.
+     Only views RemoteViews allows: FrameLayout, LinearLayout, TextView,
+     ImageView, Chronometer. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:clipToOutline="true">
+
+    <ImageView
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="-52dp"
+        android:layout_marginEnd="-40dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_widget_rosette" />
+
+    <LinearLayout
+        android:id="@+id/widget_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="10dp">
+
+        <!-- Bot + name, and the city (tap: open the app, refresh location). -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_bot" />
+
+            <!-- Shrinks on narrow launchers rather than being cut. -->
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/widget_brand"
+                android:scaleType="fitStart"
+                android:src="@drawable/ic_widget_wordmark" />
+
+            <LinearLayout
+                android:id="@+id/city_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/widget_chip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="9dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_widget_pin" />
+
+                <TextView
+                    android:id="@+id/city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:ellipsize="end"
+                    android:maxWidth="120dp"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_accent"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:layout_marginStart="4dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_widget_refresh" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- The countdown is the hero; the day's dates sit beside it. -->
+        <TextView
+            android:id="@+id/until"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:autoSizeMaxTextSize="11.5sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="0.5sp"
+            android:autoSizeTextType="uniform"
+            android:letterSpacing="0.16"
+            android:maxLines="1"
+            android:textColor="@color/widget_accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <!-- As big as the room allows: shrinks only on narrow launchers. -->
+            <Chronometer
+                android:id="@+id/countdown"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:autoSizeMaxTextSize="50sp"
+                android:autoSizeMinTextSize="24sp"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:countDown="true"
+                android:fontFeatureSettings="tnum"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/widget_ink"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/date_line1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_soft"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/date_line2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_faint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- The day: six windows; the current one filled, the next coloured. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout android:id="@+id/cell_0" style="@style/WidgetCell">
+                <TextView android:id="@+id/name_0" style="@style/WidgetCellName" />
+                <TextView android:id="@+id/time_0" style="@style/WidgetCellTime" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cell_1" style="@style/WidgetCell">
+                <TextView android:id="@+id/name_1" style="@style/WidgetCellName" />
+                <TextView android:id="@+id/time_1" style="@style/WidgetCellTime" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cell_2" style="@style/WidgetCell">
+                <TextView android:id="@+id/name_2" style="@style/WidgetCellName" />
+                <TextView android:id="@+id/time_2" style="@style/WidgetCellTime" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cell_3" style="@style/WidgetCell">
+                <TextView android:id="@+id/name_3" style="@style/WidgetCellName" />
+                <TextView android:id="@+id/time_3" style="@style/WidgetCellTime" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cell_4" style="@style/WidgetCell">
+                <TextView android:id="@+id/name_4" style="@style/WidgetCellName" />
+                <TextView android:id="@+id/time_4" style="@style/WidgetCellTime" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/cell_5" style="@style/WidgetCell">
+                <TextView android:id="@+id/name_5" style="@style/WidgetCellName" />
+                <TextView android:id="@+id/time_5" style="@style/WidgetCellTime" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/rail"
+            android:layout_width="match_parent"
+            android:layout_height="12dp"
+            android:layout_marginTop="6dp"
+            android:importantForAccessibility="no"
+            android:scaleType="fitXY" />
+    </LinearLayout>
+
+    <include layout="@layout/widget_prayer_empty" />
+</FrameLayout>

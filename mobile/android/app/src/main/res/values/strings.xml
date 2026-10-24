@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widgets. The widget's own texts (prayer names, dates) come
+     from the app in the language chosen there; these follow the phone's. -->
+<resources>
+    <string name="widget_brand" translatable="false">Muslim Vegukin Bot</string>
+    <string name="widget_open_app">Open the app to see prayer times</string>
+    <string name="widget_large_label">Prayer times</string>
+    <string name="widget_large_description">Today’s prayer times, a countdown to the next prayer, the date and the Hijri date.</string>
+    <string name="widget_small_label">Next prayer</string>
+    <string name="widget_small_description">A countdown to the next prayer, your city and the date.</string>
+    <string name="reminders_channel_sound">Prayer reminders: sound</string>
+    <string name="reminders_channel_vibrate">Prayer reminders: vibration</string>
+    <string name="reminders_channel_silent">Prayer reminders: silent</string>
+    <string name="alerts_channel">Alerts: places and HiKorea</string>
+</resources>
