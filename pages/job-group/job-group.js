@@ -110,6 +110,12 @@ let sheetOpen = false;
 let editingPostId = null;
 let myPosts = [];
 
+// Signs each call, so the server knows who is asking rather than taking the
+// user_id it is sent (job_group_bp.py, JOB_GROUP_REQUIRE_SIGNED).
+function signed(headers) {
+  return tg.initData ? Object.assign({ 'X-Init-Data': tg.initData }, headers || {}) : (headers || {});
+}
+
 function getUserId() {
   return tg.initDataUnsafe?.user?.id;
 }
@@ -192,7 +198,7 @@ async function fetchMyPosts() {
   const userId = getUserId();
   if (!userId) { renderMyPosts(); return; }
   try {
-    const resp = await fetch(`${API_BASE_URL}/api/group/posts?user_id=${userId}`, { signal: AbortSignal.timeout(10000) });
+    const resp = await fetch(`${API_BASE_URL}/api/group/posts?user_id=${userId}`, { headers: signed(), signal: AbortSignal.timeout(10000) });
     const data = await resp.json();
     if (data.success) {
       myPosts = data.posts.map(p => ({
@@ -409,7 +415,7 @@ async function submitPost() {
       : { user_id: userId, user_name: userName, message, contact, commission };
 
     const response = await fetch(url, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: signed({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(payload), signal: AbortSignal.timeout(15000)
     });
     if (!response.ok) { const d = await response.json().catch(() => ({})); throw new Error(d.message || `Server xatosi: ${response.status}`); }
@@ -649,7 +655,7 @@ async function executeAction(postId, action) {
   try {
     const resp = await fetch(`${API_BASE_URL}/api/group/post/status`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: signed({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ post_id: postId, user_id: userId, status: newStatus }),
       signal: AbortSignal.timeout(10000),
     });
@@ -673,7 +679,7 @@ async function deletePost(postId, userId) {
   try {
     const resp = await fetch(`${API_BASE_URL}/api/group/post/delete`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: signed({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ post_id: postId, user_id: userId }),
       signal: AbortSignal.timeout(10000),
     });
