@@ -64,9 +64,9 @@ class BusinessStats {
   }
 }
 
-/// Visits to the whole project today (the app, the web app, both bots), as
-/// the server counts them from the activity log: one person's actions with
-/// no half-hour gap are one visit. Null when unavailable.
+/// Times the whole project was used today (the app, the web app, both bots):
+/// every action in the server's activity log, so one person using it ten
+/// times counts ten. Null when unavailable.
 Future<int?> fetchTodayVisits() async {
   try {
     final response = await http.get(AppConfig.apiBase.resolve('api/visits/today')).timeout(const Duration(seconds: 15));
