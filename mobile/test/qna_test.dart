@@ -72,7 +72,7 @@ void main() {
   group('the page', () {
     testWidgets('today’s selection: kept all day, more as it scrolls, a new one on asking', (tester) async {
       final app = await openQna(tester);
-      expect(app.activity.actions, ['qna']);
+      expect(app.activity.actions, ['open', 'qna']);
       expect(find.text('Kunlik tanlov'), findsOneWidget);
       expect(find.text('Safarda namozni qasr qilish qanday bo‘ladi?'), findsOneWidget);
       expect(app.qna.browses, 1);

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../app_services.dart';
 import '../../core/app_language.dart';
@@ -32,6 +33,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late Future<BusinessStats?> _stats = widget.services.businessStats();
+  late Future<int?> _visits = widget.services.todayVisits();
+
+  /// When the app went to the background: back after half an hour or more
+  /// is a new visit, as the server counts them.
+  DateTime? _away;
 
   AppServices get _services => widget.services;
 
@@ -39,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _services.activity.log('open');
     // First launch: location, camera and "Alarms & reminders", asked once,
     // over the home screen.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -100,7 +107,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Back from the background (or from system settings after allowing
     // location): pick up a new day, a stale location or a new permission.
+    if (state == AppLifecycleState.paused) _away ??= DateTime.now();
     if (state == AppLifecycleState.resumed) {
+      if (_away case final away? when DateTime.now().difference(away) >= const Duration(minutes: 30)) {
+        _services.activity.log('open');
+      }
+      _away = null;
+      setState(() {
+        _visits = _services.todayVisits();
+      });
       _services.prayer.refresh();
       _services.reminders.checkNotifications();
       _services.account.refreshInbox();
@@ -110,8 +125,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _refresh() async {
-    setState(() => _stats = _services.businessStats());
-    await Future.wait([_services.prayer.refresh(), _stats]);
+    setState(() {
+      _stats = _services.businessStats();
+      _visits = _services.todayVisits();
+    });
+    await Future.wait([_services.prayer.refresh(), _stats, _visits]);
   }
 
   void _open(Feature feature) => openSection(context, feature, _services);
@@ -185,12 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ),
                     ),
                     SliverPadding(
-                      padding: EdgeInsets.fromLTRB(
-                        14,
-                        0,
-                        14,
-                        20 + MediaQuery.paddingOf(context).bottom,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
                       sliver: SliverGrid.builder(
                         itemCount: features.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -212,6 +225,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         },
                       ),
                     ),
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(14, 18, 14, 18 + MediaQuery.paddingOf(context).bottom),
+                      sliver: SliverToBoxAdapter(
+                        child: FutureBuilder(
+                          future: _visits,
+                          builder: (context, snapshot) => snapshot.data == null
+                              ? const SizedBox.shrink()
+                              : _TodayVisits(count: snapshot.data!, locale: language.code),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -219,6 +243,63 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Today's visits to the whole project, with a blue dot that beats: alive.
+class _TodayVisits extends StatefulWidget {
+  const _TodayVisits({required this.count, required this.locale});
+
+  final int count;
+  final String locale;
+
+  @override
+  State<_TodayVisits> createState() => _TodayVisitsState();
+}
+
+class _TodayVisitsState extends State<_TodayVisits> with SingleTickerProviderStateMixin {
+  late final _beat = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat();
+
+  @override
+  void dispose() {
+    _beat.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    const blue = Color(0xFF2F80ED);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 18,
+          height: 18,
+          child: AnimatedBuilder(
+            animation: _beat,
+            builder: (context, _) => Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 8 + 10 * _beat.value,
+                  height: 8 + 10 * _beat.value,
+                  decoration: BoxDecoration(color: blue.withValues(alpha: 0.35 * (1 - _beat.value)), shape: BoxShape.circle),
+                ),
+                Container(width: 8, height: 8, decoration: const BoxDecoration(color: blue, shape: BoxShape.circle)),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            AppLocalizations.of(context).homeVisitsToday(NumberFormat.decimalPattern(widget.locale).format(widget.count)),
+            style: TextStyle(fontSize: 13, color: p.inkMuted),
+          ),
+        ),
+      ],
     );
   }
 }

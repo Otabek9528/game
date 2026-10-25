@@ -64,6 +64,20 @@ class BusinessStats {
   }
 }
 
+/// Visits to the whole project today (the app, the web app, both bots), as
+/// the server counts them from the activity log: one person's actions with
+/// no half-hour gap are one visit. Null when unavailable.
+Future<int?> fetchTodayVisits() async {
+  try {
+    final response = await http.get(AppConfig.apiBase.resolve('api/visits/today')).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) return null;
+    final visits = (jsonDecode(response.body) as Map<String, dynamic>)['visits'];
+    return visits is num && visits > 0 ? visits.toInt() : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 /// The app asks for its permissions once, on first launch, and never again
 /// on its own. Afterwards only the user's own taps (e.g. the prayer card's
 /// "use my location" button) can bring a permission dialog back.
@@ -149,6 +163,7 @@ class AppServices {
     required this.account,
     this.qiblaDevice = const AndroidQiblaDevice(),
     this.businessStats = BusinessStats.fetch,
+    this.todayVisits = fetchTodayVisits,
     this.parcels = const HttpParcelSource(),
     this.openLink = openExternalLink,
     this.shareText = share.shareText,
@@ -183,6 +198,9 @@ class AppServices {
   final AccountController account;
   final QiblaDevice qiblaDevice;
   final Future<BusinessStats?> Function() businessStats;
+
+  /// Today's visits to the project, at the bottom of the home screen.
+  final Future<int?> Function() todayVisits;
   final ParcelSource parcels;
 
   /// Telegram, the dialer, the browser.

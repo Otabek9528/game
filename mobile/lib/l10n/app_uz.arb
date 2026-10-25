@@ -2305,5 +2305,14 @@
   "jbSignInTitle": "E’lon joylash uchun kiring",
   "jbSignInBody": "E’lonlaringiz akkauntingizga bog‘lanadi: keyin ularni band qilish, tahrirlash yoki o‘chirish mumkin.",
   "jbSignIn": "Kirish",
-  "jbLoadFailed": "E’lonlarni yuklab bo‘lmadi"
+  "jbLoadFailed": "E’lonlarni yuklab bo‘lmadi",
+  "homeVisitsToday": "Bugungi tashriflar: {count}",
+  "@homeVisitsToday": {
+    "description": "At the bottom of the home screen: visits to the whole project today.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  }
 }

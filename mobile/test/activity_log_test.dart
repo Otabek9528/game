@@ -65,6 +65,29 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Foydali linklar'));
     await tester.pumpAndSettle();
-    expect(app.activity.actions, ['links']);
+    expect(app.activity.actions, ['open', 'links']);
+  });
+
+  testWidgets('today’s visits at the very bottom, with a beating dot; a return after half an hour is a new visit', (tester) async {
+    final app = TestApp(language: 'uz')..visits = 12345;
+    await app.launch(tester, settle: false);
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(seconds: 1));
+    }
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -3000));
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Bugungi tashriflar: 12\u00a0345'), findsOneWidget);
+    expect(app.activity.actions, ['open']);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump(const Duration(seconds: 1));
+    expect(app.activity.actions, ['open'], reason: 'back at once: the same visit');
+    app.visits = null;
+    await tester.pump(const Duration(seconds: 1));
   });
 }

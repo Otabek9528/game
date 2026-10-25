@@ -221,6 +221,7 @@ class TestApp {
     MemoryStore? store,
     DateTime? now,
     BusinessStats? stats = const BusinessStats(businesses: 5, categories: 10),
+    this.visits,
     FakeParcels? parcels,
     FakeBusinesses? businesses,
   })  : languageStore = MemoryLanguageStore(language),
@@ -259,6 +260,7 @@ class TestApp {
       account: account,
       qiblaDevice: qibla,
       businessStats: () async => stats,
+      todayVisits: () async => visits,
       parcels: this.parcels,
       openLink: (uri) async => links.add(uri),
       shareText: (text) async => shared.add(text),
@@ -311,6 +313,10 @@ class TestApp {
   final cars = FakeCars();
   final housing = FakeHousing();
   final jobs = FakeJobs();
+
+  /// Today's visits shown on the home screen; none by default, so the
+  /// home screen has nothing that keeps moving.
+  int? visits;
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];

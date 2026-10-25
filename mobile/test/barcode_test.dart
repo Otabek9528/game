@@ -115,7 +115,7 @@ void main() {
       final app = await openScanner(tester);
       final camera = app.cameras.single;
       expect(camera.status, CameraStatus.running);
-      expect(app.activity.actions, ['barcode']);
+      expect(app.activity.actions, ['open', 'barcode']);
 
       camera.read(cola);
       await tester.pumpAndSettle();

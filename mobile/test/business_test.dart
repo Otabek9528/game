@@ -341,7 +341,7 @@ void main() {
   group('the directory', () {
     testWidgets('every kind as a tile, with what it covers; empty ones last; kept for next time', (tester) async {
       final app = await openDirectory(tester);
-      expect(app.activity.actions, ['business']);
+      expect(app.activity.actions, ['open', 'business']);
       expect(find.text('Biznes katalogi'), findsOneWidget);
       expect(find.text('6 ta biznes'), findsOneWidget, reason: 'the hero’s count');
       expect(find.text('Halol go‘sht, ziravorlar, oziq-ovqat'), findsOneWidget);

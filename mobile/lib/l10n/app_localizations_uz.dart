@@ -4394,4 +4394,9 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get jbLoadFailed => 'E’lonlarni yuklab bo‘lmadi';
+
+  @override
+  String homeVisitsToday(String count) {
+    return 'Bugungi tashriflar: $count';
+  }
 }

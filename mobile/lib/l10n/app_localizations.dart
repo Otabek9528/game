@@ -7875,6 +7875,12 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'E’lonlarni yuklab bo‘lmadi'**
   String get jbLoadFailed;
+
+  /// At the bottom of the home screen: visits to the whole project today.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugungi tashriflar: {count}'**
+  String homeVisitsToday(String count);
 }
 
 class _AppLocalizationsDelegate

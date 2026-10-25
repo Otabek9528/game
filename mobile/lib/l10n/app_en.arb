@@ -1295,5 +1295,6 @@
   "jbSignInTitle": "E’lon joylash uchun kiring",
   "jbSignInBody": "E’lonlaringiz akkauntingizga bog‘lanadi: keyin ularni band qilish, tahrirlash yoki o‘chirish mumkin.",
   "jbSignIn": "Kirish",
-  "jbLoadFailed": "E’lonlarni yuklab bo‘lmadi"
+  "jbLoadFailed": "E’lonlarni yuklab bo‘lmadi",
+  "homeVisitsToday": "Today’s visits: {count}"
 }
