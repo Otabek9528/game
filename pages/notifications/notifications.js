@@ -19,7 +19,7 @@
   var API = ((window.API_CONFIG && API_CONFIG.BASE_URL) || 'https://vegukin-api.duckdns.org/').replace(/\/+$/, '');
 
   var TYPES = ['mosque', 'restaurant', 'shop'];
-  var RADII = [5, 10, 15, 20];
+  var RADII = [1, 3, 5, 10];
   var DEFAULT_RADIUS = 5;
   var EMOJI = { mosque: '🕌', restaurant: '🍽️', shop: '🏪' };
   // Signature problems: the only fix is reopening the page inside Telegram.
@@ -292,7 +292,7 @@
     renderWatches();
   }
 
-  // Four rings for 5/10/15/20 km; the chosen one is solid.
+  // Four rings for 1/3/5/10 km; the chosen one is solid.
   function radarSvg(km) {
     var out = '<svg viewBox="0 0 70 70" aria-hidden="true">';
     RADII.forEach(function (r, i) {
@@ -688,7 +688,7 @@
       });
   }
 
-  // Places within 20 km of the centre; every radius is counted from this one list.
+  // Places within 10 km of the centre; every radius is counted from this one list.
   function loadPoints(source, center) {
     var s = sheet;
     api('GET', '/api/places/in-radius?lat=' + encodeURIComponent(center.lat) + '&lon=' + encodeURIComponent(center.lon))
