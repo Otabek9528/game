@@ -537,9 +537,9 @@ window.PLACES_TEXT = {
   page: {
     title: { uz: "Bildirishnomalar", ru: "Уведомления", en: "Notifications" },
     via: {
-      uz: "Xabarlar Telegramda shu botdan keladi",
-      ru: "Сообщения приходят в Telegram от этого бота",
-      en: "Messages arrive in Telegram from this bot"
+      uz: "Xabarlar Telegramda @muslim_vegukin_bot dan keladi",
+      ru: "Сообщения приходят в Telegram от @muslim_vegukin_bot",
+      en: "Messages arrive in Telegram from @muslim_vegukin_bot"
     },
     loading:   { uz: "Yuklanmoqda…", ru: "Загрузка…", en: "Loading…" },
     loadError: {
@@ -639,9 +639,9 @@ window.PLACES_TEXT = {
     myLocation:      { uz: "Joylashuvim", ru: "Моё место", en: "My location" },
     address:         { uz: "Manzil", ru: "Адрес", en: "Address" },
     addressHint: {
-      uz: "Koreys tilida, ko‘cha va bino raqami bilan to‘liq manzil kiriting",
-      ru: "Полный адрес на корейском: улица и номер дома",
-      en: "Full address in Korean, with the street and building number"
+      uz: "Manzilni koreys tilida kiriting",
+      ru: "Введите адрес на корейском",
+      en: "Enter the address in Korean"
     },
     addressExample:  { uz: "서울 동대문구 회기로 56", ru: "서울 동대문구 회기로 56", en: "서울 동대문구 회기로 56" },
     located:         { uz: "Hozirgina aniqlandi", ru: "Определено только что", en: "Located just now" },
@@ -649,7 +649,6 @@ window.PLACES_TEXT = {
     savedCenter:     { uz: "Saqlangan markaz", ru: "Сохранённый центр", en: "Saved centre" },
     relocate:        { uz: "Qayta aniqlash", ru: "Обновить", en: "Update" },
     find:            { uz: "Topish", ru: "Найти", en: "Find" },
-    found:           { uz: "Topildi", ru: "Найдено", en: "Found" },
     finding:         { uz: "Manzil qidirilmoqda…", ru: "Ищем адрес…", en: "Looking up the address…" },
     noCenter: {
       uz: "Markazni tanlang — bu yerda qamrov ko‘rinadi.",
@@ -687,26 +686,6 @@ window.PLACES_TEXT = {
      XATOLAR / ERRORS from the notifications API, by code
      ------------------------------------------------------- */
   notifyErrors: {
-    address_not_exact: {
-      uz: "Aniq manzil kerak: ko‘cha va bino raqami bilan, masalan 서울 동대문구 회기로 56. Shahar yoki tuman nomi yetmaydi.",
-      ru: "Нужен точный адрес — улица и номер дома, например 서울 동대문구 회기로 56. Названия города или района недостаточно.",
-      en: "Enter an exact address — street and building number, e.g. 서울 동대문구 회기로 56. A city or district name isn’t enough."
-    },
-    area_budget: {
-      uz: "Hududlaringiz juda katta maydonni qamrab oladi. Birini kichraytiring yoki o‘chiring.",
-      ru: "Ваши районы охватывают слишком большую площадь. Уменьшите или удалите один из них.",
-      en: "Your areas would cover too much ground. Make one smaller or delete one."
-    },
-    too_many_changes: {
-      uz: "Bugun hududlar juda ko‘p o‘zgartirildi. Ertaga urinib ko‘ring.",
-      ru: "Сегодня районы менялись слишком часто. Попробуйте завтра.",
-      en: "Too many area changes today. Please try again tomorrow."
-    },
-    too_many_previews: {
-      uz: "Bugun juda ko‘p joy ko‘rib chiqildi. Ertaga urinib ko‘ring.",
-      ru: "Сегодня просмотрено слишком много мест. Попробуйте завтра.",
-      en: "Too many places looked at today. Please try again tomorrow."
-    },
     address_not_found: {
       uz: "Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.",
       ru: "Адрес не найден. Попробуйте написать точнее, на корейском.",
