@@ -96,7 +96,7 @@ class WidgetData(
                 val until = o.optJSONArray("until")
                 val days = o.optJSONArray("days")
                 WidgetData(
-                    brand = o.optString("brand", "Muslim Vegukin Bot"),
+                    brand = o.optString("brand", "Muslim Vegukin"),
                     message = o.optString("message", ""),
                     city = if (o.has("city")) o.getString("city") else null,
                     names = List(names?.length() ?: 0) { names!!.getString(it) },

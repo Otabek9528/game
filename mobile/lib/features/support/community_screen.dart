@@ -71,9 +71,10 @@ class CommunityScreen extends StatelessWidget {
                 children: [
                   SupportHero(
                     title: s.communityTitle,
-                    mark: const HeroMark(child: KhatamMark(size: 40, glow: false)),
+                    inline: true,
+                    mark: const KhatamMark(size: 84),
                     headline: CommunityGroup.name,
-                    subtitle: '${CommunityGroup.handle}  ·  ${s.communityHeroSubtitle}',
+                    subtitle: '${CommunityGroup.handle}\n${s.communityHeroSubtitle}',
                     actions: [
                       IconButton(
                         onPressed: () => copyWithNote(context, CommunityGroup.url, s.communityLinkCopied),
@@ -97,9 +98,12 @@ class CommunityScreen extends StatelessWidget {
                         children: [
                           const Icon(Icons.verified_rounded, size: 16, color: Brand.gold300),
                           const SizedBox(width: 6),
-                          Text(
-                            s.communityHeroTitle,
-                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
+                          Flexible(
+                            child: Text(
+                              s.communityHeroTitle,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
+                            ),
                           ),
                         ],
                       ),

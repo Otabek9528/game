@@ -111,12 +111,8 @@ class _StoreScreenState extends State<StoreScreen> {
       _failed = false;
     });
     _load();
-    if (_scroll.hasClients && _scroll.offset > _heroHeight) {
-      _scroll.jumpTo(_heroHeight);
-    }
+    if (_scroll.hasClients && _scroll.offset > 0) _scroll.jumpTo(0);
   }
-
-  static const _heroHeight = 112.0;
 
   @override
   Widget build(BuildContext context) {
@@ -133,51 +129,54 @@ class _StoreScreenState extends State<StoreScreen> {
       body: CustomScrollView(
         controller: _scroll,
         slivers: [
+          // One slim bar: the store's logo, its name and how many products.
           SliverAppBar(
             pinned: true,
-            expandedHeight: _heroHeight + kToolbarHeight,
+            toolbarHeight: 68,
+            titleSpacing: 0,
             backgroundColor: p.hero.first,
             surfaceTintColor: Colors.transparent,
             foregroundColor: Colors.white,
             systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
-            titleTextStyle: const TextStyle(
-              fontFamily: Brand.displayFont,
-              fontWeight: FontWeight.w700,
-              fontSize: 20,
-              color: Colors.white,
+            flexibleSpace: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero),
+              ),
             ),
-            title: Text(widget.store.store),
-            flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.pin,
-              background: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero),
-                ),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-                    child: Row(
-                      children: [
-                        StoreEmblem(widget.store.store, height: 64, maxWidth: 170),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                s.barcodeProducts(meta?.total ?? widget.store.count),
-                                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white),
-                              ),
-                            ],
-                          ),
+            title: Row(
+              children: [
+                StoreEmblem(widget.store.store, height: 42, maxWidth: 118),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.store.store,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: Brand.displayFont,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 19,
+                          height: 1.15,
+                          color: Colors.white,
                         ),
-                      ],
-                    ),
+                      ),
+                      Text(
+                        s.barcodeProducts(meta?.total ?? widget.store.count),
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                const SizedBox(width: 12),
+              ],
             ),
           ),
           SliverPersistentHeader(

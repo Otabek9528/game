@@ -13,6 +13,7 @@ import 'core/share.dart' as share;
 import 'core/system.dart';
 import 'core/locale_controller.dart';
 import 'core/theme_controller.dart';
+import 'core/new_badges.dart';
 import 'features/barcode/barcode_camera.dart';
 import 'features/barcode/barcode_source.dart';
 import 'features/business/business_source.dart';
@@ -164,6 +165,7 @@ class AppServices {
     this.qiblaDevice = const AndroidQiblaDevice(),
     this.businessStats = BusinessStats.fetch,
     this.todayVisits = fetchTodayVisits,
+    this.homePage = fetchHomePage,
     this.parcels = const HttpParcelSource(),
     this.openLink = openExternalLink,
     this.shareText = share.shareText,
@@ -201,6 +203,9 @@ class AppServices {
 
   /// Today's visits to the project, at the bottom of the home screen.
   final Future<int?> Function() todayVisits;
+
+  /// The live web app's home page, for its "NEW" marks.
+  final HomePageSource homePage;
   final ParcelSource parcels;
 
   /// Telegram, the dialer, the browser.

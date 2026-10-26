@@ -24,7 +24,10 @@ class LinksScreen extends StatefulWidget {
 }
 
 class _LinksScreenState extends State<LinksScreen> {
-  late final LinksController _c = LinksController(store: widget.services.store, script: widget.services.linksScript);
+  late final LinksController _c = LinksController(
+    store: widget.services.store,
+    script: widget.services.linksScript,
+  );
   final _search = TextEditingController();
   String _query = '';
   bool _locating = false;
@@ -76,19 +79,33 @@ class _LinksScreenState extends State<LinksScreen> {
           children: [
             ListTile(
               leading: _Badge(link: link, size: 44),
-              title: Text(link.title(_language), style: TextStyle(fontWeight: FontWeight.w700, color: p.ink)),
-              subtitle: Text(link.url.replaceFirst('https://', ''), style: TextStyle(color: p.inkMuted)),
+              title: Text(
+                link.title(_language),
+                style: TextStyle(fontWeight: FontWeight.w700, color: p.ink),
+              ),
+              subtitle: Text(
+                link.url.replaceFirst('https://', ''),
+                style: TextStyle(color: p.inkMuted),
+              ),
             ),
             const Divider(height: 8),
             for (final (value, icon, label) in [
               ('open', Icons.send_rounded, s.linksOpen),
               ('copy', Icons.copy_rounded, s.linksCopy),
               ('share', Icons.share_rounded, s.linksShare),
-              ('favorite', favorite ? Icons.star_rounded : Icons.star_border_rounded,
-                  favorite ? s.linksUnfavorite : s.linksFavorite),
+              (
+                'favorite',
+                favorite ? Icons.star_rounded : Icons.star_border_rounded,
+                favorite ? s.linksUnfavorite : s.linksFavorite,
+              ),
             ])
               ListTile(
-                leading: Icon(icon, color: value == 'favorite' && favorite ? Brand.gold500 : p.accent),
+                leading: Icon(
+                  icon,
+                  color: value == 'favorite' && favorite
+                      ? Brand.gold500
+                      : p.accent,
+                ),
                 title: Text(label, style: TextStyle(color: p.ink)),
                 onTap: () => Navigator.pop(context, value),
               ),
@@ -106,7 +123,12 @@ class _LinksScreenState extends State<LinksScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(SnackBar(content: Text(s.linksCopied), behavior: SnackBarBehavior.floating));
+          ..showSnackBar(
+            SnackBar(
+              content: Text(s.linksCopied),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
       case 'share':
         await _services.shareText('${link.title(_language)}\n${link.url}');
       case 'favorite':
@@ -120,7 +142,9 @@ class _LinksScreenState extends State<LinksScreen> {
     final p = VegukinPalette.of(context);
     final bottom = MediaQuery.paddingOf(context).bottom;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
       child: Scaffold(
         backgroundColor: p.page,
         body: ListenableBuilder(
@@ -141,8 +165,11 @@ class _LinksScreenState extends State<LinksScreen> {
               Expanded(
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(14, 14, 14, 24 + bottom),
-                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                  children: normalizeQuery(_query).isNotEmpty ? _results(context) : _browse(context),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  children: normalizeQuery(_query).isNotEmpty
+                      ? _results(context)
+                      : _browse(context),
                 ),
               ),
             ],
@@ -161,7 +188,11 @@ class _LinksScreenState extends State<LinksScreen> {
         const SizedBox(height: 24),
         Icon(Icons.search_off_rounded, size: 44, color: p.inkMuted),
         const SizedBox(height: 10),
-        Text(s.linksNothing, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, color: p.inkSoft)),
+        Text(
+          s.linksNothing,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 15, color: p.inkSoft),
+        ),
         const SizedBox(height: 24),
         _Suggest(onTap: () => _services.openLink(Uri.parse(suggestGroupUrl))),
       ];
@@ -170,7 +201,10 @@ class _LinksScreenState extends State<LinksScreen> {
     return [
       Padding(
         padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
-        child: Text(s.linksResults(found.length), style: TextStyle(fontSize: 13, color: p.inkMuted)),
+        child: Text(
+          s.linksResults(found.length),
+          style: TextStyle(fontSize: 13, color: p.inkMuted),
+        ),
       ),
       for (final (kind, title) in [
         (LinkKind.job, s.linksJobs),
@@ -179,7 +213,8 @@ class _LinksScreenState extends State<LinksScreen> {
       ])
         if (found.any((l) => l.kind == kind))
           _section(context, title, [
-            for (final link in found.where((l) => l.kind == kind)) _row(context, link, place, highlight: _query),
+            for (final link in found.where((l) => l.kind == kind))
+              _row(context, link, place, highlight: _query),
           ]),
     ];
   }
@@ -189,25 +224,32 @@ class _LinksScreenState extends State<LinksScreen> {
     final favorites = _c.favorites;
     return [
       if (favorites.isNotEmpty) ...[
-        _Label(icon: Icons.star_rounded, text: s.linksFavorites, color: Brand.gold500),
+        _Label(
+          icon: Icons.star_rounded,
+          text: s.linksFavorites,
+          color: Brand.gold500,
+          count: favorites.length,
+        ),
         SizedBox(
-          height: 44,
+          height: 96,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: favorites.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 4),
             itemBuilder: (context, i) => _FavoriteChip(
+              link: favorites[i],
               title: favorites[i].title(_language),
               onTap: () => _open(favorites[i]),
               onLongPress: () => _menu(favorites[i]),
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
       ],
       _Tabs(
         tab: _c.tab,
         labels: [s.linksJobs, s.linksLife, s.linksGroups],
+        counts: [_c.jobs.length, _c.life.length, _c.groups.length],
         onChanged: (t) {
           HapticFeedback.selectionClick();
           _c.setTab(t);
@@ -218,8 +260,10 @@ class _LinksScreenState extends State<LinksScreen> {
         LinksTab.jobs => _jobs(context),
         LinksTab.life => _life(context),
         LinksTab.groups => [
-            _section(context, null, [for (final link in _c.groups) _row(context, link, null)]),
-          ],
+          _section(context, null, [
+            for (final link in _c.groups) _row(context, link, null),
+          ]),
+        ],
       },
       const SizedBox(height: 6),
       _Suggest(onTap: () => _services.openLink(Uri.parse(suggestGroupUrl))),
@@ -233,7 +277,9 @@ class _LinksScreenState extends State<LinksScreen> {
     final inKorea = LinksController.inKorea(place);
     final nearest = inKorea && _c.order == JobOrder.nearest;
     final jobs = _c.jobs;
-    Widget rows(Iterable<UsefulLink> links) => _section(context, null, [for (final l in links) _row(context, l, place)]);
+    Widget rows(Iterable<UsefulLink> links) => _section(context, null, [
+      for (final l in links) _row(context, l, place),
+    ]);
 
     final header = <Widget>[
       if (inKorea)
@@ -244,7 +290,11 @@ class _LinksScreenState extends State<LinksScreen> {
               (JobOrder.regions, Icons.map_rounded, s.linksByRegion),
             ]) ...[
               ChoiceChip(
-                avatar: Icon(icon, size: 17, color: _c.order == order ? Colors.white : p.accent),
+                avatar: Icon(
+                  icon,
+                  size: 17,
+                  color: _c.order == order ? Colors.white : p.accent,
+                ),
                 label: Text(label),
                 selected: _c.order == order,
                 showCheckmark: false,
@@ -254,7 +304,9 @@ class _LinksScreenState extends State<LinksScreen> {
                   fontWeight: FontWeight.w600,
                 ),
                 backgroundColor: p.card,
-                side: BorderSide(color: _c.order == order ? p.action : p.hairline),
+                side: BorderSide(
+                  color: _c.order == order ? p.action : p.hairline,
+                ),
                 onSelected: (_) {
                   HapticFeedback.selectionClick();
                   _c.setOrder(order);
@@ -279,7 +331,8 @@ class _LinksScreenState extends State<LinksScreen> {
     ];
 
     if (nearest) {
-      double km(UsefulLink l) => LinksController.distanceKm(l, place) ?? double.infinity;
+      double km(UsefulLink l) =>
+          LinksController.distanceKm(l, place) ?? double.infinity;
       final placed = jobs.where((l) => l.placed && l.cities.isNotEmpty).toList()
         ..sort((a, b) => km(a).compareTo(km(b)));
       final near = placed.where((l) => km(l) <= 50).toList();
@@ -289,19 +342,48 @@ class _LinksScreenState extends State<LinksScreen> {
       return [
         ...header,
         if (nationwide.isNotEmpty) ...[
-          _Label(icon: Icons.public_rounded, text: s.linksNationwide),
+          _Label(
+            icon: Icons.public_rounded,
+            text: s.linksNationwide,
+            count: nationwide.length,
+          ),
           rows(nationwide),
         ],
-        if (near.isNotEmpty) ...[_Label(icon: Icons.near_me_rounded, text: s.linksNearby), rows(near)],
-        if (far.isNotEmpty) ...[_Label(icon: Icons.location_city_rounded, text: s.linksFarther), rows(far)],
-        if (unknown.isNotEmpty) ...[_Label(icon: Icons.more_horiz_rounded, text: s.linksOther), rows(unknown)],
+        if (near.isNotEmpty) ...[
+          _Label(
+            icon: Icons.near_me_rounded,
+            text: s.linksNearby,
+            count: near.length,
+          ),
+          rows(near),
+        ],
+        if (far.isNotEmpty) ...[
+          _Label(
+            icon: Icons.location_city_rounded,
+            text: s.linksFarther,
+            count: far.length,
+          ),
+          rows(far),
+        ],
+        if (unknown.isNotEmpty) ...[
+          _Label(
+            icon: Icons.more_horiz_rounded,
+            text: s.linksOther,
+            count: unknown.length,
+          ),
+          rows(unknown),
+        ],
       ];
     }
 
     final regions = [
       (LinkRegion.nationwide, Icons.public_rounded, s.linksNationwide),
       (LinkRegion.capital, Icons.location_city_rounded, s.linksRegionCapital),
-      (LinkRegion.chungcheong, Icons.landscape_rounded, s.linksRegionChungcheong),
+      (
+        LinkRegion.chungcheong,
+        Icons.landscape_rounded,
+        s.linksRegionChungcheong,
+      ),
       (LinkRegion.jeolla, Icons.agriculture_rounded, s.linksRegionJeolla),
       (LinkRegion.gyeongsang, Icons.sailing_rounded, s.linksRegionGyeongsang),
       (LinkRegion.other, Icons.more_horiz_rounded, s.linksOther),
@@ -310,9 +392,17 @@ class _LinksScreenState extends State<LinksScreen> {
       ...header,
       for (final (region, icon, title) in regions)
         if (jobs.any((l) => l.region == region)) ...[
-          _Label(icon: icon, text: title),
-          rows(jobs.where((l) => l.region == region).toList()
-            ..sort((a, b) => normalizeQuery(a.name).compareTo(normalizeQuery(b.name)))),
+          _Label(
+            icon: icon,
+            text: title,
+            count: jobs.where((l) => l.region == region).length,
+          ),
+          rows(
+            jobs.where((l) => l.region == region).toList()..sort(
+              (a, b) =>
+                  normalizeQuery(a.name).compareTo(normalizeQuery(b.name)),
+            ),
+          ),
         ],
     ];
   }
@@ -323,7 +413,11 @@ class _LinksScreenState extends State<LinksScreen> {
       (LifeTopic.official, Icons.account_balance_rounded, s.linksTopicOfficial),
       (LifeTopic.news, Icons.newspaper_rounded, s.linksTopicNews),
       (LifeTopic.legal, Icons.gavel_rounded, s.linksTopicLegal),
-      (LifeTopic.insurance, Icons.health_and_safety_rounded, s.linksTopicInsurance),
+      (
+        LifeTopic.insurance,
+        Icons.health_and_safety_rounded,
+        s.linksTopicInsurance,
+      ),
       (LifeTopic.work, Icons.work_rounded, s.linksTopicWork),
       (LifeTopic.everyday, Icons.local_cafe_rounded, s.linksTopicEveryday),
       (LifeTopic.other, Icons.more_horiz_rounded, s.linksOther),
@@ -332,9 +426,14 @@ class _LinksScreenState extends State<LinksScreen> {
     return [
       for (final (t, icon, title) in topics)
         if (_c.life.any((l) => topic(l) == t)) ...[
-          _Label(icon: icon, text: title),
+          _Label(
+            icon: icon,
+            text: title,
+            count: _c.life.where((l) => topic(l) == t).length,
+          ),
           _section(context, null, [
-            for (final link in _c.life.where((l) => topic(l) == t)) _row(context, link, null),
+            for (final link in _c.life.where((l) => topic(l) == t))
+              _row(context, link, null),
           ]),
         ],
     ];
@@ -351,11 +450,14 @@ class _LinksScreenState extends State<LinksScreen> {
           Material(
             color: p.card,
             clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18), side: BorderSide(color: p.hairline)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: BorderSide(color: p.hairline),
+            ),
             child: Column(
               children: [
                 for (final (i, row) in rows.indexed) ...[
-                  if (i > 0) Divider(height: 1, indent: 66, color: p.hairline),
+                  if (i > 0) Divider(height: 1, indent: 70, color: p.hairline),
                   row,
                 ],
               ],
@@ -366,33 +468,39 @@ class _LinksScreenState extends State<LinksScreen> {
     );
   }
 
-  Widget _row(BuildContext context, UsefulLink link, SavedLocation? place, {String highlight = ''}) {
+  Widget _row(
+    BuildContext context,
+    UsefulLink link,
+    SavedLocation? place, {
+    String highlight = '',
+  }) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final km = LinksController.distanceKm(link, place);
     final city = LinksController.nearestCity(link, place);
     final subtitle = switch (link.kind) {
-      LinkKind.job => link.region == LinkRegion.nationwide
-          ? s.linksNationwide
-          : city == null
-              ? (link.handle ?? '')
-              : '${city.name} · ${city.hangul}',
+      LinkKind.job =>
+        link.region == LinkRegion.nationwide
+            ? s.linksNationwide
+            : city == null
+            ? (link.handle ?? '')
+            : '${city.name} · ${city.hangul}',
       LinkKind.life => link.handle ?? '',
       LinkKind.group => switch (link.group) {
-          GroupFor.women => s.linksForWomen,
-          GroupFor.ours => s.linksOurs,
-          _ => s.linksForEveryone,
-        },
+        GroupFor.women => s.linksForWomen,
+        GroupFor.ours => s.linksOurs,
+        _ => s.linksForEveryone,
+      },
     };
     final favorite = _c.isFavorite(link);
     return InkWell(
       onTap: () => _open(link),
       onLongPress: () => _menu(link),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+        padding: const EdgeInsets.fromLTRB(12, 9, 2, 9),
         child: Row(
           children: [
-            _Badge(link: link),
+            _Badge(link: link, size: 46),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -402,7 +510,12 @@ class _LinksScreenState extends State<LinksScreen> {
                     _highlighted(link.title(_language), highlight, p),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 15, height: 1.3, fontWeight: FontWeight.w600, color: p.ink),
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      height: 1.3,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink,
+                    ),
                   ),
                   if (subtitle.isNotEmpty) ...[
                     const SizedBox(height: 2),
@@ -425,7 +538,10 @@ class _LinksScreenState extends State<LinksScreen> {
               tooltip: favorite ? s.linksUnfavorite : s.linksFavorite,
               icon: Icon(
                 favorite ? Icons.star_rounded : Icons.star_border_rounded,
-                color: favorite ? Brand.gold500 : p.inkMuted,
+                size: 22,
+                color: favorite
+                    ? Brand.gold500
+                    : p.inkMuted.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -439,19 +555,25 @@ class _LinksScreenState extends State<LinksScreen> {
     final q = query.trim().toLowerCase();
     final at = q.isEmpty ? -1 : text.toLowerCase().indexOf(q);
     if (at < 0) return TextSpan(text: text);
-    return TextSpan(children: [
-      TextSpan(text: text.substring(0, at)),
-      TextSpan(
-        text: text.substring(at, at + q.length),
-        style: TextStyle(color: p.accent, fontWeight: FontWeight.w800),
-      ),
-      TextSpan(text: text.substring(at + q.length)),
-    ]);
+    return TextSpan(
+      children: [
+        TextSpan(text: text.substring(0, at)),
+        TextSpan(
+          text: text.substring(at, at + q.length),
+          style: TextStyle(color: p.accent, fontWeight: FontWeight.w800),
+        ),
+        TextSpan(text: text.substring(at + q.length)),
+      ],
+    );
   }
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.title, required this.subtitle, required this.search});
+  const _Hero({
+    required this.title,
+    required this.subtitle,
+    required this.search,
+  });
 
   final String title;
   final String subtitle;
@@ -462,7 +584,11 @@ class _Hero extends StatelessWidget {
     final p = VegukinPalette.of(context);
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero.sublist(1)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: p.hero.sublist(1),
+        ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
       ),
       child: SafeArea(
@@ -477,8 +603,12 @@ class _Hero extends StatelessWidget {
                   const SizedBox(width: 4),
                   IconButton(
                     onPressed: () => Navigator.maybePop(context),
-                    tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                    tooltip: MaterialLocalizations.of(context)
+                        .backButtonTooltip,
+                    icon: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: Colors.white,
+                    ),
                   ),
                   Expanded(
                     child: Column(
@@ -496,14 +626,23 @@ class _Hero extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        Text(subtitle, style: const TextStyle(fontSize: 12.5, color: Colors.white70)),
+                        Text(
+                          subtitle,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Colors.white70,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(padding: const EdgeInsets.fromLTRB(14, 2, 14, 16), child: search),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 2, 14, 16),
+              child: search,
+            ),
           ],
         ),
       ),
@@ -512,7 +651,12 @@ class _Hero extends StatelessWidget {
 }
 
 class _SearchBox extends StatelessWidget {
-  const _SearchBox({required this.controller, required this.hint, required this.onChanged, required this.onClear});
+  const _SearchBox({
+    required this.controller,
+    required this.hint,
+    required this.onChanged,
+    required this.onClear,
+  });
 
   final TextEditingController controller;
   final String hint;
@@ -544,7 +688,10 @@ class _SearchBox extends StatelessWidget {
           fillColor: p.card,
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(vertical: 13),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
@@ -553,10 +700,16 @@ class _SearchBox extends StatelessWidget {
 
 /// Jobs, Korea life, groups.
 class _Tabs extends StatelessWidget {
-  const _Tabs({required this.tab, required this.labels, required this.onChanged});
+  const _Tabs({
+    required this.tab,
+    required this.labels,
+    required this.counts,
+    required this.onChanged,
+  });
 
   final LinksTab tab;
   final List<String> labels;
+  final List<int> counts;
   final ValueChanged<LinksTab> onChanged;
 
   @override
@@ -565,7 +718,34 @@ class _Tabs extends StatelessWidget {
     return SegmentedButton<LinksTab>(
       segments: [
         for (final (i, t) in LinksTab.values.indexed)
-          ButtonSegment(value: t, label: Text(labels[i], maxLines: 1, overflow: TextOverflow.ellipsis)),
+          ButtonSegment(
+            value: t,
+            label: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    labels[i],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                if (counts[i] > 0) ...[
+                  const SizedBox(width: 5),
+                  Text(
+                    '${counts[i]}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: t == tab ? Colors.white70 : p.inkMuted,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
       ],
       selected: {tab},
       showSelectedIcon: false,
@@ -584,11 +764,12 @@ class _Tabs extends StatelessWidget {
 
 /// A section's heading.
 class _Label extends StatelessWidget {
-  const _Label({required this.text, this.icon, this.color});
+  const _Label({required this.text, this.icon, this.color, this.count});
 
   final String text;
   final IconData? icon;
   final Color? color;
+  final int? count;
 
   @override
   Widget build(BuildContext context) {
@@ -597,52 +778,114 @@ class _Label extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
       child: Row(
         children: [
-          if (icon != null) ...[Icon(icon, size: 17, color: color ?? p.gold), const SizedBox(width: 6)],
-          Expanded(
+          if (icon != null) ...[
+            Icon(icon, size: 17, color: color ?? p.gold),
+            const SizedBox(width: 6),
+          ],
+          Flexible(
             child: Text(
               text,
-              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, letterSpacing: 0.2, color: p.inkSoft),
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+                color: p.inkSoft,
+              ),
             ),
           ),
+          if (count != null) ...[
+            const SizedBox(width: 6),
+            Text(
+              '$count',
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: p.inkMuted,
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-/// The link's picture: its topic for "Korea life", a briefcase or the
-/// globe for job groups, people for groups; "bot" marked.
+/// The link's picture, as Telegram draws a chat without a photo: its
+/// initials on one of Telegram's colours, the same colour each time; a bot
+/// marked.
 class _Badge extends StatelessWidget {
   const _Badge({required this.link, this.size = 40});
 
   final UsefulLink link;
   final double size;
 
+  static const _colors = [
+    [Color(0xFFFF885E), Color(0xFFFF516A)],
+    [Color(0xFFFFCD6A), Color(0xFFFFA85C)],
+    [Color(0xFF82B1FF), Color(0xFF665FFF)],
+    [Color(0xFFA0DE7E), Color(0xFF54CB68)],
+    [Color(0xFF53EDD6), Color(0xFF28C9B7)],
+    [Color(0xFF72D5FD), Color(0xFF2A9EF1)],
+    [Color(0xFFE0A2F3), Color(0xFFD669ED)],
+  ];
+
+  static final _letter = RegExp(r'\p{L}', unicode: true);
+
+  /// "Korea ish bor" → "KI", "Гр.Паран. Реклама" → "ГР".
+  static String initials(String name) {
+    final letters = [
+      for (final word in name.split(RegExp(r'\s+')))
+        if (_letter.firstMatch(word) case final m?) m.group(0)!.toUpperCase(),
+    ];
+    return letters.isEmpty ? '#' : letters.take(2).join();
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    final icon = switch (link.kind) {
-      LinkKind.life => link.life?.icon ?? Icons.link_rounded,
-      LinkKind.group => link.group == GroupFor.ours ? Icons.mosque_rounded : Icons.groups_rounded,
-      LinkKind.job => link.region == LinkRegion.nationwide ? Icons.public_rounded : Icons.work_rounded,
-    };
+    final colors =
+        _colors[link.url.codeUnits.fold<int>(
+              0,
+              (h, c) => (h * 31 + c) & 0x7fffffff,
+            ) %
+            _colors.length];
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
           width: size,
           height: size,
-          decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(size * 0.32)),
-          child: Icon(icon, size: size * 0.5, color: p.accent),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: colors,
+            ),
+          ),
+          child: Text(
+            initials(link.name),
+            textScaler: TextScaler.noScaling,
+            style: TextStyle(
+              fontSize: size * 0.36,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
         ),
         if (link.isBot)
           Positioned(
-            right: -4,
-            bottom: -4,
+            right: -3,
+            bottom: -3,
             child: Container(
               padding: const EdgeInsets.all(2.5),
               decoration: BoxDecoration(color: p.card, shape: BoxShape.circle),
-              child: const Icon(Icons.smart_toy_rounded, size: 14, color: Brand.gold500),
+              child: const Icon(
+                Icons.smart_toy_rounded,
+                size: 14,
+                color: Brand.gold500,
+              ),
             ),
           ),
       ],
@@ -658,7 +901,9 @@ class _Distance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    final text = km < 1 ? '<1 km' : '${km < 100 ? km.round() : (km / 10).round() * 10} km';
+    final text = km < 1
+        ? '<1 km'
+        : '${km < 100 ? km.round() : (km / 10).round() * 10} km';
     final near = km <= 50;
     return Container(
       margin: const EdgeInsets.only(left: 6),
@@ -681,8 +926,14 @@ class _Distance extends StatelessWidget {
 }
 
 class _FavoriteChip extends StatelessWidget {
-  const _FavoriteChip({required this.title, required this.onTap, required this.onLongPress});
+  const _FavoriteChip({
+    required this.link,
+    required this.title,
+    required this.onTap,
+    required this.onLongPress,
+  });
 
+  final UsefulLink link;
   final String title;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
@@ -690,27 +941,37 @@ class _FavoriteChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    return Material(
-      color: p.card,
-      shape: StadiumBorder(side: BorderSide(color: Brand.gold400.withValues(alpha: 0.6))),
-      child: InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        customBorder: const StadiumBorder(),
+    return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      borderRadius: BorderRadius.circular(14),
+      child: SizedBox(
+        width: 74,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
             children: [
-              const Icon(Icons.star_rounded, size: 17, color: Brand.gold500),
-              const SizedBox(width: 6),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 170),
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: p.ink),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Brand.gold400, width: 2),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: _Badge(link: link, size: 50),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                title,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  height: 1.2,
+                  fontWeight: FontWeight.w600,
+                  color: p.ink,
                 ),
               ),
             ],
@@ -743,14 +1004,22 @@ class _LocateCard extends StatelessWidget {
         children: [
           Icon(Icons.near_me_rounded, color: p.accent),
           const SizedBox(width: 10),
-          Expanded(child: Text(s.linksLocate, style: TextStyle(fontSize: 13.5, height: 1.35, color: p.inkSoft))),
+          Expanded(
+            child: Text(
+              s.linksLocate,
+              style: TextStyle(fontSize: 13.5, height: 1.35, color: p.inkSoft),
+            ),
+          ),
           const SizedBox(width: 6),
           busy
               ? Padding(
                   padding: const EdgeInsets.all(12),
                   child: SizedBox.square(
                     dimension: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2.4, color: p.accent),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.4,
+                      color: p.accent,
+                    ),
                   ),
                 )
               : TextButton(
@@ -793,9 +1062,19 @@ class _Suggest extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(s.linksSuggestTitle, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink)),
+                    Text(
+                      s.linksSuggestTitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(s.linksSuggestBody, style: TextStyle(fontSize: 13, color: p.inkSoft)),
+                    Text(
+                      s.linksSuggestBody,
+                      style: TextStyle(fontSize: 13, color: p.inkSoft),
+                    ),
                   ],
                 ),
               ),

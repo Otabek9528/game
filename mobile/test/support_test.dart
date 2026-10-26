@@ -89,7 +89,7 @@ void main() {
     testWidgets('join, always in reach', (tester) async {
       final app = await open(tester, 'Jamoa');
       expect(find.byType(CommunityScreen), findsOneWidget);
-      expect(find.text('@MuslimVegukin  ·  Bot foydalanuvchilari jamiyati'), findsOneWidget);
+      expect(find.text('@MuslimVegukin\nFoydalanuvchilar jamiyati'), findsOneWidget);
       await tester.tap(find.text('Hoziroq qo‘shiling'));
       expect(app.links.last, Uri.parse('https://t.me/MuslimVegukin'));
     });

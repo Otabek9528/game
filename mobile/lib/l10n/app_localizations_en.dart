@@ -1085,7 +1085,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get donationMessage =>
-      'If this bot has been useful to you and you would like to contribute to its operation and development, you can send any amount to the account below.';
+      'If Muslim Vegukin has been useful to you and you would like to contribute to its operation and development, you can send any amount to the account below.';
 
   @override
   String get donationName => 'Name';
@@ -1122,7 +1122,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get communityHeroTitle => 'Official Telegram Group';
 
   @override
-  String get communityHeroSubtitle => 'Bot users community';
+  String get communityHeroSubtitle => 'Users’ community';
 
   @override
   String get communityJoinNow => 'Join now';
@@ -1132,7 +1132,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get communityPurposeText =>
-      'This group is the official discussion platform for Muslim Vegukin Bot users. Here you can discuss all bot-related topics.';
+      'This group is the official discussion platform for Muslim Vegukin users. Here you can discuss everything about the project.';
 
   @override
   String get communityAllowedTitle => 'Group discussion topics';
@@ -1148,16 +1148,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get communityTopicIdeaTitle => 'Suggestions and ideas';
 
   @override
-  String get communityTopicIdeaBody => 'Your thoughts on improving the bot';
+  String get communityTopicIdeaBody =>
+      'Your ideas for improving Muslim Vegukin';
 
   @override
   String get communityTopicBugTitle => 'Bug reports';
 
   @override
-  String get communityTopicBugBody => 'If you find a problem in the bot';
+  String get communityTopicBugBody => 'If you find a problem';
 
   @override
-  String get communityTopicNewsTitle => 'Bot news';
+  String get communityTopicNewsTitle => 'Project news';
 
   @override
   String get communityTopicNewsBody =>
@@ -1171,7 +1172,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Testing new features before public release';
 
   @override
-  String get communityTopicQuestionTitle => 'Questions about the bot';
+  String get communityTopicQuestionTitle => 'Questions about Muslim Vegukin';
 
   @override
   String get communityTopicQuestionBody => 'How to use, about features';
@@ -1202,7 +1203,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get communityBanned2Body => 'Language courses, learning centers, etc.';
 
   @override
-  String get communityBanned3Title => 'Non-bot related questions';
+  String get communityBanned3Title => 'Questions unrelated to the project';
 
   @override
   String get communityBanned3Body => 'Use other groups for general questions';
@@ -1217,7 +1218,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get communityBanned5Title => 'Off-topic discussions';
 
   @override
-  String get communityBanned5Body => 'Conversations unrelated to the bot';
+  String get communityBanned5Body => 'Conversations unrelated to the project';
 
   @override
   String get communityPenaltyTitle => 'Warning';
@@ -4155,10 +4156,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jbTitle => 'Ish e’lonlari guruhi';
 
   @override
-  String get jbSubtitle => 'Bot foydalanuvchilari uchun maxsus xizmat';
+  String get jbSubtitle =>
+      'Muslim Vegukin foydalanuvchilari uchun maxsus xizmat';
 
   @override
-  String get jbBotDoes => 'Bot tomonidan:';
+  String get jbBotDoes => 'Muslim Vegukin tomonidan:';
 
   @override
   String get jbPoint1 =>
@@ -4231,7 +4233,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get jbHow2 =>
-      'E’loningiz faqat bot guruhiga joylanadi. Foydalanuvchilar siz bilan tez orada bog‘lanishadi';
+      'E’loningiz faqat Muslim Vegukin guruhiga joylanadi. Foydalanuvchilar siz bilan tez orada bog‘lanishadi';
 
   @override
   String get jbHow3 => 'Odam topilgach, e’lonni “Band” deb belgilang';
@@ -4242,7 +4244,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get jbHowRule =>
-      'Sharti: E’lon faqat bot guruhida e’lon qilinib, boshqa guruhlarga joylanmasligi kerak';
+      'Sharti: E’lon faqat Muslim Vegukin guruhida e’lon qilinib, boshqa guruhlarga joylanmasligi kerak';
 
   @override
   String get jbHowWait =>

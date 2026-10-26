@@ -16,7 +16,7 @@ void main() {
     final data = widgetPayload(app.prayer, AppLanguage.en);
     expect(data['days'], isNull);
     expect(data['message'], 'Open the app to see prayer times');
-    expect(data['brand'], 'Muslim Vegukin Bot');
+    expect(data['brand'], 'Muslim Vegukin');
   });
 
   test('carries a week of times and labels in the app language', () async {

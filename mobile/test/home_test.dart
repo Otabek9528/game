@@ -1,3 +1,4 @@
+import 'package:muslim_vegukin/core/new_badges.dart';
 import 'package:muslim_vegukin/core/app_language.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,7 @@ List<String> tiles(WidgetTester tester, List<String> labels) {
 
 void main() {
   _languageMenuTests();
+  _newBadgeTests();
 
   testWidgets('shows today: date, city, countdown and the day strip', (
     tester,
@@ -248,6 +250,51 @@ void _languageMenuTests() {
         findsNothing,
         reason: 'the menu closed, no page opened',
       );
+    },
+  );
+}
+
+void _newBadgeTests() {
+  test(
+    'NEW follows the web home page: its isNew lines and the band’s badge',
+    () {
+      const page = '''
+      <span class="new-badge biz-band-badge">NEW</span>
+      <script>
+    const FEATURE_CARDS = {
+      mosque: { icon: '🕌', href: 'x' },
+      cars: { icon: '🚘', href: 'pages/cars/cars.html',isNew: true},
+      //housing: { icon: '🏠', href: 'pages/housing/housing.html', isNew: true},
+      jobs: { icon: '💼', href: 'x' }, // isNew: true
+      business: { icon: '🏬', href: 'x', isBand: true }
+    };''';
+      expect(parseNewBadges(page), {'cars', 'business'});
+      expect(
+        parseNewBadges(
+          page.replaceFirst(
+            '<span class="new-badge biz-band-badge">NEW</span>',
+            '<!-- <span class="new-badge biz-band-badge">NEW</span> -->',
+          ),
+        ),
+        {'cars'},
+      );
+      expect(parseNewBadges('<html>nothing</html>'), isNull);
+    },
+  );
+
+  testWidgets(
+    'the home screen takes its NEW marks from the web page, and keeps them',
+    (tester) async {
+      final app = TestApp(language: 'uz')
+        ..homePage =
+            'const FEATURE_CARDS = {\n  qibla: { icon: "x", isNew: true },\n  cars: { icon: "x" },\n};';
+      await app.launch(tester);
+      expect(
+        find.text('YANGI'),
+        findsOneWidget,
+        reason: 'only Qibla now; the band lost its badge too',
+      );
+      expect(app.store.read('new_badges'), 'qibla');
     },
   );
 }

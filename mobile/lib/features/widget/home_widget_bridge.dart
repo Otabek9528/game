@@ -82,7 +82,7 @@ Map<String, dynamic> widgetPayload(PrayerController prayer, AppLanguage language
   final days = prayer.days;
   final base = <String, dynamic>{
     'v': 1,
-    'brand': 'Muslim Vegukin Bot',
+    'brand': 'Muslim Vegukin',
     'message': s.widgetOpenApp,
   };
   if (place == null || days.isEmpty) return base;

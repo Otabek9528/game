@@ -261,6 +261,7 @@ class TestApp {
       qiblaDevice: qibla,
       businessStats: () async => stats,
       todayVisits: () async => visits,
+      homePage: () async => homePage,
       parcels: this.parcels,
       openLink: (uri) async => links.add(uri),
       shareText: (text) async => shared.add(text),
@@ -317,6 +318,9 @@ class TestApp {
   /// Today's visits shown on the home screen; none by default, so the
   /// home screen has nothing that keeps moving.
   int? visits;
+
+  /// The web app's home page, for the "NEW" marks; none by default.
+  String? homePage;
 
   /// Each camera the ingredient check opened, the last one current.
   final cameras = <FakeScannerCamera>[];

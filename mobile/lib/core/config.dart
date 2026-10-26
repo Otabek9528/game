@@ -12,6 +12,10 @@ abstract final class AppConfig {
   /// above has only a few.
   static final photosBase = Uri.parse('https://vegukin-twa.pages.dev/');
 
+  /// The same live web app, for what the app follows from it (the home
+  /// page's "NEW" marks).
+  static final liveWebBase = Uri.parse('https://vegukin-twa.pages.dev/');
+
   /// The Muslim Vegukin API (places, business directory, …).
   static final apiBase = Uri.parse('https://vegukin-api.duckdns.org/');
 

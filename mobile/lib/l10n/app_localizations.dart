@@ -1981,7 +1981,7 @@ abstract class AppLocalizations {
   /// No description provided for @donationMessage.
   ///
   /// In uz, this message translates to:
-  /// **'Agar ushbu bot sizga foydali bo‘layotgan bo‘lsa va uning ishlashi hamda rivojlanishiga o‘z hissangizni qo‘shmoqchi bo‘lsangiz, quyidagi hisob raqamga istalgan miqdorda moddiy mablag‘laringizni yuborishingiz mumkin.'**
+  /// **'Agar Muslim Vegukin sizga foydali bo‘layotgan bo‘lsa va uning ishlashi hamda rivojlanishiga o‘z hissangizni qo‘shmoqchi bo‘lsangiz, quyidagi hisob raqamga istalgan miqdorda moddiy mablag‘laringizni yuborishingiz mumkin.'**
   String get donationMessage;
 
   /// No description provided for @donationName.
@@ -2053,7 +2053,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityHeroSubtitle.
   ///
   /// In uz, this message translates to:
-  /// **'Bot foydalanuvchilari jamiyati'**
+  /// **'Foydalanuvchilar jamiyati'**
   String get communityHeroSubtitle;
 
   /// No description provided for @communityJoinNow.
@@ -2071,7 +2071,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityPurposeText.
   ///
   /// In uz, this message translates to:
-  /// **'Ushbu guruh Muslim Vegukin Bot foydalanuvchilari uchun rasmiy muhokama maydonidir. Bu yerda bot bilan bog‘liq barcha masalalarni muhokama qilishingiz mumkin.'**
+  /// **'Ushbu guruh Muslim Vegukin foydalanuvchilari uchun rasmiy muhokama maydonidir. Bu yerda loyiha bilan bog‘liq barcha masalalarni muhokama qilishingiz mumkin.'**
   String get communityPurposeText;
 
   /// No description provided for @communityAllowedTitle.
@@ -2101,7 +2101,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityTopicIdeaBody.
   ///
   /// In uz, this message translates to:
-  /// **'Botni yaxshilash uchun fikrlaringiz'**
+  /// **'Muslim Vegukinni yaxshilash uchun fikrlaringiz'**
   String get communityTopicIdeaBody;
 
   /// No description provided for @communityTopicBugTitle.
@@ -2113,13 +2113,13 @@ abstract class AppLocalizations {
   /// No description provided for @communityTopicBugBody.
   ///
   /// In uz, this message translates to:
-  /// **'Agar botda muammo topsangiz'**
+  /// **'Agar biror muammo topsangiz'**
   String get communityTopicBugBody;
 
   /// No description provided for @communityTopicNewsTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Bot yangiliklari'**
+  /// **'Loyiha yangiliklari'**
   String get communityTopicNewsTitle;
 
   /// No description provided for @communityTopicNewsBody.
@@ -2143,7 +2143,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityTopicQuestionTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Bot haqida savollar'**
+  /// **'Muslim Vegukin haqida savollar'**
   String get communityTopicQuestionTitle;
 
   /// No description provided for @communityTopicQuestionBody.
@@ -2203,7 +2203,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityBanned3Title.
   ///
   /// In uz, this message translates to:
-  /// **'Bot bilan bog‘liq bo‘lmagan savollar'**
+  /// **'Loyihaga aloqasi yo‘q savollar'**
   String get communityBanned3Title;
 
   /// No description provided for @communityBanned3Body.
@@ -2233,7 +2233,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityBanned5Body.
   ///
   /// In uz, this message translates to:
-  /// **'Bot bilan aloqasi bo‘lmagan suhbatlar'**
+  /// **'Loyihaga aloqasi bo‘lmagan suhbatlar'**
   String get communityBanned5Body;
 
   /// No description provided for @communityPenaltyTitle.
@@ -7327,13 +7327,13 @@ abstract class AppLocalizations {
   /// No description provided for @jbSubtitle.
   ///
   /// In uz, this message translates to:
-  /// **'Bot foydalanuvchilari uchun maxsus xizmat'**
+  /// **'Muslim Vegukin foydalanuvchilari uchun maxsus xizmat'**
   String get jbSubtitle;
 
   /// No description provided for @jbBotDoes.
   ///
   /// In uz, this message translates to:
-  /// **'Bot tomonidan:'**
+  /// **'Muslim Vegukin tomonidan:'**
   String get jbBotDoes;
 
   /// No description provided for @jbPoint1.
@@ -7465,7 +7465,7 @@ abstract class AppLocalizations {
   /// No description provided for @jbHow2.
   ///
   /// In uz, this message translates to:
-  /// **'E’loningiz faqat bot guruhiga joylanadi. Foydalanuvchilar siz bilan tez orada bog‘lanishadi'**
+  /// **'E’loningiz faqat Muslim Vegukin guruhiga joylanadi. Foydalanuvchilar siz bilan tez orada bog‘lanishadi'**
   String get jbHow2;
 
   /// No description provided for @jbHow3.
@@ -7483,7 +7483,7 @@ abstract class AppLocalizations {
   /// No description provided for @jbHowRule.
   ///
   /// In uz, this message translates to:
-  /// **'Sharti: E’lon faqat bot guruhida e’lon qilinib, boshqa guruhlarga joylanmasligi kerak'**
+  /// **'Sharti: E’lon faqat Muslim Vegukin guruhida e’lon qilinib, boshqa guruhlarga joylanmasligi kerak'**
   String get jbHowRule;
 
   /// No description provided for @jbHowWait.

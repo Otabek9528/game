@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../app_services.dart';
 import '../../core/app_language.dart';
+import '../../core/new_badges.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
@@ -33,6 +34,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late Future<BusinessStats?> _stats = widget.services.businessStats();
   late Future<int?> _visits = widget.services.todayVisits();
 
+  /// "NEW" as the web app's home page marks it.
+  late final _badges = NewBadges(widget.services.store, widget.services.homePage);
+
   /// When the app went to the background: back after half an hour or more
   /// is a new visit, as the server counts them.
   DateTime? _away;
@@ -44,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _services.activity.log('open');
+    unawaited(_badges.refresh());
     // First launch: location, camera and "Alarms & reminders", asked once,
     // over the home screen.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -98,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _badges.dispose();
     super.dispose();
   }
 
@@ -184,9 +190,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           if (showsBusiness(language)) ...[
                             FutureBuilder(
                               future: _stats,
-                              builder: (context, snapshot) => _BusinessBand(
-                                stats: snapshot.data,
-                                onTap: () => _open(businessFeature),
+                              builder: (context, snapshot) => ListenableBuilder(
+                                listenable: _badges,
+                                builder: (context, _) => _BusinessBand(
+                                  stats: snapshot.data,
+                                  isNew: _badges.isNew(businessFeature),
+                                  onTap: () => _open(businessFeature),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 14),
@@ -209,11 +219,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         ),
                         itemBuilder: (context, i) {
                           final feature = features[i];
-                          return _FeatureTile(
-                            emoji: feature.emoji,
-                            label: feature.label(s),
-                            isNew: feature.isNew,
-                            onTap: () => _open(feature),
+                          return ListenableBuilder(
+                            listenable: _badges,
+                            builder: (context, _) => _FeatureTile(
+                              emoji: feature.emoji,
+                              label: feature.label(s),
+                              isNew: _badges.isNew(feature),
+                              onTap: () => _open(feature),
+                            ),
                           );
                         },
                       ),
@@ -452,9 +465,10 @@ class _LanguageMenu extends StatelessWidget {
 /// Full-width and gold, so it reads as its own section rather than one more
 /// tile in the grid — as on the web.
 class _BusinessBand extends StatelessWidget {
-  const _BusinessBand({required this.stats, required this.onTap});
+  const _BusinessBand({required this.stats, required this.isNew, required this.onTap});
 
   final BusinessStats? stats;
+  final bool isNew;
   final VoidCallback onTap;
 
   @override
@@ -529,6 +543,7 @@ class _BusinessBand extends StatelessWidget {
       ),
     );
 
+    if (!isNew) return band;
     // The badge sits on the band's top edge, so the title keeps the full width.
     return Stack(
       clipBehavior: Clip.none,
