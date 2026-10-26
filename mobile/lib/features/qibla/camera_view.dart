@@ -49,7 +49,7 @@ class CameraQiblaView extends StatefulWidget {
   State<CameraQiblaView> createState() => _CameraQiblaViewState();
 }
 
-class _CameraQiblaViewState extends State<CameraQiblaView> {
+class _CameraQiblaViewState extends State<CameraQiblaView> with SingleTickerProviderStateMixin {
   /// How far above or below the sun's height a tap may be and still count
   /// as the sun.
   static const _sunBand = 8.0;
@@ -57,10 +57,22 @@ class _CameraQiblaViewState extends State<CameraQiblaView> {
   String? _note;
   Timer? _noteTimer;
 
+  /// The turn guide's beat: runs only while there is a way to turn.
+  late final _guide = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100));
+
   @override
   void dispose() {
     _noteTimer?.cancel();
+    _guide.dispose();
     super.dispose();
+  }
+
+  void _beat(bool on) {
+    if (on == _guide.isAnimating) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || on == _guide.isAnimating) return;
+      on ? _guide.repeat() : _guide.stop();
+    });
   }
 
   void _say(String text) {
@@ -138,7 +150,7 @@ class _CameraQiblaViewState extends State<CameraQiblaView> {
                 ),
               ),
               ListenableBuilder(
-                listenable: widget.controller,
+                listenable: Listenable.merge([widget.controller, _guide]),
                 builder: (context, _) => _overlay(context, size, hFov, vFov),
               ),
             ],
@@ -177,6 +189,7 @@ class _CameraQiblaViewState extends State<CameraQiblaView> {
       _ => null,
     };
     final degrees = c.correction.abs().round();
+    _beat(!aligned && upright && c.qibla != null);
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -195,6 +208,8 @@ class _CameraQiblaViewState extends State<CameraQiblaView> {
               sun: sunUp ? sun : null,
               sunLabel: s.qiblaSunMarker,
               insets: widget.insets,
+              beat: _guide.isAnimating ? _guide.value : null,
+              guide: upright,
             ),
           ),
         ),
@@ -271,6 +286,8 @@ class _Overlay extends CustomPainter {
     required this.sun,
     required this.sunLabel,
     required this.insets,
+    required this.beat,
+    required this.guide,
   });
 
   final CameraPose pose;
@@ -289,6 +306,12 @@ class _Overlay extends CustomPainter {
   final SunPosition? sun;
   final String sunLabel;
   final EdgeInsets insets;
+
+  /// Where the turn guide is in its beat (0–1); null when still.
+  final double? beat;
+
+  /// Whether to show the way to turn (not while the phone lies flat).
+  final bool guide;
 
   static const _rad = math.pi / 180;
   static const _tapeH = 52.0;
@@ -436,7 +459,12 @@ class _Overlay extends CustomPainter {
     }
 
     final kaaba = pose.project(qibla, 0);
-    if (kaaba != null && kaaba.dx >= 0 && kaaba.dx <= size.width) {
+    final inSight = kaaba != null && kaaba.dx >= 0 && kaaba.dx <= size.width;
+    final toRight = diff > 0;
+    final dir = toRight ? 1.0 : -1.0;
+    final beat = this.beat ?? 0;
+    final pulse = 0.5 - 0.5 * math.cos(2 * math.pi * beat);
+    if (inSight) {
       // In sight: the Kaaba on the horizon, a thin beam from its tape mark.
       final at = Offset(kaaba.dx, (kaaba.dy + lift.dy).clamp(lo, hi));
       canvas.drawLine(
@@ -454,23 +482,81 @@ class _Overlay extends CustomPainter {
       _kaaba(canvas, at, 40, gold);
       _pill(canvas, Offset(at.dx, at.dy + 44), label, Colors.black.withValues(alpha: 0.62), Colors.white, 13,
           accentText: gold);
-    } else {
-      // Out of sight: an arrow on the side to turn to, with how far.
-      final toRight = diff > 0;
-      final x = toRight ? size.width - 30 : 30.0;
+      // Chevrons from the aim towards it, as many as fit between.
+      if (!aligned && guide) {
+        final room = (at.dx - aim.dx).abs() - 30 - 44;
+        _chevrons(canvas, Offset(aim.dx + dir * 52, aim.dy), dir, math.min(3, (room / 30).floor()), beat);
+      }
+    } else if (guide) {
+      // Out of sight: the side to turn to glows, chevrons run from the aim
+      // towards it, and a big arrow at the edge says how far.
+      final glow = Rect.fromLTWH(toRight ? size.width - 90 : 0, lo - 60, 90, hi - lo + 120);
+      canvas.drawRect(
+        glow,
+        Paint()
+          ..shader = LinearGradient(
+            begin: toRight ? Alignment.centerRight : Alignment.centerLeft,
+            end: toRight ? Alignment.centerLeft : Alignment.centerRight,
+            colors: [Brand.gold300.withValues(alpha: 0.22 + 0.28 * pulse), Brand.gold300.withValues(alpha: 0)],
+          ).createShader(glow),
+      );
+      _chevrons(canvas, Offset(aim.dx + dir * 52, aim.dy), dir, 3, beat);
+      final x = toRight ? size.width - 36 : 36.0;
       final y = aim.dy;
-      canvas.drawCircle(Offset(x, y), 26, Paint()..color = Colors.black.withValues(alpha: 0.5));
+      final r = 28 + 3 * pulse;
+      canvas.drawCircle(Offset(x, y), r, Paint()..color = Brand.gold300);
+      canvas.drawCircle(
+        Offset(x, y),
+        r,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = Colors.white,
+      );
       canvas.drawPath(
         Path()
-          ..moveTo(x + (toRight ? 13 : -13), y)
-          ..lineTo(x + (toRight ? -7 : 7), y - 14)
-          ..lineTo(x + (toRight ? -7 : 7), y + 14)
+          ..moveTo(x + dir * 14, y)
+          ..lineTo(x - dir * 8, y - 15)
+          ..lineTo(x - dir * 8, y + 15)
           ..close(),
-        Paint()..color = Brand.gold300,
+        Paint()..color = const Color(0xFF16130F),
       );
-      _pill(canvas, Offset(x, y + 42), '${diff.abs().round()}°', Colors.black.withValues(alpha: 0.62), Colors.white, 13);
+      _pill(canvas, Offset(x, y + 50), '${diff.abs().round()}°', Colors.black.withValues(alpha: 0.7), Colors.white, 14);
     }
     canvas.restore();
+  }
+
+  /// [count] big chevrons from [from] the way to turn ([dir] 1 is right), a
+  /// wave of light running through them that way.
+  void _chevrons(Canvas canvas, Offset from, double dir, int count, double beat) {
+    if (count <= 0) return;
+    final wave = beat * (count + 1.2) - 0.6;
+    for (var k = 0; k < count; k++) {
+      final lit = (1 - (wave - k).abs()).clamp(0.0, 1.0);
+      final x = from.dx + dir * (k * 30 + 5 * lit);
+      final path = Path()
+        ..moveTo(x - dir * 9, from.dy - 16)
+        ..lineTo(x + dir * 7, from.dy)
+        ..lineTo(x - dir * 9, from.dy + 16);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 10
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = Colors.black.withValues(alpha: 0.35),
+      );
+      canvas.drawPath(
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 6
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = Brand.gold300.withValues(alpha: 0.5 + 0.5 * lit),
+      );
+    }
   }
 
   /// A Kaaba: black cube, gold band and door, gold edge.

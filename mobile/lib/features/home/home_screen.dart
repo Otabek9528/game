@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -152,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final p = VegukinPalette.of(context);
     final language = _services.locale.language ?? AppLanguage.uz;
     final features = featuresFor(language);
-    final textScale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
+    final scaler = MediaQuery.textScalerOf(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
@@ -210,9 +209,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           crossAxisCount: 3,
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,
-                          // Room for the emoji and two lines of label at
-                          // the user's text size (both grow with it).
-                          mainAxisExtent: math.max(112, 36 + 68 * textScale),
+                          // Exactly the emoji and two lines of label at the
+                          // user's text size (both grow with it), so a
+                          // one-line label leaves no tall gap below it.
+                          mainAxisExtent: _FeatureTile.height(scaler),
                         ),
                         itemBuilder: (context, i) {
                           final feature = features[i];
@@ -503,6 +503,22 @@ class _FeatureTile extends StatelessWidget {
   final bool isNew;
   final VoidCallback onTap;
 
+  static const _top = 14.0;
+  static const _gap = 6.0;
+  static const _bottom = 10.0;
+  static const _emoji = TextStyle(fontSize: 31, height: 1.15);
+  static const _labelSize = 12.5;
+  static const _labelHeight = 1.25;
+
+  bool get _oneWord => !label.contains(' ') && !label.contains('-');
+
+  TextStyle _labelStyle(VegukinPalette p) =>
+      TextStyle(fontSize: _labelSize, height: _labelHeight, fontWeight: FontWeight.w600, color: p.ink);
+
+  /// A tile's height: padding, the emoji and room for two lines of label.
+  static double height(TextScaler scaler) =>
+      _top + scaler.scale(_emoji.fontSize!) * _emoji.height! + _gap + scaler.scale(_labelSize) * _labelHeight * 2 + _bottom + 1;
+
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
@@ -520,21 +536,27 @@ class _FeatureTile extends StatelessWidget {
           children: [
             Positioned.fill(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(6, 14, 6, 8),
+                padding: const EdgeInsets.fromLTRB(6, _top, 6, _bottom),
                 child: Column(
                   children: [
-                    Text(emoji, style: const TextStyle(fontSize: 31, height: 1.15)),
-                    const SizedBox(height: 8),
-                    Text(
-                      label,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        height: 1.25,
-                        fontWeight: FontWeight.w600,
-                        color: p.ink,
+                    Text(emoji, style: _emoji),
+                    const SizedBox(height: _gap),
+                    // The two lines' room, a one-line label in its middle:
+                    // the emojis of a row stay level and no tile has a
+                    // gap at its foot.
+                    Expanded(
+                      child: Center(
+                        child: _oneWord
+                            // A single long word with large text: a touch
+                            // smaller rather than split ("Bildirishnomala / r").
+                            ? FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: _labelStyle(p)))
+                            : Text(
+                                label,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: _labelStyle(p),
+                              ),
                       ),
                     ),
                   ],

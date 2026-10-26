@@ -11,7 +11,7 @@ import 'support/fakes.dart';
 List<String> tiles(WidgetTester tester, List<String> labels) {
   final found = [for (final l in labels) if (find.text(l).evaluate().isNotEmpty) l];
   int order(String l) {
-    final at = tester.getTopLeft(find.text(l));
+    final at = tester.getCenter(find.text(l));
     return (at.dy ~/ 20) * 10000 + at.dx.round();
   }
 
@@ -101,7 +101,7 @@ void main() {
   testWidgets('in English and Russian: only what the web offers there, in its order', (tester) async {
     await TestApp(language: 'en').launch(tester);
     expect(find.text('Business Directory'), findsNothing);
-    await tester.drag(find.byType(CustomScrollView), const Offset(0, -600));
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
     await tester.pumpAndSettle();
     const all = [
       'Mosques', 'Restaurants', 'Shops', 'Notifications', 'Qibla', 'Ask the scholars', 'Ingredient check', 'Housing',
