@@ -2314,5 +2314,124 @@
         "type": "String"
       }
     }
-  }
+  },
+  "ntTitle": "Bildirishnomalar",
+  "ntLoadError": "Obunalaringizni yuklab bo‘lmadi.",
+  "ntRetry": "Qayta urinish",
+  "ntHelloSent": "Sinov xabari yuborildi. Botni tekshiring.",
+  "ntBlocked": "Bot sizga xabar yubora olmayapti, shuning uchun Telegramda xabar kelmaydi. Botni ochib, «Start» tugmasini bosing, so‘ng tekshiring.",
+  "ntOpenBot": "Botni ochish",
+  "ntCheck": "Tekshirish",
+  "ntEmptyTitle": "Hech narsani o‘tkazib yubormang",
+  "ntEmptyBody": "O‘zgarishlarni birinchilardan bo‘lib biling.",
+  "ntEmptyAreaTitle": "Hududni kuzatish",
+  "ntEmptyAreaBody": "Manzil yoki joylashuvingiz atrofida yangi joy ochilsa, yopilsa yoki o‘zgarsa",
+  "ntEmptyPlaceTitle": "Joyni kuzatish",
+  "ntEmptyPlaceBody": "Istalgan joy sahifasida «Kuzatish» tugmasini bosing",
+  "ntWhenTitle": "Qachon xabar keladi?",
+  "ntWhenNew": "Yangi joy ochilsa",
+  "ntWhenClosed": "Joy yopilsa",
+  "ntWhenPhone": "Telefon o‘zgarsa",
+  "ntWhenName": "Nomi o‘zgarsa",
+  "ntWhenOwner": "Joy egasi e’lon bersa",
+  "ntWhenMosque": "Masjid e’lon bersa",
+  "ntAreasTitle": "Hududlar",
+  "ntAreasAdd": "Hudud qo‘shish",
+  "ntCurrentLocation": "Joriy joylashuvim",
+  "ntRadiusKm": "{km} km radius",
+  "@ntRadiusKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
+  "ntFromLocation": "Joylashuvimdan",
+  "ntInside": "hozir {n} ta joy",
+  "@ntInside": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ntEdit": "Tahrirlash",
+  "ntDelete": "O‘chirish",
+  "ntDeleteConfirm": "Bu hudud bo‘yicha xabarlar to‘xtatilsinmi?",
+  "ntAreaSaved": "Hudud saqlandi",
+  "ntAreaUpdated": "Hudud yangilandi",
+  "ntAreaDeleted": "Hudud o‘chirildi",
+  "ntWatchTitle": "Kuzatuvdagi joylar",
+  "ntWatchHint": "Joyni kuzatish uchun uning sahifasidagi «Kuzatish» tugmasini bosing.",
+  "ntWatchRemoved": "Kuzatuvdan olib tashlandi",
+  "ntWatchStop": "Kuzatishni to‘xtatish",
+  "ntSheetAdd": "Hududni kuzatish",
+  "ntSheetEdit": "Hududni tahrirlash",
+  "ntMyLocation": "Joylashuvim",
+  "ntAddress": "Manzil",
+  "ntAddressHint": "Manzilni koreys tilida kiriting",
+  "ntLocated": "Hozirgina aniqlandi",
+  "ntLocating": "Joylashuv aniqlanmoqda…",
+  "ntSavedCenter": "Saqlangan markaz",
+  "ntRelocate": "Qayta aniqlash",
+  "ntFind": "Topish",
+  "ntFinding": "Manzil qidirilmoqda…",
+  "ntNothingInside": "Bu radiusda hozircha joy yo‘q",
+  "ntLocationFailed": "Joylashuvni aniqlab bo‘lmadi. Manzilni kiriting yoki qayta urinib ko‘ring.",
+  "ntRadius": "Radius",
+  "ntCountMosque": "{n} masjid",
+  "@ntCountMosque": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ntCountRestaurant": "{n} oshxona",
+  "@ntCountRestaurant": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ntCountShop": "{n} do‘kon",
+  "@ntCountShop": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ntWhich": "Qaysi joylar?",
+  "ntPickOne": "Kamida bitta turni tanlang.",
+  "ntNote": "Yangi joy ochilsa, yopilsa, telefon raqami yoki nomi o‘zgarsa va e’lon berilsa — xabar olasiz.",
+  "ntSave": "Saqlash",
+  "ntErrAddressNotFound": "Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.",
+  "ntErrRateLimited": "So‘rovlar juda ko‘p. Bir daqiqadan so‘ng urinib ko‘ring.",
+  "ntErrTooManyAreas": "Hududlar juda ko‘p. Keraksizlarini o‘chiring.",
+  "ntErrAreaBudget": "Hududlaringiz juda katta joyni qamrab oldi. Birini kichraytiring yoki o‘chiring.",
+  "ntErrTooManyChanges": "Bugun hududlar ko‘p o‘zgartirildi. Ertaga urinib ko‘ring.",
+  "ntErrTooManyPreviews": "Bugun juda ko‘p joy ko‘rib chiqildi. Ertaga urinib ko‘ring.",
+  "ntErrOffline": "Internetga ulanib bo‘lmadi. Qayta urinib ko‘ring.",
+  "ntErrGeneric": "Xatolik yuz berdi. Qayta urinib ko‘ring.",
+  "ntWhereTitle": "Xabarlar qayerga keladi?",
+  "ntViaApp": "Ilovada",
+  "ntViaAppBody": "Telefoningizga bildirishnoma",
+  "ntViaBot": "Telegram botda",
+  "ntViaBotBody": "Muslim Vegukin botidan xabar",
+  "ntViaOne": "Kamida bittasi yoqilgan bo‘lsin.",
+  "ntAppOnly": "Xabarlar shu ilovaga bildirishnoma bo‘lib keladi.",
+  "ntAppOnlyHint": "Telegram orqali kirsangiz, botdan ham olishingiz mumkin.",
+  "ntPushOff": "Telefonda bildirishnomalar o‘chirilgan — xabarlar ko‘rinmaydi.",
+  "ntPushOn": "Yoqish",
+  "ntStoppedPlace": "Bu joy bo‘yicha xabarlar to‘xtatildi.",
+  "ntStoppedArea": "Bu hudud bo‘yicha xabarlar to‘xtatildi.",
+  "ntUndo": "Qaytarish",
+  "ntTypeMosque": "Masjid",
+  "ntTypeRestaurant": "Oshxona",
+  "ntTypeShop": "Do‘kon",
+  "ntTypesMosque": "Masjidlar",
+  "ntTypesRestaurant": "Oshxonalar",
+  "ntTypesShop": "Do‘konlar"
 }

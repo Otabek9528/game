@@ -4508,4 +4508,280 @@ class AppLocalizationsRu extends AppLocalizations {
   String homeVisitsToday(String count) {
     return 'Посещений сегодня: $count';
   }
+
+  @override
+  String get ntTitle => 'Уведомления';
+
+  @override
+  String get ntLoadError => 'Не удалось загрузить ваши подписки.';
+
+  @override
+  String get ntRetry => 'Повторить';
+
+  @override
+  String get ntHelloSent =>
+      'Отправили проверочное сообщение. Загляните в бота.';
+
+  @override
+  String get ntBlocked =>
+      'Бот не может вам писать, поэтому в Telegram сообщения не приходят. Откройте бота, нажмите «Start», затем проверьте.';
+
+  @override
+  String get ntOpenBot => 'Открыть бота';
+
+  @override
+  String get ntCheck => 'Проверить';
+
+  @override
+  String get ntEmptyTitle => 'Ничего не пропустите';
+
+  @override
+  String get ntEmptyBody => 'Узнавайте об изменениях первыми.';
+
+  @override
+  String get ntEmptyAreaTitle => 'Следить за районом';
+
+  @override
+  String get ntEmptyAreaBody =>
+      'Новые, закрытые и изменённые места рядом с адресом или с вами';
+
+  @override
+  String get ntEmptyPlaceTitle => 'Следить за местом';
+
+  @override
+  String get ntEmptyPlaceBody => 'Нажмите «Следить» на странице любого места';
+
+  @override
+  String get ntWhenTitle => 'Когда приходят сообщения?';
+
+  @override
+  String get ntWhenNew => 'Открылось новое место';
+
+  @override
+  String get ntWhenClosed => 'Место закрылось';
+
+  @override
+  String get ntWhenPhone => 'Сменился телефон';
+
+  @override
+  String get ntWhenName => 'Сменилось название';
+
+  @override
+  String get ntWhenOwner => 'Объявление владельца';
+
+  @override
+  String get ntWhenMosque => 'Объявление мечети';
+
+  @override
+  String get ntAreasTitle => 'Районы';
+
+  @override
+  String get ntAreasAdd => 'Добавить район';
+
+  @override
+  String get ntCurrentLocation => 'Моё местоположение';
+
+  @override
+  String ntRadiusKm(int km) {
+    return 'радиус $km км';
+  }
+
+  @override
+  String get ntFromLocation => 'По геолокации';
+
+  @override
+  String ntInside(int n) {
+    return 'сейчас мест: $n';
+  }
+
+  @override
+  String get ntEdit => 'Изменить';
+
+  @override
+  String get ntDelete => 'Удалить';
+
+  @override
+  String get ntDeleteConfirm => 'Отключить сообщения по этому району?';
+
+  @override
+  String get ntAreaSaved => 'Район сохранён';
+
+  @override
+  String get ntAreaUpdated => 'Район обновлён';
+
+  @override
+  String get ntAreaDeleted => 'Район удалён';
+
+  @override
+  String get ntWatchTitle => 'Отслеживаемые места';
+
+  @override
+  String get ntWatchHint =>
+      'Чтобы следить за местом, нажмите «Следить» на его странице.';
+
+  @override
+  String get ntWatchRemoved => 'Удалено из отслеживаемых';
+
+  @override
+  String get ntWatchStop => 'Перестать следить';
+
+  @override
+  String get ntSheetAdd => 'Следить за районом';
+
+  @override
+  String get ntSheetEdit => 'Изменить район';
+
+  @override
+  String get ntMyLocation => 'Моё место';
+
+  @override
+  String get ntAddress => 'Адрес';
+
+  @override
+  String get ntAddressHint => 'Введите адрес на корейском';
+
+  @override
+  String get ntLocated => 'Определено только что';
+
+  @override
+  String get ntLocating => 'Определяем местоположение…';
+
+  @override
+  String get ntSavedCenter => 'Сохранённый центр';
+
+  @override
+  String get ntRelocate => 'Обновить';
+
+  @override
+  String get ntFind => 'Найти';
+
+  @override
+  String get ntFinding => 'Ищем адрес…';
+
+  @override
+  String get ntNothingInside => 'В этом радиусе пока нет мест';
+
+  @override
+  String get ntLocationFailed =>
+      'Не удалось определить местоположение. Введите адрес или попробуйте ещё раз.';
+
+  @override
+  String get ntRadius => 'Радиус';
+
+  @override
+  String ntCountMosque(int n) {
+    return 'Мечети: $n';
+  }
+
+  @override
+  String ntCountRestaurant(int n) {
+    return 'Рестораны: $n';
+  }
+
+  @override
+  String ntCountShop(int n) {
+    return 'Магазины: $n';
+  }
+
+  @override
+  String get ntWhich => 'Какие места?';
+
+  @override
+  String get ntPickOne => 'Выберите хотя бы один тип.';
+
+  @override
+  String get ntNote =>
+      'Вы получите сообщение, когда место откроется, закроется, сменит телефон или название, или опубликует объявление.';
+
+  @override
+  String get ntSave => 'Сохранить';
+
+  @override
+  String get ntErrAddressNotFound =>
+      'Адрес не найден. Попробуйте написать точнее, на корейском.';
+
+  @override
+  String get ntErrRateLimited =>
+      'Слишком много запросов. Попробуйте через минуту.';
+
+  @override
+  String get ntErrTooManyAreas => 'Слишком много районов. Удалите ненужные.';
+
+  @override
+  String get ntErrAreaBudget =>
+      'Ваши районы охватывают слишком большую территорию. Уменьшите или удалите один.';
+
+  @override
+  String get ntErrTooManyChanges =>
+      'Сегодня районы менялись слишком часто. Попробуйте завтра.';
+
+  @override
+  String get ntErrTooManyPreviews =>
+      'Сегодня просмотрено слишком много мест. Попробуйте завтра.';
+
+  @override
+  String get ntErrOffline =>
+      'Не удалось подключиться к интернету. Попробуйте ещё раз.';
+
+  @override
+  String get ntErrGeneric => 'Произошла ошибка. Попробуйте ещё раз.';
+
+  @override
+  String get ntWhereTitle => 'Куда приходят сообщения?';
+
+  @override
+  String get ntViaApp => 'В приложении';
+
+  @override
+  String get ntViaAppBody => 'Уведомление на телефон';
+
+  @override
+  String get ntViaBot => 'В Telegram-боте';
+
+  @override
+  String get ntViaBotBody => 'Сообщение от бота Muslim Vegukin';
+
+  @override
+  String get ntViaOne => 'Оставьте включённым хотя бы один способ.';
+
+  @override
+  String get ntAppOnly => 'Сообщения приходят в это приложение уведомлениями.';
+
+  @override
+  String get ntAppOnlyHint =>
+      'Войдите через Telegram, чтобы получать их и в боте.';
+
+  @override
+  String get ntPushOff =>
+      'Уведомления на телефоне выключены — сообщения не будут видны.';
+
+  @override
+  String get ntPushOn => 'Включить';
+
+  @override
+  String get ntStoppedPlace => 'Сообщения по этому месту отключены.';
+
+  @override
+  String get ntStoppedArea => 'Сообщения по этому району отключены.';
+
+  @override
+  String get ntUndo => 'Вернуть';
+
+  @override
+  String get ntTypeMosque => 'Мечеть';
+
+  @override
+  String get ntTypeRestaurant => 'Ресторан';
+
+  @override
+  String get ntTypeShop => 'Магазин';
+
+  @override
+  String get ntTypesMosque => 'Мечети';
+
+  @override
+  String get ntTypesRestaurant => 'Рестораны';
+
+  @override
+  String get ntTypesShop => 'Магазины';
 }

@@ -23,6 +23,7 @@ import 'package:muslim_vegukin/features/cars/cars_models.dart';
 import 'package:muslim_vegukin/features/cars/cars_source.dart';
 import 'package:muslim_vegukin/features/housing/housing_source.dart';
 import 'package:muslim_vegukin/features/jobs/jobs_source.dart';
+import 'package:muslim_vegukin/features/notifications/notify_models.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_models.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_source.dart';
 import 'package:muslim_vegukin/core/theme_controller.dart';
@@ -1410,6 +1411,71 @@ class FakePlaces implements PlacesSource {
       for (final MapEntry(:key, :value) in watches.entries)
         if (value.watching) WatchedPlace(id: key, name: byId(key).name, kind: byId(key).kind),
     ];
+  }
+
+  // Notifications: areas, how one is told, the bot reachable or not.
+  final areas = <NotifyArea>[];
+  NotifyDelivery delivery = const NotifyDelivery();
+  bool botBlocked = false;
+  int _areaId = 50;
+
+  @override
+  Future<NotifyMe> notifyMe(Map<String, String> auth) async {
+    _online('notifyMe');
+    return (areas: List.of(areas), watches: await watched(auth), delivery: delivery, botBlocked: botBlocked);
+  }
+
+  @override
+  Future<NotifyArea> saveArea(Map<String, String> auth, AreaDraft draft, {int? id, required String lang}) async {
+    _online('saveArea ${id ?? 'new'} ${draft.address ?? 'here'} ${draft.radiusKm}');
+    if (draft.address != null && !draft.address!.contains('안산')) throw const PlacesException('address_not_found', 404);
+    final area = NotifyArea(
+      id: id ?? _areaId++,
+      fromLocation: draft.address == null,
+      label: draft.address ?? draft.label,
+      lat: draft.lat ?? 37.32,
+      lon: draft.lon ?? 126.83,
+      radiusKm: draft.radiusKm,
+      types: draft.types,
+      inside: draft.radiusKm,
+    );
+    final at = areas.indexWhere((a) => a.id == id);
+    at < 0 ? areas.add(area) : areas[at] = area;
+    return area;
+  }
+
+  @override
+  Future<void> deleteArea(Map<String, String> auth, int id) async {
+    _online('deleteArea $id');
+    areas.removeWhere((a) => a.id == id);
+  }
+
+  @override
+  Future<RadiusPreview> inRadius(Map<String, String> auth, {double? lat, double? lon, String? address}) async {
+    _online('inRadius ${address ?? '$lat,$lon'}');
+    if (address != null && !address.contains('안산')) throw const PlacesException('address_not_found', 404);
+    return (
+      lat: lat ?? 37.32,
+      lon: lon ?? 126.83,
+      label: address == null ? null : '경기 안산시 단원구 $address',
+      points: [
+        (lat: 37.321, lon: 126.832, kind: PlaceKind.restaurant, km: 0.3),
+        (lat: 37.33, lon: 126.81, kind: PlaceKind.mosque, km: 2.1),
+        (lat: 37.38, lon: 126.80, kind: PlaceKind.mosque, km: 7.2),
+      ],
+    );
+  }
+
+  @override
+  Future<void> hello(Map<String, String> auth, String lang) async {
+    _online('hello');
+    botBlocked = false;
+  }
+
+  @override
+  Future<NotifyDelivery> setDelivery(Map<String, String> auth, {required bool telegram, required bool push, required String lang}) async {
+    _online('delivery $telegram $push');
+    return delivery = NotifyDelivery(telegram: telegram, push: push, canTelegram: true, bot: delivery.bot);
   }
 
   /// The web app's photo list.

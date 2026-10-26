@@ -27,9 +27,7 @@ void main() {
   _languageMenuTests();
   _newBadgeTests();
 
-  testWidgets('shows today: date, city, countdown and the day strip', (
-    tester,
-  ) async {
+  testWidgets('shows today: date, city, countdown and the day strip', (tester) async {
     await TestApp(language: 'uz').launch(tester);
 
     expect(find.text('Shanba, 17-oktabr'), findsOneWidget);
@@ -43,13 +41,8 @@ void main() {
     }
   });
 
-  testWidgets('labels sunrise as the end of Fajr, not a prayer', (
-    tester,
-  ) async {
-    await TestApp(
-      language: 'ru',
-      now: DateTime(2026, 10, 17, 6, 0),
-    ).launch(tester);
+  testWidgets('labels sunrise as the end of Fajr, not a prayer', (tester) async {
+    await TestApp(language: 'ru', now: DateTime(2026, 10, 17, 6, 0)).launch(tester);
 
     expect(find.text('ДО КОНЦА ФАДЖРА'), findsOneWidget);
     expect(find.text('Суббота, 17 октября'), findsOneWidget);
@@ -63,51 +56,41 @@ void main() {
     expect(find.text('UNTIL DHUHR'), findsOneWidget);
   });
 
-  testWidgets(
-    'refused at first launch: the card explains, its button asks again',
-    (tester) async {
-      final app = TestApp(
-        language: 'en',
-        location: FakeLocation(
-          access: LocationAccess.denied,
-          afterRequest: LocationAccess.denied,
-        ),
-      );
-      await app.launch(tester);
+  testWidgets('refused at first launch: the card explains, its button asks again', (tester) async {
+    final app = TestApp(
+      language: 'en',
+      location: FakeLocation(access: LocationAccess.denied, afterRequest: LocationAccess.denied),
+    );
+    await app.launch(tester);
 
-      // The one-time ask happened and was refused.
-      expect(app.location.requests, 1);
-      expect(find.text('Prayer times need your location'), findsOneWidget);
+    // The one-time ask happened and was refused.
+    expect(app.location.requests, 1);
+    expect(find.text('Prayer times need your location'), findsOneWidget);
 
-      app.location.afterRequest = LocationAccess.granted;
-      await tester.tap(find.text('Use my location'));
-      await tester.pumpAndSettle();
-      expect(app.location.requests, 2);
-      expect(find.text('UNTIL DHUHR'), findsOneWidget);
-    },
-  );
+    app.location.afterRequest = LocationAccess.granted;
+    await tester.tap(find.text('Use my location'));
+    await tester.pumpAndSettle();
+    expect(app.location.requests, 2);
+    expect(find.text('UNTIL DHUHR'), findsOneWidget);
+  });
 
-  testWidgets(
-    '"Alarms & reminders" is explained and opened once, after location and camera',
-    (tester) async {
-      final app = TestApp(language: 'en')
-        ..permissions.exactAlarmsMissing = true;
-      await app.launch(tester);
-      await tester.pumpAndSettle();
+  testWidgets('"Alarms & reminders" is explained and opened once, after location and camera', (tester) async {
+    final app = TestApp(language: 'en')..permissions.exactAlarmsMissing = true;
+    await app.launch(tester);
+    await tester.pumpAndSettle();
 
-      expect(find.text('Exact timing'), findsOneWidget);
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
-      expect(app.permissions.exactAlarmSettingsOpened, 1);
+    expect(find.text('Exact timing'), findsOneWidget);
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(app.permissions.exactAlarmSettingsOpened, 1);
 
-      // Back from the settings page, or the next launch: not asked again.
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      await tester.pumpAndSettle();
-      expect(find.text('Exact timing'), findsNothing);
-      expect(app.permissions.asks, 1);
-    },
-  );
+    // Back from the settings page, or the next launch: not asked again.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(find.text('Exact timing'), findsNothing);
+    expect(app.permissions.asks, 1);
+  });
 
   testWidgets('blocked location points to the app settings', (tester) async {
     await TestApp(
@@ -123,47 +106,42 @@ void main() {
     expect(find.text('5 ta biznes · 10 ta yo‘nalish'), findsOneWidget);
   });
 
-  testWidgets(
-    'in English and Russian: only what the web offers there, in its order',
-    (tester) async {
-      await TestApp(language: 'en').launch(tester);
-      expect(find.text('Business Directory'), findsNothing);
-      await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
-      await tester.pumpAndSettle();
-      const all = [
-        'Mosques',
-        'Restaurants',
-        'Shops',
-        'Notifications',
-        'Qibla',
-        'Ask the scholars',
-        'Ingredient check',
-        'Housing',
-        'Vegukin Cars',
-        'Immigration services',
-        'Jobs',
-        'Parcels',
-        'Useful links',
-        'Support us',
-        'Community',
-      ];
-      expect(tiles(tester, all), [
-        'Mosques',
-        'Restaurants',
-        'Shops',
-        'Notifications',
-        'Qibla',
-        'Ingredient check',
-        'Support us',
-        'Community',
-        'Immigration services',
-      ]);
-    },
-  );
+  testWidgets('in English and Russian: only what the web offers there, in its order', (tester) async {
+    await TestApp(language: 'en').launch(tester);
+    expect(find.text('Business Directory'), findsNothing);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    const all = [
+      'Mosques',
+      'Restaurants',
+      'Shops',
+      'Notifications',
+      'Qibla',
+      'Ask the scholars',
+      'Ingredient check',
+      'Housing',
+      'Vegukin Cars',
+      'Immigration services',
+      'Jobs',
+      'Parcels',
+      'Useful links',
+      'Support us',
+      'Community',
+    ];
+    expect(tiles(tester, all), [
+      'Mosques',
+      'Restaurants',
+      'Shops',
+      'Notifications',
+      'Qibla',
+      'Ingredient check',
+      'Support us',
+      'Community',
+      'Immigration services',
+    ]);
+  });
 
-  testWidgets('in Uzbek: every section, and the business directory', (
-    tester,
-  ) async {
+  testWidgets('in Uzbek: every section, and the business directory', (tester) async {
     await TestApp(language: 'uz').launch(tester);
     expect(find.text('Biznes Katalogi'), findsOneWidget);
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -900));
@@ -173,32 +151,23 @@ void main() {
     expect(find.text('Jamoa'), findsOneWidget);
   });
 
-  testWidgets(
-    'a section opens its page; the prayer card opens the prayers page',
-    (tester) async {
-      final app = TestApp(language: 'uz');
-      await app.launch(tester);
+  testWidgets('a section opens its page; the prayer card opens the prayers page', (tester) async {
+    final app = TestApp(language: 'uz');
+    await app.launch(tester);
 
-      await tester.tap(find.text('Masjidlar'));
-      await tester.pumpAndSettle();
-      expect(
-        find.byType(PlacesScreen),
-        findsOneWidget,
-        reason: 'native, not the web page',
-      );
-      expect(app.opened.ids, isEmpty);
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Masjidlar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PlacesScreen), findsOneWidget, reason: 'native, not the web page');
+    expect(app.opened.ids, isEmpty);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.text('PESHINGACHA'));
-      await tester.pumpAndSettle();
-      expect(find.byType(PrayersScreen), findsOneWidget);
-    },
-  );
+    await tester.tap(find.text('PESHINGACHA'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PrayersScreen), findsOneWidget);
+  });
 
-  testWidgets('the sun/moon button switches day and night, and remembers it', (
-    tester,
-  ) async {
+  testWidgets('the sun/moon button switches day and night, and remembers it', (tester) async {
     final app = TestApp(language: 'en');
     await app.launch(tester);
     BuildContext home() => tester.element(find.byType(CustomScrollView));
@@ -216,8 +185,7 @@ void main() {
   });
 
   testWidgets('home fits a small phone with very large text', (tester) async {
-    await TestApp(language: 'ru')
-        .launch(tester, screen: const Size(320, 568), textScale: 1.8);
+    await TestApp(language: 'ru').launch(tester, screen: const Size(320, 568), textScale: 1.8);
     // A layout overflow would already have failed the test.
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -2000));
     await tester.pumpAndSettle();
@@ -226,39 +194,26 @@ void main() {
 }
 
 void _languageMenuTests() {
-  testWidgets(
-    'the header’s language button opens a menu with flags; a pick changes the app at once',
-    (tester) async {
-      final app = TestApp(language: 'uz');
-      await app.launch(tester, screen: const Size(360, 780));
-      expect(
-        tester.takeException(),
-        isNull,
-        reason: 'the header fits a narrow phone',
-      );
-      await tester.tap(find.text('UZ'));
-      await tester.pumpAndSettle();
-      expect(find.text('O‘zbekcha'), findsOneWidget);
-      expect(find.text('🇷🇺'), findsOneWidget);
-      expect(find.text('English'), findsOneWidget);
-      await tester.tap(find.text('Русский'));
-      await tester.pumpAndSettle();
-      expect(app.services.locale.language, AppLanguage.ru);
-      expect(find.text('RU'), findsOneWidget);
-      expect(
-        find.text('English'),
-        findsNothing,
-        reason: 'the menu closed, no page opened',
-      );
-    },
-  );
+  testWidgets('the header’s language button opens a menu with flags; a pick changes the app at once', (tester) async {
+    final app = TestApp(language: 'uz');
+    await app.launch(tester, screen: const Size(360, 780));
+    expect(tester.takeException(), isNull, reason: 'the header fits a narrow phone');
+    await tester.tap(find.text('UZ'));
+    await tester.pumpAndSettle();
+    expect(find.text('O‘zbekcha'), findsOneWidget);
+    expect(find.text('🇷🇺'), findsOneWidget);
+    expect(find.text('English'), findsOneWidget);
+    await tester.tap(find.text('Русский'));
+    await tester.pumpAndSettle();
+    expect(app.services.locale.language, AppLanguage.ru);
+    expect(find.text('RU'), findsOneWidget);
+    expect(find.text('English'), findsNothing, reason: 'the menu closed, no page opened');
+  });
 }
 
 void _newBadgeTests() {
-  test(
-    'NEW follows the web home page: its isNew lines and the band’s badge',
-    () {
-      const page = '''
+  test('NEW follows the web home page: its isNew lines and the band’s badge', () {
+    const page = '''
       <span class="new-badge biz-band-badge">NEW</span>
       <script>
     const FEATURE_CARDS = {
@@ -268,33 +223,24 @@ void _newBadgeTests() {
       jobs: { icon: '💼', href: 'x' }, // isNew: true
       business: { icon: '🏬', href: 'x', isBand: true }
     };''';
-      expect(parseNewBadges(page), {'cars', 'business'});
-      expect(
-        parseNewBadges(
-          page.replaceFirst(
-            '<span class="new-badge biz-band-badge">NEW</span>',
-            '<!-- <span class="new-badge biz-band-badge">NEW</span> -->',
-          ),
+    expect(parseNewBadges(page), {'cars', 'business'});
+    expect(
+      parseNewBadges(
+        page.replaceFirst(
+          '<span class="new-badge biz-band-badge">NEW</span>',
+          '<!-- <span class="new-badge biz-band-badge">NEW</span> -->',
         ),
-        {'cars'},
-      );
-      expect(parseNewBadges('<html>nothing</html>'), isNull);
-    },
-  );
+      ),
+      {'cars'},
+    );
+    expect(parseNewBadges('<html>nothing</html>'), isNull);
+  });
 
-  testWidgets(
-    'the home screen takes its NEW marks from the web page, and keeps them',
-    (tester) async {
-      final app = TestApp(language: 'uz')
-        ..homePage =
-            'const FEATURE_CARDS = {\n  qibla: { icon: "x", isNew: true },\n  cars: { icon: "x" },\n};';
-      await app.launch(tester);
-      expect(
-        find.text('YANGI'),
-        findsOneWidget,
-        reason: 'only Qibla now; the band lost its badge too',
-      );
-      expect(app.store.read('new_badges'), 'qibla');
-    },
-  );
+  testWidgets('the home screen takes its NEW marks from the web page, and keeps them', (tester) async {
+    final app = TestApp(language: 'uz')
+      ..homePage = 'const FEATURE_CARDS = {\n  qibla: { icon: "x", isNew: true },\n  cars: { icon: "x" },\n};';
+    await app.launch(tester);
+    expect(find.text('YANGI'), findsOneWidget, reason: 'only Qibla now; the band lost its badge too');
+    expect(app.store.read('new_badges'), 'qibla');
+  });
 }

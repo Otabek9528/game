@@ -4464,4 +4464,278 @@ class AppLocalizationsEn extends AppLocalizations {
   String homeVisitsToday(String count) {
     return 'Today’s visits: $count';
   }
+
+  @override
+  String get ntTitle => 'Notifications';
+
+  @override
+  String get ntLoadError => 'Couldn’t load your subscriptions.';
+
+  @override
+  String get ntRetry => 'Try again';
+
+  @override
+  String get ntHelloSent => 'A test message is on its way. Check the bot.';
+
+  @override
+  String get ntBlocked =>
+      'The bot can’t message you, so nothing reaches you in Telegram. Open the bot, tap “Start”, then check.';
+
+  @override
+  String get ntOpenBot => 'Open the bot';
+
+  @override
+  String get ntCheck => 'Check';
+
+  @override
+  String get ntEmptyTitle => 'Don’t miss a thing';
+
+  @override
+  String get ntEmptyBody => 'Be the first to know about changes.';
+
+  @override
+  String get ntEmptyAreaTitle => 'Watch an area';
+
+  @override
+  String get ntEmptyAreaBody =>
+      'When places open, close or change around an address or your location';
+
+  @override
+  String get ntEmptyPlaceTitle => 'Watch a place';
+
+  @override
+  String get ntEmptyPlaceBody => 'Tap “Watch” on any place’s page';
+
+  @override
+  String get ntWhenTitle => 'When do messages arrive?';
+
+  @override
+  String get ntWhenNew => 'A new place opens';
+
+  @override
+  String get ntWhenClosed => 'A place closes';
+
+  @override
+  String get ntWhenPhone => 'Phone number changes';
+
+  @override
+  String get ntWhenName => 'Name changes';
+
+  @override
+  String get ntWhenOwner => 'The owner posts news';
+
+  @override
+  String get ntWhenMosque => 'A mosque posts news';
+
+  @override
+  String get ntAreasTitle => 'Areas';
+
+  @override
+  String get ntAreasAdd => 'Add area';
+
+  @override
+  String get ntCurrentLocation => 'My current location';
+
+  @override
+  String ntRadiusKm(int km) {
+    return '$km km radius';
+  }
+
+  @override
+  String get ntFromLocation => 'From my location';
+
+  @override
+  String ntInside(int n) {
+    return '$n places now';
+  }
+
+  @override
+  String get ntEdit => 'Edit';
+
+  @override
+  String get ntDelete => 'Delete';
+
+  @override
+  String get ntDeleteConfirm => 'Stop messages for this area?';
+
+  @override
+  String get ntAreaSaved => 'Area saved';
+
+  @override
+  String get ntAreaUpdated => 'Area updated';
+
+  @override
+  String get ntAreaDeleted => 'Area deleted';
+
+  @override
+  String get ntWatchTitle => 'Watched places';
+
+  @override
+  String get ntWatchHint => 'To watch a place, tap “Watch” on its page.';
+
+  @override
+  String get ntWatchRemoved => 'Removed from watched places';
+
+  @override
+  String get ntWatchStop => 'Stop watching';
+
+  @override
+  String get ntSheetAdd => 'Watch an area';
+
+  @override
+  String get ntSheetEdit => 'Edit area';
+
+  @override
+  String get ntMyLocation => 'My location';
+
+  @override
+  String get ntAddress => 'Address';
+
+  @override
+  String get ntAddressHint => 'Enter the address in Korean';
+
+  @override
+  String get ntLocated => 'Located just now';
+
+  @override
+  String get ntLocating => 'Finding your location…';
+
+  @override
+  String get ntSavedCenter => 'Saved centre';
+
+  @override
+  String get ntRelocate => 'Update';
+
+  @override
+  String get ntFind => 'Find';
+
+  @override
+  String get ntFinding => 'Looking up the address…';
+
+  @override
+  String get ntNothingInside => 'No places in this radius yet';
+
+  @override
+  String get ntLocationFailed =>
+      'Couldn’t get your location. Enter an address or try again.';
+
+  @override
+  String get ntRadius => 'Radius';
+
+  @override
+  String ntCountMosque(int n) {
+    return 'Mosques: $n';
+  }
+
+  @override
+  String ntCountRestaurant(int n) {
+    return 'Restaurants: $n';
+  }
+
+  @override
+  String ntCountShop(int n) {
+    return 'Shops: $n';
+  }
+
+  @override
+  String get ntWhich => 'Which places?';
+
+  @override
+  String get ntPickOne => 'Choose at least one type.';
+
+  @override
+  String get ntNote =>
+      'You’ll hear when a place opens, closes, changes its phone or name, or posts news.';
+
+  @override
+  String get ntSave => 'Save';
+
+  @override
+  String get ntErrAddressNotFound =>
+      'That address wasn’t found. Try writing it more precisely, in Korean.';
+
+  @override
+  String get ntErrRateLimited =>
+      'Too many requests. Please try again in a minute.';
+
+  @override
+  String get ntErrTooManyAreas =>
+      'Too many areas. Delete the ones you don’t need.';
+
+  @override
+  String get ntErrAreaBudget =>
+      'Your areas cover too much ground. Make one smaller or delete one.';
+
+  @override
+  String get ntErrTooManyChanges =>
+      'Too many area changes today. Try again tomorrow.';
+
+  @override
+  String get ntErrTooManyPreviews =>
+      'Too many different places looked at today. Try again tomorrow.';
+
+  @override
+  String get ntErrOffline => 'Couldn’t connect. Please try again.';
+
+  @override
+  String get ntErrGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get ntWhereTitle => 'Where do messages arrive?';
+
+  @override
+  String get ntViaApp => 'In the app';
+
+  @override
+  String get ntViaAppBody => 'A notification on your phone';
+
+  @override
+  String get ntViaBot => 'In the Telegram bot';
+
+  @override
+  String get ntViaBotBody => 'A message from the Muslim Vegukin bot';
+
+  @override
+  String get ntViaOne => 'Keep at least one on.';
+
+  @override
+  String get ntAppOnly => 'Messages arrive in this app as notifications.';
+
+  @override
+  String get ntAppOnlyHint =>
+      'Sign in with Telegram to get them in the bot too.';
+
+  @override
+  String get ntPushOff =>
+      'Notifications are off on this phone — you won’t see the messages.';
+
+  @override
+  String get ntPushOn => 'Turn on';
+
+  @override
+  String get ntStoppedPlace => 'Messages for this place are off.';
+
+  @override
+  String get ntStoppedArea => 'Messages for this area are off.';
+
+  @override
+  String get ntUndo => 'Undo';
+
+  @override
+  String get ntTypeMosque => 'Mosque';
+
+  @override
+  String get ntTypeRestaurant => 'Restaurant';
+
+  @override
+  String get ntTypeShop => 'Shop';
+
+  @override
+  String get ntTypesMosque => 'Mosques';
+
+  @override
+  String get ntTypesRestaurant => 'Restaurants';
+
+  @override
+  String get ntTypesShop => 'Shops';
 }

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../../core/config.dart';
+import '../notifications/notify_models.dart';
 import 'places_models.dart';
 
 /// Places near an address the server found.
@@ -46,6 +47,24 @@ abstract interface class PlacesSource {
   Future<void> claim(Map<String, String> auth, int id, String lang);
 
   Future<List<WatchedPlace>> watched(Map<String, String> auth);
+
+  /// One's areas, watched places and how one is told.
+  Future<NotifyMe> notifyMe(Map<String, String> auth);
+
+  /// A new area, or area [id] changed. `address_not_found`, `area_budget`,
+  /// `too_many_areas`, `too_many_changes`, `rate_limited` when not.
+  Future<NotifyArea> saveArea(Map<String, String> auth, AreaDraft draft, {int? id, required String lang});
+
+  Future<void> deleteArea(Map<String, String> auth, int id);
+
+  /// The places within 10 km of a point or of an address.
+  Future<RadiusPreview> inRadius(Map<String, String> auth, {double? lat, double? lon, String? address});
+
+  /// The bot's test message, and the person switched back on.
+  Future<void> hello(Map<String, String> auth, String lang);
+
+  /// A Telegram account's choice: the bot, the app, or both.
+  Future<NotifyDelivery> setDelivery(Map<String, String> auth, {required bool telegram, required bool push, required String lang});
 
   /// The web app's photo list: folder → ["ext:hash", ...] by number; empty
   /// when the site has none (the main site doesn't: it answers a missing
@@ -141,6 +160,45 @@ class HttpPlacesSource implements PlacesSource {
     final json = _check(await _send('GET', 'api/notify/me', headers: auth));
     return [for (final w in (json['watches'] as List?) ?? const []) ?WatchedPlace.fromJson(w)];
   }
+
+  @override
+  Future<NotifyMe> notifyMe(Map<String, String> auth) async =>
+      notifyMeFromJson(_check(await _send('GET', 'api/notify/me', headers: auth)));
+
+  @override
+  Future<NotifyArea> saveArea(Map<String, String> auth, AreaDraft draft, {int? id, required String lang}) async {
+    final body = {
+      'source': draft.address == null ? 'location' : 'address',
+      if (draft.address != null) 'address': draft.address,
+      if (draft.address == null) ...{'lat': draft.lat, 'lon': draft.lon, 'label': draft.label},
+      'radiusKm': draft.radiusKm,
+      'types': [for (final k in PlaceKind.values) if (draft.types.contains(k)) k.key],
+      'lang': lang,
+    };
+    final json = _check(await _send(id == null ? 'POST' : 'PUT', id == null ? 'api/notify/areas' : 'api/notify/areas/$id',
+        headers: auth, body: body));
+    return NotifyArea.fromJson(json['area']) ?? (throw const PlacesException('bad_response'));
+  }
+
+  @override
+  Future<void> deleteArea(Map<String, String> auth, int id) async =>
+      _check(await _send('DELETE', 'api/notify/areas/$id', headers: auth));
+
+  @override
+  Future<RadiusPreview> inRadius(Map<String, String> auth, {double? lat, double? lon, String? address}) async {
+    final json = _check(await _send('GET', 'api/places/in-radius',
+        headers: auth, query: address != null ? {'address': address} : {'lat': '$lat', 'lon': '$lon'}));
+    return radiusPreviewFromJson(json) ?? (throw const PlacesException('bad_response'));
+  }
+
+  @override
+  Future<void> hello(Map<String, String> auth, String lang) async =>
+      _check(await _send('POST', 'api/notify/hello', headers: auth, body: {'lang': lang}));
+
+  @override
+  Future<NotifyDelivery> setDelivery(Map<String, String> auth, {required bool telegram, required bool push, required String lang}) async =>
+      NotifyDelivery.fromJson(_check(await _send('PUT', 'api/notify/delivery',
+          headers: auth, body: {'telegram': telegram, 'push': push, 'lang': lang}))['delivery']);
 
   @override
   Future<Map<String, List<String>>> photoManifest() async {

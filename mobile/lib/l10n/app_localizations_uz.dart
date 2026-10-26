@@ -4401,4 +4401,281 @@ class AppLocalizationsUz extends AppLocalizations {
   String homeVisitsToday(String count) {
     return 'Bugungi tashriflar: $count';
   }
+
+  @override
+  String get ntTitle => 'Bildirishnomalar';
+
+  @override
+  String get ntLoadError => 'Obunalaringizni yuklab bo‘lmadi.';
+
+  @override
+  String get ntRetry => 'Qayta urinish';
+
+  @override
+  String get ntHelloSent => 'Sinov xabari yuborildi. Botni tekshiring.';
+
+  @override
+  String get ntBlocked =>
+      'Bot sizga xabar yubora olmayapti, shuning uchun Telegramda xabar kelmaydi. Botni ochib, «Start» tugmasini bosing, so‘ng tekshiring.';
+
+  @override
+  String get ntOpenBot => 'Botni ochish';
+
+  @override
+  String get ntCheck => 'Tekshirish';
+
+  @override
+  String get ntEmptyTitle => 'Hech narsani o‘tkazib yubormang';
+
+  @override
+  String get ntEmptyBody => 'O‘zgarishlarni birinchilardan bo‘lib biling.';
+
+  @override
+  String get ntEmptyAreaTitle => 'Hududni kuzatish';
+
+  @override
+  String get ntEmptyAreaBody =>
+      'Manzil yoki joylashuvingiz atrofida yangi joy ochilsa, yopilsa yoki o‘zgarsa';
+
+  @override
+  String get ntEmptyPlaceTitle => 'Joyni kuzatish';
+
+  @override
+  String get ntEmptyPlaceBody =>
+      'Istalgan joy sahifasida «Kuzatish» tugmasini bosing';
+
+  @override
+  String get ntWhenTitle => 'Qachon xabar keladi?';
+
+  @override
+  String get ntWhenNew => 'Yangi joy ochilsa';
+
+  @override
+  String get ntWhenClosed => 'Joy yopilsa';
+
+  @override
+  String get ntWhenPhone => 'Telefon o‘zgarsa';
+
+  @override
+  String get ntWhenName => 'Nomi o‘zgarsa';
+
+  @override
+  String get ntWhenOwner => 'Joy egasi e’lon bersa';
+
+  @override
+  String get ntWhenMosque => 'Masjid e’lon bersa';
+
+  @override
+  String get ntAreasTitle => 'Hududlar';
+
+  @override
+  String get ntAreasAdd => 'Hudud qo‘shish';
+
+  @override
+  String get ntCurrentLocation => 'Joriy joylashuvim';
+
+  @override
+  String ntRadiusKm(int km) {
+    return '$km km radius';
+  }
+
+  @override
+  String get ntFromLocation => 'Joylashuvimdan';
+
+  @override
+  String ntInside(int n) {
+    return 'hozir $n ta joy';
+  }
+
+  @override
+  String get ntEdit => 'Tahrirlash';
+
+  @override
+  String get ntDelete => 'O‘chirish';
+
+  @override
+  String get ntDeleteConfirm => 'Bu hudud bo‘yicha xabarlar to‘xtatilsinmi?';
+
+  @override
+  String get ntAreaSaved => 'Hudud saqlandi';
+
+  @override
+  String get ntAreaUpdated => 'Hudud yangilandi';
+
+  @override
+  String get ntAreaDeleted => 'Hudud o‘chirildi';
+
+  @override
+  String get ntWatchTitle => 'Kuzatuvdagi joylar';
+
+  @override
+  String get ntWatchHint =>
+      'Joyni kuzatish uchun uning sahifasidagi «Kuzatish» tugmasini bosing.';
+
+  @override
+  String get ntWatchRemoved => 'Kuzatuvdan olib tashlandi';
+
+  @override
+  String get ntWatchStop => 'Kuzatishni to‘xtatish';
+
+  @override
+  String get ntSheetAdd => 'Hududni kuzatish';
+
+  @override
+  String get ntSheetEdit => 'Hududni tahrirlash';
+
+  @override
+  String get ntMyLocation => 'Joylashuvim';
+
+  @override
+  String get ntAddress => 'Manzil';
+
+  @override
+  String get ntAddressHint => 'Manzilni koreys tilida kiriting';
+
+  @override
+  String get ntLocated => 'Hozirgina aniqlandi';
+
+  @override
+  String get ntLocating => 'Joylashuv aniqlanmoqda…';
+
+  @override
+  String get ntSavedCenter => 'Saqlangan markaz';
+
+  @override
+  String get ntRelocate => 'Qayta aniqlash';
+
+  @override
+  String get ntFind => 'Topish';
+
+  @override
+  String get ntFinding => 'Manzil qidirilmoqda…';
+
+  @override
+  String get ntNothingInside => 'Bu radiusda hozircha joy yo‘q';
+
+  @override
+  String get ntLocationFailed =>
+      'Joylashuvni aniqlab bo‘lmadi. Manzilni kiriting yoki qayta urinib ko‘ring.';
+
+  @override
+  String get ntRadius => 'Radius';
+
+  @override
+  String ntCountMosque(int n) {
+    return '$n masjid';
+  }
+
+  @override
+  String ntCountRestaurant(int n) {
+    return '$n oshxona';
+  }
+
+  @override
+  String ntCountShop(int n) {
+    return '$n do‘kon';
+  }
+
+  @override
+  String get ntWhich => 'Qaysi joylar?';
+
+  @override
+  String get ntPickOne => 'Kamida bitta turni tanlang.';
+
+  @override
+  String get ntNote =>
+      'Yangi joy ochilsa, yopilsa, telefon raqami yoki nomi o‘zgarsa va e’lon berilsa — xabar olasiz.';
+
+  @override
+  String get ntSave => 'Saqlash';
+
+  @override
+  String get ntErrAddressNotFound =>
+      'Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.';
+
+  @override
+  String get ntErrRateLimited =>
+      'So‘rovlar juda ko‘p. Bir daqiqadan so‘ng urinib ko‘ring.';
+
+  @override
+  String get ntErrTooManyAreas =>
+      'Hududlar juda ko‘p. Keraksizlarini o‘chiring.';
+
+  @override
+  String get ntErrAreaBudget =>
+      'Hududlaringiz juda katta joyni qamrab oldi. Birini kichraytiring yoki o‘chiring.';
+
+  @override
+  String get ntErrTooManyChanges =>
+      'Bugun hududlar ko‘p o‘zgartirildi. Ertaga urinib ko‘ring.';
+
+  @override
+  String get ntErrTooManyPreviews =>
+      'Bugun juda ko‘p joy ko‘rib chiqildi. Ertaga urinib ko‘ring.';
+
+  @override
+  String get ntErrOffline =>
+      'Internetga ulanib bo‘lmadi. Qayta urinib ko‘ring.';
+
+  @override
+  String get ntErrGeneric => 'Xatolik yuz berdi. Qayta urinib ko‘ring.';
+
+  @override
+  String get ntWhereTitle => 'Xabarlar qayerga keladi?';
+
+  @override
+  String get ntViaApp => 'Ilovada';
+
+  @override
+  String get ntViaAppBody => 'Telefoningizga bildirishnoma';
+
+  @override
+  String get ntViaBot => 'Telegram botda';
+
+  @override
+  String get ntViaBotBody => 'Muslim Vegukin botidan xabar';
+
+  @override
+  String get ntViaOne => 'Kamida bittasi yoqilgan bo‘lsin.';
+
+  @override
+  String get ntAppOnly => 'Xabarlar shu ilovaga bildirishnoma bo‘lib keladi.';
+
+  @override
+  String get ntAppOnlyHint =>
+      'Telegram orqali kirsangiz, botdan ham olishingiz mumkin.';
+
+  @override
+  String get ntPushOff =>
+      'Telefonda bildirishnomalar o‘chirilgan — xabarlar ko‘rinmaydi.';
+
+  @override
+  String get ntPushOn => 'Yoqish';
+
+  @override
+  String get ntStoppedPlace => 'Bu joy bo‘yicha xabarlar to‘xtatildi.';
+
+  @override
+  String get ntStoppedArea => 'Bu hudud bo‘yicha xabarlar to‘xtatildi.';
+
+  @override
+  String get ntUndo => 'Qaytarish';
+
+  @override
+  String get ntTypeMosque => 'Masjid';
+
+  @override
+  String get ntTypeRestaurant => 'Oshxona';
+
+  @override
+  String get ntTypeShop => 'Do‘kon';
+
+  @override
+  String get ntTypesMosque => 'Masjidlar';
+
+  @override
+  String get ntTypesRestaurant => 'Oshxonalar';
+
+  @override
+  String get ntTypesShop => 'Do‘konlar';
 }

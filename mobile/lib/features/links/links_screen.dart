@@ -24,10 +24,7 @@ class LinksScreen extends StatefulWidget {
 }
 
 class _LinksScreenState extends State<LinksScreen> {
-  late final LinksController _c = LinksController(
-    store: widget.services.store,
-    script: widget.services.linksScript,
-  );
+  late final LinksController _c = LinksController(store: widget.services.store, script: widget.services.linksScript);
   final _search = TextEditingController();
   String _query = '';
   bool _locating = false;
@@ -83,10 +80,7 @@ class _LinksScreenState extends State<LinksScreen> {
                 link.title(_language),
                 style: TextStyle(fontWeight: FontWeight.w700, color: p.ink),
               ),
-              subtitle: Text(
-                link.url.replaceFirst('https://', ''),
-                style: TextStyle(color: p.inkMuted),
-              ),
+              subtitle: Text(link.url.replaceFirst('https://', ''), style: TextStyle(color: p.inkMuted)),
             ),
             const Divider(height: 8),
             for (final (value, icon, label) in [
@@ -100,12 +94,7 @@ class _LinksScreenState extends State<LinksScreen> {
               ),
             ])
               ListTile(
-                leading: Icon(
-                  icon,
-                  color: value == 'favorite' && favorite
-                      ? Brand.gold500
-                      : p.accent,
-                ),
+                leading: Icon(icon, color: value == 'favorite' && favorite ? Brand.gold500 : p.accent),
                 title: Text(label, style: TextStyle(color: p.ink)),
                 onTap: () => Navigator.pop(context, value),
               ),
@@ -123,12 +112,7 @@ class _LinksScreenState extends State<LinksScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(s.linksCopied),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          ..showSnackBar(SnackBar(content: Text(s.linksCopied), behavior: SnackBarBehavior.floating));
       case 'share':
         await _services.shareText('${link.title(_language)}\n${link.url}');
       case 'favorite':
@@ -142,9 +126,7 @@ class _LinksScreenState extends State<LinksScreen> {
     final p = VegukinPalette.of(context);
     final bottom = MediaQuery.paddingOf(context).bottom;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+      value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
         backgroundColor: p.page,
         body: ListenableBuilder(
@@ -165,11 +147,8 @@ class _LinksScreenState extends State<LinksScreen> {
               Expanded(
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(14, 14, 14, 24 + bottom),
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  children: normalizeQuery(_query).isNotEmpty
-                      ? _results(context)
-                      : _browse(context),
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  children: normalizeQuery(_query).isNotEmpty ? _results(context) : _browse(context),
                 ),
               ),
             ],
@@ -201,10 +180,7 @@ class _LinksScreenState extends State<LinksScreen> {
     return [
       Padding(
         padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
-        child: Text(
-          s.linksResults(found.length),
-          style: TextStyle(fontSize: 13, color: p.inkMuted),
-        ),
+        child: Text(s.linksResults(found.length), style: TextStyle(fontSize: 13, color: p.inkMuted)),
       ),
       for (final (kind, title) in [
         (LinkKind.job, s.linksJobs),
@@ -213,8 +189,7 @@ class _LinksScreenState extends State<LinksScreen> {
       ])
         if (found.any((l) => l.kind == kind))
           _section(context, title, [
-            for (final link in found.where((l) => l.kind == kind))
-              _row(context, link, place, highlight: _query),
+            for (final link in found.where((l) => l.kind == kind)) _row(context, link, place, highlight: _query),
           ]),
     ];
   }
@@ -224,12 +199,7 @@ class _LinksScreenState extends State<LinksScreen> {
     final favorites = _c.favorites;
     return [
       if (favorites.isNotEmpty) ...[
-        _Label(
-          icon: Icons.star_rounded,
-          text: s.linksFavorites,
-          color: Brand.gold500,
-          count: favorites.length,
-        ),
+        _Label(icon: Icons.star_rounded, text: s.linksFavorites, color: Brand.gold500, count: favorites.length),
         SizedBox(
           height: 96,
           child: ListView.separated(
@@ -260,9 +230,7 @@ class _LinksScreenState extends State<LinksScreen> {
         LinksTab.jobs => _jobs(context),
         LinksTab.life => _life(context),
         LinksTab.groups => [
-          _section(context, null, [
-            for (final link in _c.groups) _row(context, link, null),
-          ]),
+          _section(context, null, [for (final link in _c.groups) _row(context, link, null)]),
         ],
       },
       const SizedBox(height: 6),
@@ -277,9 +245,8 @@ class _LinksScreenState extends State<LinksScreen> {
     final inKorea = LinksController.inKorea(place);
     final nearest = inKorea && _c.order == JobOrder.nearest;
     final jobs = _c.jobs;
-    Widget rows(Iterable<UsefulLink> links) => _section(context, null, [
-      for (final l in links) _row(context, l, place),
-    ]);
+    Widget rows(Iterable<UsefulLink> links) =>
+        _section(context, null, [for (final l in links) _row(context, l, place)]);
 
     final header = <Widget>[
       if (inKorea)
@@ -290,23 +257,14 @@ class _LinksScreenState extends State<LinksScreen> {
               (JobOrder.regions, Icons.map_rounded, s.linksByRegion),
             ]) ...[
               ChoiceChip(
-                avatar: Icon(
-                  icon,
-                  size: 17,
-                  color: _c.order == order ? Colors.white : p.accent,
-                ),
+                avatar: Icon(icon, size: 17, color: _c.order == order ? Colors.white : p.accent),
                 label: Text(label),
                 selected: _c.order == order,
                 showCheckmark: false,
                 selectedColor: p.action,
-                labelStyle: TextStyle(
-                  color: _c.order == order ? Colors.white : p.inkSoft,
-                  fontWeight: FontWeight.w600,
-                ),
+                labelStyle: TextStyle(color: _c.order == order ? Colors.white : p.inkSoft, fontWeight: FontWeight.w600),
                 backgroundColor: p.card,
-                side: BorderSide(
-                  color: _c.order == order ? p.action : p.hairline,
-                ),
+                side: BorderSide(color: _c.order == order ? p.action : p.hairline),
                 onSelected: (_) {
                   HapticFeedback.selectionClick();
                   _c.setOrder(order);
@@ -331,8 +289,7 @@ class _LinksScreenState extends State<LinksScreen> {
     ];
 
     if (nearest) {
-      double km(UsefulLink l) =>
-          LinksController.distanceKm(l, place) ?? double.infinity;
+      double km(UsefulLink l) => LinksController.distanceKm(l, place) ?? double.infinity;
       final placed = jobs.where((l) => l.placed && l.cities.isNotEmpty).toList()
         ..sort((a, b) => km(a).compareTo(km(b)));
       final near = placed.where((l) => km(l) <= 50).toList();
@@ -342,35 +299,19 @@ class _LinksScreenState extends State<LinksScreen> {
       return [
         ...header,
         if (nationwide.isNotEmpty) ...[
-          _Label(
-            icon: Icons.public_rounded,
-            text: s.linksNationwide,
-            count: nationwide.length,
-          ),
+          _Label(icon: Icons.public_rounded, text: s.linksNationwide, count: nationwide.length),
           rows(nationwide),
         ],
         if (near.isNotEmpty) ...[
-          _Label(
-            icon: Icons.near_me_rounded,
-            text: s.linksNearby,
-            count: near.length,
-          ),
+          _Label(icon: Icons.near_me_rounded, text: s.linksNearby, count: near.length),
           rows(near),
         ],
         if (far.isNotEmpty) ...[
-          _Label(
-            icon: Icons.location_city_rounded,
-            text: s.linksFarther,
-            count: far.length,
-          ),
+          _Label(icon: Icons.location_city_rounded, text: s.linksFarther, count: far.length),
           rows(far),
         ],
         if (unknown.isNotEmpty) ...[
-          _Label(
-            icon: Icons.more_horiz_rounded,
-            text: s.linksOther,
-            count: unknown.length,
-          ),
+          _Label(icon: Icons.more_horiz_rounded, text: s.linksOther, count: unknown.length),
           rows(unknown),
         ],
       ];
@@ -379,11 +320,7 @@ class _LinksScreenState extends State<LinksScreen> {
     final regions = [
       (LinkRegion.nationwide, Icons.public_rounded, s.linksNationwide),
       (LinkRegion.capital, Icons.location_city_rounded, s.linksRegionCapital),
-      (
-        LinkRegion.chungcheong,
-        Icons.landscape_rounded,
-        s.linksRegionChungcheong,
-      ),
+      (LinkRegion.chungcheong, Icons.landscape_rounded, s.linksRegionChungcheong),
       (LinkRegion.jeolla, Icons.agriculture_rounded, s.linksRegionJeolla),
       (LinkRegion.gyeongsang, Icons.sailing_rounded, s.linksRegionGyeongsang),
       (LinkRegion.other, Icons.more_horiz_rounded, s.linksOther),
@@ -392,16 +329,10 @@ class _LinksScreenState extends State<LinksScreen> {
       ...header,
       for (final (region, icon, title) in regions)
         if (jobs.any((l) => l.region == region)) ...[
-          _Label(
-            icon: icon,
-            text: title,
-            count: jobs.where((l) => l.region == region).length,
-          ),
+          _Label(icon: icon, text: title, count: jobs.where((l) => l.region == region).length),
           rows(
-            jobs.where((l) => l.region == region).toList()..sort(
-              (a, b) =>
-                  normalizeQuery(a.name).compareTo(normalizeQuery(b.name)),
-            ),
+            jobs.where((l) => l.region == region).toList()
+              ..sort((a, b) => normalizeQuery(a.name).compareTo(normalizeQuery(b.name))),
           ),
         ],
     ];
@@ -413,11 +344,7 @@ class _LinksScreenState extends State<LinksScreen> {
       (LifeTopic.official, Icons.account_balance_rounded, s.linksTopicOfficial),
       (LifeTopic.news, Icons.newspaper_rounded, s.linksTopicNews),
       (LifeTopic.legal, Icons.gavel_rounded, s.linksTopicLegal),
-      (
-        LifeTopic.insurance,
-        Icons.health_and_safety_rounded,
-        s.linksTopicInsurance,
-      ),
+      (LifeTopic.insurance, Icons.health_and_safety_rounded, s.linksTopicInsurance),
       (LifeTopic.work, Icons.work_rounded, s.linksTopicWork),
       (LifeTopic.everyday, Icons.local_cafe_rounded, s.linksTopicEveryday),
       (LifeTopic.other, Icons.more_horiz_rounded, s.linksOther),
@@ -426,15 +353,8 @@ class _LinksScreenState extends State<LinksScreen> {
     return [
       for (final (t, icon, title) in topics)
         if (_c.life.any((l) => topic(l) == t)) ...[
-          _Label(
-            icon: icon,
-            text: title,
-            count: _c.life.where((l) => topic(l) == t).length,
-          ),
-          _section(context, null, [
-            for (final link in _c.life.where((l) => topic(l) == t))
-              _row(context, link, null),
-          ]),
+          _Label(icon: icon, text: title, count: _c.life.where((l) => topic(l) == t).length),
+          _section(context, null, [for (final link in _c.life.where((l) => topic(l) == t)) _row(context, link, null)]),
         ],
     ];
   }
@@ -468,12 +388,7 @@ class _LinksScreenState extends State<LinksScreen> {
     );
   }
 
-  Widget _row(
-    BuildContext context,
-    UsefulLink link,
-    SavedLocation? place, {
-    String highlight = '',
-  }) {
+  Widget _row(BuildContext context, UsefulLink link, SavedLocation? place, {String highlight = ''}) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final km = LinksController.distanceKm(link, place);
@@ -510,12 +425,7 @@ class _LinksScreenState extends State<LinksScreen> {
                     _highlighted(link.title(_language), highlight, p),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      height: 1.3,
-                      fontWeight: FontWeight.w700,
-                      color: p.ink,
-                    ),
+                    style: TextStyle(fontSize: 15.5, height: 1.3, fontWeight: FontWeight.w700, color: p.ink),
                   ),
                   if (subtitle.isNotEmpty) ...[
                     const SizedBox(height: 2),
@@ -539,9 +449,7 @@ class _LinksScreenState extends State<LinksScreen> {
               icon: Icon(
                 favorite ? Icons.star_rounded : Icons.star_border_rounded,
                 size: 22,
-                color: favorite
-                    ? Brand.gold500
-                    : p.inkMuted.withValues(alpha: 0.6),
+                color: favorite ? Brand.gold500 : p.inkMuted.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -569,11 +477,7 @@ class _LinksScreenState extends State<LinksScreen> {
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero({
-    required this.title,
-    required this.subtitle,
-    required this.search,
-  });
+  const _Hero({required this.title, required this.subtitle, required this.search});
 
   final String title;
   final String subtitle;
@@ -584,11 +488,7 @@ class _Hero extends StatelessWidget {
     final p = VegukinPalette.of(context);
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: p.hero.sublist(1),
-        ),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero.sublist(1)),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
       ),
       child: SafeArea(
@@ -603,12 +503,8 @@ class _Hero extends StatelessWidget {
                   const SizedBox(width: 4),
                   IconButton(
                     onPressed: () => Navigator.maybePop(context),
-                    tooltip: MaterialLocalizations.of(context)
-                        .backButtonTooltip,
-                    icon: const Icon(
-                      Icons.arrow_back_rounded,
-                      color: Colors.white,
-                    ),
+                    tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                   ),
                   Expanded(
                     child: Column(
@@ -626,23 +522,14 @@ class _Hero extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          subtitle,
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            color: Colors.white70,
-                          ),
-                        ),
+                        Text(subtitle, style: const TextStyle(fontSize: 12.5, color: Colors.white70)),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 2, 14, 16),
-              child: search,
-            ),
+            Padding(padding: const EdgeInsets.fromLTRB(14, 2, 14, 16), child: search),
           ],
         ),
       ),
@@ -651,12 +538,7 @@ class _Hero extends StatelessWidget {
 }
 
 class _SearchBox extends StatelessWidget {
-  const _SearchBox({
-    required this.controller,
-    required this.hint,
-    required this.onChanged,
-    required this.onClear,
-  });
+  const _SearchBox({required this.controller, required this.hint, required this.onChanged, required this.onClear});
 
   final TextEditingController controller;
   final String hint;
@@ -688,10 +570,7 @@ class _SearchBox extends StatelessWidget {
           fillColor: p.card,
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(vertical: 13),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
         ),
       ),
     );
@@ -700,12 +579,7 @@ class _SearchBox extends StatelessWidget {
 
 /// Jobs, Korea life, groups.
 class _Tabs extends StatelessWidget {
-  const _Tabs({
-    required this.tab,
-    required this.labels,
-    required this.counts,
-    required this.onChanged,
-  });
+  const _Tabs({required this.tab, required this.labels, required this.counts, required this.onChanged});
 
   final LinksTab tab;
   final List<String> labels;
@@ -778,30 +652,18 @@ class _Label extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
       child: Row(
         children: [
-          if (icon != null) ...[
-            Icon(icon, size: 17, color: color ?? p.gold),
-            const SizedBox(width: 6),
-          ],
+          if (icon != null) ...[Icon(icon, size: 17, color: color ?? p.gold), const SizedBox(width: 6)],
           Flexible(
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.2,
-                color: p.inkSoft,
-              ),
+              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, letterSpacing: 0.2, color: p.inkSoft),
             ),
           ),
           if (count != null) ...[
             const SizedBox(width: 6),
             Text(
               '$count',
-              style: TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: p.inkMuted,
-              ),
+              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.inkMuted),
             ),
           ],
         ],
@@ -843,12 +705,7 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    final colors =
-        _colors[link.url.codeUnits.fold<int>(
-              0,
-              (h, c) => (h * 31 + c) & 0x7fffffff,
-            ) %
-            _colors.length];
+    final colors = _colors[link.url.codeUnits.fold<int>(0, (h, c) => (h * 31 + c) & 0x7fffffff) % _colors.length];
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -858,20 +715,12 @@ class _Badge extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: colors,
-            ),
+            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: colors),
           ),
           child: Text(
             initials(link.name),
             textScaler: TextScaler.noScaling,
-            style: TextStyle(
-              fontSize: size * 0.36,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
+            style: TextStyle(fontSize: size * 0.36, fontWeight: FontWeight.w700, color: Colors.white),
           ),
         ),
         if (link.isBot)
@@ -881,11 +730,7 @@ class _Badge extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(2.5),
               decoration: BoxDecoration(color: p.card, shape: BoxShape.circle),
-              child: const Icon(
-                Icons.smart_toy_rounded,
-                size: 14,
-                color: Brand.gold500,
-              ),
+              child: const Icon(Icons.smart_toy_rounded, size: 14, color: Brand.gold500),
             ),
           ),
       ],
@@ -901,17 +746,12 @@ class _Distance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    final text = km < 1
-        ? '<1 km'
-        : '${km < 100 ? km.round() : (km / 10).round() * 10} km';
+    final text = km < 1 ? '<1 km' : '${km < 100 ? km.round() : (km / 10).round() * 10} km';
     final near = km <= 50;
     return Container(
       margin: const EdgeInsets.only(left: 6),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: near ? p.cardSelected : p.page,
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: BoxDecoration(color: near ? p.cardSelected : p.page, borderRadius: BorderRadius.circular(999)),
       child: Text(
         text,
         style: TextStyle(
@@ -926,12 +766,7 @@ class _Distance extends StatelessWidget {
 }
 
 class _FavoriteChip extends StatelessWidget {
-  const _FavoriteChip({
-    required this.link,
-    required this.title,
-    required this.onTap,
-    required this.onLongPress,
-  });
+  const _FavoriteChip({required this.link, required this.title, required this.onTap, required this.onLongPress});
 
   final UsefulLink link;
   final String title;
@@ -967,12 +802,7 @@ class _FavoriteChip extends StatelessWidget {
                 maxLines: 2,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  height: 1.2,
-                  fontWeight: FontWeight.w600,
-                  color: p.ink,
-                ),
+                style: TextStyle(fontSize: 11.5, height: 1.2, fontWeight: FontWeight.w600, color: p.ink),
               ),
             ],
           ),
@@ -1005,10 +835,7 @@ class _LocateCard extends StatelessWidget {
           Icon(Icons.near_me_rounded, color: p.accent),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              s.linksLocate,
-              style: TextStyle(fontSize: 13.5, height: 1.35, color: p.inkSoft),
-            ),
+            child: Text(s.linksLocate, style: TextStyle(fontSize: 13.5, height: 1.35, color: p.inkSoft)),
           ),
           const SizedBox(width: 6),
           busy
@@ -1016,10 +843,7 @@ class _LocateCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: SizedBox.square(
                     dimension: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.4,
-                      color: p.accent,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2.4, color: p.accent),
                   ),
                 )
               : TextButton(
@@ -1064,17 +888,10 @@ class _Suggest extends StatelessWidget {
                   children: [
                     Text(
                       s.linksSuggestTitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: p.ink,
-                      ),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      s.linksSuggestBody,
-                      style: TextStyle(fontSize: 13, color: p.inkSoft),
-                    ),
+                    Text(s.linksSuggestBody, style: TextStyle(fontSize: 13, color: p.inkSoft)),
                   ],
                 ),
               ),

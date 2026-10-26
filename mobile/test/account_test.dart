@@ -13,6 +13,8 @@ import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 
 import 'package:muslim_vegukin/features/places/place_detail.dart';
 
+import 'package:muslim_vegukin/features/notifications/notifications_screen.dart';
+
 import 'support/fakes.dart';
 
 AccountController controller(MemoryStore store, FakeAccounts accounts, {FakePush? push, AppLanguage language = AppLanguage.uz}) =>
@@ -178,7 +180,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Kebab House\nNow open'), findsOneWidget);
       await tester.tap(find.text('Open'));
-      expect(app.opened.ids.last, 'notifications');
+      await tester.pumpAndSettle();
+      expect(find.byType(NotificationsScreen), findsOneWidget, reason: 'native now');
     });
 
     test('which page a notification opens', () {

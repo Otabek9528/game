@@ -35,11 +35,7 @@ class SupportHero extends StatelessWidget {
     final p = VegukinPalette.of(context);
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: p.hero.sublist(1),
-        ),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero.sublist(1)),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(26)),
       ),
       child: SafeArea(
@@ -53,12 +49,8 @@ class SupportHero extends StatelessWidget {
                   const SizedBox(width: 4),
                   IconButton(
                     onPressed: () => Navigator.maybePop(context),
-                    tooltip: MaterialLocalizations.of(context)
-                        .backButtonTooltip,
-                    icon: const Icon(
-                      Icons.arrow_back_rounded,
-                      color: Colors.white,
-                    ),
+                    tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                   ),
                   Expanded(
                     child: Text(
@@ -98,18 +90,8 @@ class SupportHero extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 3),
-                          Text(
-                            subtitle,
-                            style: const TextStyle(
-                              fontSize: 13.5,
-                              height: 1.35,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          if (below != null) ...[
-                            const SizedBox(height: 10),
-                            below!,
-                          ],
+                          Text(subtitle, style: const TextStyle(fontSize: 13.5, height: 1.35, color: Colors.white70)),
+                          if (below != null) ...[const SizedBox(height: 10), below!],
                         ],
                       ),
                     ),
@@ -137,11 +119,7 @@ class SupportHero extends StatelessWidget {
                     Text(
                       subtitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        height: 1.35,
-                        color: Colors.white70,
-                      ),
+                      style: const TextStyle(fontSize: 14, height: 1.35, color: Colors.white70),
                     ),
                     if (below != null) ...[const SizedBox(height: 16), below!],
                   ],
@@ -167,10 +145,7 @@ class HeroMark extends StatelessWidget {
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       color: Colors.white.withValues(alpha: 0.14),
-      border: Border.all(
-        color: Colors.white.withValues(alpha: 0.35),
-        width: 1.5,
-      ),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.5),
     ),
     child: Center(child: child),
   );
@@ -178,13 +153,7 @@ class HeroMark extends StatelessWidget {
 
 /// A white card with a hairline edge.
 class SupportCard extends StatelessWidget {
-  const SupportCard({
-    super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(16),
-    this.color,
-    this.edge,
-  });
+  const SupportCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.color, this.edge});
 
   final Widget child;
   final EdgeInsets padding;
@@ -219,11 +188,7 @@ class SupportLabel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(4, 18, 4, 10),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w800,
-          color: p.ink,
-        ),
+        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink),
       ),
     );
   }
@@ -231,14 +196,7 @@ class SupportLabel extends StatelessWidget {
 
 /// A row with an icon tile, a bold title and a line under it.
 class IconLine extends StatelessWidget {
-  const IconLine({
-    super.key,
-    required this.icon,
-    required this.title,
-    this.body = '',
-    this.tint,
-    this.trailing,
-  });
+  const IconLine({super.key, required this.icon, required this.title, this.body = '', this.tint, this.trailing});
 
   final IconData icon;
   final String title;
@@ -256,10 +214,7 @@ class IconLine extends StatelessWidget {
         Container(
           width: 38,
           height: 38,
-          decoration: BoxDecoration(
-            color: colour.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(12),
-          ),
+          decoration: BoxDecoration(color: colour.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
           child: Icon(icon, size: 20, color: colour),
         ),
         const SizedBox(width: 12),
@@ -270,23 +225,11 @@ class IconLine extends StatelessWidget {
               const SizedBox(height: 1),
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 14.5,
-                  height: 1.3,
-                  fontWeight: FontWeight.w700,
-                  color: p.ink,
-                ),
+                style: TextStyle(fontSize: 14.5, height: 1.3, fontWeight: FontWeight.w700, color: p.ink),
               ),
               if (body.isNotEmpty) ...[
                 const SizedBox(height: 2),
-                Text(
-                  body,
-                  style: TextStyle(
-                    fontSize: 13,
-                    height: 1.35,
-                    color: p.inkSoft,
-                  ),
-                ),
+                Text(body, style: TextStyle(fontSize: 13, height: 1.35, color: p.inkSoft)),
               ],
             ],
           ),
@@ -298,17 +241,11 @@ class IconLine extends StatelessWidget {
 }
 
 /// Copies [text], with a buzz and a short note.
-Future<void> copyWithNote(
-  BuildContext context,
-  String text,
-  String note,
-) async {
+Future<void> copyWithNote(BuildContext context, String text, String note) async {
   await Clipboard.setData(ClipboardData(text: text));
   HapticFeedback.mediumImpact();
   if (!context.mounted) return;
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(content: Text(note), behavior: SnackBarBehavior.floating),
-    );
+    ..showSnackBar(SnackBar(content: Text(note), behavior: SnackBarBehavior.floating));
 }

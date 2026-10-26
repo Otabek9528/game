@@ -7881,6 +7881,510 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Bugungi tashriflar: {count}'**
   String homeVisitsToday(String count);
+
+  /// No description provided for @ntTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar'**
+  String get ntTitle;
+
+  /// No description provided for @ntLoadError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Obunalaringizni yuklab bo‘lmadi.'**
+  String get ntLoadError;
+
+  /// No description provided for @ntRetry.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta urinish'**
+  String get ntRetry;
+
+  /// No description provided for @ntHelloSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sinov xabari yuborildi. Botni tekshiring.'**
+  String get ntHelloSent;
+
+  /// No description provided for @ntBlocked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot sizga xabar yubora olmayapti, shuning uchun Telegramda xabar kelmaydi. Botni ochib, «Start» tugmasini bosing, so‘ng tekshiring.'**
+  String get ntBlocked;
+
+  /// No description provided for @ntOpenBot.
+  ///
+  /// In uz, this message translates to:
+  /// **'Botni ochish'**
+  String get ntOpenBot;
+
+  /// No description provided for @ntCheck.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tekshirish'**
+  String get ntCheck;
+
+  /// No description provided for @ntEmptyTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hech narsani o‘tkazib yubormang'**
+  String get ntEmptyTitle;
+
+  /// No description provided for @ntEmptyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘zgarishlarni birinchilardan bo‘lib biling.'**
+  String get ntEmptyBody;
+
+  /// No description provided for @ntEmptyAreaTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hududni kuzatish'**
+  String get ntEmptyAreaTitle;
+
+  /// No description provided for @ntEmptyAreaBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil yoki joylashuvingiz atrofida yangi joy ochilsa, yopilsa yoki o‘zgarsa'**
+  String get ntEmptyAreaBody;
+
+  /// No description provided for @ntEmptyPlaceTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joyni kuzatish'**
+  String get ntEmptyPlaceTitle;
+
+  /// No description provided for @ntEmptyPlaceBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Istalgan joy sahifasida «Kuzatish» tugmasini bosing'**
+  String get ntEmptyPlaceBody;
+
+  /// No description provided for @ntWhenTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qachon xabar keladi?'**
+  String get ntWhenTitle;
+
+  /// No description provided for @ntWhenNew.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi joy ochilsa'**
+  String get ntWhenNew;
+
+  /// No description provided for @ntWhenClosed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joy yopilsa'**
+  String get ntWhenClosed;
+
+  /// No description provided for @ntWhenPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon o‘zgarsa'**
+  String get ntWhenPhone;
+
+  /// No description provided for @ntWhenName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Nomi o‘zgarsa'**
+  String get ntWhenName;
+
+  /// No description provided for @ntWhenOwner.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joy egasi e’lon bersa'**
+  String get ntWhenOwner;
+
+  /// No description provided for @ntWhenMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masjid e’lon bersa'**
+  String get ntWhenMosque;
+
+  /// No description provided for @ntAreasTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hududlar'**
+  String get ntAreasTitle;
+
+  /// No description provided for @ntAreasAdd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hudud qo‘shish'**
+  String get ntAreasAdd;
+
+  /// No description provided for @ntCurrentLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joriy joylashuvim'**
+  String get ntCurrentLocation;
+
+  /// No description provided for @ntRadiusKm.
+  ///
+  /// In uz, this message translates to:
+  /// **'{km} km radius'**
+  String ntRadiusKm(int km);
+
+  /// No description provided for @ntFromLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvimdan'**
+  String get ntFromLocation;
+
+  /// No description provided for @ntInside.
+  ///
+  /// In uz, this message translates to:
+  /// **'hozir {n} ta joy'**
+  String ntInside(int n);
+
+  /// No description provided for @ntEdit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tahrirlash'**
+  String get ntEdit;
+
+  /// No description provided for @ntDelete.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chirish'**
+  String get ntDelete;
+
+  /// No description provided for @ntDeleteConfirm.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu hudud bo‘yicha xabarlar to‘xtatilsinmi?'**
+  String get ntDeleteConfirm;
+
+  /// No description provided for @ntAreaSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hudud saqlandi'**
+  String get ntAreaSaved;
+
+  /// No description provided for @ntAreaUpdated.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hudud yangilandi'**
+  String get ntAreaUpdated;
+
+  /// No description provided for @ntAreaDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hudud o‘chirildi'**
+  String get ntAreaDeleted;
+
+  /// No description provided for @ntWatchTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvdagi joylar'**
+  String get ntWatchTitle;
+
+  /// No description provided for @ntWatchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joyni kuzatish uchun uning sahifasidagi «Kuzatish» tugmasini bosing.'**
+  String get ntWatchHint;
+
+  /// No description provided for @ntWatchRemoved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvdan olib tashlandi'**
+  String get ntWatchRemoved;
+
+  /// No description provided for @ntWatchStop.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatishni to‘xtatish'**
+  String get ntWatchStop;
+
+  /// No description provided for @ntSheetAdd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hududni kuzatish'**
+  String get ntSheetAdd;
+
+  /// No description provided for @ntSheetEdit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hududni tahrirlash'**
+  String get ntSheetEdit;
+
+  /// No description provided for @ntMyLocation.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvim'**
+  String get ntMyLocation;
+
+  /// No description provided for @ntAddress.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil'**
+  String get ntAddress;
+
+  /// No description provided for @ntAddressHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzilni koreys tilida kiriting'**
+  String get ntAddressHint;
+
+  /// No description provided for @ntLocated.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozirgina aniqlandi'**
+  String get ntLocated;
+
+  /// No description provided for @ntLocating.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuv aniqlanmoqda…'**
+  String get ntLocating;
+
+  /// No description provided for @ntSavedCenter.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlangan markaz'**
+  String get ntSavedCenter;
+
+  /// No description provided for @ntRelocate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta aniqlash'**
+  String get ntRelocate;
+
+  /// No description provided for @ntFind.
+  ///
+  /// In uz, this message translates to:
+  /// **'Topish'**
+  String get ntFind;
+
+  /// No description provided for @ntFinding.
+  ///
+  /// In uz, this message translates to:
+  /// **'Manzil qidirilmoqda…'**
+  String get ntFinding;
+
+  /// No description provided for @ntNothingInside.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu radiusda hozircha joy yo‘q'**
+  String get ntNothingInside;
+
+  /// No description provided for @ntLocationFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylashuvni aniqlab bo‘lmadi. Manzilni kiriting yoki qayta urinib ko‘ring.'**
+  String get ntLocationFailed;
+
+  /// No description provided for @ntRadius.
+  ///
+  /// In uz, this message translates to:
+  /// **'Radius'**
+  String get ntRadius;
+
+  /// No description provided for @ntCountMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} masjid'**
+  String ntCountMosque(int n);
+
+  /// No description provided for @ntCountRestaurant.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} oshxona'**
+  String ntCountRestaurant(int n);
+
+  /// No description provided for @ntCountShop.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n} do‘kon'**
+  String ntCountShop(int n);
+
+  /// No description provided for @ntWhich.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaysi joylar?'**
+  String get ntWhich;
+
+  /// No description provided for @ntPickOne.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamida bitta turni tanlang.'**
+  String get ntPickOne;
+
+  /// No description provided for @ntNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi joy ochilsa, yopilsa, telefon raqami yoki nomi o‘zgarsa va e’lon berilsa — xabar olasiz.'**
+  String get ntNote;
+
+  /// No description provided for @ntSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get ntSave;
+
+  /// No description provided for @ntErrAddressNotFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu manzil topilmadi. Koreys tilida, aniqroq yozib ko‘ring.'**
+  String get ntErrAddressNotFound;
+
+  /// No description provided for @ntErrRateLimited.
+  ///
+  /// In uz, this message translates to:
+  /// **'So‘rovlar juda ko‘p. Bir daqiqadan so‘ng urinib ko‘ring.'**
+  String get ntErrRateLimited;
+
+  /// No description provided for @ntErrTooManyAreas.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hududlar juda ko‘p. Keraksizlarini o‘chiring.'**
+  String get ntErrTooManyAreas;
+
+  /// No description provided for @ntErrAreaBudget.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hududlaringiz juda katta joyni qamrab oldi. Birini kichraytiring yoki o‘chiring.'**
+  String get ntErrAreaBudget;
+
+  /// No description provided for @ntErrTooManyChanges.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugun hududlar ko‘p o‘zgartirildi. Ertaga urinib ko‘ring.'**
+  String get ntErrTooManyChanges;
+
+  /// No description provided for @ntErrTooManyPreviews.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bugun juda ko‘p joy ko‘rib chiqildi. Ertaga urinib ko‘ring.'**
+  String get ntErrTooManyPreviews;
+
+  /// No description provided for @ntErrOffline.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internetga ulanib bo‘lmadi. Qayta urinib ko‘ring.'**
+  String get ntErrOffline;
+
+  /// No description provided for @ntErrGeneric.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik yuz berdi. Qayta urinib ko‘ring.'**
+  String get ntErrGeneric;
+
+  /// No description provided for @ntWhereTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarlar qayerga keladi?'**
+  String get ntWhereTitle;
+
+  /// No description provided for @ntViaApp.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ilovada'**
+  String get ntViaApp;
+
+  /// No description provided for @ntViaAppBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefoningizga bildirishnoma'**
+  String get ntViaAppBody;
+
+  /// No description provided for @ntViaBot.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram botda'**
+  String get ntViaBot;
+
+  /// No description provided for @ntViaBotBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin botidan xabar'**
+  String get ntViaBotBody;
+
+  /// No description provided for @ntViaOne.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamida bittasi yoqilgan bo‘lsin.'**
+  String get ntViaOne;
+
+  /// No description provided for @ntAppOnly.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarlar shu ilovaga bildirishnoma bo‘lib keladi.'**
+  String get ntAppOnly;
+
+  /// No description provided for @ntAppOnlyHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram orqali kirsangiz, botdan ham olishingiz mumkin.'**
+  String get ntAppOnlyHint;
+
+  /// No description provided for @ntPushOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonda bildirishnomalar o‘chirilgan — xabarlar ko‘rinmaydi.'**
+  String get ntPushOff;
+
+  /// No description provided for @ntPushOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqish'**
+  String get ntPushOn;
+
+  /// No description provided for @ntStoppedPlace.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu joy bo‘yicha xabarlar to‘xtatildi.'**
+  String get ntStoppedPlace;
+
+  /// No description provided for @ntStoppedArea.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu hudud bo‘yicha xabarlar to‘xtatildi.'**
+  String get ntStoppedArea;
+
+  /// No description provided for @ntUndo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qaytarish'**
+  String get ntUndo;
+
+  /// No description provided for @ntTypeMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masjid'**
+  String get ntTypeMosque;
+
+  /// No description provided for @ntTypeRestaurant.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oshxona'**
+  String get ntTypeRestaurant;
+
+  /// No description provided for @ntTypeShop.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘kon'**
+  String get ntTypeShop;
+
+  /// No description provided for @ntTypesMosque.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masjidlar'**
+  String get ntTypesMosque;
+
+  /// No description provided for @ntTypesRestaurant.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oshxonalar'**
+  String get ntTypesRestaurant;
+
+  /// No description provided for @ntTypesShop.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘konlar'**
+  String get ntTypesShop;
 }
 
 class _AppLocalizationsDelegate

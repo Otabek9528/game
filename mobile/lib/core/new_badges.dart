@@ -12,9 +12,7 @@ typedef HomePageSource = Future<String?> Function();
 
 Future<String?> fetchHomePage() async {
   try {
-    final response = await http
-        .get(AppConfig.liveWebBase.resolve('index.html'))
-        .timeout(const Duration(seconds: 15));
+    final response = await http.get(AppConfig.liveWebBase.resolve('index.html')).timeout(const Duration(seconds: 15));
     return response.statusCode == 200 ? utf8.decode(response.bodyBytes) : null;
   } catch (_) {
     return null;
