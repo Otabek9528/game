@@ -74,11 +74,9 @@ void main() {
 
     await tester.tap(find.byTooltip('Change language'));
     await tester.pumpAndSettle();
-    expect(find.text('Save'), findsOneWidget);
+    expect(find.text('Save'), findsNothing, reason: 'a menu, not the first-launch page');
 
     await tester.tap(find.text('O‘zbekcha'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Saqlash'));
     await tester.pumpAndSettle();
 
     expect(app.languageStore.value, 'uz');
