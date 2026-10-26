@@ -58,7 +58,15 @@ Outputs: `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (etc.) and
 `build/app/outputs/bundle/release/app-release.aab`. Keep `build/symbols` for
 each release: it turns obfuscated crash reports back into readable ones.
 
-Check the signature: `keytool -printcert -jarfile build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
+Check the signature (`keytool -printcert` can't: with minSdk 24 the APK has
+only the v2/v3 signature, so it says "Not a signed jar file"). Windows:
+
+```powershell
+& (Get-ChildItem "$env:LOCALAPPDATA\Android\Sdk\build-tools\*\apksigner.bat" | Select-Object -Last 1).FullName verify --print-certs build\app\outputs\flutter-apk\app-arm64-v8a-release.apk
+```
+
+`Signer #1 certificate DN` must be your name, not `CN=Android Debug`; its
+SHA-1 must match `keytool -list` on your `.jks`.
 
 ## 4. Install and test on a phone
 
