@@ -18,7 +18,7 @@ class HousingKit {
   /// The account's header; the account is made when missing.
   Future<Map<String, String>> auth() async {
     try {
-      await services.account.ensure();
+      await services.account.headers();
     } catch (_) {}
     return services.account.authHeaders;
   }

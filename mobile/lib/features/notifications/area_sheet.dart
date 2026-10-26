@@ -94,6 +94,13 @@ class _AreaSheetState extends State<_AreaSheet> {
       }
       unawaited(_preview(area.fromLocation, c));
     } else {
+      // Where the phone was last seen, at once; the fresh fix (seconds,
+      // sometimes) replaces it when it comes.
+      if (_services.prayer.place case final saved?) {
+        final c = (lat: saved.lat, lon: saved.lon, label: saved.city, fresh: false);
+        _location = c;
+        unawaited(_preview(true, c));
+      }
       unawaited(_locate());
     }
   }
@@ -119,12 +126,19 @@ class _AreaSheetState extends State<_AreaSheet> {
         _locateFailed = true;
       });
     }
-    final c = (lat: fix.lat, lon: fix.lon, label: _services.prayer.place?.city, fresh: true);
+    final before = _location;
+    final c = (lat: fix.lat, lon: fix.lon, label: _services.prayer.place?.city ?? before?.label, fresh: true);
+    // Within a couple of hundred metres the preview already shown stands.
+    final moved = before == null || (before.lat - c.lat).abs() > 0.002 || (before.lon - c.lon).abs() > 0.002;
     setState(() {
       _locating = false;
       _location = c;
     });
-    await _preview(true, c);
+    if (moved) {
+      await _preview(true, c);
+    } else if (_points[true] case final kept?) {
+      setState(() => _points[true] = (lat: c.lat, lon: c.lon, label: kept.label, points: kept.points));
+    }
   }
 
   Future<void> _preview(bool here, _Center c) async {
@@ -161,7 +175,12 @@ class _AreaSheetState extends State<_AreaSheet> {
     }
   }
 
-  bool get _canSave => !_saving && _types.isNotEmpty && (_here ? _location != null : _address.text.trim().isNotEmpty);
+  // Around where one stands: the fresh fix, not the last one seen (it may be
+  // kilometres off), unless no fix can be had.
+  bool get _canSave =>
+      !_saving &&
+      _types.isNotEmpty &&
+      (_here ? _location != null && (_location!.fresh || !_locating) : _address.text.trim().isNotEmpty);
 
   Future<void> _save() async {
     final s = AppLocalizations.of(context);
@@ -413,17 +432,22 @@ class _AreaSheetState extends State<_AreaSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _locating
-                      ? s.ntLocating
-                      : c != null
+                  c != null
                       ? (c.label ?? '${c.lat.toStringAsFixed(4)}, ${c.lon.toStringAsFixed(4)}')
                       : failed
                       ? s.ntLocationFailed
                       : s.ntLocating,
                   style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink),
                 ),
-                if (c != null && !_locating)
-                  Text(c.fresh ? s.ntLocated : s.ntSavedCenter, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
+                if (c != null)
+                  Text(
+                    _locating
+                        ? s.ntLocating
+                        : c.fresh
+                        ? s.ntLocated
+                        : s.ntSavedCenter,
+                    style: TextStyle(fontSize: 12.5, color: p.inkMuted),
+                  ),
               ],
             ),
           ),

@@ -118,4 +118,20 @@ void main() {
     expect(app.places.watches[1]!.watching, isTrue);
     expect(find.text('Ansan Markaziy Masjidi'), findsOneWidget, reason: 'back in the list');
   });
+
+  testWidgets('opens at once with what it showed last time, then refreshes', (tester) async {
+    final app = TestApp(language: 'uz');
+    app.places.areas.add(const NotifyArea(
+        id: 9, fromLocation: false, label: '안산 원곡동', lat: 37.33, lon: 126.81, radiusKm: 5, types: {PlaceKind.mosque}, inside: 2));
+    await openNotifications(tester, app: app);
+    Navigator.of(tester.element(find.byType(NotificationsScreen))).pop();
+    await tester.pumpAndSettle();
+    app.places.fail = true;
+    await tester.tap(find.text('Bildirishnomalar').first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(find.text('안산 원곡동'), findsOneWidget, reason: 'kept on the phone, no spinner first');
+    await tester.pumpAndSettle();
+    expect(find.text('안산 원곡동'), findsOneWidget, reason: 'offline: still there');
+  });
 }

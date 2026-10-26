@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,19 +40,41 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   PlacesSource get _source => _services.places;
   String get _lang => _services.locale.language?.code ?? 'uz';
 
-  NotifyMe? _me;
+  /// What the page showed last time, kept on the phone: shown at once,
+  /// then refreshed. Someone else's (signed in or out since) is not used.
+  static const _cacheKey = 'notify_me';
+  NotifyMe? _meValue;
+  NotifyMe? get _me => _meValue;
+  set _me(NotifyMe? me) {
+    _meValue = me;
+    if (me == null) return;
+    unawaited(_services.store.write(_cacheKey, jsonEncode({'user': _services.account.user?.id, ...notifyMeToJson(me)})));
+  }
+
+  NotifyMe? _cached() {
+    try {
+      final json = jsonDecode(_services.store.read(_cacheKey) ?? '');
+      if (json is! Map<String, dynamic> || json['user'] != _services.account.user?.id) return null;
+      return notifyMeFromJson(json);
+    } on FormatException {
+      return null;
+    }
+  }
+
+  bool _refreshing = false;
   bool _failed = false;
   bool _checking = false;
 
   @override
   void initState() {
     super.initState();
+    _meValue = _cached();
     unawaited(_load(stop: widget.stop));
   }
 
   Future<Map<String, String>> _auth() async {
     try {
-      await _services.account.ensure();
+      await _services.account.headers();
     } catch (_) {}
     return _services.account.authHeaders;
   }
@@ -70,7 +93,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Future<void> _load({String? stop}) async {
-    setState(() => _failed = false);
+    setState(() {
+      _failed = false;
+      _refreshing = true;
+    });
     try {
       final auth = await _auth();
       if (stop != null) await _applyStop(auth, stop);
@@ -78,6 +104,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       if (mounted) setState(() => _me = me);
     } on PlacesException {
       if (mounted) setState(() => _failed = true);
+    } finally {
+      if (mounted) setState(() => _refreshing = false);
     }
   }
 
@@ -244,7 +272,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final me = _me;
     return Scaffold(
       backgroundColor: p.page,
-      appBar: AppBar(backgroundColor: p.page, surfaceTintColor: Colors.transparent, title: Text(s.ntTitle)),
+      appBar: AppBar(
+        backgroundColor: p.page,
+        surfaceTintColor: Colors.transparent,
+        title: Text(s.ntTitle),
+        // Refreshing what is already shown: a thin line, not a spinner.
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: _refreshing && me != null ? const LinearProgressIndicator(minHeight: 2) : const SizedBox(height: 2),
+        ),
+      ),
       floatingActionButton: me == null || (me.areas.isEmpty && me.watches.isEmpty)
           ? null
           : FloatingActionButton.extended(

@@ -99,6 +99,34 @@ NotifyMe notifyMeFromJson(Map<String, dynamic> json) {
   );
 }
 
+/// [notifyMeFromJson]'s input again: what the page keeps on the phone, to
+/// show at once next time.
+Map<String, Object?> notifyMeToJson(NotifyMe me) => {
+  'subscriber': {'active': !me.botBlocked},
+  'delivery': {
+    'telegram': me.delivery.telegram,
+    'push': me.delivery.push,
+    'canTelegram': me.delivery.canTelegram,
+    'bot': me.delivery.bot,
+  },
+  'areas': [
+    for (final a in me.areas)
+      {
+        'id': a.id,
+        'source': a.fromLocation ? 'location' : 'address',
+        'label': a.label,
+        'lat': a.lat,
+        'lon': a.lon,
+        'radiusKm': a.radiusKm,
+        'types': [for (final k in a.types) k.key],
+        'insideCount': a.inside,
+      },
+  ],
+  'watches': [
+    for (final w in me.watches) {'placeId': w.id, 'name': w.name, 'type': w.kind.key, 'city': w.city},
+  ],
+};
+
 RadiusPreview? radiusPreviewFromJson(Map<String, dynamic> json) {
   final c = json['center'];
   if (c is! Map || _num(c['lat']) == null || _num(c['lon']) == null) return null;

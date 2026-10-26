@@ -36,7 +36,7 @@ class JobsKit {
   /// The account's header and id; the account is made when missing.
   Future<(Map<String, String>, int)> auth() async {
     try {
-      await services.account.ensure();
+      await services.account.headers();
     } catch (_) {}
     final id = services.account.user?.id;
     if (id == null) throw const JobsException('offline');

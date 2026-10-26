@@ -148,7 +148,7 @@ class CarsKit extends ChangeNotifier {
   /// The account's header; the account is made when missing. Empty offline.
   Future<Map<String, String>> auth() async {
     try {
-      await services.account.ensure();
+      await services.account.headers();
     } catch (_) {}
     return services.account.authHeaders;
   }

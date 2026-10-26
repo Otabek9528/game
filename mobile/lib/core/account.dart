@@ -389,6 +389,16 @@ class AccountController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The header to call the API with: the session the phone has, with no
+  /// call to the server for it; a new one made first when there is none.
+  /// [ensure] also refreshes who is signed in, which the app does at start
+  /// and with each notification token; before every request it only made
+  /// each page wait for an extra round trip.
+  Future<Map<String, String>> headers() async {
+    if (_token == null) await ensure();
+    return authHeaders;
+  }
+
   /// The account, created when missing. Safe to call again and again.
   Future<void> ensure() => _starting ??= _ensure().whenComplete(() => _starting = null);
 

@@ -103,7 +103,7 @@ class HikoreaKit extends ChangeNotifier {
 
   /// The account's header for the server; the account is made if missing.
   Future<Map<String, String>> auth() async {
-    await services.account.ensure();
+    await services.account.headers();
     final headers = services.account.authHeaders;
     if (headers.isEmpty) throw const HkException('offline');
     return headers;
