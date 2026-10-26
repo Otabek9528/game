@@ -59,10 +59,13 @@ Outputs: `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (etc.) and
 each release: it turns obfuscated crash reports back into readable ones.
 
 Check the signature (`keytool -printcert` can't: with minSdk 24 the APK has
-only the v2/v3 signature, so it says "Not a signed jar file"). Windows:
+only the v2/v3 signature, so it says "Not a signed jar file"). Windows, from
+`mobile` (the SDK's location is read from `android/local.properties`):
 
 ```powershell
-& (Get-ChildItem "$env:LOCALAPPDATA\Android\Sdk\build-tools\*\apksigner.bat" | Select-Object -Last 1).FullName verify --print-certs build\app\outputs\flutter-apk\app-arm64-v8a-release.apk
+$sdk = (Select-String -Path android\local.properties -Pattern '^sdk\.dir=(.*)').Matches[0].Groups[1].Value -replace '\\:',':' -replace '\\\\','\'
+$apksigner = (Get-ChildItem "$sdk\build-tools\*\apksigner.bat" | Select-Object -Last 1).FullName
+& $apksigner verify --print-certs build\app\outputs\flutter-apk\app-arm64-v8a-release.apk
 ```
 
 `Signer #1 certificate DN` must be your name, not `CN=Android Debug`; its
