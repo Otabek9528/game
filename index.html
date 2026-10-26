@@ -112,6 +112,45 @@
       <main class="main" id="featureCards">
         <!-- Feature cards will be dynamically generated -->
       </main>
+		
+	 <div id="todayVisits" class="today-visits" hidden><span class="tv-dot"></span><span id="todayVisitsText"></span></div>
+		<style>
+		  .today-visits { display: flex; align-items: center; justify-content: center; gap: 8px;
+			padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); font-size: 13px; color: var(--text-muted);}
+		  .today-visits[hidden] { display: none; }
+		  .tv-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #2F80ED; flex-shrink: 0; }
+		  .tv-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #2F80ED;
+			animation: tvBeat 1.4s ease-out infinite; }
+		  @keyframes tvBeat { from { transform: scale(1); opacity: .45; } to { transform: scale(2.3); opacity: 0; } }
+		</style>
+		<script>
+		(function () {
+		  var API = 'https://vegukin-api.duckdns.org/api/visits/today';
+		  var LABEL = { uz: 'Bugungi tashriflar', ru: 'Посещений сегодня', en: 'Today’s visits' };
+
+		  // The home page logs nothing by itself, so a visit that only looks at the
+		  // prayer times would go uncounted: log one "open" per visit (30-minute gap).
+		  try {
+			var last = +localStorage.getItem('vg_open_at') || 0;
+			if (Date.now() - last > 30 * 60 * 1000 && window.logInteraction) window.logInteraction('open');
+			localStorage.setItem('vg_open_at', String(Date.now()));
+		  } catch (e) {}
+
+		  fetch(API, { signal: AbortSignal.timeout(10000) })
+			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (d) {
+			  if (!d || !(d.visits > 0)) return;
+			  var lang = (window.I18N && I18N.currentLang) || 'uz';
+			  var sep = lang === 'en' ? ',' : ' ';
+			  var n = String(d.visits).replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+			  document.getElementById('todayVisitsText').textContent = (LABEL[lang] || LABEL.uz) + ': ' + n;
+			  document.getElementById('todayVisits').hidden = false;
+			})
+			.catch(function () {});
+		})();
+		</script> 	
+	
+	
     </div>
   </div>
 
@@ -119,44 +158,6 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="js/logger.js"></script> 
   <script src="js/i18n.js"></script>
-  
- <div id="todayVisits" class="today-visits" hidden><span class="tv-dot"></span><span id="todayVisitsText"></span></div>
-<style>
-  .today-visits { display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); font-size: 13px; color: var(--text-muted); }
-  .today-visits[hidden] { display: none; }
-  .tv-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #2F80ED; flex-shrink: 0; }
-  .tv-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #2F80ED;
-    animation: tvBeat 1.4s ease-out infinite; }
-  @keyframes tvBeat { from { transform: scale(1); opacity: .45; } to { transform: scale(2.3); opacity: 0; } }
-</style>
-<script>
-(function () {
-  var API = 'https://vegukin-api.duckdns.org/api/visits/today';
-  var LABEL = { uz: 'Bugungi tashriflar', ru: 'Посещений сегодня', en: 'Today’s visits' };
-
-  // The home page logs nothing by itself, so a visit that only looks at the
-  // prayer times would go uncounted: log one "open" per visit (30-minute gap).
-  try {
-    var last = +localStorage.getItem('vg_open_at') || 0;
-    if (Date.now() - last > 30 * 60 * 1000 && window.logInteraction) window.logInteraction('open');
-    localStorage.setItem('vg_open_at', String(Date.now()));
-  } catch (e) {}
-
-  fetch(API, { signal: AbortSignal.timeout(10000) })
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) {
-      if (!d || !(d.visits > 0)) return;
-      var lang = (window.I18N && I18N.currentLang) || 'uz';
-      var sep = lang === 'en' ? ',' : ' ';
-      var n = String(d.visits).replace(/\B(?=(\d{3})+(?!\d))/g, sep);
-      document.getElementById('todayVisitsText').textContent = (LABEL[lang] || LABEL.uz) + ': ' + n;
-      document.getElementById('todayVisits').hidden = false;
-    })
-    .catch(function () {});
-})();
-</script> 
- 
   <script src="js/locationManager.js"></script>
   <script src="js/prayerTimes.js"></script>
   <script src="js/homeScreenPrompt.js"></script>
