@@ -9,7 +9,6 @@ import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
-import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
 import '../../core/account.dart';
 import '../account/account_screen.dart';
@@ -133,16 +132,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _open(Feature feature) => openSection(context, feature, _services);
 
-  void _openLanguage() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => LanguageScreen(
-          services: _services,
-          initialLanguage: _services.locale.language ?? AppLanguage.uz,
-          isOnboarding: false,
-        ),
-      ),
-    );
+  /// From the header's menu; the full page is for the first launch only.
+  void _chooseLanguage(AppLanguage language) {
+    HapticFeedback.selectionClick();
+    if (language != _services.locale.language) unawaited(_services.locale.choose(language));
   }
 
   @override
@@ -165,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               account: _services.account,
               onInbox: () => openInbox(context, _services),
               onAccount: () => openAccount(context, _services),
-              onLanguage: _openLanguage,
+              onLanguage: _chooseLanguage,
               onTheme: () {
                 HapticFeedback.selectionClick();
                 _services.theme.toggle(Theme.of(context).brightness);
@@ -318,7 +311,7 @@ class _Header extends StatelessWidget {
   final AccountController account;
   final VoidCallback onInbox;
   final VoidCallback onAccount;
-  final VoidCallback onLanguage;
+  final ValueChanged<AppLanguage> onLanguage;
 
   /// Day ↔ night.
   final VoidCallback onTheme;
@@ -374,23 +367,80 @@ class _Header extends StatelessWidget {
               ),
               _ThemeButton(onTap: onTheme),
               const SizedBox(width: 8),
-              Tooltip(
-                message: s.changeLanguage,
-                child: TextButton.icon(
-                  onPressed: onLanguage,
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.white.withValues(alpha: 0.12),
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                  icon: const Icon(Icons.translate_rounded, size: 17),
-                  label: Text(
-                    language.code.toUpperCase(),
-                    style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.5),
-                  ),
+              _LanguageMenu(current: language, onSelected: onLanguage, tooltip: s.changeLanguage),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The header's language button: a menu of the languages, each with its flag
+/// and its own name, the current one ticked.
+class _LanguageMenu extends StatelessWidget {
+  const _LanguageMenu({required this.current, required this.onSelected, required this.tooltip});
+
+  final AppLanguage current;
+  final ValueChanged<AppLanguage> onSelected;
+  final String tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return MenuAnchor(
+      alignmentOffset: const Offset(0, 6),
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(p.card),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        elevation: const WidgetStatePropertyAll(8),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+        padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 6)),
+      ),
+      menuChildren: [
+        for (final language in AppLanguage.values)
+          MenuItemButton(
+            onPressed: () => onSelected(language),
+            style: MenuItemButton.styleFrom(
+              minimumSize: const Size(200, 48),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              backgroundColor: language == current ? p.cardSelected : null,
+            ),
+            leadingIcon: Text(language.flag, style: const TextStyle(fontSize: 22)),
+            trailingIcon: language == current ? Icon(Icons.check_rounded, size: 20, color: p.accent) : null,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4, right: 12),
+              child: Text(
+                language.nativeName,
+                style: TextStyle(
+                  fontSize: 15.5,
+                  fontWeight: language == current ? FontWeight.w800 : FontWeight.w600,
+                  color: p.ink,
                 ),
               ),
+            ),
+          ),
+      ],
+      builder: (context, menu, _) => Tooltip(
+        message: tooltip,
+        child: TextButton(
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            menu.isOpen ? menu.close() : menu.open();
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.white.withValues(alpha: 0.12),
+            shape: const StadiumBorder(),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // An icon's size whatever the text size, as the icon it replaces.
+              Text(current.flag, textScaler: TextScaler.noScaling, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Text(current.code.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.5)),
             ],
           ),
         ),

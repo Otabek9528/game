@@ -3,18 +3,19 @@ import 'dart:ui';
 /// The languages the app is written in.
 ///
 /// Each one is named in its own language ("Русский", not "Russian"): someone
-/// looking for their language scans for the word they know. Flags are left out
-/// on purpose — a flag is a country, and Russian here is read by Uzbeks,
-/// Kazakhs and Kyrgyz alike.
+/// looking for their language scans for the word they know. The first-launch
+/// page shows a letter of each script; the home screen's quick menu adds the
+/// flag people expect there, next to the name.
 enum AppLanguage {
-  uz(code: 'uz', nativeName: 'O‘zbekcha', glyph: 'O‘'),
-  ru(code: 'ru', nativeName: 'Русский', glyph: 'Я'),
-  en(code: 'en', nativeName: 'English', glyph: 'Aa');
+  uz(code: 'uz', nativeName: 'O‘zbekcha', glyph: 'O‘', flag: '🇺🇿'),
+  ru(code: 'ru', nativeName: 'Русский', glyph: 'Я', flag: '🇷🇺'),
+  en(code: 'en', nativeName: 'English', glyph: 'Aa', flag: '🇬🇧');
 
   const AppLanguage({
     required this.code,
     required this.nativeName,
     required this.glyph,
+    required this.flag,
   });
 
   final String code;
@@ -22,6 +23,9 @@ enum AppLanguage {
 
   /// A letter that is unmistakably this language's script, used as its icon.
   final String glyph;
+
+  /// As in the home screen's language menu.
+  final String flag;
 
   Locale get locale => Locale(code);
 
