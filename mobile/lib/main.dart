@@ -13,10 +13,10 @@ import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
 import 'core/push.dart';
 import 'core/theme_controller.dart';
+import 'features/home/sections.dart';
 import 'features/prayer/prayer_controller.dart';
 import 'features/prayer/prayer_sources.dart';
 import 'features/reminders/reminder_controller.dart';
-import 'features/web/web_feature_screen.dart';
 import 'features/widget/home_widget_bridge.dart';
 
 Future<void> main() async {
@@ -35,11 +35,7 @@ Future<void> main() async {
   await initializeDateFormatting();
 
   final store = await PrefsKeyValueStore.open();
-  final prayer = PrayerController(
-    location: DeviceLocationSource(),
-    times: AladhanSource(),
-    store: store,
-  );
+  final prayer = PrayerController(location: DeviceLocationSource(), times: AladhanSource(), store: store);
   final locale = LocaleController(await PrefsLanguageStore.open());
   final homeWidget = HomeWidgetBridge();
   final reminders = ReminderController(store);
@@ -49,7 +45,7 @@ Future<void> main() async {
     theme: ThemeController(store),
     prayer: prayer,
     permissions: DevicePermissions(store, prayer, homeWidget),
-    openFeature: openWebFeature,
+    openFeature: openInBrowser,
     homeWidget: homeWidget,
     reminders: reminders,
     activity: HttpActivityLog(store),
@@ -59,8 +55,7 @@ Future<void> main() async {
       push: FirebasePushService(),
       google: GoogleSignInAuth(),
       // Before the language is chosen: the one the language screen offers.
-      language: () =>
-          locale.language ?? AppLanguage.guessFrom(WidgetsBinding.instance.platformDispatcher.locales),
+      language: () => locale.language ?? AppLanguage.guessFrom(WidgetsBinding.instance.platformDispatcher.locales),
     ),
   );
 
@@ -72,6 +67,7 @@ Future<void> main() async {
     homeWidget.publish(prayer, language);
     reminders.publish(prayer, language);
   }
+
   prayer.addListener(publish);
   locale.addListener(publish);
   reminders.addListener(publish);
@@ -80,8 +76,5 @@ Future<void> main() async {
   // asked once, from the home screen, after the language is chosen.
   prayer.start();
 
-  runApp(VegukinApp(
-    services: services,
-    deviceLocales: WidgetsBinding.instance.platformDispatcher.locales,
-  ));
+  runApp(VegukinApp(services: services, deviceLocales: WidgetsBinding.instance.platformDispatcher.locales));
 }

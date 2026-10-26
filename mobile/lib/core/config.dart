@@ -1,7 +1,7 @@
 /// Addresses the app talks to.
 abstract final class AppConfig {
-  /// Where the web app (the Telegram Mini App pages) is served. Sections not
-  /// yet rebuilt natively open from here inside the app.
+  /// Where the web app (the Telegram Mini App pages) is served: the links
+  /// page's list, and a section the app doesn't know, in the browser.
   ///
   /// This is the GitHub Pages site of this repository. If the bot serves the
   /// pages from somewhere else, change it here.

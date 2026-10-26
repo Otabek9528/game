@@ -19,9 +19,12 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- No cloud backup: a restored copy would carry this phone's session and
+         install id to another phone, and the two would share push. -->
     <application
         android:label="Muslim Vegukin"
         android:name="${applicationName}"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

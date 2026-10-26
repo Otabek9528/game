@@ -6,6 +6,8 @@ import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
 import 'package:muslim_vegukin/features/prayers/prayers_screen.dart';
 
 import 'package:muslim_vegukin/features/places/places_screen.dart';
+import 'package:muslim_vegukin/features/home/feature_catalog.dart';
+import 'package:muslim_vegukin/features/home/sections.dart';
 
 import 'support/fakes.dart';
 
@@ -242,5 +244,13 @@ void _newBadgeTests() {
     await app.launch(tester);
     expect(find.text('YANGI'), findsOneWidget, reason: 'only Qibla now; the band lost its badge too');
     expect(app.store.read('new_badges'), 'qibla');
+  });
+
+  testWidgets('a section the app does not know opens its web page in the browser', (tester) async {
+    final app = TestApp(language: 'uz');
+    await app.launch(tester);
+    openInBrowser(tester.element(find.byType(Scaffold).first),
+        const Feature(id: 'ramadan', emoji: '🌙', path: 'pages/ramadan/ramadan.html'), app.services);
+    expect(app.links.last, Uri.parse('https://otabek9528.github.io/game/pages/ramadan/ramadan.html'));
   });
 }

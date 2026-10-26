@@ -134,12 +134,11 @@ Run these in the terminal from the `mobile` folder:
 | `flutter run` | Build and start the app on the connected phone/emulator |
 | `flutter test` | Run the automatic tests in `test/` |
 | `flutter analyze` | Check the code for mistakes and style problems |
-| `flutter build apk --release` | Build an installable APK (needs a signing key first — not set up yet) |
+| `flutter build apk --release` | Build an installable APK (signing, AAB and Google Play: see `RELEASE.md`) |
 
 ## Before the first Play Store upload
 
 - **Application ID** — `com.vegukin.muslim_vegukin` in
   `android/app/build.gradle.kts`. It can never change once the app is
   published, so settle it before then.
-- **Release signing key** — not set up yet; release builds currently use the
-  debug key. Never commit the key file.
+- **Release signing, building and publishing** — `RELEASE.md`.
