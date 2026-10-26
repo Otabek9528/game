@@ -1,25 +1,34 @@
 # Release: signed APK, AAB, Google Play
 
-All commands run from the `mobile` folder.
+All commands run from the `mobile` folder, one line each (they work in
+PowerShell and in bash).
 
 ## 1. Signing key (once; keep it forever)
 
-```sh
-keytool -genkey -v -keystore ~/muslim-vegukin-upload.jks -alias upload \
-  -keyalg RSA -keysize 2048 -validity 10000
+Windows (PowerShell):
+
+```powershell
+keytool -genkeypair -v -keystore "$env:USERPROFILE\muslim-vegukin-upload.jks" -alias upload -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-Create `android/key.properties` (git-ignored, never share it):
+macOS/Linux: the same with `-keystore ~/muslim-vegukin-upload.jks`.
+
+It asks for a password (twice), then name/organization/city (any answers),
+then `yes`. Keep the key outside the project folder.
+
+Create `android/key.properties` (git-ignored, never share it). Forward slashes,
+even on Windows (a backslash is an escape character in this file):
 
 ```properties
-storeFile=/home/YOU/muslim-vegukin-upload.jks
+storeFile=C:/Users/YOU/muslim-vegukin-upload.jks
 storePassword=…
 keyAlias=upload
 keyPassword=…
 ```
 
+`keyPassword` is the same as `storePassword` unless you chose a different one.
 Without this file, release builds are signed with the debug key: they install,
-but Google Play refuses them. Back up the `.jks` and both passwords somewhere
+but Google Play refuses them. Back up the `.jks` and the password somewhere
 safe; losing them means asking Google for an upload-key reset.
 
 ## 2. Version
@@ -30,11 +39,13 @@ for every upload; Play rejects a code it has seen.
 ## 3. Build
 
 ```sh
-flutter clean && flutter pub get && flutter analyze && flutter test
+flutter clean
+flutter pub get
+flutter analyze
+flutter test
 
 # APKs to share directly (one per CPU type; most phones: arm64-v8a)
-flutter build apk --release --split-per-abi \
-  --obfuscate --split-debug-info=build/symbols
+flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/symbols
 
 # One APK for any phone (bigger)
 flutter build apk --release --obfuscate --split-debug-info=build/symbols
@@ -67,7 +78,7 @@ Google Cloud console → the project of `googleServerClientId` → Credentials �
 add an **Android** OAuth client for `com.vegukin.muslim_vegukin` with the SHA-1
 of **both**:
 
-- your upload key: `keytool -list -v -keystore ~/muslim-vegukin-upload.jks -alias upload`
+- your upload key: `keytool -list -v -keystore "$env:USERPROFILE\muslim-vegukin-upload.jks" -alias upload`
 - Play's app-signing key: Play Console → Test and release → App integrity →
   App signing (available after the first AAB upload).
 
