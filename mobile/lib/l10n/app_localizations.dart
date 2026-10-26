@@ -8125,7 +8125,7 @@ abstract class AppLocalizations {
   /// No description provided for @ntAddressHint.
   ///
   /// In uz, this message translates to:
-  /// **'Manzilni koreys tilida kiriting'**
+  /// **'To‘liq manzilni koreys tilida, bino raqami bilan kiriting'**
   String get ntAddressHint;
 
   /// No description provided for @ntLocated.
@@ -8385,6 +8385,24 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Do‘konlar'**
   String get ntTypesShop;
+
+  /// No description provided for @ntErrAddressNotExact.
+  ///
+  /// In uz, this message translates to:
+  /// **'To‘liq manzilni bino yoki uy raqami bilan kiriting. Masalan: 서울 동대문구 회기로 56'**
+  String get ntErrAddressNotExact;
+
+  /// No description provided for @ntFound.
+  ///
+  /// In uz, this message translates to:
+  /// **'Topildi'**
+  String get ntFound;
+
+  /// No description provided for @ntDeliveryTooltip.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarlar qayerga keladi'**
+  String get ntDeliveryTooltip;
 }
 
 class _AppLocalizationsDelegate

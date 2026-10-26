@@ -30,6 +30,10 @@ void main() {
     expect(find.byType(NotificationsScreen), findsOneWidget);
     expect(app.opened.ids, isEmpty, reason: 'not the web page');
     expect(find.text('Hech narsani o‘tkazib yubormang'), findsOneWidget);
+    expect(find.text('Qachon xabar keladi?'.toUpperCase()), findsOneWidget);
+    expect(find.text('Xabarlar shu ilovaga bildirishnoma bo‘lib keladi.'), findsNothing, reason: 'a one-time choice: not on the page');
+    await tester.tap(find.byTooltip('Xabarlar qayerga keladi'));
+    await tester.pumpAndSettle();
     expect(find.text('Xabarlar shu ilovaga bildirishnoma bo‘lib keladi.'), findsOneWidget);
     expect(find.text('Telegram botda'), findsNothing, reason: 'not a Telegram account');
   });
@@ -71,10 +75,16 @@ void main() {
     await tester.enterText(find.byType(TextField), '안산 원곡동');
     await tester.tap(find.text('Topish'));
     await tester.pumpAndSettle();
-    expect(find.text('경기 안산시 단원구 안산 원곡동'), findsOneWidget);
+    expect(find.textContaining('To‘liq manzilni bino yoki uy raqami bilan kiriting'), findsOneWidget,
+        reason: 'a district is not an address: said so, not just "not found"');
+    await tester.enterText(find.byType(TextField), '안산 원곡동 1');
+    await tester.tap(find.text('Topish'));
+    await tester.pumpAndSettle();
+    expect(find.text('경기 안산시 단원구 안산 원곡동 1'), findsOneWidget);
+    expect(find.text('Topildi'), findsOneWidget);
     await tapVisible(tester, find.text('Saqlash'));
     expect(app.places.areas.single.fromLocation, isFalse);
-    expect(find.text('안산 원곡동'), findsOneWidget, reason: 'its card');
+    expect(find.text('안산 원곡동 1'), findsOneWidget, reason: 'its card');
   });
 
   testWidgets('a Telegram account chooses the bot, the app or both; a blocked bot is said, with a check', (tester) async {
@@ -83,14 +93,17 @@ void main() {
       ..delivery = const NotifyDelivery(telegram: true, push: true, canTelegram: true, bot: 'MuslimVegukinBot')
       ..botBlocked = true;
     await openNotifications(tester, app: app);
-    expect(find.text('Telegram botda'), findsOneWidget);
-    expect(find.textContaining('Bot sizga xabar yubora olmayapti'), findsOneWidget);
+    expect(find.textContaining('Bot sizga xabar yubora olmayapti'), findsOneWidget, reason: 'a problem: on the page');
     await tester.tap(find.text('Botni ochish'));
     expect(app.links.last, Uri.parse('https://t.me/MuslimVegukinBot'));
     await tester.tap(find.text('Tekshirish'));
     await tester.pumpAndSettle();
     expect(app.places.asked, contains('hello'));
     expect(find.textContaining('Bot sizga xabar yubora olmayapti'), findsNothing);
+
+    await tester.tap(find.byTooltip('Xabarlar qayerga keladi'));
+    await tester.pumpAndSettle();
+    expect(find.text('Telegram botda'), findsOneWidget);
 
     await tester.tap(find.text('Ilovada'));
     await tester.pumpAndSettle();

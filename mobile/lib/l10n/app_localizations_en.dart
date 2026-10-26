@@ -4592,7 +4592,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ntAddress => 'Address';
 
   @override
-  String get ntAddressHint => 'Enter the address in Korean';
+  String get ntAddressHint =>
+      'The full address in Korean, with the building number';
 
   @override
   String get ntLocated => 'Located just now';
@@ -4738,4 +4739,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ntTypesShop => 'Shops';
+
+  @override
+  String get ntErrAddressNotExact =>
+      'Enter the full address with the building or house number, e.g. 서울 동대문구 회기로 56';
+
+  @override
+  String get ntFound => 'Found';
+
+  @override
+  String get ntDeliveryTooltip => 'Where messages arrive';
 }

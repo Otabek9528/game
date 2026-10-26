@@ -1337,7 +1337,7 @@
   "ntSheetEdit": "Edit area",
   "ntMyLocation": "My location",
   "ntAddress": "Address",
-  "ntAddressHint": "Enter the address in Korean",
+  "ntAddressHint": "The full address in Korean, with the building number",
   "ntLocated": "Located just now",
   "ntLocating": "Finding your location…",
   "ntSavedCenter": "Saved centre",
@@ -1380,5 +1380,8 @@
   "ntTypeShop": "Shop",
   "ntTypesMosque": "Mosques",
   "ntTypesRestaurant": "Restaurants",
-  "ntTypesShop": "Shops"
+  "ntTypesShop": "Shops",
+  "ntErrAddressNotExact": "Enter the full address with the building or house number, e.g. 서울 동대문구 회기로 56",
+  "ntFound": "Found",
+  "ntDeliveryTooltip": "Where messages arrive"
 }

@@ -1337,7 +1337,7 @@
   "ntSheetEdit": "Изменить район",
   "ntMyLocation": "Моё место",
   "ntAddress": "Адрес",
-  "ntAddressHint": "Введите адрес на корейском",
+  "ntAddressHint": "Полный адрес на корейском, с номером здания",
   "ntLocated": "Определено только что",
   "ntLocating": "Определяем местоположение…",
   "ntSavedCenter": "Сохранённый центр",
@@ -1380,5 +1380,8 @@
   "ntTypeShop": "Магазин",
   "ntTypesMosque": "Мечети",
   "ntTypesRestaurant": "Рестораны",
-  "ntTypesShop": "Магазины"
+  "ntTypesShop": "Магазины",
+  "ntErrAddressNotExact": "Введите полный адрес с номером здания или дома, например: 서울 동대문구 회기로 56",
+  "ntFound": "Найдено",
+  "ntDeliveryTooltip": "Куда приходят сообщения"
 }

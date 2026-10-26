@@ -4638,7 +4638,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get ntAddress => 'Адрес';
 
   @override
-  String get ntAddressHint => 'Введите адрес на корейском';
+  String get ntAddressHint => 'Полный адрес на корейском, с номером здания';
 
   @override
   String get ntLocated => 'Определено только что';
@@ -4784,4 +4784,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get ntTypesShop => 'Магазины';
+
+  @override
+  String get ntErrAddressNotExact =>
+      'Введите полный адрес с номером здания или дома, например: 서울 동대문구 회기로 56';
+
+  @override
+  String get ntFound => 'Найдено';
+
+  @override
+  String get ntDeliveryTooltip => 'Куда приходят сообщения';
 }

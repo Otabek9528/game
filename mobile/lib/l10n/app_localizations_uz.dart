@@ -4531,7 +4531,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get ntAddress => 'Manzil';
 
   @override
-  String get ntAddressHint => 'Manzilni koreys tilida kiriting';
+  String get ntAddressHint =>
+      'To‘liq manzilni koreys tilida, bino raqami bilan kiriting';
 
   @override
   String get ntLocated => 'Hozirgina aniqlandi';
@@ -4678,4 +4679,14 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get ntTypesShop => 'Do‘konlar';
+
+  @override
+  String get ntErrAddressNotExact =>
+      'To‘liq manzilni bino yoki uy raqami bilan kiriting. Masalan: 서울 동대문구 회기로 56';
+
+  @override
+  String get ntFound => 'Topildi';
+
+  @override
+  String get ntDeliveryTooltip => 'Xabarlar qayerga keladi';
 }

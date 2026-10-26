@@ -1429,6 +1429,9 @@ class FakePlaces implements PlacesSource {
   Future<NotifyArea> saveArea(Map<String, String> auth, AreaDraft draft, {int? id, required String lang}) async {
     _online('saveArea ${id ?? 'new'} ${draft.address ?? 'here'} ${draft.radiusKm}');
     if (draft.address != null && !draft.address!.contains('안산')) throw const PlacesException('address_not_found', 404);
+    if (draft.address != null && !RegExp(r'\d').hasMatch(draft.address!)) {
+      throw const PlacesException('address_not_exact', 400);
+    }
     final area = NotifyArea(
       id: id ?? _areaId++,
       fromLocation: draft.address == null,
@@ -1454,6 +1457,8 @@ class FakePlaces implements PlacesSource {
   Future<RadiusPreview> inRadius(Map<String, String> auth, {double? lat, double? lon, String? address}) async {
     _online('inRadius ${address ?? '$lat,$lon'}');
     if (address != null && !address.contains('안산')) throw const PlacesException('address_not_found', 404);
+    // As the server: a city or a district is not an address.
+    if (address != null && !RegExp(r'\d').hasMatch(address)) throw const PlacesException('address_not_exact', 400);
     return (
       lat: lat ?? 37.32,
       lon: lon ?? 126.83,

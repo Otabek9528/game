@@ -15,7 +15,8 @@ import 'notify_models.dart';
 
 /// What went wrong, in the person's words.
 String notifyError(AppLocalizations s, Object e) => switch (e is PlacesException ? e.code : 'offline') {
-  'address_not_found' || 'not_exact' => s.ntErrAddressNotFound,
+  'address_not_exact' => s.ntErrAddressNotExact,
+  'address_not_found' => s.ntErrAddressNotFound,
   'rate_limited' => s.ntErrRateLimited,
   'too_many_areas' => s.ntErrTooManyAreas,
   'area_budget' => s.ntErrAreaBudget,
@@ -204,7 +205,7 @@ class _AreaSheetState extends State<_AreaSheet> {
       HapticFeedback.heavyImpact();
       setState(() {
         _saving = false;
-        if (e.code == 'address_not_found' || e.code == 'not_exact') {
+        if (e.code == 'address_not_found' || e.code == 'address_not_exact') {
           _addressError = notifyError(s, e);
         } else {
           _error = notifyError(s, e);
@@ -502,10 +503,16 @@ class _AreaSheetState extends State<_AreaSheet> {
               ),
             ),
             const SizedBox(width: 8),
+            // "Topish" until the address is found, then "✓ Topildi", as on the web.
             FilledButton.tonal(
-              onPressed: _finding ? null : _find,
+              onPressed: _finding || found ? null : _find,
               style: FilledButton.styleFrom(minimumSize: const Size(0, 50)),
-              child: Text(s.ntFind),
+              child: found
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [const Icon(Icons.check_rounded, size: 18), const SizedBox(width: 4), Text(s.ntFound)],
+                    )
+                  : Text(s.ntFind),
             ),
           ],
         ),

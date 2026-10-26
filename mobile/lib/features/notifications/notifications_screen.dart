@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,7 +49,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   set _me(NotifyMe? me) {
     _meValue = me;
     if (me == null) return;
-    unawaited(_services.store.write(_cacheKey, jsonEncode({'user': _services.account.user?.id, ...notifyMeToJson(me)})));
+    unawaited(
+      _services.store.write(_cacheKey, jsonEncode({'user': _services.account.user?.id, ...notifyMeToJson(me)})),
+    );
   }
 
   NotifyMe? _cached() {
@@ -260,6 +263,64 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  /// Where messages arrive: a one-time choice, so behind the bar's button
+  /// rather than on the page.
+  Future<void> _openDelivery() async {
+    HapticFeedback.lightImpact();
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: VegukinPalette.of(context).page,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheet) {
+          final me = _me;
+          if (me == null) return const SizedBox.shrink();
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ListenableBuilder(
+                    listenable: _services.account,
+                    builder: (context, _) => _DeliveryCard(
+                      delivery: me.delivery,
+                      pushAllowed: _services.account.pushAllowed,
+                      onChanged: ({required telegram, required push}) {
+                        final done = _setDelivery(telegram: telegram, push: push);
+                        setSheet(() {});
+                        unawaited(
+                          done.whenComplete(() {
+                            if (context.mounted) setSheet(() {});
+                          }),
+                        );
+                      },
+                      onPushOn: _services.permissions.openAppSettings,
+                    ),
+                  ),
+                  if (me.delivery.telegram && me.botBlocked) ...[
+                    const SizedBox(height: 12),
+                    _BotBlocked(
+                      bot: me.delivery.bot,
+                      checking: _checking,
+                      onOpenBot: (bot) => _services.openLink(Uri.parse('https://t.me/$bot')),
+                      onCheck: () async {
+                        await _check();
+                        if (context.mounted) setSheet(() {});
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   void _openList(PlaceKind kind) {
     final feature = featureGrid.firstWhere((f) => f.id == kind.key);
     openSection(context, feature, _services);
@@ -276,6 +337,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
         title: Text(s.ntTitle),
+        actions: [
+          if (me != null)
+            ListenableBuilder(
+              listenable: _services.account,
+              builder: (context, _) => _DeliveryButton(
+                delivery: me.delivery,
+                warn: (me.delivery.push && !_services.account.pushAllowed) || (me.delivery.telegram && me.botBlocked),
+                onTap: _openDelivery,
+              ),
+            ),
+          const SizedBox(width: 8),
+        ],
         // Refreshing what is already shown: a thin line, not a spinner.
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
@@ -316,23 +389,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(16, 4, 16, 96 + MediaQuery.paddingOf(context).bottom),
                 children: [
+                  // Not the choice (behind the bar's button) but what keeps
+                  // messages from arriving: shown until it is put right.
                   ListenableBuilder(
                     listenable: _services.account,
-                    builder: (context, _) => _DeliveryCard(
-                      delivery: me.delivery,
-                      pushAllowed: _services.account.pushAllowed,
-                      onChanged: _setDelivery,
-                      onPushOn: _services.permissions.openAppSettings,
-                    ),
+                    builder: (context, _) => me.delivery.push && !_services.account.pushAllowed
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _PushOff(onTurnOn: _services.permissions.openAppSettings),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                   if (me.delivery.telegram && me.botBlocked) ...[
-                    const SizedBox(height: 12),
                     _BotBlocked(
                       bot: me.delivery.bot,
                       checking: _checking,
                       onOpenBot: (bot) => _services.openLink(Uri.parse('https://t.me/$bot')),
                       onCheck: _check,
                     ),
+                    const SizedBox(height: 12),
                   ],
                   if (me.areas.isEmpty && me.watches.isEmpty)
                     _Empty(onArea: _addArea, onList: _openList)
@@ -471,23 +546,86 @@ class _DeliveryCard extends StatelessWidget {
               subtitle: Text(s.ntAppOnlyHint, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
             ),
           if (pushOff)
-            Container(
-              margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
-              decoration: BoxDecoration(color: const Color(0x1FE0A100), borderRadius: BorderRadius.circular(12)),
-              child: Row(
-                children: [
-                  const Icon(Icons.notifications_off_rounded, size: 20, color: Color(0xFFB07A00)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(s.ntPushOff, style: TextStyle(fontSize: 12.5, height: 1.35, color: p.ink)),
-                  ),
-                  TextButton(onPressed: onPushOn, child: Text(s.ntPushOn)),
-                ],
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: _PushOff(onTurnOn: onPushOn),
             )
           else
             const SizedBox(height: 6),
+        ],
+      ),
+    );
+  }
+}
+
+/// The bar's button: where messages go now (the phone, Telegram), with a
+/// dot when something keeps them from arriving.
+class _DeliveryButton extends StatelessWidget {
+  const _DeliveryButton({required this.delivery, required this.warn, required this.onTap});
+
+  final NotifyDelivery delivery;
+  final bool warn;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    return Tooltip(
+      message: s.ntDeliveryTooltip,
+      child: Material(
+        color: p.card,
+        shape: StadiumBorder(side: BorderSide(color: p.hairline)),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 6, 8, 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (delivery.push) Icon(Icons.phone_iphone_rounded, size: 19, color: p.accent),
+                if (delivery.push && delivery.telegram) const SizedBox(width: 4),
+                if (delivery.telegram) const Icon(Icons.telegram, size: 19, color: Color(0xFF229ED9)),
+                const SizedBox(width: 2),
+                Icon(Icons.expand_more_rounded, size: 18, color: p.inkMuted),
+                if (warn)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(left: 2),
+                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.error, shape: BoxShape.circle),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Notifications are off on the phone: nothing pushed will show.
+class _PushOff extends StatelessWidget {
+  const _PushOff({required this.onTurnOn});
+
+  final VoidCallback onTurnOn;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+      decoration: BoxDecoration(color: const Color(0x1FE0A100), borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        children: [
+          const Icon(Icons.notifications_off_rounded, size: 20, color: Color(0xFFB07A00)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(s.ntPushOff, style: TextStyle(fontSize: 12.5, height: 1.35, color: p.ink)),
+          ),
+          TextButton(onPressed: onTurnOn, child: Text(s.ntPushOn)),
         ],
       ),
     );
@@ -548,147 +686,304 @@ class _BotBlocked extends StatelessWidget {
   }
 }
 
-/// Nothing watched yet: the two ways in, and what one hears about.
+/// Nothing watched yet, as the web page has it: a bell with the three kinds
+/// of place around it, the two ways in (an area, the main one; a place from
+/// its page), and what one hears about.
 class _Empty extends StatelessWidget {
   const _Empty({required this.onArea, required this.onList});
 
   final VoidCallback onArea;
   final ValueChanged<PlaceKind> onList;
 
+  static const _deep = Color(0xFF065F46);
+
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    Widget way(IconData icon, String title, String body, {VoidCallback? onTap, Widget? below}) => Material(
-      color: p.card,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: p.hairline),
+    Widget orb(String emoji) => Container(
+      width: 32,
+      height: 32,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: p.card,
+        shape: BoxShape.circle,
+        boxShadow: const [BoxShadow(color: Color(0x1F1C1917), blurRadius: 10, offset: Offset(0, 3))],
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
+      child: Text(emoji, style: const TextStyle(fontSize: 16)),
+    );
+    final whens = [
+      ('🆕', s.ntWhenNew),
+      ('🚫', s.ntWhenClosed),
+      ('📞', s.ntWhenPhone),
+      ('✏️', s.ntWhenName),
+      ('📣', s.ntWhenOwner),
+      ('🕌', s.ntWhenMosque),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 4),
+        Center(
+          child: SizedBox(
+            width: 168,
+            height: 132,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox.square(dimension: 124, child: CustomPaint(painter: _DashedCircle(p.hairlineStrong))),
+                Container(
+                  width: 84,
+                  height: 84,
+                  decoration: BoxDecoration(color: p.cardSelected, shape: BoxShape.circle),
+                ),
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    color: p.accent,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: p.accent.withValues(alpha: 0.32), blurRadius: 16, offset: const Offset(0, 6)),
+                    ],
+                  ),
+                  child: const Icon(Icons.notifications_active_outlined, color: Colors.white, size: 26),
+                ),
+                Positioned(left: 14, top: 20, child: orb('🕌')),
+                Positioned(right: 12, top: 6, child: orb('🍽️')),
+                Positioned(right: 30, bottom: 2, child: orb('🏪')),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          s.ntEmptyTitle,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: Brand.displayFont,
+            fontSize: 21,
+            height: 1.3,
+            fontWeight: FontWeight.w700,
+            color: p.ink,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 320),
+            child: Text(
+              s.ntEmptyBody,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14.5, height: 1.55, color: p.inkSoft),
+            ),
+          ),
+        ),
+        const SizedBox(height: 18),
+        // The main way in: an area, on the page's green.
+        Material(
+          color: Colors.transparent,
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [p.accent, _deep]),
+              border: const Border(bottom: BorderSide(color: Color(0xFF064E3B), width: 4)),
+              boxShadow: [
+                BoxShadow(color: p.accent.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8)),
+              ],
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: onArea,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(Icons.my_location_rounded, color: Colors.white),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.ntEmptyAreaTitle,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            s.ntEmptyAreaBody,
+                            style: TextStyle(fontSize: 13, height: 1.45, color: Colors.white.withValues(alpha: 0.92)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.85)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // The other: a place, from its own page; the lists are a tap away.
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: p.card,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: p.hairline, width: 1.5),
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(14)),
-                child: Icon(icon, color: p.accent),
+                child: Icon(Icons.notifications_none_rounded, color: p.accent),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
-                      style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: p.ink),
+                      s.ntEmptyPlaceTitle,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: p.ink),
                     ),
-                    const SizedBox(height: 2),
-                    Text(body, style: TextStyle(fontSize: 13, height: 1.4, color: p.inkSoft)),
-                    ?below,
+                    const SizedBox(height: 3),
+                    Text(s.ntEmptyPlaceBody, style: TextStyle(fontSize: 13, height: 1.45, color: p.inkSoft)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (final kind in PlaceKind.values)
+                          Material(
+                            color: p.page,
+                            shape: const StadiumBorder(),
+                            child: InkWell(
+                              customBorder: const StadiumBorder(),
+                              onTap: () => onList(kind),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(8, 4, 10, 4),
+                                child: Text(
+                                  '${kind.emoji} ${switch (kind) {
+                                    PlaceKind.mosque => s.ntTypesMosque,
+                                    PlaceKind.restaurant => s.ntTypesRestaurant,
+                                    PlaceKind.shop => s.ntTypesShop,
+                                  }}',
+                                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.inkSoft),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              if (onTap != null) Icon(Icons.chevron_right_rounded, color: p.inkMuted),
             ],
           ),
         ),
-      ),
-    );
-    final whens = [
-      (Icons.add_business_rounded, s.ntWhenNew),
-      (Icons.block_rounded, s.ntWhenClosed),
-      (Icons.call_rounded, s.ntWhenPhone),
-      (Icons.edit_rounded, s.ntWhenName),
-      (Icons.campaign_rounded, s.ntWhenOwner),
-      (Icons.mosque_rounded, s.ntWhenMosque),
-    ];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 22),
-        Text(
-          s.ntEmptyTitle,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: p.ink),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          s.ntEmptyBody,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: p.inkSoft),
-        ),
-        const SizedBox(height: 16),
-        way(Icons.radar_rounded, s.ntEmptyAreaTitle, s.ntEmptyAreaBody, onTap: onArea),
-        const SizedBox(height: 10),
-        way(
-          Icons.notifications_active_rounded,
-          s.ntEmptyPlaceTitle,
-          s.ntEmptyPlaceBody,
-          below: Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
+        const SizedBox(height: 18),
+        // When a message comes: a dashed box, two columns.
+        CustomPaint(
+          painter: _DashedBox(p.hairlineStrong),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final kind in PlaceKind.values)
-                  ActionChip(
-                    avatar: Text(kind.emoji),
-                    label: Text(switch (kind) {
-                      PlaceKind.mosque => s.ntTypesMosque,
-                      PlaceKind.restaurant => s.ntTypesRestaurant,
-                      PlaceKind.shop => s.ntTypesShop,
-                    }),
-                    onPressed: () => onList(kind),
-                    backgroundColor: p.page,
-                    side: BorderSide(color: p.hairline),
+                Text(
+                  s.ntWhenTitle.toUpperCase(),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.3, color: p.inkMuted),
+                ),
+                const SizedBox(height: 9),
+                LayoutBuilder(
+                  builder: (context, box) => Wrap(
+                    spacing: 12,
+                    runSpacing: 7,
+                    children: [
+                      for (final (emoji, text) in whens)
+                        SizedBox(
+                          width: box.maxWidth >= 300 ? (box.maxWidth - 12) / 2 : box.maxWidth,
+                          child: Row(
+                            children: [
+                              Text(emoji, style: const TextStyle(fontSize: 14.5)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(text, style: TextStyle(fontSize: 13, height: 1.35, color: p.inkSoft)),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
+                ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 18),
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(
-            s.ntWhenTitle,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink),
-          ),
-        ),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final (icon, text) in whens)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                decoration: BoxDecoration(
-                  color: p.card,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: p.hairline),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(icon, size: 16, color: p.accent),
-                    const SizedBox(width: 6),
-                    Text(
-                      text,
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: p.ink),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
       ],
     );
   }
+}
+
+/// A dashed ring, the outer one of the welcome's bell.
+class _DashedCircle extends CustomPainter {
+  _DashedCircle(this.colour);
+
+  final Color colour;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..color = colour;
+    final r = size.width / 2 - 1;
+    const dashes = 36;
+    for (var i = 0; i < dashes; i++) {
+      final a = i * 2 * math.pi / dashes;
+      canvas.drawArc(Rect.fromCircle(center: size.center(Offset.zero), radius: r), a, math.pi / dashes, false, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedCircle old) => old.colour != colour;
+}
+
+/// A dashed, rounded box.
+class _DashedBox extends CustomPainter {
+  _DashedBox(this.colour);
+
+  final Color colour;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..color = colour;
+    final path = Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(18)));
+    for (final metric in path.computeMetrics()) {
+      for (var d = 0.0; d < metric.length; d += 10) {
+        canvas.drawPath(metric.extractPath(d, math.min(d + 5, metric.length)), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedBox old) => old.colour != colour;
 }
 
 class _Heading extends StatelessWidget {
