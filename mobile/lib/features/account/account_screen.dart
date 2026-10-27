@@ -8,6 +8,7 @@ import '../../app_services.dart';
 import '../../core/account.dart';
 import '../../core/app_language.dart';
 import '../../core/config.dart';
+import '../../core/google_auth.dart';
 import '../../core/system.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
@@ -1159,7 +1160,8 @@ class _SignInPanelState extends State<SignInPanel> with WidgetsBindingObserver {
     if (widget.telegramOnly) return const ['telegram'];
     final language = widget.services.locale.language ?? AppLanguage.uz;
     // Uzbeks have Telegram; most others use WhatsApp.
-    return language == AppLanguage.uz ? const ['telegram', 'whatsapp', 'google'] : const ['whatsapp', 'google', 'telegram'];
+    final order = language == AppLanguage.uz ? const ['telegram', 'whatsapp', 'google'] : const ['whatsapp', 'google', 'telegram'];
+    return [for (final p in order) if (p != 'google' || googleSignInAvailable) p];
   }
 
   Future<void> _start(String provider) async {

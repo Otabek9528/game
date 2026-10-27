@@ -1,6 +1,7 @@
 import 'package:muslim_vegukin/core/new_badges.dart';
 import 'package:muslim_vegukin/core/app_language.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/features/prayer/prayer_sources.dart';
 import 'package:muslim_vegukin/features/prayers/prayers_screen.dart';
@@ -252,5 +253,22 @@ void _newBadgeTests() {
     openInBrowser(tester.element(find.byType(Scaffold).first),
         const Feature(id: 'ramadan', emoji: '🌙', path: 'pages/ramadan/ramadan.html'), app.services);
     expect(app.links.last, Uri.parse('https://otabek9528.github.io/game/pages/ramadan/ramadan.html'));
+  });
+
+  testWidgets('a reminder tapped while the app runs (iOS says so) opens the prayers page', (tester) async {
+    final app = TestApp(language: 'uz');
+    await app.launch(tester);
+    var action = 'open_prayers';
+    const channel = MethodChannel('vegukin/widget');
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
+      if (call.method != 'takeLaunchAction') return null;
+      final taken = action;
+      action = '';
+      return taken.isEmpty ? null : taken;
+    });
+    await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        channel.name, const StandardMethodCodec().encodeMethodCall(const MethodCall('launchAction')), (_) {});
+    await tester.pumpAndSettle();
+    expect(find.byType(PrayersScreen), findsOneWidget);
   });
 }

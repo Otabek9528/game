@@ -1,0 +1,6 @@
+/* iOS ruxsat so'raganda ko'rsatadi. */
+"CFBundleDisplayName" = "Muslim Vegukin";
+"NSLocationWhenInUseUsageDescription" = "Namoz vaqtlari, qibla va yaqin joylar turgan joyingiz uchun ko‘rsatiladi.";
+"NSCameraUsageDescription" = "Kamera mahsulot shtrix-kodini skanerlaydi va qibla yo‘nalishini kamera ko‘rinishida ko‘rsatadi.";
+"NSPhotoLibraryUsageDescription" = "Avtomobil yoki uy-joy e’loningiz uchun rasm va videolarni tanlang.";
+"NSMicrophoneUsageDescription" = "E’lon uchun yozgan videongizda ovoz bo‘ladi.";

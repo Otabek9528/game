@@ -21,6 +21,17 @@ class HomeWidgetBridge {
       : _channel = channel ?? const MethodChannel('vegukin/widget');
 
   final MethodChannel _channel;
+
+  /// Told when there is a launch action to take, the app already running:
+  /// on iOS, a reminder or the widget tapped after the app last looked (see
+  /// [takeLaunchAction]).
+  set onLaunchAction(VoidCallback? listener) => _channel.setMethodCallHandler(
+        listener == null
+            ? null
+            : (call) async {
+                if (call.method == 'launchAction') listener();
+              },
+      );
   String? _lastSent;
 
   /// Sends the current data to the widgets if it changed since last time.

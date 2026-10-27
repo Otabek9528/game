@@ -1,0 +1,6 @@
+/* Shown by iOS when the app asks for a permission. */
+"CFBundleDisplayName" = "Muslim Vegukin";
+"NSLocationWhenInUseUsageDescription" = "Prayer times, the qibla and nearby places are shown for where you are.";
+"NSCameraUsageDescription" = "The camera scans product barcodes and shows the qibla direction over the camera view.";
+"NSPhotoLibraryUsageDescription" = "Choose photos and videos for your car or housing listing.";
+"NSMicrophoneUsageDescription" = "Videos you record for a listing include sound.";

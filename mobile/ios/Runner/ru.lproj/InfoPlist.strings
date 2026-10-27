@@ -1,0 +1,6 @@
+/* Показывается iOS при запросе разрешения. */
+"CFBundleDisplayName" = "Muslim Vegukin";
+"NSLocationWhenInUseUsageDescription" = "Время намаза, кибла и места рядом показываются для вашего местоположения.";
+"NSCameraUsageDescription" = "Камера сканирует штрихкоды товаров и показывает направление киблы в режиме камеры.";
+"NSPhotoLibraryUsageDescription" = "Выберите фото и видео для объявления о машине или жилье.";
+"NSMicrophoneUsageDescription" = "Видео, которое вы снимаете для объявления, записывается со звуком.";

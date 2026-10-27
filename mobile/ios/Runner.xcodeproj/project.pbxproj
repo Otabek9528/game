@@ -16,6 +16,12 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		FB75409C6A25DF30C75E3D81 /* VegukinPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DADFF4B67669E521A7CBFDF /* VegukinPlugin.swift */; };
+		76EAC467A32F59ED60C6B4EF /* QiblaCompass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6869C49EAFB1E6AED5B80DF /* QiblaCompass.swift */; };
+		4E56D5FF44F2DAC1E14B8D33 /* QiblaCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EEC0791C5BEE5DF711396E /* QiblaCamera.swift */; };
+		9315C61115CE91A3FFC2FFC8 /* PrayerReminders.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEEEE6447099C0E4723D4D6 /* PrayerReminders.swift */; };
+		1AFAFADA15FD4DE53A963575 /* vegukin_chime.caf in Resources */ = {isa = PBXBuildFile; fileRef = D26287F6DFC8AFD60D2CBC9D /* vegukin_chime.caf */; };
+		B7018CE631D0D0F2C7430663 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4F2940B8A07080388D40D944 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +65,15 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1DADFF4B67669E521A7CBFDF /* VegukinPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VegukinPlugin.swift; sourceTree = "<group>"; };
+		B6869C49EAFB1E6AED5B80DF /* QiblaCompass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiblaCompass.swift; sourceTree = "<group>"; };
+		A7EEC0791C5BEE5DF711396E /* QiblaCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiblaCamera.swift; sourceTree = "<group>"; };
+		ECEEEE6447099C0E4723D4D6 /* PrayerReminders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerReminders.swift; sourceTree = "<group>"; };
+		D26287F6DFC8AFD60D2CBC9D /* vegukin_chime.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = vegukin_chime.caf; sourceTree = "<group>"; };
+		641D203BEF099CCBBA8CAA5C /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		455057F7B46176E9F17861BF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E948F2D1B679D9FC0087AF4E /* uz */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uz; path = uz.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B96DA0936C66CF7A5FA4E845 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +139,13 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				1DADFF4B67669E521A7CBFDF /* VegukinPlugin.swift */,
+				B6869C49EAFB1E6AED5B80DF /* QiblaCompass.swift */,
+				A7EEC0791C5BEE5DF711396E /* QiblaCamera.swift */,
+				ECEEEE6447099C0E4723D4D6 /* PrayerReminders.swift */,
+				D26287F6DFC8AFD60D2CBC9D /* vegukin_chime.caf */,
+				641D203BEF099CCBBA8CAA5C /* Runner.entitlements */,
+				4F2940B8A07080388D40D944 /* InfoPlist.strings */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -198,6 +220,8 @@
 			knownRegions = (
 				en,
 				Base,
+				uz,
+				ru,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
@@ -229,6 +253,8 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				1AFAFADA15FD4DE53A963575 /* vegukin_chime.caf in Resources */,
+				B7018CE631D0D0F2C7430663 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,6 +310,10 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
+				FB75409C6A25DF30C75E3D81 /* VegukinPlugin.swift in Sources */,
+				76EAC467A32F59ED60C6B4EF /* QiblaCompass.swift in Sources */,
+				4E56D5FF44F2DAC1E14B8D33 /* QiblaCamera.swift in Sources */,
+				9315C61115CE91A3FFC2FFC8 /* PrayerReminders.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,6 +342,16 @@
 				97C147001CF9000F007C117D /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		4F2940B8A07080388D40D944 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				455057F7B46176E9F17861BF /* en */,
+				E948F2D1B679D9FC0087AF4E /* uz */,
+				B96DA0936C66CF7A5FA4E845 /* ru */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -365,7 +405,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Profile;
@@ -376,6 +416,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -492,7 +533,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -546,7 +587,7 @@
 				SUPPORTED_PLATFORMS = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -557,6 +598,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -579,6 +621,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;

@@ -47,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _services.homeWidget.onLaunchAction = _takeWidgetAction;
     _services.activity.log('open');
     unawaited(_badges.refresh());
     // First launch: location, camera and "Alarms & reminders", asked once,
@@ -103,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _services.homeWidget.onLaunchAction = null;
     _badges.dispose();
     super.dispose();
   }

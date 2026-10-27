@@ -52,6 +52,26 @@ const firebaseOptions = FirebaseOptions(
   storageBucket: 'muslim-vegukin.firebasestorage.app',
 );
 
+/// The Firebase project's iOS app (GoogleService-Info.plist: API_KEY and
+/// GOOGLE_APP_ID), once it is registered (mobile/ios/IOS.md). Empty: no push
+/// on iPhone yet, and the app works on without it.
+const firebaseIosApiKey = '';
+const firebaseIosAppId = '';
+
+/// The options for this platform; null on an iPhone until the iOS app is set.
+FirebaseOptions? get platformFirebaseOptions {
+  if (defaultTargetPlatform != TargetPlatform.iOS) return firebaseOptions;
+  if (firebaseIosAppId.isEmpty) return null;
+  return FirebaseOptions(
+    apiKey: firebaseIosApiKey,
+    appId: firebaseIosAppId,
+    messagingSenderId: firebaseOptions.messagingSenderId,
+    projectId: firebaseOptions.projectId,
+    storageBucket: firebaseOptions.storageBucket,
+    iosBundleId: 'com.vegukin.muslimVegukin',
+  );
+}
+
 class FirebasePushService implements PushService {
   FirebasePushService();
 
@@ -96,7 +116,9 @@ class FirebasePushService implements PushService {
     required PushArrived onForeground,
   }) async {
     try {
-      if (Firebase.apps.isEmpty) await Firebase.initializeApp(options: firebaseOptions);
+      final options = platformFirebaseOptions;
+      if (options == null) return false;
+      if (Firebase.apps.isEmpty) await Firebase.initializeApp(options: options);
       final messaging = FirebaseMessaging.instance;
       final settings = await messaging.requestPermission();
       final allowed =
