@@ -23,6 +23,7 @@ import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
 import '../reminders/reminders.dart';
 import 'inbox_screen.dart';
+import 'privacy_screen.dart';
 
 void openAccount(BuildContext context, AppServices services) {
   HapticFeedback.selectionClick();
@@ -260,7 +261,8 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
                   _NavRow(
                     icon: Icons.privacy_tip_outlined,
                     title: s.accountPrivacy,
-                    onTap: () => unawaited(_services.openLink(AppConfig.privacyPolicy)),
+                    onTap: () => Navigator.of(context)
+                        .push(MaterialPageRoute<void>(builder: (_) => PrivacyScreen(services: _services))),
                   ),
                 ],
               ),

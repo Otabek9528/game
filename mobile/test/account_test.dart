@@ -7,6 +7,7 @@ import 'package:muslim_vegukin/core/app_language.dart';
 import 'package:muslim_vegukin/features/account/account_screen.dart';
 import 'package:muslim_vegukin/features/account/inbox_message.dart';
 import 'package:muslim_vegukin/features/account/inbox_screen.dart';
+import 'package:muslim_vegukin/features/account/privacy_screen.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_models.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_screen.dart';
 import 'package:muslim_vegukin/features/hikorea/hikorea_watches.dart';
@@ -799,7 +800,10 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
       await tapScrolled(tester, find.text('Privacy policy'));
-      expect(app.links.last, Uri.parse('https://vegukin-twa.pages.dev/privacy.html'));
+      expect(find.byType(PrivacyScreen), findsOneWidget, reason: 'in the app, not the browser');
+      expect(find.text('Muslim Vegukin — Privacy Policy'), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.text('Muslim Vegukin · Version 1.0.0 (1)'),
         150,
