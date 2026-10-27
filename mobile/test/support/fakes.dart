@@ -975,16 +975,23 @@ class FakeAccounts implements AccountSource {
     return photos[_of(token).id];
   }
 
-  /// Test notifications asked for, by token; [testPushError]: the answer instead.
+  /// Test notifications asked for, by token. [testPush]: what the server
+  /// says each did; the bot's part only for a Telegram account (a positive id).
   final testPushes = <String>[];
-  String? testPushError;
+  String testPushOutcome = 'sent';
+  String testTelegramOutcome = 'sent';
 
   @override
-  Future<void> testPush(String token) async {
+  Future<TestPushResult> testPush(String token) async {
     _online();
-    _of(token);
-    if (testPushError case final code?) throw AccountException(code, 409);
+    final user = _of(token);
     testPushes.add(token);
+    final telegram = user.id > 0;
+    return (
+      push: testPushOutcome,
+      telegram: telegram ? testTelegramOutcome : null,
+      bot: telegram ? 'MuslimVegukinBot' : null,
+    );
   }
 
   /// What was pushed to each user id, oldest first.

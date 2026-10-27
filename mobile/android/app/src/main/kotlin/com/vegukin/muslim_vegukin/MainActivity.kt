@@ -1,7 +1,9 @@
 package com.vegukin.muslim_vegukin
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -165,6 +167,19 @@ class MainActivity : FlutterActivity() {
             }
         }
 
+        /** "vegukin/alerts": the server's notifications, see lib/core/push.dart. */
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/alerts").setMethodCallHandler { call, result ->
+            when (call.method) {
+                "shown" -> result.success(alertsShown())
+                "show" -> {
+                    val args = call.arguments as? Map<*, *>
+                    showAlert(args?.get("title") as? String, args?.get("body") as? String)
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
         /** "vegukin/share": Android's share sheet, see lib/core/share.dart. */
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "vegukin/share").setMethodCallHandler { call, result ->
             when (call.method) {
@@ -180,6 +195,49 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    /**
+     * Whether this phone shows the server's notifications: the app's are
+     * allowed, and its "alerts" channel isn't muted (which the permission
+     * alone doesn't tell).
+     */
+    private fun alertsShown(): Boolean {
+        val manager = getSystemService(NotificationManager::class.java) ?: return false
+        if (!manager.areNotificationsEnabled()) return false
+        if (Build.VERSION.SDK_INT < 26) return true
+        val channel = manager.getNotificationChannel("alerts") ?: return true
+        return channel.importance != NotificationManager.IMPORTANCE_NONE
+    }
+
+    /**
+     * One of the server's notifications, shown by the app itself: Android
+     * shows none while the app is open (the test one, so it is seen).
+     */
+    private fun showAlert(title: String?, body: String?) {
+        val manager = getSystemService(NotificationManager::class.java) ?: return
+        val open = PendingIntent.getActivity(
+            this,
+            3,
+            Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val builder = if (Build.VERSION.SDK_INT >= 26) {
+            Notification.Builder(this, "alerts")
+        } else {
+            @Suppress("DEPRECATION")
+            Notification.Builder(this).setPriority(Notification.PRIORITY_HIGH).setDefaults(Notification.DEFAULT_ALL)
+        }
+        val notification = builder
+            .setSmallIcon(R.drawable.ic_stat_prayer)
+            .setColor(0xFF047857.toInt())
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(Notification.BigTextStyle().bigText(body))
+            .setAutoCancel(true)
+            .setContentIntent(open)
+            .build()
+        manager.notify(ALERT_ID, notification)
+    }
+
     /** An app's launcher icon as a PNG, 96 px square. */
     private fun iconPng(pkg: String): ByteArray? = try {
         val drawable = packageManager.getApplicationIcon(pkg)
@@ -189,6 +247,11 @@ class MainActivity : FlutterActivity() {
         ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }.toByteArray()
     } catch (e: Exception) {
         null
+    }
+
+    private companion object {
+        /** The test notification's id: a second test replaces the first. */
+        const val ALERT_ID = 7301
     }
 
     override fun onDestroy() {

@@ -3652,12 +3652,6 @@ abstract class AppLocalizations {
   /// **'Akkaunt o‘chirildi'**
   String get accountDeleted;
 
-  /// No description provided for @accountPushOn.
-  ///
-  /// In uz, this message translates to:
-  /// **'Bildirishnomalar shu telefonga keladi'**
-  String get accountPushOn;
-
   /// No description provided for @accountPushOff.
   ///
   /// In uz, this message translates to:
@@ -4444,41 +4438,11 @@ abstract class AppLocalizations {
   /// **'Yoqish'**
   String get accountTurnOn;
 
-  /// No description provided for @accountWhatComes.
-  ///
-  /// In uz, this message translates to:
-  /// **'HiKorea\'da joy ochilishi, kuzatayotgan joy va hududlaringiz yangiliklari, e’lonlar.'**
-  String get accountWhatComes;
-
-  /// No description provided for @accountTelegramToo.
-  ///
-  /// In uz, this message translates to:
-  /// **'Ular Telegram\'dagi Muslim Vegukin botidan ham keladi.'**
-  String get accountTelegramToo;
-
-  /// No description provided for @accountTestPush.
-  ///
-  /// In uz, this message translates to:
-  /// **'Sinov bildirishnomasi'**
-  String get accountTestPush;
-
-  /// No description provided for @accountTestSent.
-  ///
-  /// In uz, this message translates to:
-  /// **'Yuborildi — telefoningizda ko‘ring'**
-  String get accountTestSent;
-
   /// No description provided for @accountTestFailed.
   ///
   /// In uz, this message translates to:
   /// **'Yuborib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.'**
   String get accountTestFailed;
-
-  /// No description provided for @accountActivity.
-  ///
-  /// In uz, this message translates to:
-  /// **'Faoliyatingiz'**
-  String get accountActivity;
 
   /// No description provided for @accountInboxNone.
   ///
@@ -8403,6 +8367,210 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Xabarlar qayerga keladi'**
   String get ntDeliveryTooltip;
+
+  /// No description provided for @accountMine.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabarlar va kuzatuvlar'**
+  String get accountMine;
+
+  /// No description provided for @accountPlacesWatches.
+  ///
+  /// In uz, this message translates to:
+  /// **'Joylar va hududlar'**
+  String get accountPlacesWatches;
+
+  /// No description provided for @accountAreas.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} hudud'**
+  String accountAreas(num count);
+
+  /// No description provided for @accountPlaces.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} joy'**
+  String accountPlaces(num count);
+
+  /// No description provided for @accountNoneYet.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hali yo‘q'**
+  String get accountNoneYet;
+
+  /// No description provided for @accountHikoreaWatches.
+  ///
+  /// In uz, this message translates to:
+  /// **'HiKorea kuzatuvlari'**
+  String get accountHikoreaWatches;
+
+  /// No description provided for @accountOnPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu telefonda'**
+  String get accountOnPhone;
+
+  /// No description provided for @accountOn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqilgan'**
+  String get accountOn;
+
+  /// No description provided for @accountOff.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘chiq'**
+  String get accountOff;
+
+  /// No description provided for @accountReminders.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz eslatmalari'**
+  String get accountReminders;
+
+  /// No description provided for @accountRemindersCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta namoz'**
+  String accountRemindersCount(num count);
+
+  /// No description provided for @accountTestTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sinov xabari'**
+  String get accountTestTitle;
+
+  /// No description provided for @accountTestToPhone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu telefonga yuboriladi.'**
+  String get accountTestToPhone;
+
+  /// No description provided for @accountTestToBoth.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu telefonga va Telegram botga yuboriladi.'**
+  String get accountTestToBoth;
+
+  /// No description provided for @accountTestSend.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuborish'**
+  String get accountTestSend;
+
+  /// No description provided for @accountTestWaiting.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonga kelishini kutyapmiz…'**
+  String get accountTestWaiting;
+
+  /// No description provided for @accountTestArrived.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonga keldi'**
+  String get accountTestArrived;
+
+  /// No description provided for @accountTestNotArrived.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonga kelmadi'**
+  String get accountTestNotArrived;
+
+  /// No description provided for @accountTestNotArrivedHelp.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon sozlamalarida Muslim Vegukin bildirishnomalari yoqilganini va quvvat tejash ilovani cheklamayotganini tekshiring.'**
+  String get accountTestNotArrivedHelp;
+
+  /// No description provided for @accountTestCheckShade.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefonning bildirishnomalar panelini tekshiring'**
+  String get accountTestCheckShade;
+
+  /// No description provided for @accountTestNoToken.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon hali ro‘yxatdan o‘tmagan. Internetni tekshirib, ilovani qayta oching.'**
+  String get accountTestNoToken;
+
+  /// No description provided for @accountTestServerFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Server yubora olmadi. Birozdan so‘ng urinib ko‘ring.'**
+  String get accountTestServerFailed;
+
+  /// No description provided for @accountTestBotSent.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram botga yuborildi'**
+  String get accountTestBotSent;
+
+  /// No description provided for @accountTestBotBlocked.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot sizga yoza olmaydi: botni oching va «Start»ni bosing.'**
+  String get accountTestBotBlocked;
+
+  /// No description provided for @accountTestBotFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram botga yuborib bo‘lmadi'**
+  String get accountTestBotFailed;
+
+  /// No description provided for @accountOpenBot.
+  ///
+  /// In uz, this message translates to:
+  /// **'Botni ochish'**
+  String get accountOpenBot;
+
+  /// No description provided for @accountSettings.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sozlamalar'**
+  String get accountSettings;
+
+  /// No description provided for @accountAlarmsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz eslatmalari kechikishi mumkin'**
+  String get accountAlarmsTitle;
+
+  /// No description provided for @accountAlarmsBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ular aynan vaqtida kelishi uchun «Signal va eslatmalar» ruxsatini yoqing.'**
+  String get accountAlarmsBody;
+
+  /// No description provided for @accountAllow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ruxsat berish'**
+  String get accountAllow;
+
+  /// No description provided for @accountShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ilovani ulashish'**
+  String get accountShare;
+
+  /// No description provided for @accountShareText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin — Koreyadagi musulmonlar uchun: namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va boshqalar.\n{link}'**
+  String accountShareText(Object link);
+
+  /// No description provided for @accountFeedback.
+  ///
+  /// In uz, this message translates to:
+  /// **'Taklif yoki xato haqida yozish'**
+  String get accountFeedback;
+
+  /// No description provided for @accountVersion.
+  ///
+  /// In uz, this message translates to:
+  /// **'Versiya {version}'**
+  String accountVersion(Object version);
 }
 
 class _AppLocalizationsDelegate

@@ -2003,9 +2003,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get accountDeleted => 'Akkaunt o‘chirildi';
 
   @override
-  String get accountPushOn => 'Bildirishnomalar shu telefonga keladi';
-
-  @override
   String get accountPushOff =>
       'Xabarlar baribir «Kelgan xabarlar»ga tushadi, lekin telefon ularni ko‘rsatmaydi.';
 
@@ -2467,25 +2464,8 @@ class AppLocalizationsUz extends AppLocalizations {
   String get accountTurnOn => 'Yoqish';
 
   @override
-  String get accountWhatComes =>
-      'HiKorea\'da joy ochilishi, kuzatayotgan joy va hududlaringiz yangiliklari, e’lonlar.';
-
-  @override
-  String get accountTelegramToo =>
-      'Ular Telegram\'dagi Muslim Vegukin botidan ham keladi.';
-
-  @override
-  String get accountTestPush => 'Sinov bildirishnomasi';
-
-  @override
-  String get accountTestSent => 'Yuborildi — telefoningizda ko‘ring';
-
-  @override
   String get accountTestFailed =>
       'Yuborib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.';
-
-  @override
-  String get accountActivity => 'Faoliyatingiz';
 
   @override
   String get accountInboxNone => 'Hozircha xabar yo‘q';
@@ -4689,4 +4669,122 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get ntDeliveryTooltip => 'Xabarlar qayerga keladi';
+
+  @override
+  String get accountMine => 'Xabarlar va kuzatuvlar';
+
+  @override
+  String get accountPlacesWatches => 'Joylar va hududlar';
+
+  @override
+  String accountAreas(num count) {
+    return '$count hudud';
+  }
+
+  @override
+  String accountPlaces(num count) {
+    return '$count joy';
+  }
+
+  @override
+  String get accountNoneYet => 'Hali yo‘q';
+
+  @override
+  String get accountHikoreaWatches => 'HiKorea kuzatuvlari';
+
+  @override
+  String get accountOnPhone => 'Shu telefonda';
+
+  @override
+  String get accountOn => 'Yoqilgan';
+
+  @override
+  String get accountOff => 'O‘chiq';
+
+  @override
+  String get accountReminders => 'Namoz eslatmalari';
+
+  @override
+  String accountRemindersCount(num count) {
+    return '$count ta namoz';
+  }
+
+  @override
+  String get accountTestTitle => 'Sinov xabari';
+
+  @override
+  String get accountTestToPhone => 'Shu telefonga yuboriladi.';
+
+  @override
+  String get accountTestToBoth => 'Shu telefonga va Telegram botga yuboriladi.';
+
+  @override
+  String get accountTestSend => 'Yuborish';
+
+  @override
+  String get accountTestWaiting => 'Telefonga kelishini kutyapmiz…';
+
+  @override
+  String get accountTestArrived => 'Telefonga keldi';
+
+  @override
+  String get accountTestNotArrived => 'Telefonga kelmadi';
+
+  @override
+  String get accountTestNotArrivedHelp =>
+      'Telefon sozlamalarida Muslim Vegukin bildirishnomalari yoqilganini va quvvat tejash ilovani cheklamayotganini tekshiring.';
+
+  @override
+  String get accountTestCheckShade =>
+      'Telefonning bildirishnomalar panelini tekshiring';
+
+  @override
+  String get accountTestNoToken =>
+      'Telefon hali ro‘yxatdan o‘tmagan. Internetni tekshirib, ilovani qayta oching.';
+
+  @override
+  String get accountTestServerFailed =>
+      'Server yubora olmadi. Birozdan so‘ng urinib ko‘ring.';
+
+  @override
+  String get accountTestBotSent => 'Telegram botga yuborildi';
+
+  @override
+  String get accountTestBotBlocked =>
+      'Bot sizga yoza olmaydi: botni oching va «Start»ni bosing.';
+
+  @override
+  String get accountTestBotFailed => 'Telegram botga yuborib bo‘lmadi';
+
+  @override
+  String get accountOpenBot => 'Botni ochish';
+
+  @override
+  String get accountSettings => 'Sozlamalar';
+
+  @override
+  String get accountAlarmsTitle => 'Namoz eslatmalari kechikishi mumkin';
+
+  @override
+  String get accountAlarmsBody =>
+      'Ular aynan vaqtida kelishi uchun «Signal va eslatmalar» ruxsatini yoqing.';
+
+  @override
+  String get accountAllow => 'Ruxsat berish';
+
+  @override
+  String get accountShare => 'Ilovani ulashish';
+
+  @override
+  String accountShareText(Object link) {
+    return 'Muslim Vegukin — Koreyadagi musulmonlar uchun: namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va boshqalar.\n$link';
+  }
+
+  @override
+  String get accountFeedback => 'Taklif yoki xato haqida yozish';
+
+  @override
+  String accountVersion(Object version) {
+    return 'Versiya $version';
+  }
 }

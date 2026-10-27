@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// A notification from the server: what it said, and what to open.
 @immutable
@@ -32,9 +33,13 @@ abstract interface class PushService {
   });
 
   /// Whether notifications are allowed now: the person may have changed it
-  /// in the phone's settings since [start].
+  /// in the phone's settings since [start]. False too when the app's
+  /// "alerts" channel is muted: allowed, but nothing would show.
   Future<bool> isAllowed();
 }
+
+/// The test notification's data: it says it arrived (see AccountController).
+bool isTestPush(PushMessage message) => message.data['kind'] == 'test';
 
 /// The Firebase project's Android app (from google-services.json). Read by
 /// the app at start instead of by Gradle, so the build needs no Google
@@ -52,6 +57,32 @@ class FirebasePushService implements PushService {
 
   final _subscriptions = <StreamSubscription<Object?>>[];
 
+  /// MainActivity's: whether the "alerts" channel shows, and showing one.
+  static const _alerts = MethodChannel('vegukin/alerts');
+
+  static Future<bool> _channelShown() async {
+    try {
+      return await _alerts.invokeMethod<bool>('shown') ?? true;
+    } on PlatformException catch (_) {
+      return true;
+    } on MissingPluginException catch (_) {
+      return true;
+    }
+  }
+
+  /// One arrived while the app is open, which Android doesn't show. The
+  /// test is shown as a real notification, so the person sees what one
+  /// looks like (and that the channel isn't muted).
+  static void _arrived(RemoteMessage m, PushArrived onForeground) {
+    final message = _message(m);
+    if (isTestPush(message)) {
+      unawaited(
+        _alerts.invokeMethod<void>('show', {'title': message.title, 'body': message.body}).catchError((Object _) {}),
+      );
+    }
+    onForeground(message);
+  }
+
   static PushMessage _message(RemoteMessage m) => PushMessage(
         title: m.notification?.title,
         body: m.notification?.body,
@@ -68,8 +99,10 @@ class FirebasePushService implements PushService {
       if (Firebase.apps.isEmpty) await Firebase.initializeApp(options: firebaseOptions);
       final messaging = FirebaseMessaging.instance;
       final settings = await messaging.requestPermission();
-      final allowed = settings.authorizationStatus == AuthorizationStatus.authorized ||
-          settings.authorizationStatus == AuthorizationStatus.provisional;
+      final allowed =
+          (settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional) &&
+          await _channelShown();
       for (final s in _subscriptions) {
         unawaited(s.cancel());
       }
@@ -80,7 +113,7 @@ class FirebasePushService implements PushService {
         ..clear()
         // ignore: deprecated_member_use
         ..add(messaging.onTokenRefresh.listen(onToken))
-        ..add(FirebaseMessaging.onMessage.listen((m) => onForeground(_message(m))))
+        ..add(FirebaseMessaging.onMessage.listen((m) => _arrived(m, onForeground)))
         ..add(FirebaseMessaging.onMessageOpenedApp.listen((m) => onOpen(_message(m))));
       // ignore: deprecated_member_use
       final token = await messaging.getToken();
@@ -102,8 +135,9 @@ class FirebasePushService implements PushService {
     try {
       if (Firebase.apps.isEmpty) return false;
       final settings = await FirebaseMessaging.instance.getNotificationSettings();
-      return settings.authorizationStatus == AuthorizationStatus.authorized ||
-          settings.authorizationStatus == AuthorizationStatus.provisional;
+      return (settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional) &&
+          await _channelShown();
     } catch (e) {
       return false;
     }

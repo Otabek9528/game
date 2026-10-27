@@ -98,6 +98,8 @@ class _VegukinAppState extends State<VegukinApp> {
 
   /// One arrived while the app was open: Android doesn't show it, so the app does.
   void _showPush(PushMessage message) {
+    // The test shows as a real notification, and on the account page.
+    if (isTestPush(message)) return;
     unawaited(widget.services.account.refreshInbox());
     final text = [?message.title, ?message.body].join('\n');
     final context = _navigator.currentContext;

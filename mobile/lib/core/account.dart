@@ -110,6 +110,13 @@ class LoginLink {
   final Duration expiresIn;
 }
 
+/// What a test notification did on each way it goes. [push]: `sent` (the
+/// notification service took it), `no_token` (this phone gave none yet),
+/// `rejected` (its token is dead), `failed`, `off` (none on the server).
+/// [telegram], for a Telegram account: `sent`, `blocked` (the bot can't write
+/// to them) or `failed`; null otherwise. [bot]: its username, to open it.
+typedef TestPushResult = ({String push, String? telegram, String? bot});
+
 class AccountException implements Exception {
   const AccountException(this.code, [this.status = 0]);
 
@@ -146,8 +153,9 @@ abstract interface class AccountSource {
   /// The signed-in account's profile photo; null when it has none.
   Future<Uint8List?> photo(String token);
 
-  /// A notification to this phone, to see that they arrive.
-  Future<void> testPush(String token);
+  /// A test notification to this phone, and from the bot to a Telegram
+  /// account.
+  Future<TestPushResult> testPush(String token);
 }
 
 class HttpAccountSource implements AccountSource {
@@ -255,7 +263,15 @@ class HttpAccountSource implements AccountSource {
   }
 
   @override
-  Future<void> testPush(String token) => _call('POST', 'api/app/me/test-push', token: token);
+  Future<TestPushResult> testPush(String token) async {
+    final json = await _call('POST', 'api/app/me/test-push', token: token);
+    final telegram = json['telegram'], bot = json['bot'];
+    return (
+      push: json['push'] is String ? json['push'] as String : (json['sent'] == true ? 'sent' : 'failed'),
+      telegram: telegram is String ? telegram : null,
+      bot: bot is String && bot.isNotEmpty ? bot : null,
+    );
+  }
 
   @override
   Future<(List<InboxItem>, bool)> inbox(String token, {int? before}) async {
@@ -353,6 +369,10 @@ class AccountController extends ChangeNotifier {
   /// Whether this phone lets the app show notifications.
   bool get pushAllowed => _pushAllowed;
 
+  /// Whether [pushAllowed] is known: false until the first ask is answered.
+  bool get pushChecked => _pushChecked;
+  bool _pushChecked = false;
+
   /// For calls that need to know who is asking; empty until the account exists.
   Map<String, String> get authHeaders => _token == null ? const {} : {'Authorization': 'Bearer $_token'};
 
@@ -369,13 +389,20 @@ class AccountController extends ChangeNotifier {
   /// hands the server this phone's token. Once; after the first-launch
   /// permission questions, so its prompt never comes before them.
   Future<void> startPush() => _pushStarted ??= _push
-          .start(
-            onToken: _setPushToken,
-            onOpen: (m) => _onOpen(m),
-            onForeground: (m) => _onForeground(m),
-          )
-          .then((allowed) {
+      .start(
+        onToken: _setPushToken,
+        onOpen: (m) {
+          _noteTest(m);
+          _onOpen(m);
+        },
+        onForeground: (m) {
+          _noteTest(m);
+          _onForeground(m);
+        },
+      )
+      .then((allowed) {
         _pushAllowed = allowed;
+        _pushChecked = true;
         notifyListeners();
       });
 
@@ -534,8 +561,24 @@ class AccountController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// A notification to this phone now, in the app's language.
-  Future<void> sendTestPush() async => _source.testPush(await _session());
+  /// When the last test notification reached this phone; null until it does.
+  DateTime? get testArrivedAt => _testArrivedAt;
+  DateTime? _testArrivedAt;
+
+  void _noteTest(PushMessage message) {
+    if (!isTestPush(message)) return;
+    _testArrivedAt = DateTime.now();
+    notifyListeners();
+  }
+
+  /// A test notification to this phone now, in the app's language (and from
+  /// the bot to a Telegram account). Whether it reached the phone is
+  /// [testArrivedAt]: the server only knows it was handed on.
+  Future<TestPushResult> sendTestPush() async {
+    final session = await _session();
+    _testArrivedAt = null;
+    return _source.testPush(session);
+  }
 
   /// The app's language changed: notifications from now on come in it.
   Future<void> languageChanged() async {

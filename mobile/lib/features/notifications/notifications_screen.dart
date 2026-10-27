@@ -21,6 +21,24 @@ import 'notify_models.dart';
 /// one stood, or an address), places watched one by one, and how one is told
 /// — the app's notifications, and for a Telegram account the bot as well.
 /// A message's "Stop" opens here and stops at once, with an undo.
+const _cacheKey = 'notify_me';
+
+/// The areas and places watched, as the Notifications page last had them
+/// (the account page counts them too). Someone else's (signed in or out
+/// since) is not used.
+NotifyMe? cachedNotifyMe(AppServices services) {
+  try {
+    final json = jsonDecode(services.store.read(_cacheKey) ?? '');
+    if (json is! Map<String, dynamic> || json['user'] != services.account.user?.id) return null;
+    return notifyMeFromJson(json);
+  } on FormatException {
+    return null;
+  }
+}
+
+void keepNotifyMe(AppServices services, NotifyMe me) =>
+    unawaited(services.store.write(_cacheKey, jsonEncode({'user': services.account.user?.id, ...notifyMeToJson(me)})));
+
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key, required this.services, this.stop});
 
@@ -42,27 +60,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String get _lang => _services.locale.language?.code ?? 'uz';
 
   /// What the page showed last time, kept on the phone: shown at once,
-  /// then refreshed. Someone else's (signed in or out since) is not used.
-  static const _cacheKey = 'notify_me';
+  /// then refreshed.
   NotifyMe? _meValue;
   NotifyMe? get _me => _meValue;
   set _me(NotifyMe? me) {
     _meValue = me;
-    if (me == null) return;
-    unawaited(
-      _services.store.write(_cacheKey, jsonEncode({'user': _services.account.user?.id, ...notifyMeToJson(me)})),
-    );
+    if (me != null) keepNotifyMe(_services, me);
   }
 
-  NotifyMe? _cached() {
-    try {
-      final json = jsonDecode(_services.store.read(_cacheKey) ?? '');
-      if (json is! Map<String, dynamic> || json['user'] != _services.account.user?.id) return null;
-      return notifyMeFromJson(json);
-    } on FormatException {
-      return null;
-    }
-  }
+  NotifyMe? _cached() => cachedNotifyMe(_services);
 
   bool _refreshing = false;
   bool _failed = false;

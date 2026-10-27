@@ -7,12 +7,20 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/account.dart';
 import '../../core/app_language.dart';
+import '../../core/config.dart';
+import '../../core/system.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../hikorea/hikorea_kit.dart';
 import '../hikorea/hikorea_watches.dart';
+import '../home/feature_catalog.dart';
+import '../home/sections.dart';
+import '../notifications/notifications_screen.dart';
+import '../notifications/notify_models.dart';
 import '../onboarding/language_screen.dart';
+import '../prayers/prayers_screen.dart';
+import '../reminders/reminders.dart';
 import 'inbox_screen.dart';
 
 void openAccount(BuildContext context, AppServices services) {
@@ -44,10 +52,17 @@ Future<bool> askToSignIn(BuildContext context, AppServices services, {bool teleg
   return done ?? services.account.signedIn;
 }
 
-/// The person's page: who the app is signed in as (with the photo the
-/// sign-in brought), whether alerts reach this phone and a way to check,
-/// what they have going (inbox, watches), the app's settings, and, last,
-/// signing out and deleting the account.
+/// The person's page, in the order it is used:
+///
+/// * who the app is signed in as (or, for a guest, why and how to sign in);
+/// * what needs doing, only when something does: notifications off, prayer
+///   reminders that would come late;
+/// * what reaches them and what they follow: the inbox, places and areas,
+///   HiKorea;
+/// * how it reaches this phone: notifications, prayer reminders, and a test
+///   that says what actually arrived, here and in the Telegram bot;
+/// * the app: language, dark mode, sharing it, writing to us;
+/// * last and quiet, signing out and deleting the account; the version.
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key, required this.services});
 
@@ -60,15 +75,27 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserver {
   late final HikoreaKit _hikorea = HikoreaKit(widget.services);
 
-  AccountController get _account => widget.services.account;
+  /// The areas and places watched, as last known; refreshed on opening.
+  NotifyMe? _notify;
+
+  /// Reminders are on but Android would let them come late.
+  bool _alarmsLate = false;
+
+  AppServices get _services => widget.services;
+  AccountController get _account => _services.account;
+
+  /// Prayers with a reminder on.
+  int get _reminders => ReminderSlot.values.where((slot) => _services.reminders.settings[slot].isOn).length;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _notify = cachedNotifyMe(_services);
     unawaited(_hikorea.refreshWatches());
     unawaited(_account.refreshInbox());
-    unawaited(_account.recheckPush());
+    unawaited(_recheck());
+    unawaited(_refreshNotify());
   }
 
   @override
@@ -80,8 +107,45 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Back from the phone's settings: notifications may be on now.
-    if (state == AppLifecycleState.resumed) unawaited(_account.recheckPush());
+    // Back from the phone's settings: notifications or alarms may be on now.
+    if (state == AppLifecycleState.resumed) unawaited(_recheck());
+  }
+
+  Future<void> _recheck() async {
+    await _account.recheckPush();
+    final late = _reminders > 0 && await _services.homeWidget.exactAlarmsMissing();
+    if (mounted && late != _alarmsLate) setState(() => _alarmsLate = late);
+  }
+
+  Future<void> _refreshNotify() async {
+    try {
+      final me = await _services.places.notifyMe(await _account.headers());
+      keepNotifyMe(_services, me);
+      if (mounted) setState(() => _notify = me);
+    } catch (_) {
+      // Offline: the counts kept from before stand.
+    }
+  }
+
+  Future<void> _openNotifications() async {
+    _services.activity.log('notifications');
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => NotificationsScreen(services: _services),
+        settings: const RouteSettings(name: 'notifications'),
+      ),
+    );
+    if (mounted) setState(() => _notify = cachedNotifyMe(_services));
+  }
+
+  String? _watching(AppLocalizations s) {
+    final me = _notify;
+    if (me == null) return null;
+    final parts = [
+      if (me.areas.isNotEmpty) s.accountAreas(me.areas.length),
+      if (me.watches.isNotEmpty) s.accountPlaces(me.watches.length),
+    ];
+    return parts.isEmpty ? s.accountNoneYet : parts.join(' · ');
   }
 
   @override
@@ -96,71 +160,206 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
         surfaceTintColor: Colors.transparent,
       ),
       body: ListenableBuilder(
-        listenable: Listenable.merge([_account, _hikorea, widget.services.locale, widget.services.theme]),
+        listenable: Listenable.merge([_account, _hikorea, _services.locale, _services.theme, _services.reminders]),
         builder: (context, _) {
           final user = _account.user;
           final signedIn = user != null && user.signedIn;
+          final pushOff = _account.pushChecked && !_account.pushAllowed;
           return ListView(
-            padding: EdgeInsets.fromLTRB(16, 4, 16, 28 + MediaQuery.paddingOf(context).bottom),
+            padding: EdgeInsets.fromLTRB(16, 4, 16, 20 + MediaQuery.paddingOf(context).bottom),
             children: [
-              _ProfileHeader(services: widget.services),
+              _ProfileHeader(services: _services),
+              if (pushOff)
+                _Attention(
+                  icon: Icons.notifications_off_rounded,
+                  title: s.accountPushOffTitle,
+                  body: s.accountPushOff,
+                  action: s.accountTurnOn,
+                  onAction: _services.reminders.openNotificationSettings,
+                ),
+              if (_alarmsLate)
+                _Attention(
+                  icon: Icons.alarm_rounded,
+                  title: s.accountAlarmsTitle,
+                  body: s.accountAlarmsBody,
+                  action: s.accountAllow,
+                  onAction: _services.homeWidget.openExactAlarmSettings,
+                ),
+              _SectionTitle(s.accountMine),
+              _RowsCard(
+                children: [
+                  _NavRow(
+                    icon: Icons.inbox_rounded,
+                    title: s.inboxTitle,
+                    value: _account.unread > 0
+                        ? s.inboxUnread(_account.unread)
+                        : _account.inbox.isEmpty
+                        ? s.accountInboxNone
+                        : s.accountInboxAll(_account.inbox.length),
+                    highlight: _account.unread > 0,
+                    onTap: () => openInbox(context, _services),
+                  ),
+                  _NavRow(
+                    icon: Icons.place_rounded,
+                    title: s.accountPlacesWatches,
+                    value: _watching(s),
+                    onTap: _openNotifications,
+                  ),
+                  _NavRow(
+                    icon: Icons.event_available_rounded,
+                    title: s.accountHikoreaWatches,
+                    value: switch (_hikorea.watches?.length) {
+                      null => null,
+                      0 => s.accountNoneYet,
+                      final n => s.accountActive(n),
+                    },
+                    onTap: () => openWatches(context, _hikorea),
+                  ),
+                ],
+              ),
               _SectionTitle(s.accountNotifications),
-              _NotificationsCard(services: widget.services),
-              _SectionTitle(s.accountActivity),
-              _RowsCard(children: [
-                _NavRow(
-                  icon: Icons.inbox_rounded,
-                  title: s.inboxTitle,
-                  value: _account.unread > 0
-                      ? s.inboxUnread(_account.unread)
-                      : _account.inbox.isEmpty
-                          ? s.accountInboxNone
-                          : s.accountInboxAll(_account.inbox.length),
-                  highlight: _account.unread > 0,
-                  onTap: () => openInbox(context, widget.services),
-                ),
-                _NavRow(
-                  icon: Icons.event_available_rounded,
-                  title: s.hkMyWatches,
-                  value: switch (_hikorea.watches?.length) {
-                    null => null,
-                    0 => s.hkWatchesEmpty,
-                    final n => s.accountActive(n),
-                  },
-                  onTap: () => openWatches(context, _hikorea),
-                ),
-              ]),
+              _NotificationsCard(services: _services, reminders: _reminders, off: pushOff),
               _SectionTitle(s.accountApp),
-              _RowsCard(children: [
-                _NavRow(
-                  icon: Icons.translate_rounded,
-                  title: s.accountLanguage,
-                  value: (widget.services.locale.language ?? AppLanguage.uz).nativeName,
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                    builder: (_) => LanguageScreen(
-                      services: widget.services,
-                      initialLanguage: widget.services.locale.language ?? AppLanguage.uz,
-                      isOnboarding: false,
+              _RowsCard(
+                children: [
+                  _NavRow(
+                    icon: Icons.translate_rounded,
+                    title: s.accountLanguage,
+                    value: (_services.locale.language ?? AppLanguage.uz).nativeName,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => LanguageScreen(
+                          services: _services,
+                          initialLanguage: _services.locale.language ?? AppLanguage.uz,
+                          isOnboarding: false,
+                        ),
+                      ),
                     ),
-                  )),
-                ),
-                _SwitchRow(
-                  icon: Icons.dark_mode_outlined,
-                  title: s.accountDarkMode,
-                  value: Theme.of(context).brightness == Brightness.dark,
-                  onChanged: (_) {
-                    HapticFeedback.selectionClick();
-                    unawaited(widget.services.theme.toggle(Theme.of(context).brightness));
-                  },
-                ),
-              ]),
-              if (signedIn) ...[
-                _SectionTitle(s.accountManage),
-                _Manage(user: user, services: widget.services),
-              ],
+                  ),
+                  _SwitchRow(
+                    icon: Icons.dark_mode_outlined,
+                    title: s.accountDarkMode,
+                    value: Theme.of(context).brightness == Brightness.dark,
+                    onChanged: (_) {
+                      HapticFeedback.selectionClick();
+                      unawaited(_services.theme.toggle(Theme.of(context).brightness));
+                    },
+                  ),
+                  _NavRow(
+                    icon: Icons.share_rounded,
+                    title: s.accountShare,
+                    onTap: () => unawaited(_services.shareText(s.accountShareText(AppConfig.playStoreUrl))),
+                  ),
+                  _NavRow(
+                    icon: Icons.forum_rounded,
+                    title: s.accountFeedback,
+                    onTap: () => openSection(context, featureGrid.firstWhere((f) => f.id == 'community'), _services),
+                  ),
+                ],
+              ),
+              if (signedIn) ...[_SectionTitle(s.accountManage), _Manage(user: user, services: _services)],
+              _Version(system: _services.system),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Something to put right, at the top, only while it needs it.
+class _Attention extends StatelessWidget {
+  const _Attention({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.action,
+    required this.onAction,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final String action;
+  final VoidCallback onAction;
+
+  static const _amber = Color(0xFFF59E0B);
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+      decoration: BoxDecoration(
+        color: _amber.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _amber.withValues(alpha: 0.45)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: const Color(0xFFD97706)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, height: 1.3, color: p.ink),
+                ),
+                const SizedBox(height: 3),
+                Text(body, style: TextStyle(fontSize: 13.5, height: 1.4, color: p.inkSoft)),
+                const SizedBox(height: 4),
+                TextButton(
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    onAction();
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: dark ? const Color(0xFFFBBF24) : const Color(0xFFB45309),
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(0, 40),
+                  ),
+                  child: Text(action, style: const TextStyle(fontWeight: FontWeight.w800)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The app's version, at the very bottom, for when someone asks.
+class _Version extends StatefulWidget {
+  const _Version({required this.system});
+
+  final SystemBridge system;
+
+  @override
+  State<_Version> createState() => _VersionState();
+}
+
+class _VersionState extends State<_Version> {
+  late final Future<DeviceInfo?> _device = widget.system.device();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    return FutureBuilder<DeviceInfo?>(
+      future: _device,
+      builder: (context, snapshot) => Padding(
+        padding: const EdgeInsets.only(top: 22),
+        child: Text(
+          ['Muslim Vegukin', if (snapshot.data case final device?) s.accountVersion(device.version)].join(' · '),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12.5, color: p.inkMuted),
+        ),
       ),
     );
   }
@@ -407,30 +606,97 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-/// Whether alerts reach this phone, what they are about, and a test; when
-/// they can't, the way to turn them on.
+/// How messages reach this phone: whether notifications show, the prayer
+/// reminders, and a test that says what actually arrived (the server only
+/// knows it handed it on), here and, for a Telegram account, in the bot.
 class _NotificationsCard extends StatefulWidget {
-  const _NotificationsCard({required this.services});
+  const _NotificationsCard({required this.services, required this.reminders, required this.off});
 
   final AppServices services;
+
+  /// Prayers with a reminder on.
+  final int reminders;
+
+  /// The phone doesn't show the app's notifications.
+  final bool off;
 
   @override
   State<_NotificationsCard> createState() => _NotificationsCardState();
 }
 
-enum _Test { idle, sending, sent, failed }
+/// Where the test is on this phone.
+enum _Phone { idle, waiting, arrived, notArrived, away, noToken, serverFailed, offline }
 
-class _NotificationsCardState extends State<_NotificationsCard> {
-  _Test _test = _Test.idle;
+class _NotificationsCardState extends State<_NotificationsCard> with WidgetsBindingObserver {
+  /// How long a test may take to arrive before it is said not to have.
+  static const _patience = Duration(seconds: 20);
 
-  Future<void> _sendTest() async {
+  _Phone _phone = _Phone.idle;
+  TestPushResult? _result;
+  Timer? _timer;
+
+  /// The app went to the background while waiting: the test may be in the
+  /// notification panel, where the app can't see it.
+  bool _left = false;
+
+  AccountController get _account => widget.services.account;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _account.addListener(_maybeArrived);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _account.removeListener(_maybeArrived);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_phone != _Phone.waiting) return;
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) _left = true;
+    if (state == AppLifecycleState.resumed && _left && _account.testArrivedAt == null) _settle(_Phone.away);
+  }
+
+  void _maybeArrived() {
+    if (_phone == _Phone.waiting && _account.testArrivedAt != null) _settle(_Phone.arrived);
+  }
+
+  void _settle(_Phone phone) {
+    _timer?.cancel();
+    if (mounted) setState(() => _phone = phone);
+  }
+
+  Future<void> _send() async {
     HapticFeedback.selectionClick();
-    setState(() => _test = _Test.sending);
+    _timer?.cancel();
+    setState(() {
+      _phone = _Phone.waiting;
+      _result = null;
+      _left = false;
+    });
+    final TestPushResult result;
     try {
-      await widget.services.account.sendTestPush();
-      if (mounted) setState(() => _test = _Test.sent);
+      result = await _account.sendTestPush();
     } on AccountException {
-      if (mounted) setState(() => _test = _Test.failed);
+      _settle(_Phone.offline);
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _result = result);
+    switch (result.push) {
+      case 'sent':
+        if (_account.testArrivedAt != null) return _settle(_Phone.arrived);
+        _timer = Timer(_patience, () => _settle(_left ? _Phone.away : _Phone.notArrived));
+      case 'no_token' || 'rejected':
+        _settle(_Phone.noToken);
+      default:
+        _settle(_Phone.serverFailed);
     }
   }
 
@@ -438,82 +704,169 @@ class _NotificationsCardState extends State<_NotificationsCard> {
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
-    final account = widget.services.account;
-    final on = account.pushAllowed;
-    final telegram = account.user?.provider == 'telegram';
-    final (stateBg, stateInk) = on
-        ? (p.accent.withValues(alpha: 0.12), p.accent)
-        : (const Color(0xFFF59E0B).withValues(alpha: 0.16), const Color(0xFFB45309));
-    return _Card(
+    final services = widget.services;
+    final telegram = _account.user?.provider == 'telegram';
+    final result = _result;
+    return Material(
+      color: p.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: p.hairline),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(color: stateBg, shape: BoxShape.circle),
-                child: Icon(on ? Icons.notifications_active_rounded : Icons.notifications_off_rounded, color: stateInk),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  on ? s.accountPushOn : s.accountPushOffTitle,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, height: 1.3, color: p.ink),
-                ),
-              ),
-            ],
+          _NavRow(
+            icon: widget.off ? Icons.notifications_off_rounded : Icons.notifications_active_rounded,
+            title: s.accountOnPhone,
+            value: widget.off ? s.accountOff : s.accountOn,
+            pill: widget.off ? _Pill.warn : _Pill.good,
+            onTap: services.reminders.openNotificationSettings,
           ),
-          const SizedBox(height: 12),
-          Text(on ? s.accountWhatComes : s.accountPushOff, style: TextStyle(fontSize: 14, height: 1.45, color: p.inkSoft)),
-          if (telegram) ...[
-            const SizedBox(height: 6),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 2),
-                  child: Icon(Icons.telegram, size: 17, color: Color(0xFF229ED9)),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(s.accountTelegramToo, style: TextStyle(fontSize: 13.5, height: 1.4, color: p.inkSoft)),
-                ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 14),
-          if (!on)
-            FilledButton.icon(
-              onPressed: widget.services.permissions.openAppSettings,
-              icon: const Icon(Icons.settings_rounded),
-              label: Text(s.accountTurnOn),
-            )
-          else ...[
-            OutlinedButton.icon(
-              onPressed: _test == _Test.sending ? null : _sendTest,
-              icon: _test == _Test.sending
-                  ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.send_rounded, size: 18),
-              label: Text(s.accountTestPush),
-            ),
-            if (_test == _Test.sent || _test == _Test.failed) ...[
-              const SizedBox(height: 8),
-              Text(
-                _test == _Test.sent ? s.accountTestSent : s.accountTestFailed,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  height: 1.3,
-                  fontWeight: FontWeight.w600,
-                  color: _test == _Test.sent ? p.accent : const Color(0xFFB91C1C),
-                ),
+          Divider(height: 1, thickness: 1, indent: 62, color: p.hairline),
+          _NavRow(
+            icon: Icons.access_alarm_rounded,
+            title: s.accountReminders,
+            value: widget.reminders > 0 ? s.accountRemindersCount(widget.reminders) : s.accountOff,
+            onTap: () =>
+                Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PrayersScreen(services: services))),
+          ),
+          if (!widget.off) ...[
+            Divider(height: 1, thickness: 1, indent: 62, color: p.hairline),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      const _RowIcon(Icons.send_rounded),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              s.accountTestTitle,
+                              style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: p.ink),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              telegram ? s.accountTestToBoth : s.accountTestToPhone,
+                              style: TextStyle(fontSize: 13, height: 1.3, color: p.inkMuted),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton(
+                        onPressed: _phone == _Phone.waiting ? null : _send,
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 38),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                        child: Text(s.accountTestSend),
+                      ),
+                    ],
+                  ),
+                  if (_phone != _Phone.idle) ...[
+                    const SizedBox(height: 10),
+                    switch (_phone) {
+                      _Phone.waiting => _Outcome.waiting(s.accountTestWaiting),
+                      _Phone.arrived => _Outcome.good(s.accountTestArrived),
+                      _Phone.notArrived => _Outcome.bad(
+                        s.accountTestNotArrived,
+                        help: s.accountTestNotArrivedHelp,
+                        action: s.accountSettings,
+                        onAction: services.reminders.openNotificationSettings,
+                      ),
+                      _Phone.away => _Outcome.info(s.accountTestCheckShade),
+                      _Phone.noToken => _Outcome.bad(s.accountTestNoToken),
+                      _Phone.serverFailed => _Outcome.bad(s.accountTestServerFailed),
+                      _Phone.offline || _Phone.idle => _Outcome.bad(s.accountTestFailed),
+                    },
+                  ],
+                  if (result?.telegram case final bot?) ...[
+                    const SizedBox(height: 6),
+                    switch (bot) {
+                      'sent' => _Outcome.good(s.accountTestBotSent),
+                      'blocked' => _Outcome.bad(s.accountTestBotBlocked),
+                      _ => _Outcome.bad(s.accountTestBotFailed),
+                    },
+                    if (result?.bot case final name?)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(start: 40),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: TextButton.icon(
+                            onPressed: () => services.openLink(Uri.parse('https://t.me/$name')),
+                            icon: const Icon(Icons.telegram, size: 18),
+                            label: Text(s.accountOpenBot),
+                          ),
+                        ),
+                      ),
+                  ],
+                ],
               ),
-            ],
+            ),
           ],
         ],
       ),
+    );
+  }
+}
+
+/// One line of a test's outcome: a mark, what happened, and how to put it right.
+class _Outcome extends StatelessWidget {
+  const _Outcome.good(this.text) : kind = 0, help = null, action = null, onAction = null;
+  const _Outcome.bad(this.text, {this.help, this.action, this.onAction}) : kind = 1;
+  const _Outcome.info(this.text) : kind = 2, help = null, action = null, onAction = null;
+  const _Outcome.waiting(this.text) : kind = 3, help = null, action = null, onAction = null;
+
+  final String text;
+  final int kind;
+  final String? help;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    final red = Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFB91C1C);
+    final (Widget mark, Color ink) = switch (kind) {
+      0 => (Icon(Icons.check_circle_rounded, size: 20, color: p.accent), p.accent),
+      1 => (Icon(Icons.error_rounded, size: 20, color: red), red),
+      2 => (Icon(Icons.info_rounded, size: 20, color: p.inkSoft), p.inkSoft),
+      _ => (const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2.2)), p.inkSoft),
+    };
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(width: 34, child: Center(child: mark)),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                text,
+                style: TextStyle(fontSize: 14, height: 1.35, fontWeight: FontWeight.w700, color: ink),
+              ),
+              if (help != null) ...[
+                const SizedBox(height: 3),
+                Text(help!, style: TextStyle(fontSize: 13, height: 1.4, color: p.inkSoft)),
+              ],
+              if (action != null && onAction != null)
+                TextButton(
+                  onPressed: onAction,
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 40)),
+                  child: Text(action!),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -560,15 +913,25 @@ class _RowIcon extends StatelessWidget {
   }
 }
 
+/// How a row's value stands out: news (gold), all well (green), a problem (amber).
+enum _Pill { none, news, good, warn }
+
 class _NavRow extends StatelessWidget {
-  const _NavRow({required this.icon, required this.title, this.value, this.highlight = false, required this.onTap});
+  const _NavRow({
+    required this.icon,
+    required this.title,
+    this.value,
+    bool highlight = false,
+    _Pill pill = _Pill.none,
+    required this.onTap,
+  }) : pill = highlight ? _Pill.news : pill;
 
   final IconData icon;
   final String title;
 
   /// On the right: a count, the current choice; null while loading.
   final String? value;
-  final bool highlight;
+  final _Pill pill;
   final VoidCallback onTap;
 
   @override
@@ -591,20 +954,42 @@ class _NavRow extends StatelessWidget {
             if (value != null)
               ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width / 3),
-                child: highlight
-                    ? DecoratedBox(
-                        decoration: BoxDecoration(color: Brand.gold300, borderRadius: BorderRadius.circular(20)),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                          child: Text(value,
-                              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF3D2C05))),
-                        ),
-                      )
-                    : Text(value,
+                child: switch (pill) {
+                  _Pill.none => Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                    style: TextStyle(fontSize: 14, color: p.inkMuted),
+                  ),
+                  _ => DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: switch (pill) {
+                        _Pill.news => Brand.gold300,
+                        _Pill.good => p.accent.withValues(alpha: 0.12),
+                        _ => const Color(0xFFF59E0B).withValues(alpha: 0.18),
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                      child: Text(
+                        value,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(fontSize: 14, color: p.inkMuted)),
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: switch (pill) {
+                            _Pill.news => const Color(0xFF3D2C05),
+                            _Pill.good => p.accent,
+                            _ => const Color(0xFFB45309),
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                },
               ),
             Icon(Icons.chevron_right_rounded, color: p.inkMuted),
           ],

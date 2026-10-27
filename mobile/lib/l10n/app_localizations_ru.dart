@@ -2043,9 +2043,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accountDeleted => 'Аккаунт удалён';
 
   @override
-  String get accountPushOn => 'Уведомления приходят на этот телефон';
-
-  @override
   String get accountPushOff =>
       'Сообщения всё равно попадут во «Входящие», но телефон их не покажет.';
 
@@ -2548,25 +2545,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accountTurnOn => 'Включить';
 
   @override
-  String get accountWhatComes =>
-      'Свободные места на HiKorea, новости мест и районов, за которыми вы следите, и объявления.';
-
-  @override
-  String get accountTelegramToo =>
-      'Они приходят и от бота Muslim Vegukin в Telegram.';
-
-  @override
-  String get accountTestPush => 'Тестовое уведомление';
-
-  @override
-  String get accountTestSent => 'Отправлено — посмотрите на телефоне';
-
-  @override
   String get accountTestFailed =>
       'Не удалось отправить. Попробуйте чуть позже.';
-
-  @override
-  String get accountActivity => 'Ваша активность';
 
   @override
   String get accountInboxNone => 'Сообщений пока нет';
@@ -4794,4 +4774,143 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get ntDeliveryTooltip => 'Куда приходят сообщения';
+
+  @override
+  String get accountMine => 'Сообщения и отслеживания';
+
+  @override
+  String get accountPlacesWatches => 'Места и районы';
+
+  @override
+  String accountAreas(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count районов',
+      few: '$count района',
+      one: '$count район',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String accountPlaces(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count мест',
+      few: '$count места',
+      one: '$count место',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountNoneYet => 'Пока нет';
+
+  @override
+  String get accountHikoreaWatches => 'Отслеживания HiKorea';
+
+  @override
+  String get accountOnPhone => 'На этом телефоне';
+
+  @override
+  String get accountOn => 'Включены';
+
+  @override
+  String get accountOff => 'Выключены';
+
+  @override
+  String get accountReminders => 'Напоминания о намазе';
+
+  @override
+  String accountRemindersCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count намазов',
+      few: '$count намаза',
+      one: '$count намаз',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountTestTitle => 'Тестовое сообщение';
+
+  @override
+  String get accountTestToPhone => 'Придёт на этот телефон.';
+
+  @override
+  String get accountTestToBoth => 'Придёт на этот телефон и в Telegram-бот.';
+
+  @override
+  String get accountTestSend => 'Отправить';
+
+  @override
+  String get accountTestWaiting => 'Ждём его на этом телефоне…';
+
+  @override
+  String get accountTestArrived => 'Пришло на этот телефон';
+
+  @override
+  String get accountTestNotArrived => 'Не пришло на этот телефон';
+
+  @override
+  String get accountTestNotArrivedHelp =>
+      'В настройках телефона проверьте, что уведомления Muslim Vegukin включены и экономия батареи не ограничивает приложение.';
+
+  @override
+  String get accountTestCheckShade =>
+      'Посмотрите в панели уведомлений телефона';
+
+  @override
+  String get accountTestNoToken =>
+      'Телефон ещё не зарегистрирован. Проверьте интернет и откройте приложение заново.';
+
+  @override
+  String get accountTestServerFailed =>
+      'Сервер не смог отправить. Попробуйте чуть позже.';
+
+  @override
+  String get accountTestBotSent => 'Отправлено в Telegram-бот';
+
+  @override
+  String get accountTestBotBlocked =>
+      'Бот не может вам написать: откройте его и нажмите «Старт».';
+
+  @override
+  String get accountTestBotFailed => 'Не удалось отправить в Telegram-бот';
+
+  @override
+  String get accountOpenBot => 'Открыть бота';
+
+  @override
+  String get accountSettings => 'Настройки';
+
+  @override
+  String get accountAlarmsTitle => 'Напоминания о намазе могут опаздывать';
+
+  @override
+  String get accountAlarmsBody =>
+      'Разрешите «Будильники и напоминания», чтобы они приходили точно вовремя.';
+
+  @override
+  String get accountAllow => 'Разрешить';
+
+  @override
+  String get accountShare => 'Поделиться приложением';
+
+  @override
+  String accountShareText(Object link) {
+    return 'Muslim Vegukin — для мусульман в Корее: время намаза, кибла, халяль-места, очередь в HiKorea и многое другое.\n$link';
+  }
+
+  @override
+  String get accountFeedback => 'Предложить идею или сообщить об ошибке';
+
+  @override
+  String accountVersion(Object version) {
+    return 'Версия $version';
+  }
 }

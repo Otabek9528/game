@@ -2023,9 +2023,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDeleted => 'Account deleted';
 
   @override
-  String get accountPushOn => 'Notifications come to this phone';
-
-  @override
   String get accountPushOff =>
       'Alerts still reach your Inbox, but this phone won’t show them.';
 
@@ -2520,25 +2517,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountTurnOn => 'Turn on';
 
   @override
-  String get accountWhatComes =>
-      'Slots opening on HiKorea, news from places and areas you follow, and announcements.';
-
-  @override
-  String get accountTelegramToo =>
-      'They also come from the Muslim Vegukin bot in Telegram.';
-
-  @override
-  String get accountTestPush => 'Send a test';
-
-  @override
-  String get accountTestSent => 'Sent — look at your phone';
-
-  @override
   String get accountTestFailed =>
       'Couldn’t send. Please try again in a moment.';
-
-  @override
-  String get accountActivity => 'Your activity';
 
   @override
   String get accountInboxNone => 'No messages yet';
@@ -4749,4 +4729,139 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ntDeliveryTooltip => 'Where messages arrive';
+
+  @override
+  String get accountMine => 'Messages & watches';
+
+  @override
+  String get accountPlacesWatches => 'Places & areas';
+
+  @override
+  String accountAreas(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count areas',
+      one: '1 area',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String accountPlaces(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places',
+      one: '1 place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountNoneYet => 'None yet';
+
+  @override
+  String get accountHikoreaWatches => 'HiKorea watches';
+
+  @override
+  String get accountOnPhone => 'On this phone';
+
+  @override
+  String get accountOn => 'On';
+
+  @override
+  String get accountOff => 'Off';
+
+  @override
+  String get accountReminders => 'Prayer reminders';
+
+  @override
+  String accountRemindersCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count prayers',
+      one: '1 prayer',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountTestTitle => 'Test message';
+
+  @override
+  String get accountTestToPhone => 'Goes to this phone.';
+
+  @override
+  String get accountTestToBoth => 'Goes to this phone and to the Telegram bot.';
+
+  @override
+  String get accountTestSend => 'Send';
+
+  @override
+  String get accountTestWaiting => 'Waiting for it on this phone…';
+
+  @override
+  String get accountTestArrived => 'Arrived on this phone';
+
+  @override
+  String get accountTestNotArrived => 'Didn’t arrive on this phone';
+
+  @override
+  String get accountTestNotArrivedHelp =>
+      'In the phone’s settings, check that Muslim Vegukin’s notifications are on and battery saving doesn’t restrict the app.';
+
+  @override
+  String get accountTestCheckShade => 'Look in the phone’s notification panel';
+
+  @override
+  String get accountTestNoToken =>
+      'This phone isn’t registered yet. Check the internet and reopen the app.';
+
+  @override
+  String get accountTestServerFailed =>
+      'The server couldn’t send it. Try again in a moment.';
+
+  @override
+  String get accountTestBotSent => 'Sent to the Telegram bot';
+
+  @override
+  String get accountTestBotBlocked =>
+      'The bot can’t write to you: open it and tap Start.';
+
+  @override
+  String get accountTestBotFailed => 'Couldn’t send to the Telegram bot';
+
+  @override
+  String get accountOpenBot => 'Open the bot';
+
+  @override
+  String get accountSettings => 'Settings';
+
+  @override
+  String get accountAlarmsTitle => 'Prayer reminders may come late';
+
+  @override
+  String get accountAlarmsBody =>
+      'Allow “Alarms & reminders” so they come right on time.';
+
+  @override
+  String get accountAllow => 'Allow';
+
+  @override
+  String get accountShare => 'Share the app';
+
+  @override
+  String accountShareText(Object link) {
+    return 'Muslim Vegukin — for Muslims in Korea: prayer times, qibla, halal places, HiKorea appointments and more.\n$link';
+  }
+
+  @override
+  String get accountFeedback => 'Suggest an idea or report a bug';
+
+  @override
+  String accountVersion(Object version) {
+    return 'Version $version';
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/core/account.dart';
 import 'package:muslim_vegukin/core/app_language.dart';
@@ -14,6 +15,9 @@ import 'package:muslim_vegukin/features/home/feature_catalog.dart';
 import 'package:muslim_vegukin/features/places/place_detail.dart';
 
 import 'package:muslim_vegukin/features/notifications/notifications_screen.dart';
+import 'package:muslim_vegukin/features/notifications/notify_models.dart';
+import 'package:muslim_vegukin/features/places/places_models.dart';
+import 'package:muslim_vegukin/features/support/community_screen.dart';
 
 import 'support/fakes.dart';
 
@@ -74,6 +78,18 @@ void tapSpan(WidgetTester tester, String text) {
 List<String> buttons(WidgetTester tester, List<String> labels) {
   final shown = [for (final l in labels) if (find.text(l).evaluate().isNotEmpty) l];
   return shown..sort((a, b) => tester.getTopLeft(find.text(a)).dy.compareTo(tester.getTopLeft(find.text(b)).dy));
+}
+
+/// Answers [channel]'s calls (with [answers], else null) and lists them.
+List<String> recordChannel(WidgetTester tester, String channel, {Map<String, Object?> answers = const {}}) {
+  final calls = <String>[];
+  final c = MethodChannel(channel);
+  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(c, (call) async {
+    calls.add(call.method);
+    return answers[call.method];
+  });
+  addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(c, null));
+  return calls;
 }
 
 void main() {
@@ -560,33 +576,100 @@ void main() {
   });
 
   group('the account page', () {
-    testWidgets('notifications off: said so, with the way to turn them on; on again when back from settings',
-        (tester) async {
+    testWidgets('notifications off: said so at the top, with the way to turn them on; on again when back', (
+      tester,
+    ) async {
       final app = TestApp(language: 'en');
       app.push.allowed = false;
       await openAccountScreen(tester, app: app);
+      final calls = recordChannel(tester, 'vegukin/reminders');
       expect(find.text('Notifications are off'), findsOneWidget);
       expect(find.text('Alerts still reach your Inbox, but this phone won’t show them.'), findsOneWidget);
+      expect(find.text('Test message'), findsNothing, reason: 'nothing to test while they are off');
       await tester.tap(find.text('Turn on'));
-      expect(app.permissions.settingsOpened, 1);
+      expect(calls, ['openNotificationSettings'], reason: 'the app’s notification settings, channels and all');
 
       app.push.allowed = true;
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pumpAndSettle();
-      expect(find.text('Notifications come to this phone'), findsOneWidget);
+      expect(find.text('Notifications are off'), findsNothing);
+      expect(find.text('On'), findsOneWidget, reason: 'this phone: on');
     });
 
-    testWidgets('a test notification to this phone', (tester) async {
+    testWidgets('the test says what arrived: here at once, or not within 20 s, with what to check', (tester) async {
       final app = await openAccountScreen(tester);
-      await tester.tap(find.text('Send a test'));
-      await tester.pumpAndSettle();
+      expect(find.text('Goes to this phone.'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Send'), 150, scrollable: find.byType(Scrollable).last);
+      await tester.tap(find.text('Send'));
+      await tester.pump();
       expect(app.accounts.testPushes, ['token-1']);
-      expect(find.text('Sent — look at your phone'), findsOneWidget);
+      expect(find.text('Waiting for it on this phone…'), findsOneWidget, reason: '"sent" is not "arrived"');
 
-      app.accounts.testPushError = 'no_push_token';
-      await tester.tap(find.text('Send a test'));
+      app.push.arrive('Notifications work ✅', 'Muslim Vegukin alerts reach this phone.', {'kind': 'test'});
+      await tester.pump();
+      expect(find.text('Arrived on this phone'), findsOneWidget);
+      expect(find.byType(SnackBar), findsNothing, reason: 'shown as a real notification instead');
+
+      await tester.tap(find.text('Send'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 21));
+      expect(find.text('Didn’t arrive on this phone'), findsOneWidget);
+      expect(find.textContaining('battery saving'), findsOneWidget);
+      expect(find.text('Settings'), findsOneWidget);
+
+      app.accounts.testPushOutcome = 'no_token';
+      await tester.tap(find.text('Send'));
       await tester.pumpAndSettle();
-      expect(find.text('Couldn’t send. Please try again in a moment.'), findsOneWidget);
+      expect(find.text('This phone isn’t registered yet. Check the internet and reopen the app.'), findsOneWidget);
+
+      app.accounts.testPushOutcome = 'sent';
+      await tester.tap(find.text('Send'));
+      await tester.pump();
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Look in the phone’s notification panel'),
+        findsOneWidget,
+        reason: 'away meanwhile: it may be there, unseen by the app',
+      );
+    });
+
+    testWidgets('a Telegram account: the test comes from the bot too, and a blocked bot is said', (tester) async {
+      final app = TestApp(language: 'en');
+      await openSignIn(tester, app: app);
+      await tester.tap(find.text('Continue with Telegram'));
+      await settleWaiting(tester);
+      app.accounts.confirm('CODE1', const AppUser(id: 555000111, signedIn: true, provider: 'telegram', name: 'Aziz'));
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+      expect(find.text('Goes to this phone and to the Telegram bot.'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Send'), 150, scrollable: find.byType(Scrollable).last);
+      await tester.tap(find.text('Send'));
+      await tester.pump();
+      expect(find.text('Sent to the Telegram bot'), findsOneWidget);
+      await tester.tap(find.text('Open the bot'));
+      expect(app.links.last, Uri.parse('https://t.me/MuslimVegukinBot'));
+
+      app.push.arrive('Notifications work ✅', '…', {'kind': 'test'});
+      await tester.pump();
+      expect(find.text('Arrived on this phone'), findsOneWidget);
+      app.accounts.testTelegramOutcome = 'blocked';
+      await tester.tap(find.text('Send'));
+      await tester.pump();
+      expect(find.text('The bot can’t write to you: open it and tap Start.'), findsOneWidget);
+    });
+
+    testWidgets('prayer reminders that would come late: said at the top, with the way to allow', (tester) async {
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      final calls = recordChannel(tester, 'vegukin/widget', answers: {'exactAlarmsMissing': true});
+      await tester.tap(find.byTooltip('Account'));
+      await tester.pumpAndSettle();
+      expect(find.text('Prayer reminders may come late'), findsOneWidget);
+      await tester.tap(find.text('Allow'));
+      expect(calls.last, 'openExactAlarmSettings');
+      expect(find.text('5 prayers'), findsOneWidget, reason: 'the reminders that are on');
     });
 
     testWidgets('the Telegram photo, on the page and on the home screen; fetched once', (tester) async {
@@ -600,7 +683,6 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
       await tester.pumpAndSettle();
       expect(find.descendant(of: find.byType(AccountAvatar), matching: find.byType(Image)), findsOneWidget);
-      expect(find.text('They also come from the Muslim Vegukin bot in Telegram.'), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.descendant(of: find.byType(AccountAvatar), matching: find.byType(Image)), findsOneWidget,
@@ -621,29 +703,65 @@ void main() {
       expect(find.text('WhatsApp doesn’t share profile photos with apps.'), findsOneWidget);
     });
 
-    testWidgets('what they have going: the inbox and the watches, one tap away; the app\'s settings', (tester) async {
+    testWidgets('what reaches them and what they follow, one tap away; the app; the version', (tester) async {
       final app = TestApp(language: 'en');
-      app.hikorea.watchList.add(HkWatch(
-        id: 1,
-        officeId: '1270100',
-        officeNameEn: 'Seoul Immigration Office',
-        deskSeq: 201,
-        start: DateTime(2026, 10, 18),
-        end: DateTime(2026, 10, 31),
-        status: 'active',
-      ));
+      app.hikorea.watchList.add(
+        HkWatch(
+          id: 1,
+          officeId: '1270100',
+          officeNameEn: 'Seoul Immigration Office',
+          deskSeq: 201,
+          start: DateTime(2026, 10, 18),
+          end: DateTime(2026, 10, 31),
+          status: 'active',
+        ),
+      );
+      app.places.areas.add(
+        const NotifyArea(
+          id: 9,
+          fromLocation: false,
+          label: '안산 원곡동',
+          lat: 37.33,
+          lon: 126.81,
+          radiusKm: 5,
+          types: {PlaceKind.mosque},
+        ),
+      );
+      app.places.watches[1] = app.places.watches[1]!.copyWith(watching: true);
       await app.launch(tester);
       app.accounts.alert(app.account.user!.id, 'Kebab House');
       await tester.tap(find.byTooltip('Account'));
       await tester.pumpAndSettle();
       expect(find.text('1 new'), findsOneWidget);
+      expect(find.text('1 area · 1 place'), findsOneWidget, reason: 'from the server, kept for next time');
       expect(find.text('1 active'), findsOneWidget);
-      await tapScrolled(tester, find.text('My watches'));
+      expect(
+        tester.getTopLeft(find.text('Inbox')).dy,
+        lessThan(tester.getTopLeft(find.text('Test message')).dy),
+        reason: 'what they use most comes before settings',
+      );
+
+      await tapScrolled(tester, find.text('Places & areas'));
+      expect(find.byType(NotificationsScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tapScrolled(tester, find.text('HiKorea watches'));
       expect(find.byType(HkWatchesScreen), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
 
       expect(find.text('English'), findsOneWidget, reason: 'the language');
+      await tapScrolled(tester, find.text('Share the app'));
+      expect(app.shared.single, contains('play.google.com/store/apps/details?id=com.vegukin.muslim_vegukin'));
+      await tapScrolled(tester, find.text('Suggest an idea or report a bug'));
+      expect(find.byType(CommunityScreen), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Muslim Vegukin · Version 1.0.0 (1)'),
+        150,
+        scrollable: find.byType(Scrollable).last,
+      );
       await tapScrolled(tester, find.text('Dark mode'));
       expect(Theme.of(tester.element(find.byType(AccountScreen))).brightness, Brightness.dark);
     });
