@@ -1,0 +1,964 @@
+<title>Muslim Vegukin Play Launch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a field manual. A sticky phase list on the left (wide screens), one
+   column of numbered phases on the right; on phones, a sticky progress strip. */
+:root {
+  --page: #f4f6f2;
+  --card: #ffffff;
+  --ink: #18201c;
+  --soft: #46524c;
+  --muted: #74807a;
+  --line: #dfe5df;
+  --accent: #047857;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2f2ea;
+  --gold: #a87a0c;
+  --gold-soft: #fbf3dc;
+  --warn: #92400e;
+  --warn-soft: #fdf1dc;
+  --code: #eef2ee;
+  --display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --body: "Noto Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0d1311; --card: #141c19; --ink: #e6ece8; --soft: #b3beb8; --muted: #84908a; --line: #25312c;
+    --accent: #34d399; --accent-ink: #062b1f; --accent-soft: #11291f; --gold: #eab932; --gold-soft: #2a2410;
+    --warn: #fbbf24; --warn-soft: #2b2210; --code: #1a2420; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0d1311; --card: #141c19; --ink: #e6ece8; --soft: #b3beb8; --muted: #84908a; --line: #25312c;
+  --accent: #34d399; --accent-ink: #062b1f; --accent-soft: #11291f; --gold: #eab932; --gold-soft: #2a2410;
+  --warn: #fbbf24; --warn-soft: #2b2210; --code: #1a2420; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--page); color: var(--ink); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1140px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 40px; padding-block: 28px 80px; }
+@media (max-width: 900px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+/* Phase list */
+nav.phases { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; }
+nav.phases .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+nav.phases ol { list-style: none; margin: 10px 0 18px; padding: 0; display: grid; gap: 2px; }
+nav.phases a { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 8px;
+  color: var(--soft); text-decoration: none; font-size: 14px; line-height: 1.3; }
+nav.phases a:hover { background: var(--card); color: var(--ink); }
+nav.phases .n { font: 600 12px var(--mono); color: var(--muted); }
+nav.phases .c { font: 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+nav.phases a.done .n, nav.phases a.done .c { color: var(--accent); }
+nav.phases a.done { color: var(--ink); }
+@media (max-width: 900px) { nav.phases { display: none; } }
+
+.strip { display: none; }
+@media (max-width: 900px) {
+  .strip { display: flex; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--page); gap: 12px; align-items: center;
+    padding-block: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--soft); }
+  .strip .bar { flex: 1; }
+}
+.bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .3s; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+/* Header */
+header.top h1 { font: 700 clamp(30px, 5vw, 44px)/1.12 var(--display); margin: 6px 0 12px; text-wrap: balance; }
+header.top .eyebrow { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+header.top p { color: var(--soft); max-width: 64ch; margin: 0 0 12px; }
+.overall { display: flex; gap: 14px; align-items: center; margin: 18px 0 6px; font-size: 14px; color: var(--soft); flex-wrap: wrap; }
+.overall .bar { flex: 1 1 200px; }
+.reset { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
+
+/* Journey table */
+.journey { margin: 26px 0 8px; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num, th.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; margin: 12px 0 4px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.tbl table td:first-child { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.tbl.wide table td:first-child { white-space: normal; min-width: 150px; }
+.yes { color: var(--accent); font-weight: 700; }
+.no { color: var(--muted); }
+
+/* Phases */
+section.phase { margin-top: 56px; scroll-margin-top: 72px; }
+.ph-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; border-top: 2px solid var(--ink); padding-top: 14px; }
+.ph-head .num { font: 600 15px var(--mono); color: var(--accent); }
+.ph-head h2 { font: 700 clamp(23px, 3.4vw, 30px)/1.2 var(--display); margin: 0; flex: 1 1 260px; text-wrap: balance; }
+.ph-head .count { font: 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+section.phase.complete .ph-head { border-top-color: var(--accent); }
+section.phase.complete .ph-head .count { color: var(--accent); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 6px; }
+.chip { font-size: 12.5px; padding: 3px 10px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.chip.wait { background: var(--gold-soft); color: var(--gold); }
+.why { color: var(--soft); max-width: 68ch; }
+h3 { font-size: 17px; margin: 28px 0 6px; }
+.where { font-family: var(--mono); font-size: 13px; color: var(--soft); background: var(--code); border-radius: 8px; padding: 6px 10px;
+  display: inline-block; margin: 4px 0 8px; max-width: 100%; overflow-wrap: anywhere; }
+
+ol.steps { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 10px; counter-reset: step; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; align-items: start;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+ol.steps > li > input { width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--accent); cursor: pointer; }
+ol.steps > li > div { min-width: 0; }
+ol.steps > li > div::before { content: counter(step) ". "; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+ol.steps > li:has(input:checked) { background: transparent; }
+ol.steps > li:has(input:checked) > div { color: var(--muted); }
+ol.steps > li p { margin: 6px 0 0; }
+ol.steps ul { margin: 6px 0 0; padding-left: 20px; }
+ol.steps ul li { margin: 3px 0; }
+
+.note { border-radius: 10px; padding: 10px 14px; margin: 12px 0; background: var(--code); color: var(--soft); font-size: 14.5px; max-width: 72ch; }
+.note.warn { background: var(--warn-soft); color: var(--warn); }
+.note.warn strong, .note strong { color: inherit; }
+.note.check { background: var(--accent-soft); color: var(--accent); }
+
+code, kbd { font-family: var(--mono); font-size: .88em; background: var(--code); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
+
+.paste { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; overflow: hidden; }
+.paste-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 7px 8px 7px 14px; border-bottom: 1px solid var(--line);
+  font-size: 13px; color: var(--soft); font-weight: 600; flex-wrap: wrap; }
+.paste-head .limit { font: 12px var(--mono); color: var(--muted); font-weight: 400; margin-left: auto; }
+.paste pre { margin: 0; padding: 12px 14px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.6 var(--body); color: var(--ink); }
+.paste pre.cmd { font: 13.5px/1.6 var(--mono); }
+button.copy { font: 600 13px var(--body); border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 8px;
+  padding: 4px 12px; cursor: pointer; }
+button.copy:hover { background: var(--accent); color: var(--accent-ink); }
+button.copy.ok { background: var(--accent); color: var(--accent-ink); }
+.langs { display: grid; gap: 4px; }
+details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; }
+details > summary { cursor: pointer; padding: 10px 14px; font-weight: 600; }
+details > div { padding: 0 14px 12px; }
+dl.terms { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; margin: 12px 0; }
+dl.terms dt { font-weight: 700; }
+dl.terms dd { margin: 0; color: var(--soft); }
+@media (max-width: 560px) { dl.terms { grid-template-columns: minmax(0, 1fr); } dl.terms dd { margin-bottom: 8px; } }
+footer { margin-top: 64px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+
+<div class="wrap">
+<nav class="phases" aria-label="Phases">
+  <div class="label">Your progress</div>
+  <div class="bar" style="margin-top:10px"><i id="nav-bar"></i></div>
+  <ol id="nav-list"></ol>
+  <div class="label">Reference</div>
+  <ol>
+    <li><a href="#words"><span class="n">A</span><span>Words you'll see</span><span></span></a></li>
+    <li><a href="#trouble"><span class="n">B</span><span>If something goes wrong</span><span></span></a></li>
+  </ol>
+</nav>
+
+<main>
+<div class="strip"><span id="strip-text">0 of 0 steps</span><div class="bar"><i id="strip-bar"></i></div></div>
+
+<header class="top">
+  <div class="eyebrow">Muslim Vegukin · first Google Play release</div>
+  <h1>From your laptop to the Play Store</h1>
+  <p>This page walks you through publishing the app for the first time, in the order Google needs it. Every form is
+    explained field by field, and every text you have to paste is here with a Copy button.</p>
+  <p>Most of the time is spent <strong>waiting for Google</strong>: about 3 to 5 weeks in total, of which a few hours are
+    your own work. Tick each step as you finish; this page remembers your ticks in this browser, so you can stop and
+    come back.</p>
+  <div class="overall"><span id="overall-text">0 of 0 steps done</span><div class="bar"><i id="overall-bar"></i></div>
+    <button class="reset" id="reset" type="button">Clear my ticks</button></div>
+</header>
+
+<div class="journey">
+<table>
+  <thead><tr><th class="num">#</th><th>Phase</th><th>Your time</th><th>Then you wait</th></tr></thead>
+  <tbody>
+    <tr><td class="num">0</td><td>Get ready</td><td>15 min</td><td>—</td></tr>
+    <tr><td class="num">1</td><td>Put the privacy policy online</td><td>10 min</td><td>2–5 minutes</td></tr>
+    <tr><td class="num">2</td><td>Create your developer account</td><td>30 min</td><td>a few hours to a few days (ID check)</td></tr>
+    <tr><td class="num">3</td><td>Build the app file (.aab)</td><td>10 min</td><td>—</td></tr>
+    <tr><td class="num">4</td><td>Create the app in Play Console</td><td>5 min</td><td>—</td></tr>
+    <tr><td class="num">5</td><td>Answer the app content forms</td><td>45 min</td><td>—</td></tr>
+    <tr><td class="num">6</td><td>Fill in the store page</td><td>45 min</td><td>—</td></tr>
+    <tr><td class="num">7</td><td>Internal test, on your own phone</td><td>20 min</td><td>a few minutes</td></tr>
+    <tr><td class="num">8</td><td>Closed test with 12+ people</td><td>1 hour, then reminders</td><td>review 1–3 days, then 14 days</td></tr>
+    <tr><td class="num">9</td><td>Apply for production</td><td>20 min</td><td>up to 7 days</td></tr>
+    <tr><td class="num">10</td><td>Release to everyone</td><td>15 min</td><td>review 1–7 days</td></tr>
+    <tr><td class="num">11</td><td>After launch</td><td>with each update</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">Phases 1 and 3 don't need the developer account: do them while Google checks your ID.</p>
+
+<!-- ================================================================ 0 -->
+<section class="phase" id="phase-0" data-title="Get ready">
+<div class="ph-head"><span class="num">0</span><h2>Get ready</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">15 minutes</span></div>
+<p class="why">Collect these before you start, so no form stops you halfway.</p>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p0-1" aria-label="Done"><div><strong>A Google account that will own the app.</strong>
+  <p>Make a new Gmail just for this, for example <code>muslimvegukin.app@gmail.com</code>, so the app doesn't depend
+  on your personal mailbox. Turn on 2-Step Verification for it (Google account → Security). Use this one account
+  for everything below.</p></div></li>
+<li><input type="checkbox" class="tick" id="p0-2" aria-label="Done"><div><strong>A bank card that works online,</strong> for the
+  one-time registration fee of <strong>US$25</strong>. Korean cards (Visa, Mastercard) work.</div></li>
+<li><input type="checkbox" class="tick" id="p0-3" aria-label="Done"><div><strong>Your passport or Korean residence card (ARC).</strong>
+  <p>Google checks your identity. The name you type must match the document exactly.</p></div></li>
+<li><input type="checkbox" class="tick" id="p0-4" aria-label="Done"><div><strong>Your Android phone.</strong>
+  <p>Google asks new developers to prove they own a real Android phone, and you'll test the app on it.</p></div></li>
+<li><input type="checkbox" class="tick" id="p0-5" aria-label="Done"><div><strong>Start asking people to test.</strong>
+  <p>Google requires a test with at least <strong>12 people for 14 days</strong> before the app can go public (phase 8).
+  They need an Android phone and a Gmail. Ask 15–20 people in your Telegram group, so you still have 12 if someone
+  drops out. The message to send is in phase 8.1; you can send it today.</p></div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 1 -->
+<section class="phase" id="phase-1" data-title="Privacy policy online">
+<div class="ph-head"><span class="num">1</span><h2>Put the privacy policy online</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">10 minutes</span><span class="chip wait">2–5 minutes for Cloudflare</span></div>
+<p class="why">Google won't accept the app without a privacy policy web page, and it also wants a link where people
+can ask to delete their account. The file <code>privacy.html</code> has both, in English, Uzbek and Russian.</p>
+
+<h3>Where the file is, and where it goes</h3>
+<div class="tbl wide"><table>
+  <tr><td>The file, on your PC</td><td><code>E:\dev\game\mobile\store\privacy.html</code> (after <code>git pull</code> in
+    <code>E:\dev\game</code>)</td></tr>
+  <tr><td>Where it must go</td><td>The <strong>top folder</strong> of your web app's GitHub repository
+    <code>Otabek9528/vegukin_TWA</code>, next to <code>index.html</code>, on branch <code>main</code></td></tr>
+  <tr><td>Why there</td><td>Cloudflare Pages publishes exactly that folder as <code>https://vegukin-twa.pages.dev/</code>,
+    so the file becomes <code>https://vegukin-twa.pages.dev/privacy.html</code></td></tr>
+</table></div>
+
+<h3>Upload it on the GitHub website (easiest)</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p1-1" aria-label="Done"><div>Open
+  <a href="https://github.com/Otabek9528/vegukin_TWA" target="_blank" rel="noopener">github.com/Otabek9528/vegukin_TWA</a> and sign in.
+  Above the file list, the branch button must say <strong>main</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p1-2" aria-label="Done"><div>Click <strong>Add file</strong> → <strong>Upload files</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p1-3" aria-label="Done"><div>Drag <code>privacy.html</code> from
+  <code>E:\dev\game\mobile\store\</code> onto the page. Don't open any folder first: the file must land next to
+  <code>index.html</code>, not inside <code>pages</code> or another folder.</div></li>
+<li><input type="checkbox" class="tick" id="p1-4" aria-label="Done"><div>Under <strong>Commit changes</strong>, write
+  <code>Add privacy policy</code>, keep <strong>Commit directly to the main branch</strong>, click <strong>Commit changes</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p1-5" aria-label="Done"><div>Wait 2–5 minutes (Cloudflare rebuilds the site
+  after each change on <code>main</code>), then open
+  <a href="https://vegukin-twa.pages.dev/privacy.html" target="_blank" rel="noopener">vegukin-twa.pages.dev/privacy.html</a>.
+  <p>You should see <em>Muslim Vegukin — Privacy Policy</em> with English / O‘zbekcha / Русский buttons. The address
+  may change to <code>…/privacy</code> without <code>.html</code>: Cloudflare does that, and both addresses work.</p></div></li>
+<li><input type="checkbox" class="tick" id="p1-6" aria-label="Done"><div>Open
+  <a href="https://vegukin-twa.pages.dev/privacy.html#delete" target="_blank" rel="noopener">vegukin-twa.pages.dev/privacy.html#delete</a>:
+  the page should jump to <em>Deleting your account</em>. Check both links on your phone too.</div></li>
+</ol>
+<details><summary>Still "404 Not found" after 10 minutes?</summary><div>
+  <p>Open <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">dash.cloudflare.com</a> → <strong>Workers &amp; Pages</strong> → the
+  <strong>vegukin-twa</strong> project → <strong>Deployments</strong>. The newest one should say <em>Success</em> and
+  mention <em>Add privacy policy</em>.</p>
+  <ul>
+    <li>A failed deployment: send me a screenshot of it.</li>
+    <li>No new deployment at all: the project isn't linked to GitHub. There, choose <strong>Create deployment</strong> and
+    upload the whole web app folder with <code>privacy.html</code> in it.</li>
+  </ul>
+</div></details>
+<details><summary>Prefer Git on your PC?</summary><div>
+  <p>Copy <code>privacy.html</code> into the top folder of your local copy of <code>vegukin_TWA</code>, then in that folder:</p>
+  <div class="paste"><div class="paste-head"><span>PowerShell, one line at a time</span><button class="copy" type="button" data-for="c-git">Copy</button></div>
+<pre class="cmd" id="c-git">git add privacy.html
+git commit -m "Add privacy policy"
+git push</pre></div>
+</div></details>
+<p class="note">The policy names Telegram <code>@otabeksattarov</code> as the contact. If you'd rather give an email address,
+tell me and I'll change the file.</p>
+</section>
+
+<!-- ================================================================ 2 -->
+<section class="phase" id="phase-2" data-title="Developer account">
+<div class="ph-head"><span class="num">2</span><h2>Create your developer account</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">30 minutes</span><span class="chip wait">a few hours to a few days</span></div>
+<p class="why">This is your publisher account on Google Play. You create it once; all your apps live in it.</p>
+<div class="where">play.google.com/console/signup</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p2-1" aria-label="Done"><div>Open
+  <a href="https://play.google.com/console/signup" target="_blank" rel="noopener">play.google.com/console/signup</a>
+  and sign in with the Google account from phase 0.</div></li>
+<li><input type="checkbox" class="tick" id="p2-2" aria-label="Done"><div><strong>Choose an account type → Yourself.</strong>
+  <p>"An organization or business" needs a registered company and a D-U-N-S number. Choose it only if you have a
+  company.</p></div></li>
+<li><input type="checkbox" class="tick" id="p2-3" aria-label="Done"><div>Fill in the forms:
+  <div class="tbl wide"><table>
+    <tr><th>Field</th><th>What to enter</th></tr>
+    <tr><td>Developer name</td><td>Shown on Google Play under the app's name. <code>Muslim Vegukin</code> (or your own name).
+      You can change it later.</td></tr>
+    <tr><td>Legal name and address</td><td>Exactly as on your passport or ARC; your address in Korea. Google compares
+      them with the document.</td></tr>
+    <tr><td>Contact email and phone</td><td>Private, for Google to reach you. They send codes to check both.</td></tr>
+    <tr><td>Developer email (public)</td><td>Shown on the store page so users can write to you. Use the new Gmail.</td></tr>
+    <tr><td>Questions about you</td><td>Experience, how many apps you plan, whether you'll earn money from them.
+      Answer honestly (e.g. less than 1 year, 1 app, no earnings); they don't decide approval.</td></tr>
+  </table></div></div></li>
+<li><input type="checkbox" class="tick" id="p2-4" aria-label="Done"><div>Accept the Developer Distribution Agreement and pay the <strong>US$25</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p2-5" aria-label="Done"><div><strong>Identity check.</strong> Upload clear photos of
+  your passport or ARC, the whole document, nothing cut off. The answer comes by email, from a few hours to several
+  days.</div></li>
+<li><input type="checkbox" class="tick" id="p2-6" aria-label="Done"><div><strong>Android phone check.</strong> On your Android phone,
+  install <strong>Google Play Console</strong> from the Play Store, sign in with the same Google account, and follow
+  its verification prompt.</div></li>
+<li><input type="checkbox" class="tick" id="p2-7" aria-label="Done"><div>Open
+  <a href="https://play.google.com/console" target="_blank" rel="noopener">play.google.com/console</a>. When the
+  page shows no red <em>Action needed</em> items, the account is ready.</div></li>
+</ol>
+<p class="note warn"><strong>Watch out.</strong> Never make a second developer account: Google can close both. If something
+goes wrong in this phase, tell me before trying again.</p>
+</section>
+
+<!-- ================================================================ 3 -->
+<section class="phase" id="phase-3" data-title="Build the .aab">
+<div class="ph-head"><span class="num">3</span><h2>Build the app file (.aab)</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">10 minutes</span></div>
+<p class="why">Google doesn't take the APK you shared with your friend. It wants an <strong>app bundle</strong>
+(<code>.aab</code>), signed with your key, and makes the phone-specific APKs from it itself.</p>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p3-1" aria-label="Done"><div><strong>Check the version.</strong> Open
+  <code>E:\dev\game\mobile\pubspec.yaml</code> and find <code>version: 1.0.0+1</code>.
+  <p><code>1.0.0</code> is what users see. The number after <code>+</code> is the <strong>version code</strong>: each file
+  you upload to Google must have a bigger one than the last. Keep <code>+1</code> for the first upload; for every later
+  upload raise it (<code>1.0.1+2</code>, <code>1.0.2+3</code>…).</p></div></li>
+<li><input type="checkbox" class="tick" id="p3-2" aria-label="Done"><div>In PowerShell, run these one at a time. Paste each
+  line whole (last time a long line got cut off).
+  <div class="paste"><div class="paste-head"><span>PowerShell</span><button class="copy" type="button" data-for="c-build">Copy</button></div>
+<pre class="cmd" id="c-build">cd E:\dev\game
+git pull origin claude/intelligent-clarke-88a75i
+cd mobile
+flutter clean
+flutter pub get
+flutter build appbundle --release --obfuscate --split-debug-info=build/symbols</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p3-3" aria-label="Done"><div>The result:
+  <code>E:\dev\game\mobile\build\app\outputs\bundle\release\app-release.aab</code>. This is the file you'll upload.</div></li>
+<li><input type="checkbox" class="tick" id="p3-4" aria-label="Done"><div>Copy the folder <code>E:\dev\game\mobile\build\symbols</code>
+  somewhere safe and name it after the version (e.g. <code>symbols-1.0.0+1</code>). It turns crash reports back into
+  readable ones later.</div></li>
+</ol>
+<p class="note warn"><strong>Watch out.</strong> Keep <code>android\key.properties</code> in place: without it the bundle is
+signed with the debug key and Google refuses it. Your <code>.jks</code> file and its password must never be lost: every
+future update has to be signed with the same key.</p>
+</section>
+
+<!-- ================================================================ 4 -->
+<section class="phase" id="phase-4" data-title="Create the app">
+<div class="ph-head"><span class="num">4</span><h2>Create the app in Play Console</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">5 minutes</span></div>
+<div class="where">Play Console → Home → Create app</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p4-1" aria-label="Done"><div>Click <strong>Create app</strong> and fill in:
+  <div class="tbl wide"><table>
+    <tr><th>Field</th><th>What to enter</th></tr>
+    <tr><td>App name</td><td><code>Muslim Vegukin</code></td></tr>
+    <tr><td>Default language</td><td><strong>English (United States) – en-US</strong>. Google's reviewers read English;
+      Russian (and Uzbek, if Google offers it) are added as translations in phase 6.</td></tr>
+    <tr><td>App or game</td><td>App</td></tr>
+    <tr><td>Free or paid</td><td>Free. (A free app can never become paid later; that's fine here.)</td></tr>
+    <tr><td>Declarations</td><td>Tick <em>Developer Program Policies</em> and <em>US export laws</em>. Tick any Play App
+      Signing terms shown too.</td></tr>
+  </table></div></div></li>
+<li><input type="checkbox" class="tick" id="p4-2" aria-label="Done"><div>Click <strong>Create app</strong>. You land on the app's
+  <strong>Dashboard</strong>, with a list called <strong>Set up your app</strong>. Phases 5 and 6 work through that list.</div></li>
+</ol>
+<p class="note">Google renames menus now and then. If you can't find a page named here, type its name into the
+search box at the top of Play Console.</p>
+</section>
+
+<!-- ================================================================ 5 -->
+<section class="phase" id="phase-5" data-title="App content forms">
+<div class="ph-head"><span class="num">5</span><h2>Answer the app content forms</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">45 minutes</span></div>
+<p class="why">Google asks what the app does with people's data, who it's for and whether it shows ads. On the
+Dashboard, under <strong>Set up your app</strong>, click <strong>View tasks</strong>; each line opens one form. Answer,
+<strong>Save</strong>, go back. The order doesn't matter. All answers below come from the app's actual code.</p>
+<div class="where">Dashboard → Set up your app (also under Policy and programs → App content)</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p5-1" aria-label="Done"><div><strong>Privacy policy</strong>: paste the address, Save.
+  <div class="paste"><div class="paste-head"><span>Privacy policy URL</span><button class="copy" type="button" data-for="t-privacy">Copy</button></div>
+<pre class="cmd" id="t-privacy">https://vegukin-twa.pages.dev/privacy.html</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p5-2" aria-label="Done"><div><strong>App access</strong>: choose
+  <em>All functionality in my app is available without any access restrictions</em>, Save.
+  <p>Signing in is optional, and everything can be opened without it. If Google ever asks how to test sign-in, reply
+  with this:</p>
+  <div class="paste"><div class="paste-head"><span>Only if Google asks</span><button class="copy" type="button" data-for="t-access">Copy</button></div>
+<pre id="t-access">Signing in is optional; every section of the app can be opened without it. To try signing in, open the Account page (person icon on the home screen), tap "Sign in" and choose "Continue with Google": any Google account works. Telegram and WhatsApp sign-in need the tester's own accounts in those apps.</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p5-3" aria-label="Done"><div><strong>Ads</strong>: <em>No, my app does not contain ads</em>.</div></li>
+<li><input type="checkbox" class="tick" id="p5-4" aria-label="Done"><div><strong>Content rating</strong>: <em>Start questionnaire</em>.
+  Email: yours. Category: the one closest to an everyday tool (named like <em>Utility, Productivity, Communication, or
+  Other</em>). Then:
+  <div class="tbl wide"><table>
+    <tr><th>Question about…</th><th>Answer</th></tr>
+    <tr><td>Violence, blood, fear, sexuality, bad language, drugs/alcohol/tobacco, crude humour, gambling</td><td class="no">No to all</td></tr>
+    <tr><td>Users can interact or share content with each other</td><td class="yes">Yes</td></tr>
+    <tr><td>Shares the user's current location with other users</td><td class="no">No</td></tr>
+    <tr><td>Users can buy digital goods</td><td class="no">No</td></tr>
+    <tr><td>Is it a web browser or search engine; unrestricted internet access</td><td class="no">No</td></tr>
+    <tr><td>Swastikas or other hate symbols</td><td class="no">No</td></tr>
+  </table></div>
+  <p>"Yes" to sharing because reviews and car/housing/job posts are public. <strong>Save</strong>, then <strong>Submit</strong>.
+  The expected rating is <em>Everyone</em> (3+) with the note <em>Users interact</em>.</p></div></li>
+<li><input type="checkbox" class="tick" id="p5-5" aria-label="Done"><div><strong>Target audience and content</strong>: tick only
+  <strong>18 and over</strong>. "Could your store listing unintentionally appeal to children?" → <strong>No</strong>. Save.
+  <p>Choosing children's ages brings Google's strict Families rules; the app is made for adults living in Korea.</p></div></li>
+<li><input type="checkbox" class="tick" id="p5-6" aria-label="Done"><div><strong>News apps</strong>: <em>No</em>.</div></li>
+<li><input type="checkbox" class="tick" id="p5-7" aria-label="Done"><div><strong>Government apps</strong>: <em>No</em>.</div></li>
+<li><input type="checkbox" class="tick" id="p5-8" aria-label="Done"><div><strong>Financial features</strong>: <em>My app doesn't provide
+  any financial features</em>. The donation page only shows a bank account; the app takes no payments.</div></li>
+<li><input type="checkbox" class="tick" id="p5-9" aria-label="Done"><div><strong>Health apps</strong>: <em>My app does not have any
+  health features</em>.</div></li>
+<li><input type="checkbox" class="tick" id="p5-10" aria-label="Done"><div><strong>Advertising ID</strong>: <em>No</em>. The app has no
+  advertising ID; the code removes that permission.</div></li>
+<li><input type="checkbox" class="tick" id="p5-11" aria-label="Done"><div><strong>Data safety</strong>: the longest form. Follow
+  the walk-through below, then tick this step.</div></li>
+</ol>
+
+<h3>Data safety, page by page</h3>
+<p class="why">Take your time here: what you declare shows on the store page as the app's "Data safety" section, and
+Google compares it with what the app really does.</p>
+<p><strong>Page 1, Overview</strong>: read, then Next.</p>
+<p><strong>Page 2, Data collection and security</strong>:</p>
+<div class="tbl wide"><table>
+  <tr><th>Question</th><th>Answer</th></tr>
+  <tr><td>Does your app collect or share any of the required user data types?</td><td class="yes">Yes</td></tr>
+  <tr><td>Is all of the user data collected by your app encrypted in transit?</td><td class="yes">Yes</td></tr>
+  <tr><td>Which methods of account creation does your app support?</td><td>Tick <strong>OAuth</strong> (Google) and
+    <strong>Other</strong>, and describe it as: <em>Sign-in with Telegram or WhatsApp through our bots</em></td></tr>
+  <tr><td>Link for users to request account deletion</td><td><code>https://vegukin-twa.pages.dev/privacy.html#delete</code></td></tr>
+  <tr><td>Can users ask to delete some data without deleting the account?</td><td class="yes">Yes: watches, areas,
+    reviews and listings can each be removed in the app</td></tr>
+  <tr><td>Independent security review</td><td class="no">Leave unticked</td></tr>
+</table></div>
+<p><strong>Page 3, Data types</strong>: tick exactly these, nothing else.</p>
+<div class="tbl wide"><table>
+  <tr><th>Category</th><th>Tick</th></tr>
+  <tr><td>Location</td><td>Approximate location, Precise location</td></tr>
+  <tr><td>Personal info</td><td>Name, Email address, User IDs, Phone number</td></tr>
+  <tr><td>Photos and videos</td><td>Photos, Videos</td></tr>
+  <tr><td>App activity</td><td>App interactions, Other user-generated content</td></tr>
+  <tr><td>Device or other IDs</td><td>Device or other IDs</td></tr>
+</table></div>
+<p><strong>Page 4, Data usage and handling</strong>: for each ticked type, click it and answer four questions:</p>
+<div class="tbl wide"><table>
+  <tr><th>Data type</th><th>Collected</th><th>Shared</th><th>Processed ephemerally</th><th>Required or optional</th><th>Purposes</th></tr>
+  <tr><td>Approximate location</td><td class="yes">Yes</td><td class="yes">Yes ¹</td><td class="no">No</td><td>Optional</td><td>App functionality</td></tr>
+  <tr><td>Precise location</td><td class="yes">Yes</td><td class="yes">Yes ¹</td><td class="no">No</td><td>Optional</td><td>App functionality</td></tr>
+  <tr><td>Name</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Optional</td><td>App functionality, Account management</td></tr>
+  <tr><td>Email address</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Optional</td><td>Account management</td></tr>
+  <tr><td>User IDs</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Required</td><td>App functionality, Analytics, Account management</td></tr>
+  <tr><td>Phone number</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Optional</td><td>Account management</td></tr>
+  <tr><td>Photos</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Optional</td><td>App functionality</td></tr>
+  <tr><td>Videos</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Optional</td><td>App functionality</td></tr>
+  <tr><td>App interactions</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Required</td><td>Analytics</td></tr>
+  <tr><td>Other user-generated content</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Optional</td><td>App functionality</td></tr>
+  <tr><td>Device or other IDs</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Required</td><td>App functionality, Analytics</td></tr>
+</table></div>
+<p class="note">¹ Location is "shared" because coordinates go to two outside services: AlAdhan (it calculates prayer
+times) and OpenStreetMap (it finds your city's name). Declaring more than the app does is harmless; declaring less
+gets apps rejected.</p>
+<p>Then <strong>Next</strong> → Google shows a preview of the store's Data safety section → <strong>Save</strong>.</p>
+<p class="note warn"><strong>If other forms appear</strong> (e.g. <em>Photo and video permissions</em>, <em>Foreground
+service</em>): they mean some library in the app asks for that permission. Send me a screenshot before answering.</p>
+</section>
+
+<!-- ================================================================ 6 -->
+<section class="phase" id="phase-6" data-title="Store page">
+<div class="ph-head"><span class="num">6</span><h2>Fill in the store page</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">45 minutes</span></div>
+<p class="why">What people see on Google Play before they install: name, descriptions, icon, banner and screenshots.</p>
+
+<h3>6.1 Category and contact details</h3>
+<div class="where">Grow users → Store presence → Store settings</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p6-1" aria-label="Done"><div>
+  <div class="tbl wide"><table>
+    <tr><th>Field</th><th>What to enter</th></tr>
+    <tr><td>App category</td><td>Lifestyle</td></tr>
+    <tr><td>Tags</td><td>Up to 5 from Google's list that fit: religion, prayer, maps, travel and local.</td></tr>
+    <tr><td>Email address</td><td>The new Gmail (public; required)</td></tr>
+    <tr><td>Website</td><td><code>https://vegukin-twa.pages.dev/</code></td></tr>
+    <tr><td>Phone number</td><td>Leave empty</td></tr>
+  </table></div> Save.</div></li>
+</ol>
+
+<h3>6.2 Screenshots: take and fix them first</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p6-2" aria-label="Done"><div>On your phone, with the app in <strong>English</strong>,
+  take 4–8 screenshots (Power + Volume down): home, prayer times, Qibla, a mosque page with the map, HiKorea,
+  Notifications, an ingredient check result, Account. Use real, tidy screens: no half-loaded pages.</div></li>
+<li><input type="checkbox" class="tick" id="p6-3" aria-label="Done"><div><strong>Fix the shape.</strong> Google's rule: the long side
+  may be at most twice the short side. Most phones take 1080 × 2400 (2.22 ×), which Google refuses.
+  <p>Crop each to <strong>1080 × 2160</strong> (cut the status bar and a little at the bottom). On Windows: open the image in
+  <em>Photos</em> → Edit → Crop → aspect ratio 1:2. Or send them to me and I'll crop them.</p></div></li>
+</ol>
+
+<h3>6.3 The store listing in English</h3>
+<div class="where">Grow users → Store presence → Main store listing</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p6-4" aria-label="Done"><div>App name: <code>Muslim Vegukin</code>. Paste the two
+  descriptions:
+  <div class="paste"><div class="paste-head"><span>Short description · English</span><span class="limit"></span><button class="copy" type="button" data-for="t-en-s">Copy</button></div>
+<pre id="t-en-s" data-limit="80">Prayer times, qibla, halal places and HiKorea alerts for Muslims in Korea</pre></div>
+  <div class="paste"><div class="paste-head"><span>Full description · English</span><span class="limit"></span><button class="copy" type="button" data-for="t-en-f">Copy</button></div>
+<pre id="t-en-f" data-limit="4000">Muslim Vegukin brings what Muslims living in Korea need into one app.
+
+🕌 PRAYER TIMES
+• Accurate prayer times for your city, with imsak and the last third of the night
+• A reminder for each prayer: sound, vibration or silent
+• Two home-screen widgets: the next prayer and the time left
+
+🧭 QIBLA
+• The qibla direction with the compass and the camera
+• Check the compass against the sun, with an accuracy indicator
+
+📍 MOSQUES, HALAL RESTAURANTS AND SHOPS
+• Places near you with a map, opening hours and reviews
+• Suggest a new place, and follow places you care about
+
+🔔 NOTIFICATIONS
+• Hear when a new mosque or restaurant opens in an area you choose
+• Updates about the places you follow
+
+🛂 HIKOREA APPOINTMENTS
+• Watch immigration offices for free days and get notified the moment one opens
+
+🔍 INGREDIENT CHECK
+• Scan a product's barcode to see whether it is halal
+
+Available in English, Russian and Uzbek, in light and dark mode. No ads.
+Signing in is optional: with Telegram, WhatsApp or Google.</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p6-5" aria-label="Done"><div>Graphics:
+  <div class="tbl wide"><table>
+    <tr><th>Slot</th><th>File</th></tr>
+    <tr><td>App icon</td><td><code>E:\dev\game\mobile\store\play_icon_512.png</code> (512 × 512)</td></tr>
+    <tr><td>Feature graphic</td><td><code>E:\dev\game\mobile\store\feature_graphic.png</code> (1024 × 500)</td></tr>
+    <tr><td>Phone screenshots</td><td>Your cropped screenshots from 6.2</td></tr>
+    <tr><td>Video, tablet, Chromebook</td><td>Leave empty</td></tr>
+  </table></div> Save.</div></li>
+</ol>
+
+<h3>6.4 Russian and Uzbek translations</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p6-6" aria-label="Done"><div>On the same page: <strong>Manage translations</strong> →
+  <strong>Add your own translations</strong> → tick <strong>Russian – ru-RU</strong>, and <strong>Uzbek</strong> if
+  Google's list has it → Add.</div></li>
+<li><input type="checkbox" class="tick" id="p6-7" aria-label="Done"><div>Switch the language at the top of the page to Russian,
+  paste, Save. Then the same for Uzbek.
+  <div class="langs">
+  <div class="paste"><div class="paste-head"><span>Short description · Russian</span><span class="limit"></span><button class="copy" type="button" data-for="t-ru-s">Copy</button></div>
+<pre id="t-ru-s" data-limit="80">Время намаза, кибла, халяль-места и HiKorea для мусульман в Корее</pre></div>
+  <div class="paste"><div class="paste-head"><span>Full description · Russian</span><span class="limit"></span><button class="copy" type="button" data-for="t-ru-f">Copy</button></div>
+<pre id="t-ru-f" data-limit="4000">Muslim Vegukin — всё, что нужно мусульманам в Корее, в одном приложении.
+
+🕌 ВРЕМЯ НАМАЗА
+• Точное время намаза для вашего города, имсак и последняя треть ночи
+• Напоминание о каждом намазе: звук, вибрация или без звука
+• Два виджета для главного экрана: следующий намаз и оставшееся время
+
+🧭 КИБЛА
+• Направление киблы по компасу и через камеру
+• Проверка компаса по солнцу и индикатор точности
+
+📍 МЕЧЕТИ, ХАЛЯЛЬ-РЕСТОРАНЫ И МАГАЗИНЫ
+• Места рядом с вами: карта, часы работы и отзывы
+• Предложите новое место и следите за изменениями
+
+🔔 УВЕДОМЛЕНИЯ
+• Узнайте, когда в выбранном районе открывается новая мечеть или ресторан
+• Новости мест, за которыми вы следите
+
+🛂 ОЧЕРЕДЬ В HIKOREA
+• Отслеживайте свободные дни в иммиграционных офисах и получайте уведомление, как только они появятся
+
+🔍 ПРОВЕРКА СОСТАВА
+• Отсканируйте штрихкод товара и узнайте, халяль ли он
+
+Приложение на русском, английском и узбекском, со светлой и тёмной темой. Без рекламы.
+Вход необязателен: через Telegram, WhatsApp или Google.</pre></div>
+  <div class="paste"><div class="paste-head"><span>Short description · Uzbek</span><span class="limit"></span><button class="copy" type="button" data-for="t-uz-s">Copy</button></div>
+<pre id="t-uz-s" data-limit="80">Namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari — Koreyadagilar uchun</pre></div>
+  <div class="paste"><div class="paste-head"><span>Full description · Uzbek</span><span class="limit"></span><button class="copy" type="button" data-for="t-uz-f">Copy</button></div>
+<pre id="t-uz-f" data-limit="4000">Muslim Vegukin — Koreyada yashovchi musulmonlar uchun bitta ilovada hamma kerakli narsa.
+
+🕌 NAMOZ VAQTLARI
+• Shahringiz uchun aniq namoz vaqtlari, imsak va tunning oxirgi uchdan biri
+• Har bir namoz uchun eslatma: ovoz, tebranish yoki jim
+• Bosh ekran uchun ikki xil vidjet: keyingi namoz va qolgan vaqt
+
+🧭 QIBLA
+• Kompas va kamera orqali qibla yo‘nalishi
+• Quyosh bo‘yicha kompasni tekshirish va aniqlik ko‘rsatkichi
+
+📍 MASJIDLAR, HALOL RESTORANLAR VA DO‘KONLAR
+• Yaqiningizdagi joylar, xarita, ish vaqtlari va izohlar
+• Yangi joy taklif qilish va joy haqida xabar olish
+
+🔔 BILDIRISHNOMALAR
+• Tanlagan hududingizda yangi masjid yoki restoran ochilsa — xabar
+• Kuzatayotgan joylaringizdagi o‘zgarishlar
+
+🛂 HIKOREA NAVBATLARI
+• Immigratsiya ofislarida bo‘sh kunlarni kuzatish va ochilganda darhol xabar olish
+
+🔍 TARKIB TEKSHIRUVI
+• Mahsulot shtrix-kodini skanerlang — halol yoki yo‘qligini bilib oling
+
+🚗 AVTOMOBIL, 🏠 UY-JOY, 💼 ISH, 📦 POSILKA
+• E’lonlarni ko‘rish, saqlash va o‘z e’loningizni joylash
+• Telegram guruhlari, biznes katalogi va savol-javoblar
+
+Ilova o‘zbek, rus va ingliz tillarida, kunduzgi va tungi rejimda ishlaydi. Reklama yo‘q.
+Kirish ixtiyoriy: Telegram, WhatsApp yoki Google orqali.</pre></div>
+  </div></div></li>
+</ol>
+<p class="note">The English and Russian texts list only what those languages show in the app: cars, housing, jobs,
+parcels, links, the business directory and Q&amp;A are Uzbek-only. Many of your users' phones are set to
+<strong>Korean</strong>; they'll see the English listing unless you add a Korean one. Ask me if you want a Korean text.</p>
+</section>
+
+<!-- ================================================================ 7 -->
+<section class="phase" id="phase-7" data-title="Internal test">
+<div class="ph-head"><span class="num">7</span><h2>Internal test, on your own phone</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">20 minutes</span><span class="chip wait">a few minutes</span></div>
+<p class="why">The first upload goes to you alone. You check that the app installed from Google Play works,
+because Google re-signs it with its own key, before any stranger sees it. No review here.</p>
+<div class="where">Test and release → Testing → Internal testing</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p7-1" aria-label="Done"><div><strong>Testers</strong> tab → <strong>Create email list</strong>
+  → name it <code>Me</code> → add your Gmail (the one in your phone's Play Store) → Save. Tick the list → Save.</div></li>
+<li><input type="checkbox" class="tick" id="p7-2" aria-label="Done"><div><strong>Releases</strong> tab → <strong>Create new release</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p7-3" aria-label="Done"><div>If asked how to sign the app, choose <strong>Use
+  Google-generated key</strong> (recommended). Google keeps the key that signs the app on phones; your <code>.jks</code>
+  becomes your <strong>upload key</strong>, which proves to Google that uploads come from you.</div></li>
+<li><input type="checkbox" class="tick" id="p7-4" aria-label="Done"><div><strong>App bundles → Upload</strong> →
+  <code>app-release.aab</code>. Wait until it shows version <code>1 (1.0.0)</code>.</div></li>
+<li><input type="checkbox" class="tick" id="p7-5" aria-label="Done"><div>Release name: leave what Google fills in. Release notes:
+  <div class="paste"><div class="paste-head"><span>Release notes</span><button class="copy" type="button" data-for="t-notes">Copy</button></div>
+<pre id="t-notes">&lt;en-US&gt;
+First version: prayer times and reminders, qibla, mosques and halal places, HiKorea appointment alerts, ingredient check.
+&lt;/en-US&gt;
+&lt;ru-RU&gt;
+Первая версия: время намаза и напоминания, кибла, мечети и халяль-места, уведомления HiKorea, проверка состава.
+&lt;/ru-RU&gt;</pre></div>
+  <p>The tags tell Google which language each note is in. Only languages your listing has are allowed.</p></div></li>
+<li><input type="checkbox" class="tick" id="p7-6" aria-label="Done"><div><strong>Next</strong>. Yellow warnings are fine; red errors
+  must be fixed (see <a href="#trouble">If something goes wrong</a>). <strong>Save</strong> → <strong>Start rollout to
+  Internal testing</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p7-7" aria-label="Done"><div><strong>Install it.</strong> First uninstall the APK you
+  installed yourself (it has a different signature). Testers tab → <em>How testers join your test</em> → <strong>Copy
+  link</strong> → open it on your phone → <strong>Accept invite</strong> → <strong>Download it on Google Play</strong> → Install.
+  It can take up to an hour before the Play Store shows the app.</div></li>
+<li><input type="checkbox" class="tick" id="p7-8" aria-label="Done"><div><strong>Make Google sign-in work.</strong>
+  <div class="where">Test and release → App integrity → App signing</div>
+  <p>Copy the <strong>SHA-1</strong> under <em>App signing key certificate</em>. Then in the Firebase console → project
+  <strong>muslim-vegukin</strong> → ⚙ Project settings → Your apps → the Android app → <strong>Add fingerprint</strong> →
+  paste → Save. Wait 5 minutes.</p>
+  <p>Without this, Google sign-in fails in every copy installed from Google Play.</p></div></li>
+<li><input type="checkbox" class="tick" id="p7-9" aria-label="Done"><div><strong>Test it</strong> on the Play-installed app: it opens;
+  prayer times; Google, Telegram and WhatsApp sign-in; Account → Send a test → "Arrived on this phone".</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 8 -->
+<section class="phase" id="phase-8" data-title="Closed test, 12 × 14">
+<div class="ph-head"><span class="num">8</span><h2>Closed test with 12+ people for 14 days</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">1 hour, then reminders</span><span class="chip wait">review 1–3 days, then 14 days</span></div>
+<p class="why">Google's rule for new personal accounts: before the app can go public, at least <strong>12 testers</strong>
+must stay in a closed test for <strong>14 days in a row</strong>. Only people with Android phones can test.</p>
+
+<h3>8.1 Collect your testers' Gmail addresses</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p8-1" aria-label="Done"><div>Send this to your Telegram group (or one by one). Each person must
+  send the Gmail that their phone's Play Store uses. Aim for 15–20 people.
+  <div class="paste"><div class="paste-head"><span>Message 1 · asking for testers (Uzbek)</span><button class="copy" type="button" data-for="t-msg1">Copy</button></div>
+<pre id="t-msg1">Assalomu alaykum! 🌙
+Muslim Vegukin ilovasini Google Play'ga chiqaryapmiz. Google yangi ilovadan 14 kunlik sinovni talab qiladi — buning uchun kamida 12 nafar sinovchi kerak. Yordam bera olasizmi?
+
+Kerak bo‘ladi: Android telefon va undagi Play Store'ga kirilgan Gmail manzili (iPhone mos kelmaydi).
+
+Rozi bo‘lsangiz, Play Store'dagi Gmail manzilingizni menga yozing. Rahmat!</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p8-2" aria-label="Done"><div>Keep the addresses in one list (a note or a spreadsheet),
+  separated by commas: <code>name1@gmail.com, name2@gmail.com, …</code></div></li>
+</ol>
+
+<h3>8.2 Create the closed test</h3>
+<div class="where">Test and release → Testing → Closed testing</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p8-3" aria-label="Done"><div>There's usually a track called <strong>Alpha</strong>
+  already: click <strong>Manage track</strong> (or <em>Create track</em>, name it <code>Beta</code>).</div></li>
+<li><input type="checkbox" class="tick" id="p8-4" aria-label="Done"><div><strong>Countries / regions</strong> tab → Add countries →
+  South Korea, Uzbekistan, and every other country your testers' Play accounts are from → Save.</div></li>
+<li><input type="checkbox" class="tick" id="p8-5" aria-label="Done"><div><strong>Testers</strong> tab → <strong>Create email list</strong>
+  → name <code>Beta testers</code> → paste the addresses → Save. Tick the list. <em>Feedback URL or email</em>: your
+  Telegram link or Gmail. Save.</div></li>
+<li><input type="checkbox" class="tick" id="p8-6" aria-label="Done"><div><strong>Releases</strong> tab → <strong>Create new release</strong>
+  → <strong>Add from library</strong> → the bundle you uploaded in phase 7 → Add → paste the same release notes →
+  Next → Save → <strong>Start rollout to Closed testing</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p8-7" aria-label="Done"><div>Open <strong>Publishing overview</strong> (left menu). If it
+  lists changes waiting, click <strong>Send changes for review</strong>.
+  <p>Google reviews the app for the first time now: usually 1–3 days, sometimes up to a week. You get an email; the
+  overview then says the changes are live.</p></div></li>
+</ol>
+
+<h3>8.3 Invite the testers</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p8-8" aria-label="Done"><div>After approval: Closed testing → your track → Testers tab →
+  <strong>Copy link</strong> (the "Join on the web" link). Send it with this message:
+  <div class="paste"><div class="paste-head"><span>Message 2 · the invitation (Uzbek)</span><button class="copy" type="button" data-for="t-msg2">Copy</button></div>
+<pre id="t-msg2">Rahmat, sinovga qo‘shildingiz! 🤲
+
+1) Shu havolani telefoningizda oching (Play Store'dagi Gmail bilan kirilgan bo‘lsin):
+HAVOLANI SHU YERGA QO‘YING
+
+2) «Become a tester» (Sinovchi bo‘lish) tugmasini bosing.
+3) So‘ng o‘sha sahifadagi «Download it on Google Play» orqali ilovani o‘rnating.
+4) 14 kun davomida ilovani o‘chirmang va 2–3 kunda bir marta ochib turing.
+
+Xato yoki taklif bo‘lsa, shu yerga yozing. Rahmat!</pre></div>
+  <p>Replace <code>HAVOLANI SHU YERGA QO‘YING</code> with the link before sending.</p></div></li>
+<li><input type="checkbox" class="tick" id="p8-9" aria-label="Done"><div>Check the count: the closed test page shows how many testers
+  have joined. Remind the ones who haven't. The 14 days count only while <strong>12 or more</strong> are in.</div></li>
+</ol>
+
+<h3>8.4 The 14 days</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p8-10" aria-label="Done"><div>Every few days, remind testers to open the app. Ask what
+  works, what breaks, what's missing. Google looks at whether testers actually use the app.</div></li>
+<li><input type="checkbox" class="tick" id="p8-11" aria-label="Done"><div><strong>Write down</strong> what testers report and what you
+  change. Phase 9 asks for exactly that.</div></li>
+<li><input type="checkbox" class="tick" id="p8-12" aria-label="Done"><div>Fixed something? Raise the version (<code>1.0.1+2</code>),
+  build a new <code>.aab</code> (phase 3), and upload it as a new release on the <strong>same closed track</strong>. The 14
+  days keep counting.</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 9 -->
+<section class="phase" id="phase-9" data-title="Apply for production">
+<div class="ph-head"><span class="num">9</span><h2>Apply for production</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">20 minutes</span><span class="chip wait">up to 7 days</span></div>
+<p class="why">After the 14 days, the Dashboard shows <strong>Apply for production</strong>. Google asks about your test
+and your app, in English. Below are drafts: replace everything in [square brackets] with what really happened.</p>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p9-1" aria-label="Done"><div>Dashboard → <strong>Apply for production</strong>. Answer with
+  the drafts below, adjusted to your test.</div></li>
+<li><input type="checkbox" class="tick" id="p9-2" aria-label="Done"><div>Submit. Google replies by email, usually within 7 days. If
+  they say no, they explain why (most often: more testing). Keep testing and apply again.</div></li>
+</ol>
+<div class="paste"><div class="paste-head"><span>How did you recruit users for your closed test?</span><button class="copy" type="button" data-for="t-q1">Copy</button></div>
+<pre id="t-q1">We invited members of our Telegram community, Muslim Vegukin, who already use the web version of the app inside Telegram, plus friends and family living in Korea. Testers joined through the opt-in link we shared in the group.</pre></div>
+<div class="paste"><div class="paste-head"><span>Describe the engagement you received from testers</span><button class="copy" type="button" data-for="t-q2">Copy</button></div>
+<pre id="t-q2">Testers used the app most days: prayer times and reminders, the qibla compass, the mosque and halal restaurant maps, HiKorea appointment alerts and the ingredient check. They reported problems and ideas in our Telegram group and by direct message.</pre></div>
+<div class="paste"><div class="paste-head"><span>Summary of the feedback, and how you collected it</span><button class="copy" type="button" data-for="t-q3">Copy</button></div>
+<pre id="t-q3">We collected feedback in our Telegram group and by direct messages. The main points were: [write 2–4 real points, for example "a reminder came late on one Samsung phone", "the qibla camera needed clearer guidance", "some mosque opening hours were wrong"].</pre></div>
+<div class="paste"><div class="paste-head"><span>Who is the intended audience of your app?</span><button class="copy" type="button" data-for="t-q4">Copy</button></div>
+<pre id="t-q4">Muslims living in South Korea, mostly from Uzbekistan and other Central Asian countries. They need prayer times, the qibla direction, halal food and mosques nearby, and help getting appointments at immigration offices (HiKorea).</pre></div>
+<div class="paste"><div class="paste-head"><span>Describe how your app provides value to users</span><button class="copy" type="button" data-for="t-q5">Copy</button></div>
+<pre id="t-q5">One app replaces several: accurate prayer times with reminders and home-screen widgets, a compass and camera qibla finder, a map of mosques, halal restaurants and shops with reviews, alerts when a HiKorea appointment opens, and a barcode check for halal ingredients. It is free, has no ads, and works in Uzbek, Russian and English.</pre></div>
+<div class="paste"><div class="paste-head"><span>What changes did you make based on the closed test?</span><button class="copy" type="button" data-for="t-q6">Copy</button></div>
+<pre id="t-q6">[List your real changes, for example: "Fixed a start-up problem on some phones", "Made the test notification show whether it really arrived", "Corrected place information testers reported".] Each fix was released to the closed testing track and checked by the testers.</pre></div>
+<div class="paste"><div class="paste-head"><span>How did you decide the app is ready for production?</span><button class="copy" type="button" data-for="t-q7">Copy</button></div>
+<pre id="t-q7">During two weeks the main features worked for all testers on different phones ([e.g. Samsung, Xiaomi, Pixel]), the problems they found were fixed and re-tested, and Android vitals showed no crashes in the last days of the test.</pre></div>
+<p class="note">"How many installs do you expect in the first year?": pick the range that matches your Telegram audience;
+<em>1,000 – 10,000</em> is a sensible, honest start.</p>
+</section>
+
+<!-- ================================================================ 10 -->
+<section class="phase" id="phase-10" data-title="Release to everyone">
+<div class="ph-head"><span class="num">10</span><h2>Release to everyone</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">15 minutes</span><span class="chip wait">review 1–7 days</span></div>
+<div class="where">Test and release → Production</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p10-1" aria-label="Done"><div><strong>Countries / regions</strong> tab → Add countries:
+  South Korea, Uzbekistan, Kazakhstan, Kyrgyzstan, Tajikistan, Russia (or all countries) → Save.</div></li>
+<li><input type="checkbox" class="tick" id="p10-2" aria-label="Done"><div><strong>Releases</strong> tab → <strong>Create new release</strong>
+  → <strong>Add from library</strong> → the newest bundle → release notes → Next → Save.</div></li>
+<li><input type="checkbox" class="tick" id="p10-3" aria-label="Done"><div>Rollout: Google may offer a <strong>staged rollout</strong>
+  (a percentage of users first). 20% is a safe start; raise it to 100% after a few calm days (Production →
+  <em>Increase rollout</em>). Then <strong>Start rollout to Production</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p10-4" aria-label="Done"><div><strong>Publishing overview</strong> → <strong>Send changes for
+  review</strong>, if listed. You get an email when it's approved.</div></li>
+<li><input type="checkbox" class="tick" id="p10-5" aria-label="Done"><div>Share the app's address in your Telegram group. The
+  Share button on the app's Account page already uses it.
+  <div class="paste"><div class="paste-head"><span>Google Play address</span><button class="copy" type="button" data-for="t-play">Copy</button></div>
+<pre class="cmd" id="t-play">https://play.google.com/store/apps/details?id=com.vegukin.muslim_vegukin</pre></div></div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 11 -->
+<section class="phase" id="phase-11" data-title="After launch">
+<div class="ph-head"><span class="num">11</span><h2>After launch</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">with each update</span></div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p11-1" aria-label="Done"><div><strong>Each update:</strong> raise the version in
+  <code>pubspec.yaml</code>, build the <code>.aab</code> (phase 3), Production → Create new release → Upload → notes →
+  rollout. Updates are reviewed faster than the first release, often within a day.</div></li>
+<li><input type="checkbox" class="tick" id="p11-2" aria-label="Done"><div><strong>Reviews:</strong> Monitor and improve → Ratings and
+  reviews. Reply politely; people see your answers.</div></li>
+<li><input type="checkbox" class="tick" id="p11-3" aria-label="Done"><div><strong>Crashes:</strong> Monitor and improve → Android vitals →
+  Crashes and ANRs. Send me the report with the version, plus that version's <code>symbols</code> folder, and I'll find the
+  cause.</div></li>
+<li><input type="checkbox" class="tick" id="p11-4" aria-label="Done"><div><strong>Emails from Google</strong> about new rules (for
+  example a yearly "target API level" deadline): forward them to me before the date in the email.</div></li>
+<li><input type="checkbox" class="tick" id="p11-5" aria-label="Done"><div><strong>Back up the upload key</strong>: the <code>.jks</code>
+  file and its password, in two places outside this PC.</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ glossary -->
+<section id="words" style="margin-top:64px; scroll-margin-top:72px">
+<div class="ph-head"><span class="num">A</span><h2>Words you'll see</h2></div>
+<dl class="terms">
+  <dt>Play Console</dt><dd>Google's website for publishers, <code>play.google.com/console</code>. Google Play (the Play
+    Store) is the shop people install from.</dd>
+  <dt>App bundle (.aab)</dt><dd>The file you upload. Google makes the APKs phones install from it. APKs are only for
+    sharing directly, as you did with your friend.</dd>
+  <dt>Track</dt><dd>Who a version goes to: <em>Internal testing</em> (up to 100 people, instant, no review), <em>Closed
+    testing</em> (invited people), <em>Production</em> (everyone).</dd>
+  <dt>Release</dt><dd>One version put on one track. The same bundle can be released on several tracks.</dd>
+  <dt>Rollout</dt><dd>Making a release available. A <em>staged</em> rollout reaches a percentage of users first.</dd>
+  <dt>Review</dt><dd>Google checks releases before people get them (all tracks except internal testing).</dd>
+  <dt>Version code</dt><dd>The number after <code>+</code> in <code>pubspec.yaml</code>. Must grow with every upload.
+    The <em>version name</em> (<code>1.0.0</code>) is what users see.</dd>
+  <dt>Upload key</dt><dd>Your <code>.jks</code>. You sign bundles with it; Google checks uploads really come from you.</dd>
+  <dt>App signing key</dt><dd>Google's own key, which signs the app phones install. Its SHA-1 goes into Firebase for
+    Google sign-in (phase 7).</dd>
+  <dt>Opt-in link</dt><dd>The link testers open to join a test before they can install it.</dd>
+</dl>
+</section>
+
+<!-- ================================================================ trouble -->
+<section id="trouble" style="margin-top:56px; scroll-margin-top:72px">
+<div class="ph-head"><span class="num">B</span><h2>If something goes wrong</h2></div>
+<div class="tbl wide"><table>
+  <tr><th>Google says</th><th>What to do</th></tr>
+  <tr><td>Version code 1 has already been used</td><td>Raise the number after <code>+</code> in <code>pubspec.yaml</code>,
+    build again, upload the new file.</td></tr>
+  <tr><td>…signed in debug mode</td><td><code>android\key.properties</code> is missing or wrong. Check it (see
+    <code>RELEASE.md</code>), build again.</td></tr>
+  <tr><td>…not signed with the correct key</td><td>You signed with a different <code>.jks</code> than the first upload.
+    Use the original. If it's lost: App integrity → <em>Request upload key reset</em>, and tell me.</td></tr>
+  <tr><td>Screenshot has the wrong aspect ratio</td><td>Crop to 1080 × 2160 (phase 6.2).</td></tr>
+  <tr><td>Privacy policy link not working</td><td>Phase 1: the page must open for anyone, without signing in.</td></tr>
+  <tr><td>Google sign-in fails in the Play version</td><td>Phase 7, last step: the app-signing SHA-1 in Firebase.</td></tr>
+  <tr><td>The 14 days don't advance</td><td>Fewer than 12 testers are opted in. Check the count; ask more people.</td></tr>
+  <tr><td>An email about a policy problem</td><td>Don't change anything at random: send me the email text.</td></tr>
+</table></div>
+</section>
+
+<footer>Prepared for Muslim Vegukin (<code>com.vegukin.muslim_vegukin</code>), version 1.0.0. Play Console's menus change
+from time to time; if a name here doesn't match, search for it at the top of Play Console.</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var KEY = 'mv-play-launch-v1';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input.tick'));
+  var phases = Array.prototype.slice.call(document.querySelectorAll('section.phase'));
+
+  // The phase list in the side column.
+  var list = document.getElementById('nav-list');
+  phases.forEach(function (sec) {
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.innerHTML = '<span class="n"></span><span></span><span class="c"></span>';
+    a.children[0].textContent = sec.querySelector('.ph-head .num').textContent;
+    a.children[1].textContent = sec.getAttribute('data-title');
+    li.appendChild(a);
+    list.appendChild(li);
+    sec._nav = a;
+  });
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+  function update() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    var total = boxes.length;
+    var pct = total ? Math.round(done / total * 100) : 0;
+    ['overall-bar', 'nav-bar', 'strip-bar'].forEach(function (id) { document.getElementById(id).style.width = pct + '%'; });
+    document.getElementById('overall-text').textContent = done + ' of ' + total + ' steps done';
+    document.getElementById('strip-text').textContent = done + ' / ' + total;
+    phases.forEach(function (sec) {
+      var bs = sec.querySelectorAll('input.tick');
+      var d = 0;
+      for (var i = 0; i < bs.length; i++) if (bs[i].checked) d++;
+      var label = d + '/' + bs.length;
+      sec.querySelector('.ph-head .count').textContent = label;
+      sec._nav.children[2].textContent = label;
+      var complete = bs.length > 0 && d === bs.length;
+      sec.classList.toggle('complete', complete);
+      sec._nav.classList.toggle('done', complete);
+    });
+  }
+
+  boxes.forEach(function (b) {
+    b.checked = !!saved[b.id];
+    b.addEventListener('change', function () { saved[b.id] = b.checked; save(); update(); });
+  });
+
+  // Clearing asks twice, on the button itself.
+  var reset = document.getElementById('reset');
+  var armed = null;
+  reset.addEventListener('click', function () {
+    if (!armed) {
+      reset.textContent = 'Click again to clear all ticks';
+      armed = setTimeout(function () { reset.textContent = 'Clear my ticks'; armed = null; }, 4000);
+      return;
+    }
+    clearTimeout(armed); armed = null;
+    saved = {}; save();
+    boxes.forEach(function (b) { b.checked = false; });
+    reset.textContent = 'Clear my ticks';
+    update();
+  });
+
+  // Character counts against Google's limits.
+  Array.prototype.forEach.call(document.querySelectorAll('pre[data-limit]'), function (pre) {
+    var n = Array.from(pre.textContent).length;
+    var limit = +pre.getAttribute('data-limit');
+    var el = pre.parentNode.querySelector('.limit');
+    if (el) el.textContent = n + ' / ' + limit + ' characters';
+  });
+
+  // Copy buttons.
+  function selectText(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  function flash(btn, text) {
+    var old = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', old);
+    btn.textContent = text;
+    btn.classList.add('ok');
+    setTimeout(function () { btn.textContent = old; btn.classList.remove('ok'); }, 1800);
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('button.copy');
+    if (!btn) return;
+    var el = document.getElementById(btn.getAttribute('data-for'));
+    if (!el) return;
+    var text = el.textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { flash(btn, 'Copied'); },
+        function () { selectText(el); flash(btn, 'Selected: press Ctrl+C'); });
+    } else {
+      selectText(el); flash(btn, 'Selected: press Ctrl+C');
+    }
+  });
+
+  update();
+})();
+</script>
