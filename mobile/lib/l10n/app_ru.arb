@@ -1411,5 +1411,6 @@
   "accountShare": "Поделиться приложением",
   "accountShareText": "Muslim Vegukin — для мусульман в Корее: время намаза, кибла, халяль-места, очередь в HiKorea и многое другое.\n{link}",
   "accountFeedback": "Предложить идею или сообщить об ошибке",
-  "accountVersion": "Версия {version}"
+  "accountVersion": "Версия {version}",
+  "accountPrivacy": "Политика конфиденциальности"
 }

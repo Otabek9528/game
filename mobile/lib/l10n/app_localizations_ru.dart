@@ -4913,4 +4913,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String accountVersion(Object version) {
     return 'Версия $version';
   }
+
+  @override
+  String get accountPrivacy => 'Политика конфиденциальности';
 }

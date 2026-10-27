@@ -2464,5 +2464,6 @@
   "accountShare": "Ilovani ulashish",
   "accountShareText": "Muslim Vegukin — Koreyadagi musulmonlar uchun: namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va boshqalar.\n{link}",
   "accountFeedback": "Taklif yoki xato haqida yozish",
-  "accountVersion": "Versiya {version}"
+  "accountVersion": "Versiya {version}",
+  "accountPrivacy": "Maxfiylik siyosati"
 }

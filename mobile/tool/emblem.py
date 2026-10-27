@@ -229,14 +229,17 @@ def _rgb(hex_color):
     return tuple(int(hex_color[i:i + 2], 16) for i in (1, 3, 5))
 
 
-def picture(px, star=0.54, square=False):
+def picture(px, star=0.54, square=False, bare=False):
     """The emblem on emerald, px square: a disc (legacy launcher icons) or the
-    whole square (store icon, bot avatars: they round it themselves). star:
-    its width, of the picture's."""
+    whole square (store icon, bot avatars: they round it themselves); bare:
+    on nothing (the iOS launch screen paints the emerald). star: its width,
+    of the picture's."""
     k = 8
     n = px * k
     im = Image.new('RGBA', (n, n), (0, 0, 0, 0))
-    if square:
+    if bare:
+        pass
+    elif square:
         im.paste(_rgb(EMERALD800), (0, 0, n, n))
     else:
         ImageDraw.Draw(im).ellipse([0, 0, n - 1, n - 1], fill=_rgb(EMERALD800))

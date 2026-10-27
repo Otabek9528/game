@@ -95,17 +95,5 @@ of **both**:
 
 ## 6. Google Play
 
-1. Play Console → Create app (name, language, free, app).
-2. App content: privacy policy URL (required: location, account, push), Data
-   safety (location: approximate/precise, app functionality, not shared;
-   name/email/photo with Google sign-in; device id for push), ads: none,
-   content rating questionnaire, target audience 18+ or general.
-3. Store listing: short and full description, 512×512 icon, 1024×500 feature
-   graphic, at least 2 phone screenshots.
-4. Testing → Internal testing → Create release → upload `app-release.aab` →
-   add testers → roll out. New personal accounts must run a closed test
-   (12 testers, 14 days) before production.
-5. Production → Create release → same AAB (or a newer one) → review → roll out.
-
-Exact alarms (prayer reminders) use `SCHEDULE_EXACT_ALARM`, which the user
-grants; it needs no Play declaration.
+Step by step, with the listing texts in three languages, the Data safety answers and the store graphics:
+[`store/PLAY_STORE.md`](store/PLAY_STORE.md). Publish `store/privacy.html` on the web app first.

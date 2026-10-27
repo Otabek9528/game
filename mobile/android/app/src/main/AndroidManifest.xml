@@ -1,6 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Prayer times, web pages, the API. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- No advertising ID (Play's "uses advertising ID: No"), even if a
+         Google library would add the permission. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
     <!-- Prayer times for the user's city; "near me" places; Qibla. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

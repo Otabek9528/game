@@ -4787,4 +4787,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String accountVersion(Object version) {
     return 'Versiya $version';
   }
+
+  @override
+  String get accountPrivacy => 'Maxfiylik siyosati';
 }

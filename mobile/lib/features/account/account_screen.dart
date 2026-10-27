@@ -255,6 +255,11 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
                     title: s.accountFeedback,
                     onTap: () => openSection(context, featureGrid.firstWhere((f) => f.id == 'community'), _services),
                   ),
+                  _NavRow(
+                    icon: Icons.privacy_tip_outlined,
+                    title: s.accountPrivacy,
+                    onTap: () => unawaited(_services.openLink(AppConfig.privacyPolicy)),
+                  ),
                 ],
               ),
               if (signedIn) ...[_SectionTitle(s.accountManage), _Manage(user: user, services: _services)],

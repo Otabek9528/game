@@ -1411,5 +1411,6 @@
   "accountShare": "Share the app",
   "accountShareText": "Muslim Vegukin — for Muslims in Korea: prayer times, qibla, halal places, HiKorea appointments and more.\n{link}",
   "accountFeedback": "Suggest an idea or report a bug",
-  "accountVersion": "Version {version}"
+  "accountVersion": "Version {version}",
+  "accountPrivacy": "Privacy policy"
 }

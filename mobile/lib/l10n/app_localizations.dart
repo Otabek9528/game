@@ -8571,6 +8571,12 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Versiya {version}'**
   String accountVersion(Object version);
+
+  /// No description provided for @accountPrivacy.
+  ///
+  /// In uz, this message translates to:
+  /// **'Maxfiylik siyosati'**
+  String get accountPrivacy;
 }
 
 class _AppLocalizationsDelegate

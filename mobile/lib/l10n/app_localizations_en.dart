@@ -4864,4 +4864,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String accountVersion(Object version) {
     return 'Version $version';
   }
+
+  @override
+  String get accountPrivacy => 'Privacy policy';
 }

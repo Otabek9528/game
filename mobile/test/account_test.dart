@@ -757,6 +757,8 @@ void main() {
       expect(find.byType(CommunityScreen), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
+      await tapScrolled(tester, find.text('Privacy policy'));
+      expect(app.links.last, Uri.parse('https://vegukin-twa.pages.dev/privacy.html'));
       await tester.scrollUntilVisible(
         find.text('Muslim Vegukin · Version 1.0.0 (1)'),
         150,
