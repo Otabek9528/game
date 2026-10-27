@@ -18,10 +18,21 @@ import 'features/prayer/prayer_controller.dart';
 import 'features/prayer/prayer_sources.dart';
 import 'features/reminders/reminder_controller.dart';
 import 'features/widget/home_widget_bridge.dart';
+import 'startup_failed.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await _start();
+  } catch (error, stack) {
+    // Before the first frame nothing is drawn: without this the phone would
+    // stay on the green splash screen, saying nothing.
+    debugPrint('Startup failed: $error\n$stack');
+    runApp(StartupFailed(error: error));
+  }
+}
 
+Future<void> _start() async {
   // Draw behind the status and navigation bars; screens pad themselves.
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
@@ -34,9 +45,12 @@ Future<void> main() async {
   // Weekday and month names for the dates on the prayer card.
   await initializeDateFormatting();
 
-  final store = await PrefsKeyValueStore.open();
+  // The phone's saved settings; a storage that never answers is a failure
+  // too, said as one, rather than a splash screen forever.
+  const wait = Duration(seconds: 10);
+  final store = await PrefsKeyValueStore.open().timeout(wait);
   final prayer = PrayerController(location: DeviceLocationSource(), times: AladhanSource(), store: store);
-  final locale = LocaleController(await PrefsLanguageStore.open());
+  final locale = LocaleController(await PrefsLanguageStore.open().timeout(wait));
   final homeWidget = HomeWidgetBridge();
   final reminders = ReminderController(store);
   final services = AppServices(
