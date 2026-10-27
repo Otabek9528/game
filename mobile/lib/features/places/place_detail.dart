@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/brand_logos.dart';
 import '../../l10n/app_localizations.dart';
 import '../account/account_screen.dart';
 import 'place_actions.dart';
@@ -423,30 +424,27 @@ class _Location extends StatelessWidget {
               children: [
                 Expanded(
                   child: _NavButton(
-                    mark: 'N',
+                    logo: BrandLogo.naver,
                     name: 'Naver',
                     brand: const Color(0xFF03C75A),
-                    onMark: Colors.white,
                     onTap: () => services.openLink(naverUri(place)),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _NavButton(
-                    mark: 'K',
+                    logo: BrandLogo.kakao,
                     name: 'Kakao',
                     brand: const Color(0xFFFEE500),
-                    onMark: const Color(0xFF191600),
                     onTap: () => services.openLink(kakaoUri(place)),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _NavButton(
-                    mark: 'G',
+                    logo: BrandLogo.google,
                     name: 'Google',
                     brand: const Color(0xFF4285F4),
-                    onMark: Colors.white,
                     onTap: () => services.openLink(googleUri(place)),
                   ),
                 ),
@@ -469,15 +467,14 @@ class _Location extends StatelessWidget {
   }
 }
 
-/// A navigator, big enough to hit without looking: its mark on its
-/// colour, its name under it.
+/// A navigator, big enough to hit without looking: its logo, its name
+/// under it.
 class _NavButton extends StatelessWidget {
-  const _NavButton({required this.mark, required this.name, required this.brand, required this.onMark, required this.onTap});
+  const _NavButton({required this.logo, required this.name, required this.brand, required this.onTap});
 
-  final String mark;
+  final BrandLogo logo;
   final String name;
   final Color brand;
-  final Color onMark;
   final VoidCallback onTap;
 
   @override
@@ -506,16 +503,25 @@ class _NavButton extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Naver's and Kakao's logos are their squares; Google's G
+                  // sits on white, as on its own buttons.
                   Container(
                     width: 32,
                     height: 32,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: brand,
+                      color: logo == BrandLogo.google ? Colors.white : null,
                       borderRadius: BorderRadius.circular(10),
-                      boxShadow: [BoxShadow(color: brand.withValues(alpha: 0.35), blurRadius: 8, offset: const Offset(0, 2))],
+                      border: logo == BrandLogo.google ? Border.all(color: const Color(0x1F000000)) : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: logo == BrandLogo.google ? const Color(0x1A000000) : brand.withValues(alpha: 0.35),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: Text(mark, style: TextStyle(fontSize: 17, height: 1, fontWeight: FontWeight.w900, color: onMark)),
+                    child: BrandLogoMark(logo, size: logo == BrandLogo.google ? 19 : 32),
                   ),
                   const SizedBox(height: 7),
                   Text(name, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink)),

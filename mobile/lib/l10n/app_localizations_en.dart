@@ -1992,6 +1992,40 @@ class AppLocalizationsEn extends AppLocalizations {
       'That didn’t work. Check your connection and try again.';
 
   @override
+  String get signInWaTitle => 'How WhatsApp sign-in works';
+
+  @override
+  String get signInWaStep1 =>
+      'WhatsApp opens a chat with the Muslim Vegukin bot, with a short code already typed in the message box.';
+
+  @override
+  String get signInWaStep2 =>
+      'Send that message as it is, without changing it.';
+
+  @override
+  String get signInWaStep3 => 'The bot replies at once: tap “Yes, log in”.';
+
+  @override
+  String get signInWaStep4 => 'Come back to this app — you’re signed in.';
+
+  @override
+  String get signInWaNote =>
+      'You need WhatsApp on this phone. The code only signs you in, and works for 10 minutes.';
+
+  @override
+  String get signInWaOpen => 'Open WhatsApp';
+
+  @override
+  String get signInBack => 'Back';
+
+  @override
+  String get signInWaWaitingTitle => 'Send the message in WhatsApp';
+
+  @override
+  String get signInWaWaitingBody =>
+      'Then tap “Yes, log in” in the bot’s reply. We’ll wait here.';
+
+  @override
   String get signInDone => 'You’re signed in';
 
   @override

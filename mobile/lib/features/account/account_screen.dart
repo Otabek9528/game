@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import '../../core/config.dart';
 import '../../core/google_auth.dart';
 import '../../core/system.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/brand_logos.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../hikorea/hikorea_kit.dart';
@@ -41,7 +41,8 @@ Future<bool> askToSignIn(BuildContext context, AppServices services, {bool teleg
     isScrollControlled: true,
     showDragHandle: true,
     backgroundColor: VegukinPalette.of(context).card,
-    builder: (context) => Padding(
+    // Scrolls when WhatsApp's steps outgrow a small screen or large text.
+    builder: (context) => SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.paddingOf(context).bottom),
       child: SignInPanel(
         services: services,
@@ -417,6 +418,13 @@ String providerName(String? provider) => switch (provider) {
       _ => '',
     };
 
+BrandLogo? providerLogo(String? provider) => switch (provider) {
+      'google' => BrandLogo.google,
+      'whatsapp' => BrandLogo.whatsapp,
+      'telegram' => BrandLogo.telegram,
+      _ => null,
+    };
+
 /// The person: photo (or initials) and the mark of where they signed in.
 class AccountAvatar extends StatelessWidget {
   const AccountAvatar({super.key, required this.account, this.size = 40, this.badge = false, this.onDark = false});
@@ -458,12 +466,7 @@ class AccountAvatar extends StatelessWidget {
         child: Icon(Icons.person_rounded, size: size * 0.62, color: onDark ? Colors.white : p.inkMuted),
       );
     }
-    final mark = switch (user?.provider) {
-      'telegram' => (const Color(0xFF229ED9), const Icon(Icons.telegram, color: Colors.white)),
-      'whatsapp' => (const Color(0xFF25D366), const Icon(Icons.chat_rounded, color: Colors.white)),
-      'google' => (Colors.white, const CustomPaint(painter: _GoogleMark())),
-      _ => null,
-    };
+    final logo = providerLogo(user?.provider);
     return SizedBox.square(
       dimension: size,
       child: Stack(
@@ -476,20 +479,21 @@ class AccountAvatar extends StatelessWidget {
             ),
             child: ClipOval(child: SizedBox.square(dimension: size, child: face)),
           ),
-          if (badge && signedIn && mark != null)
+          if (badge && signedIn && logo != null)
             Positioned(
               right: -2,
               bottom: -2,
               child: Container(
                 width: size * 0.34,
                 height: size * 0.34,
-                padding: EdgeInsets.all(size * 0.05),
+                // Telegram's mark is itself a disc: it fills the badge.
+                padding: EdgeInsets.all(logo == BrandLogo.telegram ? 0 : size * 0.05),
                 decoration: BoxDecoration(
-                  color: mark.$1,
+                  color: logo == BrandLogo.telegram ? const Color(0xFF26A5E4) : Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(color: onDark ? p.hero.last : p.card, width: 2),
                 ),
-                child: FittedBox(child: SizedBox.square(dimension: 24, child: mark.$2)),
+                child: FittedBox(child: BrandLogoMark(logo)),
               ),
             ),
         ],
@@ -1115,6 +1119,8 @@ class _Manage extends StatelessWidget {
 }
 
 /// The ways to sign in, and the wait while the person says Yes in a bot.
+/// WhatsApp first says what will happen there: the person has to send the
+/// typed-in code themselves, which nothing else asks of them.
 class SignInPanel extends StatefulWidget {
   const SignInPanel({super.key, required this.services, required this.onSignedIn, this.telegramOnly = false});
 
@@ -1134,6 +1140,9 @@ class _SignInPanelState extends State<SignInPanel> with WidgetsBindingObserver {
   DateTime? _linkUntil;
   Timer? _poll;
   String? _error;
+
+  /// WhatsApp's steps, shown before it opens.
+  bool _whatsappSteps = false;
 
   AccountController get _account => widget.services.account;
 
@@ -1183,6 +1192,7 @@ class _SignInPanelState extends State<SignInPanel> with WidgetsBindingObserver {
       if (!mounted) return;
       setState(() {
         _busy = null;
+        _whatsappSteps = false;
         _link = link;
         _linkProvider = provider;
         _linkUntil = DateTime.now().add(link.expiresIn);
@@ -1193,6 +1203,7 @@ class _SignInPanelState extends State<SignInPanel> with WidgetsBindingObserver {
       if (!mounted) return;
       setState(() {
         _busy = null;
+        _whatsappSteps = false;
         _error = s.signInFailed;
       });
     }
@@ -1237,8 +1248,10 @@ class _SignInPanelState extends State<SignInPanel> with WidgetsBindingObserver {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     final link = _link;
+    if (_whatsappSteps && link == null) return _whatsappIntro(s, p);
     if (link != null) {
       final app = providerName(_linkProvider);
+      final whatsapp = _linkProvider == 'whatsapp';
       return Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1246,10 +1259,10 @@ class _SignInPanelState extends State<SignInPanel> with WidgetsBindingObserver {
           const SizedBox(height: 4),
           const Center(child: SizedBox.square(dimension: 34, child: CircularProgressIndicator(strokeWidth: 3))),
           const SizedBox(height: 16),
-          Text(s.signInWaitingTitle(app),
+          Text(whatsapp ? s.signInWaWaitingTitle : s.signInWaitingTitle(app),
               textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: p.ink)),
           const SizedBox(height: 6),
-          Text(s.signInWaitingBody,
+          Text(whatsapp ? s.signInWaWaitingBody : s.signInWaitingBody,
               textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.4, color: p.inkSoft)),
           const SizedBox(height: 16),
           FilledButton.tonalIcon(
@@ -1279,12 +1292,98 @@ class _SignInPanelState extends State<SignInPanel> with WidgetsBindingObserver {
               _ => s.signInTelegram,
             },
             busy: _busy == provider,
-            onTap: _busy == null ? () => _start(provider) : null,
+            onTap: _busy != null
+                ? null
+                : provider == 'whatsapp'
+                    ? () => setState(() {
+                          _whatsappSteps = true;
+                          _error = null;
+                        })
+                    : () => _start(provider),
           ),
           const SizedBox(height: 10),
         ],
         if (_error != null)
           Text(_error!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13.5, color: Color(0xFFB91C1C))),
+      ],
+    );
+  }
+
+  /// What happens in WhatsApp, before it opens: send the typed-in message,
+  /// tap Yes, come back.
+  Widget _whatsappIntro(AppLocalizations s, VegukinPalette p) {
+    const green = Color(0xFF25D366);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final busy = _busy == 'whatsapp';
+    final steps = [s.signInWaStep1, s.signInWaStep2, s.signInWaStep3, s.signInWaStep4];
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const BrandLogoMark(BrandLogo.whatsapp, size: 30),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(s.signInWaTitle, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: p.ink)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        for (final (i, step) in steps.indexed)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 26,
+                  height: 26,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: green.withValues(alpha: 0.16), shape: BoxShape.circle),
+                  child: Text('${i + 1}',
+                      style: TextStyle(
+                          fontSize: 13.5, fontWeight: FontWeight.w800, color: dark ? green : const Color(0xFF0E7A3F))),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: Text(step, style: TextStyle(fontSize: 15, height: 1.35, color: p.ink)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        const SizedBox(height: 2),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: p.badge, borderRadius: BorderRadius.circular(12)),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.info_outline_rounded, size: 18, color: p.inkMuted),
+              const SizedBox(width: 10),
+              Expanded(child: Text(s.signInWaNote, style: TextStyle(fontSize: 13, height: 1.4, color: p.inkSoft))),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Dark text on WhatsApp's green, as its own site has it: white on it
+        // is too faint to read.
+        FilledButton.icon(
+          style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: const Color(0xFF111B21)),
+          onPressed: busy ? null : () => _start('whatsapp'),
+          icon: busy
+              ? const SizedBox.square(
+                  dimension: 18, child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF111B21)))
+              : const Icon(Icons.open_in_new_rounded),
+          label: Text(s.signInWaOpen),
+        ),
+        TextButton(
+          onPressed: busy ? null : () => setState(() => _whatsappSteps = false),
+          child: Text(s.signInBack),
+        ),
       ],
     );
   }
@@ -1301,11 +1400,6 @@ class _ProviderButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    final mark = switch (provider) {
-      'whatsapp' => const Icon(Icons.chat_rounded, color: Color(0xFF25D366), size: 26),
-      'telegram' => const Icon(Icons.telegram, color: Color(0xFF229ED9), size: 26),
-      _ => const SizedBox.square(dimension: 26, child: CustomPaint(painter: _GoogleMark())),
-    };
     return Material(
       color: p.card,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: p.hairlineStrong)),
@@ -1316,7 +1410,11 @@ class _ProviderButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           child: Row(
             children: [
-              mark,
+              // The G fills its square; the other two have air around them.
+              SizedBox.square(
+                dimension: 26,
+                child: Center(child: BrandLogoMark(providerLogo(provider)!, size: provider == 'google' ? 22 : 26)),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(label, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: p.ink)),
@@ -1328,35 +1426,4 @@ class _ProviderButton extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Google's four-colour G, as its sign-in buttons show it.
-class _GoogleMark extends CustomPainter {
-  const _GoogleMark();
-
-  static const _blue = Color(0xFF4285F4);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final stroke = size.width * 0.2;
-    final rect = Rect.fromCircle(center: size.center(Offset.zero), radius: (size.width - stroke) / 2 - 1);
-    double rad(double degrees) => degrees * math.pi / 180;
-    Paint pen(Color colour) => Paint()
-      ..color = colour
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke;
-    // Clockwise from three o'clock; the gap at the upper right is the G's mouth.
-    canvas
-      ..drawArc(rect, rad(0), rad(45), false, pen(_blue))
-      ..drawArc(rect, rad(45), rad(90), false, pen(const Color(0xFF34A853)))
-      ..drawArc(rect, rad(135), rad(80), false, pen(const Color(0xFFFBBC05)))
-      ..drawArc(rect, rad(215), rad(105), false, pen(const Color(0xFFEA4335)))
-      ..drawRect(
-        Rect.fromLTRB(rect.center.dx, rect.center.dy - stroke / 2, rect.right + stroke / 2, rect.center.dy + stroke / 2),
-        Paint()..color = _blue,
-      );
-  }
-
-  @override
-  bool shouldRepaint(_GoogleMark old) => false;
 }

@@ -62,6 +62,14 @@ Future<void> settleWaiting(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 500));
 }
 
+/// WhatsApp, past its steps: the bot opened, the app waiting.
+Future<void> startWhatsApp(WidgetTester tester) async {
+  await tester.tap(find.text('Continue with WhatsApp'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Open WhatsApp'));
+  await settleWaiting(tester);
+}
+
 /// Taps the link [text] in the message's selectable text.
 void tapSpan(WidgetTester tester, String text) {
   final spans = <TextSpan>[];
@@ -222,15 +230,42 @@ void main() {
           ['Telegram orqali kirish', 'WhatsApp orqali kirish', 'Google orqali kirish']);
     });
 
+    testWidgets('WhatsApp: what will happen there first, then the bot opens', (tester) async {
+      final app = await openSignIn(tester);
+      final opened = app.links.length;
+      await tester.tap(find.text('Continue with WhatsApp'));
+      await tester.pumpAndSettle();
+      expect(find.text('How WhatsApp sign-in works'), findsOneWidget);
+      expect(find.text('Send that message as it is, without changing it.'), findsOneWidget);
+      expect(find.text('The bot replies at once: tap “Yes, log in”.'), findsOneWidget);
+      expect(app.links.length, opened, reason: 'nothing opened yet');
+
+      await tester.tap(find.text('Back'));
+      await tester.pumpAndSettle();
+      expect(find.text('Continue with WhatsApp'), findsOneWidget);
+      expect(app.links.length, opened);
+
+      await startWhatsApp(tester);
+      expect(app.links.last, Uri.parse('https://wa.me/821012345678?text=LOGIN%20CODE1'));
+      expect(find.text('Send the message in WhatsApp'), findsOneWidget);
+    });
+
+    testWidgets('Telegram and Google need no steps: one tap opens them', (tester) async {
+      final app = await openSignIn(tester);
+      await tester.tap(find.text('Continue with Telegram'));
+      await settleWaiting(tester);
+      expect(find.text('How WhatsApp sign-in works'), findsNothing);
+      expect(app.links.last.host, 't.me');
+      expect(find.text('Tap “Yes, log in” in Telegram'), findsOneWidget);
+    });
+
     testWidgets('WhatsApp: the bot opens, the app waits, and is signed in when Yes is tapped', (tester) async {
       final app = await openSignIn(tester);
-      await tester.tap(find.text('Continue with WhatsApp'));
-      await settleWaiting(tester);
-      expect(app.links.last, Uri.parse('https://wa.me/821012345678?text=LOGIN%20CODE1'));
-      expect(find.text('Tap “Yes, log in” in WhatsApp'), findsOneWidget);
+      await startWhatsApp(tester);
+      expect(find.text('Send the message in WhatsApp'), findsOneWidget);
 
       await tester.pump(const Duration(seconds: 3));
-      expect(find.text('Tap “Yes, log in” in WhatsApp'), findsOneWidget, reason: 'still waiting');
+      expect(find.text('Send the message in WhatsApp'), findsOneWidget, reason: 'still waiting');
 
       app.accounts.confirm('CODE1',
           const AppUser(id: -9000000000001, signedIn: true, provider: 'whatsapp', name: 'Rahim', detail: '+821098765432'));
@@ -283,7 +318,10 @@ void main() {
       app.accounts.fail = true;
       await tester.tap(find.text('Continue with WhatsApp'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Open WhatsApp'));
+      await tester.pumpAndSettle();
       expect(find.text('That didn’t work. Check your connection and try again.'), findsOneWidget);
+      expect(find.text('Continue with WhatsApp'), findsOneWidget, reason: 'the ways in are back');
     });
 
     testWidgets('for a section that works through Telegram: Telegram alone, and why', (tester) async {
@@ -307,8 +345,12 @@ void main() {
   group('signed in', () {
     Future<TestApp> signedIn(WidgetTester tester, {String provider = 'whatsapp'}) async {
       final app = await openSignIn(tester);
-      await tester.tap(find.text(provider == 'telegram' ? 'Continue with Telegram' : 'Continue with WhatsApp'));
-      await settleWaiting(tester);
+      if (provider == 'telegram') {
+        await tester.tap(find.text('Continue with Telegram'));
+        await settleWaiting(tester);
+      } else {
+        await startWhatsApp(tester);
+      }
       app.accounts.confirm('CODE1', AppUser(id: provider == 'telegram' ? 555000111 : -9000000000001,
           signedIn: true, provider: provider, name: 'Rahim'));
       await tester.pump(const Duration(seconds: 3));
@@ -693,8 +735,7 @@ void main() {
 
     testWidgets('WhatsApp: initials, and why there is no photo', (tester) async {
       final app = await openSignIn(tester);
-      await tester.tap(find.text('Continue with WhatsApp'));
-      await settleWaiting(tester);
+      await startWhatsApp(tester);
       app.accounts.confirm('CODE1',
           const AppUser(id: -9000000000001, signedIn: true, provider: 'whatsapp', name: 'Rahim Aliyev', detail: '+8210'));
       await tester.pump(const Duration(seconds: 3));

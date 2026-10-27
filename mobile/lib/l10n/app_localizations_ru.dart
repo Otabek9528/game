@@ -2013,6 +2013,40 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не получилось. Проверьте интернет и попробуйте снова.';
 
   @override
+  String get signInWaTitle => 'Как войти через WhatsApp';
+
+  @override
+  String get signInWaStep1 =>
+      'WhatsApp откроет чат с ботом Muslim Vegukin — короткий код уже будет набран в поле сообщения.';
+
+  @override
+  String get signInWaStep2 =>
+      'Отправьте это сообщение как есть, ничего не меняя.';
+
+  @override
+  String get signInWaStep3 => 'Бот сразу ответит: нажмите «Да, войти».';
+
+  @override
+  String get signInWaStep4 => 'Вернитесь в приложение — вы уже вошли.';
+
+  @override
+  String get signInWaNote =>
+      'Нужен WhatsApp на этом телефоне. Код служит только для входа и действует 10 минут.';
+
+  @override
+  String get signInWaOpen => 'Открыть WhatsApp';
+
+  @override
+  String get signInBack => 'Назад';
+
+  @override
+  String get signInWaWaitingTitle => 'Отправьте сообщение в WhatsApp';
+
+  @override
+  String get signInWaWaitingBody =>
+      'Затем нажмите «Да, войти» в ответе бота. Мы подождём здесь.';
+
+  @override
   String get signInDone => 'Вы вошли';
 
   @override

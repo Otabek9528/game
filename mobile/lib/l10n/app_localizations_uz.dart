@@ -1973,6 +1973,39 @@ class AppLocalizationsUz extends AppLocalizations {
       'Bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.';
 
   @override
+  String get signInWaTitle => 'WhatsApp orqali kirish qanday bo‘ladi';
+
+  @override
+  String get signInWaStep1 =>
+      'WhatsApp Muslim Vegukin boti bilan chatni ochadi. Xabar maydonida qisqa kod tayyor yozilgan bo‘ladi.';
+
+  @override
+  String get signInWaStep2 => 'Shu xabarni o‘zgartirmasdan yuboring.';
+
+  @override
+  String get signInWaStep3 => 'Bot darhol javob beradi: «Ha, kirish»ni bosing.';
+
+  @override
+  String get signInWaStep4 => 'Ilovaga qayting — siz kirgan bo‘lasiz.';
+
+  @override
+  String get signInWaNote =>
+      'Buning uchun shu telefonda WhatsApp bo‘lishi kerak. Kod faqat kirish uchun, 10 daqiqa amal qiladi.';
+
+  @override
+  String get signInWaOpen => 'WhatsAppni ochish';
+
+  @override
+  String get signInBack => 'Orqaga';
+
+  @override
+  String get signInWaWaitingTitle => 'WhatsAppda xabarni yuboring';
+
+  @override
+  String get signInWaWaitingBody =>
+      'So‘ng bot javobida «Ha, kirish»ni bosing. Shu yerda kutib turamiz.';
+
+  @override
   String get signInDone => 'Kirdingiz';
 
   @override

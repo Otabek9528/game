@@ -3598,6 +3598,66 @@ abstract class AppLocalizations {
   /// **'Bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.'**
   String get signInFailed;
 
+  /// No description provided for @signInWaTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'WhatsApp orqali kirish qanday bo‘ladi'**
+  String get signInWaTitle;
+
+  /// No description provided for @signInWaStep1.
+  ///
+  /// In uz, this message translates to:
+  /// **'WhatsApp Muslim Vegukin boti bilan chatni ochadi. Xabar maydonida qisqa kod tayyor yozilgan bo‘ladi.'**
+  String get signInWaStep1;
+
+  /// No description provided for @signInWaStep2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shu xabarni o‘zgartirmasdan yuboring.'**
+  String get signInWaStep2;
+
+  /// No description provided for @signInWaStep3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot darhol javob beradi: «Ha, kirish»ni bosing.'**
+  String get signInWaStep3;
+
+  /// No description provided for @signInWaStep4.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ilovaga qayting — siz kirgan bo‘lasiz.'**
+  String get signInWaStep4;
+
+  /// No description provided for @signInWaNote.
+  ///
+  /// In uz, this message translates to:
+  /// **'Buning uchun shu telefonda WhatsApp bo‘lishi kerak. Kod faqat kirish uchun, 10 daqiqa amal qiladi.'**
+  String get signInWaNote;
+
+  /// No description provided for @signInWaOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'WhatsAppni ochish'**
+  String get signInWaOpen;
+
+  /// No description provided for @signInBack.
+  ///
+  /// In uz, this message translates to:
+  /// **'Orqaga'**
+  String get signInBack;
+
+  /// No description provided for @signInWaWaitingTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'WhatsAppda xabarni yuboring'**
+  String get signInWaWaitingTitle;
+
+  /// No description provided for @signInWaWaitingBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'So‘ng bot javobida «Ha, kirish»ni bosing. Shu yerda kutib turamiz.'**
+  String get signInWaWaitingBody;
+
   /// No description provided for @signInDone.
   ///
   /// In uz, this message translates to:
