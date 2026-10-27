@@ -35,6 +35,8 @@ dependencies:
     sdk: flutter
   intl: any
   shared_preferences: ^2.5.6
+  # 2.5.0–2.5.1 stop Android release builds at startup (NoSuchMethodError, R8).
+  shared_preferences_android: ^2.5.2
   http: ^1.6.0
   geolocator: ^14.1.1
   url_launcher: ^6.3.3
