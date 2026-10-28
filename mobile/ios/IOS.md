@@ -12,7 +12,7 @@ check; type errors and runtime behaviour can only show up on a Mac. Expect one r
 | Push notifications | Code ready; needs the Firebase iOS app + APNs key (step 2) |
 | Google sign-in | Code ready; hidden on iPhone until its client id is filled in (step 2) |
 | Telegram and WhatsApp sign-in | Work as on Android (they open the bots) |
-| Home-screen widget (`PrayerWidget/PrayerWidget.swift`) | Source ready; the widget **target** must be added once in Xcode on a Mac (step 5). The app works without it |
+| Home-screen widget (`PrayerWidget/PrayerWidget.swift`) | Source ready; the widget **target** must be added once in Xcode on a Mac (step 5). The app works without it, and only offers the widget (Prayers page, Account → Home-screen widget: a how-to, since iPhone apps can't place widgets) once the target is in the build |
 | App icon, launch screen, permission texts (uz/ru/en), iPhone-only, portrait | Done |
 
 Differences from Android, by necessity:

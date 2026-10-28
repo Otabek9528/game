@@ -245,6 +245,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetOpenApp => 'Open the app to see prayer times';
 
   @override
+  String get widgetOfferTitle => 'Prayer times on your home screen';
+
+  @override
+  String get widgetOfferBody =>
+      'A countdown to the next prayer, without opening the app.';
+
+  @override
+  String get widgetOfferAdd => 'Add to home screen';
+
+  @override
+  String get widgetOfferClose => 'Not now';
+
+  @override
+  String get widgetSheetTitle => 'Add the widget';
+
+  @override
+  String get widgetSheetPick =>
+      'Pick a size. Your phone will ask you to confirm.';
+
+  @override
+  String get widgetSizeLarge => 'Large · 4×2';
+
+  @override
+  String get widgetSizeSmall => 'Small · 2×2';
+
+  @override
+  String get widgetPinFailed =>
+      'Couldn’t add it from here. Touch and hold an empty spot on the home screen → Widgets → Muslim Vegukin.';
+
+  @override
+  String get widgetGuideStep1 =>
+      'Touch and hold an empty spot on the Home Screen until the icons jiggle.';
+
+  @override
+  String get widgetGuideStep2 =>
+      'Tap Edit → Add Widget (or +) in the top corner.';
+
+  @override
+  String get widgetGuideStep3 =>
+      'Search for Muslim Vegukin, choose a size and tap Add Widget.';
+
+  @override
+  String get widgetGuideDone => 'Got it';
+
+  @override
+  String get accountWidget => 'Home-screen widget';
+
+  @override
   String get exactAlarmsTitle => 'Exact timing';
 
   @override

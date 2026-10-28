@@ -72,6 +72,7 @@ flutter:
     - assets/fonts/OFL.txt
     - assets/stores/
     - assets/cars/
+    - assets/widget/
 
   fonts:
     - family: PlayfairDisplay

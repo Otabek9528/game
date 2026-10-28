@@ -15,6 +15,7 @@ import '../prayer/prayer_controller.dart';
 import '../prayer/prayer_models.dart';
 import '../reminders/reminder_sheet.dart';
 import '../reminders/reminders.dart';
+import '../widget/widget_offer.dart';
 import 'nafl_card.dart';
 import 'prayer_timeline.dart';
 import 'settings_sheet.dart';
@@ -186,6 +187,7 @@ class _PrayersScreenState extends State<PrayersScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
+                              WidgetOfferCard(services: widget.services),
                               _DateNav(
                                 date: _viewDate,
                                 offset: _offset,

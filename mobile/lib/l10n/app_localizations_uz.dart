@@ -216,6 +216,54 @@ class AppLocalizationsUz extends AppLocalizations {
   String get widgetOpenApp => 'Namoz vaqtlari uchun ilovani oching';
 
   @override
+  String get widgetOfferTitle => 'Namoz vaqtlari bosh ekraningizda';
+
+  @override
+  String get widgetOfferBody =>
+      'Keyingi namozgacha qolgan vaqt — ilovani ochmasdan.';
+
+  @override
+  String get widgetOfferAdd => 'Bosh ekranga qo‘shish';
+
+  @override
+  String get widgetOfferClose => 'Hozir emas';
+
+  @override
+  String get widgetSheetTitle => 'Vidjetni qo‘shish';
+
+  @override
+  String get widgetSheetPick =>
+      'O‘lchamni tanlang. Telefoningiz tasdiqlashni so‘raydi.';
+
+  @override
+  String get widgetSizeLarge => 'Katta · 4×2';
+
+  @override
+  String get widgetSizeSmall => 'Kichik · 2×2';
+
+  @override
+  String get widgetPinFailed =>
+      'Bu yerdan qo‘shib bo‘lmadi. Bosh ekrandagi bo‘sh joyni bosib turing → Vidjetlar → Muslim Vegukin.';
+
+  @override
+  String get widgetGuideStep1 =>
+      'Bosh ekrandagi bo‘sh joyni ikonkalar qimirlaguncha bosib turing.';
+
+  @override
+  String get widgetGuideStep2 =>
+      'Yuqori burchakda «Edit» → «Add Widget» (yoki «+») ni bosing.';
+
+  @override
+  String get widgetGuideStep3 =>
+      'Muslim Vegukin’ni qidiring, o‘lchamni tanlang va «Add Widget»ni bosing.';
+
+  @override
+  String get widgetGuideDone => 'Tushunarli';
+
+  @override
+  String get accountWidget => 'Bosh ekran vidjeti';
+
+  @override
   String get exactAlarmsTitle => 'Aniq vaqt uchun ruxsat';
 
   @override

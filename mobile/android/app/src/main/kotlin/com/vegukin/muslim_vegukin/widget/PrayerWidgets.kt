@@ -40,8 +40,20 @@ class SmallPrayerWidget : PrayerWidgetProvider()
  * The countdown itself is a Chronometer, which ticks every second by itself.
  */
 abstract class PrayerWidgetProvider : AppWidgetProvider() {
+    private val size get() = if (this is LargePrayerWidget) "large" else "small"
+
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         PrayerWidgets.updateAll(context)
+    }
+
+    /** The first of this size placed on a home screen. */
+    override fun onEnabled(context: Context) {
+        WidgetLog.event(context, "widget_added_$size")
+    }
+
+    /** The last of this size taken away. */
+    override fun onDisabled(context: Context) {
+        WidgetLog.event(context, "widget_removed_$size")
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -72,6 +84,9 @@ object PrayerWidgets {
     /** Opens the app from the widget's city and refreshes the location. */
     const val ACTION_REFRESH_LOCATION = "com.vegukin.muslim_vegukin.REFRESH_LOCATION"
 
+    /** Opens the app from the rest of the widget; counted as a widget tap. */
+    const val ACTION_OPEN_FROM_WIDGET = "com.vegukin.muslim_vegukin.OPEN_FROM_WIDGET"
+
     private const val PREFS = "vegukin_widget"
     private const val KEY_DATA = "data"
 
@@ -91,6 +106,33 @@ object PrayerWidgets {
         large.forEach { render(context, manager, it, true) }
         small.forEach { render(context, manager, it, false) }
         if (large.isEmpty() && small.isEmpty()) cancelSchedule(context) else scheduleNext(context)
+        WidgetLog.daily(context, large.size, small.size)
+    }
+
+    /** The sizes on a home screen now: "large", "small". */
+    fun placed(context: Context): List<String> {
+        val manager = AppWidgetManager.getInstance(context)
+        return buildList {
+            if (manager.getAppWidgetIds(ComponentName(context, LargePrayerWidget::class.java)).isNotEmpty()) add("large")
+            if (manager.getAppWidgetIds(ComponentName(context, SmallPrayerWidget::class.java)).isNotEmpty()) add("small")
+        }
+    }
+
+    /** Whether this launcher can add a widget for the app (Android 8+, most launchers). */
+    fun canPin(context: Context): Boolean =
+        Build.VERSION.SDK_INT >= 26 && AppWidgetManager.getInstance(context).isRequestPinAppWidgetSupported
+
+    /**
+     * Asks the launcher to add a widget: it shows its own "Add to home
+     * screen" with a preview, and places it on a tap. False when it can't.
+     */
+    fun pin(context: Context, large: Boolean): Boolean {
+        if (!canPin(context)) return false
+        val provider = ComponentName(
+            context,
+            if (large) LargePrayerWidget::class.java else SmallPrayerWidget::class.java,
+        )
+        return AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
     }
 
     fun render(context: Context, manager: AppWidgetManager, id: Int, large: Boolean) {
@@ -102,7 +144,7 @@ object PrayerWidgets {
         val data = load(context)
         val moment = data?.momentAt(now)
 
-        views.setOnClickPendingIntent(R.id.widget_root, openApp(context, null))
+        views.setOnClickPendingIntent(R.id.widget_root, openApp(context, ACTION_OPEN_FROM_WIDGET))
 
         if (data == null || moment == null || data.names.size < 6 || data.until.size < 6) {
             views.setViewVisibility(R.id.widget_content, View.GONE)
@@ -220,7 +262,11 @@ object PrayerWidgets {
         }
         return PendingIntent.getActivity(
             context,
-            if (action == null) 0 else 1,
+            when (action) {
+                null -> 0
+                ACTION_REFRESH_LOCATION -> 1
+                else -> 2
+            },
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )

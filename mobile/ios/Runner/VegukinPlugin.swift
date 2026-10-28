@@ -88,6 +88,19 @@ final class VegukinPlugin: NSObject, FlutterPlugin, FlutterSceneLifeCycleDelegat
     case "takeLaunchAction":
       result(launchAction)
       launchAction = nil
+    case "placed":
+      // The sizes on the home and lock screens; Flutter counts them once a day.
+      WidgetCenter.shared.getCurrentConfigurations { found in
+        let kinds = Set(((try? found.get()) ?? []).map { Self.widgetKind($0.family) })
+        DispatchQueue.main.async { result(kinds.sorted()) }
+      }
+    case "offer":
+      // Apps can't place widgets on iPhone: the app shows how. Only once the
+      // widget target is in the build (ios/IOS.md, step 5).
+      result(Self.hasWidget ? "guide" : nil)
+    case "track", "pin":
+      // Android's: its widgets count themselves and can be placed by the app.
+      result(nil)
     default:
       result(FlutterMethodNotImplemented)
     }
@@ -227,7 +240,9 @@ final class VegukinPlugin: NSObject, FlutterPlugin, FlutterSceneLifeCycleDelegat
 
   private func handle(_ contexts: Set<UIOpenURLContext>) -> Bool {
     guard let url = contexts.map(\.url).first(where: { $0.scheme == Self.urlScheme }) else { return false }
-    setLaunchAction(url.host == "location" ? "refresh_location" : "open_prayers")
+    // The widget's city refreshes the location; the rest of it opens the
+    // prayers page, counted as a widget tap.
+    setLaunchAction(url.host == "location" ? "refresh_location" : "widget_prayers")
     return true
   }
 
@@ -256,6 +271,22 @@ final class VegukinPlugin: NSObject, FlutterPlugin, FlutterSceneLifeCycleDelegat
       address = UIApplication.openSettingsURLString
     }
     if let url = URL(string: address) { UIApplication.shared.open(url) }
+  }
+
+  /// "small", "medium", "large", or "lock" for the lock screen's.
+  private static func widgetKind(_ family: WidgetFamily) -> String {
+    switch family {
+    case .systemSmall: return "small"
+    case .systemMedium: return "medium"
+    case .systemLarge: return "large"
+    default: return "lock"
+    }
+  }
+
+  /// Whether the widget extension (ios/PrayerWidget) is in the app.
+  private static var hasWidget: Bool {
+    guard let plugins = Bundle.main.builtInPlugInsURL else { return false }
+    return FileManager.default.fileExists(atPath: plugins.appendingPathComponent("PrayerWidget.appex").path)
   }
 
   private static func bankURL(_ package: String) -> URL? {

@@ -16,6 +16,7 @@ import com.vegukin.muslim_vegukin.qibla.QiblaCamera
 import com.vegukin.muslim_vegukin.qibla.QiblaCompass
 import com.vegukin.muslim_vegukin.reminders.PrayerReminders
 import com.vegukin.muslim_vegukin.widget.PrayerWidgets
+import com.vegukin.muslim_vegukin.widget.WidgetLog
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -56,6 +57,7 @@ class MainActivity : FlutterActivity() {
     private fun readLaunchAction(intent: Intent?) {
         when (intent?.action) {
             PrayerWidgets.ACTION_REFRESH_LOCATION -> launchAction = "refresh_location"
+            PrayerWidgets.ACTION_OPEN_FROM_WIDGET -> launchAction = "widget"
             PrayerReminders.ACTION_OPEN_PRAYERS -> launchAction = "open_prayers"
         }
     }
@@ -83,6 +85,21 @@ class MainActivity : FlutterActivity() {
                     result.success(launchAction)
                     launchAction = null
                 }
+                "track" -> {
+                    val args = call.arguments as Map<*, *>
+                    WidgetLog.remember(
+                        this,
+                        args["url"] as String,
+                        (args["user_id"] as Number).toLong(),
+                        args["username"] as? String ?: "",
+                    )
+                    // The app is open: today's count goes now if it hasn't.
+                    PrayerWidgets.updateAll(this)
+                    result.success(null)
+                }
+                "placed" -> result.success(PrayerWidgets.placed(this))
+                "offer" -> result.success(if (PrayerWidgets.canPin(this)) "pin" else null)
+                "pin" -> result.success(PrayerWidgets.pin(this, call.arguments == "large"))
                 else -> result.notImplemented()
             }
         }

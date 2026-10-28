@@ -256,6 +256,54 @@ class AppLocalizationsRu extends AppLocalizations {
   String get widgetOpenApp => 'Откройте приложение, чтобы увидеть время намаза';
 
   @override
+  String get widgetOfferTitle => 'Время намаза на главном экране';
+
+  @override
+  String get widgetOfferBody =>
+      'Отсчёт до следующего намаза — без открытия приложения.';
+
+  @override
+  String get widgetOfferAdd => 'Добавить на главный экран';
+
+  @override
+  String get widgetOfferClose => 'Не сейчас';
+
+  @override
+  String get widgetSheetTitle => 'Добавить виджет';
+
+  @override
+  String get widgetSheetPick =>
+      'Выберите размер. Телефон попросит подтвердить.';
+
+  @override
+  String get widgetSizeLarge => 'Большой · 4×2';
+
+  @override
+  String get widgetSizeSmall => 'Маленький · 2×2';
+
+  @override
+  String get widgetPinFailed =>
+      'Отсюда добавить не получилось. Нажмите и удерживайте пустое место на главном экране → Виджеты → Muslim Vegukin.';
+
+  @override
+  String get widgetGuideStep1 =>
+      'Нажмите и удерживайте пустое место на главном экране, пока значки не начнут покачиваться.';
+
+  @override
+  String get widgetGuideStep2 =>
+      'Нажмите «Изменить» → «Добавить виджет» (или «+») в верхнем углу.';
+
+  @override
+  String get widgetGuideStep3 =>
+      'Найдите Muslim Vegukin, выберите размер и нажмите «Добавить виджет».';
+
+  @override
+  String get widgetGuideDone => 'Понятно';
+
+  @override
+  String get accountWidget => 'Виджет на главный экран';
+
+  @override
   String get exactAlarmsTitle => 'Точное время';
 
   @override

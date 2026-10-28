@@ -484,6 +484,90 @@ abstract class AppLocalizations {
   /// **'Namoz vaqtlari uchun ilovani oching'**
   String get widgetOpenApp;
 
+  /// No description provided for @widgetOfferTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namoz vaqtlari bosh ekraningizda'**
+  String get widgetOfferTitle;
+
+  /// No description provided for @widgetOfferBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Keyingi namozgacha qolgan vaqt — ilovani ochmasdan.'**
+  String get widgetOfferBody;
+
+  /// No description provided for @widgetOfferAdd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bosh ekranga qo‘shish'**
+  String get widgetOfferAdd;
+
+  /// No description provided for @widgetOfferClose.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozir emas'**
+  String get widgetOfferClose;
+
+  /// No description provided for @widgetSheetTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vidjetni qo‘shish'**
+  String get widgetSheetTitle;
+
+  /// No description provided for @widgetSheetPick.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘lchamni tanlang. Telefoningiz tasdiqlashni so‘raydi.'**
+  String get widgetSheetPick;
+
+  /// No description provided for @widgetSizeLarge.
+  ///
+  /// In uz, this message translates to:
+  /// **'Katta · 4×2'**
+  String get widgetSizeLarge;
+
+  /// No description provided for @widgetSizeSmall.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kichik · 2×2'**
+  String get widgetSizeSmall;
+
+  /// No description provided for @widgetPinFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu yerdan qo‘shib bo‘lmadi. Bosh ekrandagi bo‘sh joyni bosib turing → Vidjetlar → Muslim Vegukin.'**
+  String get widgetPinFailed;
+
+  /// No description provided for @widgetGuideStep1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bosh ekrandagi bo‘sh joyni ikonkalar qimirlaguncha bosib turing.'**
+  String get widgetGuideStep1;
+
+  /// No description provided for @widgetGuideStep2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuqori burchakda «Edit» → «Add Widget» (yoki «+») ni bosing.'**
+  String get widgetGuideStep2;
+
+  /// No description provided for @widgetGuideStep3.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin’ni qidiring, o‘lchamni tanlang va «Add Widget»ni bosing.'**
+  String get widgetGuideStep3;
+
+  /// No description provided for @widgetGuideDone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tushunarli'**
+  String get widgetGuideDone;
+
+  /// No description provided for @accountWidget.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bosh ekran vidjeti'**
+  String get accountWidget;
+
   /// No description provided for @exactAlarmsTitle.
   ///
   /// In uz, this message translates to:

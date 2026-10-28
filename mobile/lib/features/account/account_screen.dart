@@ -22,6 +22,7 @@ import '../notifications/notify_models.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
 import '../reminders/reminders.dart';
+import '../widget/widget_offer.dart';
 import 'inbox_screen.dart';
 import 'privacy_screen.dart';
 
@@ -84,6 +85,9 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
   /// Reminders are on but Android would let them come late.
   bool _alarmsLate = false;
 
+  /// How the app can add the home-screen widget (`pin`, `guide`), if it can.
+  String? _widgetOffer;
+
   AppServices get _services => widget.services;
   AccountController get _account => _services.account;
 
@@ -99,6 +103,9 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
     unawaited(_account.refreshInbox());
     unawaited(_recheck());
     unawaited(_refreshNotify());
+    unawaited(_services.homeWidget.offer().then((offer) {
+      if (mounted) setState(() => _widgetOffer = offer);
+    }));
   }
 
   @override
@@ -248,6 +255,12 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
                       unawaited(_services.theme.toggle(Theme.of(context).brightness));
                     },
                   ),
+                  if (_widgetOffer case final offer?)
+                    _NavRow(
+                      icon: Icons.widgets_outlined,
+                      title: s.accountWidget,
+                      onTap: () => showAddWidget(context, _services, offer),
+                    ),
                   _NavRow(
                     icon: Icons.share_rounded,
                     title: s.accountShare,

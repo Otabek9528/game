@@ -33,6 +33,9 @@ class HttpActivityLog implements ActivityLog {
 
   static const _key = 'install_id';
 
+  /// Where actions are sent; the Android widgets send theirs here too.
+  static final endpoint = AppConfig.apiBase.resolve('api/log-interaction');
+
   String get suffix => _platform == TargetPlatform.iOS ? 'ios' : 'apk';
 
   /// There is no Telegram account in the app, so each install gets its own
@@ -62,7 +65,7 @@ class HttpActivityLog implements ActivityLog {
   void log(String action, [String? detail]) {
     _client
         .post(
-          AppConfig.apiBase.resolve('api/log-interaction'),
+          endpoint,
           headers: const {'Content-Type': 'application/json'},
           body: jsonEncode(payload(action, detail)),
         )

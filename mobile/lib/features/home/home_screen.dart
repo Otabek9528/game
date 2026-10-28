@@ -59,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       await _services.permissions.askOnce();
       unawaited(_services.account.startPush());
       await _takeWidgetAction();
+      unawaited(_services.homeWidget.track(_services.activity, _services.store, _services.clock()));
       await _offerExactAlarms();
     });
   }
@@ -82,12 +83,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (allow ?? false) await _services.permissions.openExactAlarmSettings();
   }
 
-  /// Opened from a widget's city (refresh it) or a prayer reminder (show
-  /// the prayers page).
+  /// Opened from a widget's city (refresh it), the rest of a widget (counted;
+  /// on iPhone it opens the prayers page) or a prayer reminder (the prayers
+  /// page).
   Future<void> _takeWidgetAction() async {
     switch (await _services.homeWidget.takeLaunchAction()) {
       case 'refresh_location':
         await _services.prayer.locate(userAsked: true);
+      case 'widget':
+        _services.activity.log('widget_tap');
+      case 'widget_prayers':
+        _services.activity.log('widget_tap');
+        if (mounted) _openPrayers();
       case 'open_prayers':
         if (mounted) _openPrayers();
     }

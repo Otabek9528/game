@@ -8,7 +8,7 @@
 const privacyText = <String, List<String>>{
   'uz': [
     '# Muslim Vegukin — Maxfiylik siyosati',
-    '_ 27-oktabr 2026-yildan amalda',
+    '_ 28-oktabr 2026-yildan amalda',
     'Muslim Vegukin (“ilova”) Koreyadagi musulmonlarga namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va jamoa xizmatlarida yordam beradi. Bu siyosat ilova nimani, nima uchun to‘plashini va uni qanday o‘chirishni tushuntiradi. Biz reklama ko‘rsatmaymiz, ma’lumotlaringizni sotmaymiz va sizni boshqa ilova yoki saytlarda kuzatmaymiz.',
     '## Nima to‘planadi va nima uchun',
     '- **Joylashuv** (faqat ruxsat bersangiz): turgan joyingiz uchun namoz vaqtlari va qibla, yaqin joylar va siz kuzatayotgan hududlar uchun. Koordinatalar yaqin joylar va saqlangan hududlar uchun serverimizga, namoz vaqtlarini hisoblash uchun AlAdhan’ga (api.aladhan.com), shahar nomini topish uchun OpenStreetMap Nominatim’ga yuboriladi.',
@@ -16,7 +16,7 @@ const privacyText = <String, List<String>>{
     '- **Kirsangiz** (ixtiyoriy): Telegram orqali — Telegram id, ism, foydalanuvchi nomi va profil rasmi; WhatsApp orqali — telefon raqami va ism; Google orqali — ism, email va profil rasmi. Joylaganlaringizda ismingizni ko‘rsatish va telefon almashtirganda kuzatuvlaringizni saqlab qolish uchun.',
     '- **Siz joylagan narsalar**: izohlar, joy takliflari, avtomobil va uy-joy e’lonlari (siz tanlagan rasm va videolar bilan), ish e’lonlari. Ular e’lonlar taxtasidagi kabi ochiq.',
     '- **Kuzatuvlaringiz**: xabar olishni so‘ragan joylar, hududlar, HiKorea ofislari, avtomobil va uy-joy qidiruvlari.',
-    '- **Foydalanish hisobi**: qaysi bo‘limlar ochilgani va tarkib tekshiruvida skanerlangan shtrix-kodlar (kod raqami bilan) — nima ishlatilishi va qaysi mahsulotlar yetishmasligini bilish uchun.',
+    '- **Foydalanish hisobi**: qaysi bo‘limlar ochilgani, bosh ekrandagi vidjet ishlatilayotgani (vidjet buni kuniga bir marta bildiradi) va tarkib tekshiruvida skanerlangan shtrix-kodlar (kod raqami bilan) — nima ishlatilishi va qaysi mahsulotlar yetishmasligini bilish uchun.',
     '## Telefoningizda qoladigan narsalar',
     'Kamera faqat telefonda — shtrix-kodni skanerlash va qibla kamerasi uchun ishlatiladi; e’lon uchun o‘zingiz tanlagan rasmlardan boshqa hech qanday tasvir yuborilmaydi. Sozlamalar, saqlanganlar va namoz eslatmalari telefonda saqlanadi.',
     '## Ma’lumot yana kimga boradi',
@@ -38,7 +38,7 @@ const privacyText = <String, List<String>>{
   ],
   'en': [
     '# Muslim Vegukin — Privacy Policy',
-    '_ Effective 27 October 2026',
+    '_ Effective 28 October 2026',
     'Muslim Vegukin (“the app”) helps Muslims in Korea with prayer times, the qibla, halal places, HiKorea appointments and community services. This policy explains what the app collects, why, and how to delete it. We do not show ads, do not sell your data and do not track you across other apps or websites.',
     '## What we collect and why',
     '- **Location** (only if you allow it): to show prayer times and the qibla for where you are, nearby places, and the areas you choose to watch. Your coordinates are sent to our server for nearby places and saved areas, to AlAdhan (api.aladhan.com) to calculate prayer times, and to OpenStreetMap Nominatim to find your city’s name.',
@@ -46,7 +46,7 @@ const privacyText = <String, List<String>>{
     '- **If you sign in** (optional): with Telegram — your Telegram id, name, username and profile photo; with WhatsApp — your phone number and name; with Google — your name, email address and profile photo. Used to show your name on what you post and to keep your watches when you change phones.',
     '- **What you post**: reviews, place suggestions, car and housing listings (with the photos and videos you choose) and job posts. These are public, like on a bulletin board.',
     '- **Your watches**: places, areas, HiKorea offices and car or housing searches you ask to be notified about.',
-    '- **Usage counts**: which sections are opened and barcodes scanned in the ingredient check (with the barcode number), counted per installation to see what is used and which products are missing.',
+    '- **Usage counts**: which sections are opened, whether the home-screen widget is in use (the widget reports that once a day), and barcodes scanned in the ingredient check (with the barcode number), counted per installation to see what is used and which products are missing.',
     '## What stays on your phone',
     'The camera is used only on the phone, to scan barcodes and for the qibla camera view; no pictures are sent unless you choose photos for a listing. Your settings, saved items and prayer reminders are kept on the phone.',
     '## Who else receives data',
@@ -68,7 +68,7 @@ const privacyText = <String, List<String>>{
   ],
   'ru': [
     '# Muslim Vegukin — Политика конфиденциальности',
-    '_ Действует с 27 октября 2026 г.',
+    '_ Действует с 28 октября 2026 г.',
     'Muslim Vegukin («приложение») помогает мусульманам в Корее: время намаза, кибла, халяль-места, очередь в HiKorea и сервисы сообщества. Здесь описано, какие данные собирает приложение, зачем и как их удалить. Мы не показываем рекламу, не продаём данные и не отслеживаем вас в других приложениях и на сайтах.',
     '## Что мы собираем и зачем',
     '- **Местоположение** (только с вашего разрешения): время намаза и кибла для вашего места, места рядом и районы, которые вы отслеживаете. Координаты отправляются на наш сервер (места рядом, сохранённые районы), в AlAdhan (api.aladhan.com) для расчёта времени намаза и в OpenStreetMap Nominatim для названия города.',
@@ -76,7 +76,7 @@ const privacyText = <String, List<String>>{
     '- **Если вы входите** (необязательно): через Telegram — id, имя, имя пользователя и фото профиля; через WhatsApp — номер телефона и имя; через Google — имя, email и фото профиля. Чтобы показывать ваше имя в публикациях и сохранять отслеживания при смене телефона.',
     '- **Ваши публикации**: отзывы, предложения мест, объявления о машинах и жилье (с выбранными вами фото и видео), вакансии. Они видны всем, как на доске объявлений.',
     '- **Ваши отслеживания**: места, районы, офисы HiKorea, поиски машин и жилья, о которых вы просили сообщать.',
-    '- **Статистика использования**: какие разделы открываются и какие штрихкоды сканируются в проверке состава (с номером кода) — чтобы понимать, чем пользуются и каких товаров не хватает.',
+    '- **Статистика использования**: какие разделы открываются, стоит ли виджет на главном экране (виджет сообщает об этом раз в день) и какие штрихкоды сканируются в проверке состава (с номером кода) — чтобы понимать, чем пользуются и каких товаров не хватает.',
     '## Что остаётся на телефоне',
     'Камера работает только на телефоне — для сканирования штрихкодов и камеры киблы; изображения не отправляются, кроме фото, которые вы сами выбрали для объявления. Настройки, сохранённое и напоминания о намазе хранятся на телефоне.',
     '## Кто ещё получает данные',

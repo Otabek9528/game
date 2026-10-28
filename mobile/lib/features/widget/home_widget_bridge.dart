@@ -4,13 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/activity_log.dart';
 import '../../core/app_language.dart';
+import '../../core/key_value_store.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayer/calendar_text.dart';
 import '../prayer/prayer_controller.dart';
 import '../prayer/prayer_models.dart';
 
-/// Talks to the Android home-screen widgets (android/…/widget/).
+/// Talks to the home-screen widgets (android/…/widget/, ios/PrayerWidget).
 ///
 /// The widgets can't run Dart, so the app hands them everything already
 /// worked out and in the user's language: a week of prayer times, labels and
@@ -71,8 +73,75 @@ class HomeWidgetBridge {
     }
   }
 
+  /// Lets the widgets be counted, as the app's pages are ([ActivityLog]).
+  ///
+  /// Android's count themselves (WidgetLog.kt): once a day while one is on a
+  /// home screen, when the first is placed and when the last is removed,
+  /// even if the app isn't opened. They're told here where to send and as
+  /// whom. iPhone widgets can't send anything: the app reports the ones
+  /// placed, once a day, when it is opened.
+  Future<void> track(ActivityLog activity, KeyValueStore store, DateTime now) async {
+    try {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final today = DateFormat('yyyy-MM-dd').format(now);
+        if (store.read(_countedKey) == today) return;
+        for (final kind in await placed()) {
+          activity.log('widget_$kind');
+        }
+        await store.write(_countedKey, today);
+      } else {
+        await _channel.invokeMethod<void>('track', {'url': '${HttpActivityLog.endpoint}', ...activity.who});
+      }
+    } on MissingPluginException {
+      // Tests.
+    } on PlatformException catch (e) {
+      debugPrint('Widget tracking failed: $e');
+    }
+  }
+
+  static const _countedKey = 'widget_counted';
+
+  /// The widget sizes on this phone's home (and lock) screens: Android
+  /// `large`, `small`; iPhone `small`, `medium`, `large`, `lock`.
+  Future<List<String>> placed() async {
+    try {
+      return await _channel.invokeListMethod<String>('placed') ?? const [];
+    } on MissingPluginException {
+      return const [];
+    } on PlatformException {
+      return const [];
+    }
+  }
+
+  /// How the app can help put a widget on the home screen: `pin` (Android
+  /// adds it, see [pin]), `guide` (iPhone: show how), or null (it can't:
+  /// an old launcher, or no widget in this build).
+  Future<String?> offer() async {
+    try {
+      return await _channel.invokeMethod<String>('offer');
+    } on MissingPluginException {
+      return null;
+    } on PlatformException {
+      return null;
+    }
+  }
+
+  /// Asks the launcher to add the [size] (`large` or `small`) widget: it
+  /// shows its own confirmation with a preview. False when it couldn't.
+  Future<bool> pin(String size) async {
+    try {
+      return await _channel.invokeMethod<bool>('pin', size) ?? false;
+    } on MissingPluginException {
+      return false;
+    } on PlatformException {
+      return false;
+    }
+  }
+
   /// What the user tapped on a widget to open the app, once:
-  /// `refresh_location` (the city) or null.
+  /// `refresh_location` (the city), `widget` (the rest of it; on iPhone
+  /// `widget_prayers`, which opens the prayers page), `open_prayers` (a
+  /// reminder) or null.
   Future<String?> takeLaunchAction() async {
     try {
       return await _channel.invokeMethod<String>('takeLaunchAction');
