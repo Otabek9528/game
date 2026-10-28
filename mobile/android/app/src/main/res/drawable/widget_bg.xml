@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Light mode: parchment, warmed by a gold glow. Dark mode: drawable-night/. -->
+<!-- The brand emerald, a gold glow and a gold hairline edge (light and dark mode alike). -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
             <gradient
                 android:angle="315"
-                android:startColor="#FFFFFFFF"
-                android:endColor="#FFF7F3EC" />
+                android:startColor="#FF04382B"
+                android:centerColor="#FF065F46"
+                android:endColor="#FF047857" />
             <corners android:radius="24dp" />
         </shape>
     </item>

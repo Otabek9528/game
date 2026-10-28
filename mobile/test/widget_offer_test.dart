@@ -199,11 +199,11 @@ void main() {
     });
   });
 
-  testWidgets('the previews are in the app, light and dark', (tester) async {
-    for (final name in ['large_day', 'large_night', 'small_day', 'small_night']) {
+  testWidgets('the previews are in the app', (tester) async {
+    for (final name in ['large', 'small']) {
       expect(await rootBundle.load('assets/widget/$name.webp'), isNotNull, reason: name);
     }
-    await tester.pumpWidget(MaterialApp(home: Builder(builder: (context) => widgetPreview(context, 'small'))));
+    await tester.pumpWidget(MaterialApp(home: widgetPreview('small')));
     expect(find.byType(Image), findsOneWidget);
   });
 }

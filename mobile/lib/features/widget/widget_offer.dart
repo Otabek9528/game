@@ -7,11 +7,10 @@ import '../../app_services.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 
-/// The widget as it looks, light or dark like the page.
-Widget widgetPreview(BuildContext context, String size, {double? width}) {
-  final dark = Theme.of(context).brightness == Brightness.dark;
-  return Image.asset('assets/widget/${size}_${dark ? 'night' : 'day'}.webp', width: width, fit: BoxFit.contain);
-}
+/// The widget as it looks on the home screen: emerald, in light and dark mode
+/// alike.
+Widget widgetPreview(String size, {double? width}) =>
+    Image.asset('assets/widget/$size.webp', width: width, fit: BoxFit.contain);
 
 /// Puts the prayer widget on the home screen, as far as the phone allows:
 /// on Android the launcher adds it after the person picks a size (its own
@@ -58,7 +57,7 @@ class _PickSize extends StatelessWidget {
             padding: const EdgeInsets.all(4),
             child: Column(
               children: [
-                widgetPreview(context, size),
+                widgetPreview(size),
                 const SizedBox(height: 8),
                 Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink)),
               ],
@@ -101,7 +100,7 @@ class _Guide extends StatelessWidget {
       children: [
         Text(s.widgetSheetTitle, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: p.ink)),
         const SizedBox(height: 14),
-        Center(child: widgetPreview(context, 'large', width: 260)),
+        Center(child: widgetPreview('large', width: 260)),
         const SizedBox(height: 16),
         for (final (i, step) in steps.indexed)
           Padding(
@@ -205,7 +204,7 @@ class _WidgetOfferCardState extends State<WidgetOfferCard> with WidgetsBindingOb
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  widgetPreview(context, 'large', width: 104),
+                  widgetPreview('large', width: 104),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

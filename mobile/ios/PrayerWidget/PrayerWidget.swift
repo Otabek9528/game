@@ -13,7 +13,18 @@ import WidgetKit
 
 private let appGroup = "group.com.vegukin.muslimVegukin"
 private let dataKey = "prayer_widget"
-private let accent = Color(red: 0.016, green: 0.471, blue: 0.341)  // #047857
+// As on Android, in light and dark mode alike: white and gold on the brand
+// emerald (android/…/res/values/colors.xml, drawable/widget_bg.xml).
+private let accent = Color(red: 0.969, green: 0.835, blue: 0.420)  // #F7D56B
+private let emerald = LinearGradient(
+  colors: [
+    Color(red: 0.016, green: 0.220, blue: 0.169),  // #04382B
+    Color(red: 0.024, green: 0.373, blue: 0.275),  // #065F46
+    Color(red: 0.016, green: 0.471, blue: 0.341),  // #047857
+  ],
+  startPoint: .topLeading,
+  endPoint: .bottomTrailing
+)
 
 /// What the app sent (widgetPayload in home_widget_bridge.dart).
 struct PrayerData: Decodable {
@@ -128,6 +139,8 @@ struct PrayerWidgetView: View {
       }
     }
     .widgetURL(URL(string: "muslimvegukin://prayers"))
+    // White text (.primary) and light grey (.secondary) on the emerald.
+    .environment(\.colorScheme, .dark)
     .widgetBackground()
   }
 
@@ -194,12 +207,12 @@ struct PrayerWidgetView: View {
 }
 
 private extension View {
-  /// iOS 17 asks widgets for their background this way.
+  /// The emerald; iOS 17 asks widgets for their background this way.
   @ViewBuilder func widgetBackground() -> some View {
     if #available(iOSApplicationExtension 17.0, *) {
-      containerBackground(for: .widget) { Color(.systemBackground) }
+      containerBackground(for: .widget) { emerald }
     } else {
-      padding().background(Color(.systemBackground))
+      padding().background(emerald)
     }
   }
 }

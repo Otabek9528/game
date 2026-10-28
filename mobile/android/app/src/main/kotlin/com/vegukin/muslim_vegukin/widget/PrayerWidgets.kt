@@ -241,7 +241,7 @@ object PrayerWidgets {
         manager.getAppWidgetOptions(id).getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
             .takeIf { it > 0 } ?: fallback
 
-    /** Text colour from a day/night colour resource; follows the theme on Android 12+. */
+    /** Text colour from a colour resource (res/values/colors.xml). */
     private fun tint(context: Context, views: RemoteViews, viewId: Int, colorRes: Int) {
         if (Build.VERSION.SDK_INT >= 31) {
             views.setColorStateList(viewId, "setTextColor", colorRes)

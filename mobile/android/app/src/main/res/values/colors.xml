@@ -4,14 +4,14 @@
     <color name="splash_background">#FF064E3B</color>
     <color name="ic_launcher_background">#FF065F46</color>
 
-    <!-- Home-screen widgets. Light mode here, dark mode in values-night. -->
-    <color name="widget_ink">#FF1C1917</color>
-    <color name="widget_soft">#FF44403C</color>
-    <color name="widget_faint">#FF78716C</color>
-    <color name="widget_accent">#FF047857</color>
-    <color name="widget_current_bg">#FFE2F5EC</color>
-    <color name="widget_chip_stroke">#59047857</color>
-    <color name="widget_rosette">#24047857</color>
-    <color name="widget_glow">#33EAB932</color>
-    <color name="widget_edge">#FFE8E3DB</color>
+    <!-- Home-screen widgets: white and gold on the brand emerald, in light and dark mode alike. -->
+    <color name="widget_ink">#FFFFFFFF</color>
+    <color name="widget_soft">#D9FFFFFF</color>
+    <color name="widget_faint">#8CFFFFFF</color>
+    <color name="widget_accent">#FFF7D56B</color>
+    <color name="widget_current_bg">#26FFFFFF</color>
+    <color name="widget_chip_stroke">#80F7D56B</color>
+    <color name="widget_rosette">#2EF7D56B</color>
+    <color name="widget_glow">#3DF7D56B</color>
+    <color name="widget_edge">#47F7D56B</color>
 </resources>
