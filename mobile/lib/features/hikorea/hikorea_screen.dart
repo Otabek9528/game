@@ -609,6 +609,7 @@ class _AddressRow extends StatelessWidget {
           Expanded(
             child: Text(s.hkAddressCardTitle, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink)),
           ),
+          const SizedBox(width: 8),
           Text(s.hkAddressTitle, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: p.accent)),
           Icon(Icons.chevron_right_rounded, color: p.accent),
         ],
