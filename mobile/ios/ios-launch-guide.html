@@ -1,0 +1,629 @@
+<title>Muslim Vegukin iPhone Launch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a field manual, like the Play launch guide. A sticky phase list on the left
+   (wide screens), one column of numbered phases on the right; on phones, a sticky progress strip. */
+:root {
+  --page: #f4f6f2;
+  --card: #ffffff;
+  --ink: #18201c;
+  --soft: #46524c;
+  --muted: #74807a;
+  --line: #dfe5df;
+  --accent: #047857;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2f2ea;
+  --gold: #a87a0c;
+  --gold-soft: #fbf3dc;
+  --warn: #92400e;
+  --warn-soft: #fdf1dc;
+  --code: #eef2ee;
+  --display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --body: "Noto Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0d1311; --card: #141c19; --ink: #e6ece8; --soft: #b3beb8; --muted: #84908a; --line: #25312c;
+    --accent: #34d399; --accent-ink: #062b1f; --accent-soft: #11291f; --gold: #eab932; --gold-soft: #2a2410;
+    --warn: #fbbf24; --warn-soft: #2b2210; --code: #1a2420; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0d1311; --card: #141c19; --ink: #e6ece8; --soft: #b3beb8; --muted: #84908a; --line: #25312c;
+  --accent: #34d399; --accent-ink: #062b1f; --accent-soft: #11291f; --gold: #eab932; --gold-soft: #2a2410;
+  --warn: #fbbf24; --warn-soft: #2b2210; --code: #1a2420; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--page); color: var(--ink); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1140px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 40px; padding-block: 28px 80px; }
+@media (max-width: 900px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+/* Phase list */
+nav.phases { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; }
+nav.phases .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+nav.phases ol { list-style: none; margin: 10px 0 18px; padding: 0; display: grid; gap: 2px; }
+nav.phases a { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 8px;
+  color: var(--soft); text-decoration: none; font-size: 14px; line-height: 1.3; }
+nav.phases a:hover { background: var(--card); color: var(--ink); }
+nav.phases .n { font: 600 12px var(--mono); color: var(--muted); }
+nav.phases .c { font: 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+nav.phases a.done .n, nav.phases a.done .c { color: var(--accent); }
+nav.phases a.done { color: var(--ink); }
+@media (max-width: 900px) { nav.phases { display: none; } }
+
+.strip { display: none; }
+@media (max-width: 900px) {
+  .strip { display: flex; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--page); gap: 12px; align-items: center;
+    padding-block: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--soft); }
+  .strip .bar { flex: 1; }
+}
+.bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .3s; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+/* Header */
+header.top h1 { font: 700 clamp(30px, 5vw, 44px)/1.12 var(--display); margin: 6px 0 12px; text-wrap: balance; }
+header.top .eyebrow { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+header.top p { color: var(--soft); max-width: 64ch; margin: 0 0 12px; }
+.overall { display: flex; gap: 14px; align-items: center; margin: 18px 0 6px; font-size: 14px; color: var(--soft); flex-wrap: wrap; }
+.overall .bar { flex: 1 1 200px; }
+.reset { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
+
+/* Journey table */
+.journey { margin: 26px 0 8px; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num, th.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; margin: 12px 0 4px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.tbl table td:first-child { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.tbl.wide table td:first-child { white-space: normal; min-width: 150px; }
+.yes { color: var(--accent); font-weight: 700; }
+.no { color: var(--muted); }
+
+/* Phases */
+section.phase { margin-top: 56px; scroll-margin-top: 72px; }
+.ph-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; border-top: 2px solid var(--ink); padding-top: 14px; }
+.ph-head .num { font: 600 15px var(--mono); color: var(--accent); }
+.ph-head h2 { font: 700 clamp(23px, 3.4vw, 30px)/1.2 var(--display); margin: 0; flex: 1 1 260px; text-wrap: balance; }
+.ph-head .count { font: 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+section.phase.complete .ph-head { border-top-color: var(--accent); }
+section.phase.complete .ph-head .count { color: var(--accent); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 6px; }
+.chip { font-size: 12.5px; padding: 3px 10px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.chip.wait { background: var(--gold-soft); color: var(--gold); }
+.why { color: var(--soft); max-width: 68ch; }
+h3 { font-size: 17px; margin: 28px 0 6px; }
+.where { font-family: var(--mono); font-size: 13px; color: var(--soft); background: var(--code); border-radius: 8px; padding: 6px 10px;
+  display: inline-block; margin: 4px 0 8px; max-width: 100%; overflow-wrap: anywhere; }
+
+ol.steps { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 10px; counter-reset: step; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; align-items: start;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+ol.steps > li > input { width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--accent); cursor: pointer; }
+ol.steps > li > div { min-width: 0; }
+ol.steps > li > div::before { content: counter(step) ". "; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+ol.steps > li:has(input:checked) { background: transparent; }
+ol.steps > li:has(input:checked) > div { color: var(--muted); }
+ol.steps > li p { margin: 6px 0 0; }
+ol.steps ul { margin: 6px 0 0; padding-left: 20px; }
+ol.steps ul li { margin: 3px 0; }
+
+.note { border-radius: 10px; padding: 10px 14px; margin: 12px 0; background: var(--code); color: var(--soft); font-size: 14.5px; max-width: 72ch; }
+.note.warn { background: var(--warn-soft); color: var(--warn); }
+.note.warn strong, .note strong { color: inherit; }
+.note.check { background: var(--accent-soft); color: var(--accent); }
+
+code, kbd { font-family: var(--mono); font-size: .88em; background: var(--code); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
+
+.paste { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; overflow: hidden; }
+.paste-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 7px 8px 7px 14px; border-bottom: 1px solid var(--line);
+  font-size: 13px; color: var(--soft); font-weight: 600; flex-wrap: wrap; }
+.paste-head .limit { font: 12px var(--mono); color: var(--muted); font-weight: 400; margin-left: auto; }
+.paste pre { margin: 0; padding: 12px 14px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.6 var(--body); color: var(--ink); }
+.paste pre.cmd { font: 13.5px/1.6 var(--mono); }
+button.copy { font: 600 13px var(--body); border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 8px;
+  padding: 4px 12px; cursor: pointer; }
+button.copy:hover { background: var(--accent); color: var(--accent-ink); }
+button.copy.ok { background: var(--accent); color: var(--accent-ink); }
+.langs { display: grid; gap: 4px; }
+details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; }
+details > summary { cursor: pointer; padding: 10px 14px; font-weight: 600; }
+details > div { padding: 0 14px 12px; }
+dl.terms { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; margin: 12px 0; }
+dl.terms dt { font-weight: 700; }
+dl.terms dd { margin: 0; color: var(--soft); }
+@media (max-width: 560px) { dl.terms { grid-template-columns: minmax(0, 1fr); } dl.terms dd { margin-bottom: 8px; } }
+footer { margin-top: 64px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+
+<div class="wrap">
+<nav class="phases" aria-label="Phases">
+  <div class="label">Your progress</div>
+  <div class="bar" style="margin-top:10px"><i id="nav-bar"></i></div>
+  <ol id="nav-list"></ol>
+  <div class="label">Reference</div>
+  <ol>
+    <li><a href="#words"><span class="n">A</span><span>Words you'll see</span><span></span></a></li>
+    <li><a href="#trouble"><span class="n">B</span><span>If something goes wrong</span><span></span></a></li>
+  </ol>
+</nav>
+
+<main>
+<div class="strip"><span id="strip-text">0 of 0 steps</span><div class="bar"><i id="strip-bar"></i></div></div>
+
+<header class="top">
+  <div class="eyebrow">Muslim Vegukin · first iPhone release</div>
+  <h1>From GitHub to the App Store</h1>
+  <p>The iPhone app is built on Codemagic's Macs, so you never need a Mac. This page goes in the order that costs you
+    nothing until it has to: first a free test build, then, once that passes, Apple's paid program, TestFlight on
+    your own iPhone, and finally the App Store.</p>
+  <p>Tick each step as you finish; this page remembers your ticks in this browser.</p>
+  <div class="overall"><span id="overall-text">0 of 0 steps done</span><div class="bar"><i id="overall-bar"></i></div>
+    <button class="reset" id="reset" type="button">Clear my ticks</button></div>
+
+  <div class="journey"><table>
+    <tr><th>Stage</th><th>Costs</th><th>What it proves</th></tr>
+    <tr><td>1–3 Free check on Codemagic</td><td class="num">US$0</td><td>The code builds for iPhone, the tests pass, and the app
+      starts on an iPhone simulator without crashing (you get screenshots)</td></tr>
+    <tr><td>4–8 Apple account, signing, TestFlight</td><td class="num">US$99 / year</td><td>The real app on your own
+      iPhone: camera, compass, notifications, sign-in</td></tr>
+    <tr><td>9 App Store</td><td class="num">US$0 more</td><td>Anyone can install it</td></tr>
+  </table></div>
+</header>
+
+<!-- ================================================================ 0 -->
+<section class="phase" id="phase-0" data-title="Know what the free test shows">
+<div class="ph-head"><span class="num">0</span><h2>Know what the free test shows</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">5 minutes</span></div>
+<p class="why">Read this once, so a green build doesn't promise more than it can.</p>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p0-1" aria-label="Done"><div><strong>It's the App Store, not the Play Store.</strong>
+  <p>iPhone apps are published through Apple's <strong>App Store Connect</strong>. The US$99 a year is the
+  <strong>Apple Developer Program</strong>. Google Play is only for Android, which you already have.</p></div></li>
+<li><input type="checkbox" class="tick" id="p0-2" aria-label="Done"><div><strong>The free build can't go on your iPhone.</strong>
+  <p>Without the paid program, Apple doesn't let any app be installed on a real iPhone. The free test runs the app on
+  an <strong>iPhone simulator</strong> (an iPhone on Codemagic's Mac) and gives you screenshots. The simulator has no
+  camera or compass and gets no notifications, so those are tested later, on your phone, through TestFlight.</p></div></li>
+<li><input type="checkbox" class="tick" id="p0-3" aria-label="Done"><div><strong>The iPhone widget isn't in this build yet.</strong>
+  <p>Its code is ready, but adding it to the project normally needs Xcode on a Mac. The app works without it, and the
+  "add widget" card stays hidden on iPhone until it's there. If you want it in the first release, tell me: I can add it
+  to the project myself, and the free check will show whether it builds.</p></div></li>
+<li><input type="checkbox" class="tick" id="p0-4" aria-label="Done"><div><strong>Codemagic's free plan</strong> gives about
+  <strong>500 build minutes a month</strong> on its Macs. One free check takes roughly 20–35 minutes, so you have room for
+  well over ten runs a month.</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 1 -->
+<section class="phase" id="phase-1" data-title="Open a Codemagic account">
+<div class="ph-head"><span class="num">1</span><h2>Open a Codemagic account</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">10 minutes</span></div>
+<p class="why">Codemagic signs in with your GitHub account and reads the app's code from your repository. The settings
+for the builds are already in the repository, in the file <code>codemagic.yaml</code>.</p>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p1-1" aria-label="Done"><div>Open
+  <a href="https://codemagic.io/signup" target="_blank" rel="noopener">codemagic.io/signup</a> and choose
+  <strong>Sign up with GitHub</strong>. Sign in to GitHub as <strong>Otabek9528</strong> and allow Codemagic.</div></li>
+<li><input type="checkbox" class="tick" id="p1-2" aria-label="Done"><div>If it asks what kind of account: choose
+  <strong>Personal</strong> (the free plan). Skip any team or billing offers.</div></li>
+<li><input type="checkbox" class="tick" id="p1-3" aria-label="Done"><div>Go to <strong>Applications</strong> →
+  <strong>Add application</strong> → <strong>GitHub</strong>.
+  <p>If the repository list is empty, Codemagic asks you to install its GitHub app: choose your account
+  <strong>Otabek9528</strong>, then <strong>Only select repositories</strong> → <code>game</code> → <strong>Install</strong>.</p></div></li>
+<li><input type="checkbox" class="tick" id="p1-4" aria-label="Done"><div>Pick the repository <code>Otabek9528/game</code>.
+  If it asks for the project type, choose <strong>Flutter App</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p1-5" aria-label="Done"><div>On the app's page, if you see a choice between
+  <strong>Workflow Editor</strong> and <strong>codemagic.yaml</strong>, choose <strong>codemagic.yaml</strong>.
+  <p>Codemagic then reads the file from the branch you build. You don't edit anything in Codemagic's editor.</p></div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 2 -->
+<section class="phase" id="phase-2" data-title="Run the free check">
+<div class="ph-head"><span class="num">2</span><h2>Run the free check</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">2 minutes</span><span class="chip wait">20–35 minutes of building</span></div>
+<p class="why">This is the workflow named <strong>iOS check (no Apple account)</strong>. It runs six steps: get the packages,
+analyze the code, run all the app's tests, build the app for iPhones, build it for the simulator, and start it on an
+iPhone simulator.</p>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p2-1" aria-label="Done"><div>On the app's page in Codemagic, click
+  <strong>Start new build</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p2-2" aria-label="Done"><div>Branch: choose the branch the app is on:
+  <div class="paste"><div class="paste-head">Branch<button class="copy" type="button" data-for="branch">Copy</button></div>
+  <pre class="cmd" id="branch">claude/intelligent-clarke-88a75i</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p2-3" aria-label="Done"><div>Workflow: <strong>iOS check (no Apple account)</strong>
+  → <strong>Start new build</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p2-4" aria-label="Done"><div>Wait. Each step turns green as it passes. You
+  can close the page; Codemagic emails you when it's done.</div></li>
+</ol>
+<div class="note">The first build is the slowest: Codemagic downloads Flutter and the iPhone libraries. If it stops on the
+first try with an error, that's normal for a first iPhone build; go to phase 3.</div>
+</section>
+
+<!-- ================================================================ 3 -->
+<section class="phase" id="phase-3" data-title="Read the result">
+<div class="ph-head"><span class="num">3</span><h2>Read the result</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">10 minutes</span></div>
+
+<h3>If it's red</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p3-1" aria-label="Done"><div>Click the step with the red mark. Its log opens.
+  Scroll to the bottom.</div></li>
+<li><input type="checkbox" class="tick" id="p3-2" aria-label="Done"><div>Copy the <strong>last 60 lines or so</strong> (the
+  first lines that say <code>error</code> are what matters) and send them to me with the step's name. If the failed step
+  is <strong>Run on an iPhone simulator</strong>, also download <code>iphone_log.txt</code> from Artifacts and send it.
+  <p>These logs hold no passwords: this workflow uses none.</p></div></li>
+<li><input type="checkbox" class="tick" id="p3-3" aria-label="Done"><div>I fix it in the code and push. Then run phase 2
+  again, on the same branch.</div></li>
+</ol>
+
+<h3>When it's green</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p3-4" aria-label="Done"><div>On the build's page, open <strong>Artifacts</strong>
+  and download the zip. Inside are <code>iphone_1.png</code>, <code>iphone_2.png</code>, <code>iphone_3.png</code>
+  (20, 40 and 60 seconds after the app started) and the app's log.</div></li>
+<li><input type="checkbox" class="tick" id="p3-5" aria-label="Done"><div>Look at the screenshots. You should see the app's
+  first screen (choosing a language), possibly with a permission question from iOS on top. Send them to me if
+  anything looks wrong: cut-off text, empty areas, a white screen.</div></li>
+</ol>
+<div class="note check"><strong>Green with good screenshots</strong> means the app compiles for iPhone, every test passes
+and it starts without crashing. That's the point to pay for the Apple Developer Program.</div>
+</section>
+
+<!-- ================================================================ 4 -->
+<section class="phase" id="phase-4" data-title="Join the Apple Developer Program">
+<div class="ph-head"><span class="num">4</span><h2>Join the Apple Developer Program</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">30 minutes</span><span class="chip wait">usually 1–2 days for Apple</span></div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p4-1" aria-label="Done"><div><strong>An Apple ID with two-factor authentication.</strong>
+  <p>Use the Apple ID you'll keep for the app. If you have an iPhone, it's the one in Settings → your name; two-factor
+  is on there by default. The name on it should be your legal name.</p></div></li>
+<li><input type="checkbox" class="tick" id="p4-2" aria-label="Done"><div>The easiest way is the <strong>Apple Developer</strong>
+  app on an iPhone (from the App Store) → <strong>Account</strong> → <strong>Enroll now</strong>: it scans your ID and
+  takes the payment through your Apple ID. Without an iPhone, use
+  <a href="https://developer.apple.com/programs/enroll/" target="_blank" rel="noopener">developer.apple.com/programs/enroll</a>.</div></li>
+<li><input type="checkbox" class="tick" id="p4-3" aria-label="Done"><div>Entity type: <strong>Individual / Sole Proprietor</strong>.
+  <p>Your own name appears as the seller on the App Store. An organization would need a D-U-N-S company number,
+  which takes weeks.</p></div></li>
+<li><input type="checkbox" class="tick" id="p4-4" aria-label="Done"><div>Pay the <strong>US$99</strong> (a Visa or Mastercard
+  works). It renews every year; if it lapses, the app leaves the App Store.</div></li>
+<li><input type="checkbox" class="tick" id="p4-5" aria-label="Done"><div>Wait for the email <strong>Welcome to the Apple
+  Developer Program</strong>. Then sign in once at
+  <a href="https://appstoreconnect.apple.com" target="_blank" rel="noopener">appstoreconnect.apple.com</a> and accept any
+  agreement it shows (Business → Agreements: the <strong>Free Apps</strong> agreement must be Active; a free app needs no
+  bank or tax details).</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 5 -->
+<section class="phase" id="phase-5" data-title="Register the app with Apple">
+<div class="ph-head"><span class="num">5</span><h2>Register the app with Apple</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">20 minutes</span></div>
+<p class="why">Apple needs to know the app's ID and what it's allowed to do (notifications, sharing data with its widget)
+before anything can be signed.</p>
+
+<h3>The app's ID</h3>
+<div class="where">developer.apple.com/account → Certificates, Identifiers &amp; Profiles → Identifiers → +</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p5-1" aria-label="Done"><div>Choose <strong>App IDs</strong> → Continue →
+  <strong>App</strong> → Continue.</div></li>
+<li><input type="checkbox" class="tick" id="p5-2" aria-label="Done"><div>Description <code>Muslim Vegukin</code>.
+  Bundle ID: <strong>Explicit</strong>, exactly:
+  <div class="paste"><div class="paste-head">Bundle ID<button class="copy" type="button" data-for="bid">Copy</button></div>
+  <pre class="cmd" id="bid">com.vegukin.muslimVegukin</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p5-3" aria-label="Done"><div>Under Capabilities tick <strong>App Groups</strong>
+  and <strong>Push Notifications</strong>. Continue → Register.</div></li>
+</ol>
+
+<h3>The group the app shares with its widget</h3>
+<div class="where">Identifiers → + → App Groups</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p5-4" aria-label="Done"><div>Description <code>Muslim Vegukin widget</code>, Identifier:
+  <div class="paste"><div class="paste-head">App Group<button class="copy" type="button" data-for="grp">Copy</button></div>
+  <pre class="cmd" id="grp">group.com.vegukin.muslimVegukin</pre></div>
+  Continue → Register.</div></li>
+<li><input type="checkbox" class="tick" id="p5-5" aria-label="Done"><div>Open the App ID <code>com.vegukin.muslimVegukin</code>
+  again → next to <strong>App Groups</strong> click <strong>Configure</strong> → tick the group → Continue → <strong>Save</strong>.
+  <p>Without this the signing in phase 7 fails with a message about App Groups.</p></div></li>
+</ol>
+
+<h3>The app in App Store Connect</h3>
+<div class="where">appstoreconnect.apple.com → Apps → + → New App</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p5-6" aria-label="Done"><div>Platform <strong>iOS</strong>. Name
+  <code>Muslim Vegukin</code> (the name on the App Store; if it's taken, add a short subtitle, e.g.
+  <code>Muslim Vegukin: Prayer Times</code>).</div></li>
+<li><input type="checkbox" class="tick" id="p5-7" aria-label="Done"><div>Primary language <strong>English (U.S.)</strong>.
+  Bundle ID: pick <code>com.vegukin.muslimVegukin</code> from the list. SKU <code>muslim-vegukin</code>.
+  User access <strong>Full Access</strong> → Create.</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 6 -->
+<section class="phase" id="phase-6" data-title="Connect Codemagic to Apple">
+<div class="ph-head"><span class="num">6</span><h2>Connect Codemagic to Apple</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">15 minutes</span></div>
+<p class="why">An <strong>App Store Connect API key</strong> lets Codemagic sign the app and upload it for you. It works like
+a password for your Apple account's app side.</p>
+<div class="note warn"><strong>The key file (.p8) is a password.</strong> Apple lets you download it once. Keep it in a safe
+place, upload it only to Codemagic, and don't send it to anyone, me included.</div>
+
+<h3>Make the key</h3>
+<div class="where">appstoreconnect.apple.com → Users and Access → Integrations → App Store Connect API → Team Keys</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p6-1" aria-label="Done"><div>The first time, click <strong>Request Access</strong>
+  and accept (instant for the account holder).</div></li>
+<li><input type="checkbox" class="tick" id="p6-2" aria-label="Done"><div>Click <strong>+</strong> (Generate API Key). Name
+  <code>Codemagic</code>, Access <strong>App Manager</strong> → Generate.</div></li>
+<li><input type="checkbox" class="tick" id="p6-3" aria-label="Done"><div>Note the <strong>Issuer ID</strong> (above the
+  list) and the key's <strong>Key ID</strong>. Click <strong>Download</strong> and keep the file
+  <code>AuthKey_XXXXXXXXXX.p8</code>.</div></li>
+</ol>
+
+<h3>Give it to Codemagic</h3>
+<div class="where">Codemagic → Team settings (your account's settings) → Team integrations → Developer Portal → Connect</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p6-4" aria-label="Done"><div>App Store Connect API key name: exactly this
+  (the build settings look for it by name):
+  <div class="paste"><div class="paste-head">Key name<button class="copy" type="button" data-for="keyname">Copy</button></div>
+  <pre class="cmd" id="keyname">Vegukin App Store Connect</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p6-5" aria-label="Done"><div>Fill in the Issuer ID and Key ID, choose the
+  <code>.p8</code> file → Save.</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 7 -->
+<section class="phase" id="phase-7" data-title="Set up signing">
+<div class="ph-head"><span class="num">7</span><h2>Set up signing</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">15 minutes</span></div>
+<p class="why">Every iPhone app is signed with a <strong>certificate</strong> (who made it) and a <strong>provisioning
+profile</strong> (which app it is and what it may do). Codemagic keeps both and applies them when it builds.</p>
+
+<h3>The certificate</h3>
+<div class="where">Codemagic → Team settings → codemagic.yaml settings → Code signing identities → iOS certificates</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p7-1" aria-label="Done"><div>Click <strong>Generate certificate</strong>, choose
+  the key <strong>Vegukin App Store Connect</strong>, type <strong>Apple Distribution</strong>. Give it a reference name, e.g.
+  <code>vegukin_distribution</code> → Create.</div></li>
+<li><input type="checkbox" class="tick" id="p7-2" aria-label="Done"><div>Codemagic offers to download the certificate
+  (<code>.p12</code>) with its password: download it and keep both with the <code>.p8</code>. You'd need them only if you
+  ever leave Codemagic.</div></li>
+</ol>
+
+<h3>The provisioning profile</h3>
+<div class="where">developer.apple.com/account → Profiles → +</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p7-3" aria-label="Done"><div>Under Distribution choose <strong>App Store
+  Connect</strong> → Continue. App ID <code>com.vegukin.muslimVegukin</code> → Continue.</div></li>
+<li><input type="checkbox" class="tick" id="p7-4" aria-label="Done"><div>Certificate: the one Codemagic just made (Apple
+  Distribution, today's date) → Continue. Name <code>Muslim Vegukin App Store</code> → Generate. No need to download it.</div></li>
+<li><input type="checkbox" class="tick" id="p7-5" aria-label="Done"><div>Back in Codemagic → Code signing identities →
+  <strong>iOS provisioning profiles</strong> → <strong>Fetch profiles</strong> → choose the key → tick
+  <strong>Muslim Vegukin App Store</strong> → Download selected.</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ 8 -->
+<section class="phase" id="phase-8" data-title="TestFlight on your iPhone">
+<div class="ph-head"><span class="num">8</span><h2>TestFlight on your iPhone</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">10 minutes</span><span class="chip wait">25–35 minutes building, then ~15 for Apple</span></div>
+<p class="why">The workflow <strong>iOS to TestFlight</strong> builds the signed app and uploads it. TestFlight is Apple's app
+for installing test builds; nobody else sees them.</p>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p8-1" aria-label="Done"><div>Codemagic → Start new build → same branch →
+  workflow <strong>iOS to TestFlight</strong> → Start.</div></li>
+<li><input type="checkbox" class="tick" id="p8-2" aria-label="Done"><div>When it's green, App Store Connect →
+  your app → <strong>TestFlight</strong>. The build shows <em>Processing</em> for 10–30 minutes, then
+  <em>Ready to Submit</em> or <em>Testing</em>.</div></li>
+<li><input type="checkbox" class="tick" id="p8-3" aria-label="Done"><div>Under <strong>Internal Testing</strong> click
+  <strong>+</strong>, name the group <code>Me</code>, add yourself, and add the build to the group.</div></li>
+<li><input type="checkbox" class="tick" id="p8-4" aria-label="Done"><div>On your iPhone install <strong>TestFlight</strong>
+  from the App Store, sign in with the same Apple ID, open the invitation email → <strong>Install</strong>.</div></li>
+<li><input type="checkbox" class="tick" id="p8-5" aria-label="Done"><div>Test on the phone: language choice and
+  location; prayer times and a reminder set a minute ahead; the Qibla compass (flat, then the camera view); a barcode
+  scan; Telegram and WhatsApp sign-in; sharing the app. Write down anything wrong and send it to me with screenshots.</div></li>
+</ol>
+<div class="note">Notifications from the server and Google sign-in need the Firebase and Google values for iPhone first
+(<code>mobile/ios/IOS.md</code>, step 2). Send me the four values from <code>GoogleService-Info.plist</code>
+(<code>API_KEY</code>, <code>GOOGLE_APP_ID</code>, <code>CLIENT_ID</code>, <code>REVERSED_CLIENT_ID</code>); they are not
+secret. The APNs <code>.p8</code> key goes only to the Firebase console, never to me.</div>
+<div class="note">Each new TestFlight build: change the code, push, and start the workflow again. The build number goes up
+by itself.</div>
+</section>
+
+<!-- ================================================================ 9 -->
+<section class="phase" id="phase-9" data-title="Submit to the App Store">
+<div class="ph-head"><span class="num">9</span><h2>Submit to the App Store</h2><span class="count"></span></div>
+<div class="chips"><span class="chip">1–2 hours</span><span class="chip wait">review: usually 1–3 days</span></div>
+
+<h3>First, two things Apple's review would reject</h3>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p9-1" aria-label="Done"><div><strong>Sign in with Apple.</strong>
+  <p>Apple requires it in apps that offer Google, Telegram or similar sign-in (App Review Guideline 4.8). It's a button
+  in the sign-in sheet plus a check on the server. Ask me to add it before you submit; TestFlight doesn't need it.</p></div></li>
+<li><input type="checkbox" class="tick" id="p9-2" aria-label="Done"><div><strong>The donation page.</strong>
+  <p>Apple rejects donations to an app's developer that bypass in-app purchase, unless the developer is a registered
+  charity (Guideline 3.1.1). Ask me to hide it on iPhone.</p></div></li>
+</ol>
+
+<h3>The App Store page</h3>
+<div class="where">App Store Connect → your app → App Store tab → iOS App 1.0</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p9-3" aria-label="Done"><div><strong>Screenshots</strong> for a 6.9-inch
+  iPhone (1320 × 2868 pixels), at least 3. Take them on your iPhone if it's a Pro Max; otherwise ask me, and I'll add
+  a Codemagic step that makes them on the simulator.</div></li>
+<li><input type="checkbox" class="tick" id="p9-4" aria-label="Done"><div><strong>Texts</strong>: the Play Store
+  descriptions fit (the Play launch guide has them with Copy buttons). Subtitle, 30 characters at most:
+  <div class="paste"><div class="paste-head">Subtitle<button class="copy" type="button" data-for="sub">Copy</button><span class="limit"></span></div>
+  <pre id="sub" data-limit="30">Prayer times, qibla, HiKorea</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p9-5" aria-label="Done"><div><strong>Privacy policy URL</strong>:
+  <div class="paste"><div class="paste-head">URL<button class="copy" type="button" data-for="purl">Copy</button></div>
+  <pre class="cmd" id="purl">https://vegukin-twa.pages.dev/privacy.html</pre></div>
+  Category <strong>Lifestyle</strong>. Age rating: answer the questions (all "None"; user-generated content: yes).</div></li>
+<li><input type="checkbox" class="tick" id="p9-6" aria-label="Done"><div><strong>App Privacy</strong>: the same data as
+  Play's Data safety form: location, name, email, phone number, user ID, photos or videos, other user content, product
+  interaction, device ID. None is used for tracking; all are linked to the user.</div></li>
+<li><input type="checkbox" class="tick" id="p9-7" aria-label="Done"><div>Under <strong>Build</strong>, pick the TestFlight
+  build you tested. In <strong>App Review Information</strong>, paste:
+  <div class="paste"><div class="paste-head">Review notes<button class="copy" type="button" data-for="notes">Copy</button></div>
+  <pre id="notes">Signing in is optional; most features work without it. Telegram and WhatsApp sign-in need the reviewer's own account. Google sign-in and Sign in with Apple work with any account.</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p9-8" aria-label="Done"><div><strong>Add for Review</strong> → <strong>Submit</strong>.
+  If Apple writes back with a rejection, send me its text: most are fixed in one round.</div></li>
+</ol>
+</section>
+
+<!-- ================================================================ A -->
+<section class="ref" id="words" style="margin-top:56px">
+<div class="ph-head"><span class="num">A</span><h2>Words you'll see</h2></div>
+<dl class="terms">
+  <dt>Codemagic</dt><dd>A service with Macs in the cloud that builds the iPhone app from your GitHub code.</dd>
+  <dt>Workflow</dt><dd>One kind of build, written in <code>codemagic.yaml</code>: here <em>iOS check</em> and <em>iOS to TestFlight</em>.</dd>
+  <dt>Simulator</dt><dd>A virtual iPhone on a Mac. Good for "does it start?", without camera, compass or notifications.</dd>
+  <dt>Bundle ID</dt><dd>The app's permanent ID with Apple: <code>com.vegukin.muslimVegukin</code>. It can never change.</dd>
+  <dt>App Store Connect</dt><dd>Apple's site for your apps: TestFlight, the store page, review.</dd>
+  <dt>API key (.p8)</dt><dd>Lets Codemagic act in App Store Connect for you. A password: never share it.</dd>
+  <dt>Certificate</dt><dd>Proves the app comes from you. Codemagic makes and keeps it.</dd>
+  <dt>Provisioning profile</dt><dd>Apple's permission for one app with one certificate and its capabilities (notifications, App Group).</dd>
+  <dt>TestFlight</dt><dd>Apple's app for installing test builds on your own iPhone before release.</dd>
+</dl>
+</section>
+
+<!-- ================================================================ B -->
+<section class="ref" id="trouble" style="margin-top:56px">
+<div class="ph-head"><span class="num">B</span><h2>If something goes wrong</h2></div>
+<details><summary>"Integration … not found" or "No App Store Connect API key"</summary><div>The key's name in Codemagic must be
+  exactly <code>Vegukin App Store Connect</code> (phase 6). Rename it there, or tell me the name you used.</div></details>
+<details><summary>"No matching profiles found" or "doesn't include … App Groups / aps-environment"</summary><div>The App ID is
+  missing a capability, or the profile was made before you ticked it. Check phase 5 (App Groups configured, Push
+  Notifications on), then make a new profile and fetch it again (phase 7).</div></details>
+<details><summary>"The bundle version must be higher than the previously uploaded version"</summary><div>Something was uploaded
+  outside Codemagic with a higher build number. Start the workflow again; if it repeats, tell me.</div></details>
+<details><summary>The free minutes ran out</summary><div>They come back at the start of each month. Run the free check only
+  after I tell you a fix is pushed, so each run counts.</div></details>
+<details><summary>"Run on an iPhone simulator" failed</summary><div>The app crashed or closed on the simulator. Send me
+  <code>iphone_log.txt</code> and the screenshots from Artifacts.</div></details>
+<details><summary>Anything else</summary><div>Send me the failed step's name and the last 60 lines of its log. Never send
+  the <code>.p8</code>, the <code>.p12</code> or its password.</div></details>
+</section>
+
+<footer>Muslim Vegukin · iPhone release guide · build settings in <code>codemagic.yaml</code> at the top of the repository;
+details in <code>mobile/ios/IOS.md</code>.</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var KEY = 'mv-ios-launch-v1';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input.tick'));
+  var phases = Array.prototype.slice.call(document.querySelectorAll('section.phase'));
+
+  // The phase list in the side column.
+  var list = document.getElementById('nav-list');
+  phases.forEach(function (sec) {
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.innerHTML = '<span class="n"></span><span></span><span class="c"></span>';
+    a.children[0].textContent = sec.querySelector('.ph-head .num').textContent;
+    a.children[1].textContent = sec.getAttribute('data-title');
+    li.appendChild(a);
+    list.appendChild(li);
+    sec._nav = a;
+  });
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+
+  function update() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    var total = boxes.length;
+    var pct = total ? Math.round(done / total * 100) : 0;
+    ['overall-bar', 'nav-bar', 'strip-bar'].forEach(function (id) { document.getElementById(id).style.width = pct + '%'; });
+    document.getElementById('overall-text').textContent = done + ' of ' + total + ' steps done';
+    document.getElementById('strip-text').textContent = done + ' / ' + total;
+    phases.forEach(function (sec) {
+      var bs = sec.querySelectorAll('input.tick');
+      var d = 0;
+      for (var i = 0; i < bs.length; i++) if (bs[i].checked) d++;
+      var label = d + '/' + bs.length;
+      sec.querySelector('.ph-head .count').textContent = label;
+      sec._nav.children[2].textContent = label;
+      var complete = bs.length > 0 && d === bs.length;
+      sec.classList.toggle('complete', complete);
+      sec._nav.classList.toggle('done', complete);
+    });
+  }
+
+  boxes.forEach(function (b) {
+    b.checked = !!saved[b.id];
+    b.addEventListener('change', function () { saved[b.id] = b.checked; save(); update(); });
+  });
+
+  // Clearing asks twice, on the button itself.
+  var reset = document.getElementById('reset');
+  var armed = null;
+  reset.addEventListener('click', function () {
+    if (!armed) {
+      reset.textContent = 'Click again to clear all ticks';
+      armed = setTimeout(function () { reset.textContent = 'Clear my ticks'; armed = null; }, 4000);
+      return;
+    }
+    clearTimeout(armed); armed = null;
+    saved = {}; save();
+    boxes.forEach(function (b) { b.checked = false; });
+    reset.textContent = 'Clear my ticks';
+    update();
+  });
+
+  // Character counts against Google's limits.
+  Array.prototype.forEach.call(document.querySelectorAll('pre[data-limit]'), function (pre) {
+    var n = Array.from(pre.textContent).length;
+    var limit = +pre.getAttribute('data-limit');
+    var el = pre.parentNode.querySelector('.limit');
+    if (el) el.textContent = n + ' / ' + limit + ' characters';
+  });
+
+  // Copy buttons.
+  function selectText(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  function flash(btn, text) {
+    var old = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', old);
+    btn.textContent = text;
+    btn.classList.add('ok');
+    setTimeout(function () { btn.textContent = old; btn.classList.remove('ok'); }, 1800);
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('button.copy');
+    if (!btn) return;
+    var el = document.getElementById(btn.getAttribute('data-for'));
+    if (!el) return;
+    var text = el.textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { flash(btn, 'Copied'); },
+        function () { selectText(el); flash(btn, 'Selected: press Ctrl+C'); });
+    } else {
+      selectText(el); flash(btn, 'Selected: press Ctrl+C');
+    }
+  });
+
+  update();
+})();
+</script>

@@ -73,10 +73,16 @@ project carries `Runner/Runner.entitlements`).
 Run on an iPhone (cable, *Trust this computer*): `flutter run --release`. The first time, the iPhone asks you to
 trust the developer: Settings → General → VPN & Device Management.
 
-**B. Without a Mac**: Codemagic (<https://codemagic.io>, free tier ~500 build minutes a month) builds iOS apps on
-its Macs from GitHub and uploads them to TestFlight. Connect the repository, pick the Flutter workflow, branch
-`claude/intelligent-clarke-88a75i`, project path `mobile`, build for iOS, and under *iOS code signing* add an
-**App Store Connect API key** (App Store Connect → Users and Access → Integrations → Keys) with automatic signing.
+**B. Without a Mac: Codemagic.** Step by step in `ios-launch-guide.html` (next to this file). The build settings are
+`codemagic.yaml` at the top of the repository, with two workflows:
+
+- `ios-check`: free, no Apple account. Analyze, tests, an unsigned iPhone build (proves it compiles), a simulator
+  build started on an iPhone simulator (`tool/ios_simulator_check.sh`: fails if the app crashes; screenshots in the
+  build's artifacts).
+- `ios-testflight`: needs the Apple Developer Program, an App Store Connect API key named
+  `Vegukin App Store Connect` in Codemagic, and Codemagic's signing files. Builds the `.ipa` and sends it to
+  TestFlight.
+
 Everything except the widget works this way; the widget target needs Xcode once (step 5), so ship v1 without it if
 there's no Mac.
 

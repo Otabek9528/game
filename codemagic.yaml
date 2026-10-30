@@ -1,0 +1,74 @@
+# Codemagic (https://codemagic.io): the iPhone app, built on Codemagic's Macs.
+# The app is in mobile/; the steps around this file are in
+# mobile/ios/ios-launch-guide.html.
+#
+# ios-check      No Apple account needed. Analyzes, runs the tests, builds the
+#                app for iPhones (unsigned: proves it compiles) and for the
+#                simulator, starts it on an iPhone simulator and saves
+#                screenshots. Nothing to install on a phone.
+# ios-testflight Needs the Apple Developer Program and the App Store Connect
+#                key added in Codemagic. Builds the signed app and sends it to
+#                TestFlight, from where it installs on an iPhone.
+
+workflows:
+  ios-check:
+    name: iOS check (no Apple account)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    working_directory: mobile
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Packages
+        script: flutter pub get
+      - name: Analyze
+        script: flutter analyze
+      - name: Tests
+        script: flutter test
+      - name: Build for iPhone (unsigned)
+        script: flutter build ios --release --no-codesign
+      - name: Build for the simulator
+        script: flutter build ios --simulator --debug
+      - name: Run on an iPhone simulator
+        script: bash tool/ios_simulator_check.sh
+
+  ios-testflight:
+    name: iOS to TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    working_directory: mobile
+    integrations:
+      # The name given to the App Store Connect key in Codemagic
+      # (Team settings, Team integrations, Developer Portal).
+      app_store_connect: Vegukin App Store Connect
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.vegukin.muslimVegukin
+    scripts:
+      - name: Packages
+        script: flutter pub get
+      - name: Tests
+        script: flutter test
+      - name: Signing
+        script: xcode-project use-profiles
+      - name: Build the .ipa
+        # Codemagic's build count as the build number: each upload's is
+        # higher, as App Store Connect requires. The version is pubspec's.
+        script: |
+          flutter build ipa --release \
+            --obfuscate --split-debug-info=build/symbols \
+            --build-number=$BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/symbols/**
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
