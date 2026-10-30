@@ -37,7 +37,8 @@ The app's Play Console entry was first used by the web app's build (TWA), which
 fixed its ID (`com.muslimVegukin.myapp`) and its **upload key**. Play accepts a
 new `.aab` only if it is signed with that same key.
 
-- Play Console → Test and release → App integrity → App signing →
+- Play Console → Protected with Play → Play Store protection → Protect app
+  signing key (older consoles: Test and release → App integrity → App signing) →
   **Upload key certificate**: note its SHA-1.
 - Your key's SHA-1: `keytool -list -v -keystore "$env:USERPROFILE\muslim-vegukin-upload.jks" -alias upload`.
 - The same: nothing to do. Different: either point `key.properties` at the web
@@ -107,8 +108,9 @@ add an **Android** OAuth client for `com.muslimVegukin.myapp` with the SHA-1
 of **both**:
 
 - your upload key: `keytool -list -v -keystore "$env:USERPROFILE\muslim-vegukin-upload.jks" -alias upload`
-- Play's app-signing key: Play Console → Test and release → App integrity →
-  App signing (available after the first AAB upload).
+- Play's app-signing key: Play Console → Protected with Play → Play Store
+  protection → Protect app signing key → *App signing key certificate*
+  (older consoles: Test and release → App integrity → App signing).
 
 ## 6. Google Play
 

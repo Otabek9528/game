@@ -46,7 +46,7 @@ bool isTestPush(PushMessage message) => message.data['kind'] == 'test';
 /// plugin. None of it is secret: every installed copy carries it.
 const firebaseOptions = FirebaseOptions(
   apiKey: 'AIzaSyDeN7pAJJHnKik9bxL_5VBngoiM-OwU0wg',
-  appId: '1:450113929398:android:016bc085ad55d7064aa617',
+  appId: '1:450113929398:android:c0e2df0a8a65abd04aa617',
   messagingSenderId: '450113929398',
   projectId: 'muslim-vegukin',
   storageBucket: 'muslim-vegukin.firebasestorage.app',

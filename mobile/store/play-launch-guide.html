@@ -656,9 +656,10 @@ First version: prayer times and reminders, qibla, mosques and halal places, HiKo
   link</strong> → open it on your phone → <strong>Accept invite</strong> → <strong>Download it on Google Play</strong> → Install.
   It can take up to an hour before the Play Store shows the app.</div></li>
 <li><input type="checkbox" class="tick" id="p7-8" aria-label="Done"><div><strong>Make Google sign-in work.</strong>
-  <div class="where">Test and release → App integrity → App signing</div>
+  <div class="where">Protected with Play → Play Store protection → Protect app signing key</div>
+  <p>(Older consoles: Test and release → App integrity → App signing. If the menu says "App Integrity settings have moved", click <strong>Go to Protected with Play</strong>.)</p>
   <p>Copy the <strong>SHA-1</strong> under <em>App signing key certificate</em>. Then in the Firebase console → project
-  <strong>muslim-vegukin</strong> → ⚙ Project settings → Your apps → the Android app → <strong>Add fingerprint</strong> →
+  <strong>muslim-vegukin</strong> → ⚙ Project settings → Your apps → the Android app <code>com.muslimVegukin.myapp</code> → <strong>Add fingerprint</strong> →
   paste → Save. Wait 5 minutes.</p>
   <p>Without this, Google sign-in fails in every copy installed from Google Play.</p></div></li>
 <li><input type="checkbox" class="tick" id="p7-9" aria-label="Done"><div><strong>Test it</strong> on the Play-installed app: it opens;
@@ -843,7 +844,7 @@ and your app, in English. Below are drafts: replace everything in [square bracke
   <tr><td>…signed in debug mode</td><td><code>android\key.properties</code> is missing or wrong. Check it (see
     <code>RELEASE.md</code>), build again.</td></tr>
   <tr><td>…not signed with the correct key</td><td>You signed with a different <code>.jks</code> than the first upload.
-    Use the original. If it's lost: App integrity → <em>Request upload key reset</em>, and tell me.</td></tr>
+    Use the original. If it's lost: Protected with Play → Protect app signing key → <em>Request upload key reset</em>, and tell me.</td></tr>
   <tr><td>Screenshot has the wrong aspect ratio</td><td>Crop to 1080 × 2160 (phase 6.2).</td></tr>
   <tr><td>Privacy policy link not working</td><td>Phase 1: the page must open for anyone, without signing in.</td></tr>
   <tr><td>Google sign-in fails in the Play version</td><td>Phase 7, last step: the app-signing SHA-1 in Firebase.</td></tr>
