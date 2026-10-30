@@ -794,7 +794,7 @@ void main() {
 
       expect(find.text('English'), findsOneWidget, reason: 'the language');
       await tapScrolled(tester, find.text('Share the app'));
-      expect(app.shared.single, contains('play.google.com/store/apps/details?id=com.vegukin.muslim_vegukin'));
+      expect(app.shared.single, contains('play.google.com/store/apps/details?id=com.muslimVegukin.myapp'));
       await tapScrolled(tester, find.text('Suggest an idea or report a bug'));
       expect(find.byType(CommunityScreen), findsOneWidget);
       await tester.pageBack();

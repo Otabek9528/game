@@ -17,7 +17,7 @@ abstract final class AppConfig {
   static final liveWebBase = Uri.parse('https://vegukin-twa.pages.dev/');
 
   /// The app on Google Play, for sharing it (works once it is published).
-  static const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.vegukin.muslim_vegukin';
+  static const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.muslimVegukin.myapp';
 
   /// The Muslim Vegukin API (places, business directory, …).
   static final apiBase = Uri.parse('https://vegukin-api.duckdns.org/');

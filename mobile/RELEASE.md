@@ -31,10 +31,27 @@ Without this file, release builds are signed with the debug key: they install,
 but Google Play refuses them. Back up the `.jks` and the password somewhere
 safe; losing them means asking Google for an upload-key reset.
 
+### The Play Console entry already has an upload key
+
+The app's Play Console entry was first used by the web app's build (TWA), which
+fixed its ID (`com.muslimVegukin.myapp`) and its **upload key**. Play accepts a
+new `.aab` only if it is signed with that same key.
+
+- Play Console → Test and release → App integrity → App signing →
+  **Upload key certificate**: note its SHA-1.
+- Your key's SHA-1: `keytool -list -v -keystore "$env:USERPROFILE\muslim-vegukin-upload.jks" -alias upload`.
+- The same: nothing to do. Different: either point `key.properties` at the web
+  app build's keystore (PWABuilder's download has `signing.keystore` and its
+  passwords in `signing-key-info.txt`; Bubblewrap's is `android.keystore`), or on
+  that same page **Request upload key reset** with the certificate of your key
+  (`keytool -export -rfc -keystore "$env:USERPROFILE\muslim-vegukin-upload.jks" -alias upload -file upload_certificate.pem`)
+  and wait for Google's email (a few days).
+
 ## 2. Version
 
 `pubspec.yaml` → `version: 1.0.0+1` (name + code). Raise the number after `+`
-for every upload; Play rejects a code it has seen.
+for every upload; Play rejects a code it has seen, including the web app
+build's (Play Console → Test and release → App bundle explorer lists them).
 
 ## 3. Build
 
@@ -86,7 +103,7 @@ notification, a Notifications area, cars/housing photo upload.
 ## 5. Google sign-in in release (must do, or sign-in fails)
 
 Google Cloud console → the project of `googleServerClientId` → Credentials →
-add an **Android** OAuth client for `com.vegukin.muslim_vegukin` with the SHA-1
+add an **Android** OAuth client for `com.muslimVegukin.myapp` with the SHA-1
 of **both**:
 
 - your upload key: `keytool -list -v -keystore "$env:USERPROFILE\muslim-vegukin-upload.jks" -alias upload`

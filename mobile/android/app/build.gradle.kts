@@ -28,8 +28,10 @@ android {
     }
 
     defaultConfig {
-        // Permanent once published on Google Play.
-        applicationId = "com.vegukin.muslim_vegukin"
+        // The app's ID on Google Play, fixed by the first upload to its Play Console
+        // entry (the web app's earlier build); permanent. The Kotlin code keeps its
+        // own package (namespace above), which needn't match.
+        applicationId = "com.muslimVegukin.myapp"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         // From pubspec.yaml's `version: name+code`; split APKs add 1000 * ABI.

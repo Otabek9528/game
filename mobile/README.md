@@ -138,7 +138,8 @@ Run these in the terminal from the `mobile` folder:
 
 ## Before the first Play Store upload
 
-- **Application ID** — `com.vegukin.muslim_vegukin` in
-  `android/app/build.gradle.kts`. It can never change once the app is
-  published, so settle it before then.
+- **Application ID** — `com.muslimVegukin.myapp` in
+  `android/app/build.gradle.kts`: the ID of the app's Play Console entry, fixed
+  by its first upload. It can never change. The Kotlin code keeps its own
+  package, `com.vegukin.muslim_vegukin` (`namespace`).
 - **Release signing, building and publishing** — `RELEASE.md`.
