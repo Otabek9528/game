@@ -43,7 +43,10 @@ done
 xcrun simctl spawn "$UDID" log show --last 5m --style compact --predicate 'process == "Runner"' \
   > "$OUT/iphone_log.txt" 2>&1 || true
 
-if xcrun simctl spawn "$UDID" launchctl list | grep -q "$BUNDLE"; then
+# Read the whole list first: grep -q stops at the first match, and the
+# list's writer then dies of a broken pipe, which pipefail counts as failure.
+running=$(xcrun simctl spawn "$UDID" launchctl list || true)
+if grep -q "$BUNDLE" <<<"$running"; then
   echo "The app is still running after a minute: it starts without crashing."
 else
   echo "The app is not running any more: it crashed or closed. See iphone_log.txt in the artifacts."
