@@ -1,8 +1,9 @@
 #!/bin/bash
 # Codemagic, workflow ios-check (codemagic.yaml): starts the simulator build
-# on an iPhone simulator, takes three screenshots a minute apart, and fails if
-# the app isn't running by then (it crashed). Screenshots and the app's log go
-# to $CM_EXPORT_DIR, which Codemagic offers for download with the build.
+# on an iPhone simulator past its first-launch questions, takes screenshots of
+# the home screen and the prayers page (light, then dark), and fails if the app
+# isn't running by then (it crashed). Screenshots and the app's log go to
+# $CM_EXPORT_DIR, which Codemagic offers for download with the build.
 #
 # Run from mobile/, after `flutter build ios --simulator --debug`.
 set -euo pipefail
@@ -33,12 +34,34 @@ xcrun simctl bootstatus "$UDID" -b
 xcrun simctl location "$UDID" set 37.3219,126.8309 || true
 xcrun simctl install "$UDID" "$APP"
 xcrun simctl privacy "$UDID" grant location "$BUNDLE" || true
-xcrun simctl launch "$UDID" "$BUNDLE"
 
-for n in 1 2 3; do
-  sleep 20
-  xcrun simctl io "$UDID" screenshot "$OUT/iphone_$n.png"
-done
+# Answers to what the first launch asks, which nobody is there to tap: the
+# language (Uzbek), and the camera and notification prompts as already shown.
+# Location is granted above, so the app finds Ansan by itself. Every check run
+# is the same install (-1), so they count as one test user in the stats.
+# Written as a file, before the app has ever run, so no preferences cache holds
+# an older copy.
+DATA=$(xcrun simctl get_app_container "$UDID" "$BUNDLE" data)
+mkdir -p "$DATA/Library/Preferences"
+python3 - "$DATA/Library/Preferences/$BUNDLE.plist" <<'PY'
+import plistlib, sys
+answers = {"app_language": "uz", "permissions_asked": "1", "notifications_asked": "1", "install_id": "-1"}
+with open(sys.argv[1], "wb") as f:
+    plistlib.dump(answers, f)
+PY
+
+xcrun simctl launch "$UDID" "$BUNDLE"
+sleep 30
+xcrun simctl io "$UDID" screenshot "$OUT/iphone_1_home.png"
+
+# The link the widget opens: the prayers page.
+xcrun simctl openurl "$UDID" "muslimvegukin://prayers" || true
+sleep 10
+xcrun simctl io "$UDID" screenshot "$OUT/iphone_2_prayers.png"
+
+xcrun simctl ui "$UDID" appearance dark || true
+sleep 6
+xcrun simctl io "$UDID" screenshot "$OUT/iphone_3_prayers_dark.png"
 
 xcrun simctl spawn "$UDID" log show --last 5m --style compact --predicate 'process == "Runner"' \
   > "$OUT/iphone_log.txt" 2>&1 || true
