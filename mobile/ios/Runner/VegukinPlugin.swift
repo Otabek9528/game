@@ -95,8 +95,8 @@ final class VegukinPlugin: NSObject, FlutterPlugin, FlutterSceneLifeCycleDelegat
         DispatchQueue.main.async { result(kinds.sorted()) }
       }
     case "offer":
-      // Apps can't place widgets on iPhone: the app shows how. Only once the
-      // widget target is in the build (ios/IOS.md, step 5).
+      // Apps can't place widgets on iPhone: the app shows how. Only when the
+      // widget extension (ios/PrayerWidget) is in the build.
       result(Self.hasWidget ? "guide" : nil)
     case "track", "pin":
       // Android's: its widgets count themselves and can be placed by the app.

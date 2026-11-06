@@ -12,7 +12,7 @@ check; type errors and runtime behaviour can only show up on a Mac. Expect one r
 | Push notifications | Code ready; needs the Firebase iOS app + APNs key (step 2) |
 | Google sign-in | Code ready; hidden on iPhone until its client id is filled in (step 2) |
 | Telegram and WhatsApp sign-in | Work as on Android (they open the bots) |
-| Home-screen widget (`PrayerWidget/PrayerWidget.swift`) | Source ready; the widget **target** must be added once in Xcode on a Mac (step 5). The app works without it, and only offers the widget (Prayers page, Account → Home-screen widget: a how-to, since iPhone apps can't place widgets) once the target is in the build |
+| Home-screen and lock-screen widget (`PrayerWidget/`) | In the project as the **PrayerWidget** target, embedded in the app. Signing it needs its own App ID (step 1). The app offers it on the Prayers page and in Account (a how-to, since iPhone apps can't place widgets) |
 | App icon, launch screen, permission texts (uz/ru/en), iPhone-only, portrait | Done |
 
 Differences from Android, by necessity:
@@ -30,6 +30,8 @@ Differences from Android, by necessity:
 - In <https://developer.apple.com/account> → Certificates, Identifiers & Profiles → **Identifiers** → `+` → App IDs →
   Bundle ID `com.vegukin.muslimVegukin`, capabilities **Push Notifications** and **App Groups**. Then Identifiers →
   App Groups → `+` → `group.com.vegukin.muslimVegukin`, and assign it to the App ID.
+- A second App ID for the widget: Bundle ID `com.vegukin.muslimVegukin.PrayerWidget`, capability **App Groups**,
+  configured with the same group. It needs its own App Store provisioning profile.
   (Xcode's automatic signing can do this itself; doing it here avoids surprises.)
 
 ## 2. Firebase and Google (once)
@@ -83,8 +85,7 @@ trust the developer: Settings → General → VPN & Device Management.
   `Vegukin App Store Connect` in Codemagic, and Codemagic's signing files. Builds the `.ipa` and sends it to
   TestFlight.
 
-Everything except the widget works this way; the widget target needs Xcode once (step 5), so ship v1 without it if
-there's no Mac.
+Everything works this way, the widget included.
 
 ## 4. First run: what to check
 
@@ -95,20 +96,15 @@ should sit where the compass points); a barcode scan; Telegram and WhatsApp sign
 
 If something fails to compile, send me the error lines from Xcode's Issue navigator.
 
-## 5. The home-screen widget (Mac, once)
+## 5. The widget
 
-1. Xcode → File → New → Target → **Widget Extension** → Product Name `PrayerWidget`, uncheck *Include Live
-   Activity* and *Include Configuration App Intent* → Finish → *Don't activate* the new scheme.
-2. Delete the Swift files Xcode generated in the new `PrayerWidget` group (*Move to Trash*), then drag
-   `ios/PrayerWidget/PrayerWidget.swift` into that group, with only the **PrayerWidget** target ticked.
-3. PrayerWidget target → General → Minimum Deployments **iOS 16.0**; Bundle Identifier
-   `com.vegukin.muslimVegukin.PrayerWidget`.
-4. PrayerWidget target → Signing & Capabilities → `+ Capability` → **App Groups** → tick
-   `group.com.vegukin.muslimVegukin` (the same one the app has).
-5. If the build stops with *"Cycle inside Runner"*: Runner target → Build Phases → drag **Embed Foundation
-   Extensions** up, right under *Copy Bundle Resources* (above *Thin Binary*).
+Already in the project: the **PrayerWidget** target (`PrayerWidget/PrayerWidget.swift`, its `Info.plist` and
+entitlements), iOS 16+, bundle ID `com.vegukin.muslimVegukin.PrayerWidget`, the app group
+`group.com.vegukin.muslimVegukin`. The app embeds it in *Embed Foundation Extensions*, placed before Flutter's
+*Thin Binary* script (after it, Xcode reports a dependency cycle). Its version and build number are the app's
+(from `Flutter/Generated.xcconfig`).
 
-The widget then shows the next prayer with a countdown (small), the day's six times (medium) and the next prayer
+The widget shows the next prayer with a countdown (small), the day's six times (medium) and the next prayer
 on the lock screen; it fills in after the app has been opened once.
 
 ## 6. TestFlight and the App Store

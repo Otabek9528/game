@@ -195,10 +195,10 @@ footer { margin-top: 64px; color: var(--muted); font-size: 13px; border-top: 1px
   <p>Without the paid program, Apple doesn't let any app be installed on a real iPhone. The free test runs the app on
   an <strong>iPhone simulator</strong> (an iPhone on Codemagic's Mac) and gives you screenshots. The simulator has no
   camera or compass and gets no notifications, so those are tested later, on your phone, through TestFlight.</p></div></li>
-<li><input type="checkbox" class="tick" id="p0-3" aria-label="Done"><div><strong>The iPhone widget isn't in this build yet.</strong>
-  <p>Its code is ready, but adding it to the project normally needs Xcode on a Mac. The app works without it, and the
-  "add widget" card stays hidden on iPhone until it's there. If you want it in the first release, tell me: I can add it
-  to the project myself, and the free check will show whether it builds.</p></div></li>
+<li><input type="checkbox" class="tick" id="p0-3" aria-label="Done"><div><strong>The iPhone widget is in this build.</strong>
+  <p>The free check builds it with the app. Apple counts it as a second, small app inside the first, so signing it later
+  needs its own App ID (phase 5) and profile (phase 7). On the simulator it isn't on the home screen, so the
+  screenshots show the app only.</p></div></li>
 <li><input type="checkbox" class="tick" id="p0-4" aria-label="Done"><div><strong>Codemagic's free plan</strong> gives about
   <strong>500 build minutes a month</strong> on its Macs. One free check takes roughly 20–35 minutes, so you have room for
   well over ten runs a month.</div></li>
@@ -338,6 +338,19 @@ before anything can be signed.</p>
   <p>Without this the signing in phase 7 fails with a message about App Groups.</p></div></li>
 </ol>
 
+<h3>The widget's ID</h3>
+<div class="where">Identifiers → + → App IDs → App</div>
+<ol class="steps">
+<li><input type="checkbox" class="tick" id="p5-5a" aria-label="Done"><div>Description <code>Muslim Vegukin widget</code>.
+  Bundle ID: <strong>Explicit</strong>, exactly:
+  <div class="paste"><div class="paste-head">Widget bundle ID<button class="copy" type="button" data-for="wbid">Copy</button></div>
+  <pre class="cmd" id="wbid">com.vegukin.muslimVegukin.PrayerWidget</pre></div></div></li>
+<li><input type="checkbox" class="tick" id="p5-5b" aria-label="Done"><div>Under Capabilities tick only <strong>App Groups</strong>
+  → Continue → Register. Then open it again → <strong>App Groups</strong> → <strong>Configure</strong> → tick
+  <code>group.com.vegukin.muslimVegukin</code> → Save.
+  <p>The widget reads the prayer times the app leaves in that group.</p></div></li>
+</ol>
+
 <h3>The app in App Store Connect</h3>
 <div class="where">appstoreconnect.apple.com → Apps → + → New App</div>
 <ol class="steps">
@@ -408,9 +421,13 @@ profile</strong> (which app it is and what it may do). Codemagic keeps both and 
   Connect</strong> → Continue. App ID <code>com.vegukin.muslimVegukin</code> → Continue.</div></li>
 <li><input type="checkbox" class="tick" id="p7-4" aria-label="Done"><div>Certificate: the one Codemagic just made (Apple
   Distribution, today's date) → Continue. Name <code>Muslim Vegukin App Store</code> → Generate. No need to download it.</div></li>
+<li><input type="checkbox" class="tick" id="p7-4a" aria-label="Done"><div>The same again for the widget: Profiles → + →
+  App Store Connect → App ID <code>com.vegukin.muslimVegukin.PrayerWidget</code> → the same certificate → name
+  <code>Muslim Vegukin Widget App Store</code> → Generate.</div></li>
 <li><input type="checkbox" class="tick" id="p7-5" aria-label="Done"><div>Back in Codemagic → Code signing identities →
   <strong>iOS provisioning profiles</strong> → <strong>Fetch profiles</strong> → choose the key → tick
-  <strong>Muslim Vegukin App Store</strong> → Download selected.</div></li>
+  <strong>both</strong> profiles → Download selected.
+  <p>Codemagic matches each profile to its part of the app by the bundle ID.</p></div></li>
 </ol>
 </section>
 
@@ -505,8 +522,9 @@ by itself.</div>
 <details><summary>"Integration … not found" or "No App Store Connect API key"</summary><div>The key's name in Codemagic must be
   exactly <code>Vegukin App Store Connect</code> (phase 6). Rename it there, or tell me the name you used.</div></details>
 <details><summary>"No matching profiles found" or "doesn't include … App Groups / aps-environment"</summary><div>The App ID is
-  missing a capability, or the profile was made before you ticked it. Check phase 5 (App Groups configured, Push
-  Notifications on), then make a new profile and fetch it again (phase 7).</div></details>
+  missing a capability, or the profile was made before you ticked it. Check phase 5 (App Groups configured on both IDs,
+  Push Notifications on the app's), then make a new profile and fetch it again (phase 7). If the message names
+  <code>PrayerWidget</code>, it's the widget's ID or profile.</div></details>
 <details><summary>"The bundle version must be higher than the previously uploaded version"</summary><div>Something was uploaded
   outside Codemagic with a higher build number. Start the workflow again; if it repeats, tell me.</div></details>
 <details><summary>The free minutes ran out</summary><div>They come back at the start of each month. Run the free check only
