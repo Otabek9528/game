@@ -2,8 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:muslim_vegukin/core/account.dart';
 import 'package:muslim_vegukin/core/app_language.dart';
+import 'package:muslim_vegukin/core/push_reports.dart';
 import 'package:muslim_vegukin/features/account/account_screen.dart';
 import 'package:muslim_vegukin/features/account/inbox_message.dart';
 import 'package:muslim_vegukin/features/account/inbox_screen.dart';
@@ -564,6 +567,45 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(InboxMessageScreen), findsOneWidget);
       expect(find.textContaining('Eid prayer at 7:00.', findRichText: true), findsOneWidget);
+    });
+
+    testWidgets('a campaign message: formatted, opens whole even with a section, says it was read and clicked',
+        (tester) async {
+      final reported = <String>[];
+      pushReports = PushReports(
+        retryAfter: Duration.zero,
+        client: MockClient((r) async {
+          reported.add(r.body);
+          return http.Response('{"success": true}', 200);
+        }),
+      );
+      addTearDown(() => pushReports = PushReports());
+      final app = TestApp(language: 'en');
+      await app.launch(tester);
+      const data = {
+        'kind': 'campaign',
+        'c': '7',
+        'd': '41',
+        'k': 'key-41',
+        'url': 'https://vegukin-twa.pages.dev/pages/places/places.html?type=mosque',
+      };
+      final item = app.accounts.alert(app.account.user!.id, 'Jummah',
+          body: 'Juma muborak', text: 'Juma muborak. Map (https://x.org/map)',
+          html: '<b>Juma</b> muborak. <a href="https://x.org/map">Map</a>', data: data);
+      app.push.open({...data, 'inbox_id': '${item.id}'});
+      await tester.pumpAndSettle();
+      expect(find.byType(InboxMessageScreen), findsOneWidget, reason: 'the message, not the section');
+      expect(find.text('Open Mosques'), findsOneWidget);
+      expect(find.textContaining('muborak', findRichText: true), findsOneWidget);
+      expect(find.textContaining('https://x.org', findRichText: true), findsNothing, reason: 'the link has its words');
+      tapSpan(tester, 'Map');
+      await tester.pumpAndSettle();
+      expect(app.links.last, Uri.parse('https://x.org/map'));
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      expect(reported, [
+        '{"d":41,"k":"key-41","e":"read"}',
+        '{"d":41,"k":"key-41","e":"clicked","link":"https://x.org/map"}',
+      ]);
     });
 
     testWidgets('one arriving while the app is open is counted', (tester) async {

@@ -5,6 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'push_reports.dart';
+
 /// A notification from the server: what it said, and what to open.
 @immutable
 class PushMessage {
@@ -37,6 +39,12 @@ abstract interface class PushService {
   /// "alerts" channel is muted: allowed, but nothing would show.
   Future<bool> isAllowed();
 }
+
+/// A campaign message reached this phone while the app was in the
+/// background or closed (Android runs this in its own isolate; iOS can't).
+@pragma('vm:entry-point')
+Future<void> pushArrivedInBackground(RemoteMessage message) =>
+    pushReports.send({for (final e in message.data.entries) e.key: '${e.value}'}, PushEvent.received);
 
 /// The test notification's data: it says it arrived (see AccountController).
 bool isTestPush(PushMessage message) => message.data['kind'] == 'test';
@@ -95,12 +103,22 @@ class FirebasePushService implements PushService {
   /// looks like (and that the channel isn't muted).
   static void _arrived(RemoteMessage m, PushArrived onForeground) {
     final message = _message(m);
+    unawaited(pushReports.send(message.data, PushEvent.received));
     if (isTestPush(message)) {
       unawaited(
         _alerts.invokeMethod<void>('show', {'title': message.title, 'body': message.body}).catchError((Object _) {}),
       );
     }
     onForeground(message);
+  }
+
+  static bool _backgroundSet = false;
+
+  /// Its notification was tapped.
+  static void _opened(RemoteMessage m, PushOpened onOpen) {
+    final message = _message(m);
+    unawaited(pushReports.send(message.data, PushEvent.opened));
+    onOpen(message);
   }
 
   static PushMessage _message(RemoteMessage m) => PushMessage(
@@ -136,13 +154,18 @@ class FirebasePushService implements PushService {
         // ignore: deprecated_member_use
         ..add(messaging.onTokenRefresh.listen(onToken))
         ..add(FirebaseMessaging.onMessage.listen((m) => _arrived(m, onForeground)))
-        ..add(FirebaseMessaging.onMessageOpenedApp.listen((m) => onOpen(_message(m))));
+        ..add(FirebaseMessaging.onMessageOpenedApp.listen((m) => _opened(m, onOpen)));
       // ignore: deprecated_member_use
       final token = await messaging.getToken();
       if (token != null) onToken(token);
       // Opened by tapping a notification while the app was closed.
       final initial = await messaging.getInitialMessage();
-      if (initial != null) onOpen(_message(initial));
+      if (initial != null) _opened(initial, onOpen);
+      // So a campaign message can say it arrived while the app was closed.
+      if (defaultTargetPlatform == TargetPlatform.android && !_backgroundSet) {
+        FirebaseMessaging.onBackgroundMessage(pushArrivedInBackground);
+        _backgroundSet = true;
+      }
       return allowed;
     } catch (e) {
       // No Google Play services, or no network for the first token: the app

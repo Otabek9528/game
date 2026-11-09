@@ -1008,8 +1008,10 @@ class FakeAccounts implements AccountSource {
     List<String> images = const [],
     Map<String, String> data = const {},
     DateTime? at,
+    String? html,
   }) {
-    final item = InboxItem(id: ++_alerts, title: title, body: body, text: text, images: images, data: data, at: at ?? testNow);
+    final item = InboxItem(
+        id: ++_alerts, title: title, body: body, text: text, images: images, data: data, at: at ?? testNow, html: html);
     (inboxes[userId] ??= []).add(item);
     return item;
   }

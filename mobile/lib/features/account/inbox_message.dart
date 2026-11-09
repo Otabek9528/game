@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -5,14 +7,18 @@ import 'package:intl/intl.dart';
 import '../../app_services.dart';
 import '../../core/account.dart';
 import '../../core/app_language.dart';
+import '../../core/push_reports.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/feature_catalog.dart';
 import '../home/sections.dart';
 import '../qna/qna_parts.dart';
+import 'rich_message.dart';
 
 void openInboxMessage(BuildContext context, AppServices services, InboxItem item) {
   HapticFeedback.selectionClick();
+  // A campaign message tells the admin it was read (nothing about who).
+  unawaited(pushReports.send(item.data, PushEvent.read));
   Navigator.of(context).push(
     MaterialPageRoute<void>(builder: (_) => InboxMessageScreen(services: services, item: item)),
   );
@@ -26,6 +32,11 @@ class InboxMessageScreen extends StatelessWidget {
 
   final AppServices services;
   final InboxItem item;
+
+  void _openLink(Uri uri) {
+    unawaited(pushReports.send(item.data, PushEvent.clicked, link: uri.toString()));
+    unawaited(services.openLink(uri));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,13 +88,20 @@ class InboxMessageScreen extends StatelessWidget {
             const SizedBox(height: 16),
             InboxPhotos(urls: item.images),
           ],
-          if (item.text.isNotEmpty) ...[
+          if (item.html case final html?) ...[
+            const SizedBox(height: 16),
+            RichMessage(
+              html,
+              style: TextStyle(fontSize: 16, height: 1.55, color: p.ink),
+              onLink: (uri) => _openLink(uri),
+            ),
+          ] else if (item.text.isNotEmpty) ...[
             const SizedBox(height: 16),
             LinkedText(
               item.text,
               phones: true,
               style: TextStyle(fontSize: 16, height: 1.55, color: p.ink),
-              onLink: services.openLink,
+              onLink: (uri) => _openLink(uri),
             ),
           ],
           if (target != null) ...[

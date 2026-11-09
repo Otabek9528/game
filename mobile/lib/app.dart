@@ -74,7 +74,10 @@ class _VegukinAppState extends State<VegukinApp> {
     final feature = featureForPush(message.data);
     final inboxId = int.tryParse(message.data['inbox_id'] ?? '');
     final context = _navigator.currentContext;
-    if (feature == null && inboxId != null) {
+    // The admin's messages open whole, formatted, with their section as a
+    // button: the message is the point, not the section.
+    final campaign = message.data['kind'] == 'campaign';
+    if ((feature == null || campaign) && inboxId != null) {
       unawaited(_openMessage(inboxId));
       return;
     }

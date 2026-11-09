@@ -10,6 +10,7 @@ import 'config.dart';
 import 'google_auth.dart';
 import 'key_value_store.dart';
 import 'push.dart';
+import 'push_reports.dart';
 
 /// Who the app is on the server (app_accounts.py). Every install has one from
 /// the first launch; [signedIn] once a Google, WhatsApp or Telegram identity
@@ -63,6 +64,7 @@ class InboxItem {
     this.images = const [],
     this.data = const {},
     required this.at,
+    this.html,
   }) : text = text ?? body;
 
   final int id;
@@ -81,6 +83,10 @@ class InboxItem {
   final Map<String, String> data;
   final DateTime at;
 
+  /// The admin's campaign messages, formatted (see RichMessage); [text] is
+  /// the same words plain.
+  final String? html;
+
   static InboxItem? fromJson(Object? json) {
     if (json is! Map<String, dynamic>) return null;
     final id = json['id'];
@@ -96,6 +102,7 @@ class InboxItem {
       images: [if (images is List) for (final url in images) if (url is String && url.startsWith('https://')) url],
       data: data is Map ? {for (final e in data.entries) '${e.key}': '${e.value}'} : const {},
       at: at.toLocal(),
+      html: switch (json['html']) { final String h when h.trim().isNotEmpty => h, _ => null },
     );
   }
 }
@@ -203,7 +210,12 @@ class HttpAccountSource implements AccountSource {
   @override
   Future<(String, AppUser)> hello({required String lang, String? pushToken}) async {
     final json = await _call('POST', 'api/app/hello',
-        body: {'platform': Platform.isIOS ? 'ios' : 'android', 'lang': lang, 'pushToken': ?pushToken});
+        body: {
+          'platform': Platform.isIOS ? 'ios' : 'android',
+          'lang': lang,
+          'pushToken': ?pushToken,
+          'reports': pushReportsVersion,
+        });
     final token = json['token'];
     if (token is! String || token.isEmpty) throw const AccountException('bad_response');
     return (token, _user(json));
@@ -214,7 +226,8 @@ class HttpAccountSource implements AccountSource {
 
   @override
   Future<void> updateDevice(String token, {String? pushToken, String? lang}) =>
-      _call('PUT', 'api/app/me/device', token: token, body: {'pushToken': ?pushToken, 'lang': ?lang});
+      _call('PUT', 'api/app/me/device', token: token,
+          body: {'pushToken': ?pushToken, 'lang': ?lang, 'reports': pushReportsVersion});
 
   @override
   Future<AppUser> signInWithGoogle(String token, String idToken) async =>
