@@ -35,10 +35,22 @@ xcrun simctl location "$UDID" set 37.3219,126.8309 || true
 xcrun simctl install "$UDID" "$APP"
 xcrun simctl privacy "$UDID" grant location "$BUNDLE" || true
 
+# The app registers itself with the API the moment it starts: every check run
+# was a new "person" in the push panel and the stats. The check is about the
+# app starting, not the server, so the API is unreachable from this Mac (the
+# simulator uses its network). Prayer times and photos come from other hosts.
+API_HOST=vegukin-api.duckdns.org
+if echo "127.0.0.1 $API_HOST" | sudo tee -a /etc/hosts >/dev/null; then
+  sudo dscacheutil -flushcache || true
+  sudo killall -HUP mDNSResponder || true
+  echo "$API_HOST blocked for the check"
+else
+  echo "WARNING: could not block $API_HOST; this run registers as a user"
+fi
+
 # Answers to what the first launch asks, which nobody is there to tap: the
 # language (Uzbek), and the camera and notification prompts as already shown.
-# Location is granted above, so the app finds Ansan by itself. Every check run
-# is the same install (-1), so they count as one test user in the stats.
+# Location is granted above, so the app finds Ansan by itself.
 # Written as a file, before the app has ever run, so no preferences cache holds
 # an older copy.
 DATA=$(xcrun simctl get_app_container "$UDID" "$BUNDLE" data)
