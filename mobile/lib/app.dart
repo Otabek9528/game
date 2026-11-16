@@ -6,6 +6,7 @@ import 'app_services.dart';
 import 'core/app_language.dart';
 import 'core/push.dart';
 import 'core/theme.dart';
+import 'core/tokens.dart';
 import 'features/account/inbox_message.dart';
 import 'features/account/inbox_screen.dart';
 import 'features/home/feature_catalog.dart';
@@ -138,7 +139,12 @@ class _VegukinAppState extends State<VegukinApp> {
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         // At launch, over whichever screen comes first while it loads.
-        builder: (context, child) => Opening(child: child!),
+        // Text follows the phone's font setting up to a point: past it rows
+        // and cards lose their words, which is worse than smaller letters.
+        builder: (context, child) => MediaQuery.withClampedTextScaling(
+          maxScaleFactor: TextGrowth.app,
+          child: Opening(child: child!),
+        ),
         home: _needsLanguage
             ? LanguageScreen(services: widget.services, initialLanguage: _guess)
             : HomeScreen(services: widget.services),
