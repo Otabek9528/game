@@ -73,7 +73,10 @@ class _CarsScreenState extends State<CarsScreen> {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     return PopScope(
-      canPop: _tab == 0,
+      // Android's back button returns to the first tab before it leaves.
+      // An iPhone has no back button: holding the page here only made its
+      // swipe-back do nothing, so there back always leaves.
+      canPop: _tab == 0 || Theme.of(context).platform == TargetPlatform.iOS,
       onPopInvokedWithResult: (popped, _) {
         if (!popped) _go(0);
       },

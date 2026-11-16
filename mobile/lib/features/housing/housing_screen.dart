@@ -69,7 +69,9 @@ class _HousingScreenState extends State<HousingScreen> {
     final s = AppLocalizations.of(context);
     final p = VegukinPalette.of(context);
     return PopScope(
-      canPop: _tab == 0,
+      // As in Cars: Android's back button returns to the first tab first;
+      // on an iPhone back (the swipe) always leaves.
+      canPop: _tab == 0 || Theme.of(context).platform == TargetPlatform.iOS,
       onPopInvokedWithResult: (popped, _) {
         if (!popped) setState(() => _tab = 0);
       },

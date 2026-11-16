@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muslim_vegukin/features/housing/housing_parts.dart';
@@ -23,6 +24,27 @@ Future<void> signIn(WidgetTester tester, TestApp app) async {
 }
 
 void main() {
+  testWidgets('back from another tab: the board on Android, out of housing on an iPhone', (tester) async {
+    await openHousing(tester);
+    await tester.tap(find.byType(NavigationDestination).at(2));
+    await tester.pumpAndSettle();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(HousingScreen), findsOneWidget);
+    expect(tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex, 0);
+  });
+
+  testWidgets('back from another tab on an iPhone: out of housing at once', (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await openHousing(tester);
+    await tester.tap(find.byType(NavigationDestination).at(2));
+    await tester.pumpAndSettle();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(HousingScreen), findsNothing);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
   test('addresses split as the web page does; numbers written as in Korea', () {
     expect(splitAddress('경기도 안산시 단원구 원곡동 123'), ('경기도 · 안산시 단원구', '원곡동 123'));
     expect(splitAddress('서울 관악구 신림동'), ('서울 · 관악구', '신림동'));

@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -244,6 +244,31 @@ void main() {
       await tester.pumpAndSettle();
       expect(app.cars.asked.last, 'search ');
       expect(find.text('8 results'), findsOneWidget);
+    });
+
+    // Android's back button; an iPhone's swipe from the edge asks the same.
+    testWidgets('back from another tab on Android: the first tab, then out', (tester) async {
+      await openCars(tester);
+      await tester.tap(find.byType(NavigationDestination).at(1));
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byType(CarsScreen), findsOneWidget);
+      expect(tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex, 0);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byType(CarsScreen), findsNothing);
+    });
+
+    testWidgets('back from another tab on an iPhone: out of the market at once', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      await openCars(tester);
+      await tester.tap(find.byType(NavigationDestination).at(1));
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byType(CarsScreen), findsNothing, reason: 'the swipe-back did nothing here');
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('offline: said so, and tried again', (tester) async {
