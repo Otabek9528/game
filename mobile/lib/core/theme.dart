@@ -72,7 +72,8 @@ class VegukinPalette extends ThemeExtension<VegukinPalette> {
     hairlineStrong: Color(0xFFDBD4C9),
     ink: Color(0xFF292524),
     inkSoft: Color(0xFF57534E),
-    inkMuted: Color(0xFF78716C),
+    // 5.1 : 1 on the page, 4.7 on a badge (was 4.49 and 4.15).
+    inkMuted: Color(0xFF6F6863),
     accent: Brand.emerald700,
     action: Brand.emerald700,
     badge: Color(0xFFF2EEE8),
@@ -89,9 +90,11 @@ class VegukinPalette extends ThemeExtension<VegukinPalette> {
     hairlineStrong: Color(0x29FFFFFF),
     ink: Color(0xFFE6E1DB),
     inkSoft: Color(0xFFA49D95),
-    inkMuted: Color(0xFF7D766E),
+    // 5.9 : 1 on the page, 5.3 on a card (was 4.17 and 3.74).
+    inkMuted: Color(0xFF968F87),
     accent: Brand.emerald400,
-    action: Brand.emerald600,
+    // White on it is 5.5 : 1 (on emerald600 it was 3.8).
+    action: Brand.emerald700,
     badge: Color(0xFF2A2623),
     gold: Brand.gold400,
     goldSoft: Brand.gold300,
@@ -165,6 +168,20 @@ abstract final class VegukinTheme {
           height: 1.2,
         ),
         titleLarge: display(base.textTheme.titleLarge),
+      ),
+      // Five destinations across 360 dp leave a label 72: Material's 12 with
+      // its wide letter spacing broke "Уведомления" in the middle of the word.
+      navigationBarTheme: NavigationBarThemeData(
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return base.textTheme.labelMedium?.copyWith(
+            fontSize: 11.5,
+            letterSpacing: 0,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected ? p.ink : p.inkSoft,
+            overflow: TextOverflow.ellipsis,
+          );
+        }),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
