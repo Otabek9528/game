@@ -140,9 +140,9 @@ class HkPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final colours = hkTone(context, tone);
     return DecoratedBox(
-      decoration: BoxDecoration(color: colours.background, borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(color: colours.background, borderRadius: BorderRadius.circular(14)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -150,9 +150,12 @@ class HkPill extends StatelessWidget {
             Flexible(
               child: Text(
                 text,
-                maxLines: 1,
+                // What it says is the point ("8 free days in your dates",
+                // "Nearest free day: Monday, 19 October"): a second line
+                // rather than "…".
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: colours.ink),
+                style: TextStyle(fontSize: 12.5, height: 1.25, fontWeight: FontWeight.w700, color: colours.ink),
               ),
             ),
           ],

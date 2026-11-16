@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
+import '../../core/widgets/tap_pad.dart';
 import '../../l10n/app_localizations.dart';
 import '../support/support_parts.dart';
 import 'business_data.dart';
@@ -446,23 +448,31 @@ class _ContactButton extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Two of these share the screen's width: the number and
+                    // what the tap does get smaller rather than lose their
+                    // ends ("010-1234-…" was all one saw of a phone number).
                     if (value.isNotEmpty)
+                      FitLine(value, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: ink)),
+                    if (value.isEmpty)
                       Text(
-                        value,
-                        maxLines: 1,
+                        linkVerb(s, link.kind),
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: ink),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: primary ? Colors.white.withValues(alpha: 0.85) : p.inkSoft,
+                        ),
+                      )
+                    else
+                      FitLine(
+                        linkVerb(s, link.kind),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: primary ? Colors.white.withValues(alpha: 0.85) : p.inkSoft,
+                        ),
                       ),
-                    Text(
-                      linkVerb(s, link.kind),
-                      maxLines: value.isEmpty ? 2 : 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: value.isEmpty ? 14 : 12,
-                        fontWeight: value.isEmpty ? FontWeight.w700 : FontWeight.w500,
-                        color: primary ? Colors.white.withValues(alpha: 0.85) : p.inkSoft,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -622,11 +632,8 @@ class _BizDescriptionState extends State<BizDescription> {
               ),
             ),
             if (line.address case final address?)
-              Padding(
-                padding: const EdgeInsets.only(top: 6, bottom: 4),
-                child: Wrap(
+              Wrap(
                   spacing: 6,
-                  runSpacing: 6,
                   children: [
                     _AddressButton(
                       badge: Icon(Icons.copy_rounded, size: 14, color: p.inkSoft),
@@ -644,7 +651,6 @@ class _BizDescriptionState extends State<BizDescription> {
                       onTap: () => widget.onLink(kakaoMap(address)),
                     ),
                   ],
-                ),
               ),
             const SizedBox(height: 2),
           ],
@@ -713,21 +719,24 @@ class _AddressButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    return Material(
-      color: p.cardSelected,
-      shape: const StadiumBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const StadiumBorder(),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              badge,
-              const SizedBox(width: 6),
-              Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink)),
-            ],
+    // The pill is 30 high; a finger gets 48.
+    return TapPad(
+      child: Material(
+        color: p.cardSelected,
+        shape: const StadiumBorder(),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const StadiumBorder(),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                badge,
+                const SizedBox(width: 6),
+                Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink)),
+              ],
+            ),
           ),
         ),
       ),
@@ -748,7 +757,8 @@ class _MapBadge extends StatelessWidget {
         height: 16,
         alignment: Alignment.center,
         decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(4)),
-        child: Text(letter, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: ink)),
+        // A 16-pt badge: its letter is its size, whatever the font setting.
+        child: Text(letter, textScaler: TextScaler.noScaling, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: ink)),
       );
 }
 

@@ -725,7 +725,13 @@ class _AddressRow extends StatelessWidget {
             child: Text(s.hkAddressCardTitle, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink)),
           ),
           const SizedBox(width: 8),
-          Text(s.hkAddressTitle, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: p.accent)),
+          Flexible(
+            child: Text(
+              s.hkAddressTitle,
+              textAlign: TextAlign.end,
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: p.accent),
+            ),
+          ),
           Icon(Icons.chevron_right_rounded, color: p.accent),
         ],
       ),
@@ -770,7 +776,7 @@ class OfficeRow extends StatelessWidget {
                 const SizedBox(height: 1),
                 Text(
                   [kind, if (office.desks.isNotEmpty) s.hkCounters(office.desks.length)].join(' · '),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 13, color: p.inkSoft),
                 ),

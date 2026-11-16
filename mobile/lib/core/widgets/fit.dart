@@ -17,7 +17,9 @@ class TightText extends StatelessWidget {
 
 /// One line that gets smaller instead of being cut when it is a little too
 /// long for its place: a page's title, a button's label, a phone number.
-/// Never smaller than [floor] of its size; past that it is cut as before.
+/// Never smaller than [floor] of the size it was designed at (so with the
+/// phone's font set larger it may give back more of that growth); past that
+/// it is cut as before.
 class FitLine extends StatelessWidget {
   const FitLine(this.text, {super.key, this.style, this.alignment = AlignmentDirectional.centerStart, this.floor = 0.72});
 
@@ -41,8 +43,10 @@ class FitLine extends StatelessWidget {
         final wide = painter.width;
         painter.dispose();
         final room = box.maxWidth;
-        final shrink = !room.isFinite || wide <= room ? 1.0 : (room / wide).clamp(floor, 1.0);
         final size = style.fontSize;
+        final grown = size == null ? 1.0 : scaler.scale(size) / size;
+        final least = (floor / grown).clamp(0.0, 1.0);
+        final shrink = !room.isFinite || wide <= room ? 1.0 : (room / wide).clamp(least, 1.0);
         return Align(
           alignment: alignment,
           widthFactor: 1,

@@ -190,7 +190,8 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
             // Free days: book them; none: watch for one.
-            child: free.isEmpty
+            // Two buttons in one row: their labels grow to 115 % only.
+            child: TightText(max: 1.15, child: free.isEmpty
                 ? FilledButton.icon(
                     onPressed: _watch,
                     icon: const Icon(Icons.notifications_active_outlined),
@@ -201,18 +202,23 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
                       Expanded(
                         child: FilledButton.icon(
                           onPressed: () => _kit.services.openLink(Uri.parse('https://www.hikorea.go.kr/')),
+                          // Beside "Watch" it has half a screen: less padding
+                          // and a label that shrinks, not "HiKorea’da bron …".
+                          style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12)),
                           icon: const Icon(Icons.open_in_new_rounded),
-                          label: Text(s.hkBook, maxLines: 1, overflow: TextOverflow.ellipsis),
+                          label: FitLine(s.hkBook, alignment: Alignment.center),
                         ),
                       ),
                       const SizedBox(width: 10),
                       OutlinedButton.icon(
                         onPressed: _watch,
+                        style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 14)),
                         icon: const Icon(Icons.notifications_active_outlined),
                         label: Text(s.hkWatchShort),
                       ),
                     ],
                   ),
+            ),
           ),
         ),
       ),
