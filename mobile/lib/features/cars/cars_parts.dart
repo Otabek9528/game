@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'cars_kit.dart';
 import 'cars_models.dart';
@@ -193,9 +194,12 @@ class CarCard extends StatelessWidget {
           HapticFeedback.lightImpact();
           onTap();
         },
-        child: SizedBox(
-          height: 138,
-          child: Row(
+        // As tall as its five lines of text need, 138 at least: with a
+        // bigger font, or specs on two lines, they pushed each other out.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 138),
+          child: IntrinsicHeight(
+            child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(
@@ -203,7 +207,8 @@ class CarCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    CarPhoto(car: car, width: 300),
+                    // Filling, not sizing: the text decides the card's height.
+                    Positioned.fill(child: CarPhoto(car: car, width: 300)),
                     Positioned(left: 7, top: 7, child: _StatusBadge(sold: car.sold)),
                     if (cheap)
                       Positioned(
@@ -247,16 +252,19 @@ class CarCard extends StatelessWidget {
                             const SizedBox(width: 6),
                           ],
                           Flexible(
-                            child: Text(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Text(
                               price == null ? s.carNoPrice : won(price),
                               maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: price == null ? 14 : 18,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -0.3,
                                 color: price == null ? p.inkMuted : car.sold ? dealColour(context, null, sold: true) : p.ink,
                                 decoration: car.sold ? TextDecoration.lineThrough : null,
+                              ),
                               ),
                             ),
                           ),
@@ -283,7 +291,8 @@ class CarCard extends StatelessWidget {
                       if (specs.isNotEmpty)
                         Text(
                           specs.join('  ·  '),
-                          maxLines: 1,
+                          // Russian's "Автомат · Газ (LPG)" needs the second line.
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 12.5, color: p.inkSoft),
                         ),
@@ -312,6 +321,7 @@ class CarCard extends StatelessWidget {
                 ),
               ),
             ],
+            ),
           ),
         ),
       ),
@@ -347,7 +357,11 @@ class _Pill extends StatelessWidget {
         decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-          child: Text(text, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: ink)),
+          // Over a photo 128 wide, beside the heart: it can't grow far.
+          child: TightText(
+            max: 1.15,
+            child: Text(text, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: ink)),
+          ),
         ),
       );
 }

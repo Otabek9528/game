@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/tokens.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'car_detail.dart';
 import 'cars_alerts.dart';
@@ -89,7 +91,7 @@ class _CarsScreenState extends State<CarsScreen> {
         ),
         bottomNavigationBar: ListenableBuilder(
           listenable: _kit,
-          builder: (context, _) => NavigationBar(
+          builder: (context, _) => TightText(max: 1, child: NavigationBar(
             selectedIndex: _tab,
             onDestinationSelected: _go,
             backgroundColor: p.card,
@@ -133,7 +135,7 @@ class _CarsScreenState extends State<CarsScreen> {
                 label: s.carTabAlerts,
               ),
             ],
-          ),
+          )),
         ),
       ),
     );
@@ -236,7 +238,8 @@ class _BrowseTabState extends State<_BrowseTab> with AutomaticKeepAliveClientMix
                 title: pick == null ? s.carMarket : [pick.brand, ?pick.model].join(' '),
                 leading: pick == null ? null : BrandLogo(pick.brand, size: 38),
                 subtitle: cars == null
-                    ? Text(s.carLoading)
+                    // Not "loading" above a message that it failed.
+                    ? (_error != null ? null : Text(s.carLoading))
                     : pick == null
                         ? Text(s.carListings('${_count ?? cars.length}'))
                         : Text(s.carAvailableSold('${stats?.countAvailable ?? 0}', '${stats?.countSold ?? 0}')),
@@ -248,16 +251,19 @@ class _BrowseTabState extends State<_BrowseTab> with AutomaticKeepAliveClientMix
                   children: [
                     if (stats != null) ...[MarketSummary(stats: stats), const SizedBox(height: 14)],
                     SizedBox(
-                      height: 38,
+                      // The chips' row is as tall as their text, which stops growing at 130 %.
+                      height: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: TextGrowth.tight).scale(38),
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         clipBehavior: Clip.none,
                         itemCount: sorts.length,
                         separatorBuilder: (_, _) => const SizedBox(width: 8),
-                        itemBuilder: (context, i) => CarChip(
-                          label: sorts[i].$2,
-                          on: _sort == sorts[i].$1,
-                          onTap: () => setState(() => _sort = sorts[i].$1),
+                        itemBuilder: (context, i) => TightText(
+                          child: CarChip(
+                            label: sorts[i].$2,
+                            on: _sort == sorts[i].$1,
+                            onTap: () => setState(() => _sort = sorts[i].$1),
+                          ),
                         ),
                       ),
                     ),
@@ -451,13 +457,15 @@ class _SearchTabState extends State<_SearchTab> with AutomaticKeepAliveClientMix
                     _search();
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 24, 4, 12),
-                  child: Text(
-                    found == null ? s.carLoading : s.carResults('${found.count}'),
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: p.ink),
+                // Not "loading" above a message that it failed.
+                if (_error == null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 24, 4, 12),
+                    child: Text(
+                      found == null ? s.carLoading : s.carResults('${found.count}'),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: p.ink),
+                    ),
                   ),
-                ),
                 if (_error != null)
                   CarsMessage(emoji: '⚠️', title: s.carLoadFailed, body: s.carCheckInternet, action: s.retry, onAction: _search)
                 else if (found == null)

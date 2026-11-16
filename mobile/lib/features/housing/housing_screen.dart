@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../account/account_screen.dart';
 import '../cars/cars_parts.dart' show CarsTabBar, SignInCard;
@@ -85,7 +86,7 @@ class _HousingScreenState extends State<HousingScreen> {
               TickerMode(enabled: i == _tab, child: tab),
           ],
         ),
-        bottomNavigationBar: NavigationBar(
+        bottomNavigationBar: TightText(max: 1, child: NavigationBar(
           selectedIndex: _tab,
           backgroundColor: p.card,
           indicatorColor: p.cardSelected,
@@ -121,7 +122,7 @@ class _HousingScreenState extends State<HousingScreen> {
               label: s.hsTabPost,
             ),
           ],
-        ),
+        )),
       ),
     );
   }

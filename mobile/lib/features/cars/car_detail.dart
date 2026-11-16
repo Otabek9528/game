@@ -468,10 +468,12 @@ class _Section extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2, color: p.ink)),
+              Flexible(
+                child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2, color: p.ink)),
+              ),
               if (subtitle != null) ...[
                 const SizedBox(width: 8),
-                Text(subtitle!, style: TextStyle(fontSize: 13, color: p.inkMuted)),
+                Flexible(child: Text(subtitle!, style: TextStyle(fontSize: 13, color: p.inkMuted))),
               ],
             ],
           ),
