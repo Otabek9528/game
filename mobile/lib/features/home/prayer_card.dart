@@ -396,11 +396,16 @@ class _Cell extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: nameColor),
+          // Six names share the card's width: one that is too long for its
+          // sixth gets smaller, as its time does, instead of losing its end
+          // ("Фад…", "Восх…" with larger text).
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              name,
+              maxLines: 1,
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: nameColor),
+            ),
           ),
           const SizedBox(height: 2),
           FittedBox(

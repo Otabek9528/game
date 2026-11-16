@@ -28,7 +28,7 @@ Future<TestApp> openScanner(WidgetTester tester, {String language = 'uz', TestAp
   addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
   app ??= TestApp(language: language);
   await app.launch(tester);
-  final tile = language == 'uz' ? 'Mahsulot tarkibini tekshirish' : 'Ingredient check';
+  final tile = language == 'uz' ? 'Tarkib tekshirish' : 'Ingredient check';
   await tester.scrollUntilVisible(find.text(tile), 200);
   await tester.drag(find.byType(CustomScrollView), const Offset(0, -200));
   await tester.pumpAndSettle();

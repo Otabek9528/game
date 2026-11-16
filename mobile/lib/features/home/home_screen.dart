@@ -8,6 +8,8 @@ import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/new_badges.dart';
 import '../../core/theme.dart';
+import '../../core/tokens.dart';
+import '../../core/widgets/fit.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayers/prayers_screen.dart';
@@ -159,7 +161,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final p = VegukinPalette.of(context);
     final language = _services.locale.language ?? AppLanguage.uz;
     final features = featuresFor(language);
-    final scaler = MediaQuery.textScalerOf(context);
+    // A tile is a third of the screen wide: its label stops growing at 130 %,
+    // where two-word names still fit their two lines.
+    final scaler = MediaQuery.textScalerOf(context).clamp(maxScaleFactor: TextGrowth.tight);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
@@ -230,11 +234,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           final feature = features[i];
                           return ListenableBuilder(
                             listenable: _badges,
-                            builder: (context, _) => _FeatureTile(
-                              emoji: feature.emoji,
-                              label: feature.label(s),
-                              isNew: _badges.isNew(feature),
-                              onTap: () => _open(feature),
+                            builder: (context, _) => TightText(
+                              child: _FeatureTile(
+                                emoji: feature.emoji,
+                                label: feature.label(s),
+                                isNew: _badges.isNew(feature),
+                                onTap: () => _open(feature),
+                              ),
                             ),
                           );
                         },
@@ -353,24 +359,30 @@ class _Header extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 8, 10),
-          child: Row(
+          padding: const EdgeInsets.fromLTRB(12, 6, 8, 8),
+          // The bar is chrome: its words stop growing before they collide.
+          child: TightText(
+            max: 1.15,
+            child: Row(
             children: [
               const KhatamMark(size: 38, glow: false),
-              const SizedBox(width: 11),
-              // On a narrow phone the name takes two lines rather than
-              // losing its end.
+              const SizedBox(width: 9),
+              // The name is a mark, not a sentence: always its two words on
+              // two lines, smaller on a narrow phone, never broken mid-word.
               const Expanded(
-                child: Text(
-                  'Muslim Vegukin',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: Brand.displayFont,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20,
-                    height: 1.05,
-                    color: Colors.white,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    'Muslim\nVegukin',
+                    semanticsLabel: 'Muslim Vegukin',
+                    style: TextStyle(
+                      fontFamily: Brand.displayFont,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      height: 1.05,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -379,7 +391,8 @@ class _Header extends StatelessWidget {
               IconButton(
                 onPressed: onAccount,
                 tooltip: s.accountTitle,
-                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: _headerTarget,
                 icon: ListenableBuilder(
                   listenable: account,
                   builder: (context, _) => account.signedIn
@@ -388,15 +401,20 @@ class _Header extends StatelessWidget {
                 ),
               ),
               _ThemeButton(onTap: onTheme),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               _LanguageMenu(current: language, onSelected: onLanguage, tooltip: s.changeLanguage),
             ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+/// A header button's touch area. Four controls and the name share 360 dp:
+/// 44 wide is what fits (iOS's minimum; Android asks 48), 48 tall.
+const _headerTarget = BoxConstraints.tightFor(width: 44, height: tapTarget);
 
 /// The header's language button: a menu of the languages, each with its flag
 /// and its own name, the current one ticked.
@@ -624,12 +642,31 @@ class _FeatureTile extends StatelessWidget {
                             // A single long word with large text: a touch
                             // smaller rather than split ("Bildirishnomala / r").
                             ? FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: _labelStyle(p)))
-                            : Text(
-                                label,
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: _labelStyle(p),
+                            // Several words: two lines; if one word alone is
+                            // wider than the tile ("Иммиграционные"), all of
+                            // it a touch smaller rather than a word split.
+                            : LayoutBuilder(
+                                builder: (context, box) {
+                                  final style = _labelStyle(p);
+                                  var widest = 0.0;
+                                  for (final word in label.split(RegExp(r'[\s-]+'))) {
+                                    final painter = TextPainter(
+                                      text: TextSpan(text: word, style: style),
+                                      textDirection: Directionality.of(context),
+                                      textScaler: MediaQuery.textScalerOf(context),
+                                    )..layout();
+                                    if (painter.width > widest) widest = painter.width;
+                                    painter.dispose();
+                                  }
+                                  final shrink = widest <= box.maxWidth ? 1.0 : (box.maxWidth / widest).clamp(0.75, 1.0);
+                                  return Text(
+                                    label,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: shrink == 1 ? style : style.copyWith(fontSize: _labelSize * shrink * 0.97),
+                                  );
+                                },
                               ),
                       ),
                     ),
@@ -689,7 +726,8 @@ class _InboxButton extends StatelessWidget {
           child: IconButton(
             onPressed: onTap,
             tooltip: s.inboxTitle,
-            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: _headerTarget,
             icon: Badge(
               isLabelVisible: unread > 0,
               label: Text(unread > 9 ? '9+' : '$unread'),
@@ -718,14 +756,17 @@ class _ThemeButton extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return Tooltip(
       message: dark ? s.themeToDay : s.themeToNight,
-      child: Material(
-        color: Colors.white.withValues(alpha: 0.12),
-        shape: const CircleBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox.square(
-            dimension: 40,
+      // The disc stays 40; what answers a finger is the 44 × 48 around it.
+      child: InkResponse(
+        onTap: onTap,
+        radius: 24,
+        child: ConstrainedBox(
+          constraints: _headerTarget,
+          child: Center(
+            child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.12), shape: BoxShape.circle),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) => RotationTransition(
@@ -738,6 +779,7 @@ class _ThemeButton extends StatelessWidget {
                 size: 20,
                 color: dark ? Brand.gold300 : Colors.white,
               ),
+            ),
             ),
           ),
         ),

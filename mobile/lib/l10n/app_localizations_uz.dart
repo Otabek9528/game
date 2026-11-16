@@ -158,7 +158,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get featureQna => 'Zikr ahlidan so‘rang';
 
   @override
-  String get featureBarcode => 'Mahsulot tarkibini tekshirish';
+  String get featureBarcode => 'Tarkib tekshirish';
 
   @override
   String get featureHousing => 'Uy-joy e’lonlari';

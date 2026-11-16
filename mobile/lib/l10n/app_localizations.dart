@@ -379,7 +379,7 @@ abstract class AppLocalizations {
   /// No description provided for @featureBarcode.
   ///
   /// In uz, this message translates to:
-  /// **'Mahsulot tarkibini tekshirish'**
+  /// **'Tarkib tekshirish'**
   String get featureBarcode;
 
   /// No description provided for @featureHousing.
