@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayer/prayer_models.dart';
 import 'links_controller.dart';
@@ -250,7 +251,12 @@ class _LinksScreenState extends State<LinksScreen> {
 
     final header = <Widget>[
       if (inKorea)
-        Row(
+        // The two orders, then where "nearest" is measured from: on the
+        // same line when there is room, under them when there isn't (it
+        // read "Joylashuvingiz:…", and with larger text the row overflowed).
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          runSpacing: 2,
           children: [
             for (final (order, icon, label) in [
               (JobOrder.nearest, Icons.near_me_rounded, s.linksNearest),
@@ -273,13 +279,9 @@ class _LinksScreenState extends State<LinksScreen> {
               const SizedBox(width: 8),
             ],
             if (nearest && place?.city != null)
-              Expanded(
-                child: Text(
-                  s.linksYourPlace(place!.city!),
-                  textAlign: TextAlign.end,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12.5, color: p.inkMuted),
-                ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(s.linksYourPlace(place!.city!), style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
               ),
           ],
         )
@@ -589,7 +591,8 @@ class _Tabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    return SegmentedButton<LinksTab>(
+    return TightText(
+      child: SegmentedButton<LinksTab>(
       segments: [
         for (final (i, t) in LinksTab.values.indexed)
           ButtonSegment(
@@ -597,12 +600,12 @@ class _Tabs extends StatelessWidget {
             label: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // A third of the width each: a longer name ("Koreya
+                // hayoti") gets smaller instead of losing its end.
                 Flexible(
-                  child: Text(
-                    labels[i],
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(labels[i], maxLines: 1, style: const TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ),
                 if (counts[i] > 0) ...[
@@ -631,6 +634,7 @@ class _Tabs extends StatelessWidget {
         foregroundColor: p.inkSoft,
         backgroundColor: p.card,
         side: BorderSide(color: p.hairline),
+      ),
       ),
     );
   }

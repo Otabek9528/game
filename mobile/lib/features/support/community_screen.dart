@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import 'donation_screen.dart';
@@ -99,9 +100,8 @@ class CommunityScreen extends StatelessWidget {
                           const Icon(Icons.verified_rounded, size: 16, color: Brand.gold300),
                           const SizedBox(width: 6),
                           Flexible(
-                            child: Text(
+                            child: FitLine(
                               s.communityHeroTitle,
-                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
                             ),
                           ),
@@ -273,17 +273,18 @@ class CommunityScreen extends StatelessWidget {
                 color: p.card,
                 border: Border(top: BorderSide(color: p.hairline)),
               ),
-              child: Row(
+              // The invitation above its button: beside it, it had two
+              // short lines and lost its second half.
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: Text(
-                      s.communityCta,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12.5, height: 1.35, color: p.inkSoft),
-                    ),
+                  Text(
+                    s.communityCta,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12.5, height: 1.35, color: p.inkSoft),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(height: 8),
                   FilledButton.icon(
                     onPressed: _join,
                     icon: const Icon(Icons.send_rounded, size: 18),
@@ -351,12 +352,8 @@ class _Action extends StatelessWidget {
               const SizedBox(height: 10),
               Text(title, style: TextStyle(fontSize: 14, height: 1.3, fontWeight: FontWeight.w700, color: p.ink)),
               const SizedBox(height: 3),
-              Text(
-                body,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12.5, height: 1.35, color: p.inkSoft),
-              ),
+              // All of it: the card grows (three lines cut Russian mid-sentence).
+              Text(body, style: TextStyle(fontSize: 12.5, height: 1.35, color: p.inkSoft)),
             ],
           ),
         ),

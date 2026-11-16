@@ -349,12 +349,7 @@ class _Hero extends StatelessWidget {
                           const Icon(Icons.search_rounded, color: Brand.emerald700),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Text(
-                              s.qnaSearchHint,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 15, color: p.inkMuted),
-                            ),
+                            child: FitLine(s.qnaSearchHint, floor: 0.8, style: TextStyle(fontSize: 15, color: p.inkMuted)),
                           ),
                         ],
                       ),

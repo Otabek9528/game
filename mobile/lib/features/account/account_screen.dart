@@ -983,7 +983,8 @@ class _NavRow extends StatelessWidget {
                 child: switch (pill) {
                   _Pill.none => Text(
                     value,
-                    maxLines: 1,
+                    // "Hozircha xabar yo‘q" is a few points wider than its third.
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.end,
                     style: TextStyle(fontSize: 14, color: p.inkMuted),

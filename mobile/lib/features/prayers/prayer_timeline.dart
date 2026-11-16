@@ -121,7 +121,7 @@ class _Row extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 1),
                         child: Text(
                           '($comment)',
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 11, color: p.inkMuted),
                         ),

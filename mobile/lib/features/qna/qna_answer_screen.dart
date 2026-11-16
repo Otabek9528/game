@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../support/support_parts.dart';
 import 'qna_library.dart';
@@ -229,8 +230,11 @@ class _QnaAnswerScreenState extends State<QnaAnswerScreen> {
                         child: OutlinedButton.icon(
                           onPressed: () => widget.services.openLink(link),
                           icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                          label: Text(s.qnaOpenSource, maxLines: 1, overflow: TextOverflow.ellipsis),
-                          style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
+                          label: FitLine(s.qnaOpenSource, alignment: Alignment.center),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(48),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -239,8 +243,11 @@ class _QnaAnswerScreenState extends State<QnaAnswerScreen> {
                       child: OutlinedButton.icon(
                         onPressed: _copy,
                         icon: const Icon(Icons.copy_rounded, size: 18),
-                        label: Text(s.qnaCopy, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
+                        label: FitLine(s.qnaCopy, alignment: Alignment.center),
+                        style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(48),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                          ),
                       ),
                     ),
                   ],

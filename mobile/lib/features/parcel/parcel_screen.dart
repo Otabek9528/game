@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayer/calendar_text.dart';
 import 'parcel_controller.dart';
@@ -655,10 +656,9 @@ class _HeroDelegate extends SliverPersistentHeaderDelegate {
                       layoutBuilder: (current, previous) =>
                           Stack(alignment: Alignment.centerLeft, children: [...previous, ?current]),
                       child: t < 0.6
-                          ? Text(
+                          ? FitLine(
                               title,
                               key: const ValueKey('title'),
-                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontFamily: Brand.displayFont,
                                 fontWeight: FontWeight.w700,

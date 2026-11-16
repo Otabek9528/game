@@ -419,10 +419,18 @@ class _PostCard extends StatelessWidget {
                 style: TextStyle(fontSize: 14.5, height: 1.45, color: p.inkSoft),
               ),
               const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Wrap(
+              // When it was posted on the left, how to reach them on the
+              // right; on its own line when the two don't fit one ("Telegram
+              // orqali bog‘lanish" had half the row and lost its end).
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    Wrap(
                       spacing: 6,
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -432,20 +440,10 @@ class _PostCard extends StatelessWidget {
                         if (post.mine) HousingPill(s.hsYours, colour: p.accent),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  if (ctaIcon == null)
-                    Flexible(
-                      child: Text(
-                        cta,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.5, color: p.inkMuted),
-                      ),
-                    )
-                  else
-                    Flexible(
-                      child: DecoratedBox(
+                    if (ctaIcon == null)
+                      Text(cta, style: TextStyle(fontSize: 12.5, color: p.inkMuted))
+                    else
+                      DecoratedBox(
                         decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(20)),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -466,8 +464,8 @@ class _PostCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

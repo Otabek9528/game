@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'linkify.dart';
 import 'parcel_models.dart';
@@ -212,8 +213,13 @@ class _PostCardState extends State<PostCard> {
                   child: FilledButton.icon(
                     onPressed: () => _go(_telegram(s, username)),
                     icon: const Icon(Icons.send_rounded, size: 18),
-                    label: Text(s.parcelWriteTelegram, overflow: TextOverflow.ellipsis),
-                    style: FilledButton.styleFrom(minimumSize: const Size(0, 44)),
+                    // Beside the call and share buttons: less padding and a
+                    // label that shrinks, not "Telegramda yo…".
+                    label: FitLine(s.parcelWriteTelegram, alignment: Alignment.center),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(0, 48),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
                   ),
                 )
               else if (phone != null)

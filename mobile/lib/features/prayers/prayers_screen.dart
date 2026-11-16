@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../core/widgets/khatam.dart';
 import '../../core/widgets/spinning_refresh.dart';
 import '../../l10n/app_localizations.dart';
@@ -802,10 +803,12 @@ class _DateNav extends StatelessWidget {
                             style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.accent),
                           ),
                           const SizedBox(height: 1),
-                          Text(
+                          // Both calendars' dates on one line: smaller rather
+                          // than cut ("… 6 Джумада аль-уля 1448").
+                          FitLine(
                             sub,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            alignment: Alignment.center,
+                            floor: 0.8,
                             style: TextStyle(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w500,

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'parcel_models.dart';
 
@@ -84,11 +85,11 @@ class Place extends StatelessWidget {
               children: [
                 Text(country.flag, style: const TextStyle(fontSize: 19)),
                 const SizedBox(width: 6),
+                // Half the header each: "O‘zbekiston" shrinks to fit rather
+                // than reading "O‘zbekis…".
                 Flexible(
-                  child: Text(
+                  child: FitLine(
                     name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                 ),
