@@ -21,6 +21,8 @@ Future<void> showReminderSheet(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    // Clear of the status bar and the notch when it grows tall.
+    useSafeArea: true,
     showDragHandle: true,
     backgroundColor: VegukinPalette.of(context).card,
     builder: (context) => _ReminderSheet(slot: slot, reminders: reminders, prayer: prayer),

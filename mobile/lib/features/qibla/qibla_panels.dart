@@ -477,6 +477,8 @@ Future<void> showDiagnostics(BuildContext context, QiblaController controller) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    // Clear of the status bar and the notch when it grows tall.
+    useSafeArea: true,
     backgroundColor: Colors.black.withValues(alpha: 0.9),
     builder: (context) => StatefulBuilder(
       builder: (context, setState) => ListenableBuilder(

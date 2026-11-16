@@ -240,6 +240,8 @@ Future<void> showOwnerSheet(BuildContext context, BizKit kit) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    // Clear of the status bar and the notch when it grows tall.
+    useSafeArea: true,
     showDragHandle: true,
     backgroundColor: p.card,
     builder: (context) => SingleChildScrollView(
@@ -292,6 +294,8 @@ Future<BizCategory?> pickCategory(BuildContext context, BizKit kit, {String? cur
   return showModalBottomSheet<BizCategory>(
     context: context,
     isScrollControlled: true,
+    // Clear of the status bar and the notch when it grows tall.
+    useSafeArea: true,
     showDragHandle: true,
     backgroundColor: p.card,
     builder: (context) => DraggableScrollableSheet(

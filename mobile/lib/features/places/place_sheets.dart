@@ -14,6 +14,8 @@ import 'places_parts.dart';
 Future<T?> showPlaceSheet<T>(BuildContext context, Widget child) => showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
+      // Clear of the status bar and the notch when it grows tall.
+      useSafeArea: true,
       showDragHandle: true,
       backgroundColor: VegukinPalette.of(context).card,
       builder: (context) => Padding(

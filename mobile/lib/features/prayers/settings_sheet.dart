@@ -34,6 +34,8 @@ Future<void> showSettingsSheet(BuildContext context, PrayerController prayer) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    // Clear of the status bar and the notch when it grows tall.
+    useSafeArea: true,
     showDragHandle: true,
     backgroundColor: VegukinPalette.of(context).card,
     builder: (context) => _SettingsSheet(prayer: prayer),
@@ -125,7 +127,9 @@ class _Label extends StatelessWidget {
         children: [
           Icon(icon, size: 17, color: p.inkSoft),
           const SizedBox(width: 8),
-          Text(text, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.inkSoft)),
+          Expanded(
+            child: Text(text, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.inkSoft)),
+          ),
         ],
       ),
     );

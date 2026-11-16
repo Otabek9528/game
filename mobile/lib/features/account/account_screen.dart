@@ -42,6 +42,8 @@ Future<bool> askToSignIn(BuildContext context, AppServices services, {bool teleg
   final done = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
+    // Clear of the status bar and the notch when it grows tall.
+    useSafeArea: true,
     showDragHandle: true,
     backgroundColor: VegukinPalette.of(context).card,
     // Scrolls when WhatsApp's steps outgrow a small screen or large text.

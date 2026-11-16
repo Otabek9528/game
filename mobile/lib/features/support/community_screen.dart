@@ -39,6 +39,8 @@ class CommunityScreen extends StatelessWidget {
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
+      // Clear of the status bar and the notch when it grows tall.
+      useSafeArea: true,
       backgroundColor: VegukinPalette.of(context).card,
       builder: (context) => _TemplateSheet(title: title, text: text),
     );

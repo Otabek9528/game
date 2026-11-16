@@ -472,7 +472,10 @@ class _PlacePill extends StatelessWidget {
                 c.locate(userAsked: true);
               },
         padding: const EdgeInsets.fromLTRB(11, 0, 12, 0),
-        child: Row(
+        // A chip beside the settings button: its words grow to 130 % only,
+        // and "when it was found" gives way before the city does.
+        child: TightText(
+          child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.location_on_rounded, size: 17, color: Brand.gold300),
@@ -489,8 +492,11 @@ class _PlacePill extends StatelessWidget {
                 '  ·  ',
                 style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.4)),
               ),
-              Text(
+              Flexible(
+                child: Text(
                 meta,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -500,11 +506,13 @@ class _PlacePill extends StatelessWidget {
                           ? Brand.gold300
                           : Colors.white.withValues(alpha: 0.7),
                 ),
+                ),
               ),
             ],
             const SizedBox(width: 6),
             SpinningRefresh(spinning: c.locating, color: Colors.white, size: 16),
           ],
+          ),
         ),
       ),
     );

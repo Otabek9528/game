@@ -759,6 +759,8 @@ class _PhotoScreen extends StatelessWidget {
 Future<String?> askForCode(BuildContext context) => showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
+      // Clear of the status bar and the notch when it grows tall.
+      useSafeArea: true,
       showDragHandle: true,
       backgroundColor: VegukinPalette.of(context).card,
       builder: (context) => const _TypeCodeSheet(),

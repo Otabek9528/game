@@ -278,6 +278,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
+      // Clear of the status bar and the notch when it grows tall.
+      useSafeArea: true,
       backgroundColor: VegukinPalette.of(context).page,
       builder: (context) => StatefulBuilder(
         builder: (context, setSheet) {
