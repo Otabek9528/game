@@ -135,7 +135,7 @@ class HttpJobsSource implements JobsSource {
     }
     final http.Response response;
     try {
-      response = await http.Response.fromStream(await _http.send(request).timeout(const Duration(seconds: 15)));
+      response = await _http.send(request).then(http.Response.fromStream).timeout(const Duration(seconds: 15));
     } on SocketException {
       throw const JobsException('offline');
     } on http.ClientException {

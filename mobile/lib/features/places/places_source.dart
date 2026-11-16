@@ -248,7 +248,7 @@ class HttpPlacesSource implements PlacesSource {
         ..body = jsonEncode(body);
     }
     try {
-      return await http.Response.fromStream(await _http.send(request).timeout(_timeout));
+      return await _http.send(request).then(http.Response.fromStream).timeout(_timeout);
     } on Exception catch (e) {
       throw _offline(e);
     }

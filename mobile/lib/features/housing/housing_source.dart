@@ -270,7 +270,7 @@ class HttpHousingSource implements HousingSource {
     }
     final http.Response response;
     try {
-      response = await http.Response.fromStream(await _http.send(request).timeout(const Duration(seconds: 30)));
+      response = await _http.send(request).then(http.Response.fromStream).timeout(const Duration(seconds: 30));
     } on SocketException {
       throw const HousingException('offline');
     } on http.ClientException {

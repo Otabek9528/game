@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:muslim_vegukin/features/jobs/jobs_posts.dart';
 import 'package:muslim_vegukin/features/jobs/jobs_screen.dart';
 import 'package:muslim_vegukin/features/jobs/jobs_source.dart';
@@ -127,4 +130,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(app.jobs.mine, hasLength(1));
   });
+
+  // The fault behind the HiKorea watches that never loaded: a time limit on
+  // the start of the answer only. A connection that stalls after the headers
+  // (a train tunnel) must end the request too.
+  testWidgets('an answer that stalls half-way gives up, as one that never starts does', (tester) async {
+    final stalled = StreamController<List<int>>();
+    final source = HttpJobsSource(_Stalling(() => http.StreamedResponse(stalled.stream, 200)));
+    Object? outcome;
+    unawaited(
+      source.posts(const {}, 1).then<void>((v) {
+        outcome = v;
+      }, onError: (Object e) {
+        outcome = e;
+      }),
+    );
+    await tester.pump(const Duration(seconds: 14));
+    expect(outcome, isNull, reason: 'still waiting');
+    await tester.pump(const Duration(seconds: 2));
+    expect(outcome, isA<JobsException>().having((e) => e.code, 'code', 'offline'));
+    await stalled.close();
+  });
+}
+
+class _Stalling extends http.BaseClient {
+  _Stalling(this.answer);
+
+  final http.StreamedResponse Function() answer;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async => answer();
 }

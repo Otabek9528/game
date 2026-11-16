@@ -183,7 +183,7 @@ class HttpAccountSource implements AccountSource {
     if (body != null) request.body = jsonEncode(body);
     http.Response response;
     try {
-      response = await http.Response.fromStream(await _http.send(request).timeout(_timeout));
+      response = await _http.send(request).then(http.Response.fromStream).timeout(_timeout);
     } on SocketException {
       throw const AccountException('offline');
     } on http.ClientException {
@@ -262,7 +262,7 @@ class HttpAccountSource implements AccountSource {
     final request = http.Request('GET', AppConfig.apiBase.resolve('api/app/me/photo'))
       ..headers['Authorization'] = 'Bearer $token';
     try {
-      final response = await http.Response.fromStream(await _http.send(request).timeout(_timeout));
+      final response = await _http.send(request).then(http.Response.fromStream).timeout(_timeout);
       if (response.statusCode == 404) return null;
       if (response.statusCode != 200) throw AccountException('server_error', response.statusCode);
       return response.bodyBytes;

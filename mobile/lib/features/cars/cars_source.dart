@@ -161,7 +161,7 @@ class HttpCarsSource implements CarsSource {
       ..files.add(http.MultipartFile.fromBytes('file', bytes, filename: name));
     final http.Response response;
     try {
-      response = await http.Response.fromStream(await _http.send(request).timeout(const Duration(minutes: 3)));
+      response = await _http.send(request).then(http.Response.fromStream).timeout(const Duration(minutes: 3));
     } on Exception {
       throw const CarsException('offline');
     }
@@ -222,7 +222,7 @@ class HttpCarsSource implements CarsSource {
 
   Future<http.Response> _send(http.Request request) async {
     try {
-      return await http.Response.fromStream(await _http.send(request).timeout(_timeout));
+      return await _http.send(request).then(http.Response.fromStream).timeout(_timeout);
     } on SocketException {
       throw const CarsException('offline');
     } on http.ClientException {
