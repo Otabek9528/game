@@ -7,6 +7,7 @@ import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../qna/qna_parts.dart';
 import 'business_card.dart';
@@ -99,7 +100,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
               foregroundColor: Colors.white,
               systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
               titleTextStyle: const TextStyle(fontFamily: Brand.displayFont, fontWeight: FontWeight.w700, fontSize: 20, color: Colors.white),
-              title: Text(s.bizTitle),
+              title: FitLine(s.bizTitle),
               actions: [
                 IconButton(onPressed: _openSearch, tooltip: s.bizSearchTitle, icon: const Icon(Icons.search_rounded)),
                 const SizedBox(width: 4),

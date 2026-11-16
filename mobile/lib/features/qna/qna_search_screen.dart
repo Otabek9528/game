@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../support/support_parts.dart';
 import 'qna_answer_screen.dart';
@@ -111,7 +112,7 @@ class _QnaSearchScreenState extends State<QnaSearchScreen> {
       appBar: AppBar(
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
-        title: Text(s.qnaSearchTitle),
+        title: FitLine(s.qnaSearchTitle),
       ),
       body: ListView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,

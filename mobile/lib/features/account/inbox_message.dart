@@ -9,6 +9,7 @@ import '../../core/account.dart';
 import '../../core/app_language.dart';
 import '../../core/push_reports.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/feature_catalog.dart';
 import '../home/sections.dart';
@@ -48,7 +49,7 @@ class InboxMessageScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: p.page,
       appBar: AppBar(
-        title: Text(s.inboxMessage),
+        title: FitLine(s.inboxMessage),
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
       ),

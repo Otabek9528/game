@@ -5,6 +5,7 @@ import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'qna_answer_screen.dart';
 import 'qna_library.dart';
@@ -135,7 +136,7 @@ class _QnaScreenState extends State<QnaScreen> {
                 fontSize: 20,
                 color: Colors.white,
               ),
-              title: Text(s.featureQna),
+              title: FitLine(s.featureQna),
               actions: [
                 IconButton(onPressed: _openSearch, tooltip: s.qnaSearchTitle, icon: const Icon(Icons.search_rounded)),
                 const SizedBox(width: 4),
@@ -407,7 +408,7 @@ class _SavedScreen extends StatelessWidget {
     final p = VegukinPalette.of(context);
     return Scaffold(
       backgroundColor: p.page,
-      appBar: AppBar(backgroundColor: p.page, surfaceTintColor: Colors.transparent, title: Text(s.qnaSaved)),
+      appBar: AppBar(backgroundColor: p.page, surfaceTintColor: Colors.transparent, title: FitLine(s.qnaSaved)),
       body: ListenableBuilder(
         listenable: library,
         builder: (context, _) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../account/account_screen.dart';
 import '../cars/cars_parts.dart' show SignInCard;
@@ -256,7 +257,7 @@ class _JobsPostsPageState extends State<JobsPostsPage> {
         appBar: AppBar(
           backgroundColor: p.page,
           surfaceTintColor: Colors.transparent,
-          title: Text(s.jbPost),
+          title: FitLine(s.jbPost),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(58),
             child: Padding(

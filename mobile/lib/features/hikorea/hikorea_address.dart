@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'hikorea_kit.dart';
 import 'hikorea_models.dart';
@@ -91,7 +92,7 @@ class _HkAddressScreenState extends State<HkAddressScreen> {
         );
     return Scaffold(
       backgroundColor: p.page,
-      appBar: AppBar(title: Text(s.hkAddressTitle), backgroundColor: p.page, surfaceTintColor: Colors.transparent),
+      appBar: AppBar(title: FitLine(s.hkAddressTitle), backgroundColor: p.page, surfaceTintColor: Colors.transparent),
       body: ListView(
         padding: EdgeInsets.fromLTRB(16, 4, 16, 28 + MediaQuery.paddingOf(context).bottom),
         children: [

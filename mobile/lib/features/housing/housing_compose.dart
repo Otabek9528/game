@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'housing_parts.dart';
 import 'housing_source.dart';
@@ -171,7 +172,7 @@ class _HousingComposeState extends State<HousingCompose> {
     );
     return Scaffold(
       backgroundColor: p.page,
-      appBar: AppBar(backgroundColor: p.page, surfaceTintColor: Colors.transparent, title: Text(_editing ? s.hsEditTitle : s.hsNewTitle)),
+      appBar: AppBar(backgroundColor: p.page, surfaceTintColor: Colors.transparent, title: FitLine(_editing ? s.hsEditTitle : s.hsNewTitle)),
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
           color: p.card,

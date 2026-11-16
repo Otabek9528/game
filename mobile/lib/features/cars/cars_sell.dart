@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../account/account_screen.dart';
 import 'car_detail.dart';
@@ -681,7 +682,7 @@ class _CarPostFormState extends State<CarPostForm> {
       appBar: AppBar(
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
-        title: Text(_editing ? s.carEditPostTitle : s.carNewPostTitle),
+        title: FitLine(_editing ? s.carEditPostTitle : s.carNewPostTitle),
       ),
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(

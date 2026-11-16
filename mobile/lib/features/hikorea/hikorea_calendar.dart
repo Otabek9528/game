@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../qna/qna_parts.dart';
 import 'hikorea_kit.dart';
@@ -83,7 +84,7 @@ class _HkCalendarScreenState extends State<HkCalendarScreen> {
     return Scaffold(
       backgroundColor: p.page,
       appBar: AppBar(
-        title: Text(officeName(widget.office.nameEn), maxLines: 1, overflow: TextOverflow.ellipsis),
+        title: FitLine(officeName(widget.office.nameEn)),
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
       ),

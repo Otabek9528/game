@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../qna/qna_parts.dart';
 import 'hikorea_calendar.dart';
@@ -130,7 +131,7 @@ class _HkWatchesScreenState extends State<HkWatchesScreen> {
     final past = [for (final w in all ?? const <HkWatch>[]) if (!w.active) w];
     return Scaffold(
       backgroundColor: p.page,
-      appBar: AppBar(title: Text(s.hkMyWatches), backgroundColor: p.page, surfaceTintColor: Colors.transparent),
+      appBar: AppBar(title: FitLine(s.hkMyWatches), backgroundColor: p.page, surfaceTintColor: Colors.transparent),
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(

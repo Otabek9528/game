@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'privacy_text.dart';
 
@@ -43,7 +44,7 @@ class PrivacyScreen extends StatelessWidget {
     }
     return Scaffold(
       backgroundColor: p.page,
-      appBar: AppBar(title: Text(s.accountPrivacy), backgroundColor: p.page, surfaceTintColor: Colors.transparent),
+      appBar: AppBar(title: FitLine(s.accountPrivacy), backgroundColor: p.page, surfaceTintColor: Colors.transparent),
       body: ListView(
         padding: EdgeInsets.fromLTRB(20, 4, 20, 28 + MediaQuery.paddingOf(context).bottom),
         children: blocks,

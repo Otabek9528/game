@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../account/account_screen.dart';
 import 'jobs_posts.dart';
@@ -170,7 +171,7 @@ class _JobsScreenState extends State<JobsScreen> {
     final p = VegukinPalette.of(context);
     return Scaffold(
       backgroundColor: p.page,
-      appBar: AppBar(backgroundColor: p.page, surfaceTintColor: Colors.transparent, title: Text(s.jbTitle)),
+      appBar: AppBar(backgroundColor: p.page, surfaceTintColor: Colors.transparent, title: FitLine(s.jbTitle)),
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
           color: p.card,

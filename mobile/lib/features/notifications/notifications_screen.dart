@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/feature_catalog.dart';
 import '../home/sections.dart';
@@ -342,7 +343,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       appBar: AppBar(
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
-        title: Text(s.ntTitle),
+        title: FitLine(s.ntTitle),
         actions: [
           if (me != null)
             ListenableBuilder(

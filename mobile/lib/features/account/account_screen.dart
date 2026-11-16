@@ -12,6 +12,7 @@ import '../../core/system.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/brand_logos.dart';
 import '../../core/widgets/khatam.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../hikorea/hikorea_kit.dart';
 import '../hikorea/hikorea_watches.dart';
@@ -165,7 +166,7 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
     return Scaffold(
       backgroundColor: p.page,
       appBar: AppBar(
-        title: Text(s.accountTitle),
+        title: FitLine(s.accountTitle),
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
       ),

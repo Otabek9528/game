@@ -8,6 +8,7 @@ import '../../app_services.dart';
 import '../../core/account.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/feature_catalog.dart';
 import 'inbox_message.dart';
@@ -88,7 +89,7 @@ class _InboxScreenState extends State<InboxScreen> {
     return Scaffold(
       backgroundColor: p.page,
       appBar: AppBar(
-        title: Text(s.inboxTitle),
+        title: FitLine(s.inboxTitle),
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
       ),

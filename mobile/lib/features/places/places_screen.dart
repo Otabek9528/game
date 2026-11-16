@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'place_sheets.dart';
 import 'place_detail.dart';
@@ -161,7 +162,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
                   fontSize: 21,
                   color: Colors.white,
                 ),
-                title: Text(kindPlural(s, _kind)),
+                title: FitLine(kindPlural(s, _kind)),
               ),
               SliverToBoxAdapter(child: _hero(context)),
               SliverPadding(

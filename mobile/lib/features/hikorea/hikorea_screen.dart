@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/khatam.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../qna/qna_parts.dart';
 import 'hikorea_address.dart';
@@ -108,7 +109,7 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
                     fontSize: 20,
                     color: Colors.white,
                   ),
-                  title: Text(s.featureHikorea),
+                  title: FitLine(s.featureHikorea),
                   actions: [
                     _WatchesButton(kit: _kit),
                     const SizedBox(width: 4),
@@ -936,7 +937,7 @@ class HkCountersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: p.page,
       appBar: AppBar(
-        title: Text(officeName(office.nameEn)),
+        title: FitLine(officeName(office.nameEn)),
         backgroundColor: p.page,
         surfaceTintColor: Colors.transparent,
       ),

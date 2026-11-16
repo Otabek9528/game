@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../support/support_data.dart';
 import '../support/support_parts.dart';
@@ -175,7 +176,7 @@ class _BarcodeScreenState extends State<BarcodeScreen> with WidgetsBindingObserv
               fontSize: 20,
               color: Colors.white,
             ),
-            title: Text(s.barcodeTitle),
+            title: FitLine(s.barcodeTitle),
             actions: [
               if (_away)
                 IconButton(
