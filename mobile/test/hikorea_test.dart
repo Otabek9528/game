@@ -242,7 +242,8 @@ void main() {
       await pushPage(tester, HikoreaScreen(services: app.services));
       await tester.pumpAndSettle();
       expect(find.text('Couldn’t load. Check your connection.'), findsNothing, reason: 'the offices kept on the phone');
-      expect(find.text('Seoul', skipOffstage: false), findsOneWidget);
+      expect(find.text('Couldn’t load your watches'), findsOneWidget, reason: 'those are not kept');
+      await tester.scrollUntilVisible(find.text('Seoul'), 200, scrollable: find.byType(Scrollable).first);
       expect(find.text('OCT', skipOffstage: false), findsWidgets, reason: 'the leaves as last time');
     });
 
@@ -299,6 +300,9 @@ void main() {
       expect(find.text('Branch office · 1 counter'), findsOneWidget);
       expect(find.text('Immigration office · 2 counters'), findsOneWidget, reason: 'Ansan');
 
+      // Back up to the search field.
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, 3000));
+      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'seoul');
       await tester.pumpAndSettle();
       expect(find.text('Seoul'), findsOneWidget);
@@ -439,6 +443,127 @@ void main() {
       expect(find.text('Which office is yours?'), findsNothing, reason: 'not new any more');
       expect(find.text('Not sure which office?'), findsOneWidget);
       expect(app.hikorea.watchList.single.deskSeq, 102);
+    });
+
+    // The watches section of the first page always ends: the watches with
+    // how they stand, none yet, or couldn't load. It used to wait forever
+    // when the calendar of a watch's counter couldn't be had.
+    group('the watches section always ends', () {
+      HkWatch watchOn(int desk, {int id = 1}) => HkWatch(
+            id: id,
+            officeId: '1270667',
+            officeNameEn: 'Ansan Immigration Office',
+            deskSeq: desk,
+            start: DateTime(2026, 10, 18),
+            end: DateTime(2026, 10, 31),
+            status: 'active',
+          );
+      final waiting = find.byType(LinearProgressIndicator);
+
+      testWidgets('a watch on a counter HiKorea replaced: said so, here and in the list, no wait', (tester) async {
+        final app = TestApp(language: 'en');
+        // Set a while ago; the server lists that counter no more and answers 404 for it.
+        app.hikorea.watchList.add(watchOn(999));
+        app.hikorea.calendarErrors[999] = const HkException('desk_not_found', 404);
+        await openHikorea(tester, app: app);
+        expect(find.text('Your watches'), findsOneWidget);
+        expect(waiting, findsNothing);
+        expect(find.text('No longer on HiKorea'), findsOneWidget);
+        expect(find.text('Try again'), findsNothing, reason: 'asking again would not help');
+
+        // Its tile leads to the list, where it can be stopped; no calendar to open.
+        await tester.tap(find.text('No longer on HiKorea'));
+        await tester.pumpAndSettle();
+        expect(find.byType(HkWatchesScreen), findsOneWidget);
+        expect(find.textContaining('Stop this watch and set a new one'), findsOneWidget);
+        expect(find.text('Calendar'), findsNothing);
+        expect(find.text('Stop'), findsOneWidget);
+      });
+
+      testWidgets('its calendar can’t be had: said so; “Try again” gets it', (tester) async {
+        final app = TestApp(language: 'en');
+        app.hikorea
+          ..bulk = false
+          ..watchList.add(watchOn(102))
+          ..calendarErrors[102] = const HkException('server_error', 502);
+        await openHikorea(tester, app: app);
+        expect(waiting, findsNothing);
+        expect(find.text('Couldn’t check'), findsOneWidget);
+
+        app.hikorea.calendarErrors.clear();
+        await tester.tap(find.text('Try again'));
+        await tester.pumpAndSettle();
+        expect(find.text('Couldn’t check'), findsNothing);
+        expect(find.text('8 free days in your dates'), findsOneWidget);
+      });
+
+      testWidgets('an answer nobody can read is a failure too, not a wait', (tester) async {
+        final app = TestApp(language: 'en');
+        app.hikorea
+          ..watchList.add(watchOn(999))
+          ..calendarErrors[999] = const FormatException('not a calendar');
+        await openHikorea(tester, app: app);
+        expect(waiting, findsNothing);
+        expect(find.text('Couldn’t check'), findsOneWidget);
+      });
+
+      testWidgets('a request that never answers: given up on after 20 seconds', (tester) async {
+        final app = TestApp(language: 'en');
+        app.hikorea
+          ..watchList.add(watchOn(999))
+          ..hung.add(999);
+        await app.launch(tester);
+        await pushPage(tester, HikoreaScreen(services: app.services));
+        // The watches come in, and their tile asks for its calendar.
+        await tester.pump(const Duration(milliseconds: 1));
+        await tester.pump(const Duration(seconds: 19));
+        expect(waiting, findsOneWidget, reason: 'still within its time');
+        await tester.pump(const Duration(seconds: 2));
+        await tester.pump();
+        expect(waiting, findsNothing);
+        expect(find.text('Couldn’t check'), findsOneWidget);
+      });
+
+      testWidgets('no watches: said so, with how to set one', (tester) async {
+        await openHikorea(tester);
+        expect(find.text('Your watches'), findsOneWidget);
+        expect(find.text('No watches yet'), findsOneWidget);
+        expect(find.text('Pick an office, look at its calendar and set a watch.'), findsOneWidget);
+        expect(waiting, findsNothing);
+      });
+
+      testWidgets('the watches can’t be loaded: said so; “Try again” loads them', (tester) async {
+        final app = TestApp(language: 'en');
+        app.hikorea
+          ..watchList.add(watchOn(102))
+          ..watchesError = const HkException('server_error', 500);
+        await openHikorea(tester, app: app);
+        expect(find.text('Couldn’t load your watches'), findsOneWidget);
+        expect(find.text('No watches yet'), findsNothing, reason: 'unknown is not none');
+        expect(find.text('Couldn’t load. Check your connection.'), findsNothing, reason: 'the offices are there all the same');
+
+        app.hikorea.watchesError = null;
+        await tester.tap(find.text('Try again'));
+        await tester.pumpAndSettle();
+        expect(find.text('Couldn’t load your watches'), findsNothing);
+        expect(find.text('8 free days in your dates'), findsOneWidget);
+      });
+
+      testWidgets('the list of watches: whatever goes wrong ends in “couldn’t load”, not a spinner', (tester) async {
+        final app = TestApp(language: 'en');
+        app.hikorea.watchesError = const FormatException('not json');
+        await openHikorea(tester, app: app);
+        await tester.tap(find.byTooltip('My watches'));
+        await tester.pumpAndSettle();
+        expect(find.byType(HkWatchesScreen), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(find.text('Couldn’t load. Check your connection.'), findsOneWidget);
+
+        app.hikorea.watchesError = null;
+        await tester.tap(find.text('Try again'));
+        await tester.pumpAndSettle();
+        expect(find.text('No watches yet'), findsOneWidget);
+      });
     });
 
     testWidgets('a counter HiKorea retired: said so, the way to the others, no watch', (tester) async {

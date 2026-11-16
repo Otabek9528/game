@@ -4666,6 +4666,30 @@ abstract class AppLocalizations {
   /// **'HiKorea\'da kun ko‘rinmayapti'**
   String get hkNoDaysShort;
 
+  /// No description provided for @hkStandFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tekshirib bo‘lmadi'**
+  String get hkStandFailed;
+
+  /// No description provided for @hkCounterGone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Endi HiKorea’da yo‘q'**
+  String get hkCounterGone;
+
+  /// No description provided for @hkCounterGoneBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu bo‘lim endi HiKorea’da yo‘q. Kuzatuvni to‘xtatib, ofisda yangisini o‘rnating.'**
+  String get hkCounterGoneBody;
+
+  /// No description provided for @hkWatchesFailed.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kuzatuvlaringizni yuklab bo‘lmadi'**
+  String get hkWatchesFailed;
+
   /// No description provided for @hkLeafLegend.
   ///
   /// In uz, this message translates to:

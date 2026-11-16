@@ -2655,6 +2655,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hkNoDaysShort => 'No days on HiKorea';
 
   @override
+  String get hkStandFailed => 'Couldn’t check';
+
+  @override
+  String get hkCounterGone => 'No longer on HiKorea';
+
+  @override
+  String get hkCounterGoneBody =>
+      'This counter is no longer on HiKorea. Stop this watch and set a new one at the office.';
+
+  @override
+  String get hkWatchesFailed => 'Couldn’t load your watches';
+
+  @override
   String get hkLeafLegend => 'Date: the earliest free day';
 
   @override

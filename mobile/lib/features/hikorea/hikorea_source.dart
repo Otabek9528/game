@@ -63,8 +63,12 @@ class HttpHikoreaSource implements HikoreaSource {
 
   static final _shared = http.Client();
 
+  /// How long an answer may take, headers and body together. Past it the
+  /// call fails as 'offline', so a page can say so and offer to try again.
+  static const _timeout = Duration(seconds: 15);
+
   // A day's check waits on HiKorea itself.
-  static const _timeout = Duration(seconds: 30);
+  static const _dayTimeout = Duration(seconds: 30);
 
   http.Client get _http => _client ?? _shared;
 
@@ -110,7 +114,8 @@ class HttpHikoreaSource implements HikoreaSource {
   }
 
   @override
-  Future<HkDay> day(int desk, String ymd) async => HkDay.fromJson(await _call('GET', 'desks/$desk/dates/$ymd'));
+  Future<HkDay> day(int desk, String ymd) async =>
+      HkDay.fromJson(await _call('GET', 'desks/$desk/dates/$ymd', timeout: _dayTimeout));
 
   @override
   Future<List<HkWatch>> watches(Map<String, String> auth, {bool past = false}) async {
@@ -144,6 +149,7 @@ class HttpHikoreaSource implements HikoreaSource {
     Map<String, String>? auth,
     Map<String, String>? query,
     Object? body,
+    Duration timeout = _timeout,
   }) async {
     var url = AppConfig.apiBase.resolve('api/hikorea/$path');
     if (query != null) url = url.replace(queryParameters: query);
@@ -153,9 +159,10 @@ class HttpHikoreaSource implements HikoreaSource {
     if (body != null) request.body = jsonEncode(body);
     http.Response response;
     try {
-      response = await http.Response.fromStream(await _http.send(request).timeout(_timeout));
+      // The body too: a connection that stalls halfway must not wait forever.
+      response = await _http.send(request).then(http.Response.fromStream).timeout(timeout);
     } on Exception catch (e) {
-      if (e is SocketException || e is http.ClientException || e is TimeoutException) {
+      if (e is IOException || e is http.ClientException || e is TimeoutException) {
         throw const HkException('offline');
       }
       rethrow;

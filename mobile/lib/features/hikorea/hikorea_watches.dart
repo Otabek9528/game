@@ -42,16 +42,20 @@ class _HkWatchesScreenState extends State<HkWatchesScreen> {
     if (_kit.offices == null) unawaited(_kit.loadOffices().then((_) {}, onError: (Object _) {}));
   }
 
+  /// Always ends, within the kit's patience: the list, or failed with a way
+  /// to try again. Whatever goes wrong; a list already shown stays.
   Future<void> _load() async {
+    if (_failed) setState(() => _failed = false);
     try {
-      final all = await _kit.source.watches(await _kit.auth(), past: true);
+      final all = await Future(() async => _kit.source.watches(await _kit.auth(), past: true))
+          .timeout(HikoreaKit.patience);
       if (mounted) {
         setState(() {
           _all = all;
           _failed = false;
         });
       }
-    } on HkException {
+    } on Exception {
       if (mounted) setState(() => _failed = _all == null);
     }
   }
@@ -163,7 +167,8 @@ class _HkWatchesScreenState extends State<HkWatchesScreen> {
                     kit: _kit,
                     watch: watch,
                     stopping: _stopping.contains(watch.id),
-                    onCalendar: () => _openCalendar(watch),
+                    // A counter HiKorea replaced has no calendar to open.
+                    onCalendar: _gone(watch) ? null : () => _openCalendar(watch),
                     onStop: () => _stop(watch),
                   ),
                 ),
@@ -172,7 +177,11 @@ class _HkWatchesScreenState extends State<HkWatchesScreen> {
                 for (final watch in past.take(20))
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: _WatchCard(kit: _kit, watch: watch, onCalendar: () => _openCalendar(watch)),
+                    child: _WatchCard(
+                      kit: _kit,
+                      watch: watch,
+                      onCalendar: _gone(watch) ? null : () => _openCalendar(watch),
+                    ),
                   ),
               ],
             ],
@@ -181,6 +190,9 @@ class _HkWatchesScreenState extends State<HkWatchesScreen> {
       ),
     );
   }
+
+  /// The offices are in, and none has this watch's counter any more.
+  bool _gone(HkWatch watch) => _kit.offices != null && _kit.deskOf(watch.deskSeq) == null;
 
   static bool _isHikoreaHome(Route<dynamic> route) => route.settings.name == hikoreaRouteName;
 }
@@ -192,14 +204,16 @@ class _WatchCard extends StatelessWidget {
   const _WatchCard({
     required this.kit,
     required this.watch,
-    required this.onCalendar,
+    this.onCalendar,
     this.onStop,
     this.stopping = false,
   });
 
   final HikoreaKit kit;
   final HkWatch watch;
-  final VoidCallback onCalendar;
+
+  /// Null when the counter is gone from HiKorea: said so instead.
+  final VoidCallback? onCalendar;
   final VoidCallback? onStop;
   final bool stopping;
 
@@ -247,14 +261,23 @@ class _WatchCard extends StatelessWidget {
                 ),
               ],
             ),
+            if (onCalendar == null && watch.active)
+              Padding(
+                padding: const EdgeInsets.only(top: 8, right: 6),
+                child: Text(
+                  s.hkCounterGoneBody,
+                  style: TextStyle(fontSize: 13, height: 1.35, color: hkTone(context, HkTone.low).ink),
+                ),
+              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton.icon(
-                  onPressed: onCalendar,
-                  icon: const Icon(Icons.calendar_month_rounded, size: 18),
-                  label: Text(s.hkCalendar),
-                ),
+                if (onCalendar != null)
+                  TextButton.icon(
+                    onPressed: onCalendar,
+                    icon: const Icon(Icons.calendar_month_rounded, size: 18),
+                    label: Text(s.hkCalendar),
+                  ),
                 if (onStop != null)
                   TextButton.icon(
                     onPressed: stopping ? null : onStop,

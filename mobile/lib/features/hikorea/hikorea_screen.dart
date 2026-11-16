@@ -68,6 +68,10 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
     ]);
   }
 
+  /// Nothing could be loaded and nothing is kept from before: the page says
+  /// so once, and its "Try again" asks for everything again.
+  bool get _nothing => _kit.offices == null && _failed;
+
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
@@ -81,10 +85,11 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
           final shown = [for (final o in offices ?? const <HkOffice>[]) if (o.matches(_query)) o]
             ..sort((a, b) => officeParts(a.nameEn).place.toLowerCase().compareTo(officeParts(b.nameEn).place.toLowerCase()));
           final searching = _query.trim().isNotEmpty;
-          final watches = _kit.watches ?? const <HkWatch>[];
+          // Null until the server has said (or failed to say) what they are.
+          final watches = _kit.watches;
           final last = _kit.lastDesk == null ? null : _kit.deskOf(_kit.lastDesk!);
           // Someone new: no watch, no counter looked at yet.
-          final newcomer = watches.isEmpty && last == null;
+          final newcomer = (watches == null || watches.isEmpty) && last == null;
           return RefreshIndicator(
             onRefresh: _refresh,
             edgeOffset: MediaQuery.paddingOf(context).top + kToolbarHeight,
@@ -119,18 +124,35 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
                   padding: EdgeInsets.fromLTRB(14, 4, 14, 28 + MediaQuery.paddingOf(context).bottom),
                   sliver: SliverList.list(
                     children: [
-                      if (!searching) ...[
+                      if (!searching && !_nothing) ...[
                         // What is theirs first: the watches, and how they stand now.
-                        if (watches.isNotEmpty) ...[
-                          HkHeading(s.hkYourWatches,
-                              action: watches.length > 2 ? s.hkSeeAll(watches.length) : null,
-                              onAction: () => openWatches(context, _kit)),
+                        // The section always ends in one of three: the watches,
+                        // none yet (and how to set one), or couldn't load (and
+                        // a way to try again). Waiting is bounded by the kit.
+                        HkHeading(s.hkYourWatches,
+                            action: watches != null && watches.length > 2 ? s.hkSeeAll(watches.length) : null,
+                            onAction: () => openWatches(context, _kit)),
+                        if (watches == null && _kit.watchesFailed)
+                          _WatchesNote(
+                            icon: Icons.cloud_off_rounded,
+                            title: s.hkWatchesFailed,
+                            action: s.retry,
+                            onAction: _kit.refreshWatches,
+                          )
+                        else if (watches == null)
+                          const _SkeletonRow()
+                        else if (watches.isEmpty)
+                          _WatchesNote(
+                            icon: Icons.notifications_none_rounded,
+                            title: s.hkWatchesEmpty,
+                            body: s.hkWatchesEmptyBody,
+                          )
+                        else
                           for (final watch in watches.take(2))
                             Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: _WatchTile(kit: _kit, watch: watch),
                             ),
-                        ],
                         if (last case (final office, final desk)) ...[
                           HkHeading(s.hkLastViewed),
                           _CounterTile(kit: _kit, office: office, desk: desk),
@@ -154,7 +176,7 @@ class _HikoreaScreenState extends State<HikoreaScreen> {
                           icon: Icons.wifi_off_rounded,
                           title: s.hkLoadFailed,
                           action: FilledButton.tonalIcon(
-                            onPressed: _load,
+                            onPressed: _refresh,
                             icon: const Icon(Icons.refresh_rounded),
                             label: Text(s.retry),
                           ),
@@ -292,14 +314,16 @@ class _WatchesButton extends StatelessWidget {
   }
 }
 
-/// The calendar of a counter, kept fresh while the tile shows; [builder]
-/// gets null until it is in.
+/// How a counter stands, kept fresh while its tile shows. It always ends:
+/// [builder] with the calendar; that the counter is gone from HiKorea; or
+/// that it couldn't be checked, with a way to try again. It waits only
+/// while a request is really on its way (see [HikoreaKit.standOf]).
 class _Live extends StatefulWidget {
   const _Live({required this.kit, required this.desk, required this.builder});
 
   final HikoreaKit kit;
   final int desk;
-  final Widget Function(BuildContext context, HkCalendar? calendar) builder;
+  final Widget Function(BuildContext context, HkCalendar calendar) builder;
 
   @override
   State<_Live> createState() => _LiveState();
@@ -312,8 +336,102 @@ class _LiveState extends State<_Live> {
     unawaited(widget.kit.loadCalendar(widget.desk));
   }
 
+  // The tile's place in the list can pass to another counter (a watch
+  // added or stopped): that one is asked for too.
   @override
-  Widget build(BuildContext context) => widget.builder(context, widget.kit.calendarOf(widget.desk));
+  void didUpdateWidget(_Live old) {
+    super.didUpdateWidget(old);
+    if (old.desk != widget.desk) unawaited(widget.kit.loadCalendar(widget.desk));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final kit = widget.kit;
+    return switch (kit.standOf(widget.desk)) {
+      HkStand.ready => widget.builder(context, kit.calendarOf(widget.desk)!),
+      HkStand.loading => const _StandLine(text: null, tone: HkTone.none),
+      HkStand.gone => _StandLine(text: s.hkCounterGone, tone: HkTone.low),
+      HkStand.failed => _StandRetry(onRetry: () => kit.retryCalendar(widget.desk)),
+    };
+  }
+}
+
+/// A counter that couldn't be checked: said so, with a way to try again.
+class _StandRetry extends StatelessWidget {
+  const _StandRetry({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final p = VegukinPalette.of(context);
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 4,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_rounded, size: 16, color: p.inkMuted),
+            const SizedBox(width: 6),
+            Flexible(child: Text(s.hkStandFailed, style: TextStyle(fontSize: 13, color: p.inkSoft))),
+          ],
+        ),
+        TextButton(
+          onPressed: onRetry,
+          style: TextButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            // Small to look at, a full finger to tap.
+            minimumSize: const Size(48, 48),
+          ),
+          child: Text(s.retry),
+        ),
+      ],
+    );
+  }
+}
+
+/// The watches section when it has no watch to show: none yet (and how to
+/// set one), or they couldn't be loaded (and a way to try again).
+class _WatchesNote extends StatelessWidget {
+  const _WatchesNote({required this.icon, required this.title, this.body, this.action, this.onAction});
+
+  final IconData icon;
+  final String title;
+  final String? body;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = VegukinPalette.of(context);
+    return HkCard(
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+      child: Row(
+        children: [
+          Icon(icon, size: 24, color: p.inkMuted),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink)),
+                if (body case final body?)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(body, style: TextStyle(fontSize: 13, height: 1.35, color: p.inkSoft)),
+                  ),
+              ],
+            ),
+          ),
+          if (action case final action?) TextButton(onPressed: onAction, child: Text(action)) else const SizedBox(width: 6),
+        ],
+      ),
+    );
+  }
 }
 
 /// How a counter stands, in a line: a pill, or a quiet wait while it loads.
@@ -390,7 +508,6 @@ class _WatchTile extends StatelessWidget {
                   kit: kit,
                   desk: watch.deskSeq,
                   builder: (context, calendar) {
-                    if (calendar == null) return const _StandLine(text: null, tone: HkTone.none);
                     if (calendar.dormant) return _StandLine(text: s.hkNoDaysShort, tone: HkTone.low);
                     final today = kit.today;
                     final free = calendar.openDays(watch.start.isAfter(today) ? watch.start : today, until: watch.end);
@@ -452,10 +569,7 @@ class _CounterTile extends StatelessWidget {
                 _Live(
                   kit: kit,
                   desk: desk.seq,
-                  builder: (context, calendar) {
-                    if (calendar == null) return const _StandLine(text: null, tone: HkTone.none);
-                    return _CounterStand(kit: kit, calendar: calendar);
-                  },
+                  builder: (context, calendar) => _CounterStand(kit: kit, calendar: calendar),
                 ),
               ],
             ),
@@ -908,9 +1022,7 @@ class _DeskCardState extends State<_DeskCard> {
             builder: (context, _) => _Live(
               kit: kit,
               desk: widget.desk.seq,
-              builder: (context, calendar) => calendar == null
-                  ? const _StandLine(text: null, tone: HkTone.none)
-                  : _CounterStand(kit: kit, calendar: calendar),
+              builder: (context, calendar) => _CounterStand(kit: kit, calendar: calendar),
             ),
           ),
           if (booth.afternoon) ...[

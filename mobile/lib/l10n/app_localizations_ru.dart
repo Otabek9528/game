@@ -2691,6 +2691,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get hkNoDaysShort => 'На HiKorea нет дней';
 
   @override
+  String get hkStandFailed => 'Не удалось проверить';
+
+  @override
+  String get hkCounterGone => 'Больше нет на HiKorea';
+
+  @override
+  String get hkCounterGoneBody =>
+      'Этого окна больше нет на HiKorea. Остановите слежение и поставьте новое в офисе.';
+
+  @override
+  String get hkWatchesFailed => 'Не удалось загрузить ваши слежения';
+
+  @override
   String get hkLeafLegend => 'Дата — ближайший свободный день';
 
   @override

@@ -263,11 +263,13 @@ class HkCalendar {
         for (final d in dates)
           if (d['capacity'] case final num cap when cap > 0) d['visi_ymd'] as String: cap.toInt(),
       },
-      deskCapacity: (json['capacity'] as num?)?.toInt(),
+      // A field of an unexpected kind is left out, not thrown on: one odd
+      // answer must not leave a page waiting for a calendar that never comes.
+      deskCapacity: switch (json['capacity']) { final num cap => cap.toInt(), _ => null },
       checkedAt: checked is String ? DateTime.tryParse(checked)?.toLocal() : null,
-      status: json['desk_status'] as String? ?? 'unknown',
+      status: switch (json['desk_status']) { final String status => status, _ => 'unknown' },
       dormant: json['listing'] == 'none',
-      listedUntil: parseYmd(json['listed_until'] as String?),
+      listedUntil: switch (json['listed_until']) { final String ymd => parseYmd(ymd), _ => null },
     );
   }
 }

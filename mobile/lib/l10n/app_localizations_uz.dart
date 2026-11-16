@@ -2596,6 +2596,19 @@ class AppLocalizationsUz extends AppLocalizations {
   String get hkNoDaysShort => 'HiKorea\'da kun ko‘rinmayapti';
 
   @override
+  String get hkStandFailed => 'Tekshirib bo‘lmadi';
+
+  @override
+  String get hkCounterGone => 'Endi HiKorea’da yo‘q';
+
+  @override
+  String get hkCounterGoneBody =>
+      'Bu bo‘lim endi HiKorea’da yo‘q. Kuzatuvni to‘xtatib, ofisda yangisini o‘rnating.';
+
+  @override
+  String get hkWatchesFailed => 'Kuzatuvlaringizni yuklab bo‘lmadi';
+
+  @override
   String get hkLeafLegend => 'Sana — eng yaqin bo‘sh kun';
 
   @override

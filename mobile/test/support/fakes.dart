@@ -1155,10 +1155,22 @@ class FakeHikorea implements HikoreaSource {
     };
   }
 
+  /// Counters whose own calendar request is refused: a counter the server
+  /// no longer lists answers 404.
+  final calendarErrors = <int, Object>{};
+
+  /// Counters whose calendar request never answers.
+  final hung = <int>{};
+
+  /// The watches can't be read (the rest answers): what the request throws.
+  Object? watchesError;
+
   @override
   Future<HkCalendar> calendar(int desk) async {
     _online();
     asked.add('calendar $desk');
+    if (hung.contains(desk)) await Completer<void>().future;
+    if (calendarErrors[desk] case final error?) throw error;
     if (calendarDelay case final delay?) {
       mostInFlight = max(mostInFlight, ++inFlight);
       await Future<void>.delayed(delay);
@@ -1209,6 +1221,7 @@ class FakeHikorea implements HikoreaSource {
   @override
   Future<List<HkWatch>> watches(Map<String, String> auth, {bool past = false}) async {
     _online();
+    if (watchesError case final error?) throw error;
     return [for (final w in watchList.reversed) if (past || w.active) w];
   }
 

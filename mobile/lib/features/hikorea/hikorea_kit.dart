@@ -8,6 +8,11 @@ import '../../core/app_language.dart';
 import 'hikorea_models.dart';
 import 'hikorea_source.dart';
 
+/// How a counter's calendar stands for a tile that shows it: here, on its
+/// way, not had (the tile offers to ask again), or [gone]: the server knows
+/// no such counter any more (HiKorea replaced it), and asking again won't help.
+enum HkStand { loading, ready, failed, gone }
+
 /// What the HiKorea pages share while open: the offices (fetched once), this
 /// person's watches, the counter they looked at last (kept on the phone), and
 /// the calendars seen, so the first page can say how those counters stand.
@@ -27,6 +32,11 @@ class HikoreaKit extends ChangeNotifier {
   final _calendars = <int, HkCalendar>{};
   final _loading = <int, Future<HkCalendar?>>{};
   final _failed = <int>{};
+  final _gone = <int>{};
+
+  /// The longest a page waits for one answer before it says it couldn't get
+  /// it. The source gives up sooner (15 s); this holds whatever it does.
+  static const patience = Duration(seconds: 20);
 
   List<HkOffice>? get offices => _offices;
 
@@ -78,12 +88,13 @@ class HikoreaKit extends ChangeNotifier {
     return _all ??= () async {
       _allLoading = true;
       try {
-        final all = await source.calendars();
+        final all = await source.calendars().timeout(patience);
         _calendars.addAll(all);
         _failed.removeAll(all.keys);
+        _gone.removeAll(all.keys);
         _keepOutlooks();
-      } on HkException {
-        // Counter by counter, then.
+      } on Exception {
+        // Refused, too slow or unreadable: counter by counter, then.
       } finally {
         _allLoading = false;
         notifyListeners();
@@ -109,18 +120,48 @@ class HikoreaKit extends ChangeNotifier {
     return headers;
   }
 
-  /// Quietly keeps the old list when offline.
+  bool _watchesFailed = false;
+
+  /// The watches couldn't be read and none are known from before: the page
+  /// says so and offers to try again, instead of showing none.
+  bool get watchesFailed => _watches == null && _watchesFailed;
+
+  /// Reads this person's watches. Always ends, within [patience]: with the
+  /// list, or failed. Offline with a list from before, that one stays.
   Future<void> refreshWatches() async {
-    try {
-      _watches = await source.watches(await auth());
+    if (_watchesFailed) {
+      // Asked again: waiting, until it is known.
+      _watchesFailed = false;
       notifyListeners();
-    } on HkException {
-      // As it was.
     }
+    try {
+      _watches = await Future(() async => source.watches(await auth())).timeout(patience);
+    } on Exception {
+      _watchesFailed = true;
+    }
+    notifyListeners();
   }
 
   /// A counter's calendar as last fetched; null until it has been.
   HkCalendar? calendarOf(int desk) => _calendars[desk];
+
+  /// What a tile showing [desk]'s calendar says. [HkStand.loading] only
+  /// while a request for it is really on its way: a calendar that isn't here
+  /// and that nobody is fetching is [HkStand.failed], never an endless wait.
+  HkStand standOf(int desk) {
+    if (_calendars.containsKey(desk)) return HkStand.ready;
+    if (_gone.contains(desk)) return HkStand.gone;
+    if (_loading.containsKey(desk) || _queue.contains(desk) || _allLoading) return HkStand.loading;
+    return HkStand.failed;
+  }
+
+  /// Asks for a counter's calendar again, after it couldn't be had.
+  void retryCalendar(int desk) {
+    _failed.remove(desk);
+    _gone.remove(desk);
+    unawaited(loadCalendar(desk));
+    notifyListeners();
+  }
 
   /// Fetches a counter's calendar (once at a time); null when offline, the
   /// one fetched before staying.
@@ -132,11 +173,18 @@ class HikoreaKit extends ChangeNotifier {
 
   Future<HkCalendar?> _fetchCalendar(int desk) async {
     try {
-      final calendar = _calendars[desk] = await source.calendar(desk);
+      final calendar = _calendars[desk] = await source.calendar(desk).timeout(patience);
       _failed.remove(desk);
+      _gone.remove(desk);
       notifyListeners();
       return calendar;
-    } on HkException {
+    } catch (e) {
+      // Every way of not getting it ends here, so no tile waits forever:
+      // offline, too slow, refused, or an answer that couldn't be read.
+      if (e is! HkException && e is! TimeoutException) debugPrint('HiKorea calendar $desk: $e');
+      // 404: the server has no such counter. HiKorea replaces counters; a
+      // watch set on the old one outlives it.
+      if (e is HkException && e.status == 404) _gone.add(desk);
       _failed.add(desk);
       notifyListeners();
       return null;
@@ -174,10 +222,14 @@ class HikoreaKit extends ChangeNotifier {
     }
   }
 
-  /// Lets the calendars that failed be asked for again.
+  /// Asks again for the calendars that failed: the ones of the office list
+  /// and the ones only a watch's tile shows.
   void retryFailed() {
     if (_failed.isEmpty) return;
+    final again = [..._failed];
     _failed.clear();
+    _gone.clear();
+    again.forEach(prefetch);
     notifyListeners();
   }
 
