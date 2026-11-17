@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/state_view.dart';
 import '../../l10n/app_localizations.dart';
 import 'housing_source.dart';
 
@@ -177,44 +178,8 @@ class HousingMessage extends StatelessWidget {
   final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(color: p.cardSelected, borderRadius: BorderRadius.circular(20)),
-            child: Icon(icon, size: 30, color: p.accent),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: p.ink),
-          ),
-          if (body != null) ...[
-            const SizedBox(height: 6),
-            Text(
-              body!,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, height: 1.45, color: p.inkSoft),
-            ),
-          ],
-          if (action != null) ...[
-            const SizedBox(height: 16),
-            FilledButton.tonal(
-              onPressed: onAction,
-              style: FilledButton.styleFrom(minimumSize: const Size(0, 46)),
-              child: Text(action!),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      StateView(icon: icon, title: title, body: body, actionLabel: action, onAction: onAction);
 }
 
 /// A Korean address typed in.

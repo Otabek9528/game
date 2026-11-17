@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/state_view.dart';
 import '../../core/widgets/khatam.dart';
 import '../../l10n/app_localizations.dart';
 import '../parcel/linkify.dart';
@@ -202,36 +203,4 @@ class _LinkedTextState extends State<LinkedText> {
 }
 
 /// A message in the middle of a list: an icon, a title, a line, an action.
-class QnaMessage extends StatelessWidget {
-  const QnaMessage({super.key, required this.icon, required this.title, this.body, this.action});
-
-  final IconData icon;
-  final String title;
-  final String? body;
-  final Widget? action;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(color: p.cardSelected, shape: BoxShape.circle),
-            child: Icon(icon, size: 30, color: p.inkMuted),
-          ),
-          const SizedBox(height: 14),
-          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: p.ink)),
-          if (body case final body?) ...[
-            const SizedBox(height: 6),
-            Text(body, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.45, color: p.inkSoft)),
-          ],
-          if (action case final action?) ...[const SizedBox(height: 14), action],
-        ],
-      ),
-    );
-  }
-}
+typedef QnaMessage = StateView;

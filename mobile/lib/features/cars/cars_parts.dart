@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
 import '../../core/widgets/fit.dart';
+import '../../core/widgets/state_view.dart';
 import '../../core/widgets/tap_pad.dart';
 import '../../l10n/app_localizations.dart';
 import 'cars_kit.dart';
@@ -666,31 +667,8 @@ class CarsMessage extends StatelessWidget {
   final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) {
-    final p = VegukinPalette.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
-      child: Column(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 44)),
-          const SizedBox(height: 10),
-          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: p.ink)),
-          if (body != null) ...[
-            const SizedBox(height: 6),
-            Text(body!, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, height: 1.4, color: p.inkSoft)),
-          ],
-          if (action != null) ...[
-            const SizedBox(height: 16),
-            FilledButton.tonal(
-              onPressed: onAction,
-              style: FilledButton.styleFrom(minimumSize: const Size(0, 46)),
-              child: Text(action!),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      StateView(emoji: emoji, title: title, body: body, actionLabel: action, onAction: onAction);
 }
 
 /// A tab's top: its title (or the make picker), a line under it.
