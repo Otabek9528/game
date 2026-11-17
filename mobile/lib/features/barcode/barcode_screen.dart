@@ -777,17 +777,23 @@ class _StoreTile extends StatelessWidget {
                               // The tile's full width: wide logos as large as square ones.
                               StoreEmblem(store.store, height: 52, width: double.infinity),
                               const SizedBox(height: 10),
-                              Text(
-                                store.store,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink),
+                              // A tile of fixed height: its two lines shrink
+                              // to fit and grow to 115 % only.
+                              TightText(
+                                max: 1.15,
+                                child: FitLine(
+                                  store.store,
+                                  alignment: Alignment.center,
+                                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink),
+                                ),
                               ),
-                              Text(
-                                s.barcodeProducts(store.count),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 11.5, color: p.inkMuted),
+                              TightText(
+                                max: 1.15,
+                                child: FitLine(
+                                  s.barcodeProducts(store.count),
+                                  alignment: Alignment.center,
+                                  style: TextStyle(fontSize: 11.5, color: p.inkMuted),
+                                ),
                               ),
                             ],
                           ),

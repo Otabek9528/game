@@ -288,7 +288,10 @@ class _GalleryState extends State<_Gallery> {
             Widget image(Uri? url, {int? cache}) => url == null
                 ? placeholder
                 : Image.network('$url', fit: BoxFit.cover, cacheWidth: cache, gaplessPlayback: true, errorBuilder: (_, _, _) => const SizedBox.shrink());
-            return GestureDetector(
+            return Semantics(
+              button: true,
+              label: '${AppLocalizations.of(context).carPhotos} ${i + 1}/${media.length}',
+              child: GestureDetector(
               onTap: () => widget.onOpen(i),
               child: Stack(
                 fit: StackFit.expand,
@@ -306,6 +309,7 @@ class _GalleryState extends State<_Gallery> {
                       ),
                     ),
                 ],
+              ),
               ),
             );
           },

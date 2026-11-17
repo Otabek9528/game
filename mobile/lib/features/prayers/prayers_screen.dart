@@ -522,26 +522,28 @@ class _PlacePill extends StatelessWidget {
 
 /// Frosted control on the emerald header.
 class _Glass extends StatelessWidget {
-  const _Glass({required this.child, this.onTap, this.padding = EdgeInsets.zero});
+  const _Glass({required this.child, this.onTap, this.padding = EdgeInsets.zero, this.tooltip});
 
   final Widget child;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry padding;
 
+  /// Its name, for one that is only an icon.
+  final String? tooltip;
+
   @override
   Widget build(BuildContext context) {
-    // 40 high to the eye, 48 to the finger.
-    return TapPad(
-      child: Material(
-        color: Colors.white.withValues(alpha: 0.12),
-        shape: StadiumBorder(side: BorderSide(color: Colors.white.withValues(alpha: 0.16))),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox(height: 40, child: Padding(padding: padding, child: Center(widthFactor: 1, child: child))),
-        ),
+    final glass = Material(
+      color: Colors.white.withValues(alpha: 0.12),
+      shape: StadiumBorder(side: BorderSide(color: Colors.white.withValues(alpha: 0.16))),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(height: 40, child: Padding(padding: padding, child: Center(widthFactor: 1, child: child))),
       ),
     );
+    // 40 high to the eye, 48 to the finger.
+    return TapPad(child: tooltip == null ? glass : Tooltip(message: tooltip, child: glass));
   }
 }
 
@@ -554,10 +556,7 @@ class _GlassButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: _Glass(onTap: onTap, child: SizedBox(width: 40, child: Center(child: child))),
-    );
+    return _Glass(onTap: onTap, tooltip: tooltip, child: SizedBox(width: 40, child: Center(child: child)));
   }
 }
 

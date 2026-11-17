@@ -270,8 +270,8 @@ class _WatchCard extends StatelessWidget {
                   style: TextStyle(fontSize: 13, height: 1.35, color: hkTone(context, HkTone.low).ink),
                 ),
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            Wrap(
+              alignment: WrapAlignment.end,
               children: [
                 if (onCalendar != null)
                   TextButton.icon(

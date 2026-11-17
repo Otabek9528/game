@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../app_services.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'barcode_models.dart';
 import 'barcode_parts.dart';
@@ -375,7 +376,7 @@ class _VerdictTab extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        child: SizedBox(
+        child: TightText(max: 1.15, child: SizedBox(
           height: 52,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -401,7 +402,7 @@ class _VerdictTab extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        )),
       ),
     );
   }

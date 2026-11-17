@@ -745,9 +745,8 @@ class _DayHeading extends SliverPersistentHeaderDelegate {
       child: Row(
         children: [
           Expanded(
-            child: Text(
+            child: FitLine(
               title,
-              overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: past ? p.inkMuted : p.ink),
             ),
           ),

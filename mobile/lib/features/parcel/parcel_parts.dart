@@ -153,7 +153,7 @@ class DayChip extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
+            child: TightText(max: 1.15, child: SizedBox(
               width: 70,
               height: 84,
               child: Column(
@@ -176,7 +176,7 @@ class DayChip extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
+            )),
           ),
         ),
         if (date.count > 0)

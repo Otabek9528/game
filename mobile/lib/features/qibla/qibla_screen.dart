@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import 'calibration_view.dart';
 import 'camera_view.dart';
@@ -346,9 +347,8 @@ class _TopBar extends StatelessWidget {
                   child: Row(
                     children: [
                       Flexible(
-                        child: Text(
+                        child: FitLine(
                           title,
-                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontFamily: Brand.displayFont,
                             fontWeight: FontWeight.w700,

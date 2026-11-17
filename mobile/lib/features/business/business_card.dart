@@ -170,7 +170,7 @@ class _BusinessCardState extends State<BusinessCard> {
             surfaceTintColor: Colors.transparent,
             scrolledUnderElevation: 0,
             shape: _scrolled ? Border(bottom: BorderSide(color: p.hairline)) : null,
-            title: _scrolled ? Text(b.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: p.ink)) : null,
+            title: _scrolled ? FitLine(b.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: p.ink)) : null,
             actions: [
               IconButton(
                 onPressed: _full ? _toggleSave : null,

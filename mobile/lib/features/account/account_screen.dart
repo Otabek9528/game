@@ -1039,17 +1039,20 @@ class _SwitchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
-    return InkWell(
-      onTap: () => onChanged(!value),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 8, 12, 8),
-        child: Row(
-          children: [
-            _RowIcon(icon),
-            const SizedBox(width: 14),
-            Expanded(child: Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: p.ink))),
-            Switch(value: value, onChanged: onChanged),
-          ],
+    // One thing to a screen reader: the switch alone had no name.
+    return MergeSemantics(
+      child: InkWell(
+        onTap: () => onChanged(!value),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 8, 12, 8),
+          child: Row(
+            children: [
+              _RowIcon(icon),
+              const SizedBox(width: 14),
+              Expanded(child: Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: p.ink))),
+              Switch(value: value, onChanged: onChanged),
+            ],
+          ),
         ),
       ),
     );
