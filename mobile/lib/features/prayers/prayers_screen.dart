@@ -901,7 +901,7 @@ class _Legend extends StatelessWidget {
                 decoration: BoxDecoration(color: p.gold, borderRadius: BorderRadius.circular(2)),
               ),
               const SizedBox(width: 8),
-              Expanded(child: Text(s.fastWindow, style: TextStyle(fontSize: 11.5, color: p.gold))),
+              Expanded(child: Text(s.fastWindow, style: TextStyle(fontSize: 11.5, color: p.goldInk))),
             ],
           ),
           const SizedBox(height: 6),

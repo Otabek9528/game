@@ -38,6 +38,7 @@ class VegukinPalette extends ThemeExtension<VegukinPalette> {
     required this.badge,
     required this.gold,
     required this.goldSoft,
+    required this.goldInk,
     required this.hero,
   });
 
@@ -61,6 +62,10 @@ class VegukinPalette extends ThemeExtension<VegukinPalette> {
   final Color gold;
   final Color goldSoft;
 
+  /// Gold for words: [gold] is for marks and fills (as text on the light
+  /// page it is 2.2 : 1).
+  final Color goldInk;
+
   /// The emerald gradient behind the welcome header, top-left to bottom-right.
   final List<Color> hero;
 
@@ -79,6 +84,7 @@ class VegukinPalette extends ThemeExtension<VegukinPalette> {
     badge: Color(0xFFF2EEE8),
     gold: Brand.gold500,
     goldSoft: Brand.gold300,
+    goldInk: Color(0xFF85630A),
     hero: [Color(0xFF053F31), Brand.emerald800, Brand.emerald700],
   );
 
@@ -98,6 +104,7 @@ class VegukinPalette extends ThemeExtension<VegukinPalette> {
     badge: Color(0xFF2A2623),
     gold: Brand.gold400,
     goldSoft: Brand.gold300,
+    goldInk: Brand.gold300,
     hero: [Color(0xFF02261D), Color(0xFF053F31), Brand.emerald900],
   );
 
@@ -125,6 +132,7 @@ class VegukinPalette extends ThemeExtension<VegukinPalette> {
       badge: mix(badge, other.badge),
       gold: mix(gold, other.gold),
       goldSoft: mix(goldSoft, other.goldSoft),
+      goldInk: mix(goldInk, other.goldInk),
       hero: List.generate(hero.length, (i) => mix(hero[i], other.hero[i])),
     );
   }
@@ -135,12 +143,16 @@ abstract final class VegukinTheme {
   static ThemeData get dark => _build(Brightness.dark, VegukinPalette.dark);
 
   static ThemeData _build(Brightness brightness, VegukinPalette p) {
+    final dark = brightness == Brightness.dark;
     final scheme = ColorScheme.fromSeed(
       seedColor: Brand.emerald700,
       brightness: brightness,
     ).copyWith(
-      primary: p.action,
-      onPrimary: Colors.white,
+      // What Material draws in "primary": labels of text and outlined
+      // buttons, spinners, cursors. On the dark page that must be the light
+      // emerald (9.7 : 1), not the button fill (3.1 : 1 as a label).
+      primary: dark ? p.accent : p.action,
+      onPrimary: dark ? const Color(0xFF053F31) : Colors.white,
       surface: p.page,
       onSurface: p.ink,
       outline: p.hairlineStrong,
@@ -175,8 +187,8 @@ abstract final class VegukinTheme {
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return base.textTheme.labelMedium?.copyWith(
-            fontSize: 11.5,
-            letterSpacing: 0,
+            fontSize: 11,
+            letterSpacing: -0.1,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             color: selected ? p.ink : p.inkSoft,
             overflow: TextOverflow.ellipsis,

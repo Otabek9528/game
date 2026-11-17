@@ -108,7 +108,7 @@ class SectionMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
         text.toUpperCase(),
-        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.6, color: VegukinPalette.of(context).gold),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.6, color: VegukinPalette.of(context).goldInk),
       );
 }
 

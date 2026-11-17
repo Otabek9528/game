@@ -243,7 +243,7 @@ class _BusinessCardState extends State<BusinessCard> {
                     Text(
                       category.toUpperCase(),
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.gold),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.goldInk),
                     ),
                   const SizedBox(height: 4),
                   Text(

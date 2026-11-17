@@ -251,7 +251,7 @@ Future<void> showOwnerSheet(BuildContext context, BizKit kit) {
         children: [
           Text(
             s.bizOwnerEyebrow.toUpperCase(),
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.gold),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: p.goldInk),
           ),
           const SizedBox(height: 4),
           Text(s.bizOwnerSheetTitle, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: p.ink)),

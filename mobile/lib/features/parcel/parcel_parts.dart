@@ -78,7 +78,10 @@ class Place extends StatelessWidget {
           key: ValueKey(country),
           crossAxisAlignment: end ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white70)),
+            Text(
+              label,
+              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9)),
+            ),
             const SizedBox(height: 3),
             Row(
               mainAxisAlignment: end ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -677,7 +680,8 @@ class NoticeCard extends StatelessWidget {
                   child: FilledButton(
                     onPressed: onOk,
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFD97706),
+                      // White on it is 5.0 : 1 (on D97706 it was 3.2).
+                      backgroundColor: const Color(0xFFB45309),
                       minimumSize: const Size(0, 40),
                     ),
                     child: Text(s.parcelNoticeOk),

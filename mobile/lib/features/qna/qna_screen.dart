@@ -186,7 +186,7 @@ class _QnaScreenState extends State<QnaScreen> {
                                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink),
                                     ),
                                   ),
-                                  Text('$saved', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: p.gold)),
+                                  Text('$saved', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: p.goldInk)),
                                   Icon(Icons.chevron_right_rounded, color: p.inkMuted),
                                 ],
                               ),

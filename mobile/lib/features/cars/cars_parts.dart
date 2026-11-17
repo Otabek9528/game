@@ -341,7 +341,8 @@ class _StatusBadge extends StatelessWidget {
     final s = AppLocalizations.of(context);
     return _Pill(
       text: sold ? s.carSold : s.carAvailable,
-      background: sold ? const Color(0xE6596572) : const Color(0xE616A34A),
+      // White on it is 5.0 : 1 (on 16A34A it was 3.3).
+      background: sold ? const Color(0xE6596572) : const Color(0xE615803D),
       ink: Colors.white,
     );
   }
