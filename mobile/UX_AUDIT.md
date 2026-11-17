@@ -96,3 +96,69 @@ own. **[iOS]** marks something that should be looked at on an iPhone.
 14. Tokens for spacing, radii and text sizes, used by the shared parts and by everything touched above (D2). *Not a rewrite of 781 styles: that changes nothing a user sees and risks every screen.*
 
 Not proposed: new navigation, new screens, new decoration, a restyle.
+
+## What was done, and what was left
+
+Measured again the same way after the changes (480 renders, same screens).
+
+| | Before | After |
+|---|---|---|
+| Places where content overflowed its box | 18 (3 of them at 130 % text) | 0 |
+| App labels cut at the default text size | about 30 | 0 |
+| Tap targets under 48 dp | about 90 | 30 |
+| Tap targets under 44 pt (iOS) | about 75 | 22 |
+| Text under 4.5 : 1 contrast, as measured | about 80 | 18 |
+| Buttons a screen reader couldn't name | 5 | 0 |
+| Tests | 387 | 403 |
+
+Still cut at the default size: three things people wrote, not the app (a long
+group name, a business's description, an address typed into a field).
+
+Each change is its own commit; the ones that change behaviour say so in their
+first line.
+
+| # in the proposal | Commit | Notes |
+|---|---|---|
+| 1, 5 | `39d3b91` Cars | |
+| 2 | `10f3e48` HiKorea and business card; `0c03edd` Parcel, Housing, Q&A, Links, Account, Community, Prayers | |
+| 3 | `e3b6aa4` Home | **Copy changed:** the Uzbek tile "Mahsulot tarkibini tekshirish" is now "Tarkib tekshirish", its screen's own title. One line in `app_uz.arb` if you want the old one back; it will be cut again. |
+| 4, 14 | `08dc8cc` tokens, titles | |
+| 6 | `d71eb3c` **[behaviour] [iOS]** swipe-back in Cars and Housing | Jobs still holds back while a post is being edited: leaving would lose the edit. |
+| 7 | `777cea3` **[behaviour]** time limits | |
+| 8 | `3681152` **[behaviour]** text capped at 160 % | |
+| 9 | `057d5db`, `4afeb7a` contrast | |
+| 10 | `5a292c2` touch areas | |
+| 11 | `f394f25` **[iOS]** sheets | |
+| 12 | `dfcfb76` names, and the last 130 % spots | |
+| 13 | `2b33424` shared state view | Three of the copies. Parcel's, Notifications' and Places' are different designs and stay. |
+
+### Left, on purpose
+
+- **Tap targets, 30 remaining.** Place cards' "Batafsil" and "Ma’lumot
+  qo‘shish" (40 high), the round back buttons over photos (44), notification
+  filter chips (26), a store's category chips (33), the reminder's sound preview
+  (46 × 40), the prayers header's method and reminder pills, Parcel's collapsed
+  direction pill, inline links in text. Each needs its row re-spaced; none is
+  the only way to its action. The home header's buttons are 44 × 48, not 48 × 48:
+  four controls and the name share 360 dp.
+- **Contrast, 18 remaining as measured.** Past and closed days in the calendar
+  (disabled, exempt), an emoji, thin Korean glyphs the checker reads as paler
+  than they are, two counters measured while a pinned header covered them, and
+  five small labels between 3.5 and 4.4.
+- **Text larger than 160 %** is capped, not supported.
+- **Tokens are not rolled out to old code.** They are in `core/tokens.dart` and
+  used by the shared widgets and by what was touched here. The 36 sizes, 22
+  radii and 160 inline colours elsewhere are as they were: changing them
+  changes nothing a user sees and would need all 50 screens checked again. Move
+  a screen over when it is next worked on.
+- **The two header families** (emerald, plain) stay.
+
+### Not verified
+
+- **On an iPhone.** The swipe-back change and the sheets are covered by tests
+  that set the platform to iOS, not by a device. Both are in
+  `store/PLAY_UPDATE.md` under "iPhone" as things to try in TestFlight.
+- **Which fault kept your HiKorea watches loading.** The server can't be
+  reached from where this was built. The fix covers every way the request can
+  fail, and the tile now says which it was: "Endi HiKorea’da yo‘q" (the counter
+  was replaced) or "Tekshirib bo‘lmadi" (the request failed).

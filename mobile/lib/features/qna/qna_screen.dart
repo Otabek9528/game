@@ -349,7 +349,13 @@ class _Hero extends StatelessWidget {
                           const Icon(Icons.search_rounded, color: Brand.emerald700),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: FitLine(s.qnaSearchHint, floor: 0.8, style: TextStyle(fontSize: 15, color: p.inkMuted)),
+                            // The field is white in dark mode too: the
+                            // light palette's grey, whichever is on.
+                            child: FitLine(
+                              s.qnaSearchHint,
+                              floor: 0.8,
+                              style: TextStyle(fontSize: 15, color: VegukinPalette.light.inkMuted),
+                            ),
                           ),
                         ],
                       ),

@@ -500,7 +500,8 @@ class _Hero extends StatelessWidget {
           children: [
             SizedBox(
               height: 64,
-              child: Row(
+              // A bar of fixed height: its two lines grow to 115 % only.
+              child: TightText(max: 1.15, child: Row(
                 children: [
                   const SizedBox(width: 4),
                   IconButton(
@@ -529,7 +530,7 @@ class _Hero extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
+              )),
             ),
             Padding(padding: const EdgeInsets.fromLTRB(14, 2, 14, 16), child: search),
           ],

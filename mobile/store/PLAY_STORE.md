@@ -8,3 +8,5 @@ releasing.
 
 Files it uses, all in this folder: `privacy.html` (goes into the web app's repository, next to `index.html`),
 `play_icon_512.png`, `feature_graphic.png`.
+
+A later version (build, internal test, promote to the testers): [`PLAY_UPDATE.md`](PLAY_UPDATE.md).

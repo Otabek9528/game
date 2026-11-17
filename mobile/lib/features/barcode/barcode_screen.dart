@@ -383,7 +383,7 @@ class _CameraArea extends StatelessWidget {
                               onTap: onTypeCode,
                               customBorder: const StadiumBorder(),
                               child: Padding(
-                                padding: const EdgeInsets.fromLTRB(16, 12, 20, 12),
+                                padding: const EdgeInsets.fromLTRB(16, 14, 20, 14),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [

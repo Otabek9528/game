@@ -116,3 +116,5 @@ of **both**:
 
 Step by step, with the listing texts in three languages, the Data safety answers and the store graphics:
 [`store/PLAY_STORE.md`](store/PLAY_STORE.md). Publish `store/privacy.html` on the web app first.
+
+An update after the first release, for your testers: [`store/PLAY_UPDATE.md`](store/PLAY_UPDATE.md).
