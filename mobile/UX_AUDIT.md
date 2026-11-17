@@ -107,8 +107,8 @@ Measured again the same way after the changes (480 renders, same screens).
 | App labels cut at the default text size | about 30 | 0 |
 | Tap targets under 48 dp | about 90 | 30 |
 | Tap targets under 44 pt (iOS) | about 75 | 22 |
-| Text under 4.5 : 1 contrast, as measured | about 80 | 18 |
-| Buttons a screen reader couldn't name | 5 | 0 |
+| Text under 4.5 : 1 contrast, as measured | about 95 | 17 |
+| Controls a screen reader couldn't name | 5 (3 of them buttons) | 2 (no buttons: an answer's selectable text) |
 | Tests | 387 | 403 |
 
 Still cut at the default size: three things people wrote, not the app (a long
@@ -141,10 +141,10 @@ first line.
   direction pill, inline links in text. Each needs its row re-spaced; none is
   the only way to its action. The home header's buttons are 44 × 48, not 48 × 48:
   four controls and the name share 360 dp.
-- **Contrast, 18 remaining as measured.** Past and closed days in the calendar
+- **Contrast, 17 remaining as measured.** Past and closed days in the calendar
   (disabled, exempt), an emoji, thin Korean glyphs the checker reads as paler
-  than they are, two counters measured while a pinned header covered them, and
-  five small labels between 3.5 and 4.4.
+  than they are, counters measured while a pinned header covered them, and a
+  few small labels between 3.5 and 4.4.
 - **Text larger than 160 %** is capped, not supported.
 - **Tokens are not rolled out to old code.** They are in `core/tokens.dart` and
   used by the shared widgets and by what was touched here. The 36 sizes, 22
