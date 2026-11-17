@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
+import '../../core/tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayer/calendar_text.dart';
 import '../prayer/prayer_models.dart';
@@ -172,7 +173,7 @@ class ReminderBell extends StatelessWidget {
         onTap: onTap,
         radius: 26,
         child: SizedBox(
-          width: 46,
+          width: tapTarget,
           height: 50,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

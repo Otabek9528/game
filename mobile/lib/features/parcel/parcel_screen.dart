@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/app_language.dart';
 import '../../core/theme.dart';
+import '../../core/tokens.dart';
 import '../../core/widgets/fit.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayer/calendar_text.dart';
@@ -781,7 +782,7 @@ class _SwapButton extends StatelessWidget {
         child: Tooltip(
           message: tooltip,
           child: SizedBox.square(
-            dimension: 46,
+            dimension: tapTarget,
             child: AnimatedRotation(
               turns: turns,
               duration: const Duration(milliseconds: 350),

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
 import '../../core/widgets/fit.dart';
+import '../../core/widgets/tap_pad.dart';
 import '../../l10n/app_localizations.dart';
 import '../qna/qna_parts.dart';
 import 'hikorea_kit.dart';
@@ -446,11 +447,9 @@ class _Month extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: cells,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              mainAxisSpacing: 5,
-              crossAxisSpacing: 5,
-            ),
+            // No gaps between cells: each day answers a finger over its whole
+            // cell (43 × 48 on a 360-dp phone) and draws its tile inside it.
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, childAspectRatio: 0.9),
             itemBuilder: (context, i) {
               final n = i - lead + 1 + skip;
               if (n < 1 + skip || n > days) return const SizedBox.shrink();
@@ -494,7 +493,12 @@ class _Day extends StatelessWidget {
             : BorderSide.none;
     return Semantics(
       button: open,
-      child: Material(
+      child: TapPad(
+        min: Size.zero,
+        child: FractionallySizedBox(
+          widthFactor: 0.885,
+          heightFactor: 0.81,
+          child: Material(
         color: background,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -523,6 +527,8 @@ class _Day extends StatelessWidget {
                   ),
                 ),
             ],
+          ),
+        ),
           ),
         ),
       ),

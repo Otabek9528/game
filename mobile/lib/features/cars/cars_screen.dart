@@ -255,7 +255,7 @@ class _BrowseTabState extends State<_BrowseTab> with AutomaticKeepAliveClientMix
                     if (stats != null) ...[MarketSummary(stats: stats), const SizedBox(height: 14)],
                     SizedBox(
                       // The chips' row is as tall as their text, which stops growing at 130 %.
-                      height: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: TextGrowth.tight).scale(38),
+                      height: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: TextGrowth.tight).scale(38) + 10,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         clipBehavior: Clip.none,
@@ -270,7 +270,7 @@ class _BrowseTabState extends State<_BrowseTab> with AutomaticKeepAliveClientMix
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 4),
                     StatusSwitch(value: _status, onChanged: (v) => setState(() => _status = v)),
                     const SizedBox(height: 14),
                     if (_error != null && cars == null)
@@ -438,7 +438,6 @@ class _SearchTabState extends State<_SearchTab> with AutomaticKeepAliveClientMix
                 CarFieldLabel(s.carFuel),
                 Wrap(
                   spacing: 8,
-                  runSpacing: 8,
                   children: [
                     for (final fuel in carFuels)
                       CarChip(

@@ -165,7 +165,6 @@ class _PostCardState extends State<PostCard> {
                   widget.onSave();
                 },
                 tooltip: widget.saved ? s.parcelUnsave : s.parcelSave,
-                visualDensity: VisualDensity.compact,
                 color: widget.saved ? p.gold : p.inkMuted,
                 icon: Icon(widget.saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded),
               ),

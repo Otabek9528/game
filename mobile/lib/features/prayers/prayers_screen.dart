@@ -10,6 +10,7 @@ import '../../core/theme.dart';
 import '../../core/widgets/fit.dart';
 import '../../core/widgets/khatam.dart';
 import '../../core/widgets/spinning_refresh.dart';
+import '../../core/widgets/tap_pad.dart';
 import '../../l10n/app_localizations.dart';
 import '../prayer/calendar_text.dart';
 import '../prayer/prayer_controller.dart';
@@ -352,7 +353,7 @@ class _Hero extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           Expanded(
@@ -529,13 +530,16 @@ class _Glass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.12),
-      shape: StadiumBorder(side: BorderSide(color: Colors.white.withValues(alpha: 0.16))),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: SizedBox(height: 40, child: Padding(padding: padding, child: Center(widthFactor: 1, child: child))),
+    // 40 high to the eye, 48 to the finger.
+    return TapPad(
+      child: Material(
+        color: Colors.white.withValues(alpha: 0.12),
+        shape: StadiumBorder(side: BorderSide(color: Colors.white.withValues(alpha: 0.16))),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(height: 40, child: Padding(padding: padding, child: Center(widthFactor: 1, child: child))),
+        ),
       ),
     );
   }
@@ -552,7 +556,7 @@ class _GlassButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: SizedBox(width: 40, child: _Glass(onTap: onTap, child: child)),
+      child: _Glass(onTap: onTap, child: SizedBox(width: 40, child: Center(child: child))),
     );
   }
 }

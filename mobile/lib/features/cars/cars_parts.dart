@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
 import '../../core/widgets/fit.dart';
+import '../../core/widgets/tap_pad.dart';
 import '../../l10n/app_localizations.dart';
 import 'cars_kit.dart';
 import 'cars_models.dart';
@@ -570,20 +571,23 @@ class CarChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = VegukinPalette.of(context);
     final fill = onColour ?? p.ink;
-    return Material(
-      color: on ? fill : p.card,
-      shape: StadiumBorder(side: BorderSide(color: on ? fill : p.hairlineStrong)),
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: on ? p.page : p.inkSoft),
+    // The chip is 35 high; a finger gets 48.
+    return TapPad(
+      child: Material(
+        color: on ? fill : p.card,
+        shape: StadiumBorder(side: BorderSide(color: on ? fill : p.hairlineStrong)),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onTap();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: on ? p.page : p.inkSoft),
+            ),
           ),
         ),
       ),
@@ -619,7 +623,8 @@ class StatusSwitch extends StatelessWidget {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  // 48 high: it was 37.
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: value == key ? p.card : Colors.transparent,
