@@ -36,6 +36,10 @@ flutter build appbundle --release --obfuscate --split-debug-info=build/symbols -
 
 - `flutter test` must end with `All tests passed!`. If it doesn't, stop and
   send me the last 30 lines.
+- `flutter --version` shows which Flutter builds the app. The iPhone app is
+  built on 3.47.9 (`codemagic.yaml`). On a 3.47 version or on 3.50 the tests
+  pass and the build works; 3.50 only adds 108 "deprecated" notices to
+  `flutter analyze`. For this update, don't run `flutter upgrade`.
 - `--build-name` and `--build-number` set the version for this build. Nothing
   in `pubspec.yaml` needs editing.
 - `android\key.properties` must be in place, as for the first release. Without

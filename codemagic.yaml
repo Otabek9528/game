@@ -9,6 +9,13 @@
 # ios-testflight Needs the Apple Developer Program and the App Store Connect
 #                key added in Codemagic. Builds the signed app and sends it to
 #                TestFlight, from where it installs on an iPhone.
+#
+# Flutter is pinned to the version the app is tested with, not "stable":
+# stable moves on by itself. 3.50 (11 November 2026) deprecates
+# package:flutter/material.dart, and the Analyze step stopped on its 108
+# notices. Moving to package:material_ui is its own piece of work: the
+# scanner and Google sign-in packages still use the old library. Change the
+# version here and in the other workflow together, after the tests pass on it.
 
 workflows:
   ios-check:
@@ -17,7 +24,7 @@ workflows:
     max_build_duration: 60
     working_directory: mobile
     environment:
-      flutter: stable
+      flutter: 3.47.9
       xcode: latest
       cocoapods: default
     scripts:
@@ -44,7 +51,7 @@ workflows:
       # (Team settings, Team integrations, Developer Portal).
       app_store_connect: Vegukin App Store Connect
     environment:
-      flutter: stable
+      flutter: 3.47.9
       xcode: latest
       cocoapods: default
       ios_signing:
