@@ -8,6 +8,7 @@ import 'app_services.dart';
 import 'core/account.dart';
 import 'core/activity_log.dart';
 import 'core/app_language.dart';
+import 'core/app_update.dart';
 import 'core/google_auth.dart';
 import 'core/key_value_store.dart';
 import 'core/locale_controller.dart';
@@ -53,6 +54,7 @@ Future<void> _start() async {
   final locale = LocaleController(await PrefsLanguageStore.open().timeout(wait));
   final homeWidget = HomeWidgetBridge();
   final reminders = ReminderController(store);
+  final activity = HttpActivityLog(store);
   final services = AppServices(
     store: store,
     locale: locale,
@@ -62,7 +64,7 @@ Future<void> _start() async {
     openFeature: openInBrowser,
     homeWidget: homeWidget,
     reminders: reminders,
-    activity: HttpActivityLog(store),
+    activity: activity,
     account: AccountController(
       store: store,
       source: const HttpAccountSource(),
@@ -71,6 +73,7 @@ Future<void> _start() async {
       // Before the language is chosen: the one the language screen offers.
       language: () => locale.language ?? AppLanguage.guessFrom(WidgetsBinding.instance.platformDispatcher.locales),
     ),
+    updates: UpdateController(source: const PlayUpdateSource(), store: store, activity: activity),
   );
 
   // The home-screen widgets and the prayer reminders follow the prayer

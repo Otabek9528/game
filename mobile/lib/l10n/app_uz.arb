@@ -2531,5 +2531,6 @@
   "updateReady": "Yangi versiya tayyor",
   "updateReadyBody": "Ilova bir necha soniyada qayta ochiladi. Yoki keyinroq: bosh sahifadan chiqqaningizda o‘zi o‘rnatiladi.",
   "updateRestart": "Qayta ishga tushirish",
-  "updateInstalling": "O‘rnatilmoqda…"
+  "updateInstalling": "O‘rnatilmoqda…",
+  "updateNow": "Yangilash"
 }

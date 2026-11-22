@@ -5088,4 +5088,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get updateInstalling => 'Устанавливается…';
+
+  @override
+  String get updateNow => 'Обновить';
 }

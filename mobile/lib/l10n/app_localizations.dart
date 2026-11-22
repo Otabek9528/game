@@ -8882,6 +8882,12 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'O‘rnatilmoqda…'**
   String get updateInstalling;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangilash'**
+  String get updateNow;
 }
 
 class _AppLocalizationsDelegate

@@ -5039,4 +5039,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateInstalling => 'Installing…';
+
+  @override
+  String get updateNow => 'Update';
 }

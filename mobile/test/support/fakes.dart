@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:muslim_vegukin/core/app_update.dart';
 import 'package:muslim_vegukin/app.dart';
 import 'package:muslim_vegukin/app_services.dart';
 import 'package:muslim_vegukin/core/key_value_store.dart';
@@ -248,6 +249,7 @@ class TestApp {
       google: google,
       language: () => locale.language ?? AppLanguage.uz,
     );
+    updates = UpdateController(source: playUpdates, store: this.store, activity: activity, clock: () => clockNow);
     services = AppServices(
       store: this.store,
       locale: locale,
@@ -259,6 +261,7 @@ class TestApp {
       reminders: reminders,
       activity: activity,
       account: account,
+      updates: updates,
       qiblaDevice: qibla,
       businessStats: () async => stats,
       todayVisits: () async => visits,
@@ -295,6 +298,8 @@ class TestApp {
   final push = FakePush();
   final google = FakeGoogle();
   late final AccountController account;
+  final playUpdates = FakePlayUpdates();
+  late final UpdateController updates;
   final qibla = FakeQiblaDevice();
   final FakeParcels parcels;
 
@@ -1915,4 +1920,38 @@ class FakeJobs implements JobsSource {
     _online('delete $id', auth);
     mine.removeWhere((p) => '${p['id']}' == id);
   }
+}
+
+/// Google Play's in-app updates. [next] is what a check finds (null: nothing
+/// newer); Play's dialog is answered with [accept]; the download ends with
+/// [downloadOk], or waits for [finishDownload] when [holdDownload].
+class FakePlayUpdates implements UpdateSource {
+  PlayUpdate? next;
+  bool accept = true;
+  bool downloadOk = true;
+  bool holdDownload = false;
+
+  /// What was asked of Play: check, dialog, install.
+  final asked = <String>[];
+  Completer<bool>? _download;
+
+  @override
+  Future<PlayUpdate?> check() async {
+    asked.add('check');
+    return next;
+  }
+
+  @override
+  Future<bool> download({required VoidCallback onAccepted}) async {
+    asked.add('dialog');
+    if (!accept) return false;
+    onAccepted();
+    if (!holdDownload) return downloadOk;
+    return (_download = Completer<bool>()).future;
+  }
+
+  void finishDownload({bool ok = true}) => _download?.complete(ok);
+
+  @override
+  void install() => asked.add('install');
 }

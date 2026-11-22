@@ -4961,4 +4961,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get updateInstalling => 'O‘rnatilmoqda…';
+
+  @override
+  String get updateNow => 'Yangilash';
 }

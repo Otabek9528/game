@@ -21,6 +21,7 @@ import '../support/platforms_sheet.dart';
 import 'feature_catalog.dart';
 import 'prayer_card.dart';
 import 'sections.dart';
+import 'update_banner.dart';
 
 /// The home screen: prayer card, business directory band, and every section
 /// of the app — the same layout as the web app's home page.
@@ -64,6 +65,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       await _takeWidgetAction();
       unawaited(_services.homeWidget.track(_services.activity, _services.store, _services.clock()));
       await _offerExactAlarms();
+      // After the app's own questions: a newer version on Play is offered
+      // with Play's dialog, and fetched in the background.
+      unawaited(_services.updates.start());
     });
   }
 
@@ -196,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
                       sliver: SliverList.list(
                         children: [
+                          UpdateBanner(updates: _services.updates),
                           PrayerCard(
                             controller: _services.prayer,
                             language: language,

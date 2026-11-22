@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 
 import 'core/account.dart';
 import 'core/activity_log.dart';
+import 'core/app_update.dart';
 import 'core/config.dart';
 import 'core/key_value_store.dart';
 import 'core/links.dart';
@@ -162,6 +163,7 @@ class AppServices {
     required this.reminders,
     required this.activity,
     required this.account,
+    required this.updates,
     this.qiblaDevice = const AndroidQiblaDevice(),
     this.businessStats = BusinessStats.fetch,
     this.todayVisits = fetchTodayVisits,
@@ -198,6 +200,9 @@ class AppServices {
 
   /// The app's account: who is asking, for the server; push notifications.
   final AccountController account;
+
+  /// Newer versions from Google Play, fetched in the background.
+  final UpdateController updates;
   final QiblaDevice qiblaDevice;
   final Future<BusinessStats?> Function() businessStats;
 

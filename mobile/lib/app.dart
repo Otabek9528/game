@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'app_services.dart';
 import 'core/app_language.dart';
+import 'core/app_update.dart';
 import 'core/push.dart';
 import 'core/theme.dart';
 import 'core/tokens.dart';
@@ -32,7 +33,7 @@ class VegukinApp extends StatefulWidget {
   State<VegukinApp> createState() => _VegukinAppState();
 }
 
-class _VegukinAppState extends State<VegukinApp> {
+class _VegukinAppState extends State<VegukinApp> with WidgetsBindingObserver {
   late final AppLanguage _guess = AppLanguage.guessFrom(widget.deviceLocales);
 
   // Decided once at launch. Picking a language later must not swap the root
@@ -50,6 +51,8 @@ class _VegukinAppState extends State<VegukinApp> {
     // Read now: a lazy read would first happen after the change, and miss it.
     _language = services.locale.language;
     services.locale.addListener(_languageChanged);
+    WidgetsBinding.instance.addObserver(this);
+    services.updates.addListener(_updateChanged);
     services.account.handlePush(onOpen: _openPush, onForeground: _showPush);
     // The account exists from the first launch, so watches need no sign-in.
     // With it, what was pushed to it (the inbox's badge).
@@ -59,7 +62,47 @@ class _VegukinAppState extends State<VegukinApp> {
   @override
   void dispose() {
     widget.services.locale.removeListener(_languageChanged);
+    WidgetsBinding.instance.removeObserver(this);
+    widget.services.updates.removeListener(_updateChanged);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final updates = widget.services.updates;
+    switch (state) {
+      case AppLifecycleState.paused:
+        // Left from the home screen with a new version waiting: it installs
+        // now, while nobody is looking. Nothing is lost by restarting there;
+        // on any other page (a form half filled) it waits.
+        if (!(_navigator.currentState?.canPop() ?? true)) updates.installQuietly();
+      case AppLifecycleState.resumed:
+        unawaited(updates.resumed());
+      default:
+    }
+  }
+
+  UpdateStage _updateStage = UpdateStage.none;
+
+  /// A new version finished downloading: on the home screen its banner says
+  /// so; anywhere else, once, at the bottom.
+  void _updateChanged() {
+    final updates = widget.services.updates;
+    final was = _updateStage;
+    _updateStage = updates.stage;
+    if (_updateStage != UpdateStage.ready || was == UpdateStage.ready) return;
+    final navigator = _navigator.currentState;
+    final context = _navigator.currentContext;
+    if (navigator == null || context == null || !navigator.canPop()) return;
+    final s = AppLocalizations.of(context);
+    _messenger.currentState
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(s.updateReady),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 8),
+        action: SnackBarAction(label: s.updateRestart, onPressed: updates.restart),
+      ));
   }
 
   void _languageChanged() {

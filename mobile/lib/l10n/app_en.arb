@@ -1462,5 +1462,6 @@
   "updateReady": "The new version is ready",
   "updateReadyBody": "The app restarts in a few seconds. Or later: it installs by itself when you leave the app from the home screen.",
   "updateRestart": "Restart",
-  "updateInstalling": "Installing…"
+  "updateInstalling": "Installing…",
+  "updateNow": "Update"
 }

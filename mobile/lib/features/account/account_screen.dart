@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../app_services.dart';
 import '../../core/account.dart';
 import '../../core/app_language.dart';
+import '../../core/app_update.dart';
 import '../../core/config.dart';
 import '../../core/google_auth.dart';
 import '../../core/system.dart';
@@ -162,6 +163,26 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
     return parts.isEmpty ? s.accountNoneYet : parts.join(' · ');
   }
 
+  Widget? _updateRow(AppLocalizations s) {
+    final updates = _services.updates;
+    // What it is on the left (room to wrap), what a tap does on the right.
+    final (title, value, pill, onTap) = switch (updates.stage) {
+      UpdateStage.none => (null, null, _Pill.none, null),
+      UpdateStage.available => (s.updateAvailable, s.updateNow, _Pill.news, updates.update),
+      UpdateStage.downloading => (s.updateTitle, s.updateDownloadingShort, _Pill.none, () {}),
+      UpdateStage.ready => (s.updateReady, s.updateRestart, _Pill.good, updates.restart),
+      UpdateStage.installing => (s.updateTitle, s.updateInstalling, _Pill.none, () {}),
+    };
+    if (title == null || value == null || onTap == null) return null;
+    return _NavRow(
+      icon: Icons.system_update_rounded,
+      title: title,
+      value: value,
+      pill: pill,
+      onTap: () => unawaited(Future.sync(onTap)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
@@ -174,7 +195,14 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
         surfaceTintColor: Colors.transparent,
       ),
       body: ListenableBuilder(
-        listenable: Listenable.merge([_account, _hikorea, _services.locale, _services.theme, _services.reminders]),
+        listenable: Listenable.merge([
+          _account,
+          _hikorea,
+          _services.locale,
+          _services.theme,
+          _services.reminders,
+          _services.updates,
+        ]),
         builder: (context, _) {
           final user = _account.user;
           final signedIn = user != null && user.signedIn;
@@ -236,6 +264,9 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
               _SectionTitle(s.accountApp),
               _RowsCard(
                 children: [
+                  // A newer version on Play: here whatever was answered to
+                  // Play's dialog, until it is installed.
+                  ?_updateRow(s),
                   _NavRow(
                     icon: Icons.translate_rounded,
                     title: s.accountLanguage,
