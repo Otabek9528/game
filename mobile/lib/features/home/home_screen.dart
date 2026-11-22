@@ -648,10 +648,13 @@ class _FeatureTile extends StatelessWidget {
                             : LayoutBuilder(
                                 builder: (context, box) {
                                   final style = _labelStyle(p);
+                                  // Measured in the font it is drawn in: a bare
+                                  // style would measure in another one.
+                                  final drawn = DefaultTextStyle.of(context).style.merge(style);
                                   var widest = 0.0;
                                   for (final word in label.split(RegExp(r'[\s-]+'))) {
                                     final painter = TextPainter(
-                                      text: TextSpan(text: word, style: style),
+                                      text: TextSpan(text: word, style: drawn),
                                       textDirection: Directionality.of(context),
                                       textScaler: MediaQuery.textScalerOf(context),
                                     )..layout();
