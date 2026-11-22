@@ -1,13 +1,13 @@
-# Sending an update to your testers on Google Play
+# Sending a new version to Google Play
 
-For a version after the first. The first release is in `play-launch-guide.html`.
-About 20 minutes of your time, then Google's review.
+Muslim Vegukin is public. This is how each new version reaches everyone. The
+first release is in `play-launch-guide.html`. About 20 minutes of your time,
+then Google's review.
 
 The route: build → **Internal testing** (you alone, no review, minutes) → check
-it on your phone → **promote the same release to Closed testing** (your
-testers; Google reviews it first, usually within hours, sometimes a few days).
-Updating does not restart the 14 days of the closed test, as long as 12 testers
-stay in.
+it on your phone → **promote the same release to Production** (everyone; Google
+reviews it first, usually within hours, sometimes a few days). Managed
+publishing is off, so it goes live by itself once approved.
 
 ## 1. Find the next version code
 
@@ -18,7 +18,8 @@ Play Console → your app → **Test and release → Latest releases and bundles
 (older consoles: App bundle explorer). Note the highest **version code** in the
 list. Yours is that number plus 1. Below it is written `N`.
 
-The version name is what people see. For this update: `1.1.0`.
+The version name is what people see. Production has `4 (1.0.0)`; for this
+update: `1.1.0`.
 
 ## 2. Build
 
@@ -63,13 +64,13 @@ release**.
 
 ```
 <en-US>
-Easier to read: nothing is cut off with larger text or in Russian, touch areas are bigger, dark mode has better contrast. HiKorea: your watches now always load, or say why not and offer to try again. Pages no longer keep loading forever on a weak connection.
+Muslim Vegukin in Telegram and WhatsApp: tap the Muslim Vegukin logo on the home screen for our bot, web app and group, or send them all to friends in one message. New versions now come inside the app: tap Update and keep using the app while it downloads.
 </en-US>
 <ru-RU>
-Стало удобнее читать: текст больше не обрезается при крупном шрифте и на русском, кнопки стали крупнее, в тёмной теме выше контраст. HiKorea: ваши слежения теперь всегда загружаются или сообщают причину и предлагают повторить. Страницы больше не зависают на загрузке при слабой связи.
+Muslim Vegukin в Telegram и WhatsApp: нажмите на логотип Muslim Vegukin на главном экране — бот, веб-приложение и группа в одном месте, и всё это можно отправить друзьям одним сообщением. Новые версии теперь приходят прямо в приложении: нажмите «Обновить» и пользуйтесь приложением, пока идёт загрузка.
 </ru-RU>
 <uz>
-O‘qish qulayroq: katta shrift bilan ham matn kesilmaydi, tugmalar kattaroq, tungi rejimda matn aniqroq. HiKorea: kuzatuvlaringiz endi doim yuklanadi yoki sababini aytib, qayta urinishni taklif qiladi. Internet sust bo‘lganda sahifalar yuklanishda qotib qolmaydi.
+Muslim Vegukin Telegram va WhatsApp’da: bosh sahifadagi Muslim Vegukin logotipini bosing — bot, veb-ilova va guruh bir joyda, hammasini do‘stlarga bitta xabarda yuborish mumkin. Yangi versiyalar endi ilovaning o‘zida keladi: «Yangilash»ni bosing, yuklanayotganda ilovadan foydalanavering.
 </uz>
 ```
 
@@ -86,38 +87,69 @@ app's settings.
 
 Account page, at the bottom: it should read `Versiya 1.1.0 (N)`.
 
-What to look at, 10 minutes:
+What to look at, 5 minutes:
 
 | Where | What should be true |
 |-------|---------------------|
-| HiKorea home | "Kuzatuvlaringiz" ends within 20 seconds as one of three: your watches with their dates, "Hali kuzatuv yo‘q" with how to add one, or "couldn’t load" with **Qayta urinish**. A watch on a counter HiKorea removed says so instead of loading. |
-| HiKorea, in airplane mode | An error with one retry button; after turning the network back on, the retry loads the page. |
-| Phone settings → Display → Font size → largest | Cars: every card shows price, year, mileage, gearbox, fuel, date. Home: the six prayer names are whole. Nothing with a striped yellow-black edge. |
-| A business card | The whole phone number is readable. |
-| HiKorea calendar | The green button reads "HiKorea’da bron qilish" in full; days are easy to hit. |
-| Dark mode | Button labels and grey secondary text are comfortable to read. |
-| Cars → Qidirish → Android back | Returns to the first tab, then leaves (as before). |
-| Sign in (Account → Kirish) with the largest font | The sheet's handle is below the status bar. |
+| Home: tap the logo or the name "Muslim Vegukin" | "Muslim Vegukin hamma joyda" opens from the bottom. |
+| Its three cards | Telegram bot opens the bot in Telegram; WhatsApp bot opens WhatsApp with "start" typed in; Telegram guruh opens the group. |
+| "Do‘stlarga ulashish" | The share menu opens with one message holding the Play link, the bot, WhatsApp and the group. |
+| Account → Ilova → "Telegram va WhatsApp’da" | The same sheet. |
+| Home, Prayers, a reminder, HiKorea | As before. |
 
-## 5. Send it to your testers
+The update offer itself can only be seen with a version newer than this one:
+see "Trying the in-app update" below.
 
-Play Console → **Internal testing → Releases** tab → on the release you just
-made: **Promote release → Closed testing** → your track (Alpha).
+## 5. Release it to everyone
 
-The notes carry over. **Next → Save → Send for review** (or **Start rollout
-to Closed testing**).
+Play Console → **Test and release → Testing → Internal testing → Releases** tab
+→ on the release you just made: **Promote release → Production**.
 
-Google reviews it. Publishing overview shows "In review", then "Available".
-Testers then get it as an ordinary update, automatically within a day or at
-once from the Play Store.
+The notes carry over. Rollout **100 %** → **Next → Save → Start rollout to
+Production**. Publishing overview shows "Changes in review"; don't press
+"Remove changes". Once Google approves, it goes live by itself. People get it
+as an ordinary Play update, automatically within a day or at once from the Play
+Store. Your closed-test testers get it too: Play gives everyone the highest
+version they can have.
 
-A message for your group, to send when it shows "Available":
+A message for your group, once it is live:
 
-> Assalomu alaykum! Ilovaning yangi versiyasi (1.1.0) chiqdi. Play Store’ni
-> oching → profil rasmi → «Ilovalar va qurilmani boshqarish» → «Yangilanishlar»
-> → Muslim Vegukin → «Yangilash». Katta shriftda ham hammasi o‘qiladigan
-> bo‘ldi, HiKorea kuzatuvlari tuzatildi. Xato yoki taklif bo‘lsa, shu yerga
-> yozing. Rahmat!
+> Assalomu alaykum! Ilovaning yangi versiyasi (1.1.0) chiqdi: Play Store’da
+> Muslim Vegukin → «Yangilash». Yangilik: bosh sahifadagi logotipni bosing —
+> Telegram bot, veb-ilova, WhatsApp bot va guruhimiz bir joyda. Bundan keyin
+> yangi versiyalar ilovaning o‘zida taklif qilinadi: «Yangilash»ni bosing,
+> ilova ishlashda davom etadi. Rahmat!
+
+## Trying the in-app update
+
+The offer is part of the app's code, so it works from the version after the one
+that has it. People on 1.0.0 (4) get 1.1.0 the usual Play way; from 1.1.0 on,
+each new version is offered inside the app.
+
+To see it yourself before your users do:
+
+1. Have 1.1.0 (`N`) on your phone **from Google Play** (section 4). An APK you
+   built yourself never gets an offer.
+2. Build the same code again with the next number:
+   `flutter build appbundle --release --obfuscate --split-debug-info=build/symbols --build-name=1.1.1 --build-number=N+1`
+   (write the number, e.g. `--build-number=6`).
+3. Upload it to **Internal testing** only (section 3); notes: "Test build".
+4. Wait 15–60 minutes. Open the app's page in the Play Store once (Play then
+   knows about the new version), close it, and open the app.
+5. What should happen:
+   - **Play's own dialog**, "Update available" → **Update**.
+   - **Home**: a card "Yangi versiya yuklanmoqda…" with a moving bar. Use the
+     app meanwhile: it works as usual.
+   - Then "Yangi versiya tayyor" → **Qayta ishga tushirish**. The app closes
+     and opens again in a few seconds; the Account page reads
+     `Versiya 1.1.1 (N+1)`.
+6. Also worth trying, with a version after that:
+   - **"No thanks"** in Play's dialog: it isn't offered again for three days.
+     Account → Ilova shows "Yangi versiya bor · Yangilash" meanwhile.
+   - **Don't press Restart**: leave the app from its home screen (the phone's
+     Home button). The next time you open it, it is the new version.
+
+1.1.1 is the same app as 1.1.0, so it can go to Production later too.
 
 ## If something goes wrong
 
@@ -126,7 +158,8 @@ A message for your group, to send when it shows "Available":
 | "Version code N has already been used" | Build again with a higher `--build-number`. |
 | "Your Android App Bundle is signed with the wrong key" | `android\key.properties` is missing or points at another keystore: see `RELEASE.md`, section 1. |
 | "You need to add release notes" or a language error | The tags must be languages your listing has. Remove the block Google names. |
-| The update doesn't appear on a phone | Wait an hour; Play Store → Settings → About → tap "Update Play Store"; check the phone's Google account is on the testers list. |
+| The update doesn't appear on a phone | Wait an hour; Play Store → Settings → About → tap "Update Play Store"; for a test build, check the phone's Google account is on the testers list. |
+| No update dialog in the app | Only an app installed from Google Play gets one. Open the app's Play Store page once and reopen the app. A version you declined is offered again after three days, or at once from Account → Ilova → Yangilash. |
 | A problem found after rollout | A release can't be taken back. Fix, build with the next version code, upload again: testers get the newer one. |
 
 ## iPhone
@@ -134,11 +167,16 @@ A message for your group, to send when it shows "Available":
 Codemagic → workflow **iOS to TestFlight** → Start new build on branch
 `claude/intelligent-clarke-88a75i`. Codemagic numbers the build itself.
 
-Two things in this update could only be checked in tests, not on a real
-iPhone. Please try them in the TestFlight build:
+The in-app update is Android only: an iPhone has no such feature, and the App
+Store updates apps by itself. The platforms sheet works on both.
+
+Three things could only be checked in tests, not on a real iPhone. Please try
+them in the TestFlight build:
 
 1. **Cars → Search tab, and Housing → My posts tab: swipe back from the left
    edge.** It should leave the section. (Before, the swipe did nothing there.)
 2. **Account → Sign in, with a large text size** (Settings → Display &
    Brightness → Text Size, or Accessibility → Larger Text): the sheet's handle
    should be under the Dynamic Island, not behind it.
+3. **Home: tap the logo.** The platforms sheet opens; each card opens Telegram
+   or WhatsApp.
