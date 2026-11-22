@@ -4962,4 +4962,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountPrivacy => 'Privacy policy';
+
+  @override
+  String get platformsTitle => 'Muslim Vegukin everywhere';
+
+  @override
+  String get platformsIntro =>
+      'One project, several ways in. Use it in Telegram or WhatsApp too, and point friends to whichever suits them.';
+
+  @override
+  String get platformsYouAreHere => 'You’re in the app now';
+
+  @override
+  String get platformsBot => 'Telegram bot';
+
+  @override
+  String get platformsBotBody =>
+      'The bot and the web app: the web app opens from the bot’s menu button';
+
+  @override
+  String get platformsWhatsApp => 'WhatsApp bot';
+
+  @override
+  String get platformsWhatsAppBody =>
+      'Send “start” in the chat that opens, and the bot replies';
+
+  @override
+  String get platformsGroup => 'Telegram group';
+
+  @override
+  String get platformsGroupBody => 'News, questions and ideas';
+
+  @override
+  String get platformsShare => 'Share with friends';
+
+  @override
+  String platformsShareText(
+    String app,
+    String bot,
+    String whatsapp,
+    String group,
+  ) {
+    return 'Muslim Vegukin — for Muslims in Korea: prayer times, qibla, halal places, HiKorea appointments and more.\n\nAndroid app: $app\nTelegram bot: $bot\nWhatsApp bot: $whatsapp\nTelegram group: $group';
+  }
+
+  @override
+  String get platformsOpen => 'Muslim Vegukin on other platforms';
+
+  @override
+  String get accountPlatforms => 'In Telegram and WhatsApp';
+
+  @override
+  String get updateTitle => 'Update';
+
+  @override
+  String get updateAvailable => 'New version available';
+
+  @override
+  String get updateDownloading => 'Downloading the new version…';
+
+  @override
+  String get updateDownloadingBody => 'Keep using the app as usual';
+
+  @override
+  String get updateDownloadingShort => 'Downloading…';
+
+  @override
+  String get updateReady => 'The new version is ready';
+
+  @override
+  String get updateReadyBody =>
+      'The app restarts in a few seconds. Or later: it installs by itself when you leave the app from the home screen.';
+
+  @override
+  String get updateRestart => 'Restart';
+
+  @override
+  String get updateInstalling => 'Installing…';
 }

@@ -27,3 +27,15 @@ abstract final class CommunityGroup {
   static const handle = '@MuslimVegukin';
   static const url = 'https://t.me/MuslimVegukin';
 }
+
+/// Muslim Vegukin outside the app: the same project in Telegram (the bot,
+/// with the web app behind its menu button) and in WhatsApp.
+abstract final class OtherPlatforms {
+  static const botHandle = '@muslim_vegukin_bot';
+  static const botUrl = 'https://t.me/muslim_vegukin_bot';
+
+  static const whatsAppNumber = '+82 10-8117-4783';
+
+  /// Opens the chat with "start" typed in, ready to send.
+  static const whatsAppUrl = 'https://wa.me/821081174783?text=start';
+}

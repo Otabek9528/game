@@ -8745,6 +8745,143 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Maxfiylik siyosati'**
   String get accountPrivacy;
+
+  /// No description provided for @platformsTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin hamma joyda'**
+  String get platformsTitle;
+
+  /// No description provided for @platformsIntro.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bitta loyiha — bir necha yo‘l. Telegram yoki WhatsApp’da ham foydalaning, do‘stlaringizga qulayini tavsiya qiling.'**
+  String get platformsIntro;
+
+  /// No description provided for @platformsYouAreHere.
+  ///
+  /// In uz, this message translates to:
+  /// **'Siz hozir ilovadasiz'**
+  String get platformsYouAreHere;
+
+  /// No description provided for @platformsBot.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram bot'**
+  String get platformsBot;
+
+  /// No description provided for @platformsBotBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bot va veb-ilova: veb-ilova botdagi menyu tugmasidan ochiladi'**
+  String get platformsBotBody;
+
+  /// No description provided for @platformsWhatsApp.
+  ///
+  /// In uz, this message translates to:
+  /// **'WhatsApp bot'**
+  String get platformsWhatsApp;
+
+  /// No description provided for @platformsWhatsAppBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ochilgan chatda «start»ni yuboring — bot javob beradi'**
+  String get platformsWhatsAppBody;
+
+  /// No description provided for @platformsGroup.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram guruh'**
+  String get platformsGroup;
+
+  /// No description provided for @platformsGroupBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangiliklar, savollar va takliflar'**
+  String get platformsGroupBody;
+
+  /// No description provided for @platformsShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Do‘stlarga ulashish'**
+  String get platformsShare;
+
+  /// No description provided for @platformsShareText.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin — Koreyadagi musulmonlar uchun: namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va boshqalar.\n\nAndroid ilova: {app}\nTelegram bot: {bot}\nWhatsApp bot: {whatsapp}\nTelegram guruh: {group}'**
+  String platformsShareText(
+    String app,
+    String bot,
+    String whatsapp,
+    String group,
+  );
+
+  /// No description provided for @platformsOpen.
+  ///
+  /// In uz, this message translates to:
+  /// **'Muslim Vegukin: boshqa platformalar'**
+  String get platformsOpen;
+
+  /// No description provided for @accountPlatforms.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram va WhatsApp’da'**
+  String get accountPlatforms;
+
+  /// No description provided for @updateTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangilanish'**
+  String get updateTitle;
+
+  /// No description provided for @updateAvailable.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi versiya bor'**
+  String get updateAvailable;
+
+  /// No description provided for @updateDownloading.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi versiya yuklanmoqda…'**
+  String get updateDownloading;
+
+  /// No description provided for @updateDownloadingBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ilovadan bemalol foydalanavering'**
+  String get updateDownloadingBody;
+
+  /// No description provided for @updateDownloadingShort.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklanmoqda…'**
+  String get updateDownloadingShort;
+
+  /// No description provided for @updateReady.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yangi versiya tayyor'**
+  String get updateReady;
+
+  /// No description provided for @updateReadyBody.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ilova bir necha soniyada qayta ochiladi. Yoki keyinroq: bosh sahifadan chiqqaningizda o‘zi o‘rnatiladi.'**
+  String get updateReadyBody;
+
+  /// No description provided for @updateRestart.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qayta ishga tushirish'**
+  String get updateRestart;
+
+  /// No description provided for @updateInstalling.
+  ///
+  /// In uz, this message translates to:
+  /// **'O‘rnatilmoqda…'**
+  String get updateInstalling;
 }
 
 class _AppLocalizationsDelegate

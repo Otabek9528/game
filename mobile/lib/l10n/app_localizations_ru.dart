@@ -5011,4 +5011,81 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get accountPrivacy => 'Политика конфиденциальности';
+
+  @override
+  String get platformsTitle => 'Muslim Vegukin везде';
+
+  @override
+  String get platformsIntro =>
+      'Один проект — несколько путей. Пользуйтесь им и в Telegram или WhatsApp, а друзьям советуйте то, что им удобнее.';
+
+  @override
+  String get platformsYouAreHere => 'Вы сейчас в приложении';
+
+  @override
+  String get platformsBot => 'Telegram-бот';
+
+  @override
+  String get platformsBotBody =>
+      'Бот и веб-приложение: веб-приложение открывается кнопкой меню в боте';
+
+  @override
+  String get platformsWhatsApp => 'WhatsApp-бот';
+
+  @override
+  String get platformsWhatsAppBody =>
+      'В открывшемся чате отправьте «start» — бот ответит';
+
+  @override
+  String get platformsGroup => 'Telegram-группа';
+
+  @override
+  String get platformsGroupBody => 'Новости, вопросы и предложения';
+
+  @override
+  String get platformsShare => 'Поделиться с друзьями';
+
+  @override
+  String platformsShareText(
+    String app,
+    String bot,
+    String whatsapp,
+    String group,
+  ) {
+    return 'Muslim Vegukin — для мусульман в Корее: время намаза, кибла, халяль-места, очередь в HiKorea и многое другое.\n\nAndroid-приложение: $app\nTelegram-бот: $bot\nWhatsApp-бот: $whatsapp\nTelegram-группа: $group';
+  }
+
+  @override
+  String get platformsOpen => 'Muslim Vegukin: другие платформы';
+
+  @override
+  String get accountPlatforms => 'В Telegram и WhatsApp';
+
+  @override
+  String get updateTitle => 'Обновление';
+
+  @override
+  String get updateAvailable => 'Есть новая версия';
+
+  @override
+  String get updateDownloading => 'Загружается новая версия…';
+
+  @override
+  String get updateDownloadingBody => 'Пользуйтесь приложением как обычно';
+
+  @override
+  String get updateDownloadingShort => 'Загружается…';
+
+  @override
+  String get updateReady => 'Новая версия готова';
+
+  @override
+  String get updateReadyBody =>
+      'Приложение перезапустится за несколько секунд. Или позже: установится само, когда вы выйдете с главного экрана.';
+
+  @override
+  String get updateRestart => 'Перезапустить';
+
+  @override
+  String get updateInstalling => 'Устанавливается…';
 }

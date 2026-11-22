@@ -17,6 +17,7 @@ import '../../core/account.dart';
 import '../account/account_screen.dart';
 import '../account/inbox_screen.dart';
 import '../parcel/parcel_controller.dart';
+import '../support/platforms_sheet.dart';
 import 'feature_catalog.dart';
 import 'prayer_card.dart';
 import 'sections.dart';
@@ -177,6 +178,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               account: _services.account,
               onInbox: () => openInbox(context, _services),
               onAccount: () => openAccount(context, _services),
+              onBrand: () => showPlatforms(context, _services),
               onLanguage: _chooseLanguage,
               onTheme: () {
                 HapticFeedback.selectionClick();
@@ -333,7 +335,11 @@ class _Header extends StatelessWidget {
     required this.onAccount,
     required this.onLanguage,
     required this.onTheme,
+    required this.onBrand,
   });
+
+  /// The emblem and the name: the project on its other platforms.
+  final VoidCallback onBrand;
 
   final AppLanguage language;
   final AccountController account;
@@ -365,23 +371,43 @@ class _Header extends StatelessWidget {
             max: 1.15,
             child: Row(
             children: [
-              const KhatamMark(size: 38, glow: false),
-              const SizedBox(width: 9),
-              // The name is a mark, not a sentence: always its two words on
-              // two lines, smaller on a narrow phone, never broken mid-word.
-              const Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    'Muslim\nVegukin',
-                    semanticsLabel: 'Muslim Vegukin',
-                    style: TextStyle(
-                      fontFamily: Brand.displayFont,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
-                      height: 1.05,
-                      color: Colors.white,
+              // The emblem and the name together: one tap shows the project's
+              // other platforms.
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  label: s.platformsOpen,
+                  excludeSemantics: true,
+                  child: InkWell(
+                    onTap: onBrand,
+                    borderRadius: BorderRadius.circular(Corner.pill),
+                    child: const Padding(
+                      padding: EdgeInsets.fromLTRB(2, 4, 8, 4),
+                      child: Row(
+                        children: [
+                          KhatamMark(size: 38, glow: false),
+                          SizedBox(width: 9),
+                          // The name is a mark, not a sentence: always its two
+                          // words on two lines, smaller on a narrow phone, never
+                          // broken mid-word.
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Text(
+                                'Muslim\nVegukin',
+                                style: TextStyle(
+                                  fontFamily: Brand.displayFont,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
+                                  height: 1.05,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

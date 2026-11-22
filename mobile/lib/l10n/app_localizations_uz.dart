@@ -4884,4 +4884,81 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get accountPrivacy => 'Maxfiylik siyosati';
+
+  @override
+  String get platformsTitle => 'Muslim Vegukin hamma joyda';
+
+  @override
+  String get platformsIntro =>
+      'Bitta loyiha — bir necha yo‘l. Telegram yoki WhatsApp’da ham foydalaning, do‘stlaringizga qulayini tavsiya qiling.';
+
+  @override
+  String get platformsYouAreHere => 'Siz hozir ilovadasiz';
+
+  @override
+  String get platformsBot => 'Telegram bot';
+
+  @override
+  String get platformsBotBody =>
+      'Bot va veb-ilova: veb-ilova botdagi menyu tugmasidan ochiladi';
+
+  @override
+  String get platformsWhatsApp => 'WhatsApp bot';
+
+  @override
+  String get platformsWhatsAppBody =>
+      'Ochilgan chatda «start»ni yuboring — bot javob beradi';
+
+  @override
+  String get platformsGroup => 'Telegram guruh';
+
+  @override
+  String get platformsGroupBody => 'Yangiliklar, savollar va takliflar';
+
+  @override
+  String get platformsShare => 'Do‘stlarga ulashish';
+
+  @override
+  String platformsShareText(
+    String app,
+    String bot,
+    String whatsapp,
+    String group,
+  ) {
+    return 'Muslim Vegukin — Koreyadagi musulmonlar uchun: namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va boshqalar.\n\nAndroid ilova: $app\nTelegram bot: $bot\nWhatsApp bot: $whatsapp\nTelegram guruh: $group';
+  }
+
+  @override
+  String get platformsOpen => 'Muslim Vegukin: boshqa platformalar';
+
+  @override
+  String get accountPlatforms => 'Telegram va WhatsApp’da';
+
+  @override
+  String get updateTitle => 'Yangilanish';
+
+  @override
+  String get updateAvailable => 'Yangi versiya bor';
+
+  @override
+  String get updateDownloading => 'Yangi versiya yuklanmoqda…';
+
+  @override
+  String get updateDownloadingBody => 'Ilovadan bemalol foydalanavering';
+
+  @override
+  String get updateDownloadingShort => 'Yuklanmoqda…';
+
+  @override
+  String get updateReady => 'Yangi versiya tayyor';
+
+  @override
+  String get updateReadyBody =>
+      'Ilova bir necha soniyada qayta ochiladi. Yoki keyinroq: bosh sahifadan chiqqaningizda o‘zi o‘rnatiladi.';
+
+  @override
+  String get updateRestart => 'Qayta ishga tushirish';
+
+  @override
+  String get updateInstalling => 'O‘rnatilmoqda…';
 }

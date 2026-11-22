@@ -23,6 +23,7 @@ import '../notifications/notify_models.dart';
 import '../onboarding/language_screen.dart';
 import '../prayers/prayers_screen.dart';
 import '../reminders/reminders.dart';
+import '../support/platforms_sheet.dart';
 import '../widget/widget_offer.dart';
 import 'inbox_screen.dart';
 import 'privacy_screen.dart';
@@ -268,6 +269,11 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
                     icon: Icons.share_rounded,
                     title: s.accountShare,
                     onTap: () => unawaited(_services.shareText(s.accountShareText(AppConfig.playStoreUrl))),
+                  ),
+                  _NavRow(
+                    icon: Icons.devices_rounded,
+                    title: s.accountPlatforms,
+                    onTap: () => showPlatforms(context, _services),
                   ),
                   _NavRow(
                     icon: Icons.forum_rounded,
