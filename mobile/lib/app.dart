@@ -101,7 +101,7 @@ class _VegukinAppState extends State<VegukinApp> with WidgetsBindingObserver {
         content: Text(s.updateReady),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 8),
-        action: SnackBarAction(label: s.updateRestart, onPressed: updates.restart),
+        action: SnackBarAction(label: s.updateInstall, onPressed: updates.restart),
       ));
   }
 

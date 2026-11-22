@@ -99,7 +99,7 @@ enum UpdateStage { none, available, downloading, ready, installing }
 /// After the start, Play is asked once; a newer version is offered with Play's
 /// own dialog, at most once every three days for the same version (it can
 /// always be taken from the account page). Taken, it downloads in the
-/// background. Then it installs when "Restart" is tapped, or by itself when
+/// background. Then it installs when "Install" is tapped, or by itself when
 /// the app is left from its home screen ([installQuietly]), where nothing is
 /// lost by restarting.
 class UpdateController extends ChangeNotifier {
@@ -197,7 +197,8 @@ class UpdateController extends ChangeNotifier {
     return _clock().difference(DateTime.fromMillisecondsSinceEpoch(at)) >= askAgainAfter;
   }
 
-  /// "Update" tapped in the app: Play's dialog, whatever was answered before.
+  /// The account page's update row tapped: Play's dialog, whatever was
+  /// answered before.
   Future<void> update() async {
     if (_stage != UpdateStage.available) return;
     await _offer();
@@ -230,7 +231,7 @@ class UpdateController extends ChangeNotifier {
     }
   }
 
-  /// "Restart" tapped: installs now.
+  /// "Install" tapped: installs now (the app restarts on the new version).
   void restart() {
     if (_stage != UpdateStage.ready) return;
     _activity?.log('update', 'restart');

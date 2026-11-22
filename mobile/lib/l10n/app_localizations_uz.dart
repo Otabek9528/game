@@ -4886,37 +4886,25 @@ class AppLocalizationsUz extends AppLocalizations {
   String get accountPrivacy => 'Maxfiylik siyosati';
 
   @override
-  String get platformsTitle => 'Muslim Vegukin hamma joyda';
-
-  @override
-  String get platformsIntro =>
-      'Bitta loyiha — bir necha yo‘l. Telegram yoki WhatsApp’da ham foydalaning, do‘stlaringizga qulayini tavsiya qiling.';
-
-  @override
-  String get platformsYouAreHere => 'Siz hozir ilovadasiz';
+  String get platformsTitle => 'Boshqa platformalar';
 
   @override
   String get platformsBot => 'Telegram bot';
 
   @override
-  String get platformsBotBody =>
-      'Bot va veb-ilova: veb-ilova botdagi menyu tugmasidan ochiladi';
+  String get platformsBotBody => 'Veb-ilova ham shu yerda';
 
   @override
   String get platformsWhatsApp => 'WhatsApp bot';
 
   @override
-  String get platformsWhatsAppBody =>
-      'Ochilgan chatda «start»ni yuboring — bot javob beradi';
-
-  @override
   String get platformsGroup => 'Telegram guruh';
 
   @override
-  String get platformsGroupBody => 'Yangiliklar, savollar va takliflar';
+  String get platformsGroupBody => 'Yangiliklar va savollar';
 
   @override
-  String get platformsShare => 'Do‘stlarga ulashish';
+  String get platformsShare => 'Ulashish';
 
   @override
   String platformsShareText(
@@ -4925,14 +4913,11 @@ class AppLocalizationsUz extends AppLocalizations {
     String whatsapp,
     String group,
   ) {
-    return 'Muslim Vegukin — Koreyadagi musulmonlar uchun: namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va boshqalar.\n\nAndroid ilova: $app\nTelegram bot: $bot\nWhatsApp bot: $whatsapp\nTelegram guruh: $group';
+    return 'Muslim Vegukin — Koreyadagi musulmonlar uchun.\n\nAndroid: $app\nTelegram: $bot\nWhatsApp: $whatsapp\nGuruh: $group';
   }
 
   @override
   String get platformsOpen => 'Muslim Vegukin: boshqa platformalar';
-
-  @override
-  String get accountPlatforms => 'Telegram va WhatsApp’da';
 
   @override
   String get updateTitle => 'Yangilanish';
@@ -4941,27 +4926,14 @@ class AppLocalizationsUz extends AppLocalizations {
   String get updateAvailable => 'Yangi versiya bor';
 
   @override
-  String get updateDownloading => 'Yangi versiya yuklanmoqda…';
-
-  @override
-  String get updateDownloadingBody => 'Ilovadan bemalol foydalanavering';
-
-  @override
-  String get updateDownloadingShort => 'Yuklanmoqda…';
+  String get updateDownloading => 'Yuklanmoqda…';
 
   @override
   String get updateReady => 'Yangi versiya tayyor';
 
   @override
-  String get updateReadyBody =>
-      'Ilova bir necha soniyada qayta ochiladi. Yoki keyinroq: bosh sahifadan chiqqaningizda o‘zi o‘rnatiladi.';
-
-  @override
-  String get updateRestart => 'Qayta ishga tushirish';
-
-  @override
   String get updateInstalling => 'O‘rnatilmoqda…';
 
   @override
-  String get updateNow => 'Yangilash';
+  String get updateInstall => 'O‘rnatish';
 }

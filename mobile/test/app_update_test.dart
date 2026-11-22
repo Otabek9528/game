@@ -127,7 +127,8 @@ void main() {
       await app.launch(tester, settle: false);
       await frames(tester);
       expect(app.playUpdates.asked, ['check', 'dialog']);
-      expect(find.descendant(of: banner, matching: find.text('Downloading the new version…')), findsOneWidget);
+      expect(find.descendant(of: banner, matching: find.text('Update')), findsOneWidget);
+      expect(find.descendant(of: banner, matching: find.text('Downloading…')), findsOneWidget);
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
 
       // Meanwhile the app works as ever.
@@ -136,14 +137,14 @@ void main() {
       expect(find.byType(AccountScreen), findsOneWidget);
       final row = find.text('Downloading…');
       await tester.scrollUntilVisible(row, 150, scrollable: find.byType(Scrollable).last);
-      expect(row, findsOneWidget, reason: 'its row on the account page');
+      expect(row, findsOneWidget, reason: 'its row on the account page: Update · Downloading…');
       await tester.pageBack();
       await frames(tester);
 
       app.playUpdates.finishDownload();
       await tester.pumpAndSettle();
-      expect(find.text('The new version is ready'), findsOneWidget);
-      await tester.tap(find.descendant(of: banner, matching: find.text('Restart')));
+      expect(find.descendant(of: banner, matching: find.text('New version ready')), findsOneWidget);
+      await tester.tap(find.descendant(of: banner, matching: find.text('Install')));
       await tester.pump();
       expect(app.playUpdates.asked.last, 'install');
       expect(find.text('Installing…'), findsOneWidget);
@@ -161,7 +162,7 @@ void main() {
       app.playUpdates.finishDownload();
       await tester.pumpAndSettle();
       expect(find.byType(SnackBar), findsOneWidget);
-      await tester.tap(find.descendant(of: find.byType(SnackBar), matching: find.text('Qayta ishga tushirish')));
+      await tester.tap(find.descendant(of: find.byType(SnackBar), matching: find.text('O‘rnatish')));
       await tester.pump();
       expect(app.playUpdates.asked.last, 'install');
     });
@@ -170,7 +171,7 @@ void main() {
       final app = TestApp(language: 'en');
       app.playUpdates.next = const PlayUpdate(versionCode: 5, downloaded: true);
       await app.launch(tester);
-      expect(find.text('The new version is ready'), findsOneWidget);
+      expect(find.text('New version ready'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Account'));
       await tester.pumpAndSettle();
@@ -196,13 +197,12 @@ void main() {
         ..next = const PlayUpdate(versionCode: 5)
         ..accept = false;
       await app.launch(tester);
-      expect(find.text('Downloading the new version…'), findsNothing);
-      expect(find.text('The new version is ready'), findsNothing);
+      expect(find.text('Downloading…'), findsNothing);
+      expect(find.text('New version ready'), findsNothing);
 
       await tester.tap(find.byTooltip('Account'));
       await tester.pumpAndSettle();
       final row = find.text('New version available');
-      expect(find.text('Update'), findsNothing, reason: 'not built yet: further down');
       await tester.scrollUntilVisible(row, 150, scrollable: find.byType(Scrollable).last);
       await tester.ensureVisible(row);
       await tester.pumpAndSettle();
@@ -211,7 +211,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(app.playUpdates.asked.where((a) => a == 'dialog'), hasLength(2));
       // The row says what is next, and so does the note at the bottom.
-      expect(find.text('Restart'), findsNWidgets(2));
+      expect(find.text('New version ready'), findsNWidgets(2));
+      expect(find.text('Install'), findsNWidgets(2));
       expect(find.byType(SnackBar), findsOneWidget);
     });
 
@@ -219,7 +220,7 @@ void main() {
       final app = TestApp(language: 'en');
       await app.launch(tester);
       expect(app.playUpdates.asked, ['check']);
-      expect(find.text('Downloading the new version…'), findsNothing);
+      expect(find.text('Downloading…'), findsNothing);
       await tester.tap(find.byTooltip('Account'));
       await tester.pumpAndSettle();
       expect(find.text('Update'), findsNothing);

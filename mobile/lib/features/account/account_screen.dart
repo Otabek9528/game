@@ -165,20 +165,22 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
 
   Widget? _updateRow(AppLocalizations s) {
     final updates = _services.updates;
-    // What it is on the left (room to wrap), what a tap does on the right.
-    final (title, value, pill, onTap) = switch (updates.stage) {
-      UpdateStage.none => (null, null, _Pill.none, null),
-      UpdateStage.available => (s.updateAvailable, s.updateNow, _Pill.news, updates.update),
-      UpdateStage.downloading => (s.updateTitle, s.updateDownloadingShort, _Pill.none, () {}),
-      UpdateStage.ready => (s.updateReady, s.updateRestart, _Pill.good, updates.restart),
-      UpdateStage.installing => (s.updateTitle, s.updateInstalling, _Pill.none, () {}),
+    // "Update", its status under it; only a version ready to install has a
+    // button, which restarts the app.
+    final (status, install, onTap) = switch (updates.stage) {
+      UpdateStage.none => (null, null, null),
+      UpdateStage.available => (s.updateAvailable, null, updates.update),
+      UpdateStage.downloading => (s.updateDownloading, null, () {}),
+      UpdateStage.ready => (s.updateReady, s.updateInstall, updates.restart),
+      UpdateStage.installing => (s.updateInstalling, null, () {}),
     };
-    if (title == null || value == null || onTap == null) return null;
+    if (status == null || onTap == null) return null;
     return _NavRow(
       icon: Icons.system_update_rounded,
-      title: title,
-      value: value,
-      pill: pill,
+      title: s.updateTitle,
+      subtitle: status,
+      value: install,
+      pill: install == null ? _Pill.none : _Pill.good,
       onTap: () => unawaited(Future.sync(onTap)),
     );
   }
@@ -303,7 +305,7 @@ class _AccountScreenState extends State<AccountScreen> with WidgetsBindingObserv
                   ),
                   _NavRow(
                     icon: Icons.devices_rounded,
-                    title: s.accountPlatforms,
+                    title: s.platformsTitle,
                     onTap: () => showPlatforms(context, _services),
                   ),
                   _NavRow(
@@ -985,6 +987,7 @@ class _NavRow extends StatelessWidget {
   const _NavRow({
     required this.icon,
     required this.title,
+    this.subtitle,
     this.value,
     bool highlight = false,
     _Pill pill = _Pill.none,
@@ -993,6 +996,9 @@ class _NavRow extends StatelessWidget {
 
   final IconData icon;
   final String title;
+
+  /// Under the title: a status in a few words.
+  final String? subtitle;
 
   /// On the right: a count, the current choice; null while loading.
   final String? value;
@@ -1014,7 +1020,17 @@ class _NavRow extends StatelessWidget {
           children: [
             _RowIcon(icon),
             const SizedBox(width: 14),
-            Expanded(child: Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: p.ink))),
+            Expanded(
+              child: subtitle == null
+                  ? Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: p.ink))
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: p.ink)),
+                        Text(subtitle!, style: TextStyle(fontSize: 13, height: 1.3, color: p.inkMuted)),
+                      ],
+                    ),
+            ),
             // At most a third of the row, so the arrows line up.
             if (value != null)
               ConstrainedBox(

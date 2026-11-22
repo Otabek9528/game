@@ -12,8 +12,7 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Muslim Vegukin: boshqa platformalar'));
       await tester.pumpAndSettle();
       expect(find.byType(PlatformsSheet), findsOneWidget);
-      expect(find.text('Muslim Vegukin hamma joyda'), findsOneWidget);
-      expect(find.text('Siz hozir ilovadasiz'), findsOneWidget);
+      expect(find.text('Boshqa platformalar'), findsOneWidget);
 
       await tester.tap(find.text('Telegram bot'));
       await tester.pumpAndSettle();
@@ -35,8 +34,8 @@ void main() {
       await app.launch(tester);
       await tester.tap(find.bySemanticsLabel('Muslim Vegukin on other platforms'));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Share with friends'));
-      await tester.tap(find.text('Share with friends'));
+      await tester.ensureVisible(find.text('Share'));
+      await tester.tap(find.text('Share'));
       await tester.pumpAndSettle();
       final text = app.shared.single;
       for (final link in [
@@ -54,14 +53,13 @@ void main() {
       await app.launch(tester);
       await tester.tap(find.byTooltip('Аккаунт'));
       await tester.pumpAndSettle();
-      final row = find.text('В Telegram и WhatsApp');
+      final row = find.text('Другие платформы');
       await tester.scrollUntilVisible(row, 150, scrollable: find.byType(Scrollable).last);
       await tester.ensureVisible(row);
       await tester.pumpAndSettle();
       await tester.tap(row);
       await tester.pumpAndSettle();
       expect(find.byType(PlatformsSheet), findsOneWidget);
-      expect(find.text('Muslim Vegukin везде'), findsOneWidget);
     });
 
     testWidgets('fits a small phone with large text, in Russian', (tester) async {
@@ -70,7 +68,7 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Muslim Vegukin: другие платформы'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      await tester.ensureVisible(find.text('Поделиться с друзьями'));
+      await tester.ensureVisible(find.text('Поделиться'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });

@@ -15,7 +15,7 @@ import 'support_data.dart';
 /// Muslim Vegukin on its other platforms: the Telegram bot (and the web app
 /// inside it), the WhatsApp bot and the Telegram group, each a tap away, and
 /// all of them shared in one message. Opened from the home screen's emblem
-/// and from the account page.
+/// and from the account page. Few words: the names and the marks say it.
 Future<void> showPlatforms(BuildContext context, AppServices services) {
   HapticFeedback.lightImpact();
   services.activity.log('platforms');
@@ -85,7 +85,6 @@ class PlatformsSheet extends StatelessWidget {
                   tint: const Color(0xFF25D366),
                   title: s.platformsWhatsApp,
                   handle: OtherPlatforms.whatsAppNumber,
-                  body: s.platformsWhatsAppBody,
                   onTap: () => _open('whatsapp_bot', OtherPlatforms.whatsAppUrl),
                 ),
                 const SizedBox(height: Space.md),
@@ -123,7 +122,7 @@ class PlatformsSheet extends StatelessWidget {
   }
 }
 
-/// The emerald top: the emblem, the name, what this is, and where one is now.
+/// The emerald top: the emblem and what this is.
 class _Hero extends StatelessWidget {
   const _Hero();
 
@@ -136,7 +135,7 @@ class _Hero extends StatelessWidget {
         gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: p.hero.sublist(1)),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(Space.xxl, Space.md, Space.xxl, Space.xxl),
+        padding: const EdgeInsets.fromLTRB(Space.xxl, Space.md, Space.xxl, Space.xl),
         child: Column(
           children: [
             // The sheet's handle, light on the emerald.
@@ -148,9 +147,9 @@ class _Hero extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: Space.xl),
-            const KhatamMark(size: 68),
             const SizedBox(height: Space.lg),
+            const KhatamMark(size: 60),
+            const SizedBox(height: Space.md),
             Text(
               s.platformsTitle,
               textAlign: TextAlign.center,
@@ -162,37 +161,6 @@ class _Hero extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: Space.sm),
-            Text(
-              s.platformsIntro,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, height: 1.45, color: Colors.white.withValues(alpha: 0.88)),
-            ),
-            const SizedBox(height: Space.lg),
-            // Where one is now: the app itself, among the ways in.
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(Corner.pill),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: Space.md, vertical: 6),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.check_circle_rounded, size: 16, color: Brand.gold300),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        s.platformsYouAreHere,
-                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -201,7 +169,8 @@ class _Hero extends StatelessWidget {
 }
 
 /// One platform: its mark on a tint of its colour, its name and address,
-/// what it offers, and the arrow that says it opens outside the app.
+/// what it offers when that isn't obvious, and the arrow that says it opens
+/// outside the app.
 class PlatformTile extends StatelessWidget {
   const PlatformTile({
     super.key,
@@ -209,7 +178,7 @@ class PlatformTile extends StatelessWidget {
     required this.tint,
     required this.title,
     required this.handle,
-    required this.body,
+    this.body,
     required this.onTap,
   });
 
@@ -217,7 +186,9 @@ class PlatformTile extends StatelessWidget {
   final Color tint;
   final String title;
   final String handle;
-  final String body;
+
+  /// What it offers, when the name alone doesn't say.
+  final String? body;
   final VoidCallback onTap;
 
   @override
@@ -232,7 +203,6 @@ class PlatformTile extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(Space.lg, Space.lg, Space.md, Space.lg),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 48,
@@ -252,16 +222,15 @@ class PlatformTile extends StatelessWidget {
                       handle,
                       style: TextStyle(fontSize: TextSize.small, fontWeight: FontWeight.w600, color: p.accent),
                     ),
-                    const SizedBox(height: Space.xs + 2),
-                    Text(body, style: TextStyle(fontSize: 13, height: 1.4, color: p.inkSoft)),
+                    if (body case final body?) ...[
+                      const SizedBox(height: Space.xs),
+                      Text(body, style: TextStyle(fontSize: 13, height: 1.4, color: p.inkSoft)),
+                    ],
                   ],
                 ),
               ),
               const SizedBox(width: Space.sm),
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Icon(Icons.north_east_rounded, size: 20, color: p.inkMuted),
-              ),
+              Icon(Icons.north_east_rounded, size: 20, color: p.inkMuted),
             ],
           ),
         ),

@@ -2494,17 +2494,14 @@
   "accountFeedback": "Taklif yoki xato haqida yozish",
   "accountVersion": "Versiya {version}",
   "accountPrivacy": "Maxfiylik siyosati",
-  "platformsTitle": "Muslim Vegukin hamma joyda",
-  "platformsIntro": "Bitta loyiha — bir necha yo‘l. Telegram yoki WhatsApp’da ham foydalaning, do‘stlaringizga qulayini tavsiya qiling.",
-  "platformsYouAreHere": "Siz hozir ilovadasiz",
+  "platformsTitle": "Boshqa platformalar",
   "platformsBot": "Telegram bot",
-  "platformsBotBody": "Bot va veb-ilova: veb-ilova botdagi menyu tugmasidan ochiladi",
+  "platformsBotBody": "Veb-ilova ham shu yerda",
   "platformsWhatsApp": "WhatsApp bot",
-  "platformsWhatsAppBody": "Ochilgan chatda «start»ni yuboring — bot javob beradi",
   "platformsGroup": "Telegram guruh",
-  "platformsGroupBody": "Yangiliklar, savollar va takliflar",
-  "platformsShare": "Do‘stlarga ulashish",
-  "platformsShareText": "Muslim Vegukin — Koreyadagi musulmonlar uchun: namoz vaqtlari, qibla, halol joylar, HiKorea navbatlari va boshqalar.\n\nAndroid ilova: {app}\nTelegram bot: {bot}\nWhatsApp bot: {whatsapp}\nTelegram guruh: {group}",
+  "platformsGroupBody": "Yangiliklar va savollar",
+  "platformsShare": "Ulashish",
+  "platformsShareText": "Muslim Vegukin — Koreyadagi musulmonlar uchun.\n\nAndroid: {app}\nTelegram: {bot}\nWhatsApp: {whatsapp}\nGuruh: {group}",
   "@platformsShareText": {
     "placeholders": {
       "app": {
@@ -2522,15 +2519,10 @@
     }
   },
   "platformsOpen": "Muslim Vegukin: boshqa platformalar",
-  "accountPlatforms": "Telegram va WhatsApp’da",
   "updateTitle": "Yangilanish",
   "updateAvailable": "Yangi versiya bor",
-  "updateDownloading": "Yangi versiya yuklanmoqda…",
-  "updateDownloadingBody": "Ilovadan bemalol foydalanavering",
-  "updateDownloadingShort": "Yuklanmoqda…",
+  "updateDownloading": "Yuklanmoqda…",
   "updateReady": "Yangi versiya tayyor",
-  "updateReadyBody": "Ilova bir necha soniyada qayta ochiladi. Yoki keyinroq: bosh sahifadan chiqqaningizda o‘zi o‘rnatiladi.",
-  "updateRestart": "Qayta ishga tushirish",
   "updateInstalling": "O‘rnatilmoqda…",
-  "updateNow": "Yangilash"
+  "updateInstall": "O‘rnatish"
 }

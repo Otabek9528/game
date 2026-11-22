@@ -4964,37 +4964,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountPrivacy => 'Privacy policy';
 
   @override
-  String get platformsTitle => 'Muslim Vegukin everywhere';
-
-  @override
-  String get platformsIntro =>
-      'One project, several ways in. Use it in Telegram or WhatsApp too, and point friends to whichever suits them.';
-
-  @override
-  String get platformsYouAreHere => 'You’re in the app now';
+  String get platformsTitle => 'Other platforms';
 
   @override
   String get platformsBot => 'Telegram bot';
 
   @override
-  String get platformsBotBody =>
-      'The bot and the web app: the web app opens from the bot’s menu button';
+  String get platformsBotBody => 'The web app is here too';
 
   @override
   String get platformsWhatsApp => 'WhatsApp bot';
 
   @override
-  String get platformsWhatsAppBody =>
-      'Send “start” in the chat that opens, and the bot replies';
-
-  @override
   String get platformsGroup => 'Telegram group';
 
   @override
-  String get platformsGroupBody => 'News, questions and ideas';
+  String get platformsGroupBody => 'News and questions';
 
   @override
-  String get platformsShare => 'Share with friends';
+  String get platformsShare => 'Share';
 
   @override
   String platformsShareText(
@@ -5003,14 +4991,11 @@ class AppLocalizationsEn extends AppLocalizations {
     String whatsapp,
     String group,
   ) {
-    return 'Muslim Vegukin — for Muslims in Korea: prayer times, qibla, halal places, HiKorea appointments and more.\n\nAndroid app: $app\nTelegram bot: $bot\nWhatsApp bot: $whatsapp\nTelegram group: $group';
+    return 'Muslim Vegukin — for Muslims in Korea.\n\nAndroid: $app\nTelegram: $bot\nWhatsApp: $whatsapp\nGroup: $group';
   }
 
   @override
   String get platformsOpen => 'Muslim Vegukin on other platforms';
-
-  @override
-  String get accountPlatforms => 'In Telegram and WhatsApp';
 
   @override
   String get updateTitle => 'Update';
@@ -5019,27 +5004,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateAvailable => 'New version available';
 
   @override
-  String get updateDownloading => 'Downloading the new version…';
+  String get updateDownloading => 'Downloading…';
 
   @override
-  String get updateDownloadingBody => 'Keep using the app as usual';
-
-  @override
-  String get updateDownloadingShort => 'Downloading…';
-
-  @override
-  String get updateReady => 'The new version is ready';
-
-  @override
-  String get updateReadyBody =>
-      'The app restarts in a few seconds. Or later: it installs by itself when you leave the app from the home screen.';
-
-  @override
-  String get updateRestart => 'Restart';
+  String get updateReady => 'New version ready';
 
   @override
   String get updateInstalling => 'Installing…';
 
   @override
-  String get updateNow => 'Update';
+  String get updateInstall => 'Install';
 }

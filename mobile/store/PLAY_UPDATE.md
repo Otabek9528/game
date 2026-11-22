@@ -64,13 +64,13 @@ release**.
 
 ```
 <en-US>
-Muslim Vegukin in Telegram and WhatsApp: tap the Muslim Vegukin logo on the home screen for our bot, web app and group, or send them all to friends in one message. New versions now come inside the app: tap Update and keep using the app while it downloads.
+Other platforms: tap the Muslim Vegukin logo on the home screen for our Telegram bot, web app, WhatsApp bot and group. Updates now install from inside the app.
 </en-US>
 <ru-RU>
-Muslim Vegukin в Telegram и WhatsApp: нажмите на логотип Muslim Vegukin на главном экране — бот, веб-приложение и группа в одном месте, и всё это можно отправить друзьям одним сообщением. Новые версии теперь приходят прямо в приложении: нажмите «Обновить» и пользуйтесь приложением, пока идёт загрузка.
+Другие платформы: нажмите на логотип Muslim Vegukin на главном экране — Telegram-бот, веб-приложение, WhatsApp-бот и группа. Обновления теперь устанавливаются прямо из приложения.
 </ru-RU>
 <uz>
-Muslim Vegukin Telegram va WhatsApp’da: bosh sahifadagi Muslim Vegukin logotipini bosing — bot, veb-ilova va guruh bir joyda, hammasini do‘stlarga bitta xabarda yuborish mumkin. Yangi versiyalar endi ilovaning o‘zida keladi: «Yangilash»ni bosing, yuklanayotganda ilovadan foydalanavering.
+Boshqa platformalar: bosh sahifadagi Muslim Vegukin logotipini bosing — Telegram bot, veb-ilova, WhatsApp bot va guruh. Yangilanishlar endi ilovaning o‘zida o‘rnatiladi.
 </uz>
 ```
 
@@ -91,10 +91,10 @@ What to look at, 5 minutes:
 
 | Where | What should be true |
 |-------|---------------------|
-| Home: tap the logo or the name "Muslim Vegukin" | "Muslim Vegukin hamma joyda" opens from the bottom. |
+| Home: tap the logo or the name "Muslim Vegukin" | "Boshqa platformalar" opens from the bottom. |
 | Its three cards | Telegram bot opens the bot in Telegram; WhatsApp bot opens WhatsApp with "start" typed in; Telegram guruh opens the group. |
-| "Do‘stlarga ulashish" | The share menu opens with one message holding the Play link, the bot, WhatsApp and the group. |
-| Account → Ilova → "Telegram va WhatsApp’da" | The same sheet. |
+| "Ulashish" | The share menu opens with one message: the Play link, the bot, WhatsApp, the group. |
+| Akkaunt → Ilova → "Boshqa platformalar" | The same sheet. |
 | Home, Prayers, a reminder, HiKorea | As before. |
 
 The update offer itself can only be seen with a version newer than this one:
@@ -114,11 +114,9 @@ version they can have.
 
 A message for your group, once it is live:
 
-> Assalomu alaykum! Ilovaning yangi versiyasi (1.1.0) chiqdi: Play Store’da
-> Muslim Vegukin → «Yangilash». Yangilik: bosh sahifadagi logotipni bosing —
-> Telegram bot, veb-ilova, WhatsApp bot va guruhimiz bir joyda. Bundan keyin
-> yangi versiyalar ilovaning o‘zida taklif qilinadi: «Yangilash»ni bosing,
-> ilova ishlashda davom etadi. Rahmat!
+> Assalomu alaykum! Yangi versiya (1.1.0): Play Store → Muslim Vegukin →
+> «Yangilash». Yangilik: bosh sahifadagi logotipni bosing — Telegram, WhatsApp
+> va guruhimiz bir joyda. Keyingi yangilanishlar ilovaning o‘zida keladi.
 
 ## Trying the in-app update
 
@@ -138,15 +136,16 @@ To see it yourself before your users do:
    knows about the new version), close it, and open the app.
 5. What should happen:
    - **Play's own dialog**, "Update available" → **Update**.
-   - **Home**: a card "Yangi versiya yuklanmoqda…" with a moving bar. Use the
+   - **Home**: a card "Yangilanish · Yuklanmoqda…" with a moving bar. Use the
      app meanwhile: it works as usual.
-   - Then "Yangi versiya tayyor" → **Qayta ishga tushirish**. The app closes
+   - Then "Yangilanish · Yangi versiya tayyor" → **O‘rnatish**. The app closes
      and opens again in a few seconds; the Account page reads
      `Versiya 1.1.1 (N+1)`.
 6. Also worth trying, with a version after that:
    - **"No thanks"** in Play's dialog: it isn't offered again for three days.
-     Account → Ilova shows "Yangi versiya bor · Yangilash" meanwhile.
-   - **Don't press Restart**: leave the app from its home screen (the phone's
+     Akkaunt → Ilova shows "Yangilanish · Yangi versiya bor" meanwhile; a tap
+     offers it again.
+   - **Don't press O‘rnatish**: leave the app from its home screen (the phone's
      Home button). The next time you open it, it is the new version.
 
 1.1.1 is the same app as 1.1.0, so it can go to Production later too.
@@ -159,7 +158,7 @@ To see it yourself before your users do:
 | "Your Android App Bundle is signed with the wrong key" | `android\key.properties` is missing or points at another keystore: see `RELEASE.md`, section 1. |
 | "You need to add release notes" or a language error | The tags must be languages your listing has. Remove the block Google names. |
 | The update doesn't appear on a phone | Wait an hour; Play Store → Settings → About → tap "Update Play Store"; for a test build, check the phone's Google account is on the testers list. |
-| No update dialog in the app | Only an app installed from Google Play gets one. Open the app's Play Store page once and reopen the app. A version you declined is offered again after three days, or at once from Account → Ilova → Yangilash. |
+| No update dialog in the app | Only an app installed from Google Play gets one. Open the app's Play Store page once and reopen the app. A version you declined is offered again after three days, or at once from Akkaunt → Ilova → Yangilanish. |
 | A problem found after rollout | A release can't be taken back. Fix, build with the next version code, upload again: testers get the newer one. |
 
 ## iPhone
