@@ -520,7 +520,11 @@ async function renderPlaceDetail(place) {
             <span class="detail-copy-mark">${PL_ICONS.copy}</span>
           </div>
         </div>
-        
+
+        <!-- Mosques: congregation and Eid times, below contact and address.
+             Filled by PlaceTimes with DOM APIs. -->
+        ${PLACE_TYPE === 'mosque' ? '<div class="detail-section pd-times" id="pdTimesSection" hidden></div>' : ''}
+
         <!-- Community-submitted, admin-moderated. Filled by PlaceExtras
              with DOM APIs so no place-supplied string touches innerHTML. -->
         <div class="detail-section" id="pdSocialSection"></div>
@@ -621,6 +625,7 @@ async function renderPlaceDetail(place) {
   if (window.PlaceExtras) PlaceExtras.mount(place);
   if (window.PlaceWatch) PlaceWatch.mount(place);
   if (window.PlaceAnnounce) PlaceAnnounce.mount(place);
+  if (window.PlaceTimes) PlaceTimes.mount(place);
 
   // Photos arrive after the card is already on screen.
   PlacePhotos.all(place.photo).then(function (photos) {
@@ -1979,4 +1984,480 @@ const Notify = (function () {
   });
 
   window.PlaceAnnounce = { mount: mount };
+})();
+
+
+// ============================================
+// PRAYER TIMES  (mosques: congregation and Eid times)
+// ============================================
+// Anyone signed in can change them and the change shows at once, with no
+// review; the sheet says so. The server keeps every version for the admin.
+//   place.timetable  {fajr … jumuah: "HH:MM" | null, updatedAt, stale} | null
+//   place.eid        {fitr: {sessions, updatedAt, stale} | null, adha: … }
+// A server without these fields (before the prayer-times update) sends no
+// `eid`: the section then stays hidden.
+
+(function () {
+  'use strict';
+
+  var DAILY = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+  var PRAYERS = DAILY.concat(['jumuah']);
+  var EIDS = ['fitr', 'adha'];
+  var SESSIONS_MAX = 3;                       // keep in step with EID_SESSIONS_MAX on the server
+  // Where the wheel starts for a time nobody has entered yet.
+  var STARTS = { fajr: '05:30', dhuhr: '13:00', asr: '16:00', maghrib: '18:00', isha: '20:00', jumuah: '13:00' };
+  var ROW_PX = 40;                            // one line of the wheel; keep in step with .pd-wheel-item
+
+  var ICON_MOON = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+  var ICON_CLOCK = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  var ICON_PLUS = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  var ICON_X = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+  var place = null;
+  var ctx = null;          // the open sheet: {mode: 'daily' | 'eid', start, draft, open}
+  var sending = false;
+  var shownNext = null;    // the row marked "next" when the section was drawn
+
+  function $(id) { return document.getElementById(id); }
+
+  // Words always go in as text; only the constant icons use innerHTML.
+  function el(tag, className, text) {
+    var e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function button(className, svg, text, onClick) {
+    var b = el('button', className);
+    b.type = 'button';
+    b.innerHTML = svg;
+    if (text) b.appendChild(document.createTextNode(text));
+    if (onClick) b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function supported(p) { return !!p && Object.prototype.hasOwnProperty.call(p, 'eid'); }
+
+  function two(n) { return (n < 10 ? '0' : '') + n; }
+  function minutes(t) { return (+t.slice(0, 2)) * 60 + (+t.slice(3, 5)); }
+  function hhmm(total) {
+    total = Math.max(0, Math.min(23 * 60 + 59, total));
+    return two(Math.floor(total / 60)) + ':' + two(total % 60);
+  }
+
+  // "24 fevral 2027" from "2027-02-24": day, month, year.
+  function longDate(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    if (!m) return iso || '';
+    var y = +m[1], mo = +m[2] - 1, d = +m[3];
+    var lang = PlacesText.lang();
+    if (lang === 'uz') {
+      // Phone browsers cannot name Uzbek months; the words live in places.text.js.
+      return d + ' ' + (T('detail.months').split(',')[mo] || '') + ' ' + y;
+    }
+    var day = new Date(Date.UTC(y, mo, d, 12));
+    try {
+      if (lang === 'ru') {
+        return day.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone: 'UTC' }) + ' ' + y;
+      }
+      return day.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+    } catch (e) {
+      return iso;
+    }
+  }
+
+  // Korea time, whatever zone the phone is set to.
+  function kstNow() {
+    var d = new Date(Date.now() + 9 * 3600 * 1000);
+    return { mins: d.getUTCHours() * 60 + d.getUTCMinutes(), friday: d.getUTCDay() === 5 };
+  }
+
+  // The row marked "next": the first prayer still ahead today (Juma instead
+  // of Peshin on a Friday), or after Xufton the first one of the morning.
+  function nextKey(tt) {
+    if (!tt) return null;
+    var now = kstNow();
+    var order = DAILY.map(function (k) {
+      return (k === 'dhuhr' && now.friday && tt.jumuah) ? 'jumuah' : k;
+    }).filter(function (k) { return tt[k]; });
+    for (var i = 0; i < order.length; i++) {
+      if (minutes(tt[order[i]]) > now.mins) return order[i];
+    }
+    return order[0] || null;
+  }
+
+  function updatedLine(className, info) {
+    return el('p', className + (info.stale ? ' is-stale' : ''), T('times.updated', { date: longDate(info.updatedAt) }));
+  }
+
+  // ---- The section on the page ----
+
+  function render() {
+    var box = $('pdTimesSection');
+    if (!box) return;
+    if (!supported(place)) { box.hidden = true; return; }
+    box.hidden = false;
+    box.textContent = '';
+
+    var tt = place.timetable || null;
+    var head = el('div', 'pd-times-head');
+    var title = el('h3', 'detail-section-title');
+    title.innerHTML = PL_ICONS.rub;
+    title.appendChild(document.createTextNode(' ' + T('times.title')));
+    head.appendChild(title);
+    head.appendChild(button('pd-times-btn', tt ? PL_ICONS.pen : ICON_PLUS, T(tt ? 'times.edit' : 'times.add'),
+                            function () { openSheet('daily'); }));
+    box.appendChild(head);
+
+    shownNext = nextKey(tt);
+    if (tt) {
+      var rows = el('div', 'pd-times-rows');
+      PRAYERS.forEach(function (k) {
+        if (!tt[k]) return;
+        var isNext = k === shownNext;
+        var row = el('div', 'pd-times-row' + (k === 'jumuah' ? ' pd-times-row--juma' : '') + (isNext ? ' is-next' : ''));
+        var name = el('span', 'pd-times-name', T('times.prayers.' + k));
+        if (isNext) name.appendChild(el('span', 'pd-times-badge', T('times.next')));
+        row.appendChild(name);
+        row.appendChild(el('span', 'pd-times-time', tt[k]));
+        rows.appendChild(row);
+      });
+      box.appendChild(rows);
+      box.appendChild(updatedLine('pd-times-updated', tt));
+    } else {
+      box.appendChild(el('p', 'pd-times-empty', T('times.empty')));
+    }
+
+    // Eid: part of the same section, set apart by a rule and its gold label.
+    // Always shown, so people know where the Eid times will be.
+    var eid = place.eid || {};
+    var any = EIDS.some(function (k) { return eid[k]; });
+    var part = el('div', 'pd-eid');
+    var eidHead = el('div', 'pd-eid-head');
+    var eidTitle = el('h4', 'pd-eid-title');
+    eidTitle.innerHTML = ICON_MOON;
+    eidTitle.appendChild(document.createTextNode(T('times.eid.title')));
+    eidHead.appendChild(eidTitle);
+    var eidBtn = button('pd-times-icon-btn', any ? PL_ICONS.pen : ICON_PLUS, null, function () { openSheet('eid'); });
+    eidBtn.setAttribute('aria-label', T(any ? 'times.eid.editLabel' : 'times.eid.addLabel'));
+    eidHead.appendChild(eidBtn);
+    part.appendChild(eidHead);
+    EIDS.forEach(function (k) {
+      var info = eid[k];
+      var row = el('div', 'pd-eid-row');
+      var line = el('div', 'pd-eid-line');
+      line.appendChild(el('span', 'pd-eid-name', T('times.eid.' + k)));
+      if (info && info.sessions && info.sessions.length) {
+        var times = el('span', 'pd-eid-times');
+        info.sessions.forEach(function (s) { times.appendChild(el('span', null, s)); });
+        line.appendChild(times);
+        row.appendChild(line);
+        row.appendChild(updatedLine('pd-eid-updated', info));
+      } else {
+        line.appendChild(el('span', 'pd-eid-none', T('times.eid.none')));
+        row.appendChild(line);
+      }
+      part.appendChild(row);
+    });
+    box.appendChild(part);
+  }
+
+  // ---- The edit sheet ----
+
+  function isOpen() { var b = $('pdTimesBackdrop'); return !!b && !b.hidden; }
+
+  function current(mode) {
+    var out = {};
+    if (mode === 'daily') {
+      var tt = place.timetable || {};
+      PRAYERS.forEach(function (k) { out[k] = tt[k] || null; });
+    } else {
+      var eid = place.eid || {};
+      EIDS.forEach(function (k) { out[k] = eid[k] && eid[k].sessions ? eid[k].sessions.slice() : []; });
+    }
+    return out;
+  }
+
+  function setError(text) {
+    var e = $('pdTimesError');
+    e.textContent = text || '';
+    e.hidden = !text;
+  }
+
+  function setSending(on) {
+    sending = on;
+    var b = $('pdTimesSave');
+    b.disabled = on;
+    b.textContent = T(on ? 'times.sheet.saving' : 'times.sheet.save');
+  }
+
+  function sheetTitle() { return T(ctx.mode === 'daily' ? 'times.sheet.title' : 'times.eid.title'); }
+
+  function openSheet(mode) {
+    // Who changed what comes from the signed Telegram data.
+    if (!Notify.signedIn()) { Notify.toast(T('common.telegramOnly')); return; }
+    ctx = { mode: mode, start: current(mode), draft: current(mode), open: null };
+    var icon = $('pdTimesIcon');
+    icon.innerHTML = mode === 'daily' ? ICON_CLOCK : ICON_MOON;
+    icon.className = 'pd-sheet-icon' + (mode === 'eid' ? ' pd-tt-icon--eid' : '');
+    $('pdTimesTitle').textContent = sheetTitle();
+    setError('');
+    setSending(false);
+    $('pdTimesBody').scrollTop = 0;
+    renderSheet();
+
+    var backdrop = $('pdTimesBackdrop');
+    var sheet = $('pdTimesSheet');
+    backdrop.hidden = false;
+    requestAnimationFrame(function () {
+      backdrop.classList.add('visible');
+      sheet.classList.add('visible');
+    });
+    Notify.haptic('light');
+    try {
+      tg.BackButton.offClick(handleMainBackButton);
+      tg.BackButton.onClick(onBack);
+    } catch (e) {}
+  }
+
+  function onBack() { closeSheet(); }
+
+  function closeSheet() {
+    if (!isOpen()) return;
+    var backdrop = $('pdTimesBackdrop');
+    var sheet = $('pdTimesSheet');
+    backdrop.classList.remove('visible');
+    sheet.classList.remove('visible');
+    setTimeout(function () { if (!sheet.classList.contains('visible')) backdrop.hidden = true; }, 280);
+    ctx = null;
+    try {
+      tg.BackButton.offClick(onBack);
+      tg.BackButton.onClick(handleMainBackButton);
+    } catch (e) {}
+  }
+
+  function renderSheet() {
+    var body = $('pdTimesBody');
+    var keep = body.scrollTop;
+    body.textContent = '';
+    if (ctx.mode === 'daily') {
+      PRAYERS.forEach(function (k) {
+        var name = T('times.prayers.' + k);
+        body.appendChild(timeRow(k, name, name, ctx.draft[k], k === 'jumuah' ? 'pd-tt-row--juma' : '',
+          function (v) { ctx.draft[k] = v; },
+          function () { ctx.draft[k] = null; }));
+      });
+    } else {
+      EIDS.forEach(function (kind) {
+        var list = ctx.draft[kind];
+        var eidName = T('times.eid.' + kind);
+        body.appendChild(el('p', 'pd-tt-group', eidName));
+        list.forEach(function (t, i) {
+          var label = T('times.sheet.session', { n: i + 1 });
+          body.appendChild(timeRow(kind + ':' + i, label, eidName + ', ' + label, t, '',
+            function (v) { list[i] = v; },
+            function () { list.splice(i, 1); }));
+        });
+        var full = list.length >= SESSIONS_MAX;
+        var add = button('pd-tt-add', ICON_PLUS, T(full ? 'times.sheet.maxSessions' : 'times.sheet.addSession'), function () {
+          var last = list.length ? list[list.length - 1] : null;
+          list.push(last ? hhmm(minutes(last) + 60) : '07:00');
+          ctx.open = kind + ':' + (list.length - 1);
+          renderSheet();
+        });
+        add.disabled = full;
+        body.appendChild(add);
+      });
+    }
+    body.scrollTop = keep;
+    var wheelEl = body.querySelector('.pd-wheel');
+    if (wheelEl && wheelEl.scrollIntoView) wheelEl.scrollIntoView({ block: 'nearest' });
+  }
+
+  // One line of the sheet: its name, its time (tap: the wheel opens under it),
+  // and a cross that takes the time away.
+  function timeRow(key, label, fullName, value, extraClass, set, remove) {
+    var frag = document.createDocumentFragment();
+    var open = ctx.open === key && !!value;
+    var row = el('div', 'pd-tt-row' + (extraClass ? ' ' + extraClass : '') + (open ? ' is-open' : ''));
+    row.appendChild(el('span', 'pd-tt-name', label));
+
+    var chip = button('pd-tt-chip' + (value ? '' : ' is-empty'), ICON_CLOCK, null, function () {
+      if (open) {
+        ctx.open = null;
+      } else {
+        if (!value) set(STARTS[key] || '07:00');
+        ctx.open = key;
+      }
+      renderSheet();
+    });
+    var shown = document.createTextNode(value || '--:--');
+    chip.appendChild(shown);
+    chip.setAttribute('aria-expanded', open ? 'true' : 'false');
+    chip.setAttribute('aria-label', fullName + ', ' + (value || T('times.eid.none')));
+    row.appendChild(chip);
+
+    if (value) {
+      var x = button('pd-tt-clear', ICON_X, null, function () {
+        remove();
+        ctx.open = null;
+        renderSheet();
+      });
+      x.setAttribute('aria-label', T('times.sheet.remove', { name: fullName }));
+      row.appendChild(x);
+    } else {
+      row.appendChild(el('span', 'pd-tt-clear-space'));
+    }
+    frag.appendChild(row);
+
+    if (open) {
+      frag.appendChild(wheel(value, function (v) {
+        set(v);
+        shown.nodeValue = v;
+        chip.setAttribute('aria-label', fullName + ', ' + v);
+      }));
+    }
+    return frag;
+  }
+
+  // Hours and minutes, each a scroll wheel. Scrolling, tapping a number and
+  // the arrow keys all move it; the value is wherever it comes to rest.
+  function wheel(value, onChange) {
+    var h = +value.slice(0, 2), m = +value.slice(3, 5);
+    var box = el('div', 'pd-wheel');
+    box.appendChild(column(24, h, T('times.sheet.hour'), function (v) { h = v; onChange(two(h) + ':' + two(m)); }));
+    box.appendChild(el('span', 'pd-wheel-sep', ':'));
+    box.appendChild(column(60, m, T('times.sheet.minute'), function (v) { m = v; onChange(two(h) + ':' + two(m)); }));
+    return box;
+  }
+
+  function column(count, value, label, onChange) {
+    var col = el('div', 'pd-wheel-col');
+    col.tabIndex = 0;
+    col.setAttribute('role', 'spinbutton');
+    col.setAttribute('aria-label', label);
+    col.setAttribute('aria-valuemin', '0');
+    col.setAttribute('aria-valuemax', String(count - 1));
+    var list = el('div', 'pd-wheel-list');
+    var items = [];
+    for (var i = 0; i < count; i++) {
+      var item = el('div', 'pd-wheel-item', two(i));
+      item.setAttribute('aria-hidden', 'true');
+      item.addEventListener('click', go.bind(null, i, true));
+      items.push(item);
+      list.appendChild(item);
+    }
+    col.appendChild(list);
+
+    var at = -1;
+    function mark(n) {
+      if (items[at]) items[at].classList.remove('is-selected');
+      at = n;
+      items[n].classList.add('is-selected');
+      col.setAttribute('aria-valuenow', String(n));
+      col.setAttribute('aria-valuetext', two(n));
+    }
+    function settle(n) {
+      n = Math.max(0, Math.min(count - 1, n));
+      if (n === at) return;
+      mark(n);
+      onChange(n);
+      try { tg.HapticFeedback.selectionChanged(); } catch (e) {}
+    }
+    function go(n, smooth) {
+      n = Math.max(0, Math.min(count - 1, n));
+      try { col.scrollTo({ top: n * ROW_PX, behavior: smooth ? 'smooth' : 'auto' }); }
+      catch (e) { col.scrollTop = n * ROW_PX; }
+      settle(n);
+    }
+    col.addEventListener('scroll', function () { settle(Math.round(col.scrollTop / ROW_PX)); }, { passive: true });
+    col.addEventListener('keydown', function (e) {
+      var step = { ArrowUp: -1, ArrowDown: 1, PageUp: -5, PageDown: 5 }[e.key];
+      if (step) { e.preventDefault(); go(at + step, true); }
+      else if (e.key === 'Home') { e.preventDefault(); go(0, true); }
+      else if (e.key === 'End') { e.preventDefault(); go(count - 1, true); }
+    });
+    mark(value);
+    // Its height is only known once it is on the page.
+    requestAnimationFrame(function () { col.scrollTop = value * ROW_PX; });
+    return col;
+  }
+
+  // Only what changed goes to the server, so two people editing different
+  // prayers at once do not undo each other.
+  function changes() {
+    var out = {};
+    if (ctx.mode === 'daily') {
+      PRAYERS.forEach(function (k) { if (ctx.draft[k] !== ctx.start[k]) out[k] = ctx.draft[k]; });
+    } else {
+      EIDS.forEach(function (k) {
+        var now = ctx.draft[k].filter(function (v, i, all) { return v && all.indexOf(v) === i; }).sort();
+        if (now.join() !== ctx.start[k].slice().sort().join()) out[k] = now;
+      });
+    }
+    return out;
+  }
+
+  function save() {
+    if (sending || !ctx) return;
+    var body = changes();
+    if (!Object.keys(body).length) { closeSheet(); return; }
+    var path = '/api/place/' + encodeURIComponent(place.id) + (ctx.mode === 'daily' ? '/timetable' : '/eid');
+    setError('');
+    setSending(true);
+    Notify.request('PUT', path, body)
+      .then(function (data) {
+        if ('timetable' in data) place.timetable = data.timetable;
+        if ('eid' in data) place.eid = data.eid;
+        setSending(false);
+        closeSheet();
+        render();
+        Notify.haptic('success');
+        Notify.toast(T('times.saved'));
+      })
+      .catch(function (err) {
+        setSending(false);
+        Notify.haptic('error');
+        setError(err.code && PlacesText.has('times.err.' + err.code)
+          ? T('times.err.' + err.code) : Notify.errorText(err));
+      });
+  }
+
+  var bound = false;
+  function bindOnce() {
+    if (bound) return;
+    bound = true;
+    $('pdTimesCancel').addEventListener('click', closeSheet);
+    $('pdTimesSave').addEventListener('click', save);
+    $('pdTimesBackdrop').addEventListener('click', function (e) {
+      if (e.target === e.currentTarget) closeSheet();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isOpen()) closeSheet();
+    });
+    // The "next" mark moves on while the page stays open.
+    setInterval(function () {
+      if (place && place.timetable && !isOpen() && nextKey(place.timetable) !== shownNext) render();
+    }, 60000);
+  }
+
+  function mount(placeData) {
+    place = placeData || null;
+    if (!$('pdTimesSection') || !$('pdTimesBackdrop')) return;
+    bindOnce();
+    render();
+  }
+
+  window.addEventListener('languageChanged', function () {
+    if (!place) return;
+    render();
+    if (isOpen() && ctx) {
+      $('pdTimesTitle').textContent = sheetTitle();
+      renderSheet();
+      setSending(sending);
+    }
+  });
+
+  window.PlaceTimes = { mount: mount };
 })();

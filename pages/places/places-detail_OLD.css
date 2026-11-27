@@ -1,0 +1,1366 @@
+/* =========================================================
+   PLACE DETAIL PAGE
+   Loads after places.css and reuses its --pl- tokens.
+   ========================================================= */
+
+.detail-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px 24px 16px;
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--pl-bg);
+}
+
+/* --- Loading / error --- */
+.detail-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 20px;
+}
+
+.detail-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid var(--pl-line);
+  border-top-color: var(--pl-accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.detail-loading p {
+  font-size: 1.05rem;
+  color: var(--pl-text-2);
+  margin: 0;
+}
+
+.detail-error {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.detail-error-icon {
+  font-size: 3.2rem;
+  margin: 0 0 20px 0;
+}
+
+.detail-error-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #c2453a;
+  margin: 0 0 12px 0;
+}
+
+.night-mode .detail-error-text { color: #e87c73; }
+
+.detail-error-hint {
+  font-size: 0.98rem;
+  color: var(--pl-text-2);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.retry-button {
+  background: linear-gradient(160deg, var(--pl-accent) 0%, var(--pl-accent-deep) 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 180ms var(--pl-ease), box-shadow 180ms var(--pl-ease);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.retry-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(5, 150, 105, 0.38);
+}
+
+.retry-button:active { transform: translateY(0); }
+
+/* =========================================================
+   CARD
+   ========================================================= */
+.detail-card {
+  background: var(--pl-surface);
+  border: 1px solid var(--pl-line);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--pl-shadow-card);
+}
+
+/* --- Hero (carousel host) --- */
+.detail-photo-section {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  background: linear-gradient(135deg, var(--pl-accent-soft) 0%, var(--pl-surface-2) 100%);
+}
+
+.detail-single-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  display: block;
+}
+
+/* --- Head: title, city, chips --- */
+.detail-head {
+  padding: 20px 22px 4px 22px;
+}
+
+.detail-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pl-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin: 0 0 6px 0;
+}
+
+.detail-eyebrow .pl-icon { width: 0.85rem; height: 0.85rem; }
+
+/* Place type on the left, watch pill on the right. */
+.detail-eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 6px 0;
+}
+
+.detail-eyebrow-row .detail-eyebrow { margin: 0; min-width: 0; }
+
+.pd-watch-slot { display: contents; }
+
+/* --- Watch pill: action + watcher count, like a like button --- */
+.pd-watch {
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1.5px solid var(--pl-line);
+  border-radius: 999px;
+  background: var(--pl-surface);
+  font-family: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 160ms ease, border-color 160ms ease, transform 140ms var(--pl-ease);
+}
+
+.pd-watch:active { transform: scale(0.97); }
+
+.pd-watch-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px 6px 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--pl-text);
+  white-space: nowrap;
+}
+
+.pd-watch-icon { line-height: 0; }
+.pd-watch-icon .pl-icon { width: 15px; height: 15px; }
+
+.pd-watch-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border-left: 1.5px solid var(--pl-line);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--pl-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pd-watch.is-on {
+  background: var(--pl-accent-soft);
+  border-color: rgba(5, 150, 105, 0.32);
+}
+
+.pd-watch.is-on .pd-watch-main { color: var(--pl-accent-deep); }
+.pd-watch.is-on .pd-watch-icon { color: var(--pl-accent); }
+.pd-watch.is-on .pd-watch-count { border-left-color: rgba(5, 150, 105, 0.22); color: var(--pl-accent-deep); }
+
+.pd-watch:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
+
+.pd-watch-count[hidden] { display: none; }
+
+.night-mode .pd-watch.is-on { border-color: rgba(16, 185, 129, 0.35); }
+.night-mode .pd-watch.is-on .pd-watch-count { border-left-color: rgba(16, 185, 129, 0.25); }
+
+.detail-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--pl-text);
+  margin: 0 0 3px 0;
+  line-height: 1.25;
+}
+
+.detail-subtitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pl-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px 0;
+}
+
+.detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--pl-line);
+}
+
+.detail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1;
+  background: var(--pl-surface-2);
+  color: var(--pl-text);
+}
+
+.detail-chip .pl-icon { width: 0.95rem; height: 0.95rem; }
+
+.detail-chip--rating .stars .pl-icon { width: 0.85rem; height: 0.85rem; }
+
+.detail-chip--rating .chip-num {
+  font-size: 0.9rem;
+  margin-left: 2px;
+}
+
+.detail-chip--rating .chip-count {
+  font-weight: 600;
+  color: var(--pl-muted);
+  font-size: 0.8rem;
+}
+
+.detail-chip--distance {
+  background: var(--pl-accent-soft);
+  color: var(--pl-accent-deep);
+}
+
+.detail-chip--muted {
+  font-weight: 600;
+  color: var(--pl-muted);
+}
+
+/* =========================================================
+   BODY SECTIONS — hairline dividers, no grey boxes
+   ========================================================= */
+.detail-content {
+  padding: 4px 22px 22px 22px;
+}
+
+.detail-section {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--pl-line);
+}
+
+.detail-section:last-child { border-bottom: none; }
+
+.detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--pl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 12px 0;
+}
+
+.detail-section-title .pl-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--pl-accent);
+}
+
+.detail-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 2px 0;
+  border-radius: 10px;
+  transition: background 200ms ease;
+}
+
+.detail-icon {
+  flex-shrink: 0;
+  color: var(--pl-muted);
+  line-height: 0;
+  margin-top: 3px;
+}
+
+.detail-icon .pl-icon { width: 1.05rem; height: 1.05rem; }
+
+.detail-text {
+  font-size: 1rem;
+  color: var(--pl-text);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.detail-copy-mark {
+  margin-left: auto;
+  color: var(--pl-muted);
+  line-height: 0;
+  margin-top: 3px;
+}
+
+.detail-copy-mark .pl-icon { width: 1rem; height: 1rem; }
+
+.detail-link {
+  color: var(--pl-accent);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 150ms ease;
+}
+
+.detail-link:hover {
+  color: var(--pl-accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.detail-phone-line {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* =========================================================
+   REVIEWS
+   ========================================================= */
+.review-card {
+  background: var(--pl-surface-2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-left: 3px solid var(--pl-accent);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.review-stars {
+  display: inline-flex;
+  gap: 2px;
+  line-height: 0;
+}
+
+.review-stars .stars .pl-icon { width: 0.9rem; height: 0.9rem; }
+
+.review-date {
+  font-size: 0.82rem;
+  color: var(--pl-muted);
+}
+
+.review-text {
+  font-size: 0.96rem;
+  color: var(--pl-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 28px 20px;
+  color: var(--pl-muted);
+  font-size: 0.96rem;
+}
+
+/* =========================================================
+   REVIEW FORM (collapsible — structure preserved for JS)
+   ========================================================= */
+.review-submit-wrapper { margin-top: 8px; }
+
+.review-collapsible {
+  background: var(--pl-surface);
+  border: 1.5px solid var(--pl-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.review-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: transparent;
+  color: var(--pl-accent-deep);
+  border: none;
+  padding: 15px 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.review-toggle-btn:hover { background: var(--pl-accent-soft); }
+
+.review-toggle-btn .toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-toggle-btn .pl-icon { width: 1rem; height: 1rem; }
+
+.toggle-arrow {
+  font-size: 0.75rem;
+  color: var(--pl-muted);
+  transition: transform 200ms var(--pl-ease);
+}
+
+.review-toggle-btn.active { border-bottom: 1px solid var(--pl-line); }
+
+.review-form-lede { margin: 0; }
+
+.review-form-body { padding: 4px 18px 18px 18px; }
+
+.review-hints {
+  background: var(--pl-accent-soft);
+  border-left: 3px solid var(--pl-accent);
+  padding: 13px 14px;
+  border-radius: 10px;
+  margin: 12px 0 16px 0;
+}
+
+.review-hints-title {
+  margin: 0 0 8px 0;
+  font-weight: 700;
+  color: var(--pl-accent-deep);
+  font-size: 0.92rem;
+}
+
+.review-hint-line {
+  margin: 4px 0;
+  font-size: 0.86rem;
+  color: var(--pl-text-2);
+  line-height: 1.5;
+}
+
+.rate-label {
+  text-align: center;
+  margin: 0 0 6px 0;
+  color: var(--pl-text-2);
+  font-size: 0.94rem;
+}
+
+.star-rating-input {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 10px 0 14px 0;
+}
+
+.star-input {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--pl-line);
+  transition: color 150ms ease, transform 150ms ease;
+}
+
+.star-input .pl-icon { width: 30px; height: 30px; }
+
+.star-input.selected {
+  color: var(--pl-star);
+  filter: drop-shadow(0 1px 4px rgba(255, 183, 3, 0.55));
+}
+
+.star-input:hover { transform: scale(1.12); }
+
+.review-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--pl-line);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--pl-text);
+  background: var(--pl-surface-2);
+  resize: vertical;
+  margin-top: 4px;
+  box-sizing: border-box;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.review-textarea:focus {
+  outline: none;
+  border-color: var(--pl-accent);
+  background: var(--pl-surface);
+}
+
+.review-textarea::placeholder { color: var(--pl-muted); }
+
+.review-submit-btn {
+  width: 100%;
+  background: linear-gradient(160deg, var(--pl-accent) 0%, var(--pl-accent-deep) 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: transform 180ms var(--pl-ease), box-shadow 180ms var(--pl-ease);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.review-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(5, 150, 105, 0.38);
+}
+
+.review-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.review-success {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.review-success-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 12px auto;
+  border-radius: 50%;
+  background: var(--pl-accent-soft);
+  color: var(--pl-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.review-success-icon .pl-icon { width: 28px; height: 28px; }
+
+.review-success h3 {
+  color: var(--pl-accent);
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+}
+
+.review-success p {
+  color: var(--pl-text-2);
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   NAVIGATION DOCK — sticky, always in thumb reach
+   ========================================================= */
+.nav-dock {
+  position: sticky;
+  bottom: 10px;
+  z-index: 60;
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--pl-surface) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--pl-line);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(28, 25, 23, 0.18);
+}
+
+.night-mode .nav-dock {
+  background: rgba(28, 28, 28, 0.85);
+  background: color-mix(in srgb, var(--pl-surface) 82%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dock-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  transition: transform 160ms var(--pl-ease), filter 160ms ease;
+}
+
+.dock-btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+.dock-btn:active { transform: translateY(0); }
+
+.dock-btn .pl-icon { width: 1.05rem; height: 1.05rem; }
+
+.dock-btn--kakao {
+  background: #fee500;
+  color: #191600;
+}
+
+.dock-btn--naver {
+  background: #03c75a;
+  color: #ffffff;
+}
+
+/* =========================================================
+   ACCESSIBILITY & MOTION
+   ========================================================= */
+.retry-button:focus-visible,
+.review-toggle-btn:focus-visible,
+.review-submit-btn:focus-visible,
+.review-textarea:focus-visible,
+.star-input:focus-visible,
+.dock-btn:focus-visible,
+.detail-link:focus-visible {
+  outline: 2px solid var(--pl-accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   SMALL SCREENS
+   ========================================================= */
+@media (max-width: 420px) {
+  .detail-photo-section { height: 290px; }
+  .detail-title { font-size: 1.45rem; }
+  .detail-head { padding: 18px 18px 4px 18px; }
+  .detail-content { padding: 4px 18px 18px 18px; }
+}
+
+/* =========================================================
+   SOCIAL LINKS + OWNER NOTE  (community submitted)
+   Reuses the --pl- tokens from places.css. Brand colour is
+   used only for the glyph and a soft tint, so the row still
+   reads as part of the emerald/sand card rather than three
+   logos pasted onto it.
+   ========================================================= */
+
+.pd-social-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* Column count follows the number of real links. One link gets a full-width
+   tile laid out horizontally, which reads as a deliberate single entry rather
+   than a third of a row with two gaps beside it. */
+.pd-social-grid--1 { grid-template-columns: 1fr; }
+.pd-social-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.pd-social-grid--3 { grid-template-columns: repeat(3, 1fr); }
+
+.pd-social-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pd-social-grid--1 .pd-social-tile { min-height: 74px; }
+
+.pd-social-grid--1 .pd-social-link {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.pd-social-grid--1 .pd-social-text { align-items: flex-start; }
+.pd-social-grid--1 .pd-social-icon .pl-icon { width: 30px; height: 30px; }
+.pd-social-grid--1 .pd-social-name { font-size: 0.95rem; }
+.pd-social-grid--1 .pd-social-state { font-size: 0.8rem; }
+
+/* The single tile is a row, so it needs no fixed height — let the link set it. */
+.pd-social-grid--1 .pd-social-tile::after {
+  content: '';
+  display: block;
+  padding-top: 0;
+}
+
+/* One box for all three states, so a filled and an empty tile line up. */
+.pd-social-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 96px;
+  padding: 14px 8px 12px;
+  border-radius: 16px;
+  border: 1.5px solid var(--pl-line);
+  background: var(--pl-surface);
+  font-family: inherit;
+  text-align: center;
+  transition: transform 160ms var(--pl-ease), border-color 160ms ease,
+              background 160ms ease, box-shadow 160ms ease;
+}
+
+.pd-social-link {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 8px 12px;
+  border-radius: 15px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.pd-social-icon {
+  line-height: 0;
+  color: var(--pl-muted);
+  transition: color 160ms ease;
+}
+
+.pd-social-icon .pl-icon { width: 26px; height: 26px; }
+
+.pd-social-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--pl-text);
+  letter-spacing: -0.01em;
+}
+
+.pd-social-state {
+  font-size: 0.7rem;
+  color: var(--pl-muted);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-social-state--add {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--pl-accent);
+  font-weight: 600;
+}
+
+.pd-social-state--add .pl-icon { width: 0.78rem; height: 0.78rem; }
+
+/* --- Connected --- */
+.pd-social-tile--on {
+  border-color: transparent;
+  background: var(--pl-surface-2);
+  cursor: pointer;
+}
+
+.pd-social-tile--on:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--pl-shadow-card);
+}
+
+.pd-social-tile--on:active { transform: translateY(0); }
+
+.pd-social-tile--telegram  { background: rgba(42, 171, 238, 0.10); }
+.pd-social-tile--telegram  .pd-social-icon { color: #2aabee; }
+.pd-social-tile--tiktok    { background: rgba(20, 20, 20, 0.07); }
+.pd-social-tile--tiktok    .pd-social-icon { color: #111111; }
+.pd-social-tile--instagram { background: rgba(214, 41, 118, 0.09); }
+.pd-social-tile--instagram .pd-social-icon { color: #d62976; }
+
+/* --- Empty: dashed, clearly an invitation rather than a dead tile --- */
+.pd-social-tile--empty {
+  border-style: dashed;
+  border-color: var(--pl-line);
+  background: transparent;
+  cursor: pointer;
+}
+
+.pd-social-tile--empty:hover {
+  border-color: var(--pl-accent);
+  background: var(--pl-accent-soft);
+}
+
+.pd-social-tile--empty:hover .pd-social-icon { color: var(--pl-accent); }
+.pd-social-tile--empty:active { transform: scale(0.97); }
+
+/* --- Awaiting review --- */
+.pd-social-tile--pending {
+  border-style: dashed;
+  border-color: var(--pl-gold);
+  background: rgba(212, 162, 26, 0.07);
+}
+
+.pd-social-tile--pending .pd-social-icon,
+.pd-social-tile--pending .pd-social-state { color: var(--pl-gold); }
+
+.pd-social-tile--pending .pd-social-state { white-space: normal; line-height: 1.25; }
+
+/* =========================================================
+   OWNER NOTE
+   ========================================================= */
+
+/* Deliberately unlike .review-card: reviews are grey cards with an accent bar
+   down one side and a rating, this is the venue's own notice — a tinted panel
+   enclosed on all four sides, with nothing else in it. */
+.pd-note-card {
+  border: 1px solid var(--pl-line);
+  border-radius: 14px;
+  background: var(--pl-accent-soft);
+  padding: 14px 16px;
+}
+
+.pd-note-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--pl-text);
+  /* Newlines come from the stored note verbatim — the text is set with
+     textContent, so this is what keeps "Mon-Fri / Sat" on separate lines
+     without ever building markup from user input. */
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.pd-note-empty {
+  margin: 0 0 12px 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--pl-muted);
+}
+
+.pd-pending-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 7px 13px;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(212, 162, 26, 0.12);
+  color: var(--pl-gold);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.pd-pending-chip .pl-icon { width: 0.85rem; height: 0.85rem; }
+
+/* =========================================================
+   SUBMISSION SHEET
+   Same idiom as the prayer settings sheet: scrim, rounded
+   sheet rising from the bottom, grab handle.
+   ========================================================= */
+
+.pd-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--pl-scrim);
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.pd-sheet-backdrop.visible { opacity: 1; }
+.pd-sheet-backdrop[hidden] { display: none; }
+
+.pd-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 301;
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--pl-surface);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -8px 40px rgba(20, 24, 22, 0.28);
+  transform: translateY(100%);
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  /* Clears the iOS home indicator and Telegram's own bottom chrome. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pd-sheet.visible { transform: translateY(0); }
+
+.pd-sheet-grip {
+  padding: 10px 0 2px;
+  display: flex;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.pd-sheet-grip-bar {
+  width: 38px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--pl-line);
+}
+
+.pd-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 20px 14px;
+  border-bottom: 1px solid var(--pl-line);
+  flex-shrink: 0;
+}
+
+.pd-sheet-icon {
+  line-height: 0;
+  color: var(--pl-accent);
+  flex-shrink: 0;
+}
+
+.pd-sheet-icon .pl-icon { width: 22px; height: 22px; }
+.pd-sheet-icon--telegram  { color: #2aabee; }
+.pd-sheet-icon--tiktok    { color: #111111; }
+.pd-sheet-icon--instagram { color: #d62976; }
+
+.pd-sheet-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--pl-text);
+  letter-spacing: -0.01em;
+}
+
+.pd-sheet-body {
+  padding: 16px 20px 4px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pd-sheet-current {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 13px;
+  padding: 9px 13px;
+  border-radius: 10px;
+  background: var(--pl-surface-2);
+}
+
+.pd-sheet-current[hidden] { display: none; }
+
+.pd-sheet-current-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--pl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+.pd-sheet-current-value {
+  font-size: 0.86rem;
+  color: var(--pl-text-2);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.pd-sheet-input,
+.pd-sheet-textarea {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1.5px solid var(--pl-line);
+  border-radius: 12px;
+  background: var(--pl-bg);
+  color: var(--pl-text);
+  font-family: inherit;
+  /* 16px keeps iOS Safari from zooming the viewport on focus. */
+  font-size: 16px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+  box-sizing: border-box;
+}
+
+.pd-sheet-textarea {
+  resize: vertical;
+  min-height: 108px;
+  line-height: 1.55;
+}
+
+.pd-sheet-input:focus,
+.pd-sheet-textarea:focus {
+  border-color: var(--pl-accent);
+  box-shadow: 0 0 0 3px var(--pl-accent-soft);
+}
+
+.pd-sheet-input::placeholder,
+.pd-sheet-textarea::placeholder { color: var(--pl-muted); }
+
+.pd-sheet-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 7px;
+}
+
+.pd-sheet-hint {
+  font-size: 0.75rem;
+  color: var(--pl-muted);
+  line-height: 1.45;
+}
+
+.pd-sheet-counter {
+  font-size: 0.72rem;
+  color: var(--pl-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.pd-sheet-counter--near { color: var(--pl-gold); font-weight: 600; }
+
+.pd-sheet-error {
+  margin: 11px 0 0 0;
+  padding: 10px 13px;
+  border-radius: 10px;
+  background: rgba(194, 69, 58, 0.09);
+  border-left: 3px solid #c2453a;
+  color: #a9382e;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.pd-sheet-error[hidden] { display: none; }
+
+.pd-sheet-moderation {
+  margin: 14px 0 0 0;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--pl-muted);
+}
+
+.pd-sheet-actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px 20px;
+  flex-shrink: 0;
+}
+
+.pd-sheet-btn {
+  flex: 1;
+  padding: 13px 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.94rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 160ms ease, transform 160ms var(--pl-ease), opacity 160ms ease;
+}
+
+.pd-sheet-btn--ghost {
+  background: var(--pl-surface-2);
+  color: var(--pl-text-2);
+}
+
+.pd-sheet-btn--ghost:hover { filter: brightness(0.97); }
+
+.pd-sheet-btn--primary {
+  background: var(--pl-accent);
+  color: #fff;
+  flex: 1.4;
+}
+
+.pd-sheet-btn--primary:hover { filter: brightness(1.05); }
+.pd-sheet-btn:active { transform: translateY(1px); }
+
+.pd-sheet-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.pd-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 14px);
+  z-index: 400;
+  max-width: 90vw;
+  padding: 12px 20px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--sand-800, #292524);
+  color: #fff;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  text-align: center;
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(28, 25, 23, 0.1));
+  opacity: 0;
+  transition: opacity 250ms ease, transform 250ms ease;
+}
+
+.pd-toast.visible { opacity: 1; transform: translate(-50%, 0); }
+.pd-toast[hidden] { display: none; }
+
+/* =========================================================
+   ACCESSIBILITY & MOTION  (extras)
+   ========================================================= */
+
+.pd-social-tile--empty:focus-visible,
+.pd-social-link:focus-visible,
+.pd-sheet-btn:focus-visible,
+.pd-sheet-input:focus-visible,
+.pd-sheet-textarea:focus-visible {
+  outline: 2px solid var(--pl-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-social-tile,
+  .pd-sheet,
+  .pd-sheet-backdrop,
+  .pd-toast {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   SMALL SCREENS  (extras)
+   ========================================================= */
+
+@media (max-width: 420px) {
+  .pd-social-grid { gap: 8px; }
+  .pd-social-tile { min-height: 88px; padding: 12px 5px 10px; }
+  .pd-social-icon .pl-icon { width: 23px; height: 23px; }
+  .pd-social-name { font-size: 0.76rem; }
+  .pd-social-state { font-size: 0.65rem; }
+  .pd-sheet-actions { padding: 12px 16px 18px; }
+  .pd-sheet-body { padding: 14px 16px 4px; }
+  .pd-sheet-head { padding: 8px 16px 12px; }
+}
+
+/* =========================================================
+   NIGHT MODE
+   ========================================================= */
+
+.night-mode .pd-social-tile { background: var(--pl-surface); }
+
+.night-mode .pd-social-tile--on { background: rgba(255, 255, 255, 0.05); }
+
+.night-mode .pd-social-tile--telegram  { background: rgba(42, 171, 238, 0.15); }
+.night-mode .pd-social-tile--telegram  .pd-social-icon { color: #4fc0f5; }
+/* The TikTok mark is black; on a dark card it needs to invert or it vanishes. */
+.night-mode .pd-social-tile--tiktok    { background: rgba(255, 255, 255, 0.09); }
+.night-mode .pd-social-tile--tiktok    .pd-social-icon { color: #f1f1ef; }
+.night-mode .pd-social-tile--instagram { background: rgba(214, 41, 118, 0.16); }
+.night-mode .pd-social-tile--instagram .pd-social-icon { color: #f06fa4; }
+
+.night-mode .pd-social-tile--empty { background: transparent; }
+
+.night-mode .pd-social-tile--pending { background: rgba(234, 185, 50, 0.1); }
+
+.night-mode .pd-sheet-icon--tiktok { color: #f1f1ef; }
+
+.night-mode .pd-sheet { box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6); }
+
+.night-mode .pd-sheet-error {
+  background: rgba(232, 124, 115, 0.12);
+  border-left-color: #e87c73;
+  color: #e87c73;
+}
+
+.night-mode .pd-toast {
+  background: #2a2a2a;
+  border: 1px solid var(--pl-line);
+}
+
+.night-mode .pd-note-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--pl-line);
+}
+
+/* A section with nothing to show and nothing to offer removes itself, so no
+   heading is left hanging over empty space. */
+.detail-section[hidden] { display: none; }
+
+/* --- Quiet empty-state prompt (replaces the dashed placeholder tiles) --- */
+.pd-quiet {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--pl-muted);
+}
+
+.pd-quiet-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--pl-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pd-quiet-link:hover { color: var(--pl-accent-deep); }
+
+/* When it follows the grid it is an aside, not the main event. */
+.pd-social-grid + .pd-quiet { margin-top: 12px; font-size: 0.82rem; }
+
+/* --- "+" tile, shown only when at least one real link exists --- */
+.pd-social-tile--add {
+  border-style: dashed;
+  background: transparent;
+  cursor: pointer;
+  gap: 4px;
+}
+
+.pd-social-tile--add:hover {
+  border-color: var(--pl-accent);
+  background: var(--pl-accent-soft);
+}
+
+.pd-social-tile--add:hover .pd-social-icon { color: var(--pl-accent); }
+.pd-social-tile--add:active { transform: scale(0.97); }
+.pd-social-tile--add .pd-social-name { color: var(--pl-muted); font-weight: 600; }
+
+/* --- Platform picker inside the sheet --- */
+.pd-sheet-picker { display: flex; flex-direction: column; gap: 8px; }
+.pd-sheet-picker[hidden] { display: none; }
+
+.pd-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--pl-line);
+  border-radius: 12px;
+  background: var(--pl-surface);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.pd-picker-row:hover { border-color: var(--pl-accent); background: var(--pl-accent-soft); }
+.pd-picker-row:active { transform: scale(0.99); }
+
+.pd-picker-icon { line-height: 0; color: var(--pl-muted); }
+.pd-picker-icon .pl-icon { width: 22px; height: 22px; }
+.pd-picker-row--telegram  .pd-picker-icon { color: #2aabee; }
+.pd-picker-row--tiktok    .pd-picker-icon { color: #111111; }
+.pd-picker-row--instagram .pd-picker-icon { color: #d62976; }
+
+.pd-picker-name { font-size: 0.95rem; font-weight: 700; color: var(--pl-text); }
+
+.pd-sheet-meta[hidden],
+.pd-sheet-moderation[hidden],
+.pd-sheet-btn[hidden] { display: none; }
+
+.pd-quiet-link:focus-visible,
+.pd-social-tile--add:focus-visible,
+.pd-picker-row:focus-visible {
+  outline: 2px solid var(--pl-accent);
+  outline-offset: 2px;
+}
+
+/* --- Night mode for the above --- */
+.night-mode .pd-social-tile--add { background: transparent; }
+.night-mode .pd-picker-row { background: rgba(255, 255, 255, 0.04); }
+.night-mode .pd-picker-row--tiktok .pd-picker-icon { color: #f1f1ef; }
+
+/* =========================================================
+   ANNOUNCEMENTS AND OWNER CLAIM  (bottom of the card)
+   Same outline row as "Izoh qoldirish"; the rest is quiet text.
+   ========================================================= */
+
+.pd-announce { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.pd-announce[hidden] { display: none; }
+
+.pd-ann-chev { line-height: 0; color: var(--pl-muted); }
+.pd-ann-chev .pl-icon { width: 1rem; height: 1rem; }
+
+.pd-ann-pending {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: -2px 0 0 4px;
+  font-size: 0.8rem;
+  color: var(--pl-muted);
+}
+
+.pd-ann-pending .pl-icon { width: 0.9rem; height: 0.9rem; }
+
+.pd-ann-claim {
+  margin: 2px 0 0;
+  text-align: center;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--pl-muted);
+}
+
+.pd-ann-claim .pd-quiet-link { font-size: inherit; }
+
+/* Composer */
+.pd-ann-place { margin: 0 0 9px; font-size: 0.84rem; color: var(--pl-muted); }
+.pd-ann-text { min-height: 140px; }
+.pd-ann-reach { margin: 12px 0 0; font-size: 0.8rem; line-height: 1.5; color: var(--pl-text-2); }
+.pd-ann-reach[hidden] { display: none; }
+
+/* Placeholder pictures (assets/place-*.svg) for places without photos are
+   light; at night they are dimmed so they do not glare. */
+.night-mode img[src*="assets/place-"] { filter: brightness(0.72) saturate(0.85); }
