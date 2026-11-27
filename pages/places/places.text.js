@@ -838,6 +838,59 @@ window.PLACES_TEXT = {
   },
 
   /* -------------------------------------------------------
+     NAMOZ VAQTLARI / PRAYER TIMES — mosque page only.
+     The mosque's own congregation times, entered by anyone
+     signed in; they show at once.
+     ------------------------------------------------------- */
+  times: {
+    title:             { uz: "Jamoat namozi", ru: "Намаз в мечети", en: "Congregation times" },
+    edit:              { uz: "Tahrirlash", ru: "Изменить", en: "Edit" },          // short
+    add:               { uz: "Qo‘shish", ru: "Добавить", en: "Add" },              // short
+    empty:             { uz: "Vaqtlar hali qo‘shilmagan", ru: "Время ещё не добавлено", en: "No times yet" },
+    // {date} is like "24 fevral 2027".
+    updated:           { uz: "Oxirgi yangilanish: {date}", ru: "Обновлено: {date}", en: "Last updated: {date}" },
+    next:              { uz: "keyingi", ru: "следующий", en: "next" },            // short
+    prayers: {
+      fajr:            { uz: "Bomdod", ru: "Фаджр", en: "Fajr" },
+      dhuhr:           { uz: "Peshin", ru: "Зухр", en: "Dhuhr" },
+      asr:             { uz: "Asr", ru: "Аср", en: "Asr" },
+      maghrib:         { uz: "Shom", ru: "Магриб", en: "Maghrib" },
+      isha:            { uz: "Xufton", ru: "Иша", en: "Isha" },
+      jumuah:          { uz: "Juma", ru: "Джума", en: "Jumu‘ah" }
+    },
+    eid: {
+      title:           { uz: "Hayit namozi", ru: "Праздничный намаз", en: "Eid prayer" },
+      fitr:            { uz: "Ramazon hayiti", ru: "Ураза-байрам", en: "Eid al-Fitr" },
+      adha:            { uz: "Qurbon hayiti", ru: "Курбан-байрам", en: "Eid al-Adha" },
+      none:            { uz: "qo‘shilmagan", ru: "не добавлено", en: "not added" },   // short
+      editLabel:       { uz: "Hayit vaqtlarini tahrirlash", ru: "Изменить время праздничного намаза", en: "Edit Eid times" },
+      addLabel:        { uz: "Hayit vaqtlarini qo‘shish", ru: "Добавить время праздничного намаза", en: "Add Eid times" }
+    },
+    sheet: {
+      title:           { uz: "Jamoat namozi vaqtlari", ru: "Время намаза в мечети", en: "Congregation times" },
+      // {n} is 1, 2 or 3.
+      session:         { uz: "{n}-jamoat", ru: "{n}-й джамаат", en: "Prayer {n}" },
+      addSession:      { uz: "Jamoat qo‘shish", ru: "Добавить джамаат", en: "Add a prayer" },
+      maxSessions:     { uz: "Jamoat qo‘shish · 3 tagacha", ru: "Не больше 3 джамаатов", en: "Up to 3 prayers" },
+      // {name} is a prayer, e.g. "Bomdod" or "Ramazon hayiti, 2-jamoat".
+      remove:          { uz: "{name}: olib tashlash", ru: "{name}: убрать", en: "Remove {name}" },
+      hour:            { uz: "Soat", ru: "Часы", en: "Hour" },
+      minute:          { uz: "Daqiqa", ru: "Минуты", en: "Minute" },
+      liveNote:        { uz: "Saqlangach hamma darhol ko‘radi.", ru: "После сохранения все увидят сразу.", en: "Everyone sees it as soon as you save." },
+      save:            { uz: "Saqlash", ru: "Сохранить", en: "Save" },          // short
+      saving:          { uz: "Saqlanmoqda…", ru: "Сохраняем…", en: "Saving…" }   // short
+    },
+    saved:             { uz: "Saqlandi", ru: "Сохранено", en: "Saved" },
+    err: {
+      too_many_edits: {
+        uz: "Juda ko‘p o‘zgartirish. Birozdan keyin urinib ko‘ring.",
+        ru: "Слишком много изменений. Попробуйте позже.",
+        en: "Too many changes. Please try again later."
+      }
+    }
+  },
+
+  /* -------------------------------------------------------
      BOT XABARLARI / BOT MESSAGES — sent by the server
      ------------------------------------------------------- */
   bot: {

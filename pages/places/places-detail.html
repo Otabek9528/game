@@ -135,6 +135,28 @@
     </div>
   </div>
 
+  <!-- ==========================================================
+       PRAYER TIMES EDITOR (mosques)
+       The daily congregation times, or the two Eids. Saved at once,
+       no review. places-detail.js fills it.
+       ========================================================== -->
+  <div class="pd-sheet-backdrop" id="pdTimesBackdrop" hidden>
+    <div class="pd-sheet pd-tt-sheet" id="pdTimesSheet" role="dialog" aria-modal="true" aria-labelledby="pdTimesTitle">
+      <div class="pd-sheet-grip"><span class="pd-sheet-grip-bar"></span></div>
+      <div class="pd-sheet-head">
+        <span class="pd-sheet-icon" id="pdTimesIcon"></span>
+        <h3 class="pd-sheet-title" id="pdTimesTitle"></h3>
+      </div>
+      <div class="pd-sheet-body pd-tt-body" id="pdTimesBody"></div>
+      <p class="pd-sheet-error pd-tt-error" id="pdTimesError" role="alert" hidden></p>
+      <p class="pd-tt-note" data-pt="times.sheet.liveNote"></p>
+      <div class="pd-sheet-actions">
+        <button type="button" class="pd-sheet-btn pd-sheet-btn--ghost" id="pdTimesCancel" data-pt="common.cancel"></button>
+        <button type="button" class="pd-sheet-btn pd-sheet-btn--primary" id="pdTimesSave" data-pt="times.sheet.save"></button>
+      </div>
+    </div>
+  </div>
+
   <div class="pd-toast" id="pdToast" role="status" aria-live="polite" hidden></div>
 
   <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
