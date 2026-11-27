@@ -537,9 +537,9 @@ window.PLACES_TEXT = {
   page: {
     title: { uz: "Bildirishnomalar", ru: "Уведомления", en: "Notifications" },
     via: {
-      uz: "Xabarlar Telegramda shu botdan keladi",
-      ru: "Сообщения приходят в Telegram от этого бота",
-      en: "Messages arrive in Telegram from this bot"
+      uz: "Xabarlar Telegramda @muslim_vegukin_bot dan keladi",
+      ru: "Сообщения приходят в Telegram от @muslim_vegukin_bot",
+      en: "Messages arrive in Telegram from @muslim_vegukin_bot"
     },
     loading:   { uz: "Yuklanmoqda…", ru: "Загрузка…", en: "Loading…" },
     loadError: {

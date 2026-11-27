@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Halal Compass</title>
+  <title>Muslim Vegukin</title>
+  
+  <link rel="icon" href="assets/brand/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/brand/mark.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/brand/app_icon_180.png">
+  <meta property="og:image" content="https://vegukin-twa.pages.dev/assets/brand/og_image_1200x630.png">
+  
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/brand/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/brand/mark.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/brand/app_icon_180.png">
+  <meta property="og:image" content="https://vegukin-twa.pages.dev/assets/brand/og_image_1200x630.png">
   <script>
   if (localStorage.getItem('theme') === 'night') {
     document.documentElement.classList.add('night-mode');
@@ -15,7 +25,7 @@
   <!-- HEADER (Panel 1) -->
   <header class="app__header">
     <div class="header-content">
-      <img src="assets/emblem.jpg" alt="Bot Emblem" class="bot-logo" />
+      <img src="assets/brand/mark.svg" alt="Bot Emblem" class="bot-logo" />
       <h1>Muslim Vegukin Bot</h1>
       
       <!-- Replace the old <button class="theme-toggle-btn"...> with this -->
@@ -112,6 +122,45 @@
       <main class="main" id="featureCards">
         <!-- Feature cards will be dynamically generated -->
       </main>
+		
+	 <div id="todayVisits" class="today-visits" hidden><span class="tv-dot"></span><span id="todayVisitsText"></span></div>
+		<style>
+		  .today-visits { display: flex; align-items: center; justify-content: center; gap: 8px;
+			padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); font-size: 13px; color: var(--text-muted);}
+		  .today-visits[hidden] { display: none; }
+		  .tv-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #2F80ED; flex-shrink: 0; }
+		  .tv-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #2F80ED;
+			animation: tvBeat 1.4s ease-out infinite; }
+		  @keyframes tvBeat { from { transform: scale(1); opacity: .45; } to { transform: scale(2.3); opacity: 0; } }
+		</style>
+		<script>
+		(function () {
+		  var API = 'https://vegukin-api.duckdns.org/api/visits/today';
+		  var LABEL = { uz: 'Bugungi tashriflar', ru: 'Посещений сегодня', en: 'Today’s visits' };
+
+		  // The home page logs nothing by itself, so a visit that only looks at the
+		  // prayer times would go uncounted: log one "open" per visit (30-minute gap).
+		  try {
+			var last = +localStorage.getItem('vg_open_at') || 0;
+			if (Date.now() - last > 30 * 60 * 1000 && window.logInteraction) window.logInteraction('open');
+			localStorage.setItem('vg_open_at', String(Date.now()));
+		  } catch (e) {}
+
+		  fetch(API, { signal: AbortSignal.timeout(10000) })
+			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (d) {
+			  if (!d || !(d.visits > 0)) return;
+			  var lang = (window.I18N && I18N.currentLang) || 'uz';
+			  var sep = lang === 'en' ? ',' : ' ';
+			  var n = String(d.visits).replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+			  document.getElementById('todayVisitsText').textContent = (LABEL[lang] || LABEL.uz) + ': ' + n;
+			  document.getElementById('todayVisits').hidden = false;
+			})
+			.catch(function () {});
+		})();
+		</script> 	
+	
+	
     </div>
   </div>
 
@@ -161,17 +210,17 @@
       notifications: { icon: '🔔', labelKey: 'feature.notifications', href: 'pages/notifications/notifications.html', isNew: true },
       qibla: { icon: '🕋', labelKey: 'feature.qibla', href: 'pages/qibla/qibla.html'}, 
       qna: { icon: '🌐', labelKey: 'feature.qna', href: 'pages/questions/qna.html'},
-      barcode: { icon: '🧪', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html', isNew: true},  // ← NEW FEATURE
-      hikorea: {icon: '🛂',labelKey: 'feature.hikorea',href: 'pages/hikorea/hikorea.html',isNew: true},
-      cars: { icon: '🚘', labelKey: 'feature.cars', href: 'pages/cars/cars.html',isNew: true},
+      barcode: { icon: '🧪', labelKey: 'feature.barcode', href: 'pages/barcode/barcode.html'},  // ,isNew: true ← NEW FEATURE
+      hikorea: {icon: '🛂',labelKey: 'feature.hikorea',href: 'pages/hikorea/hikorea.html'},
+      cars: { icon: '🚘', labelKey: 'feature.cars', href: 'pages/cars/cars.html'},
       jobs: { icon: '💼', labelKey: 'feature.jobs', href: 'pages/job-group/job-group.html'},
       parcel: { icon: '📦', labelKey: 'feature.parcel', href: 'pages/parcel/parcel.html' },
       //vegukinShops: { icon: '🛒', labelKey: 'feature.vegukinShops', href: 'pages/vegukinshops/shops.html', isNew: true },
       links: { icon: '🔗', labelKey: 'feature.links', href: 'pages/links/links.html' },
       donation: { icon: '🤝', labelKey: 'feature.donation', href: 'pages/donation/donation.html' },      
-      housing: { icon: '🏠', labelKey: 'feature.housing', href: 'pages/housing/housing.html', isNew: true},
+      housing: { icon: '🏠', labelKey: 'feature.housing', href: 'pages/housing/housing.html'},
       //market: { icon: '🛒', labelKey: 'feature.market', href: 'pages/flight/flight.html' },
-      community: { icon: '👥', labelKey: 'feature.community', href: 'pages/community/community.html' },
+      community: { icon: '👥', labelKey: 'feature.community', href: 'pages/community/community.html'},
       // Rendered as the gold band above the grid, not as a card in it.
       business: { icon: '🏬', labelKey: 'feature.business', href: 'pages/business/business.html', isBand: true }
     };

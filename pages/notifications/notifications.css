@@ -872,20 +872,27 @@ a.nt-chip:hover, a.nt-chip:active { background: var(--pl-accent-soft); color: va
 
 .nt-addr-find {
   flex-shrink: 0;
-  width: 38px;
-  height: 38px;
+  height: 36px;
+  padding: 0 14px;
   border: none;
   border-radius: 10px;
-  background: var(--pl-surface-2);
-  color: var(--pl-muted);
+  background: var(--pl-accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
 }
 
-.nt-addr-field.is-found .nt-addr-find { background: var(--pl-accent-soft); color: var(--pl-accent); }
-.nt-addr-find .pl-icon { width: 18px; height: 18px; }
+.nt-addr-find:disabled { opacity: 0.6; cursor: default; }
+.nt-addr-field.is-found .nt-addr-find { background: var(--pl-accent-soft); color: var(--pl-accent-deep); }
+.nt-addr-find .pl-icon { width: 15px; height: 15px; }
+.night-mode .nt-addr-find { color: #052e22; }
+.night-mode .nt-addr-field.is-found .nt-addr-find { color: var(--pl-accent-deep); }
 
 .nt-hint { margin: 7px 0 0; font-size: 0.76rem; line-height: 1.5; color: var(--pl-muted); }
 .nt-hint[hidden] { display: none; }
