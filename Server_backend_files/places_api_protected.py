@@ -264,6 +264,13 @@ from places_public_api import bp as places_public_bp
 app.config["PLACES_DB"] = DATABASE_PATH
 app.register_blueprint(places_public_bp)
 
+# --- Mosque prayer times (congregation and Eid), kept by the community:
+# mosque_timetable_api.py. Same database and sign-in as the reviews above.
+from mosque_timetable_api import (bp as mosque_timetable_bp, init_mosque_timetables, timetable_info,
+                                  delete_place_timetable_rows, MOSQUE_BUILDING_TYPE)
+app.register_blueprint(mosque_timetable_bp)
+init_mosque_timetables(app)   # creates the tables; idempotent
+
 
 # --- Biznes Katalogi ---
 # Its own database file, same isolation as housing/cars/parcels.
@@ -877,6 +884,10 @@ def get_place_details(place_id):
         viewer = optional_user()
         watch_info = place_watch_info(conn, place_id, viewer)
 
+        # Congregation and Eid times, mosques only (mosque_timetable_api.py).
+        prayer_times = (timetable_info(conn, place_id)
+                        if row['Building_type'] == MOSQUE_BUILDING_TYPE else None)
+
         conn.close()
         
         # Format reviews. Who wrote one stays private (it used to send their
@@ -918,6 +929,8 @@ def get_place_details(place_id):
             'reviews': reviews,
             'view_count': row['view_count']
         }
+        if prayer_times:
+            place.update(prayer_times)      # 'timetable' and 'eid'
         
         logger.info(f"Returned details for place {place_id} ({row['Building_type']}) to IP: {ip}")
         
@@ -2540,6 +2553,8 @@ def admin_delete_place(place_id):
             # Watches, owner, claims and announcements go with the place:
             # Unique_number is reused, and must not hand them to a new place.
             notify_deleted = delete_place_notify_rows(conn, place_id)
+            # Prayer times and their history: a new place may get this number.
+            timetable_deleted = delete_place_timetable_rows(conn, place_id)
             conn.execute("DELETE FROM main_db WHERE Unique_number = ?", (place_id,))
             conn.execute('COMMIT')
         except Exception:
@@ -2555,7 +2570,8 @@ def admin_delete_place(place_id):
                 logger.error(f"[NOTIFY] delete place #{place_id}: {e}")
         logger.info(f"[ADMIN] Deleted place #{place_id} "
                     f"with {reviews_deleted} review(s), {subs_deleted} submission(s), "
-                    f"{sum(notify_deleted.values())} notification row(s)")
+                    f"{sum(notify_deleted.values())} notification row(s), "
+                    f"{timetable_deleted} prayer-time row(s)")
         return jsonify({'success': True,
                         'reviews_deleted': reviews_deleted,
                         'submissions_deleted': subs_deleted,
