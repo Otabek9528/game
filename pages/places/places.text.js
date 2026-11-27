@@ -874,9 +874,10 @@ window.PLACES_TEXT = {
       // {n} is 1, 2 or 3.
       session:         { uz: "{n}-jamoat", ru: "{n}-й джамаат", en: "Prayer {n}" },
       addSession:      { uz: "Jamoat qo‘shish", ru: "Добавить джамаат", en: "Add a prayer" },
-      maxSessions:     { uz: "Jamoat qo‘shish · 3 tagacha", ru: "Не больше 3 джамаатов", en: "Up to 3 prayers" },
       // {name} is a prayer, e.g. "Bomdod" or "Ramazon hayiti, 2-jamoat".
       remove:          { uz: "{name}: olib tashlash", ru: "{name}: убрать", en: "Remove {name}" },
+      // Under the tiles until one is tapped.
+      pick:            { uz: "Namozni tanlang", ru: "Выберите намаз", en: "Pick a prayer" },
       hour:            { uz: "Soat", ru: "Часы", en: "Hour" },
       minute:          { uz: "Daqiqa", ru: "Минуты", en: "Minute" },
       liveNote:        { uz: "Saqlangach hamma darhol ko‘radi.", ru: "После сохранения все увидят сразу.", en: "Everyone sees it as soon as you save." },
