@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 import pytest
 from flask import Flask
@@ -77,48 +77,6 @@ def history(db):
 DAILY = {'fajr': '06:00', 'dhuhr': '13:00', 'asr': '16:15', 'maghrib': '18:25', 'isha': '20:00', 'jumuah': '13:30'}
 
 
-# ---------------------------------------------------------------- Eid dates
-
-def test_eid_dates_are_in_order_and_unique():
-    days = [o['expected'] for o in mt.OCCURRENCES]
-    assert days == sorted(days)
-    assert len({o['key'] for o in mt.OCCURRENCES}) == len(mt.OCCURRENCES)
-    for kind, year, _ in mt.EID_DATES:
-        assert kind in mt.EID_KINDS and 1447 <= year
-
-
-def test_eid_dates_spacing_matches_the_lunar_year():
-    by_key = {o['key']: o['expected'] for o in mt.OCCURRENCES}
-    for kind in mt.EID_KINDS:
-        years = sorted(y for k, y, _ in mt.EID_DATES if k == kind)
-        for a, b in zip(years, years[1:]):
-            gap = (by_key[f'{kind}-{b}'] - by_key[f'{kind}-{a}']).days
-            assert 353 <= gap <= 356, (kind, a, b, gap)
-    for year in {y for _, y, _ in mt.EID_DATES}:
-        # 1 Shawwal to 10 Dhu al-Hijjah: two months of 29-30 days, plus 9.
-        assert 67 <= (by_key[f'adha-{year}'] - by_key[f'fitr-{year}']).days <= 69
-
-
-def test_current_eid_today_is_ramadan_eid_2027():
-    occ, day = mt.current_eid(date(2026, 11, 27))
-    assert occ['key'] == 'fitr-1448' and day == date(2027, 3, 9)
-
-
-def test_current_eid_stays_two_days_after_then_moves_on():
-    assert mt.current_eid(date(2027, 3, 11))[0]['key'] == 'fitr-1448'
-    assert mt.current_eid(date(2027, 3, 12))[0]['key'] == 'adha-1448'
-
-
-def test_current_eid_follows_a_date_set_by_an_editor():
-    dates = {'fitr-1448': date(2027, 3, 10)}
-    assert mt.current_eid(date(2027, 3, 12), dates)[0]['key'] == 'fitr-1448'
-    assert mt.current_eid(date(2027, 3, 13), dates)[0]['key'] == 'adha-1448'
-
-
-def test_current_eid_past_the_table_is_none():
-    assert mt.current_eid(date(2040, 1, 1)) == (None, None)
-
-
 # ---------------------------------------------------------------- values
 
 @pytest.mark.parametrize('raw,out', [('06:00', '06:00'), ('6:05', '06:05'), (' 23:59 ', '23:59'),
@@ -140,21 +98,17 @@ def test_parse_sessions_sorts_dedupes_and_caps():
     assert e.value.code == 'too_many_sessions'
     with pytest.raises(mt.InputError):
         mt.parse_sessions('07:00')
+    assert mt.parse_sessions([]) == []
 
 
 # ---------------------------------------------------------------- reading
 
-def test_a_mosque_with_nothing_still_has_the_next_eid(client, db):
-    out = info(db)
-    assert out['timetable'] is None
-    assert out['eid'] == {'key': 'fitr-1448', 'eid': 'fitr', 'year': 2027, 'date': '2027-03-09',
-                          'expectedDate': '2027-03-09', 'approximate': True, 'sessions': [],
-                          'updatedAt': None, 'lastYear': None}
+def test_a_mosque_with_nothing_has_neither(client, db):
+    assert info(db) == {'timetable': None, 'eid': None}
 
 
 def test_info_without_tables_does_not_raise(db):
-    out = info(db)                      # init never ran on this database
-    assert out['timetable'] is None and out['eid']['key']
+    assert info(db) == {'timetable': None, 'eid': None}     # init never ran on this database
 
 
 # ---------------------------------------------------------------- daily times
@@ -235,68 +189,61 @@ def test_flood_brake(client, monkeypatch):
 
 # ---------------------------------------------------------------- Eid
 
-def test_save_eid_sessions(client, db):
-    r = client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'sessions': ['08:30', '07:00']})
+def test_save_eid_times(client, db):
+    r = client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['08:30', '07:00']})
     assert r.status_code == 200
-    eid = r.get_json()['eid']
-    assert eid['sessions'] == ['07:00', '08:30'] and eid['approximate'] is True
-    assert eid['updatedAt'] == '2026-11-27'
+    assert r.get_json()['eid'] == {'sessions': ['07:00', '08:30'], 'updatedAt': '2026-11-27', 'stale': False}
+    [h] = history(db)
+    assert h['section'] == 'eid' and h['old_value'] is None and json.loads(h['new_value']) == ['07:00', '08:30']
 
 
-def test_eid_date_set_by_an_editor(client, db):
-    r = client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'date': '2027-03-10'})
-    eid = r.get_json()['eid']
-    assert eid['date'] == '2027-03-10' and eid['expectedDate'] == '2027-03-09'
-    assert eid['approximate'] is False
-    # Left out next time: kept.
-    eid = client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'sessions': ['07:00']}).get_json()['eid']
-    assert eid['date'] == '2027-03-10' and eid['sessions'] == ['07:00']
+def test_eid_answer_has_no_date_or_name(client):
+    eid = client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00']}).get_json()['eid']
+    assert set(eid) == {'sessions', 'updatedAt', 'stale'}
 
 
-def test_eid_date_too_far_is_refused(client):
-    r = client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'date': '2027-03-13'})
-    assert r.status_code == 400 and r.get_json()['code'] == 'date_out_of_range'
+def test_eid_needs_sessions(client):
+    assert client.put(f'/api/place/{MOSQUE}/eid', json={}).get_json()['code'] == 'invalid_input'
+    r = client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00', '08:00', '09:00', '10:00']})
+    assert r.status_code == 400 and r.get_json()['code'] == 'too_many_sessions'
 
 
-def test_only_the_current_eid_can_be_edited(client):
-    r = client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'adha-1448', 'sessions': ['07:00']})
-    assert r.status_code == 409
-    assert r.get_json()['code'] == 'eid_changed' and r.get_json()['current'] == 'fitr-1448'
+def test_eid_only_for_mosques_and_signed_in(client, who):
+    assert client.put(f'/api/place/{RESTAURANT}/eid', json={'sessions': ['07:00']}).status_code == 400
+    who.user = None
+    assert client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00']}).status_code == 401
 
 
-def test_last_years_times_are_offered_never_shown(client, db, clock):
-    clock.now = datetime(2026, 3, 1, 9, 0, tzinfo=mt.KST)
-    client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1447', 'sessions': ['07:00', '09:00']})
-    clock.now = datetime(2026, 11, 27, 9, 0, tzinfo=mt.KST)
-    eid = info(db, today=date(2026, 11, 27))['eid']
-    assert eid['key'] == 'fitr-1448'
-    assert eid['sessions'] == [] and eid['lastYear'] == ['07:00', '09:00']
+def test_eid_same_times_change_nothing(client, db):
+    client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00']})
+    assert client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00']}).get_json()['changed'] is False
+    assert len(history(db)) == 1
 
 
-def test_after_eid_the_next_one_shows_empty(client, db):
-    client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'sessions': ['07:00']})
-    eid = info(db, today=date(2027, 3, 12))['eid']
-    assert eid['key'] == 'adha-1448' and eid['sessions'] == [] and eid['approximate'] is True
+def test_eid_stays_shown_and_goes_stale(client, db):
+    client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00']})
+    assert info(db, today=date(2027, 1, 26))['eid']['stale'] is False
+    later = info(db, today=date(2027, 11, 27))['eid']
+    assert later['sessions'] == ['07:00'] and later['stale'] is True
 
 
 def test_clearing_the_eid_removes_its_row(client, db):
-    client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'sessions': ['07:00']})
-    client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'sessions': []})
-    assert info(db)['eid']['updatedAt'] is None
-    assert history(db)[-1]['eid_key'] == 'fitr-1448' and history(db)[-1]['new_value'] is None
+    client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00']})
+    client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': []})
+    assert info(db)['eid'] is None
+    assert history(db)[-1]['new_value'] is None
 
 
 # ---------------------------------------------------------------- places and people going
 
 def test_deleting_the_place_removes_every_row(client, db):
     client.put(f'/api/place/{MOSQUE}/timetable', json=DAILY)
-    client.put(f'/api/place/{MOSQUE}/eid', json={'key': 'fitr-1448', 'sessions': ['07:00']})
+    client.put(f'/api/place/{MOSQUE}/eid', json={'sessions': ['07:00']})
     conn = sqlite3.connect(db)
     assert mt.delete_place_timetable_rows(conn, MOSQUE) == 4     # daily, eid, 2 history
     conn.commit()
     conn.close()
-    assert info(db) == {'timetable': None, 'eid': info(db)['eid']}
-    assert info(db)['eid']['sessions'] == [] and history(db) == []
+    assert info(db) == {'timetable': None, 'eid': None} and history(db) == []
 
 
 def test_delete_cascade_without_tables_does_not_raise(db):
