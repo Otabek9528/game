@@ -554,6 +554,8 @@ window.PLACES_TEXT = {
       en: "The bot can’t message you, so no news arrives. Allow messages, or open the bot and tap “Start”."
     },
     allow:     { uz: "Ruxsat berish", ru: "Разрешить", en: "Allow" },
+    // A switch: on, prayer time changes at watched mosques are messaged.
+    timesSwitch: { uz: "Masjid namoz vaqtlari o‘zgarsa", ru: "Когда меняется время намаза", en: "When prayer times change" },
     helloSent: {
       uz: "Sinov xabari yuborildi. Botni tekshiring.",
       ru: "Отправили проверочное сообщение. Загляните в бота.",
@@ -589,7 +591,8 @@ window.PLACES_TEXT = {
     whenPhone:  { uz: "Telefon o‘zgarsa", ru: "Сменился телефон", en: "Phone number changes" },
     whenName:   { uz: "Nomi o‘zgarsa", ru: "Сменилось название", en: "Name changes" },
     whenOwner:  { uz: "Joy egasi e’lon bersa", ru: "Объявление владельца", en: "The owner posts news" },
-    whenMosque: { uz: "Masjid e’lon bersa", ru: "Объявление мечети", en: "A mosque posts news" }
+    whenMosque: { uz: "Masjid e’lon bersa", ru: "Объявление мечети", en: "A mosque posts news" },
+    whenTimes:  { uz: "Masjid namoz vaqtlari o‘zgarsa", ru: "Сменилось время намаза в мечети", en: "A mosque’s prayer times change" }
   },
 
   /* -------------------------------------------------------

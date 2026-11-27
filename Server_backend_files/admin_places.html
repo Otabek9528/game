@@ -330,6 +330,13 @@
   .tt-hist-line s { color: var(--muted); }
   .tt-hist-line ins { text-decoration: none; color: var(--green); font-weight: 600; }
   .tt-hist .btn-open { margin-top: 8px; padding: 5px 12px; font-size: 0.72rem; }
+  .tt-mode { font-size: 0.78rem; line-height: 1.55; padding: 10px 12px; border-radius: 8px; margin: -8px 0 14px;
+             background: var(--bg); border: 1px solid var(--border); color: var(--sub); }
+  .tt-mode.is-on { background: rgba(26,122,66,0.06); border-color: rgba(26,122,66,0.3); color: var(--green); }
+  .tt-mode code { font-family: var(--mono); font-size: 0.72rem; }
+  .tt-out { font-family: var(--mono); font-size: 0.66rem; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+            background: var(--bg); border: 1px solid var(--border); color: var(--sub); white-space: nowrap; }
+  .tt-out.is-sent { color: var(--green); border-color: rgba(26,122,66,0.3); background: rgba(26,122,66,0.06); }
   @media (max-width: 560px) { .tt-times, .tt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
   /* ══ PLACE LIST ═══════════════════════════════════════════ */
@@ -653,6 +660,7 @@
     <button class="filter-chip"    data-ttfilter="with">With times</button>
     <button class="filter-chip"    data-ttfilter="without">Without</button>
     <button class="filter-chip"    data-ttfilter="old">Daily 60+ days old</button>
+    <button class="btn-topbar" onclick="openTimetableMessages()">📨 Messages</button>
     <button class="btn-topbar" onclick="loadTimetables()">↻ Refresh</button>
     <div class="tt-meta" id="tt-meta"></div>
   </div>
@@ -945,6 +953,19 @@
     <div class="modal-actions">
       <button class="btn-modal btn-cancel" onclick="closeModal('ttModal')">Cancel</button>
       <button class="btn-modal btn-save" id="tt-save" onclick="saveTimetable()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRAYER TIMES: messages sent (or, in a dry run, not) -->
+<div class="modal-overlay" id="ttMsgModal">
+  <div class="modal" style="max-width:560px">
+    <h3>📨 Prayer time messages</h3>
+    <div class="tt-mode" id="tt-msg-mode"></div>
+    <div id="tt-msg-list"></div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="openTimetableMessages()">↻ Refresh</button>
+      <button class="btn-modal btn-cancel" onclick="closeModal('ttMsgModal')">Close</button>
     </div>
   </div>
 </div>
@@ -2413,6 +2434,56 @@ function ttHistEntry(h) {
     </div>`;
 }
 
+// What came of each gathered change. In a dry run nothing is sent; each line
+// says how many people would have been told.
+const TT_NAMES = Object.fromEntries([...TT_PRAYERS, ...TT_EIDS]);
+const TT_OUTCOME = {
+  sent: n => [`📨 Sent to ${n}`, true],
+  dry_run: n => [`Would reach ${n}`, false],
+  unchanged: () => ['Not sent: changed back', false],
+  capped: () => ['Not sent: 3 today already', false],
+};
+
+async function openTimetableMessages() {
+  const box = document.getElementById('tt-msg-list');
+  const mode = document.getElementById('tt-msg-mode');
+  document.getElementById('ttMsgModal').classList.add('show');
+  box.innerHTML = '<div class="w-empty">Loading…</div>';
+  try {
+    const d = await (await fetch(`${TT_API}/messages`)).json();
+    if (!d.success) { box.innerHTML = '<div class="w-empty">Failed to load</div>'; return; }
+    const waiting = d.waiting ? ` ${d.waiting} mosque${d.waiting === 1 ? '' : 's'} changed and waiting` +
+      ` (a message goes out after ${d.quietMinutes} quiet minutes).` : '';
+    mode.className = 'tt-mode' + (d.mode === 'on' ? ' is-on' : '');
+    mode.innerHTML = (d.mode === 'on'
+      ? '<b>On.</b> Watchers are messaged.'
+      : d.mode === 'off'
+        ? '<b>Off.</b> Changes are not gathered or sent.'
+        : '<b>Dry run.</b> Nobody is messaged; each entry says how many would have been. To send, set ' +
+          '<code>app.config["TIMETABLE_NOTIFY"] = "on"</code> in places_api_protected.py and restart.') +
+      ` At most ${d.perDay} a day per mosque.` + waiting;
+    box.innerHTML = d.messages.length ? d.messages.map(ttMsgEntry).join('')
+                                      : '<div class="w-empty">No changes have been gathered yet.</div>';
+  } catch { box.innerHTML = '<div class="w-empty">Failed to load</div>'; }
+}
+
+function ttMsgEntry(m) {
+  const [label, sent] = (TT_OUTCOME[m.mode] || (() => [m.mode, false]))(m.recipients);
+  const list = v => (Array.isArray(v) && v.length) ? v.map(esc).join(' · ') : '—';
+  const lines = (m.changes || []).map(([k, o, n]) => TT_EIDS.some(([e]) => e === k)
+    ? `${TT_NAMES[k] || esc(k)}: <ins>${list(n)}</ins>`
+    : `${TT_NAMES[k] || esc(k)}: <s>${o ? esc(o) : '—'}</s> → <ins>${n ? esc(n) : '—'}</ins>`);
+  return `
+    <div class="tt-hist">
+      <div class="tt-hist-head">
+        <span class="tt-hist-sec">${esc(m.placeName || '')} <span style="font-weight:400;color:var(--muted)">#${m.placeId}</span></span>
+        <span class="tt-out${sent ? ' is-sent' : ''}">${label}</span>
+      </div>
+      <div class="tt-hist-line">${lines.join('<br>') || '<span class="tt-none">no change</span>'}</div>
+      <div class="tt-who" style="margin:6px 0 0">${esc(m.at)}</div>
+    </div>`;
+}
+
 async function restoreTimetable(historyId) {
   if (!confirm('Put this back as it was before this change? The mosque page shows it at once.')) return;
   try {
@@ -2444,6 +2515,7 @@ document.addEventListener('keydown', e => {
     closeModal('ownerModal');
     closeModal('ttModal');
     closeModal('ttHistModal');
+    closeModal('ttMsgModal');
   }
 });
 

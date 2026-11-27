@@ -55,6 +55,7 @@ def who(monkeypatch):
 def client(db, clock, who):
     app = Flask(__name__)
     app.secret_key = 'test'
+    app.config['TESTING'] = True                 # no background sender
     app.config['PLACES_DB'] = db
     app.register_blueprint(mt.bp)
     mt.init_mosque_timetables(app)
@@ -265,7 +266,7 @@ def test_deleting_the_place_removes_every_row(client, db):
     client.put(f'/api/place/{MOSQUE}/timetable', json=DAILY)
     client.put(f'/api/place/{MOSQUE}/eid', json={'fitr': ['07:00'], 'adha': ['07:30']})
     conn = sqlite3.connect(db)
-    assert mt.delete_place_timetable_rows(conn, MOSQUE) == 6     # daily, 2 Eids, 3 history
+    assert mt.delete_place_timetable_rows(conn, MOSQUE) == 7     # daily, 2 Eids, 3 history, 1 waiting message
     conn.commit()
     conn.close()
     assert info(db) == {'timetable': None, 'eid': NO_EID} and history(db) == []

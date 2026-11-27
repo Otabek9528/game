@@ -17,4 +17,6 @@ if 'app_accounts' not in sys.modules:
     stub.movers, stub.deleters = [], []
     stub.on_user_moved = lambda fn: stub.movers.append(fn) or fn
     stub.on_user_deleted = lambda fn: stub.deleters.append(fn) or fn
+    # As in app_accounts: app-only accounts have ids at or below -9e12.
+    stub.is_app_user = lambda uid: int(uid) <= -9_000_000_000_000
     sys.modules['app_accounts'] = stub

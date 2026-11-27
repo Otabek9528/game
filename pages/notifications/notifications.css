@@ -1138,3 +1138,65 @@ a.nt-chip:hover, a.nt-chip:active { background: var(--pl-accent-soft); color: va
 .night-mode .nt-loc.is-error { background: rgba(232, 124, 115, 0.1); }
 .night-mode .nt-map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(0.3) brightness(0.95) contrast(0.9); }
 .night-mode .nt-map .leaflet-control-attribution { background: rgba(28, 28, 28, 0.8); color: #b8b8b2; }
+
+
+/* =========================================================
+   PRAYER TIMES SWITCH
+   ========================================================= */
+
+.nt-kinds[hidden] { display: none; }
+
+.nt-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 56px;
+  padding: 10px 16px;
+  border: 1px solid var(--pl-line);
+  border-radius: 16px;
+  background: var(--pl-surface);
+  cursor: pointer;
+}
+
+.nt-switch-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--pl-text);
+}
+
+.nt-switch {
+  -webkit-appearance: none;
+  appearance: none;
+  flex-shrink: 0;
+  position: relative;
+  width: 48px;
+  height: 28px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--pl-muted);
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.nt-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 180ms ease;
+}
+
+.nt-switch:checked { background: var(--pl-accent); }
+.nt-switch:checked::after { transform: translateX(20px); }
+.nt-switch:disabled { opacity: 0.6; }
+.nt-switch:focus-visible { outline: 2px solid var(--pl-accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nt-switch, .nt-switch::after { transition: none; }
+}

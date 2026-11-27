@@ -268,6 +268,10 @@ app.register_blueprint(places_public_bp)
 # mosque_timetable_api.py. Same database and sign-in as the reviews above.
 from mosque_timetable_api import (bp as mosque_timetable_bp, init_mosque_timetables, timetable_info,
                                   delete_place_timetable_rows, MOSQUE_BUILDING_TYPE)
+# Messages when prayer times change: "dry_run" works out who would be told and
+# shows it in the panel (Timetables -> Messages) without sending; "on" sends;
+# "off" does neither.
+app.config["TIMETABLE_NOTIFY"] = "dry_run"
 app.register_blueprint(mosque_timetable_bp)
 init_mosque_timetables(app)   # creates the tables; idempotent
 

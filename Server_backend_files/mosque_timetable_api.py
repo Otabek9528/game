@@ -38,13 +38,35 @@ STALE_AFTER_DAYS days.
 Who edited is for the admin only: the public answers carry the date of the
 last change, never a name or id.
 
+Messages
+--------
+A change is told to the mosque's watchers and to the people whose area
+covers it (place_notifications_api decides who, and delivers by the bot and
+the app), except whoever made it and anyone who switched these messages off:
+
+    GET/PUT /api/notify/timetable-updates   {"on": true|false}
+
+Saves are gathered, not told one by one. Once nobody has changed a mosque
+for NOTIFY_QUIET_MINUTES (or NOTIFY_MAX_WAIT_MINUTES after the first change),
+one message says what differs from before the first change; nothing goes out
+when it was put back. A mosque sends at most NOTIFY_PER_DAY a day. Every
+outcome is logged for the panel (GET /api/admin/timetables/messages).
+
+app.config["TIMETABLE_NOTIFY"]: 'on' sends; 'dry_run' (the default) does all
+of it except sending, so the panel shows who would have been told; 'off'
+neither gathers nor sends.
+
 Configuration: app.config["PLACES_DB"] (main_db.sqlite), as places_public_api.py.
 """
 
+import html
 import json
 import logging
+import os
 import re
 import sqlite3
+import threading
+import time
 from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, jsonify, request, session
@@ -67,6 +89,28 @@ STALE_AFTER_DAYS = 60
 # A brake on scripts, far above what one person does by hand; not moderation.
 SAVES_PER_HOUR = 30
 HISTORY_PAGE = 50
+
+NOTIFY_MODES = ('on', 'dry_run', 'off')
+NOTIFY_QUIET_MINUTES = 10
+NOTIFY_MAX_WAIT_MINUTES = 60
+NOTIFY_PER_DAY = 3
+NOTIFY_POLL_SECONDS = 60
+MESSAGES_PAGE = 100
+
+# The words of the message. Mirrors times.* in pages/places/places.text.js of
+# the frontend, which this server cannot read; edit the two together.
+MESSAGE_TEXT = {
+    'updated': {'uz': 'Namoz vaqtlari yangilandi:', 'ru': 'Время намаза обновлено:',
+                'en': 'Prayer times updated:'},
+    'fajr':    {'uz': 'Bomdod', 'ru': 'Фаджр', 'en': 'Fajr'},
+    'dhuhr':   {'uz': 'Peshin', 'ru': 'Зухр', 'en': 'Dhuhr'},
+    'asr':     {'uz': 'Asr', 'ru': 'Аср', 'en': 'Asr'},
+    'maghrib': {'uz': 'Shom', 'ru': 'Магриб', 'en': 'Maghrib'},
+    'isha':    {'uz': 'Xufton', 'ru': 'Иша', 'en': 'Isha'},
+    'jumuah':  {'uz': 'Juma', 'ru': 'Джума', 'en': 'Jumu‘ah'},
+    'fitr':    {'uz': 'Ramazon hayiti', 'ru': 'Ураза-байрам', 'en': 'Eid al-Fitr'},
+    'adha':    {'uz': 'Qurbon hayiti', 'ru': 'Курбан-байрам', 'en': 'Eid al-Adha'},
+}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS mosque_timetables (
@@ -106,9 +150,34 @@ CREATE TABLE IF NOT EXISTS mosque_timetable_history (
 );
 CREATE INDEX IF NOT EXISTS idx_mosque_tt_history_place ON mosque_timetable_history (place_id, id);
 CREATE INDEX IF NOT EXISTS idx_mosque_tt_history_editor ON mosque_timetable_history (editor_id, created_at);
+
+-- A mosque changed and not yet told: the times before the first such change,
+-- and who changed it since (they are not told).
+CREATE TABLE IF NOT EXISTS timetable_notify_pending (
+    place_id         INTEGER PRIMARY KEY,
+    baseline         TEXT NOT NULL,
+    editors          TEXT NOT NULL,
+    first_at         TEXT NOT NULL,
+    last_at          TEXT NOT NULL
+);
+
+-- What came of each gathered change, for the panel.
+CREATE TABLE IF NOT EXISTS timetable_notify_log (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    place_id         INTEGER NOT NULL,
+    place_name       TEXT,
+    mode             TEXT NOT NULL CHECK (mode IN ('sent', 'dry_run', 'unchanged', 'capped')),
+    recipients       INTEGER NOT NULL DEFAULT 0,
+    changes          TEXT,
+    created_at       TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_tt_notify_log_place ON timetable_notify_log (place_id, created_at);
 """
 
 _db_path = DEFAULT_DB_PATH
+_notify_mode = 'dry_run'
+_notifier_lock = threading.Lock()
+_notifier_started = False
 _TIME = re.compile(r'^([01]?\d|2[0-3]):([0-5]\d)$')
 
 
@@ -151,13 +220,23 @@ def init_schema(path):
 
 
 def init_mosque_timetables(app):
-    """Create the tables (idempotent) and follow people whose app account changes or goes."""
-    global _db_path
+    """
+    Create the tables (idempotent), follow people whose app account changes or
+    goes, and start the worker that sends the gathered messages.
+    """
+    global _db_path, _notify_mode
     _db_path = app.config.get('PLACES_DB', DEFAULT_DB_PATH)
+    mode = app.config.get('TIMETABLE_NOTIFY', 'dry_run')
+    if mode not in NOTIFY_MODES:
+        logger.warning('[TIMETABLE] TIMETABLE_NOTIFY=%r is not one of %s: using dry_run', mode, NOTIFY_MODES)
+        mode = 'dry_run'
+    _notify_mode = mode
     init_schema(_db_path)
     from app_accounts import on_user_moved, on_user_deleted
     on_user_moved(move_editor)
     on_user_deleted(forget_editor)
+    if mode != 'off' and not app.config.get('TESTING') and os.getenv('PLACE_NOTIFY_DISABLE_SENDER') != '1':
+        start_notifier(app)
 
 
 # ============================================
@@ -341,7 +420,10 @@ def _save(place_id, user, write):
         if refused:
             conn.execute('ROLLBACK')
             return refused
+        before = _state(conn, place_id)
         changed = write(conn, now)
+        if changed:
+            _gather(conn, place_id, before, int(user['id']), now)
         conn.execute('COMMIT')
         out = {'success': True, 'changed': changed}
         out.update(timetable_info(conn, place_id))
@@ -532,11 +614,14 @@ def _admin_save(place_id, write):
                             (place_id, MOSQUE_BUILDING_TYPE)).fetchone():
             conn.execute('ROLLBACK')
             return _err('place_not_found', 'No mosque with that number.', 404)
+        before = _state(conn, place_id)
         try:
             changed = write(conn, now)
         except InputError as e:
             conn.execute('ROLLBACK')
             return _err(e.code, e.message)
+        if changed:
+            _gather(conn, place_id, before, None, now)
         conn.execute('COMMIT')
         if changed:
             logger.info('[TIMETABLE] mosque %s changed by the admin', place_id)
@@ -627,10 +712,236 @@ def admin_restore_timetable(history_id):
 
 
 # ============================================
+# MESSAGES
+# ============================================
+
+def _state(conn, place_id):
+    """Everything a message can be about: the six times and both Eids' lists."""
+    row = conn.execute("SELECT * FROM mosque_timetables WHERE place_id = ?", (place_id,)).fetchone()
+    out = {p: (row[p] if row else None) for p in PRAYERS}
+    for kind in EIDS:
+        out[kind] = _sessions(conn.execute("SELECT sessions FROM mosque_eid_times WHERE place_id = ? AND eid = ?",
+                                           (place_id, kind)).fetchone())
+    return out
+
+
+def changes_between(before, after):
+    """[(key, old, new)] in page order: prayers, then the Eids."""
+    out = []
+    for key in PRAYERS + EIDS:
+        empty = [] if key in EIDS else None
+        old, new = before.get(key, empty), after.get(key, empty)
+        if (old or empty) != (new or empty):
+            out.append((key, old or empty, new or empty))
+    return out
+
+
+def _gather(conn, place_id, before, editor_id, now):
+    """A save changed the mosque: hold it for one message, in the save's transaction."""
+    if _notify_mode == 'off':
+        return
+    stamp = _fmt(now)
+    conn.execute("INSERT OR IGNORE INTO timetable_notify_pending (place_id, baseline, editors, first_at, last_at) "
+                 "VALUES (?, ?, '[]', ?, ?)", (place_id, json.dumps(before), stamp, stamp))
+    editors = json.loads(conn.execute("SELECT editors FROM timetable_notify_pending WHERE place_id = ?",
+                                      (place_id,)).fetchone()[0])
+    if editor_id is not None and editor_id not in editors:
+        editors.append(editor_id)
+    conn.execute("UPDATE timetable_notify_pending SET editors = ?, last_at = ? WHERE place_id = ?",
+                 (json.dumps(editors), stamp, place_id))
+
+
+def _word(lang, key):
+    node = MESSAGE_TEXT[key]
+    return html.escape(node.get(lang) or node['uz'], quote=False)
+
+
+def render_message(lang, name, changes):
+    """The Telegram text, without the "why" line. Its first line, the mosque in bold, is also the push's title."""
+    lines = [f'<b>{html.escape(name or "", quote=False)}</b>', _word(lang, 'updated')]
+    for key, old, new in changes:
+        if key in EIDS:
+            lines.append(f"{_word(lang, key)}: <b>{' · '.join(new) if new else '—'}</b>")
+        else:
+            lines.append(f"{_word(lang, key)}: {old or '—'} → <b>{new or '—'}</b>")
+    return '\n'.join(lines)
+
+
+def _ensure_optout_column(conn):
+    """notify_subscribers.timetable_updates (1: told of prayer time changes). False when that table is not there yet."""
+    try:
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(notify_subscribers)")}
+    except sqlite3.Error:
+        return False
+    if not cols:
+        return False
+    if 'timetable_updates' not in cols:
+        conn.execute("ALTER TABLE notify_subscribers ADD COLUMN timetable_updates INTEGER NOT NULL DEFAULT 1")
+    return True
+
+
+def _messages(conn, place_row, changes, editors):
+    """The outbox rows for one change: who is told, each in their language."""
+    import place_notifications_api as pn
+    place = pn.place_from_row(place_row)
+    if not place.get('type_key'):
+        return []
+    lat, lon = pn._place_point(place)
+    recipients = pn.resolve_recipients(conn, place['id'], lat, lon, place['type_key'])
+    for uid in editors:
+        recipients.pop(int(uid), None)
+    if recipients and _ensure_optout_column(conn):
+        ids = list(recipients)
+        off = {r[0] for r in conn.execute(
+            f"SELECT tg_id FROM notify_subscribers WHERE timetable_updates = 0 "
+            f"AND tg_id IN ({','.join('?' * len(ids))})", ids)}
+        for uid in off:
+            recipients.pop(uid, None)
+    return [{'tg_id': uid,
+             'text': render_message(r['lang'], place.get('name'), changes) + f"\n<i>{pn._why(r['lang'], r, 'changed')}</i>",
+             'buttons': pn._buttons('changed', r['lang'], place, r)}
+            for uid, r in recipients.items()]
+
+
+def flush_notices(now=None):
+    """
+    Tell people about the mosques that have been quiet long enough. Returns
+    how many gathered changes it handled. Run by the worker every minute;
+    callable by hand.
+    """
+    now = now or _now()
+    quiet = _fmt(now - timedelta(minutes=NOTIFY_QUIET_MINUTES))
+    oldest = _fmt(now - timedelta(minutes=NOTIFY_MAX_WAIT_MINUTES))
+    day_start = _fmt(now.replace(hour=0, minute=0, second=0, microsecond=0))
+    to_send = []
+    conn = _db()
+    conn.isolation_level = None
+    try:
+        conn.execute('BEGIN IMMEDIATE')
+        due = conn.execute("SELECT * FROM timetable_notify_pending WHERE last_at <= ? OR first_at <= ?",
+                           (quiet, oldest)).fetchall()
+        for p in due:
+            pid = p['place_id']
+            conn.execute("DELETE FROM timetable_notify_pending WHERE place_id = ?", (pid,))
+            place_row = conn.execute("SELECT * FROM main_db WHERE Unique_number = ?", (pid,)).fetchone()
+            if not place_row:
+                continue
+            changes = changes_between(json.loads(p['baseline']), _state(conn, pid))
+            messages = []
+            if not changes:
+                mode = 'unchanged'
+            elif conn.execute("SELECT COUNT(*) FROM timetable_notify_log WHERE place_id = ? "
+                              "AND mode IN ('sent', 'dry_run') AND created_at >= ?",
+                              (pid, day_start)).fetchone()[0] >= NOTIFY_PER_DAY:
+                mode = 'capped'
+            else:
+                mode = 'sent' if _notify_mode == 'on' else 'dry_run'
+                messages = _messages(conn, place_row, changes, json.loads(p['editors']))
+            conn.execute("INSERT INTO timetable_notify_log (place_id, place_name, mode, recipients, changes, created_at) "
+                         "VALUES (?, ?, ?, ?, ?, ?)",
+                         (pid, place_row['Name'], mode, len(messages),
+                          json.dumps([list(c) for c in changes], ensure_ascii=False), _fmt(now)))
+            if mode == 'sent' and messages:
+                to_send.append((messages, f'place:{pid}:times'))
+        conn.execute('COMMIT')
+    except Exception:
+        if conn.in_transaction:
+            conn.execute('ROLLBACK')
+        logger.exception('[TIMETABLE] sending the gathered changes failed')
+        return 0
+    finally:
+        conn.close()
+    if to_send:
+        import place_notifications_api as pn
+        for messages, ref in to_send:
+            try:
+                pn.enqueue_messages(messages, ref)
+            except Exception:
+                logger.exception('[TIMETABLE] queueing %s failed', ref)
+    return len(due)
+
+
+def _notifier_loop(app):
+    with app.app_context():
+        while True:
+            time.sleep(NOTIFY_POLL_SECONDS)
+            try:
+                flush_notices()
+            except Exception:
+                logger.exception('[TIMETABLE] notifier error')
+
+
+def start_notifier(app):
+    global _notifier_started
+    with _notifier_lock:
+        if _notifier_started:
+            return
+        _notifier_started = True
+    threading.Thread(target=_notifier_loop, args=(app,), name='timetable-notify', daemon=True).start()
+    logger.info('[TIMETABLE] notifier started (%s)', _notify_mode)
+
+
+@bp.route('/api/notify/timetable-updates', methods=['GET', 'PUT', 'OPTIONS'])
+def notify_timetable_updates():
+    """Whether this person is told when prayer times change: {"on": true|false}."""
+    if request.method == 'OPTIONS':
+        return '', 200
+    user, err = resolve_submitter(allow_anonymous=True)
+    if err:
+        code, message = err
+        return _err(code, message, 503 if code == 'server_misconfigured' else 401)
+    uid = int(user['id'])
+    conn = _db()
+    try:
+        if not _ensure_optout_column(conn):
+            return jsonify({'success': True, 'on': True})
+        if request.method == 'PUT':
+            body = request.get_json(silent=True) or {}
+            if not isinstance(body.get('on'), bool):
+                return _err('invalid_input', 'Expected {"on": true|false}.')
+            conn.execute("UPDATE notify_subscribers SET timetable_updates = ? WHERE tg_id = ?",
+                         (int(body['on']), uid))
+            conn.commit()
+        row = conn.execute("SELECT timetable_updates FROM notify_subscribers WHERE tg_id = ?", (uid,)).fetchone()
+        return jsonify({'success': True, 'on': bool(row[0]) if row else True})
+    except sqlite3.Error as e:
+        logger.error(f'timetable-updates for {uid} failed: {e}')
+        return _err('server_error', 'Could not save. Please try again.', 500)
+    finally:
+        conn.close()
+
+
+@bp.route('/api/admin/timetables/messages', methods=['GET'])
+def admin_timetable_messages():
+    """What came of the latest gathered changes, newest first, and the mode."""
+    refused = _admin_guard()
+    if refused:
+        return refused
+    conn = _db()
+    try:
+        rows = conn.execute("SELECT * FROM timetable_notify_log ORDER BY id DESC LIMIT ?",
+                            (MESSAGES_PAGE,)).fetchall()
+        waiting = conn.execute("SELECT COUNT(*) FROM timetable_notify_pending").fetchone()[0]
+    finally:
+        conn.close()
+    out = []
+    for r in rows:
+        try:
+            changes = json.loads(r['changes'] or '[]')
+        except ValueError:
+            changes = []
+        out.append({'id': r['id'], 'placeId': r['place_id'], 'placeName': r['place_name'], 'mode': r['mode'],
+                    'recipients': r['recipients'], 'changes': changes, 'at': r['created_at']})
+    return jsonify({'success': True, 'mode': _notify_mode, 'waiting': waiting, 'messages': out,
+                    'quietMinutes': NOTIFY_QUIET_MINUTES, 'perDay': NOTIFY_PER_DAY})
+
+
+# ============================================
 # PLACES AND PEOPLE GOING
 # ============================================
 
-_TABLES = ('mosque_timetables', 'mosque_eid_times', 'mosque_timetable_history')
+_TABLES = ('mosque_timetables', 'mosque_eid_times', 'mosque_timetable_history',
+           'timetable_notify_pending', 'timetable_notify_log')
 _EDITOR_COLUMNS = (('mosque_timetables', 'updated_by', 'updated_by_name'),
                    ('mosque_eid_times', 'updated_by', 'updated_by_name'),
                    ('mosque_timetable_history', 'editor_id', 'editor_name'))

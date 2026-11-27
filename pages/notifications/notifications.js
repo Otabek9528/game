@@ -33,7 +33,8 @@
     bell: '<svg class="pl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a6.3 6.3 0 0 0-6.3 6.3c0 4.6-1.4 6.9-2.4 8a.9.9 0 0 0 .7 1.5h16a.9.9 0 0 0 .7-1.5c-1-1.1-2.4-3.4-2.4-8A6.3 6.3 0 0 0 12 2.2Z"/><path d="M9.6 19.8h4.8a2.4 2.4 0 0 1-4.8 0Z"/></svg>'
   };
 
-  var state = { areas: [], watches: [], subscriber: null };
+  // timesOn: the prayer-times switch; null while unknown or on a server without it.
+  var state = { areas: [], watches: [], subscriber: null, timesOn: null };
   var photoFound = {};   // placeId -> photo URL, or '' when it has none
 
   function $(id) { return document.getElementById(id); }
@@ -218,6 +219,7 @@
         state.subscriber = data.subscriber || null;
         showState(null);
         render();
+        loadTimesSwitch();
       })
       .catch(function (err) {
         showState('error', AUTH_CODES.indexOf(err.code) !== -1 ? T('common.telegramOnly') : T('page.loadError'),
@@ -1072,12 +1074,42 @@
   }
 
   // ============================================
+  // PRAYER TIMES SWITCH
+  // ============================================
+
+  function loadTimesSwitch() {
+    api('GET', '/api/notify/timetable-updates')
+      .then(function (d) { state.timesOn = !!d.on; })
+      .catch(function () { state.timesOn = null; })
+      .then(renderTimesSwitch);
+  }
+
+  function renderTimesSwitch() {
+    $('ntKinds').hidden = state.timesOn === null;
+    $('ntTimesSwitch').checked = state.timesOn === true;
+  }
+
+  function toggleTimes() {
+    var sw = $('ntTimesSwitch');
+    var want = sw.checked;
+    sw.disabled = true;
+    api('PUT', '/api/notify/timetable-updates', { on: want })
+      .then(function (d) { state.timesOn = !!d.on; haptic('light'); })
+      .catch(function (err) { toast(errorText(err)); haptic('error'); })
+      .then(function () {
+        sw.disabled = false;
+        renderTimesSwitch();
+      });
+  }
+
+  // ============================================
   // EVENTS
   // ============================================
 
   function bind() {
     $('ntRetry').addEventListener('click', load);
     $('ntAllow').addEventListener('click', allowMessages);
+    $('ntTimesSwitch').addEventListener('change', toggleTimes);
     $('ntEmptyAddArea').addEventListener('click', function () { openSheet(null); });
     $('ntAddArea').addEventListener('click', function () { openSheet(null); });
 

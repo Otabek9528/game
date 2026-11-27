@@ -108,6 +108,7 @@
           <li><span aria-hidden="true">✏️</span><span data-pt="empty.whenName"></span></li>
           <li><span aria-hidden="true">📣</span><span data-pt="empty.whenOwner"></span></li>
           <li><span aria-hidden="true">🕌</span><span data-pt="empty.whenMosque"></span></li>
+          <li><span aria-hidden="true">🕒</span><span data-pt="empty.whenTimes"></span></li>
         </ul>
       </div>
     </section>
@@ -138,6 +139,15 @@
           </h3>
         </div>
         <div class="nt-place-list" id="ntPlaceList"></div>
+      </section>
+
+      <!-- Prayer time changes can be switched off on their own. Hidden when
+           the server has no such switch. -->
+      <section class="nt-section nt-kinds" id="ntKinds" hidden>
+        <label class="nt-switch-row">
+          <span class="nt-switch-title" data-pt="page.timesSwitch"></span>
+          <input type="checkbox" class="nt-switch" id="ntTimesSwitch" role="switch" />
+        </label>
       </section>
 
       <p class="nt-tip">
