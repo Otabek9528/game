@@ -8840,6 +8840,192 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'O‘rnatish'**
   String get updateInstall;
+
+  /// No description provided for @ptTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jamoat namozi'**
+  String get ptTitle;
+
+  /// No description provided for @ptEdit.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tahrirlash'**
+  String get ptEdit;
+
+  /// No description provided for @ptAdd.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo‘shish'**
+  String get ptAdd;
+
+  /// No description provided for @ptEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Vaqtlar hali qo‘shilmagan'**
+  String get ptEmpty;
+
+  /// No description provided for @ptUpdated.
+  ///
+  /// In uz, this message translates to:
+  /// **'Oxirgi yangilanish: {date}'**
+  String ptUpdated(String date);
+
+  /// No description provided for @ptNext.
+  ///
+  /// In uz, this message translates to:
+  /// **'keyingi'**
+  String get ptNext;
+
+  /// No description provided for @ptFajr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bomdod'**
+  String get ptFajr;
+
+  /// No description provided for @ptDhuhr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Peshin'**
+  String get ptDhuhr;
+
+  /// No description provided for @ptAsr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Asr'**
+  String get ptAsr;
+
+  /// No description provided for @ptMaghrib.
+  ///
+  /// In uz, this message translates to:
+  /// **'Shom'**
+  String get ptMaghrib;
+
+  /// No description provided for @ptIsha.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xufton'**
+  String get ptIsha;
+
+  /// No description provided for @ptJumuah.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juma'**
+  String get ptJumuah;
+
+  /// No description provided for @ptEidTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hayit namozi'**
+  String get ptEidTitle;
+
+  /// No description provided for @ptFitr.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ramazon hayiti'**
+  String get ptFitr;
+
+  /// No description provided for @ptAdha.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qurbon hayiti'**
+  String get ptAdha;
+
+  /// No description provided for @ptNotAdded.
+  ///
+  /// In uz, this message translates to:
+  /// **'qo‘shilmagan'**
+  String get ptNotAdded;
+
+  /// No description provided for @ptEditEid.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hayit vaqtlarini tahrirlash'**
+  String get ptEditEid;
+
+  /// No description provided for @ptAddEid.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hayit vaqtlarini qo‘shish'**
+  String get ptAddEid;
+
+  /// No description provided for @ptSheetTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jamoat namozi vaqtlari'**
+  String get ptSheetTitle;
+
+  /// No description provided for @ptSession.
+  ///
+  /// In uz, this message translates to:
+  /// **'{n}-jamoat'**
+  String ptSession(int n);
+
+  /// No description provided for @ptAddSession.
+  ///
+  /// In uz, this message translates to:
+  /// **'Jamoat qo‘shish'**
+  String get ptAddSession;
+
+  /// No description provided for @ptRemove.
+  ///
+  /// In uz, this message translates to:
+  /// **'{name}: olib tashlash'**
+  String ptRemove(String name);
+
+  /// No description provided for @ptPick.
+  ///
+  /// In uz, this message translates to:
+  /// **'Namozni tanlang'**
+  String get ptPick;
+
+  /// No description provided for @ptLive.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlangach hamma darhol ko‘radi.'**
+  String get ptLive;
+
+  /// No description provided for @ptHour.
+  ///
+  /// In uz, this message translates to:
+  /// **'Soat'**
+  String get ptHour;
+
+  /// No description provided for @ptMinute.
+  ///
+  /// In uz, this message translates to:
+  /// **'Daqiqa'**
+  String get ptMinute;
+
+  /// No description provided for @ptSave.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlash'**
+  String get ptSave;
+
+  /// No description provided for @ptSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Saqlandi'**
+  String get ptSaved;
+
+  /// No description provided for @plErrTooManyEdits.
+  ///
+  /// In uz, this message translates to:
+  /// **'Juda ko‘p o‘zgartirish. Birozdan keyin urinib ko‘ring.'**
+  String get plErrTooManyEdits;
+
+  /// No description provided for @ntTimesSwitch.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masjid namoz vaqtlari o‘zgarsa'**
+  String get ntTimesSwitch;
+
+  /// No description provided for @ntWhenTimes.
+  ///
+  /// In uz, this message translates to:
+  /// **'Masjid namoz vaqtlari o‘zgarsa'**
+  String get ntWhenTimes;
 }
 
 class _AppLocalizationsDelegate

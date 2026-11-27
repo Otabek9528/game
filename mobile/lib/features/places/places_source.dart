@@ -66,6 +66,19 @@ abstract interface class PlacesSource {
   /// A Telegram account's choice: the bot, the app, or both.
   Future<NotifyDelivery> setDelivery(Map<String, String> auth, {required bool telegram, required bool push, required String lang});
 
+  /// A mosque's daily times: only [changes], "HH:MM" or null to clear one.
+  /// Needs someone signed in; shown to everyone at once.
+  Future<MosqueSchedule> saveTimes(Map<String, String> auth, int id, Map<String, String?> changes);
+
+  /// Its Eid times: by Eid ('fitr', 'adha'), 0-3 "HH:MM"; an Eid left out is kept.
+  Future<MosqueSchedule> saveEid(Map<String, String> auth, int id, Map<String, List<String>> eids);
+
+  /// Whether prayer time changes are messaged to this person; null from a
+  /// server without that choice.
+  Future<bool?> timesUpdates(Map<String, String> auth);
+
+  Future<bool> setTimesUpdates(Map<String, String> auth, {required bool on});
+
   /// The web app's photo list: folder → ["ext:hash", ...] by number; empty
   /// when the site has none (the main site doesn't: it answers a missing
   /// file with its home page).
@@ -199,6 +212,30 @@ class HttpPlacesSource implements PlacesSource {
   Future<NotifyDelivery> setDelivery(Map<String, String> auth, {required bool telegram, required bool push, required String lang}) async =>
       NotifyDelivery.fromJson(_check(await _send('PUT', 'api/notify/delivery',
           headers: auth, body: {'telegram': telegram, 'push': push, 'lang': lang}))['delivery']);
+
+  @override
+  Future<MosqueSchedule> saveTimes(Map<String, String> auth, int id, Map<String, String?> changes) async =>
+      MosqueSchedule.fromJson(_check(await _send('PUT', 'api/place/$id/timetable', headers: auth, body: changes))) ??
+      (throw const PlacesException('bad_response'));
+
+  @override
+  Future<MosqueSchedule> saveEid(Map<String, String> auth, int id, Map<String, List<String>> eids) async =>
+      MosqueSchedule.fromJson(_check(await _send('PUT', 'api/place/$id/eid', headers: auth, body: eids))) ??
+      (throw const PlacesException('bad_response'));
+
+  @override
+  Future<bool?> timesUpdates(Map<String, String> auth) async {
+    try {
+      return _check(await _send('GET', 'api/notify/timetable-updates', headers: auth))['on'] == true;
+    } on PlacesException catch (e) {
+      if (e.status == 404 || e.status == 405) return null;
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> setTimesUpdates(Map<String, String> auth, {required bool on}) async =>
+      _check(await _send('PUT', 'api/notify/timetable-updates', headers: auth, body: {'on': on}))['on'] == true;
 
   @override
   Future<Map<String, List<String>>> photoManifest() async {

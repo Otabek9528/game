@@ -4936,4 +4936,104 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get updateInstall => 'O‘rnatish';
+
+  @override
+  String get ptTitle => 'Jamoat namozi';
+
+  @override
+  String get ptEdit => 'Tahrirlash';
+
+  @override
+  String get ptAdd => 'Qo‘shish';
+
+  @override
+  String get ptEmpty => 'Vaqtlar hali qo‘shilmagan';
+
+  @override
+  String ptUpdated(String date) {
+    return 'Oxirgi yangilanish: $date';
+  }
+
+  @override
+  String get ptNext => 'keyingi';
+
+  @override
+  String get ptFajr => 'Bomdod';
+
+  @override
+  String get ptDhuhr => 'Peshin';
+
+  @override
+  String get ptAsr => 'Asr';
+
+  @override
+  String get ptMaghrib => 'Shom';
+
+  @override
+  String get ptIsha => 'Xufton';
+
+  @override
+  String get ptJumuah => 'Juma';
+
+  @override
+  String get ptEidTitle => 'Hayit namozi';
+
+  @override
+  String get ptFitr => 'Ramazon hayiti';
+
+  @override
+  String get ptAdha => 'Qurbon hayiti';
+
+  @override
+  String get ptNotAdded => 'qo‘shilmagan';
+
+  @override
+  String get ptEditEid => 'Hayit vaqtlarini tahrirlash';
+
+  @override
+  String get ptAddEid => 'Hayit vaqtlarini qo‘shish';
+
+  @override
+  String get ptSheetTitle => 'Jamoat namozi vaqtlari';
+
+  @override
+  String ptSession(int n) {
+    return '$n-jamoat';
+  }
+
+  @override
+  String get ptAddSession => 'Jamoat qo‘shish';
+
+  @override
+  String ptRemove(String name) {
+    return '$name: olib tashlash';
+  }
+
+  @override
+  String get ptPick => 'Namozni tanlang';
+
+  @override
+  String get ptLive => 'Saqlangach hamma darhol ko‘radi.';
+
+  @override
+  String get ptHour => 'Soat';
+
+  @override
+  String get ptMinute => 'Daqiqa';
+
+  @override
+  String get ptSave => 'Saqlash';
+
+  @override
+  String get ptSaved => 'Saqlandi';
+
+  @override
+  String get plErrTooManyEdits =>
+      'Juda ko‘p o‘zgartirish. Birozdan keyin urinib ko‘ring.';
+
+  @override
+  String get ntTimesSwitch => 'Masjid namoz vaqtlari o‘zgarsa';
+
+  @override
+  String get ntWhenTimes => 'Masjid namoz vaqtlari o‘zgarsa';
 }

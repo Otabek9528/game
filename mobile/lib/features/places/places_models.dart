@@ -250,6 +250,7 @@ class PlaceDetail {
     this.pending = const {},
     this.watch = const PlaceWatch(),
     this.ownReviews = false,
+    this.schedule,
   });
 
   final Place place;
@@ -266,6 +267,10 @@ class PlaceDetail {
   /// (update 6 on); before that, reviews only pile up.
   final bool ownReviews;
 
+  /// A mosque's congregation and Eid times; null for other places and from a
+  /// server without them.
+  final MosqueSchedule? schedule;
+
   PlaceReview? get myReview => reviews.where((r) => r.mine).firstOrNull;
 
   /// How many of each star, 1 to 5.
@@ -273,12 +278,14 @@ class PlaceDetail {
 
   double get average => reviews.isEmpty ? 0 : reviews.fold<int>(0, (sum, r) => sum + r.rating) / reviews.length;
 
-  PlaceDetail copyWith({List<PlaceReview>? reviews, Set<String>? pending, PlaceWatch? watch}) => PlaceDetail(
+  PlaceDetail copyWith({List<PlaceReview>? reviews, Set<String>? pending, PlaceWatch? watch, MosqueSchedule? schedule}) =>
+      PlaceDetail(
         place: place,
         reviews: reviews ?? this.reviews,
         pending: pending ?? this.pending,
         watch: watch ?? this.watch,
         ownReviews: ownReviews,
+        schedule: schedule ?? this.schedule,
       );
 
   static PlaceDetail? fromJson(Object? json) {
@@ -293,6 +300,83 @@ class PlaceDetail {
       watch: PlaceWatch.fromJson(json['watch']),
       // A server before update 6 sends the writer's id instead of "mine".
       ownReviews: raw.any((r) => r is Map && r.containsKey('mine')),
+      schedule: place.kind == PlaceKind.mosque ? MosqueSchedule.fromJson(json) : null,
+    );
+  }
+}
+
+/// "HH:MM" as the server keeps prayer times (Korea time); null for anything else.
+String? _hhmm(Object? value) =>
+    value is String && RegExp(r'^([01]\d|2[0-3]):[0-5]\d$').hasMatch(value) ? value : null;
+
+/// The server's "2027-02-24" (a Korea date), as a day.
+DateTime? _day(Object? value) {
+  final m = value is String ? RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(value) : null;
+  return m == null ? null : DateTime(int.parse(m[1]!), int.parse(m[2]!), int.parse(m[3]!));
+}
+
+/// One Eid's prayers (up to three) and when they were last changed.
+@immutable
+class EidTimes {
+  const EidTimes({this.sessions = const [], this.updated, this.stale = false});
+
+  final List<String> sessions;
+  final DateTime? updated;
+
+  /// Not changed for 60 days: likely last year's.
+  final bool stale;
+
+  static EidTimes? fromJson(Object? json) {
+    if (json is! Map) return null;
+    final sessions = [for (final t in (json['sessions'] as List?) ?? const []) ?_hhmm(t)];
+    if (sessions.isEmpty) return null;
+    return EidTimes(sessions: sessions, updated: _day(json['updatedAt']), stale: json['stale'] == true);
+  }
+}
+
+/// A mosque's own prayer times, as its community keeps them
+/// (mosque_timetable_api.py): the daily congregation times and Juma, and the
+/// two Eids. Anyone signed in changes them; they show at once.
+@immutable
+class MosqueSchedule {
+  const MosqueSchedule({this.daily = const {}, this.dailyUpdated, this.dailyStale = false, this.eids = const {}});
+
+  /// The order they are shown in.
+  static const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'jumuah'];
+
+  /// The five of every day; Juma takes Peshin's place on Fridays.
+  static const fivePrayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+  static const eidKinds = ['fitr', 'adha'];
+
+  /// "HH:MM" by prayer, only those that have a time.
+  final Map<String, String> daily;
+  final DateTime? dailyUpdated;
+  final bool dailyStale;
+
+  /// By Eid ('fitr', 'adha'), only those that have times.
+  final Map<String, EidTimes> eids;
+
+  bool get hasDaily => daily.isNotEmpty;
+  bool get hasEid => eids.isNotEmpty;
+
+  /// From a place's page or a save's answer: `timetable` and `eid`. Null
+  /// when the server has no prayer times at all (no `eid`).
+  static MosqueSchedule? fromJson(Object? json) {
+    if (json is! Map || !json.containsKey('eid')) return null;
+    final timetable = json['timetable'];
+    final daily = <String, String>{
+      if (timetable is Map)
+        for (final p in prayers) p: ?_hhmm(timetable[p]),
+    };
+    final eid = json['eid'];
+    return MosqueSchedule(
+      daily: daily,
+      dailyUpdated: timetable is Map ? _day(timetable['updatedAt']) : null,
+      dailyStale: timetable is Map && timetable['stale'] == true,
+      eids: {
+        if (eid is Map)
+          for (final kind in eidKinds) kind: ?EidTimes.fromJson(eid[kind]),
+      },
     );
   }
 }

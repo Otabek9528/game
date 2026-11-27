@@ -553,7 +553,8 @@ void main() {
 
       app.places.failNext['suggest'] = 'invalid_handle';
       expect(find.text('Do you know this place’s social media? '), findsOneWidget);
-      await tapVisible(tester, find.text('Add'));
+      // The last "Add": a mosque without prayer times has one for them higher up.
+      await tapVisible(tester, find.text('Add').last);
       await tester.tap(find.text('Telegram'));
       await tester.pumpAndSettle();
       await tester.enterText(find.descendant(of: find.byType(BottomSheet), matching: find.byType(TextField)), '@1x');

@@ -5063,4 +5063,103 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get updateInstall => 'Установить';
+
+  @override
+  String get ptTitle => 'Намаз в мечети';
+
+  @override
+  String get ptEdit => 'Изменить';
+
+  @override
+  String get ptAdd => 'Добавить';
+
+  @override
+  String get ptEmpty => 'Время ещё не добавлено';
+
+  @override
+  String ptUpdated(String date) {
+    return 'Обновлено: $date';
+  }
+
+  @override
+  String get ptNext => 'следующий';
+
+  @override
+  String get ptFajr => 'Фаджр';
+
+  @override
+  String get ptDhuhr => 'Зухр';
+
+  @override
+  String get ptAsr => 'Аср';
+
+  @override
+  String get ptMaghrib => 'Магриб';
+
+  @override
+  String get ptIsha => 'Иша';
+
+  @override
+  String get ptJumuah => 'Джума';
+
+  @override
+  String get ptEidTitle => 'Праздничный намаз';
+
+  @override
+  String get ptFitr => 'Ураза-байрам';
+
+  @override
+  String get ptAdha => 'Курбан-байрам';
+
+  @override
+  String get ptNotAdded => 'не добавлено';
+
+  @override
+  String get ptEditEid => 'Изменить время праздничного намаза';
+
+  @override
+  String get ptAddEid => 'Добавить время праздничного намаза';
+
+  @override
+  String get ptSheetTitle => 'Время намаза в мечети';
+
+  @override
+  String ptSession(int n) {
+    return '$n-й джамаат';
+  }
+
+  @override
+  String get ptAddSession => 'Добавить джамаат';
+
+  @override
+  String ptRemove(String name) {
+    return '$name: убрать';
+  }
+
+  @override
+  String get ptPick => 'Выберите намаз';
+
+  @override
+  String get ptLive => 'После сохранения все увидят сразу.';
+
+  @override
+  String get ptHour => 'Часы';
+
+  @override
+  String get ptMinute => 'Минуты';
+
+  @override
+  String get ptSave => 'Сохранить';
+
+  @override
+  String get ptSaved => 'Сохранено';
+
+  @override
+  String get plErrTooManyEdits => 'Слишком много изменений. Попробуйте позже.';
+
+  @override
+  String get ntTimesSwitch => 'Когда меняется время намаза';
+
+  @override
+  String get ntWhenTimes => 'Сменилось время намаза в мечети';
 }

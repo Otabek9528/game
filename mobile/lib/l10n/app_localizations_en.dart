@@ -5014,4 +5014,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateInstall => 'Install';
+
+  @override
+  String get ptTitle => 'Congregation times';
+
+  @override
+  String get ptEdit => 'Edit';
+
+  @override
+  String get ptAdd => 'Add';
+
+  @override
+  String get ptEmpty => 'No times yet';
+
+  @override
+  String ptUpdated(String date) {
+    return 'Last updated: $date';
+  }
+
+  @override
+  String get ptNext => 'next';
+
+  @override
+  String get ptFajr => 'Fajr';
+
+  @override
+  String get ptDhuhr => 'Dhuhr';
+
+  @override
+  String get ptAsr => 'Asr';
+
+  @override
+  String get ptMaghrib => 'Maghrib';
+
+  @override
+  String get ptIsha => 'Isha';
+
+  @override
+  String get ptJumuah => 'Jumu‘ah';
+
+  @override
+  String get ptEidTitle => 'Eid prayer';
+
+  @override
+  String get ptFitr => 'Eid al-Fitr';
+
+  @override
+  String get ptAdha => 'Eid al-Adha';
+
+  @override
+  String get ptNotAdded => 'not added';
+
+  @override
+  String get ptEditEid => 'Edit Eid times';
+
+  @override
+  String get ptAddEid => 'Add Eid times';
+
+  @override
+  String get ptSheetTitle => 'Congregation times';
+
+  @override
+  String ptSession(int n) {
+    return 'Prayer $n';
+  }
+
+  @override
+  String get ptAddSession => 'Add a prayer';
+
+  @override
+  String ptRemove(String name) {
+    return 'Remove $name';
+  }
+
+  @override
+  String get ptPick => 'Pick a prayer';
+
+  @override
+  String get ptLive => 'Everyone sees it as soon as you save.';
+
+  @override
+  String get ptHour => 'Hour';
+
+  @override
+  String get ptMinute => 'Minute';
+
+  @override
+  String get ptSave => 'Save';
+
+  @override
+  String get ptSaved => 'Saved';
+
+  @override
+  String get plErrTooManyEdits => 'Too many changes. Please try again later.';
+
+  @override
+  String get ntTimesSwitch => 'When prayer times change';
+
+  @override
+  String get ntWhenTimes => 'A mosque’s prayer times change';
 }

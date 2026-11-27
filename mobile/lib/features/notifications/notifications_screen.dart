@@ -75,6 +75,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool _failed = false;
   bool _checking = false;
 
+  /// Whether prayer time changes are messaged; null until known, and from a
+  /// server without that choice (the switch is then not shown).
+  bool? _timesOn;
+
   @override
   void initState() {
     super.initState();
@@ -112,6 +116,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       if (stop != null) await _applyStop(auth, stop);
       final me = await _source.notifyMe(auth);
       if (mounted) setState(() => _me = me);
+      unawaited(_loadTimesOn(auth));
     } on PlacesException {
       if (mounted) setState(() => _failed = true);
     } finally {
@@ -248,6 +253,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } on PlacesException catch (e) {
       if (!mounted) return;
       setState(() => _me = (areas: me.areas, watches: me.watches, delivery: before, botBlocked: me.botBlocked));
+      _snack(notifyError(s, e));
+    }
+  }
+
+  Future<void> _loadTimesOn(Map<String, String> auth) async {
+    try {
+      final on = await _source.timesUpdates(auth);
+      if (mounted) setState(() => _timesOn = on);
+    } on PlacesException {
+      // Not shown this time; the page works without it.
+    }
+  }
+
+  Future<void> _setTimesOn(bool on) async {
+    final s = AppLocalizations.of(context);
+    HapticFeedback.selectionClick();
+    // At once, as switches do; back if the server says no.
+    setState(() => _timesOn = on);
+    try {
+      final saved = await _source.setTimesUpdates(await _auth(), on: on);
+      if (mounted) setState(() => _timesOn = saved);
+    } on PlacesException catch (e) {
+      if (!mounted) return;
+      setState(() => _timesOn = !on);
       _snack(notifyError(s, e));
     }
   }
@@ -456,6 +485,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
                         child: Text(s.ntWatchHint, style: TextStyle(fontSize: 12.5, color: p.inkMuted)),
+                      ),
+                    ],
+                    // Prayer time changes can be switched off on their own.
+                    if (_timesOn case final on?) ...[
+                      const SizedBox(height: 18),
+                      Material(
+                        color: p.card,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          side: BorderSide(color: p.hairline),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: SwitchListTile(
+                          value: on,
+                          onChanged: _setTimesOn,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+                          secondary: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: p.accent.withValues(alpha: 0.13),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(Icons.schedule_rounded, color: p.accent, size: 22),
+                          ),
+                          title: Text(s.ntTimesSwitch, style: TextStyle(fontWeight: FontWeight.w700, color: p.ink)),
+                        ),
                       ),
                     ],
                   ],
@@ -728,6 +784,7 @@ class _Empty extends StatelessWidget {
       ('✏️', s.ntWhenName),
       ('📣', s.ntWhenOwner),
       ('🕌', s.ntWhenMosque),
+      ('🕒', s.ntWhenTimes),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

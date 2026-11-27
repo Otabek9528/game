@@ -1284,6 +1284,25 @@ class FakePlaces implements PlacesSource {
 
   /// A server before update 6: reviews don't say whose.
   bool oldServer = false;
+
+  /// A server before prayer times: mosques come without them.
+  bool noTimes = false;
+
+  /// Mosques' prayer times; a mosque not here has none yet. Ansan: the
+  /// daily times (Maghrib not given), Ramazon hayiti from last spring.
+  final schedules = <int, MosqueSchedule>{
+    1: MosqueSchedule(
+      daily: const {'fajr': '06:00', 'dhuhr': '13:00', 'asr': '16:15', 'isha': '20:00', 'jumuah': '13:30'},
+      dailyUpdated: DateTime(2026, 10, 1),
+      eids: {'fitr': EidTimes(sessions: const ['07:00', '08:30'], updated: DateTime(2026, 3, 18), stale: true)},
+    ),
+  };
+
+  /// What was saved: (place, body).
+  final timeSaves = <(int, Map<String, Object?>)>[];
+
+  /// The "prayer times changed" switch; null: a server without it.
+  bool? timesOn = true;
   final asked = <String>[];
 
   static Place _p(int id, String name, PlaceKind kind,
@@ -1378,7 +1397,52 @@ class FakePlaces implements PlacesSource {
       pending: {...?pending[id]},
       watch: watches[id] ?? const PlaceWatch(),
       ownReviews: !oldServer,
+      schedule: place.kind == PlaceKind.mosque && !noTimes ? schedules[id] ?? const MosqueSchedule() : null,
     );
+  }
+
+  @override
+  Future<MosqueSchedule> saveTimes(Map<String, String> auth, int id, Map<String, String?> changes) async {
+    _online('saveTimes $id ${auth['Authorization'] ?? '-'}');
+    timeSaves.add((id, Map.of(changes)));
+    final before = schedules[id] ?? const MosqueSchedule();
+    final daily = {...before.daily};
+    changes.forEach((k, v) => v == null ? daily.remove(k) : daily[k] = v);
+    return schedules[id] = MosqueSchedule(
+      daily: daily,
+      dailyUpdated: DateTime(testNow.year, testNow.month, testNow.day),
+      eids: before.eids,
+    );
+  }
+
+  @override
+  Future<MosqueSchedule> saveEid(Map<String, String> auth, int id, Map<String, List<String>> eids) async {
+    _online('saveEid $id');
+    timeSaves.add((id, Map.of(eids)));
+    final before = schedules[id] ?? const MosqueSchedule();
+    final now = {...before.eids};
+    eids.forEach((k, v) => v.isEmpty
+        ? now.remove(k)
+        : now[k] = EidTimes(sessions: v, updated: DateTime(testNow.year, testNow.month, testNow.day)));
+    return schedules[id] = MosqueSchedule(
+      daily: before.daily,
+      dailyUpdated: before.dailyUpdated,
+      dailyStale: before.dailyStale,
+      eids: now,
+    );
+  }
+
+  @override
+  Future<bool?> timesUpdates(Map<String, String> auth) async {
+    _online('timesUpdates');
+    return timesOn;
+  }
+
+  @override
+  Future<bool> setTimesUpdates(Map<String, String> auth, {required bool on}) async {
+    _online('setTimesUpdates $on');
+    timesOn = on;
+    return on;
   }
 
   @override

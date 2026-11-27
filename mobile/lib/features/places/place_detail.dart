@@ -12,6 +12,7 @@ import '../../core/widgets/brand_logos.dart';
 import '../../l10n/app_localizations.dart';
 import '../account/account_screen.dart';
 import 'place_actions.dart';
+import 'mosque_times.dart';
 import 'place_map.dart';
 import 'place_sheets.dart';
 import 'places_kit.dart';
@@ -187,6 +188,21 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
     _say(AppLocalizations.of(context).plSuggestSent);
   }
 
+  /// A mosque's times, by anyone signed in; everyone sees them at once.
+  Future<void> _editTimes(TimesPart part) async {
+    if (!await _signedIn()) return;
+    final detail = _detail;
+    final schedule = detail?.schedule;
+    if (detail == null || schedule == null || !mounted) return;
+    final saved = await showPlaceSheet<MosqueSchedule>(
+      context,
+      TimesSheet(kit: _kit, placeId: detail.place.id, schedule: schedule, part: part),
+    );
+    if (saved == null || !mounted) return;
+    _set(_detail!.copyWith(schedule: saved));
+    _say(AppLocalizations.of(context).ptSaved);
+  }
+
   Future<void> _announce() async {
     if (!await _signedIn()) return;
     final detail = _detail;
@@ -309,6 +325,23 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                   _Section(title: s.plGettingThere, child: _Location(place: place, services: _services)),
                   if (place.phones.isNotEmpty || place.menuUrl != null)
                     _Section(title: s.plContact, child: _Contact(place: place, services: _services)),
+                  // A mosque's own prayer times, where its map used to be
+                  // read: after the way there and the phone.
+                  if (detail?.schedule case final schedule?)
+                    _Section(
+                      title: s.ptTitle,
+                      trailing: TextButton.icon(
+                        onPressed: () => _editTimes(TimesPart.daily),
+                        icon: Icon(schedule.hasDaily ? Icons.edit_rounded : Icons.add_rounded, size: 18),
+                        label: Text(schedule.hasDaily ? s.ptEdit : s.ptAdd),
+                      ),
+                      child: MosqueTimesCard(
+                        schedule: schedule,
+                        language: _kit.language,
+                        now: _services.clock(),
+                        onEditEid: () => _editTimes(TimesPart.eid),
+                      ),
+                    ),
                   if (_error != null && detail == null) ...[
                     const SizedBox(height: 16),
                     _Failed(code: _error!, onRetry: _load),
@@ -394,8 +427,9 @@ class _Round extends StatelessWidget {
   }
 }
 
-/// Where it is: the map, a navigator in one tap (Naver and Kakao first:
-/// they route best in Korea; Google gives transit only here), and the
+/// Where it is: the map (not for mosques: their prayer times matter more,
+/// and the navigators show the way), a navigator in one tap (Naver and Kakao
+/// first: they route best in Korea; Google gives transit only here), and the
 /// address, copied with a tap.
 class _Location extends StatelessWidget {
   const _Location({required this.place, required this.services});
@@ -413,7 +447,7 @@ class _Location extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (place.located)
+          if (place.located && place.kind != PlaceKind.mosque)
             SizedBox(
               height: 168,
               child: PlaceMap(lat: place.lat!, lon: place.lon!, colour: kindColour(context, place.kind), emoji: place.kind.emoji),
@@ -498,11 +532,13 @@ class _NavButton extends StatelessWidget {
               HapticFeedback.lightImpact();
               onTap();
             },
-            child: SizedBox(
-              height: 78,
+            child: ConstrainedBox(
+              // Taller with large text rather than cut.
+              constraints: const BoxConstraints(minHeight: 78),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 8),
                   // Naver's and Kakao's logos are their squares; Google's G
                   // sits on white, as on its own buttons.
                   Container(
@@ -525,6 +561,7 @@ class _NavButton extends StatelessWidget {
                   ),
                   const SizedBox(height: 7),
                   Text(name, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink)),
+                  const SizedBox(height: 8),
                 ],
               ),
             ),
@@ -644,7 +681,11 @@ class _Head extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             DecoratedBox(
               decoration: BoxDecoration(color: colour.withValues(alpha: 0.13), borderRadius: BorderRadius.circular(20)),
@@ -656,7 +697,6 @@ class _Head extends StatelessWidget {
                 ),
               ),
             ),
-            const Spacer(),
             if (watch != null) _WatchPill(watch: watch, onTap: onWatch),
           ],
         ),
@@ -681,13 +721,13 @@ class _Head extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: reviews > 0
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
+                ? Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 6,
+                    runSpacing: 2,
                     children: [
                       PlaceStars(rating, size: 18),
-                      const SizedBox(width: 6),
                       Text(rating.toStringAsFixed(1), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink)),
-                      const SizedBox(width: 6),
                       Text('· ${s.plReviewCount(reviews)}', style: TextStyle(fontSize: 14, color: p.inkSoft)),
                     ],
                   )

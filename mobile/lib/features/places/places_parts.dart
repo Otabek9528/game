@@ -53,6 +53,7 @@ String placesMessage(AppLocalizations s, String code) => switch (code) {
       'has_owner' => s.plErrHasOwner,
       'too_many_pending' => s.plErrTooManyPending,
       'invalid_rating' => s.plReviewPick,
+      'too_many_edits' => s.plErrTooManyEdits,
       _ => s.plErrGeneric,
     };
 
