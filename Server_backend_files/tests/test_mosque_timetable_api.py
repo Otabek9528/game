@@ -18,9 +18,12 @@ def db(tmp_path):
     path = str(tmp_path / 'main_db.sqlite')
     conn = sqlite3.connect(path)
     # The live table's relevant columns: Unique_number is TEXT there.
-    conn.execute('CREATE TABLE main_db (Building_type TEXT, Name TEXT, Unique_number TEXT)')
-    conn.executemany('INSERT INTO main_db VALUES (?, ?, ?)',
-                     [('Masjid', 'Ansan Markaziy Masjidi', '1'), ('Oshxona', 'Somsa', '2')])
+    conn.execute('CREATE TABLE main_db (Building_type TEXT, Name TEXT, Unique_number TEXT, '
+                 'City_English TEXT, Actual_address TEXT)')
+    conn.executemany('INSERT INTO main_db VALUES (?, ?, ?, ?, ?)',
+                     [('Masjid', 'Ansan Markaziy Masjidi', '1', 'Ansan', 'Wongok-dong'),
+                      ('Oshxona', 'Somsa', '2', 'Ansan', ''),
+                      ('Masjid', 'Seoul Central Mosque', '3', 'Seoul', 'Itaewon')])
     conn.commit()
     conn.close()
     return path
@@ -51,6 +54,7 @@ def who(monkeypatch):
 @pytest.fixture
 def client(db, clock, who):
     app = Flask(__name__)
+    app.secret_key = 'test'
     app.config['PLACES_DB'] = db
     app.register_blueprint(mt.bp)
     mt.init_mosque_timetables(app)
@@ -286,3 +290,93 @@ def test_moved_and_deleted_accounts(client, db):
     h = history(db)[0]
     assert h['editor_id'] is None and h['editor_name'] is None
     assert info(db)['timetable']['fajr'] == '06:00'      # the times stay
+
+
+# ---------------------------------------------------------------- admin
+
+@pytest.fixture
+def admin(client):
+    with client.session_transaction() as s:
+        s['admin_logged_in'] = True
+    return client
+
+
+def test_admin_needs_the_panel_login(client):
+    assert client.get('/api/admin/timetables').status_code == 401
+    assert client.put('/api/admin/timetables/1', json={'fitr': ['07:00']}).status_code == 401
+    assert client.delete('/api/admin/timetables/1').status_code == 401
+    assert client.get('/api/admin/timetables/1/history').status_code == 401
+    assert client.post('/api/admin/timetables/history/1/restore').status_code == 401
+
+
+def test_admin_lists_every_mosque_with_and_without(admin, who):
+    admin.put(f'/api/place/{MOSQUE}/timetable', json=DAILY)
+    admin.put(f'/api/place/{MOSQUE}/eid', json={'adha': ['07:30']})
+    rows = admin.get('/api/admin/timetables').get_json()['mosques']
+    assert [m['id'] for m in rows] == [1, 3]                      # mosques only, by city
+    ansan, seoul = rows
+    assert ansan['timetable']['fajr'] == '06:00' and ansan['timetable']['updatedBy'] == 'ali'
+    assert ansan['timetable']['updatedById'] == 111 and ansan['timetable']['updatedAt'] == '2026-11-27'
+    assert ansan['eid']['fitr'] is None and ansan['eid']['adha']['sessions'] == ['07:30']
+    assert ansan['edits'] == 2 and ansan['lastEditAt'].startswith('2026-11-27')
+    assert seoul['timetable'] is None and seoul['eid'] == NO_EID and seoul['edits'] == 0
+
+
+def test_admin_edit_is_saved_with_history(admin, db):
+    r = admin.put('/api/admin/timetables/3', json={'daily': {'fajr': '6:10', 'jumuah': '13:00'}, 'fitr': ['08:00']})
+    body = r.get_json()
+    assert r.status_code == 200 and body['changed'] is True
+    m = body['mosque']
+    assert m['timetable']['fajr'] == '06:10' and m['timetable']['dhuhr'] is None
+    assert m['timetable']['updatedBy'] == 'admin' and m['timetable']['updatedById'] is None
+    assert m['eid']['fitr']['sessions'] == ['08:00']
+    assert {(h['section'], h['source'], h['editor_name']) for h in history(db)} == {
+        ('daily', 'admin', 'admin'), ('fitr', 'admin', 'admin')}
+
+
+def test_admin_edit_refuses_bad_input_and_saves_nothing(admin, db):
+    r = admin.put('/api/admin/timetables/3', json={'daily': {'fajr': '06:00'}, 'fitr': ['25:00']})
+    assert r.status_code == 400 and r.get_json()['code'] == 'invalid_time'
+    assert history(db) == []
+    assert admin.put('/api/admin/timetables/2', json={'fitr': ['07:00']}).status_code == 404   # a restaurant
+    assert admin.put('/api/admin/timetables/3', json={'daily': 'x'}).status_code == 400
+
+
+def test_admin_clear_keeps_history(admin, db):
+    admin.put(f'/api/place/{MOSQUE}/timetable', json=DAILY)
+    admin.put(f'/api/place/{MOSQUE}/eid', json={'fitr': ['07:00'], 'adha': ['07:30']})
+    m = admin.delete('/api/admin/timetables/1?section=fitr').get_json()['mosque']
+    assert m['eid']['fitr'] is None and m['eid']['adha'] and m['timetable']
+    m = admin.delete('/api/admin/timetables/1?section=all').get_json()['mosque']
+    assert m['timetable'] is None and m['eid'] == NO_EID
+    assert len(history(db)) == 6
+    assert admin.delete('/api/admin/timetables/1?section=x').status_code == 400
+
+
+def test_admin_history_newest_first_and_paged(admin, monkeypatch):
+    monkeypatch.setattr(mt, 'HISTORY_PAGE', 2)
+    for t in ('06:00', '06:05', '06:10'):
+        admin.put(f'/api/place/{MOSQUE}/timetable', json={'fajr': t})
+    page = admin.get('/api/admin/timetables/1/history').get_json()
+    assert [h['new']['fajr'] for h in page['history']] == ['06:10', '06:05'] and page['more'] is True
+    assert page['history'][0]['old']['fajr'] == '06:05' and page['history'][0]['editorName'] == 'ali'
+    rest = admin.get(f"/api/admin/timetables/1/history?before={page['history'][-1]['id']}").get_json()
+    assert [h['new']['fajr'] for h in rest['history']] == ['06:00'] and rest['more'] is False
+
+
+def test_admin_restore_puts_back_the_version_before(admin, db, who):
+    admin.put(f'/api/place/{MOSQUE}/timetable', json=DAILY)
+    who.user = VALI
+    admin.put(f'/api/place/{MOSQUE}/timetable', json={'dhuhr': '03:00', 'asr': None})   # vandalism
+    bad = admin.get('/api/admin/timetables/1/history').get_json()['history'][0]
+    m = admin.post(f"/api/admin/timetables/history/{bad['id']}/restore").get_json()['mosque']
+    assert m['timetable']['dhuhr'] == '13:00' and m['timetable']['asr'] == '16:15'
+    assert history(db)[-1]['source'] == 'admin'
+
+
+def test_admin_restore_of_a_first_save_clears(admin):
+    admin.put(f'/api/place/{MOSQUE}/eid', json={'fitr': ['07:00']})
+    first = admin.get('/api/admin/timetables/1/history').get_json()['history'][0]
+    m = admin.post(f"/api/admin/timetables/history/{first['id']}/restore").get_json()['mosque']
+    assert m['eid']['fitr'] is None
+    assert admin.post('/api/admin/timetables/history/999/restore').status_code == 404

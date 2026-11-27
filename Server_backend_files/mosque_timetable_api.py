@@ -16,6 +16,17 @@ earlier version back.
 Both answer with the mosque's `timetable` and `eid`, as GET /api/place/<id>
 now carries them for mosques (timetable_info()).
 
+Admin (the places panel's Timetables tab; the panel's session login):
+
+    GET    /api/admin/timetables                          every mosque, with or without times
+    GET    /api/admin/timetables/<id>/history?before=<n>  its saves, newest first, 50 a page
+    PUT    /api/admin/timetables/<id>                     {"daily": {...}, "fitr": [...], "adha": [...]}
+    DELETE /api/admin/timetables/<id>?section=daily|fitr|adha|all
+    POST   /api/admin/timetables/history/<n>/restore      puts back what was there before save n
+
+Admin changes are saved like anyone's, with history (source 'admin'), so a
+clear or a restore can itself be undone.
+
 Eid
 ---
 Two rows per mosque: the Ramadan Eid ('fitr') and Eid al-Adha ('adha'), each
@@ -36,7 +47,7 @@ import re
 import sqlite3
 from datetime import datetime, timedelta, timezone
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 
 from place_submissions_api import resolve_submitter, submitter_name
 
@@ -55,6 +66,7 @@ EID_SESSIONS_MAX = 3
 STALE_AFTER_DAYS = 60
 # A brake on scripts, far above what one person does by hand; not moderation.
 SAVES_PER_HOUR = 30
+HISTORY_PAGE = 50
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS mosque_timetables (
@@ -390,6 +402,228 @@ def put_eid(place_id):
         return bool(changed)
 
     return _save(place_id, user, write)
+
+
+# ============================================
+# ADMIN
+# ============================================
+
+def _admin_guard():
+    """An error response unless the places panel's admin is logged in."""
+    if not session.get('admin_logged_in'):
+        return _err('unauthorized', 'Unauthorized.', 401)
+    return None
+
+
+def _place_id(value):
+    """main_db.Unique_number is TEXT; the tables here use integers."""
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def _by(row):
+    return {'updatedBy': row['updated_by_name'], 'updatedById': row['updated_by']}
+
+
+def _admin_item(place, daily_row, eid_rows, edits, today):
+    """One mosque as the Timetables tab lists it: the public view plus who changed it last."""
+    daily = _daily_out(daily_row, today)
+    if daily:
+        daily.update(_by(daily_row))
+    eid = {}
+    for kind in EIDS:
+        row = eid_rows.get(kind)
+        out = _eid_out(row, today)
+        if out:
+            out.update(_by(row))
+        eid[kind] = out
+    count, last = edits or (0, None)
+    return {'id': _place_id(place['Unique_number']), 'name': place['Name'], 'city': place['City_English'],
+            'address': place['Actual_address'], 'timetable': daily, 'eid': eid,
+            'edits': count, 'lastEditAt': last}
+
+
+def _admin_one(conn, place_id, today):
+    place = conn.execute("SELECT Unique_number, Name, City_English, Actual_address FROM main_db "
+                         "WHERE Unique_number = ? AND Building_type = ?",
+                         (place_id, MOSQUE_BUILDING_TYPE)).fetchone()
+    if not place:
+        return None
+    daily = conn.execute("SELECT * FROM mosque_timetables WHERE place_id = ?", (place_id,)).fetchone()
+    eids = {r['eid']: r for r in conn.execute("SELECT * FROM mosque_eid_times WHERE place_id = ?", (place_id,))}
+    edits = conn.execute("SELECT COUNT(*), MAX(created_at) FROM mosque_timetable_history WHERE place_id = ?",
+                         (place_id,)).fetchone()
+    return _admin_item(place, daily, eids, (edits[0], edits[1]), today)
+
+
+@bp.route('/api/admin/timetables', methods=['GET'])
+def admin_list_timetables():
+    refused = _admin_guard()
+    if refused:
+        return refused
+    today = _now().date()
+    conn = _db()
+    try:
+        places = conn.execute("SELECT Unique_number, Name, City_English, Actual_address FROM main_db "
+                              "WHERE Building_type = ? ORDER BY City_English, Name",
+                              (MOSQUE_BUILDING_TYPE,)).fetchall()
+        daily = {r['place_id']: r for r in conn.execute("SELECT * FROM mosque_timetables")}
+        eids = {}
+        for r in conn.execute("SELECT * FROM mosque_eid_times"):
+            eids.setdefault(r['place_id'], {})[r['eid']] = r
+        edits = {r[0]: (r[1], r[2]) for r in conn.execute(
+            "SELECT place_id, COUNT(*), MAX(created_at) FROM mosque_timetable_history GROUP BY place_id")}
+    finally:
+        conn.close()
+    mosques = []
+    for p in places:
+        pid = _place_id(p['Unique_number'])
+        if pid is None:
+            continue
+        mosques.append(_admin_item(p, daily.get(pid), eids.get(pid, {}), edits.get(pid), today))
+    return jsonify({'success': True, 'mosques': mosques})
+
+
+def _history_out(row):
+    def parse(v):
+        try:
+            return json.loads(v) if v is not None else None
+        except ValueError:
+            return None
+    return {'id': row['id'], 'section': row['section'], 'old': parse(row['old_value']),
+            'new': parse(row['new_value']), 'editorId': row['editor_id'], 'editorName': row['editor_name'],
+            'source': row['source'], 'at': row['created_at']}
+
+
+@bp.route('/api/admin/timetables/<int:place_id>/history', methods=['GET'])
+def admin_timetable_history(place_id):
+    refused = _admin_guard()
+    if refused:
+        return refused
+    try:
+        before = int(request.args.get('before') or 0)
+    except ValueError:
+        before = 0
+    conn = _db()
+    try:
+        args = [place_id]
+        where = "place_id = ?"
+        if before > 0:
+            where += " AND id < ?"
+            args.append(before)
+        rows = conn.execute(f"SELECT * FROM mosque_timetable_history WHERE {where} ORDER BY id DESC LIMIT ?",
+                            (*args, HISTORY_PAGE + 1)).fetchall()
+    finally:
+        conn.close()
+    return jsonify({'success': True, 'history': [_history_out(r) for r in rows[:HISTORY_PAGE]],
+                    'more': len(rows) > HISTORY_PAGE})
+
+
+def _admin_save(place_id, write):
+    """write(conn, now) in one locked transaction; answers with the mosque as the tab lists it."""
+    now = _now()
+    conn = _db()
+    conn.isolation_level = None
+    try:
+        conn.execute('BEGIN IMMEDIATE')
+        if not conn.execute("SELECT 1 FROM main_db WHERE Unique_number = ? AND Building_type = ?",
+                            (place_id, MOSQUE_BUILDING_TYPE)).fetchone():
+            conn.execute('ROLLBACK')
+            return _err('place_not_found', 'No mosque with that number.', 404)
+        try:
+            changed = write(conn, now)
+        except InputError as e:
+            conn.execute('ROLLBACK')
+            return _err(e.code, e.message)
+        conn.execute('COMMIT')
+        if changed:
+            logger.info('[TIMETABLE] mosque %s changed by the admin', place_id)
+        return jsonify({'success': True, 'changed': changed, 'mosque': _admin_one(conn, place_id, now.date())})
+    except sqlite3.Error:
+        if conn.in_transaction:
+            conn.execute('ROLLBACK')
+        logger.exception('Admin prayer time save for place %s failed', place_id)
+        return _err('server_error', 'Could not save.', 500)
+    finally:
+        conn.close()
+
+
+@bp.route('/api/admin/timetables/<int:place_id>', methods=['PUT'])
+def admin_put_timetable(place_id):
+    """{"daily": {all six, null clears}, "fitr": [...], "adha": [...]}: any of the three."""
+    refused = _admin_guard()
+    if refused:
+        return refused
+    body = request.get_json(silent=True)
+    if not isinstance(body, dict) or not any(k in body for k in ('daily',) + EIDS):
+        return _err('invalid_input', 'Expected "daily", "fitr" and/or "adha".')
+    daily = body.get('daily')
+    if 'daily' in body and not isinstance(daily, dict):
+        return _err('invalid_input', 'daily: expected an object.')
+
+    def write(conn, now):
+        changed = False
+        if 'daily' in body:
+            changed |= write_daily(conn, place_id, {p: parse_time(daily.get(p), p) for p in PRAYERS},
+                                   None, now, source='admin')
+        for kind in EIDS:
+            if kind in body:
+                changed |= write_eid(conn, place_id, kind, parse_sessions(body[kind], kind), None, now,
+                                     source='admin')
+        return changed
+
+    return _admin_save(place_id, write)
+
+
+@bp.route('/api/admin/timetables/<int:place_id>', methods=['DELETE'])
+def admin_clear_timetable(place_id):
+    """Clears the daily times, one Eid, or all three. History keeps what was there."""
+    refused = _admin_guard()
+    if refused:
+        return refused
+    section = request.args.get('section', 'all')
+    if section not in ('daily', 'all') + EIDS:
+        return _err('invalid_input', 'section: daily, fitr, adha or all.')
+
+    def write(conn, now):
+        changed = False
+        if section in ('daily', 'all'):
+            changed |= write_daily(conn, place_id, {p: None for p in PRAYERS}, None, now, source='admin')
+        for kind in EIDS:
+            if section in (kind, 'all'):
+                changed |= write_eid(conn, place_id, kind, [], None, now, source='admin')
+        return changed
+
+    return _admin_save(place_id, write)
+
+
+@bp.route('/api/admin/timetables/history/<int:history_id>/restore', methods=['POST'])
+def admin_restore_timetable(history_id):
+    """Puts the section back as it was before that save (cleared, if it was empty then)."""
+    refused = _admin_guard()
+    if refused:
+        return refused
+    conn = _db()
+    try:
+        row = conn.execute("SELECT * FROM mosque_timetable_history WHERE id = ?", (history_id,)).fetchone()
+    finally:
+        conn.close()
+    if not row:
+        return _err('not_found', 'No such change.', 404)
+    entry = _history_out(row)
+    old = entry['old']
+
+    def write(conn, now):
+        if entry['section'] == 'daily':
+            values = old if isinstance(old, dict) else {}
+            return write_daily(conn, row['place_id'], {p: values.get(p) for p in PRAYERS}, None, now,
+                               source='admin')
+        return write_eid(conn, row['place_id'], entry['section'], old if isinstance(old, list) else [],
+                         None, now, source='admin')
+
+    return _admin_save(row['place_id'], write)
 
 
 # ============================================

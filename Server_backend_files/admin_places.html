@@ -290,6 +290,48 @@
   .sc.on { color: var(--green); border-color: rgba(26,122,66,0.3);
            background: rgba(26,122,66,0.07); }
 
+  /* ══ TIMETABLES ═════════════════════════════════════════ */
+  .tt-meta { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); flex-basis: 100%; }
+  .tt-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--green); border-radius: 10px; padding: 13px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); animation: slideIn 0.2s ease;
+  }
+  .tt-card.is-empty { border-left-color: var(--border); }
+  .tt-card.is-old { border-left-color: var(--orange); }
+  .tt-head { display: flex; justify-content: space-between; align-items: flex-start;
+             gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tt-name { font-weight: 700; font-size: 0.92rem; }
+  .tt-times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 14px;
+              font-size: 0.8rem; margin-bottom: 4px; }
+  .tt-times span { display: flex; justify-content: space-between; gap: 6px; padding: 3px 0;
+                   border-bottom: 1px dashed var(--border); }
+  .tt-times b, .tt-eid b { font-family: var(--mono); font-weight: 600; }
+  .tt-who { font-family: var(--mono); font-size: 0.66rem; color: var(--muted); margin: 4px 0 6px; }
+  .tt-who.is-old { color: var(--orange); font-weight: 600; }
+  .tt-eid { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px;
+            font-size: 0.8rem; padding: 6px 0; border-top: 1px solid var(--border); }
+  .tt-eid .tt-who { margin: 0; flex-basis: 100%; }
+  .tt-eid-name { font-weight: 700; color: #85630a; min-width: 108px; }
+  .tt-none { color: var(--muted); font-style: italic; }
+  .tt-actions { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; margin-top: 8px; }
+  .tt-actions button:disabled { opacity: 0.45; cursor: default; }
+  .tt-sec { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase;
+            letter-spacing: 0.05em; margin: 16px 0 8px; }
+  .tt-sec:first-of-type { margin-top: 0; }
+  .tt-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .tt-grid .form-group { margin-bottom: 0; }
+  .tt-grid .form-group input { padding: 9px 10px; }
+  .tt-hist { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+  .tt-hist-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+                  font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-bottom: 6px; }
+  .tt-hist-sec { font-family: var(--sans); font-size: 0.78rem; font-weight: 700; color: var(--text); }
+  .tt-hist-line { font-family: var(--mono); font-size: 0.76rem; line-height: 1.7; }
+  .tt-hist-line s { color: var(--muted); }
+  .tt-hist-line ins { text-decoration: none; color: var(--green); font-weight: 600; }
+  .tt-hist .btn-open { margin-top: 8px; padding: 5px 12px; font-size: 0.72rem; }
+  @media (max-width: 560px) { .tt-times, .tt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
   /* ══ PLACE LIST ═══════════════════════════════════════════ */
   .place-list { padding: 12px 12px 100px; display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
   .empty-msg { text-align: center; padding: 60px 20px; color: var(--muted); font-family: var(--mono); font-size: 0.88rem; }
@@ -544,6 +586,7 @@
   <button class="tab" data-tab="pending"><span>📥</span> Pending
     <span class="tab-badge" id="pendingBadge" hidden>0</span></button>
   <button class="tab" data-tab="reviews"><span>⭐</span> Reviews</button>
+  <button class="tab" data-tab="timetables"><span>🕌</span> Timetables</button>
   <button class="tab" data-tab="announcements"><span>📣</span> Announcements
     <span class="tab-badge" id="annBadge" hidden>0</span></button>
   <button class="tab" data-tab="claims"><span>🏷️</span> Owners
@@ -599,6 +642,21 @@
             onclick="clearReviewPlaceFilter()">✕ Place filter</button>
   </div>
   <div class="queue" id="review-list"><div class="empty-msg">Loading…</div></div>
+</div>
+
+<!-- ══════════ TIMETABLES ══════════ -->
+<div class="tab-panel" id="tab-timetables">
+  <div class="controls">
+    <input class="search-input" id="tt-search" type="text"
+           placeholder="🔍 Mosque name, city or #number" oninput="debouncedTimetables()" />
+    <button class="filter-chip on" data-ttfilter="all">All</button>
+    <button class="filter-chip"    data-ttfilter="with">With times</button>
+    <button class="filter-chip"    data-ttfilter="without">Without</button>
+    <button class="filter-chip"    data-ttfilter="old">Daily 60+ days old</button>
+    <button class="btn-topbar" onclick="loadTimetables()">↻ Refresh</button>
+    <div class="tt-meta" id="tt-meta"></div>
+  </div>
+  <div class="queue" id="tt-list"><div class="empty-msg">Loading…</div></div>
 </div>
 
 <!-- ══════════ ANNOUNCEMENTS ══════════ -->
@@ -868,6 +926,38 @@
     <div class="modal-actions">
       <button class="btn-modal btn-cancel" onclick="closeModal('ownerModal')">Cancel</button>
       <button class="btn-modal btn-save" onclick="saveOwner()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRAYER TIMES: edit -->
+<div class="modal-overlay" id="ttModal">
+  <div class="modal">
+    <h3>🕌 Prayer times</h3>
+    <div class="form-hint" id="tt-modal-place" style="margin:-12px 0 16px"></div>
+    <div class="tt-sec">Daily</div>
+    <div class="tt-grid" id="tt-daily"></div>
+    <div class="tt-sec">Ramazon hayiti</div>
+    <div class="tt-grid" id="tt-fitr"></div>
+    <div class="tt-sec">Qurbon hayiti</div>
+    <div class="tt-grid" id="tt-adha"></div>
+    <div class="form-hint" style="margin-top:14px">Empty = none. Shown on the mosque page at once; the history keeps what was there.</div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeModal('ttModal')">Cancel</button>
+      <button class="btn-modal btn-save" id="tt-save" onclick="saveTimetable()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRAYER TIMES: history -->
+<div class="modal-overlay" id="ttHistModal">
+  <div class="modal" style="max-width:560px">
+    <h3>🕘 History</h3>
+    <div class="form-hint" id="tt-hist-place" style="margin:-12px 0 16px"></div>
+    <div id="tt-hist-list"></div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" id="tt-hist-more" onclick="loadTimetableHistory(true)" hidden>Older ▾</button>
+      <button class="btn-modal btn-cancel" onclick="closeModal('ttHistModal')">Close</button>
     </div>
   </div>
 </div>
@@ -1381,6 +1471,7 @@ function switchTab(name) {
     p.classList.toggle('on', p.id === 'tab-' + name));
   if (name === 'pending') loadSubmissions();
   if (name === 'reviews') loadReviews();
+  if (name === 'timetables') loadTimetables();
   if (name === 'announcements') loadAnnouncements();
   if (name === 'claims') loadClaims();
   if (name === 'subscribers') loadSubscribersTab();
@@ -1667,7 +1758,7 @@ function s_(v) { return esc(v == null ? '' : String(v)); }
 
 function openTabFromHash() {
   const tab = location.hash.replace('#', '');
-  if (tab !== 'announcements' && tab !== 'claims' && tab !== 'subscribers') return;
+  if (!['announcements', 'claims', 'subscribers', 'timetables'].includes(tab)) return;
   switchTab(tab);
   // On a phone the tab row scrolls sideways; bring the opened tab into view.
   const el = document.querySelector(`.tab[data-tab="${tab}"]`);
@@ -2119,6 +2210,223 @@ async function personDetailHTML(tgId) {
       || '<div class="w-empty">None</div>');
 }
 
+// ══ TIMETABLES ═════════════════════════════════════
+// Mosques' congregation and Eid times. People change them on the mosque page,
+// live, with no review; here the admin sees who changed what, corrects or
+// clears it, and can put back an earlier version. Times are Korea time.
+const TT_API = '/api/admin/timetables';
+const TT_PRAYERS = [['fajr', 'Bomdod'], ['dhuhr', 'Peshin'], ['asr', 'Asr'],
+                    ['maghrib', 'Shom'], ['isha', 'Xufton'], ['jumuah', 'Juma']];
+const TT_EIDS = [['fitr', 'Ramazon hayiti'], ['adha', 'Qurbon hayiti']];
+const TT_SECTION = { daily: 'Daily times', fitr: 'Ramazon hayiti', adha: 'Qurbon hayiti' };
+const TT_PAGE = 'https://vegukin-twa.pages.dev/pages/places/places-detail.html?type=mosque&id=';
+let ttRows = [];
+let ttFilter = 'all';
+let ttEditing = null;      // mosque id in the edit window
+let ttHistFor = null;      // mosque in the history window
+let ttHistBefore = 0;      // oldest history id shown, for "Older"
+let ttDebounce = null;
+
+document.querySelectorAll('[data-ttfilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    ttFilter = btn.dataset.ttfilter;
+    document.querySelectorAll('[data-ttfilter]').forEach(c => c.classList.toggle('on', c === btn));
+    renderTimetables();
+  });
+});
+
+function debouncedTimetables() {
+  clearTimeout(ttDebounce);
+  ttDebounce = setTimeout(renderTimetables, 200);
+}
+
+async function loadTimetables() {
+  const list = document.getElementById('tt-list');
+  try {
+    const d = await (await fetch(TT_API)).json();
+    if (!d.success) { list.innerHTML = '<div class="empty-msg">Failed to load</div>'; return; }
+    ttRows = d.mosques || [];
+    renderTimetables();
+  } catch { list.innerHTML = '<div class="empty-msg">Failed to load</div>'; }
+}
+
+function ttHas(m) { return !!(m.timetable || m.eid.fitr || m.eid.adha); }
+
+function renderTimetables() {
+  const list = document.getElementById('tt-list');
+  const q = document.getElementById('tt-search').value.trim().toLowerCase().replace(/^#/, '');
+  const withTimes = ttRows.filter(ttHas).length;
+  document.getElementById('tt-meta').textContent =
+    `${ttRows.length} mosques · ${withTimes} with times · ${ttRows.length - withTimes} without`;
+  const rows = ttRows.filter(m => {
+    if (ttFilter === 'with' && !ttHas(m)) return false;
+    if (ttFilter === 'without' && ttHas(m)) return false;
+    if (ttFilter === 'old' && !(m.timetable && m.timetable.stale)) return false;
+    return !q || [m.name, m.city, m.address, String(m.id)].some(v => (v || '').toLowerCase().includes(q));
+  });
+  list.innerHTML = rows.length ? rows.map(ttCard).join('') : '<div class="empty-msg">No mosques found</div>';
+}
+
+// "2027-02-24 · ali (5512093847)"; the name is gone when the account was deleted.
+function ttWho(x) {
+  const by = x.updatedBy ? esc(x.updatedBy) + (x.updatedById ? ` (${x.updatedById})` : '') : 'deleted account';
+  return `${esc(x.updatedAt)} · ${by}`;
+}
+
+function ttCard(m) {
+  const t = m.timetable;
+  const cls = !ttHas(m) ? ' is-empty' : (t && t.stale ? ' is-old' : '');
+  const daily = t
+    ? `<div class="tt-times">${TT_PRAYERS.map(([k, n]) => `<span>${n} <b>${t[k] ? esc(t[k]) : '—'}</b></span>`).join('')}</div>
+       <div class="tt-who${t.stale ? ' is-old' : ''}">Updated ${ttWho(t)}${t.stale ? ' · 60+ days' : ''}</div>`
+    : '<div class="tt-who">No daily times</div>';
+  const eids = TT_EIDS.map(([k, n]) => {
+    const e = m.eid[k];
+    return `<div class="tt-eid"><span class="tt-eid-name">${n}</span>` +
+      (e ? `<b>${e.sessions.map(esc).join(' · ')}</b><span class="tt-who${e.stale ? ' is-old' : ''}">Updated ${ttWho(e)}</span>`
+         : '<span class="tt-none">not added</span>') + '</div>';
+  }).join('');
+  return `
+    <div class="tt-card${cls}">
+      <div class="tt-head">
+        <div>
+          <div class="tt-name">${esc(m.name)}</div>
+          <div class="rev-meta">#${m.id} · ${esc(m.city || '')}</div>
+        </div>
+        <a class="btn-open" href="${TT_PAGE}${m.id}" target="_blank" rel="noopener noreferrer">Page ↗</a>
+      </div>
+      ${daily}
+      ${eids}
+      <div class="tt-actions">
+        <button class="btn-edit" onclick="openTimetableModal(${m.id})">✏️ Edit</button>
+        <button class="btn-edit" onclick="openTimetableHistory(${m.id})"${m.edits ? '' : ' disabled'}>🕘 History (${m.edits})</button>
+        ${ttHas(m) ? `<button class="btn-delete" onclick="clearTimetable(${m.id})">🗑 Clear</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function ttReplace(m) {
+  const i = ttRows.findIndex(x => x.id === m.id);
+  if (i >= 0) ttRows[i] = m;
+  renderTimetables();
+}
+
+function ttTimeInput(id, label, value) {
+  return `<div class="form-group"><label for="${id}">${label}</label>` +
+         `<input id="${id}" type="time" value="${esc(value || '')}" /></div>`;
+}
+
+function openTimetableModal(id) {
+  const m = ttRows.find(x => x.id === id);
+  if (!m) return;
+  ttEditing = id;
+  const t = m.timetable || {};
+  document.getElementById('tt-modal-place').textContent = `#${m.id} · ${m.name}`;
+  document.getElementById('tt-daily').innerHTML =
+    TT_PRAYERS.map(([k, n]) => ttTimeInput('tt-in-' + k, n, t[k])).join('');
+  TT_EIDS.forEach(([k]) => {
+    const s = (m.eid[k] && m.eid[k].sessions) || [];
+    document.getElementById('tt-' + k).innerHTML =
+      [0, 1, 2].map(i => ttTimeInput(`tt-in-${k}-${i}`, `${i + 1}-jamoat`, s[i])).join('');
+  });
+  document.getElementById('ttModal').classList.add('show');
+}
+
+async function saveTimetable() {
+  const body = { daily: {} };
+  TT_PRAYERS.forEach(([k]) => { body.daily[k] = document.getElementById('tt-in-' + k).value || null; });
+  TT_EIDS.forEach(([k]) => {
+    body[k] = [0, 1, 2].map(i => document.getElementById(`tt-in-${k}-${i}`).value).filter(Boolean);
+  });
+  const btn = document.getElementById('tt-save');
+  btn.disabled = true;
+  try {
+    const d = await annRequest(`${TT_API}/${ttEditing}`, 'PUT', body);
+    if (!d.success) { showToast(d.error || 'Failed', true); return; }
+    ttReplace(d.mosque);
+    closeModal('ttModal');
+    showToast(d.changed ? '✓ Saved' : 'Nothing changed');
+  } catch { showToast('Failed', true); }
+  finally { btn.disabled = false; }
+}
+
+async function clearTimetable(id) {
+  const m = ttRows.find(x => x.id === id);
+  if (!m || !confirm(`Clear every prayer time of ${m.name}?\nThe history keeps them, so they can be put back.`)) return;
+  try {
+    const d = await annRequest(`${TT_API}/${id}?section=all`, 'DELETE');
+    if (!d.success) { showToast(d.error || 'Failed', true); return; }
+    ttReplace(d.mosque);
+    showToast('🗑 Cleared');
+  } catch { showToast('Failed', true); }
+}
+
+function openTimetableHistory(id) {
+  const m = ttRows.find(x => x.id === id);
+  if (!m) return;
+  ttHistFor = m;
+  ttHistBefore = 0;
+  document.getElementById('tt-hist-place').textContent = `#${m.id} · ${m.name} · Korea time`;
+  document.getElementById('tt-hist-list').innerHTML = '<div class="w-empty">Loading…</div>';
+  document.getElementById('tt-hist-more').hidden = true;
+  document.getElementById('ttHistModal').classList.add('show');
+  loadTimetableHistory(false);
+}
+
+async function loadTimetableHistory(older) {
+  const box = document.getElementById('tt-hist-list');
+  const url = `${TT_API}/${ttHistFor.id}/history` + (older && ttHistBefore ? `?before=${ttHistBefore}` : '');
+  try {
+    const d = await (await fetch(url)).json();
+    if (!d.success) { box.innerHTML = '<div class="w-empty">Failed to load</div>'; return; }
+    const html = d.history.map(ttHistEntry).join('');
+    if (older) box.insertAdjacentHTML('beforeend', html);
+    else box.innerHTML = html || '<div class="w-empty">No changes yet</div>';
+    if (d.history.length) ttHistBefore = d.history[d.history.length - 1].id;
+    document.getElementById('tt-hist-more').hidden = !d.more;
+  } catch { box.innerHTML = '<div class="w-empty">Failed to load</div>'; }
+}
+
+// Daily: only the prayers that changed. Eid: the whole list, before → after.
+function ttDiff(section, before, after) {
+  if (section === 'daily') {
+    const o = before || {}, n = after || {};
+    const lines = TT_PRAYERS.filter(([k]) => (o[k] || null) !== (n[k] || null))
+      .map(([k, name]) => `${name}: <s>${o[k] ? esc(o[k]) : '—'}</s> → <ins>${n[k] ? esc(n[k]) : '—'}</ins>`);
+    return lines.join('<br>') || '<span class="tt-none">no change</span>';
+  }
+  const list = v => (Array.isArray(v) && v.length) ? v.map(esc).join(' · ') : '—';
+  return `<s>${list(before)}</s> → <ins>${list(after)}</ins>`;
+}
+
+function ttHistEntry(h) {
+  const who = h.source === 'admin' ? 'admin'
+    : (h.editorName ? esc(h.editorName) + (h.editorId ? ` (${h.editorId})` : '') : 'deleted account');
+  return `
+    <div class="tt-hist">
+      <div class="tt-hist-head">
+        <span class="tt-hist-sec">${TT_SECTION[h.section] || esc(h.section)}</span>
+        <span>${esc(h.at)} · ${who}</span>
+      </div>
+      <div class="tt-hist-line">${ttDiff(h.section, h.old, h.new)}</div>
+      <button class="btn-open" onclick="restoreTimetable(${h.id})">↩ Put back what was before</button>
+    </div>`;
+}
+
+async function restoreTimetable(historyId) {
+  if (!confirm('Put this back as it was before this change? The mosque page shows it at once.')) return;
+  try {
+    const d = await annRequest(`${TT_API}/history/${historyId}/restore`, 'POST');
+    if (!d.success) { showToast(d.error || 'Failed', true); return; }
+    ttReplace(d.mosque);
+    const m = ttRows.find(x => x.id === ttHistFor.id);
+    if (m) ttHistFor = m;
+    showToast(d.changed ? '↩ Put back' : 'It is already like that');
+    ttHistBefore = 0;
+    loadTimetableHistory(false);
+  } catch { showToast('Failed', true); }
+}
+
 // ══ HELPERS ════════════════════════════════════════
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -2134,6 +2442,8 @@ document.addEventListener('keydown', e => {
     closeModal('reviewDeleteModal');
     closeModal('postModal');
     closeModal('ownerModal');
+    closeModal('ttModal');
+    closeModal('ttHistModal');
   }
 });
 
