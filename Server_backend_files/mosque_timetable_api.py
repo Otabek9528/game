@@ -10,17 +10,19 @@ earlier version back.
     PUT /api/place/<id>/timetable   {"fajr", "dhuhr", "asr", "maghrib", "isha", "jumuah"}
                                     each "HH:MM" (KST) or null to clear it;
                                     a key left out keeps what is there
-    PUT /api/place/<id>/eid         {"sessions": ["07:00", "08:30"]}: 0-3 times; [] clears them
+    PUT /api/place/<id>/eid         {"fitr": ["07:00", "08:30"], "adha": ["07:30"]}
+                                    0-3 times each; a key left out keeps what is there, [] clears
 
 Both answer with the mosque's `timetable` and `eid`, as GET /api/place/<id>
 now carries them for mosques (timetable_info()).
 
 Eid
 ---
-One set of Eid prayer times per mosque, with the date it was last changed.
-There is no Eid date and no Eid name: the "last updated" date is what tells
-people which Eid the times were for. Like the daily times, they are marked
-`stale` when nobody has changed them for STALE_AFTER_DAYS days.
+Two rows per mosque: the Ramadan Eid ('fitr') and Eid al-Adha ('adha'), each
+with its own times and the date they were last changed. There is no Eid date:
+the "last updated" date is what tells people which year the times were for.
+Like the daily times, each is marked `stale` when nobody has changed it for
+STALE_AFTER_DAYS days.
 
 Who edited is for the admin only: the public answers carry the date of the
 last change, never a name or id.
@@ -48,6 +50,7 @@ TS_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 MOSQUE_BUILDING_TYPE = 'Masjid'
 PRAYERS = ('fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'jumuah')
+EIDS = ('fitr', 'adha')
 EID_SESSIONS_MAX = 3
 STALE_AFTER_DAYS = 60
 # A brake on scripts, far above what one person does by hand; not moderation.
@@ -68,18 +71,20 @@ CREATE TABLE IF NOT EXISTS mosque_timetables (
 );
 
 CREATE TABLE IF NOT EXISTS mosque_eid_times (
-    place_id         INTEGER PRIMARY KEY,
+    place_id         INTEGER NOT NULL,
+    eid              TEXT NOT NULL CHECK (eid IN ('fitr', 'adha')),
     sessions         TEXT NOT NULL,      -- JSON list of "HH:MM", ascending, 1-3
     updated_at       TEXT NOT NULL,
     updated_by       INTEGER,
-    updated_by_name  TEXT
+    updated_by_name  TEXT,
+    PRIMARY KEY (place_id, eid)
 );
 
 -- Every save: what the section held before and after (JSON; NULL = empty).
 CREATE TABLE IF NOT EXISTS mosque_timetable_history (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     place_id         INTEGER NOT NULL,
-    section          TEXT NOT NULL CHECK (section IN ('daily', 'eid')),
+    section          TEXT NOT NULL CHECK (section IN ('daily', 'fitr', 'adha')),
     old_value        TEXT,
     new_value        TEXT,
     editor_id        INTEGER,
@@ -157,13 +162,13 @@ def parse_time(value, field):
     return f'{int(m.group(1)):02d}:{m.group(2)}'
 
 
-def parse_sessions(value):
-    """Eid prayer times: a list of up to EID_SESSIONS_MAX distinct times, ascending."""
+def parse_sessions(value, field):
+    """One Eid's prayer times: a list of up to EID_SESSIONS_MAX distinct times, ascending."""
     if not isinstance(value, list):
-        raise InputError('invalid_input', 'sessions: expected a list of HH:MM')
-    times = sorted({t for t in (parse_time(v, 'sessions') for v in value) if t})
+        raise InputError('invalid_input', f'{field}: expected a list of HH:MM')
+    times = sorted({t for t in (parse_time(v, field) for v in value) if t})
     if len(times) > EID_SESSIONS_MAX:
-        raise InputError('too_many_sessions', f'At most {EID_SESSIONS_MAX} Eid prayers')
+        raise InputError('too_many_sessions', f'{field}: at most {EID_SESSIONS_MAX} Eid prayers')
     return times
 
 
@@ -205,17 +210,19 @@ def _eid_out(row, today):
 
 def timetable_info(conn, place_id, today=None):
     """
-    {'timetable', 'eid'} for /api/place/<id> of a mosque; each None when
-    nothing was entered. conn needs sqlite3.Row rows. Never raises: a
-    missing table (init not run) must not take the detail page down.
+    {'timetable': {...} | None, 'eid': {'fitr': {...} | None, 'adha': {...} | None}}
+    for /api/place/<id> of a mosque; None where nothing was entered. conn
+    needs sqlite3.Row rows. Never raises: a missing table (init not run) must
+    not take the detail page down.
     """
     today = today or _now().date()
-    out = {'timetable': None, 'eid': None}
+    out = {'timetable': None, 'eid': {e: None for e in EIDS}}
     try:
         out['timetable'] = _daily_out(conn.execute(
             "SELECT * FROM mosque_timetables WHERE place_id = ?", (place_id,)).fetchone(), today)
-        out['eid'] = _eid_out(conn.execute(
-            "SELECT * FROM mosque_eid_times WHERE place_id = ?", (place_id,)).fetchone(), today)
+        for row in conn.execute("SELECT * FROM mosque_eid_times WHERE place_id = ?", (place_id,)):
+            if row['eid'] in EIDS:
+                out['eid'][row['eid']] = _eid_out(row, today)
     except sqlite3.Error as e:
         logger.warning(f'timetable_info({place_id}) failed: {e}')
     return out
@@ -292,23 +299,23 @@ def write_daily(conn, place_id, new, user, now, source='public'):
     return True
 
 
-def write_eid(conn, place_id, sessions, user, now, source='public'):
-    """The Eid prayer times, in the caller's transaction. Returns whether anything changed."""
-    row = conn.execute("SELECT * FROM mosque_eid_times WHERE place_id = ?", (place_id,)).fetchone()
+def write_eid(conn, place_id, eid, sessions, user, now, source='public'):
+    """One Eid's prayer times ('fitr' or 'adha'), in the caller's transaction. Returns whether anything changed."""
+    row = conn.execute("SELECT * FROM mosque_eid_times WHERE place_id = ? AND eid = ?", (place_id, eid)).fetchone()
     old = _sessions(row) or None
     new = sessions or None
     if old == new:
         return False
     if new is None:
-        conn.execute("DELETE FROM mosque_eid_times WHERE place_id = ?", (place_id,))
+        conn.execute("DELETE FROM mosque_eid_times WHERE place_id = ? AND eid = ?", (place_id, eid))
     else:
         conn.execute(
-            "INSERT INTO mosque_eid_times (place_id, sessions, updated_at, updated_by, updated_by_name) "
-            "VALUES (?, ?, ?, ?, ?) ON CONFLICT(place_id) DO UPDATE SET sessions = excluded.sessions, "
+            "INSERT INTO mosque_eid_times (place_id, eid, sessions, updated_at, updated_by, updated_by_name) "
+            "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(place_id, eid) DO UPDATE SET sessions = excluded.sessions, "
             "updated_at = excluded.updated_at, updated_by = excluded.updated_by, "
             "updated_by_name = excluded.updated_by_name",
-            (place_id, json.dumps(new), _fmt(now), *_who(user)))
-    _history(conn, place_id, 'eid', old, new, user, now, source)
+            (place_id, eid, json.dumps(new), _fmt(now), *_who(user)))
+    _history(conn, place_id, eid, old, new, user, now, source)
     return True
 
 
@@ -368,18 +375,19 @@ def put_eid(place_id):
     if error:
         return error
     body = request.get_json(silent=True)
-    if not isinstance(body, dict) or 'sessions' not in body:
-        return _err('invalid_input', 'Expected {"sessions": [...]}.')
+    if not isinstance(body, dict) or not any(kind in body for kind in EIDS):
+        return _err('invalid_input', 'Expected {"fitr": [...], "adha": [...]} (either or both).')
     try:
-        sessions = parse_sessions(body['sessions'])
+        given = {kind: parse_sessions(body[kind], kind) for kind in EIDS if kind in body}
     except InputError as e:
         return _err(e.code, e.message)
 
     def write(conn, now):
-        changed = write_eid(conn, place_id, sessions, user, now)
+        changed = [kind for kind, sessions in given.items()
+                   if write_eid(conn, place_id, kind, sessions, user, now)]
         if changed:
-            logger.info('[TIMETABLE] mosque %s Eid times changed by %s', place_id, user['id'])
-        return changed
+            logger.info('[TIMETABLE] mosque %s Eid times (%s) changed by %s', place_id, ', '.join(changed), user['id'])
+        return bool(changed)
 
     return _save(place_id, user, write)
 
