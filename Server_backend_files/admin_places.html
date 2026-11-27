@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Places Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f1eb;
+    --surface: #ffffff;
+    --border: #e2ddd4;
+    --accent: #c8600a;
+    --green: #1a7a42;
+    --red: #c0392b;
+    --orange: #c8600a;
+    --cyan: #0891b2;
+    --muted: #8a8278;
+    --text: #2c2825;
+    --sub: #5c5650;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+
+  /* ═══ UNIFIED TOPBAR (shared across all admin pages) ═══ */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px; display: flex; align-items: center;
+    height: 52px; gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .topbar-brand { font-weight: 700; font-size: 1rem; letter-spacing: -0.3px; white-space: nowrap; flex-shrink: 0; }
+  .topbar-brand span { color: var(--accent); }
+  .topbar-nav {
+    display: flex; gap: 4px; flex: 1;
+    overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .topbar-nav::-webkit-scrollbar { display: none; }
+  .nav-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; font-size: 0.78rem; font-weight: 600;
+    color: var(--sub); text-decoration: none; border-radius: 8px;
+    white-space: nowrap; transition: all 0.15s; border: 1px solid transparent;
+  }
+  .nav-pill:hover { background: var(--bg); color: var(--text); }
+  .nav-pill.active { background: rgba(200,96,10,0.08); color: var(--accent); border-color: rgba(200,96,10,0.2); }
+  .nav-pill .pill-icon { font-size: 0.85rem; line-height: 1; }
+  .nav-pill .pill-badge {
+    font-family: var(--mono); font-size: 0.6rem; font-weight: 600;
+    background: var(--red); color: #fff; padding: 1px 6px; border-radius: 10px; line-height: 1.4;
+  }
+  .topbar-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .btn-topbar {
+    padding: 6px 12px; font-size: 0.75rem; font-weight: 600; font-family: var(--sans);
+    color: var(--sub); background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: all 0.15s; text-decoration: none; white-space: nowrap;
+  }
+  .btn-topbar:hover { border-color: var(--muted); color: var(--text); }
+  .btn-topbar.danger { color: var(--red); border-color: rgba(192,57,43,0.25); }
+  .btn-topbar.danger:hover { background: rgba(192,57,43,0.06); }
+
+  /* ═══ UNIFIED PAGE HERO (per-page section below topbar) ═══ */
+  .page-hero {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 16px 16px 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .hero-identity { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px; }
+  .hero-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+  }
+  .hero-title { font-weight: 700; font-size: 1.05rem; line-height: 1.2; letter-spacing: -0.2px; }
+  .hero-subtitle { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
+  .hero-stats { display: flex; gap: 16px; flex-shrink: 0; }
+  .hero-stat { text-align: center; min-width: 48px; }
+  .hero-stat-val { font-family: var(--mono); font-size: 1.15rem; font-weight: 700; line-height: 1; }
+  .hero-stat-lbl { font-size: 0.6rem; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+  .hero-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .hero-icon.parcels  { background: rgba(200,96,10,0.1); }
+  .hero-icon.subs     { background: rgba(26,122,66,0.1); }
+  .hero-icon.places   { background: rgba(8,145,178,0.1); }
+  .hero-icon.products { background: rgba(37,99,168,0.1); }
+  .hero-icon.stats    { background: rgba(124,58,237,0.1); }
+  .c-accent { color: var(--accent); }
+  .c-green  { color: var(--green); }
+  .c-red    { color: var(--red); }
+  .c-blue   { color: var(--blue); }
+  .c-purple { color: var(--purple); }
+
+  @media (max-width: 560px) {
+    .topbar { height: auto; padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
+    .topbar-brand { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+    .topbar-nav { order: 3; width: 100%; padding-bottom: 2px; }
+    .topbar-actions { order: 2; }
+    .nav-pill { padding: 5px 10px; font-size: 0.72rem; }
+    .page-hero { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .hero-stats { width: 100%; justify-content: space-around; }
+    .hero-actions { width: 100%; }
+  }
+
+
+  /* ══ CONTROLS ═════════════════════════════════════════════ */
+  .controls {
+    padding: 12px 14px;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .search-input {
+    flex: 1; min-width: 180px; padding: 9px 14px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 0.82rem;
+    outline: none; border-radius: 8px;
+  }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,168,0.08); }
+
+  .filter-chip {
+    padding: 7px 14px; font-size: 0.75rem; font-weight: 600;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--sub); cursor: pointer; white-space: nowrap;
+    font-family: var(--sans); border-radius: 20px; transition: all 0.15s;
+  }
+  .filter-chip:hover { border-color: var(--muted); }
+  .filter-chip.on { border-color: var(--accent); color: var(--accent); background: rgba(37,99,168,0.07); }
+
+  .btn-add {
+    padding: 9px 18px; font-size: 0.8rem; font-weight: 700;
+    background: var(--green); color: #fff; border: none;
+    cursor: pointer; font-family: var(--sans); border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .btn-add:hover { background: #15632f; }
+
+  /* ══ TABS ═════════════════════════════════════════════════ */
+  .tabs {
+    display: flex; gap: 4px; padding: 10px 14px 0;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 16px; font-size: 0.82rem; font-weight: 600;
+    font-family: var(--sans); color: var(--sub);
+    background: none; border: none; border-bottom: 2px solid transparent;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-badge {
+    font-family: var(--mono); font-size: 0.62rem; font-weight: 600;
+    background: var(--red); color: #fff; padding: 1px 6px; border-radius: 10px;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.on { display: block; }
+
+  /* ══ SUBMISSION QUEUE ═════════════════════════════════════ */
+  .queue { padding: 12px 12px 100px; display: flex; flex-direction: column; gap: 10px;
+           max-width: 760px; margin: 0 auto; }
+  .sub-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--orange); border-radius: 10px;
+    padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    animation: slideIn 0.2s ease;
+  }
+  .sub-card.is-approved { border-left-color: var(--green); opacity: 0.72; }
+  .sub-card.is-rejected { border-left-color: var(--red); opacity: 0.72; }
+
+  .sub-head { display: flex; justify-content: space-between; align-items: flex-start;
+              gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .sub-place { font-weight: 700; font-size: 0.95rem; }
+  .sub-meta { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+  .sub-orphan { color: var(--red); font-style: italic; }
+
+  /* old -> new, side by side; the point of the queue is the comparison */
+  .diff { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .diff-cell { padding: 9px 12px; border-radius: 8px; background: var(--bg);
+               border: 1px solid var(--border); min-width: 0; }
+  .diff-label { font-size: 0.6rem; font-weight: 700; color: var(--muted);
+                text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .diff-val { font-family: var(--mono); font-size: 0.78rem; word-break: break-all;
+              white-space: pre-wrap; }
+  .diff-cell.is-new { background: rgba(26,122,66,0.06); border-color: rgba(26,122,66,0.25); }
+  .diff-cell.is-new .diff-val { color: var(--green); }
+  .diff-empty { color: var(--muted); font-style: italic; }
+  .diff-edit {
+    width: 100%; padding: 6px 8px; font-family: var(--mono); font-size: 0.78rem;
+    color: var(--green); background: var(--surface); border: 1px solid rgba(26,122,66,0.3);
+    border-radius: 6px; outline: none; resize: vertical; box-sizing: border-box;
+  }
+  .diff-edit:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,66,0.1); }
+  @media (max-width: 560px) { .diff { grid-template-columns: 1fr; } }
+
+  .sub-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .sub-actions .btn-open { padding: 7px 14px; }
+  .btn-approve, .btn-reject, .btn-open {
+    padding: 7px 15px; font-size: 0.76rem; font-weight: 700; font-family: var(--sans);
+    border: none; border-radius: 7px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-approve { background: var(--green); color: #fff; }
+  .btn-approve:hover { background: #15632f; }
+  .btn-reject { background: var(--surface); color: var(--red);
+                border: 1px solid rgba(192,57,43,0.3); }
+  .btn-reject:hover { background: rgba(192,57,43,0.07); }
+  .btn-open { background: var(--bg); color: var(--sub); border: 1px solid var(--border);
+              text-decoration: none; display: inline-block; }
+  .btn-open:hover { border-color: var(--accent); color: var(--accent); }
+  .sub-verdict { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); }
+
+  /* ══ ANNOUNCEMENTS / OWNERS ═══════════════════════════════ */
+  /* Five tabs no longer fit a phone: the row scrolls sideways instead of wrapping. */
+  .tabs { overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .ann-card { border-left-color: var(--accent); }
+  .ann-text { font-size: 0.86rem; color: var(--text); line-height: 1.6; white-space: pre-wrap;
+              word-break: break-word; padding: 9px 12px; background: var(--bg);
+              border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+  .ann-edit { min-height: 92px; font-family: var(--sans); font-size: 0.86rem; line-height: 1.6;
+              color: var(--text); margin-bottom: 4px; }
+  .ann-count { font-family: var(--mono); font-size: 0.64rem; color: var(--muted); text-align: right;
+               margin-bottom: 8px; }
+  .ann-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .ann-warn { font-size: 0.76rem; color: var(--orange); margin: -2px 0 10px; }
+  .own-section { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase;
+                 letter-spacing: 0.08em; margin: 10px 2px 0; }
+  .own-row { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+             flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border);
+             border-radius: 10px; padding: 12px 14px; }
+  .own-row .sub-actions { margin: 0; }
+
+  /* ══ SUBSCRIBERS ═════════════════════════════════════════ */
+  .w-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px;
+             padding: 12px 12px 0; max-width: 760px; margin: 0 auto; }
+  .w-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+            padding: 10px 12px; }
+  .w-stat b { display: block; font-size: 1.15rem; font-family: var(--mono); color: var(--text); }
+  .w-stat span { font-size: 0.66rem; font-weight: 600; color: var(--muted); text-transform: uppercase;
+                 letter-spacing: 0.05em; }
+  .w-stat.is-warn b { color: var(--red); }
+  .w-row { flex-wrap: wrap; }
+  .w-nums { font-size: 0.8rem; color: var(--sub); white-space: nowrap; }
+  .w-nums b { color: var(--text); font-family: var(--mono); }
+  .w-detail { flex-basis: 100%; border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; }
+  .w-detail[hidden] { display: none; }
+  .w-sub { font-size: 0.66rem; font-weight: 700; color: var(--muted); text-transform: uppercase;
+           letter-spacing: 0.06em; margin: 8px 0 4px; }
+  .w-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center;
+            font-size: 0.8rem; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+  .w-line:last-child { border-bottom: none; }
+  .w-line .sub-meta { margin: 0; }
+  .w-line a { font-size: 0.72rem; color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .w-preview { font-size: 0.78rem; color: var(--sub); flex-basis: 100%; word-break: break-word; }
+  .w-err { font-family: var(--mono); font-size: 0.66rem; color: var(--red); flex-basis: 100%; }
+  .w-empty { font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 4px 0; }
+
+  /* ══ REVIEWS ══════════════════════════════════════════════ */
+  .rev-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan); border-radius: 10px; padding: 13px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04); animation: slideIn 0.2s ease;
+  }
+  .rev-head { display: flex; justify-content: space-between; align-items: flex-start;
+              gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .rev-place { font-weight: 700; font-size: 0.9rem; }
+  .rev-stars { color: #f0a500; font-size: 0.9rem; letter-spacing: 1px; }
+  .rev-meta { font-family: var(--mono); font-size: 0.66rem; color: var(--muted); }
+  .rev-text { font-size: 0.85rem; color: var(--sub); line-height: 1.65;
+              white-space: pre-wrap; word-break: break-word; margin: 6px 0 10px; }
+  .rev-text.is-empty { color: var(--muted); font-style: italic; }
+  .rev-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .rating-picker { display: flex; gap: 4px; margin-bottom: 4px; }
+  .rating-star {
+    font-size: 1.6rem; cursor: pointer; color: var(--border); line-height: 1;
+    background: none; border: none; padding: 0; transition: color 0.12s;
+  }
+  .rating-star.on { color: #f0a500; }
+  .form-group textarea {
+    width: 100%; padding: 10px 14px; background: var(--bg);
+    border: 1px solid var(--border); color: var(--text);
+    font-family: var(--mono); font-size: 0.85rem; outline: none;
+    border-radius: 8px; resize: vertical; min-height: 96px;
+  }
+  .form-group textarea:focus { border-color: var(--accent); }
+
+  .place-socials { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .sc { font-size: 0.62rem; font-family: var(--mono); padding: 2px 7px;
+        border-radius: 4px; border: 1px solid var(--border); color: var(--muted); }
+  .sc.on { color: var(--green); border-color: rgba(26,122,66,0.3);
+           background: rgba(26,122,66,0.07); }
+
+  /* ══ PLACE LIST ═══════════════════════════════════════════ */
+  .place-list { padding: 12px 12px 100px; display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
+  .empty-msg { text-align: center; padding: 60px 20px; color: var(--muted); font-family: var(--mono); font-size: 0.88rem; }
+
+  /* ── LOAD GATE: nothing is fetched until this button is pressed ── */
+  .load-gate {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 40px 24px; text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .load-gate-icon { font-size: 2.2rem; line-height: 1; margin-bottom: 12px; }
+  .load-gate-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+  .load-gate-sub {
+    font-size: 0.82rem; color: var(--sub); line-height: 1.6;
+    max-width: 380px; margin: 0 auto 18px;
+  }
+  .btn-load {
+    padding: 12px 28px; font-size: 0.88rem; font-weight: 700;
+    font-family: var(--sans); background: var(--accent); color: #fff;
+    border: none; border-radius: 9px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-load:hover { background: #a94f08; }
+  .btn-load:disabled { opacity: 0.55; cursor: progress; }
+  .load-gate-hint { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); margin-top: 12px; min-height: 1em; }
+
+  /* ── PAGED LIST: the DOM is what freezes the browser, not the fetch ── */
+  .list-meta {
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+    padding: 2px 4px; flex-wrap: wrap;
+  }
+  .btn-reload {
+    padding: 4px 10px; font-size: 0.68rem; font-weight: 600; font-family: var(--sans);
+    background: var(--surface); border: 1px solid var(--border); color: var(--sub);
+    border-radius: 6px; cursor: pointer;
+  }
+  .btn-reload:hover { border-color: var(--accent); color: var(--accent); }
+  .load-more-row { display: flex; justify-content: center; padding: 4px 0 8px; }
+  .btn-more {
+    padding: 10px 24px; font-size: 0.8rem; font-weight: 700; font-family: var(--sans);
+    background: var(--surface); color: var(--accent);
+    border: 1px solid rgba(200,96,10,0.3); border-radius: 8px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-more:hover { background: rgba(200,96,10,0.07); }
+  .controls.is-locked .search-input,
+  .controls.is-locked .filter-chip { opacity: 0.45; pointer-events: none; }
+
+  .place-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+  .place-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .place-card.type-masjid { border-left-color: var(--green); }
+  .place-card.type-oshxona { border-left-color: var(--orange); }
+  .place-card.type-dokon { border-left-color: var(--accent); }
+
+  .place-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .place-name { font-weight: 700; font-size: 0.95rem; }
+  .place-id { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); }
+
+  .place-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .badge { font-family: var(--mono); font-size: 0.68rem; font-weight: 500; padding: 3px 8px; border-radius: 4px; }
+  .bg-green { background: rgba(26,122,66,0.1); color: var(--green); border: 1px solid rgba(26,122,66,0.2); }
+  .bg-orange { background: rgba(200,96,10,0.08); color: var(--orange); border: 1px solid rgba(200,96,10,0.2); }
+  .bg-blue { background: rgba(37,99,168,0.08); color: var(--accent); border: 1px solid rgba(37,99,168,0.2); }
+  .bg-muted { background: rgba(138,130,120,0.1); color: var(--muted); border: 1px solid rgba(138,130,120,0.2); }
+
+  .place-detail { font-size: 0.82rem; color: var(--sub); line-height: 1.7; margin-bottom: 8px; }
+  .place-detail b { color: var(--text); font-weight: 600; }
+
+  .place-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .btn-edit, .btn-delete {
+    padding: 6px 14px; font-size: 0.75rem; font-weight: 600;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--sub); cursor: pointer; font-family: var(--sans);
+    border-radius: 6px; transition: all 0.15s;
+  }
+  .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-delete:hover { border-color: var(--red); color: var(--red); }
+
+  /* ══ MODAL ════════════════════════════════════════════════ */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35); z-index: 200;
+    align-items: center; justify-content: center; padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 10px; padding: 28px;
+    width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  .modal h3 { font-size: 1rem; font-weight: 700; margin-bottom: 20px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label {
+    display: block; font-size: 0.75rem; font-weight: 600;
+    color: var(--sub); margin-bottom: 5px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .form-group input, .form-group select {
+    width: 100%; padding: 10px 14px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 0.85rem;
+    outline: none; border-radius: 8px;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,168,0.08);
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .form-hint {
+    font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 4px;
+  }
+
+  .btn-geo {
+    margin-top: 4px; padding: 7px 14px; font-size: 0.75rem; font-weight: 600;
+    background: rgba(37,99,168,0.08); color: var(--accent);
+    border: 1px solid rgba(37,99,168,0.2);
+    cursor: pointer; font-family: var(--sans); border-radius: 6px;
+    transition: all 0.15s; width: 100%;
+  }
+  .btn-geo:hover { background: rgba(37,99,168,0.15); }
+  .btn-geo:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+  .btn-modal {
+    padding: 10px 22px; font-size: 0.85rem; font-weight: 700;
+    border: none; cursor: pointer; font-family: var(--sans);
+    border-radius: 8px; transition: all 0.15s;
+  }
+  .btn-cancel { background: var(--bg); color: var(--sub); border: 1px solid var(--border); }
+  .btn-cancel:hover { background: var(--border); }
+  .btn-save { background: var(--green); color: #fff; }
+  .btn-save:hover { background: #15632f; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #a93226; }
+
+  /* ══ NOTIFY: Silent / Send ═══════════════════════════════ */
+  .notify-box {
+    margin-top: 18px; padding: 12px 14px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--bg);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .notify-box[hidden] { display: none; }
+  .notify-box.is-send { border-color: rgba(26,122,66,0.45); background: rgba(26,122,66,0.06); }
+  .notify-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .notify-label {
+    font-size: 0.75rem; font-weight: 600; color: var(--sub);
+    text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .notify-what { font-size: 0.78rem; font-weight: 700; color: var(--text); text-align: right; }
+  .notify-seg {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .notify-seg label { position: relative; cursor: pointer; }
+  .notify-seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .notify-seg span {
+    display: block; text-align: center; padding: 8px 6px; border-radius: 6px;
+    font-size: 0.82rem; font-weight: 700; color: var(--sub); transition: all 0.15s;
+  }
+  .notify-seg input:checked + span { background: var(--border); color: var(--text); }
+  .notify-seg input[value="1"]:checked + span { background: var(--green); color: #fff; }
+  .notify-seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .notify-reach { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 7px; line-height: 1.5; }
+  .confirm-text + .notify-box { margin: -6px 0 4px; }
+
+  /* ══ CONFIRM MODAL ════════════════════════════════════════ */
+  .confirm-text { font-size: 0.9rem; color: var(--sub); line-height: 1.6; margin-bottom: 20px; }
+  .confirm-name { font-weight: 700; color: var(--text); }
+
+  /* ══ TOAST ═════════════════════════════════════════════════ */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--green); border-radius: 8px;
+    padding: 12px 22px; font-family: var(--mono); font-size: 0.84rem;
+    white-space: nowrap; z-index: 999; pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transition: transform 0.25s ease, opacity 0.25s; opacity: 0;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.err { border-left-color: var(--red); }
+
+  /* ══ RESPONSIVE ═══════════════════════════════════════════ */
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .place-actions { justify-content: stretch; }
+    .btn-edit, .btn-delete { flex: 1; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-brand">VEGUKIN <span>ADMIN</span></div>
+    <nav class="topbar-nav">
+        <a class="nav-pill" href="/admin/parcels/panel"><span class="pill-icon">📦</span> Parcels</a>        
+        <a class="nav-pill" href="/admin/hikorea"><span class="pill-icon">🛂</span> HiKorea</a>        
+        <a class="nav-pill" href="/admin/cars"><span class="pill-icon">🚗</span> Cars</a>        
+        <a class="nav-pill" href="/admin/housing"><span class="pill-icon">🏠</span> Housing</a>        
+        <a class="nav-pill" href="/admin/parcels/stats"><span class="pill-icon">📊</span> Stats</a>
+        <a class="nav-pill" href="/admin/places"><span class="pill-icon">📍</span> Places</a>        
+        <a class="nav-pill" href="/admin/business"><span class="pill-icon">🕴</span> Business</a> 
+        <a class="nav-pill" href="/admin/parcels/products"><span class="pill-icon">🏷️</span> Products</a>
+        <a class="nav-pill" href="/admin/store/panel"><span class="pill-icon">🛒</span> Store</a> 
+        <a class="nav-pill" href="/admin/subscriptions"><span class="pill-icon">👥</span> Subs </a>        
+        <a class="nav-pill" href="/admin/jobs"><span class="pill-icon">💼</span> Jobs</a>
+    </nav>
+    <div class="topbar-actions">
+      
+      <button class="btn-topbar danger" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="page-hero">
+    <div class="hero-identity">
+      <div class="hero-icon places">📍</div>
+      <div>
+        <div class="hero-title">Places Manager</div>
+        <div class="hero-subtitle">Mosques, restaurants & shops</div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-val c-green" id="s-masjid">—</div><div class="hero-stat-lbl">🕌 Masjid</div></div>
+      <div class="hero-stat"><div class="hero-stat-val" id="s-oshxona" style="color:var(--orange)">—</div><div class="hero-stat-lbl">🍽 Oshxona</div></div>
+      <div class="hero-stat"><div class="hero-stat-val c-blue" id="s-dokon">—</div><div class="hero-stat-lbl">🛒 Do'kon</div></div>
+    </div>
+  </div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" data-tab="places"><span>📍</span> Places</button>
+  <button class="tab" data-tab="pending"><span>📥</span> Pending
+    <span class="tab-badge" id="pendingBadge" hidden>0</span></button>
+  <button class="tab" data-tab="reviews"><span>⭐</span> Reviews</button>
+  <button class="tab" data-tab="announcements"><span>📣</span> Announcements
+    <span class="tab-badge" id="annBadge" hidden>0</span></button>
+  <button class="tab" data-tab="claims"><span>🏷️</span> Owners
+    <span class="tab-badge" id="claimBadge" hidden>0</span></button>
+  <button class="tab" data-tab="subscribers"><span>🔔</span> Subscribers</button>
+</div>
+
+<!-- ══════════ PLACES ══════════ -->
+<div class="tab-panel on" id="tab-places">
+<div class="controls is-locked" id="placeControls">
+  <input class="search-input" id="search" type="text" placeholder="🔍 Search name, city, address..." oninput="debouncedRender()" />
+  <button class="filter-chip" id="f-all" data-filter="all">All</button>
+  <button class="filter-chip" id="f-Masjid" data-filter="Masjid">🕌 Masjid</button>
+  <button class="filter-chip" id="f-Oshxona" data-filter="Oshxona">🍽 Oshxona</button>
+  <button class="filter-chip" id="f-dokon" data-filter="Do'kon">🛒 Do'kon</button>
+  <button class="btn-add" onclick="openAddModal()">+ Add Place</button>
+</div>
+
+<!-- PLACE LIST -->
+<div class="place-list" id="place-list">
+  <div class="load-gate" id="loadGate">
+    <div class="load-gate-icon">📍</div>
+    <div class="load-gate-title">Places are not loaded</div>
+    <div class="load-gate-sub">
+      The full place list is large, so it is not fetched automatically.
+      Press the button to pull it in — the list then renders in pages of 50
+      so the browser stays responsive.
+    </div>
+    <button class="btn-load" id="loadBtn" onclick="loadPlaces()">⬇ Load all places</button>
+    <div class="load-gate-hint" id="loadHint"></div>
+  </div>
+</div>
+</div><!-- /tab-places -->
+
+<!-- ══════════ PENDING QUEUE ══════════ -->
+<div class="tab-panel" id="tab-pending">
+  <div class="controls">
+    <button class="filter-chip on" id="sf-pending"  data-sfilter="pending">Pending</button>
+    <button class="filter-chip"    id="sf-approved" data-sfilter="approved">Approved</button>
+    <button class="filter-chip"    id="sf-rejected" data-sfilter="rejected">Rejected</button>
+    <button class="filter-chip"    id="sf-all"      data-sfilter="all">All</button>
+    <button class="btn-topbar" onclick="loadSubmissions()">↻ Refresh</button>
+  </div>
+  <div class="queue" id="queue"><div class="empty-msg">Loading…</div></div>
+</div>
+
+<!-- ══════════ REVIEWS ══════════ -->
+<div class="tab-panel" id="tab-reviews">
+  <div class="controls">
+    <input class="search-input" id="rev-search" type="text"
+           placeholder="🔍 Search review text, place, user id…" oninput="debouncedReviews()" />
+    <button class="filter-chip" id="rev-clear" style="display:none"
+            onclick="clearReviewPlaceFilter()">✕ Place filter</button>
+  </div>
+  <div class="queue" id="review-list"><div class="empty-msg">Loading…</div></div>
+</div>
+
+<!-- ══════════ ANNOUNCEMENTS ══════════ -->
+<div class="tab-panel" id="tab-announcements">
+  <div class="controls">
+    <button class="filter-chip on" data-afilter="pending">Pending</button>
+    <button class="filter-chip"    data-afilter="approved">Sent</button>
+    <button class="filter-chip"    data-afilter="rejected">Rejected</button>
+    <button class="filter-chip"    data-afilter="all">All</button>
+    <button class="btn-topbar" onclick="openPostModal()">＋ Post as admin</button>
+    <button class="btn-topbar" onclick="loadAnnouncements()">↻ Refresh</button>
+  </div>
+  <div class="queue" id="ann-list"><div class="empty-msg">Loading…</div></div>
+</div>
+
+<!-- ══════════ OWNERS ══════════ -->
+<div class="tab-panel" id="tab-claims">
+  <div class="controls">
+    <button class="btn-topbar" onclick="openOwnerModal()">＋ Assign owner</button>
+    <button class="btn-topbar" onclick="loadClaims()">↻ Refresh</button>
+  </div>
+  <div class="queue" id="claim-list"><div class="empty-msg">Loading…</div></div>
+</div>
+
+<!-- ══════════ SUBSCRIBERS ══════════ -->
+<div class="tab-panel" id="tab-subscribers">
+  <div class="w-stats" id="w-stats"></div>
+  <div class="controls">
+    <button class="filter-chip on" data-wview="places">Most watched</button>
+    <button class="filter-chip"    data-wview="people">People</button>
+    <button class="filter-chip"    data-wview="areas">Areas</button>
+    <button class="filter-chip"    data-wview="messages">Messages</button>
+    <input class="search-input" id="w-search" type="text" hidden
+           placeholder="🔍 Name, @username or Telegram ID" oninput="debouncedPeople()" />
+    <select class="search-input" id="w-msg-status" hidden onchange="loadWatchView()" style="max-width:150px">
+      <option value="all">All messages</option>
+      <option value="sent">Sent</option>
+      <option value="queued">Queued</option>
+      <option value="failed">Failed</option>
+    </select>
+    <button class="btn-topbar" onclick="loadSubscribersTab()">↻ Refresh</button>
+  </div>
+  <div class="queue" id="w-list"><div class="empty-msg">Loading…</div></div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <h3 id="formTitle">➕ Add New Place</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Building Type</label>
+        <select id="f-type">
+          <option value="Masjid">🕌 Masjid</option>
+          <option value="Oshxona">🍽 Oshxona</option>
+          <option value="Do'kon">🛒 Do'kon</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Unique Number</label>
+        <input id="f-number" type="text" placeholder="e.g. 776" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Name</label>
+      <input id="f-name" type="text" placeholder="Place name" />
+    </div>
+
+    <div class="form-group">
+      <label>Address (Korean)</label>
+      <input id="f-address" type="text" placeholder="경기 광주시 역동로 47" />
+      <button class="btn-geo" id="geoBtn" onclick="fetchGeo()">📍 Auto-fill Lat/Lng from address</button>
+      <div class="form-hint" id="geoHint"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>City (Korean)</label>
+        <input id="f-cityKr" type="text" placeholder="광주시" />
+      </div>
+      <div class="form-group">
+        <label>City (English)</label>
+        <input id="f-cityEn" type="text" placeholder="Gwangju" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Latitude</label>
+        <input id="f-lat" type="text" placeholder="37.xxxx" />
+      </div>
+      <div class="form-group">
+        <label>Longitude</label>
+        <input id="f-lng" type="text" placeholder="127.xxxx" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Phone</label>
+      <input id="f-tel" type="text" placeholder="010-xxxx-xxxx" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Kakao Map Link</label>
+        <input id="f-kakao" type="text" placeholder="https://kko.to/..." />
+      </div>
+      <div class="form-group">
+        <label>Naver Map Link</label>
+        <input id="f-naver" type="text" placeholder="https://naver.me/..." />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Photo Path</label>
+      <input id="f-photo" type="text" placeholder="Photos/776" />
+      <div class="form-hint">Auto-filled as Photos/{number}</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Telegram</label>
+        <input id="f-telegram" type="text" placeholder="https://t.me/username" />
+      </div>
+      <div class="form-group">
+        <label>TikTok</label>
+        <input id="f-tiktok" type="text" placeholder="https://www.tiktok.com/@user" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Instagram</label>
+      <input id="f-instagram" type="text" placeholder="https://www.instagram.com/user/" />
+    </div>
+
+    <div class="form-group">
+      <label>Info note (opening hours, days off)</label>
+      <textarea id="f-note" maxlength="500"
+                placeholder="Du-Ju: 11:00 - 22:00&#10;Shanba: yopiq"></textarea>
+      <div class="form-hint">Max 500 characters. Empty clears it.</div>
+    </div>
+
+    <!-- Shown when adding a place, and when an edit changes the name or phone. -->
+    <div class="notify-box" id="formNotify" hidden>
+      <div class="notify-top">
+        <span class="notify-label">🔔 Subscribers</span>
+        <span class="notify-what" id="formNotifyWhat"></span>
+      </div>
+      <div class="notify-seg" role="radiogroup" aria-label="Notify subscribers">
+        <label><input type="radio" name="form-notify" value="0" checked><span>🔕 Silent</span></label>
+        <label><input type="radio" name="form-notify" value="1"><span>📨 Send</span></label>
+      </div>
+      <div class="notify-reach" id="formNotifyReach"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeModal('formModal')">Cancel</button>
+      <button class="btn-modal btn-save" id="saveBtn" onclick="savePlace()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW EDIT MODAL -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <h3>✏️ Edit Review</h3>
+    <div class="form-group">
+      <label>Rating</label>
+      <div class="rating-picker" id="ratingPicker"></div>
+    </div>
+    <div class="form-group">
+      <label>Review Text</label>
+      <textarea id="r-text" placeholder="(empty)"></textarea>
+    </div>
+    <div class="form-hint" id="r-meta"></div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeModal('reviewModal')">Cancel</button>
+      <button class="btn-modal btn-save" onclick="saveReview()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW DELETE CONFIRM -->
+<div class="modal-overlay" id="reviewDeleteModal">
+  <div class="modal">
+    <h3>⚠️ Delete Review</h3>
+    <div class="confirm-text">
+      Delete this review permanently?<br>
+      <span class="confirm-name" id="reviewDeleteWho"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeModal('reviewDeleteModal')">Cancel</button>
+      <button class="btn-modal btn-danger" onclick="confirmDeleteReview()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>⚠️ Delete Place</h3>
+    <div class="confirm-text">
+      Are you sure you want to delete <span class="confirm-name" id="deleteName"></span>?
+      <br><span id="deleteExtra"></span>
+      <br>This action cannot be undone.
+    </div>
+    <div class="notify-box" id="deleteNotify" hidden>
+      <div class="notify-top">
+        <span class="notify-label">🔔 Subscribers</span>
+        <span class="notify-what" id="deleteNotifyWhat"></span>
+      </div>
+      <div class="notify-seg" role="radiogroup" aria-label="Notify subscribers">
+        <label><input type="radio" name="delete-notify" value="0" checked><span>🔕 Silent</span></label>
+        <label><input type="radio" name="delete-notify" value="1"><span>📨 Send</span></label>
+      </div>
+      <div class="notify-reach" id="deleteNotifyReach"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn-modal btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST AS ADMIN -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal">
+    <h3>📣 Post an announcement</h3>
+    <div class="form-group">
+      <label>Place</label>
+      <select id="post-place"></select>
+    </div>
+    <div class="form-group">
+      <label>Text (sent right away, no review)</label>
+      <textarea id="post-text" maxlength="1000" placeholder="Hayit namozi 07:00, 08:00 va 09:00 da o'qiladi."></textarea>
+      <div class="form-hint" id="post-count">0 / 1000</div>
+    </div>
+    <div class="notify-reach" id="post-reach"></div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeModal('postModal')">Cancel</button>
+      <button class="btn-modal btn-save" id="postBtn" onclick="sendAdminPost()">📨 Send now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSIGN / REASSIGN OWNER -->
+<div class="modal-overlay" id="ownerModal">
+  <div class="modal">
+    <h3 id="ownerTitle">🏷️ Assign owner</h3>
+    <div class="form-group">
+      <label>Place (restaurants and shops)</label>
+      <select id="owner-place"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Telegram ID</label>
+        <input id="owner-tg" type="text" inputmode="numeric" placeholder="5512093847" />
+      </div>
+      <div class="form-group">
+        <label>Name / @username (optional)</label>
+        <input id="owner-name" type="text" placeholder="Bobur A. (@bobur_halal)" />
+      </div>
+    </div>
+    <div class="form-hint">Replaces the current owner, if there is one. Nobody is messaged.</div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" onclick="closeModal('ownerModal')">Cancel</button>
+      <button class="btn-modal btn-save" onclick="saveOwner()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = '/api/admin/places';
+const PAGE_SIZE = 50;          // cards appended per chunk; the DOM is the bottleneck
+let allPlaces = [];
+let placeById = new Map();     // lookups replace stringifying each row into onclick
+let filtered = [];             // current search/filter result, paged into the DOM
+let shown = 0;                 // how many of `filtered` are actually rendered
+let placesLoaded = false;      // nothing is fetched until the operator asks
+let placesLoading = false;
+let currentFilter = 'all';
+let editingId = null;
+let deletingId = null;
+let editingOriginal = null;    // { name, tel } when the edit form opened
+let debounceT = null;
+
+// ══ INIT ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Check session
+  fetch('/admin/check-session').then(r => r.json()).then(d => {
+    if (!d.authenticated) window.location.href = '/admin';
+    // The place table is the heavy one, so it stays behind the Load button.
+    // The pending count is a single small query and still runs on open.
+    else {
+      loadSubmissions();
+      loadNotifyBadges();
+      // The bot's "Open in admin panel" button links to #announcements / #claims.
+      openTabFromHash();
+    }
+  });
+  currentFilter = 'all';
+  const btn = document.getElementById('f-all');
+  if (btn) btn.classList.add('on');
+});
+
+document.querySelectorAll('#tab-places .filter-chip[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setFilter(btn.dataset.filter);
+  });
+});
+
+// ══ DATA ═══════════════════════════════════════════
+async function loadPlaces() {
+  if (placesLoading) return false;
+  placesLoading = true;
+  const gateBtn = document.getElementById('loadBtn');
+  const hint = document.getElementById('loadHint');
+  if (gateBtn) { gateBtn.disabled = true; gateBtn.textContent = '⏳ Loading…'; }
+  if (hint) hint.textContent = 'Fetching from the server…';
+
+  try {
+    const r = await fetch(API);
+    const d = await r.json();
+    if (d.success) {
+      allPlaces = d.places || [];
+      placeById = new Map(allPlaces.map(p => [String(p.Unique_number), p]));
+      await loadWatchCounts();
+      placesLoaded = true;
+      document.getElementById('placeControls').classList.remove('is-locked');
+      updateStats();
+      renderList();
+      showToast(`✅ ${allPlaces.length} places loaded`);
+      return true;
+    }
+    throw new Error(d.error || 'load failed');
+  } catch {
+    showToast('Failed to load places', true);
+    if (hint) hint.textContent = '❌ Load failed — try again';
+    return false;
+  } finally {
+    placesLoading = false;
+    if (gateBtn) { gateBtn.disabled = false; gateBtn.textContent = '⬇ Load all places'; }
+  }
+}
+
+// Refresh only if the operator already chose to load; a save must never
+// silently pull the whole table back in behind their back.
+function refreshPlacesIfLoaded() { if (placesLoaded) loadPlaces(); }
+
+// For actions that genuinely need the full list (add needs the max number,
+// edit-from-queue needs the row) — load on demand rather than failing.
+async function ensurePlaces() {
+  if (placesLoaded) return true;
+  showToast('Loading places first…');
+  return await loadPlaces();
+}
+
+function updateStats() {
+  if (!placesLoaded) return;
+  const counts = { Masjid: 0, Oshxona: 0, "Do'kon": 0 };
+  allPlaces.forEach(p => { if (counts.hasOwnProperty(p.Building_type)) counts[p.Building_type]++; });
+  document.getElementById('s-masjid').textContent = counts.Masjid;
+  document.getElementById('s-oshxona').textContent = counts.Oshxona;
+  document.getElementById('s-dokon').textContent = counts["Do'kon"];
+}
+
+// ══ RENDER ═════════════════════════════════════════
+function debouncedRender() {
+  clearTimeout(debounceT);
+  debounceT = setTimeout(renderList, 250);
+}
+
+function renderList() {
+  if (!placesLoaded) return;          // the gate is still showing
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  const list = document.getElementById('place-list');
+
+  filtered = allPlaces;
+  if (currentFilter !== 'all') filtered = filtered.filter(p => p.Building_type === currentFilter);
+  if (search) {
+    filtered = filtered.filter(p =>
+      (p.Name || '').toLowerCase().includes(search) ||
+      (p.City_English || '').toLowerCase().includes(search) ||
+      (p.City_Korean || '').toLowerCase().includes(search) ||
+      (p.Actual_address || '').toLowerCase().includes(search) ||
+      String(p.Unique_number).includes(search)
+    );
+  }
+
+  shown = 0;
+  list.innerHTML = '';
+  list.appendChild(metaRow());
+  if (!filtered.length) {
+    const e = document.createElement('div');
+    e.className = 'empty-msg';
+    e.textContent = 'No places found';
+    list.appendChild(e);
+    updateMeta();
+    return;
+  }
+  appendPage();
+}
+
+function metaRow() {
+  const m = document.createElement('div');
+  m.className = 'list-meta';
+  m.id = 'listMeta';
+  m.innerHTML = '<span id="listCount"></span>' +
+    '<button class="btn-reload" onclick="loadPlaces()">↻ Reload from server</button>';
+  return m;
+}
+
+function updateMeta() {
+  const c = document.getElementById('listCount');
+  if (c) c.textContent = `Showing ${Math.min(shown, filtered.length)} of ${filtered.length}` +
+    (filtered.length !== allPlaces.length ? ` (${allPlaces.length} loaded)` : '');
+}
+
+// Cards go in one page at a time. Building every row at once is what locks
+// the browser up, not the request.
+function appendPage() {
+  const list = document.getElementById('place-list');
+  const old = document.getElementById('moreRow');
+  if (old) old.remove();
+
+  const slice = filtered.slice(shown, shown + PAGE_SIZE);
+  const frag = document.createElement('div');
+  frag.style.display = 'contents';
+  frag.innerHTML = slice.map(cardHTML).join('');
+  list.appendChild(frag);
+  shown += slice.length;
+
+  if (shown < filtered.length) {
+    const row = document.createElement('div');
+    row.className = 'load-more-row';
+    row.id = 'moreRow';
+    const left = filtered.length - shown;
+    row.innerHTML = `<button class="btn-more" onclick="appendPage()">` +
+      `Show ${Math.min(PAGE_SIZE, left)} more · ${left} remaining</button>`;
+    list.appendChild(row);
+  }
+  updateMeta();
+}
+
+function cardHTML(p) {
+  const typeClass = p.Building_type === 'Masjid' ? 'type-masjid' :
+                    p.Building_type === 'Oshxona' ? 'type-oshxona' : 'type-dokon';
+  const badgeClass = p.Building_type === 'Masjid' ? 'bg-green' :
+                     p.Building_type === 'Oshxona' ? 'bg-orange' : 'bg-blue';
+  const typeIcon = p.Building_type === 'Masjid' ? '🕌' :
+                   p.Building_type === 'Oshxona' ? '🍽' : '🛒';
+
+  return `
+      <div class="place-card ${typeClass}">
+        <div class="place-header">
+          <div>
+            <div class="place-name">${esc(p.Name)}</div>
+            <div class="place-id">#${p.Unique_number} · ${esc(p.City_English)}</div>
+          </div>
+        </div>
+        <div class="place-badges">
+          <span class="badge ${badgeClass}">${typeIcon} ${p.Building_type}</span>
+          <span class="badge bg-muted">${esc(p.City_Korean || '')}</span>
+        </div>
+        <div class="place-socials">
+          <span class="sc ${p.telegram_url ? 'on' : ''}">TG</span>
+          <span class="sc ${p.tiktok_url ? 'on' : ''}">TT</span>
+          <span class="sc ${p.instagram_url ? 'on' : ''}">IG</span>
+          <span class="sc ${p.owner_note ? 'on' : ''}">NOTE</span>
+        </div>
+        <div class="place-detail">
+          <b>Address:</b> ${esc(p.Actual_address || '—')}<br>
+          <b>Tel:</b> ${esc(p.Tel || '—')}<br>
+          <b>Coords:</b> ${p.Latitude}, ${p.Longitude}
+        </div>
+        <div class="place-actions">
+          <button class="btn-edit" onclick="showWatchersFor(${p.Unique_number})">🔔 Watchers (${watchCounts[String(p.Unique_number)] || 0})</button>
+          <button class="btn-edit" onclick="showReviewsFor(${p.Unique_number})">⭐ Reviews (${p.review_count || 0})</button>
+          <button class="btn-edit" onclick="openEditModalById('${esc(String(p.Unique_number))}')">✏️ Edit</button>
+          <button class="btn-delete" onclick="openDeleteModal('${esc(String(p.Unique_number))}')">🗑 Delete</button>
+        </div>
+      </div>`;
+}
+
+// ══ FILTERS ════════════════════════════════════════
+function setFilter(f) {
+  currentFilter = f;
+  // Scoped: the Pending tab's chips and the reviews place-filter share this
+  // class, and clearing them here would fight their own active state.
+  document.querySelectorAll('#tab-places .filter-chip').forEach(c => c.classList.remove('on'));
+  const btn = document.getElementById('f-' + f);
+  if (btn) btn.classList.add('on');
+  if (placesLoaded) renderList();
+}
+
+// ══ ADD / EDIT MODAL ═══════════════════════════════
+async function openAddModal() {
+  // Unique_number is derived from the loaded rows; opening this against an
+  // empty list would hand out a number that already exists.
+  if (!(await ensurePlaces())) return;
+  editingId = null;
+  document.getElementById('formTitle').textContent = '➕ Add New Place';
+  clearForm();
+  // Auto-generate next number
+  const maxNum = allPlaces.reduce((max, p) => Math.max(max, parseInt(p.Unique_number) || 0), 0);
+  document.getElementById('f-number').value = maxNum + 1;
+  document.getElementById('f-photo').value = `Photos/${maxNum + 1}`;
+  editingOriginal = null;
+  resetNotify('form', 'new');
+  document.getElementById('formModal').classList.add('show');
+}
+
+function openEditModalById(id) {
+  const place = placeById.get(String(id));
+  if (!place) { showToast('Place not found — reload the list', true); return; }
+  openEditModal(place);
+}
+
+function openEditModal(place) {
+  editingId = place.Unique_number;
+  document.getElementById('formTitle').textContent = '✏️ Edit Place';
+  document.getElementById('f-type').value = place.Building_type;
+  document.getElementById('f-number').value = place.Unique_number;
+  document.getElementById('f-name').value = place.Name || '';
+  document.getElementById('f-address').value = place.Actual_address || '';
+  document.getElementById('f-cityKr').value = place.City_Korean || '';
+  document.getElementById('f-cityEn').value = place.City_English || '';
+  document.getElementById('f-lat').value = place.Latitude || '';
+  document.getElementById('f-lng').value = place.Longitude || '';
+  document.getElementById('f-tel').value = place.Tel || '';
+  document.getElementById('f-kakao').value = place.KakaoMap_link || '';
+  document.getElementById('f-naver').value = place.NaverMap_Link || '';
+  document.getElementById('f-photo').value = place.Photo_path || '';
+  document.getElementById('f-telegram').value = place.telegram_url || '';
+  document.getElementById('f-tiktok').value = place.tiktok_url || '';
+  document.getElementById('f-instagram').value = place.instagram_url || '';
+  document.getElementById('f-note').value = place.owner_note || '';
+  editingOriginal = { name: place.Name || '', tel: place.Tel || '' };
+  resetNotify('form', 'changed');
+  document.getElementById('formModal').classList.add('show');
+}
+
+function clearForm() {
+  ['f-name','f-address','f-cityKr','f-cityEn','f-lat','f-lng','f-tel','f-kakao','f-naver',
+   'f-photo','f-number','f-telegram','f-tiktok','f-instagram','f-note'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-type').value = 'Masjid';
+  document.getElementById('geoHint').textContent = '';
+}
+
+// ══ GEO LOOKUP ═════════════════════════════════════
+async function fetchGeo() {
+  const addr = document.getElementById('f-address').value.trim();
+  if (!addr) { showToast('Enter address first', true); return; }
+
+  const btn = document.getElementById('geoBtn');
+  const hint = document.getElementById('geoHint');
+  btn.disabled = true;
+  hint.textContent = 'Fetching...';
+
+  try {
+    const r = await fetch(`/api/admin/places/geocode?address=${encodeURIComponent(addr)}`);
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('f-lat').value = d.latitude;
+      document.getElementById('f-lng').value = d.longitude;
+      hint.textContent = `✅ Found: ${d.latitude}, ${d.longitude}`;
+      updateNotify('form');
+    } else {
+      hint.textContent = '❌ Address not found';
+    }
+  } catch {
+    hint.textContent = '❌ Geocode request failed';
+  }
+  btn.disabled = false;
+}
+
+// ══ SAVE ═══════════════════════════════════════════
+async function savePlace() {
+  const data = {
+    Building_type: document.getElementById('f-type').value,
+    Unique_number: document.getElementById('f-number').value,
+    Name: document.getElementById('f-name').value,
+    Actual_address: document.getElementById('f-address').value,
+    City_Korean: document.getElementById('f-cityKr').value,
+    City_English: document.getElementById('f-cityEn').value,
+    Latitude: parseFloat(document.getElementById('f-lat').value) || 0,
+    Longitude: parseFloat(document.getElementById('f-lng').value) || 0,
+    Tel: document.getElementById('f-tel').value,
+    KakaoMap_link: document.getElementById('f-kakao').value,
+    NaverMap_Link: document.getElementById('f-naver').value,
+    Photo_path: document.getElementById('f-photo').value,
+    // Blank clears the field. The API stores NULL rather than '', because the
+    // mini app treats NULL as "nothing registered" and '' as an empty link.
+    telegram_url: document.getElementById('f-telegram').value,
+    tiktok_url: document.getElementById('f-tiktok').value,
+    instagram_url: document.getElementById('f-instagram').value,
+    owner_note: document.getElementById('f-note').value,
+    // Silent unless Send is picked. Edits only announce a name or phone change.
+    notify: notifyChoice('form'),
+  };
+
+  if (!data.Name || !data.Unique_number) {
+    showToast('Name and number are required', true);
+    return;
+  }
+
+  try {
+    const url = editingId ? `${API}/${editingId}` : API;
+    const method = editingId ? 'PUT' : 'POST';
+    const r = await fetch(url, {
+      method, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const d = await r.json();
+    if (d.success) {
+      const msg = (editingId ? '✏️ Place updated' : '✅ Place added') + notifySuffix(d, data.notify);
+      showToast(msg, !!d.notifyError);
+      closeModal('formModal');
+      // The reload shows its own "N places loaded" toast; the save result,
+      // with the notification count, is shown again once it is done.
+      if (placesLoaded) loadPlaces().then(() => showToast(msg, !!d.notifyError));
+    } else {
+      showToast(d.error || 'Save failed', true);
+    }
+  } catch { showToast('Request failed', true); }
+}
+
+// ══ DELETE ══════════════════════════════════════════
+function openDeleteModal(id) {
+  const place = placeById.get(String(id));
+  if (!place) { showToast('Place not found — reload the list', true); return; }
+  const reviewCount = place.review_count || 0;
+  deletingId = id;
+  document.getElementById('deleteName').textContent = `#${id} ${place.Name || ''}`;
+  const extra = document.getElementById('deleteExtra');
+  extra.textContent = reviewCount
+    ? `Its ${reviewCount} review(s) and any pending submissions will be deleted too.`
+    : 'Any pending submissions for it will be deleted too.';
+  resetNotify('delete', 'closed');
+  document.getElementById('deleteModal').classList.add('show');
+}
+
+async function confirmDelete() {
+  if (!deletingId) return;
+  const notify = notifyChoice('delete');
+  closeModal('deleteModal');
+  try {
+    const r = await fetch(`${API}/${deletingId}${notify ? '?notify=1' : ''}`, { method: 'DELETE' });
+    const d = await r.json();
+    if (d.success) {
+      const msg = (d.reviews_deleted
+        ? `🗑 Place + ${d.reviews_deleted} review(s) deleted`
+        : '🗑 Place deleted') + notifySuffix(d, notify);
+      showToast(msg, !!d.notifyError);
+      // Shown again after the reload's own "N places loaded" toast.
+      if (placesLoaded) loadPlaces().then(() => showToast(msg, !!d.notifyError));
+      loadSubmissions();
+    } else {
+      showToast(d.error || 'Delete failed', true);
+    }
+  } catch { showToast('Request failed', true); }
+  deletingId = null;
+}
+
+// ══ NOTIFY: Silent / Send ══════════════════════════
+// Every add, name/phone edit and delete starts on Silent; picking Send is a
+// deliberate act. The count shows who Send would reach right now. Other
+// field edits never notify, so the box stays hidden for them.
+const REACH_API = '/api/admin/notify/reach';
+const notifyState = { form: { event: null, timer: null, seq: 0, key: '' }, delete: { event: null, timer: null, seq: 0, key: '' } };
+
+function resetNotify(which, event) {
+  notifyState[which].event = event;
+  notifyState[which].key = '';
+  document.querySelector(`input[name="${which}-notify"][value="0"]`).checked = true;
+  document.getElementById(which + 'NotifyReach').textContent = '';
+  updateNotify(which);
+}
+
+function formChanges() {
+  if (!editingOriginal) return [];
+  const out = [];
+  if (document.getElementById('f-name').value.trim() !== editingOriginal.name.trim()) out.push('Name changed');
+  if (document.getElementById('f-tel').value.trim() !== editingOriginal.tel.trim()) out.push('Phone changed');
+  return out;
+}
+
+function notifyVisible(which) {
+  const ev = notifyState[which].event;
+  if (which === 'form' && ev === 'changed') return formChanges().length > 0;
+  return !!ev;
+}
+
+function notifyChoice(which) {
+  if (!notifyVisible(which)) return false;
+  const r = document.querySelector(`input[name="${which}-notify"]:checked`);
+  return !!r && r.value === '1';
+}
+
+function updateNotify(which) {
+  const box = document.getElementById(which + 'Notify');
+  const show = notifyVisible(which);
+  box.hidden = !show;
+  if (!show) return;
+  const ev = notifyState[which].event;
+  document.getElementById(which + 'NotifyWhat').textContent =
+    ev === 'new' ? 'New place opened' : ev === 'closed' ? 'Place closed' : formChanges().join(' + ');
+  box.classList.toggle('is-send', notifyChoice(which));
+  const st = notifyState[which];
+  clearTimeout(st.timer);
+  st.timer = setTimeout(() => loadReach(which), 300);
+}
+
+async function loadReach(which) {
+  const st = notifyState[which];
+  const out = document.getElementById(which + 'NotifyReach');
+  const params = new URLSearchParams({ event: st.event });
+  if (which === 'delete') {
+    params.set('place_id', deletingId);
+  } else {
+    if (editingId) params.set('place_id', editingId);
+    const lat = parseFloat(document.getElementById('f-lat').value);
+    const lon = parseFloat(document.getElementById('f-lng').value);
+    if (lat && lon) { params.set('lat', lat); params.set('lon', lon); }
+    else if (!editingId) { st.key = ''; out.textContent = 'Fill in latitude and longitude to see who would be told.'; return; }
+    params.set('type', document.getElementById('f-type').value);
+  }
+  // Typing a new name does not change who would be told: no need to recount.
+  if (params.toString() === st.key) return;
+  st.key = params.toString();
+  const my = ++st.seq;
+  out.textContent = 'Counting subscribers…';
+  try {
+    const r = await fetch(`${REACH_API}?${params}`);
+    const d = await r.json();
+    if (my !== st.seq) return;
+    if (!d.success) { st.key = ''; out.textContent = 'Could not count subscribers.'; return; }
+    if (!d.count) { out.textContent = 'Nobody is subscribed here yet: Send would message no one.'; return; }
+    out.textContent = `Send would message ${d.count} ${d.count === 1 ? 'person' : 'people'}` +
+      (st.event === 'new' ? ' watching this area.' : ` (${d.placeWatchers} watching the place, ${d.areaWatchers} by area).`);
+  } catch {
+    if (my === st.seq) { st.key = ''; out.textContent = 'Could not count subscribers.'; }
+  }
+}
+
+function notifySuffix(d, wanted) {
+  if (d.notifyError) return ' · ⚠️ notification failed (see server log)';
+  if (!wanted) return '';
+  return d.notified ? ` · 📨 ${d.notified} message(s) queued` : ' · nobody to notify';
+}
+
+['form', 'delete'].forEach(which => {
+  document.querySelectorAll(`input[name="${which}-notify"]`).forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById(which + 'Notify').classList.toggle('is-send', notifyChoice(which));
+    });
+  });
+});
+['f-name', 'f-tel', 'f-lat', 'f-lng', 'f-type'].forEach(id => {
+  document.getElementById(id).addEventListener(id === 'f-type' ? 'change' : 'input', () => updateNotify('form'));
+});
+
+// ══ TABS ═══════════════════════════════════════════
+let currentTab = 'places';
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+function switchTab(name) {
+  currentTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === name));
+  document.querySelectorAll('.tab-panel').forEach(p =>
+    p.classList.toggle('on', p.id === 'tab-' + name));
+  if (name === 'pending') loadSubmissions();
+  if (name === 'reviews') loadReviews();
+  if (name === 'announcements') loadAnnouncements();
+  if (name === 'claims') loadClaims();
+  if (name === 'subscribers') loadSubscribersTab();
+}
+
+// ══ SUBMISSION QUEUE ═══════════════════════════════
+const SUB_API = '/api/admin/submissions';
+const FIELD_LABEL = { telegram: 'Telegram', tiktok: 'TikTok',
+                      instagram: 'Instagram', note: 'Info note' };
+let subFilter = 'pending';
+
+document.querySelectorAll('[data-sfilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    subFilter = btn.dataset.sfilter;
+    document.querySelectorAll('[data-sfilter]').forEach(c => c.classList.remove('on'));
+    btn.classList.add('on');
+    loadSubmissions();
+  });
+});
+
+async function loadSubmissions() {
+  const list = document.getElementById('queue');
+  try {
+    const r = await fetch(`${SUB_API}?status=${encodeURIComponent(subFilter)}`);
+    const d = await r.json();
+    if (!d.success) { list.innerHTML = '<div class="empty-msg">Failed to load</div>'; return; }
+    updatePendingBadge(d.counts ? d.counts.pending : 0);
+    renderSubmissions(d.submissions || []);
+  } catch { list.innerHTML = '<div class="empty-msg">Failed to load</div>'; }
+}
+
+function updatePendingBadge(n) {
+  const b = document.getElementById('pendingBadge');
+  b.textContent = n;
+  b.hidden = !n;
+}
+
+function renderSubmissions(rows) {
+  const list = document.getElementById('queue');
+  if (!rows.length) { list.innerHTML = '<div class="empty-msg">Nothing here</div>'; return; }
+
+  list.innerHTML = rows.map(s => {
+    const pending = s.status === 'pending';
+    const who = s.submitted_by_username
+      ? '@' + esc(s.submitted_by_username) : 'unknown';
+    // No place name means the place was deleted after the submission landed.
+    const place = s.place_name
+      ? esc(s.place_name)
+      : `<span class="sub-orphan">deleted place</span>`;
+    const cur = s.current_value
+      ? esc(s.current_value)
+      : '<span class="diff-empty">(nothing)</span>';
+
+    return `
+      <div class="sub-card is-${s.status}">
+        <div class="sub-head">
+          <div>
+            <div class="sub-place">${place} <span class="badge bg-blue">${FIELD_LABEL[s.field] || esc(s.field)}</span></div>
+            <div class="sub-meta">#${s.place_id} · ${who} (${s.submitted_by_tg_id}) · ${esc(s.created_at)}</div>
+          </div>
+          ${pending ? '' : `<span class="sub-verdict">${s.status} ${esc(s.reviewed_at || '')}</span>`}
+        </div>
+
+        <div class="diff">
+          <div class="diff-cell">
+            <div class="diff-label">Current</div>
+            <div class="diff-val">${cur}</div>
+          </div>
+          <div class="diff-cell is-new">
+            <div class="diff-label">Proposed${pending ? ' · editable' : ''}</div>
+            ${pending
+              ? (s.field === 'note'
+                  ? `<textarea class="diff-edit" id="val-${s.id}" rows="3">${esc(s.value)}</textarea>`
+                  : `<input class="diff-edit" id="val-${s.id}" value="${esc(s.value)}" />`)
+              : `<div class="diff-val">${esc(s.value)}</div>`}
+          </div>
+        </div>
+
+        <div class="sub-actions">
+          ${pending ? `
+            <button class="btn-approve" onclick="reviewSubmission(${s.id},'approve')">✓ Approve</button>
+            <button class="btn-reject" onclick="reviewSubmission(${s.id},'reject')">✕ Reject</button>
+          ` : ''}
+          ${s.field !== 'note' ? `<a class="btn-open" href="${esc(s.value)}" target="_blank" rel="noopener noreferrer">Open ↗</a>` : ''}
+          ${s.place_name ? `<button class="btn-open" onclick="editPlaceById(${s.place_id})">✏️ Edit place</button>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function reviewSubmission(id, action) {
+  const valEl = document.getElementById('val-' + id);
+  // Approving sends whatever is in the Proposed box, so a typo can be fixed
+  // in place. The server re-validates it like any public submission.
+  const payload = {};
+  if (action === 'approve' && valEl) payload.value = valEl.value;
+  try {
+    const r = await fetch(`${SUB_API}/${id}/${action}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.success) {
+      showToast(action === 'approve' ? '✅ Approved' : '🗑 Rejected');
+      loadSubmissions();
+      refreshPlacesIfLoaded();   // an approve just changed the place itself
+    } else {
+      showToast(d.error || 'Failed', true);
+    }
+  } catch { showToast('Request failed', true); }
+}
+
+// The queue is history: its rows show what was proposed, not what the place
+// says now. Editing the live value is the place editor's job, so jump there
+// rather than growing a second way to write the same column.
+async function editPlaceById(placeId) {
+  if (!(await ensurePlaces())) return;
+  const place = placeById.get(String(placeId));
+  if (!place) { showToast('Place not found — reload the list', true); return; }
+  switchTab('places');
+  openEditModal(place);
+}
+
+// ══ REVIEWS ════════════════════════════════════════
+const REV_API = '/api/admin/reviews';
+let reviewPlaceFilter = null;
+let currentReviews = [];
+let editingReview = null;
+let deletingReview = null;
+let reviewRating = 5;
+let revDebounce = null;
+
+function debouncedReviews() {
+  clearTimeout(revDebounce);
+  revDebounce = setTimeout(loadReviews, 250);
+}
+
+function showReviewsFor(placeId) {
+  reviewPlaceFilter = placeId;
+  document.getElementById('rev-clear').style.display = '';
+  switchTab('reviews');
+}
+
+function clearReviewPlaceFilter() {
+  reviewPlaceFilter = null;
+  document.getElementById('rev-clear').style.display = 'none';
+  loadReviews();
+}
+
+async function loadReviews() {
+  const list = document.getElementById('review-list');
+  const q = document.getElementById('rev-search').value.trim();
+  const params = new URLSearchParams();
+  if (reviewPlaceFilter) params.set('place_id', reviewPlaceFilter);
+  if (q) params.set('q', q);
+  try {
+    const r = await fetch(`${REV_API}?${params.toString()}`);
+    const d = await r.json();
+    if (!d.success) { list.innerHTML = '<div class="empty-msg">Failed to load</div>'; return; }
+    renderReviews(d.reviews || []);
+  } catch { list.innerHTML = '<div class="empty-msg">Failed to load</div>'; }
+}
+
+function stars(n) {
+  n = Math.max(0, Math.min(5, parseInt(n) || 0));
+  return '★'.repeat(n) + '☆'.repeat(5 - n);
+}
+
+function renderReviews(rows) {
+  currentReviews = rows;
+  const list = document.getElementById('review-list');
+  if (!rows.length) { list.innerHTML = '<div class="empty-msg">No reviews found</div>'; return; }
+
+  list.innerHTML = rows.map((r, i) => {
+    const place = r.place_name ? esc(r.place_name)
+                               : `<span class="sub-orphan">deleted place</span>`;
+    const text = (r.Review_Text || '').trim();
+    return `
+      <div class="rev-card">
+        <div class="rev-head">
+          <div>
+            <div class="rev-place">${place}</div>
+            <div class="rev-meta">#${r.Unique_number} · user ${esc(r.User_ID)} · ${esc(r.Timestamp || '')}</div>
+          </div>
+          <div class="rev-stars" title="${r.Rating}/5">${stars(r.Rating)}</div>
+        </div>
+        <div class="rev-text ${text ? '' : 'is-empty'}">${text ? esc(text) : '(no text)'}</div>
+        <div class="rev-actions">
+          <button class="btn-edit" onclick="openReviewModal(${i})">✏️ Edit</button>
+          <button class="btn-delete" onclick="openReviewDelete(${i})">🗑 Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openReviewModal(idx) {
+  const r = currentReviews[idx];
+  if (!r) return;
+  editingReview = r.id;
+  reviewRating = parseInt(r.Rating) || 5;
+  document.getElementById('r-text').value = r.Review_Text || '';
+  document.getElementById('r-meta').textContent =
+    `#${r.Unique_number} · user ${r.User_ID} · ${r.Timestamp || ''}`;
+  drawRatingPicker();
+  document.getElementById('reviewModal').classList.add('show');
+}
+
+function drawRatingPicker() {
+  const el = document.getElementById('ratingPicker');
+  el.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'rating-star' + (i <= reviewRating ? ' on' : '');
+    b.textContent = '★';
+    b.onclick = () => { reviewRating = i; drawRatingPicker(); };
+    el.appendChild(b);
+  }
+}
+
+async function saveReview() {
+  if (!editingReview) return;
+  try {
+    const r = await fetch(`${REV_API}/${editingReview}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        Rating: reviewRating,
+        Review_Text: document.getElementById('r-text').value
+      })
+    });
+    const d = await r.json();
+    if (d.success) {
+      showToast('✏️ Review updated');
+      closeModal('reviewModal');
+      loadReviews();
+    } else { showToast(d.error || 'Save failed', true); }
+  } catch { showToast('Request failed', true); }
+}
+
+function openReviewDelete(idx) {
+  const r = currentReviews[idx];
+  if (!r) return;
+  deletingReview = r.id;
+  document.getElementById('reviewDeleteWho').textContent =
+    `${r.place_name || 'deleted place'} · user ${r.User_ID}`;
+  document.getElementById('reviewDeleteModal').classList.add('show');
+}
+
+async function confirmDeleteReview() {
+  if (!deletingReview) return;
+  closeModal('reviewDeleteModal');
+  try {
+    const r = await fetch(`${REV_API}/${deletingReview}`, { method: 'DELETE' });
+    const d = await r.json();
+    if (d.success) {
+      showToast('🗑 Review deleted');
+      loadReviews();
+      refreshPlacesIfLoaded();   // the per-place review count just changed
+    } else { showToast(d.error || 'Delete failed', true); }
+  } catch { showToast('Request failed', true); }
+  deletingReview = null;
+}
+
+// ══ ANNOUNCEMENTS ══════════════════════════════════
+// Every post from the Mini App waits here. Approve sends whatever is in the
+// text box, so a typo can be fixed first. Sent and rejected posts stay as a
+// record; deleting one does not unsend messages already delivered.
+const ANN_API = '/api/admin/announcements';
+const TYPE_LABEL = { mosque: 'Mosque', restaurant: 'Restaurant', shop: 'Shop' };
+let annFilter = 'pending';
+
+document.querySelectorAll('[data-afilter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    annFilter = btn.dataset.afilter;
+    document.querySelectorAll('[data-afilter]').forEach(c => c.classList.remove('on'));
+    btn.classList.add('on');
+    loadAnnouncements();
+  });
+});
+
+function s_(v) { return esc(v == null ? '' : String(v)); }
+
+function openTabFromHash() {
+  const tab = location.hash.replace('#', '');
+  if (tab !== 'announcements' && tab !== 'claims' && tab !== 'subscribers') return;
+  switchTab(tab);
+  // On a phone the tab row scrolls sideways; bring the opened tab into view.
+  const el = document.querySelector(`.tab[data-tab="${tab}"]`);
+  if (el) el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
+// Also when the panel is already open and the bot link only changes the #.
+window.addEventListener('hashchange', openTabFromHash);
+
+async function loadNotifyBadges() {
+  try {
+    const d = await (await fetch('/api/admin/notify/stats')).json();
+    if (!d.success) return;
+    const a = document.getElementById('annBadge'), c = document.getElementById('claimBadge');
+    a.textContent = d.pendingAnnouncements; a.hidden = !d.pendingAnnouncements;
+    c.textContent = d.pendingClaims; c.hidden = !d.pendingClaims;
+  } catch {}
+}
+
+async function loadAnnouncements() {
+  const list = document.getElementById('ann-list');
+  list.innerHTML = '<div class="empty-msg">Loading…</div>';
+  try {
+    const d = await (await fetch(`${ANN_API}?status=${annFilter}`)).json();
+    if (!d.success) throw new Error(d.error);
+    renderAnnouncements(d.announcements);
+  } catch {
+    list.innerHTML = '<div class="empty-msg">Could not load announcements</div>';
+  }
+  loadNotifyBadges();
+}
+
+function renderAnnouncements(rows) {
+  const list = document.getElementById('ann-list');
+  if (!rows.length) { list.innerHTML = '<div class="empty-msg">Nothing here</div>'; return; }
+  list.innerHTML = rows.map(a => {
+    const pending = a.status === 'pending';
+    const place = a.place ? s_(a.place.name) : '<span class="sub-orphan">deleted place</span>';
+    const type = a.place ? `<span class="badge bg-blue">${TYPE_LABEL[a.place.type] || ''}</span>` : '';
+    const role = a.author_role === 'owner' ? '<span class="badge bg-green">owner</span>'
+               : a.author_role === 'admin' ? '<span class="badge bg-muted">admin</span>' : '';
+    const who = a.author_role === 'admin' ? 'admin' : `${s_(a.author_username)} · ID ${s_(a.author_tg_id)}`;
+    const verdict = pending ? '' : `<span class="sub-verdict">${a.status === 'approved'
+      ? `sent to ${s_(a.recipients)} · ${s_(a.sent_at)}` : `rejected · ${s_(a.reviewed_at)}`}</span>`;
+    const chips = [
+      pending && a.reach != null ? `<span class="badge bg-muted">~${s_(a.reach)} people</span>` : '',
+      `<span class="badge bg-muted">last 7 days: ${s_(a.last7)}</span>`,
+      `<span class="badge bg-muted">${s_(a.created_at)}</span>`].join('');
+    return `
+      <div class="sub-card ann-card is-${a.status}">
+        <div class="sub-head">
+          <div>
+            <div class="sub-place">${place} ${type} ${role}</div>
+            <div class="sub-meta">#${s_(a.place_id)} · ${who}</div>
+          </div>
+          ${verdict}
+        </div>
+        ${pending
+          ? `<textarea class="diff-edit ann-edit" id="ann-${a.id}" maxlength="1000"
+               oninput="document.getElementById('annc-${a.id}').textContent = this.value.length + ' / 1000'">${s_(a.text)}</textarea>
+             <div class="ann-count" id="annc-${a.id}">${a.text.length} / 1000</div>`
+          : `<div class="ann-text">${s_(a.text)}</div>`}
+        <div class="ann-chips">${chips}</div>
+        <div class="sub-actions">
+          ${pending ? `
+            <button class="btn-approve" onclick="decideAnnouncement(${a.id},'approve')">✓ Approve &amp; send</button>
+            <button class="btn-reject" onclick="decideAnnouncement(${a.id},'reject')">✕ Reject</button>
+            <button class="btn-open" onclick="saveAnnouncementText(${a.id})">💾 Save text</button>` : ''}
+          <button class="btn-open" onclick="deleteAnnouncement(${a.id})">🗑 Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function annRequest(url, method, body) {
+  const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' },
+                               body: body ? JSON.stringify(body) : undefined });
+  return r.json();
+}
+
+async function decideAnnouncement(id, action) {
+  const box = document.getElementById('ann-' + id);
+  if (action === 'reject' && !confirm('Reject this announcement? The writer is told in the bot.')) return;
+  try {
+    const d = await annRequest(`${ANN_API}/${id}/${action}`, 'POST',
+                               action === 'approve' && box ? { text: box.value } : null);
+    if (!d.success) { showToast(d.error || 'Failed', true); return; }
+    showToast(action === 'approve'
+      ? `📨 Sent to ${d.notified} ${d.notified === 1 ? 'person' : 'people'}` + (d.notifyError ? ' · ⚠️ queueing failed' : '')
+      : '✕ Rejected', !!d.notifyError);
+    loadAnnouncements();
+  } catch { showToast('Request failed', true); }
+}
+
+async function saveAnnouncementText(id) {
+  const box = document.getElementById('ann-' + id);
+  try {
+    const d = await annRequest(`${ANN_API}/${id}`, 'PUT', { text: box.value });
+    showToast(d.success ? '💾 Text saved' : (d.error || 'Failed'), !d.success);
+  } catch { showToast('Request failed', true); }
+}
+
+async function deleteAnnouncement(id) {
+  if (!confirm('Delete this announcement record? Messages already sent stay in people\'s chats.')) return;
+  try {
+    const d = await annRequest(`${ANN_API}/${id}`, 'DELETE');
+    showToast(d.success ? '🗑 Deleted' : (d.error || 'Failed'), !d.success);
+    loadAnnouncements();
+  } catch { showToast('Request failed', true); }
+}
+
+function placeOptions(filter) {
+  return allPlaces.filter(filter)
+    .sort((a, b) => String(a.Name || '').localeCompare(String(b.Name || '')))
+    .map(p => `<option value="${s_(p.Unique_number)}">${s_(p.Name)} · ${s_(p.Building_type)} · #${s_(p.Unique_number)}</option>`)
+    .join('');
+}
+
+async function openPostModal() {
+  if (!(await ensurePlaces())) return;
+  document.getElementById('post-place').innerHTML = placeOptions(() => true);
+  document.getElementById('post-text').value = '';
+  document.getElementById('post-count').textContent = '0 / 1000';
+  document.getElementById('postModal').classList.add('show');
+  updatePostReach();
+}
+
+async function updatePostReach() {
+  const out = document.getElementById('post-reach');
+  const id = document.getElementById('post-place').value;
+  out.textContent = 'Counting subscribers…';
+  try {
+    const d = await (await fetch(`/api/admin/notify/reach?place_id=${encodeURIComponent(id)}&event=changed`)).json();
+    out.textContent = d.success
+      ? (d.count ? `Will message ${d.count} ${d.count === 1 ? 'person' : 'people'} (${d.placeWatchers} watching the place, ${d.areaWatchers} by area).`
+                 : 'Nobody is subscribed here yet: this would message no one.')
+      : 'Could not count subscribers.';
+  } catch { out.textContent = 'Could not count subscribers.'; }
+}
+
+document.getElementById('post-place').addEventListener('change', updatePostReach);
+document.getElementById('post-text').addEventListener('input', e => {
+  document.getElementById('post-count').textContent = e.target.value.length + ' / 1000';
+});
+
+async function sendAdminPost() {
+  const text = document.getElementById('post-text').value.trim();
+  const place_id = document.getElementById('post-place').value;
+  if (!text) { showToast('Write the text first', true); return; }
+  const btn = document.getElementById('postBtn');
+  btn.disabled = true;
+  try {
+    const d = await annRequest(ANN_API, 'POST', { place_id, text });
+    if (!d.success) { showToast(d.error || 'Failed', true); return; }
+    closeModal('postModal');
+    showToast(`📨 Sent to ${d.notified} ${d.notified === 1 ? 'person' : 'people'}`, !!d.notifyError);
+    if (currentTab === 'announcements') loadAnnouncements();
+  } catch { showToast('Request failed', true); }
+  finally { btn.disabled = false; }
+}
+
+// ══ OWNERS ═════════════════════════════════════════
+// Restaurants and shops only. A claim carries the Telegram identity from the
+// signed Mini App data; contact the person, then approve once. Approving or
+// assigning replaces any current owner; revoking removes it.
+async function loadClaims() {
+  const list = document.getElementById('claim-list');
+  list.innerHTML = '<div class="empty-msg">Loading…</div>';
+  try {
+    const [c, o] = await Promise.all([
+      fetch('/api/admin/claims?status=pending').then(r => r.json()),
+      fetch('/api/admin/owners').then(r => r.json())]);
+    if (!c.success || !o.success) throw new Error();
+    renderOwners(c.claims, o.owners);
+  } catch {
+    list.innerHTML = '<div class="empty-msg">Could not load owners</div>';
+  }
+  loadNotifyBadges();
+}
+
+function tgLink(id, who) {
+  const m = /@([A-Za-z0-9_]{4,})/.exec(who || '');
+  const href = m ? `https://t.me/${m[1]}` : `tg://user?id=${encodeURIComponent(id)}`;
+  return `<a class="btn-open" href="${s_(href)}" target="_blank" rel="noopener noreferrer">💬 Message on Telegram</a>`;
+}
+
+function renderOwners(claims, owners) {
+  const list = document.getElementById('claim-list');
+  let h = `<div class="own-section">Ownership requests · ${claims.length}</div>`;
+  h += claims.length ? claims.map(c => `
+      <div class="sub-card is-pending">
+        <div class="sub-head">
+          <div>
+            <div class="sub-place">${c.place_name ? s_(c.place_name) : '<span class="sub-orphan">deleted place</span>'}
+              <span class="badge bg-blue">${TYPE_LABEL[c.place_type] || ''}</span></div>
+            <div class="sub-meta">#${s_(c.place_id)} · ${s_(c.username)} · ID ${s_(c.tg_id)} · ${s_(c.created_at)}</div>
+          </div>
+        </div>
+        ${c.current_owner ? `<div class="ann-warn">⚠ Approving replaces the current owner: ${s_(c.current_owner.username)} (ID ${s_(c.current_owner.tg_id)})</div>` : ''}
+        <div class="sub-actions">
+          <button class="btn-approve" onclick="decideClaim(${c.id},'approve')">✓ Approve</button>
+          <button class="btn-reject" onclick="decideClaim(${c.id},'reject')">✕ Reject</button>
+          ${tgLink(c.tg_id, c.username)}
+        </div>
+      </div>`).join('') : '<div class="empty-msg" style="padding:24px">No requests waiting</div>';
+  h += `<div class="own-section">Owners · ${owners.length}</div>`;
+  h += owners.length ? owners.map(o => `
+      <div class="own-row">
+        <div>
+          <div class="sub-place">${o.place_name ? s_(o.place_name) : '<span class="sub-orphan">deleted place</span>'}
+            <span class="badge bg-blue">${TYPE_LABEL[o.place_type] || ''}</span></div>
+          <div class="sub-meta">#${s_(o.place_id)} · ${s_(o.username || '—')} · ID ${s_(o.tg_id)} · since ${s_(o.approved_at)}</div>
+        </div>
+        <div class="sub-actions">
+          ${tgLink(o.tg_id, o.username)}
+          <button class="btn-open" onclick="openOwnerModal(${o.place_id})">↔ Reassign</button>
+          <button class="btn-reject" onclick="revokeOwner(${o.place_id})">Revoke</button>
+        </div>
+      </div>`).join('') : '<div class="empty-msg" style="padding:24px">No owners yet</div>';
+  list.innerHTML = h;
+}
+
+async function decideClaim(id, action) {
+  if (action === 'reject' && !confirm('Reject this request? The person is told in the bot.')) return;
+  try {
+    const d = await annRequest(`/api/admin/claims/${id}/${action}`, 'POST');
+    showToast(d.success ? (action === 'approve' ? '✓ Owner approved' : '✕ Request rejected') : (d.error || 'Failed'), !d.success);
+    loadClaims();
+  } catch { showToast('Request failed', true); }
+}
+
+async function revokeOwner(placeId) {
+  if (!confirm('Revoke this owner? They can no longer post for the place.')) return;
+  try {
+    const d = await annRequest(`/api/admin/owners/${placeId}`, 'DELETE');
+    showToast(d.success ? 'Owner revoked' : (d.error || 'Failed'), !d.success);
+    loadClaims();
+  } catch { showToast('Request failed', true); }
+}
+
+async function openOwnerModal(placeId) {
+  if (!(await ensurePlaces())) return;
+  const sel = document.getElementById('owner-place');
+  sel.innerHTML = placeOptions(p => p.Building_type === 'Oshxona' || p.Building_type === "Do'kon");
+  if (placeId) sel.value = String(placeId);
+  document.getElementById('ownerTitle').textContent = placeId ? '↔ Reassign owner' : '🏷️ Assign owner';
+  document.getElementById('owner-tg').value = '';
+  document.getElementById('owner-name').value = '';
+  document.getElementById('ownerModal').classList.add('show');
+}
+
+async function saveOwner() {
+  const placeId = document.getElementById('owner-place').value;
+  const tg_id = document.getElementById('owner-tg').value.trim();
+  const username = document.getElementById('owner-name').value.trim();
+  if (!/^\d+$/.test(tg_id)) { showToast('Enter the numeric Telegram ID', true); return; }
+  try {
+    const d = await annRequest(`/api/admin/owners/${placeId}`, 'PUT', { tg_id, username });
+    if (!d.success) { showToast(d.error || 'Failed', true); return; }
+    closeModal('ownerModal');
+    showToast('🏷️ Owner saved');
+    if (currentTab === 'claims') loadClaims();
+  } catch { showToast('Request failed', true); }
+}
+
+// ══ SUBSCRIBERS ════════════════════════════════════
+// Read-only. "Watching" counts only people who still accept bot messages,
+// the same number the place page shows; people who blocked the bot are listed
+// but marked.
+let watchCounts = {};
+let wView = 'places';
+let wPeopleT = null;
+
+async function loadWatchCounts() {
+  try {
+    const d = await (await fetch('/api/admin/notify/watch-counts')).json();
+    watchCounts = d.success ? d.counts : {};
+  } catch { watchCounts = {}; }
+}
+
+document.querySelectorAll('[data-wview]').forEach(btn => {
+  btn.addEventListener('click', () => setWatchView(btn.dataset.wview));
+});
+
+function setWatchView(v) {
+  wView = v;
+  document.querySelectorAll('[data-wview]').forEach(c => c.classList.toggle('on', c.dataset.wview === v));
+  document.getElementById('w-search').hidden = v !== 'people';
+  document.getElementById('w-msg-status').hidden = v !== 'messages';
+  loadWatchView();
+}
+
+function debouncedPeople() {
+  clearTimeout(wPeopleT);
+  wPeopleT = setTimeout(loadWatchView, 300);
+}
+
+function showWatchersFor(placeId) {
+  switchTab('subscribers');
+  wView = 'place:' + placeId;
+  document.querySelectorAll('[data-wview]').forEach(c => c.classList.remove('on'));
+  document.getElementById('w-search').hidden = true;
+  document.getElementById('w-msg-status').hidden = true;
+  loadWatchView();
+}
+
+async function loadSubscribersTab() {
+  loadWatchStats();
+  loadWatchView();
+}
+
+async function loadWatchStats() {
+  const el = document.getElementById('w-stats');
+  try {
+    const d = await (await fetch('/api/admin/notify/stats')).json();
+    if (!d.success) throw new Error();
+    const tile = (n, label, warn) => `<div class="w-stat${warn && n ? ' is-warn' : ''}"><b>${s_(n)}</b><span>${label}</span></div>`;
+    el.innerHTML = tile(d.subscribers.active, 'Active') + tile(d.subscribers.inactive, 'Blocked bot') +
+      tile(d.placeWatches, 'Place watches') + tile(d.areaWatches, 'Areas') +
+      tile(d.outbox.sent, 'Sent') + tile(d.outbox.queued, 'Queued') + tile(d.outbox.failed, 'Failed', true);
+  } catch { el.innerHTML = ''; }
+}
+
+async function wGet(url) {
+  const d = await (await fetch(url)).json();
+  if (!d.success) throw new Error(d.error || 'failed');
+  return d;
+}
+
+function personLine(p, extra) {
+  return `<div class="w-line">
+      <div><b>${s_(p.username || ('id' + p.tg_id))}</b>
+        ${p.active === false ? '<span class="badge bg-orange">blocked bot</span>' : ''}
+        <div class="sub-meta">ID ${s_(p.tg_id)}${p.lang ? ' · ' + s_(p.lang) : ''}${extra ? ' · ' + extra : ''}</div></div>
+      ${tgLink(p.tg_id, p.username)}
+    </div>`;
+}
+
+async function loadWatchView() {
+  const list = document.getElementById('w-list');
+  list.innerHTML = '<div class="empty-msg">Loading…</div>';
+  try {
+    if (wView.startsWith('place:')) return renderPlaceWatchers(list, wView.slice(6));
+    if (wView === 'places') {
+      const d = await wGet('/api/admin/notify/places');
+      list.innerHTML = d.places.length ? d.places.map(p => `
+        <div class="own-row w-row">
+          <div>
+            <div class="sub-place">${s_(p.name)} <span class="badge bg-blue">${TYPE_LABEL[p.type] || ''}</span></div>
+            <div class="sub-meta">#${s_(p.place_id)} · ${s_(p.city || '')}</div>
+          </div>
+          <div class="w-nums"><b>${s_(p.watchers)}</b> watching · <b>${s_(p.areaCoverage)}</b> by area</div>
+          <button class="btn-open" onclick="toggleDetail('wp-${p.place_id}', () => placeDetailHTML(${p.place_id}))">Show ▾</button>
+          <div class="w-detail" id="wp-${p.place_id}" hidden></div>
+        </div>`).join('') : '<div class="empty-msg">Nobody watches a place yet</div>';
+    } else if (wView === 'people') {
+      const q = document.getElementById('w-search').value.trim();
+      const d = await wGet('/api/admin/notify/subscribers?q=' + encodeURIComponent(q));
+      list.innerHTML = d.subscribers.length ? d.subscribers.map(u => `
+        <div class="own-row w-row">
+          <div>
+            <div class="sub-place">${s_(u.username || ('id' + u.tg_id))}
+              ${u.active ? '' : '<span class="badge bg-orange">blocked bot</span>'}</div>
+            <div class="sub-meta">ID ${s_(u.tg_id)} · ${s_(u.lang)} · joined ${s_(u.created_at)}${u.last_sent ? ' · last message ' + s_(u.last_sent) : ''}</div>
+          </div>
+          <div class="w-nums"><b>${s_(u.watches)}</b> places · <b>${s_(u.areas)}</b> areas</div>
+          <button class="btn-open" onclick="toggleDetail('wu-${u.tg_id}', () => personDetailHTML(${u.tg_id}))">Show ▾</button>
+          <div class="w-detail" id="wu-${u.tg_id}" hidden></div>
+        </div>`).join('') : '<div class="empty-msg">Nobody found</div>';
+    } else if (wView === 'areas') {
+      const d = await wGet('/api/admin/notify/areas');
+      list.innerHTML = d.areas.length ? d.areas.map(a => `
+        <div class="own-row w-row">
+          <div>
+            <div class="sub-place">${a.source === 'address' ? '📍 ' + s_(a.label) : '🎯 ' + s_(a.label || 'Location')}
+              <span class="badge bg-muted">${s_(a.radiusKm)} km</span></div>
+            <div class="sub-meta">${s_(a.username || ('id' + a.tg_id))} · ID ${s_(a.tg_id)} · ${a.types.map(t => TYPE_LABEL[t]).join(', ')} · ${s_(a.created_at)}
+              ${a.active ? '' : ' · <b>blocked bot</b>'}</div>
+          </div>
+          <div class="w-nums"><b>${s_(a.insideCount)}</b> places inside</div>
+        </div>`).join('') : '<div class="empty-msg">No areas yet</div>';
+    } else {
+      const st = document.getElementById('w-msg-status').value;
+      const d = await wGet('/api/admin/notify/messages?status=' + st);
+      list.innerHTML = d.messages.length ? `<div class="own-row w-row"><div style="flex:1">${d.messages.map(messageLine).join('')}</div></div>`
+        : '<div class="empty-msg">No messages</div>';
+    }
+  } catch {
+    list.innerHTML = '<div class="empty-msg">Could not load</div>';
+  }
+}
+
+function messageLine(m) {
+  const badge = m.status === 'sent' ? 'bg-green' : m.status === 'failed' ? 'bg-orange' : 'bg-muted';
+  return `<div class="w-line">
+      <div><span class="badge ${badge}">${s_(m.status)}</span>
+        <span class="sub-meta" style="display:inline">${s_(m.sent_at || m.created_at)} · to ${s_(m.username || ('id' + m.tg_id))} · ${s_(m.event_ref || '')}${m.attempts > 1 ? ' · tries ' + s_(m.attempts) : ''}</span></div>
+      <div class="w-preview">${s_(m.preview)}</div>
+      ${m.error ? `<div class="w-err">${s_(m.error)}</div>` : ''}
+    </div>`;
+}
+
+async function toggleDetail(id, build) {
+  const el = document.getElementById(id);
+  if (!el.hidden) { el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = '<div class="w-empty">Loading…</div>';
+  try { el.innerHTML = await build(); }
+  catch { el.innerHTML = '<div class="w-empty">Could not load</div>'; }
+}
+
+async function placeDetailHTML(placeId) {
+  const d = await wGet('/api/admin/notify/places/' + placeId);
+  // Same count as the place card: people who blocked the bot are listed, not counted.
+  const blocked = d.watchers.filter(w => w.active === false).length;
+  return `<div class="w-sub">Watching this place · ${d.watchers.length - blocked}${blocked ? ` · ${blocked} blocked the bot` : ''}</div>` +
+    (d.watchers.map(w => personLine(w, 'since ' + s_(w.since))).join('') || '<div class="w-empty">Nobody</div>') +
+    `<div class="w-sub">Their area covers it · ${d.areaWatchers.length}</div>` +
+    (d.areaWatchers.map(a => personLine(a, `${a.source === 'address' ? s_(a.label) : 'location' + (a.label ? ' ' + s_(a.label) : '')} · ${s_(a.radius_km)} km`)).join('')
+      || '<div class="w-empty">Nobody</div>');
+}
+
+async function renderPlaceWatchers(list, placeId) {
+  const d = await wGet('/api/admin/notify/places/' + placeId);
+  list.innerHTML = `
+    <button class="btn-topbar" onclick="setWatchView('places')">← All watched places</button>
+    <div class="own-row w-row">
+      <div>
+        <div class="sub-place">${s_(d.place.name)} <span class="badge bg-blue">${TYPE_LABEL[d.place.type] || ''}</span></div>
+        <div class="sub-meta">#${s_(d.place.place_id)} · ${s_(d.place.city || '')}</div>
+      </div>
+      <div class="w-detail">${await placeDetailHTML(placeId)}</div>
+    </div>`;
+}
+
+async function personDetailHTML(tgId) {
+  const d = await wGet('/api/admin/notify/subscribers/' + tgId);
+  return (d.owns.length ? `<div class="w-sub">Owner of</div>` +
+      d.owns.map(o => `<div class="w-line"><div>${s_(o.name || 'deleted place')} <span class="sub-meta" style="display:inline">#${s_(o.place_id)}</span></div></div>`).join('') : '') +
+    `<div class="w-sub">Watched places · ${d.watches.length}</div>` +
+    (d.watches.map(w => `<div class="w-line"><div>${s_(w.name || 'deleted place')} <span class="badge bg-blue">${TYPE_LABEL[w.type] || ''}</span>
+        <div class="sub-meta">#${s_(w.place_id)} · since ${s_(w.since)}</div></div></div>`).join('') || '<div class="w-empty">None</div>') +
+    `<div class="w-sub">Areas · ${d.areas.length}</div>` +
+    (d.areas.map(a => `<div class="w-line"><div>${a.source === 'address' ? s_(a.label) : 'Location' + (a.label ? ' · ' + s_(a.label) : '')}
+        <span class="badge bg-muted">${s_(a.radiusKm)} km</span>
+        <div class="sub-meta">${a.types.map(t => TYPE_LABEL[t]).join(', ')} · ${s_(a.insideCount)} places inside</div></div></div>`).join('') || '<div class="w-empty">None</div>') +
+    `<div class="w-sub">Last messages · ${d.messages.length}</div>` +
+    (d.messages.map(m => messageLine({ ...m, tg_id: d.subscriber.tg_id, username: d.subscriber.username })).join('')
+      || '<div class="w-empty">None</div>');
+}
+
+// ══ HELPERS ════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal('formModal');
+    closeModal('deleteModal');
+    closeModal('reviewModal');
+    closeModal('reviewDeleteModal');
+    closeModal('postModal');
+    closeModal('ownerModal');
+  }
+});
+
+// Auto-fill photo path when number changes
+document.getElementById('f-number').addEventListener('input', e => {
+  if (!editingId) document.getElementById('f-photo').value = `Photos/${e.target.value}`;
+});
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let toastT;
+function showToast(msg, isErr = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.className = ''; }, 2800);
+}
+
+  async function doLogout() {
+    await fetch('/admin/logout', { method: 'POST' });
+    location.href = '/admin';
+  }
+</script>
+</body>
+</html>
