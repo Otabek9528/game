@@ -2011,10 +2011,10 @@ const Notify = (function () {
   var ICON_MOON = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
   var ICON_CLOCK = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   var ICON_PLUS = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
-  var ICON_X = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  var ICON_TRASH = '<svg class="pl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
 
   var place = null;
-  var ctx = null;          // the open sheet: {mode: 'daily' | 'eid', start, draft, open}
+  var ctx = null;          // the open sheet: {mode: 'daily' | 'eid', start, draft, pick}
   var sending = false;
   var shownNext = null;    // the row marked "next" when the section was drawn
 
@@ -2197,7 +2197,7 @@ const Notify = (function () {
   function openSheet(mode) {
     // Who changed what comes from the signed Telegram data.
     if (!Notify.signedIn()) { Notify.toast(T('common.telegramOnly')); return; }
-    ctx = { mode: mode, start: current(mode), draft: current(mode), open: null };
+    ctx = { mode: mode, start: current(mode), draft: current(mode), pick: null };
     var icon = $('pdTimesIcon');
     icon.innerHTML = mode === 'daily' ? ICON_CLOCK : ICON_MOON;
     icon.className = 'pd-sheet-icon' + (mode === 'eid' ? ' pd-tt-icon--eid' : '');
@@ -2237,88 +2237,96 @@ const Notify = (function () {
     } catch (e) {}
   }
 
+  // Every prayer is a tile in a grid that never moves, and one wheel under the
+  // grid sets the picked tile. Setting times one after another, nothing
+  // shifts, and an empty tile (dashed, "—") stays in sight until it is filled.
   function renderSheet() {
     var body = $('pdTimesBody');
     var keep = body.scrollTop;
     body.textContent = '';
+    var picked = null;   // the picked tile: {fullName, value, tile, time, set, remove}
+
+    function slot(grid, key, name, fullName, value, set, remove) {
+      var isPicked = ctx.pick === key && !!value;
+      var tile = el('button', 'pd-tt-slot' + (value ? '' : ' is-empty') + (isPicked ? ' is-picked' : ''));
+      tile.type = 'button';
+      tile.setAttribute('aria-pressed', isPicked ? 'true' : 'false');
+      tile.setAttribute('aria-label', fullName + ', ' + (value || T('times.eid.none')));
+      tile.appendChild(el('span', 'pd-tt-slot-name', name));
+      var time = el('span', 'pd-tt-slot-time', value || '—');
+      tile.appendChild(time);
+      tile.addEventListener('click', function () {
+        if (isPicked) return;
+        if (!value) set(STARTS[key] || '07:00');
+        ctx.pick = key;
+        renderSheet();
+      });
+      grid.appendChild(tile);
+      if (isPicked) picked = { fullName: fullName, value: value, tile: tile, time: time, set: set, remove: remove };
+    }
+
     if (ctx.mode === 'daily') {
+      var grid = el('div', 'pd-tt-grid');
       PRAYERS.forEach(function (k) {
         var name = T('times.prayers.' + k);
-        body.appendChild(timeRow(k, name, name, ctx.draft[k], k === 'jumuah' ? 'pd-tt-row--juma' : '',
+        slot(grid, k, name, name, ctx.draft[k],
           function (v) { ctx.draft[k] = v; },
-          function () { ctx.draft[k] = null; }));
+          function () { ctx.draft[k] = null; });
       });
+      body.appendChild(grid);
     } else {
       EIDS.forEach(function (kind) {
         var list = ctx.draft[kind];
         var eidName = T('times.eid.' + kind);
         body.appendChild(el('p', 'pd-tt-group', eidName));
+        var grid = el('div', 'pd-tt-grid');
         list.forEach(function (t, i) {
           var label = T('times.sheet.session', { n: i + 1 });
-          body.appendChild(timeRow(kind + ':' + i, label, eidName + ', ' + label, t, '',
+          slot(grid, kind + ':' + i, label, eidName + ', ' + label, t,
             function (v) { list[i] = v; },
-            function () { list.splice(i, 1); }));
+            function () { list.splice(i, 1); });
         });
-        var full = list.length >= SESSIONS_MAX;
-        var add = button('pd-tt-add', ICON_PLUS, T(full ? 'times.sheet.maxSessions' : 'times.sheet.addSession'), function () {
-          var last = list.length ? list[list.length - 1] : null;
-          list.push(last ? hhmm(minutes(last) + 60) : '07:00');
-          ctx.open = kind + ':' + (list.length - 1);
-          renderSheet();
-        });
-        add.disabled = full;
-        body.appendChild(add);
+        if (list.length < SESSIONS_MAX) {
+          var add = button('pd-tt-slot pd-tt-slot--add', ICON_PLUS, T('times.add'), function () {
+            var last = list.length ? list[list.length - 1] : null;
+            list.push(last ? hhmm(minutes(last) + 60) : '07:00');
+            ctx.pick = kind + ':' + (list.length - 1);
+            renderSheet();
+          });
+          add.setAttribute('aria-label', eidName + ': ' + T('times.sheet.addSession'));
+          grid.appendChild(add);
+        }
+        body.appendChild(grid);
       });
     }
-    body.scrollTop = keep;
-    var wheelEl = body.querySelector('.pd-wheel');
-    if (wheelEl && wheelEl.scrollIntoView) wheelEl.scrollIntoView({ block: 'nearest' });
-  }
 
-  // One line of the sheet: its name, its time (tap: the wheel opens under it),
-  // and a cross that takes the time away.
-  function timeRow(key, label, fullName, value, extraClass, set, remove) {
-    var frag = document.createDocumentFragment();
-    var open = ctx.open === key && !!value;
-    var row = el('div', 'pd-tt-row' + (extraClass ? ' ' + extraClass : '') + (open ? ' is-open' : ''));
-    row.appendChild(el('span', 'pd-tt-name', label));
-
-    var chip = button('pd-tt-chip' + (value ? '' : ' is-empty'), ICON_CLOCK, null, function () {
-      if (open) {
-        ctx.open = null;
-      } else {
-        if (!value) set(STARTS[key] || '07:00');
-        ctx.open = key;
-      }
-      renderSheet();
-    });
-    var shown = document.createTextNode(value || '--:--');
-    chip.appendChild(shown);
-    chip.setAttribute('aria-expanded', open ? 'true' : 'false');
-    chip.setAttribute('aria-label', fullName + ', ' + (value || T('times.eid.none')));
-    row.appendChild(chip);
-
-    if (value) {
-      var x = button('pd-tt-clear', ICON_X, null, function () {
-        remove();
-        ctx.open = null;
+    // The wheel's place is kept from the start, so picking the first tile
+    // does not make the sheet grow and move the tiles.
+    var editor = el('div', 'pd-tt-editor' + (picked ? '' : ' is-idle'));
+    if (!picked) {
+      editor.appendChild(el('p', 'pd-tt-editor-hint', T('times.sheet.pick')));
+      // Said before anything is changed: there is no review.
+      editor.appendChild(el('p', 'pd-tt-editor-live', T('times.sheet.liveNote')));
+    } else {
+      var head = el('div', 'pd-tt-editor-head');
+      head.appendChild(el('span', 'pd-tt-editor-name', picked.fullName));
+      var trash = button('pd-tt-clear', ICON_TRASH, null, function () {
+        picked.remove();
+        ctx.pick = null;
         renderSheet();
       });
-      x.setAttribute('aria-label', T('times.sheet.remove', { name: fullName }));
-      row.appendChild(x);
-    } else {
-      row.appendChild(el('span', 'pd-tt-clear-space'));
-    }
-    frag.appendChild(row);
-
-    if (open) {
-      frag.appendChild(wheel(value, function (v) {
-        set(v);
-        shown.nodeValue = v;
-        chip.setAttribute('aria-label', fullName + ', ' + v);
+      trash.setAttribute('aria-label', T('times.sheet.remove', { name: picked.fullName }));
+      head.appendChild(trash);
+      editor.appendChild(head);
+      editor.appendChild(wheel(picked.value, function (v) {
+        picked.set(v);
+        picked.time.textContent = v;
+        picked.tile.setAttribute('aria-label', picked.fullName + ', ' + v);
       }));
     }
-    return frag;
+    body.appendChild(editor);
+    body.scrollTop = keep;
+    if (picked && editor.scrollIntoView) editor.scrollIntoView({ block: 'nearest' });
   }
 
   // Hours and minutes, each a scroll wheel. Scrolling, tapping a number and

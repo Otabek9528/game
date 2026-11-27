@@ -554,6 +554,8 @@ window.PLACES_TEXT = {
       en: "The bot can’t message you, so no news arrives. Allow messages, or open the bot and tap “Start”."
     },
     allow:     { uz: "Ruxsat berish", ru: "Разрешить", en: "Allow" },
+    // A switch: on, prayer time changes at watched mosques are messaged.
+    timesSwitch: { uz: "Masjid namoz vaqtlari o‘zgarsa", ru: "Когда меняется время намаза", en: "When prayer times change" },
     helloSent: {
       uz: "Sinov xabari yuborildi. Botni tekshiring.",
       ru: "Отправили проверочное сообщение. Загляните в бота.",
@@ -589,7 +591,8 @@ window.PLACES_TEXT = {
     whenPhone:  { uz: "Telefon o‘zgarsa", ru: "Сменился телефон", en: "Phone number changes" },
     whenName:   { uz: "Nomi o‘zgarsa", ru: "Сменилось название", en: "Name changes" },
     whenOwner:  { uz: "Joy egasi e’lon bersa", ru: "Объявление владельца", en: "The owner posts news" },
-    whenMosque: { uz: "Masjid e’lon bersa", ru: "Объявление мечети", en: "A mosque posts news" }
+    whenMosque: { uz: "Masjid e’lon bersa", ru: "Объявление мечети", en: "A mosque posts news" },
+    whenTimes:  { uz: "Masjid namoz vaqtlari o‘zgarsa", ru: "Сменилось время намаза в мечети", en: "A mosque’s prayer times change" }
   },
 
   /* -------------------------------------------------------
@@ -871,9 +874,10 @@ window.PLACES_TEXT = {
       // {n} is 1, 2 or 3.
       session:         { uz: "{n}-jamoat", ru: "{n}-й джамаат", en: "Prayer {n}" },
       addSession:      { uz: "Jamoat qo‘shish", ru: "Добавить джамаат", en: "Add a prayer" },
-      maxSessions:     { uz: "Jamoat qo‘shish · 3 tagacha", ru: "Не больше 3 джамаатов", en: "Up to 3 prayers" },
       // {name} is a prayer, e.g. "Bomdod" or "Ramazon hayiti, 2-jamoat".
       remove:          { uz: "{name}: olib tashlash", ru: "{name}: убрать", en: "Remove {name}" },
+      // Under the tiles until one is tapped.
+      pick:            { uz: "Namozni tanlang", ru: "Выберите намаз", en: "Pick a prayer" },
       hour:            { uz: "Soat", ru: "Часы", en: "Hour" },
       minute:          { uz: "Daqiqa", ru: "Минуты", en: "Minute" },
       liveNote:        { uz: "Saqlangach hamma darhol ko‘radi.", ru: "После сохранения все увидят сразу.", en: "Everyone sees it as soon as you save." },
